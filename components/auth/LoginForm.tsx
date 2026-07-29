@@ -3,10 +3,10 @@ import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { useLogin } from '@/hooks/useAuthMutations';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 
 export function LoginForm() {
-  const router = useRouter();
+
   const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -23,7 +23,7 @@ export function LoginForm() {
     e.preventDefault();
     setSuccessMessage('');
     login({ email, password }, {
-      onSuccess: (data: any) => {
+      onSuccess: (data: { accessToken?: string; refreshToken?: string }) => {
         // Lưu token vào localStorage (Giai đoạn 1)
         if (data?.accessToken) {
           localStorage.setItem('accessToken', data.accessToken);
