@@ -1,0 +1,82 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-surface text-ink font-sans antialiased;
+  }
+
+  a {
+    @apply text-accent no-underline;
+  }
+
+  a:hover {
+    @apply text-accent-dark underline;
+  }
+
+  /* Vòng focus nhìn thấy rõ — yêu cầu a11y, không được bỏ outline mà không thay thế */
+  :focus-visible {
+    @apply outline-none ring-2 ring-accent ring-offset-2 ring-offset-surface;
+  }
+}
+
+@layer components {
+  /* Khung nội dung dùng chung cho mọi trang, khớp design (max 1280px, padding 32px) */
+  .shell {
+    @apply mx-auto w-full max-w-shell px-6 md:px-8;
+  }
+
+  /* Card cơ bản + hiệu ứng nhấc lên khi hover, khớp CourseCard của design */
+  .card {
+    @apply rounded-card border border-line bg-surface-raised shadow-card;
+  }
+
+  .card-interactive {
+    @apply card cursor-pointer transition-[transform,box-shadow] duration-200
+           hover:-translate-y-1 hover:shadow-card-hover;
+  }
+
+  /* Nhãn dạng viên thuốc — dùng cho danh mục, ngôn ngữ, bộ lọc */
+  .pill {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-line
+           bg-surface-raised px-3.5 py-2 text-sm font-medium text-ink-muted
+           transition-colors hover:border-accent hover:text-accent;
+  }
+
+  .pill-active {
+    @apply border-accent bg-accent text-white hover:text-white;
+  }
+
+  /* Ô skeleton khi đang tải */
+  .skeleton {
+    background: linear-gradient(90deg, #eef0f3 25%, #f7f8fa 50%, #eef0f3 75%);
+    background-size: 400px 100%;
+    @apply animate-skeleton-shine rounded;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /*
+   * Tôn trọng thiết lập giảm chuyển động của hệ điều hành.
+   * Riêng animation báo "AI đang xử lý" vẫn giữ vì nó truyền tải trạng thái
+   * chứ không phải trang trí — nhưng làm chậm lại đáng kể.
+   */
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .animate-ai-pulse,
+  .animate-ai-spin {
+    animation-duration: 3s !important;
+    animation-iteration-count: infinite !important;
+  }
+}
