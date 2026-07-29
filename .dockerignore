@@ -1,0 +1,23 @@
+# node_modules phải cài trong container (binary khác nền tảng host)
+node_modules/
+.next/
+out/
+build/
+.turbo/
+
+.git
+.gitignore
+.env
+.env.*
+!.env.example
+
+*.md
+coverage/
+playwright-report/
+test-results/
+
+.idea/
+.vscode/
+*.log
+.DS_Store
+Thumbs.db

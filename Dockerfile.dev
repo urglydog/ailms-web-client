@@ -1,0 +1,24 @@
+# =====================================================================
+# Frontend dev image — Next.js App Router + Node 24
+#
+# Chỉ dùng cho phát triển: chạy `next dev` với hot-reload.
+# Image production (multi-stage, standalone output) sẽ làm ở Giai đoạn 10.
+# =====================================================================
+FROM node:24-alpine
+
+WORKDIR /app
+
+# libc6-compat: một số native addon của Next.js cần trên Alpine
+RUN apk add --no-cache libc6-compat curl
+
+# Cài dependency trước để cache layer — sửa code không phải npm install lại
+COPY package.json package-lock.json* ./
+RUN npm install
+
+COPY . .
+
+EXPOSE 3000
+
+# WATCHPACK_POLLING=true (đặt trong docker-compose) để hot-reload
+# hoạt động qua bind mount trên Windows/WSL2
+CMD ["npm", "run", "dev"]
