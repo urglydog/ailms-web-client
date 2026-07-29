@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+
 
 const NAV = [
   { href: '/courses', label: 'Kho khóa học' },
@@ -9,7 +9,7 @@ const NAV = [
 ];
 
 export function Header() {
-  const router = useRouter();
+
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
