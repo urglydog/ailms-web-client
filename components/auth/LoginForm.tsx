@@ -1,23 +1,39 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { useLogin } from '@/hooks/useAuthMutations';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const { mutate: login, isPending, error } = useLogin();
+
+  useEffect(() => {
+    if (searchParams.get('registered') === 'true') {
+      setSuccessMessage('Tài khoản đã được tạo thành công! Mời bạn đăng nhập.');
+    }
+  }, [searchParams]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setSuccessMessage('');
     login({ email, password }, {
-      onSuccess: () => {
-        alert('Đăng nhập thành công!');
-        // Dùng thư viện js-cookie hoặc Server Actions để lưu token. Tạm thời chuyển trang.
-        router.push('/');
+      onSuccess: (data: any) => {
+        // Lưu token vào localStorage (Giai đoạn 1)
+        if (data?.accessToken) {
+          localStorage.setItem('accessToken', data.accessToken);
+        }
+        if (data?.refreshToken) {
+          localStorage.setItem('refreshToken', data.refreshToken);
+        }
+        
+        // Cập nhật lại giao diện (reload Header) và chuyển hướng
+        window.location.href = '/'; 
       },
       onError: (err: unknown) => {
         const error = err as { response?: { data?: { detail?: string } } };
@@ -28,6 +44,7 @@ export function LoginForm() {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      {successMessage && <div className="text-green-500 text-sm text-center font-medium">{successMessage}</div>}
       {error && <div className="text-red-500 text-sm text-center">{((error as unknown) as { response?: { data?: { detail?: string } } })?.response?.data?.detail || 'Đã có lỗi xảy ra'}</div>}
       <Input 
         id="email" label="Email" type="email" required 
