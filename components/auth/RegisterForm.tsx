@@ -18,7 +18,10 @@ export function RegisterForm() {
     e.preventDefault();
     register(formData, {
       onSuccess: () => setStep('otp'),
-      onError: (err: any) => alert(err.response?.data?.detail || 'Lỗi đăng ký')
+      onError: (err: unknown) => {
+        const error = err as { response?: { data?: { detail?: string } } };
+        alert(error.response?.data?.detail || 'Lỗi đăng ký');
+      }
     });
   };
 
@@ -29,14 +32,17 @@ export function RegisterForm() {
         alert('Tạo tài khoản thành công! Mời đăng nhập.');
         router.push('/login');
       },
-      onError: (err: any) => alert(err.response?.data?.detail || 'OTP không hợp lệ')
+      onError: (err: unknown) => {
+        const error = err as { response?: { data?: { detail?: string } } };
+        alert(error.response?.data?.detail || 'OTP không hợp lệ');
+      }
     });
   };
 
   if (step === 'otp') {
     return (
       <form onSubmit={handleVerify} className="flex flex-col gap-4">
-        {verifyError && <div className="text-red-500 text-sm text-center">{(verifyError as any).response?.data?.detail || 'OTP không đúng'}</div>}
+        {verifyError && <div className="text-red-500 text-sm text-center">{((verifyError as unknown) as { response?: { data?: { detail?: string } } }).response?.data?.detail || 'OTP không đúng'}</div>}
         <p className="text-sm text-ink-muted text-center mb-4">
           Vui lòng kiểm tra email <b>{formData.email}</b> để lấy mã OTP (6 chữ số).
         </p>
@@ -54,7 +60,7 @@ export function RegisterForm() {
 
   return (
     <form onSubmit={handleRegister} className="flex flex-col gap-4">
-      {regError && <div className="text-red-500 text-sm text-center">{(regError as any).response?.data?.detail || 'Lỗi đăng ký'}</div>}
+      {regError && <div className="text-red-500 text-sm text-center">{((regError as unknown) as { response?: { data?: { detail?: string } } }).response?.data?.detail || 'Lỗi đăng ký'}</div>}
       <Input id="name" label="Họ tên" required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
       <Input id="email" label="Email" type="email" required value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
       <Input id="password" label="Mật khẩu" type="password" required value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} />
