@@ -32,12 +32,36 @@ export function LoginForm() {
           localStorage.setItem('refreshToken', data.refreshToken);
         }
         
-        // Cập nhật lại giao diện (reload Header) và chuyển hướng
-        window.location.href = '/'; 
+        let targetUrl = '/';
+        if (data?.accessToken) {
+          try {
+            const payload = data.accessToken.split('.')[1];
+            if (payload) {
+              const decoded = JSON.parse(atob(payload));
+              let roleStr = '';
+              if (typeof decoded.role === 'string') roleStr = decoded.role;
+              else if (Array.isArray(decoded.roles)) roleStr = decoded.roles[0] || '';
+              else if (typeof decoded.roles === 'string') roleStr = decoded.roles;
+              else if (Array.isArray(decoded.authorities)) roleStr = decoded.authorities.map((a: any) => a.authority || a).join(',');
+              else if (typeof decoded.authorities === 'string') roleStr = decoded.authorities;
+
+              if (roleStr.includes('ADMIN')) {
+                targetUrl = '/admin';
+              } else if (roleStr.includes('INSTRUCTOR')) {
+                targetUrl = '/instructor';
+              }
+            }
+          } catch (e) {
+            console.error('Lỗi giải mã token lúc đăng nhập:', e);
+          }
+        }
+        
+        // Cập nhật lại giao diện (reload) và chuyển hướng
+        window.location.href = targetUrl; 
       },
       onError: (err: unknown) => {
-        const error = err as { response?: { data?: { detail?: string } } };
-        alert(error.response?.data?.detail || 'Đăng nhập thất bại');
+        const error = err as { response?: { data?: { detail?: string, message?: string } } };
+        alert(error.response?.data?.message || error.response?.data?.detail || 'Đăng nhập thất bại');
       }
     });
   };
