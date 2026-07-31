@@ -3,8 +3,22 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
+interface InstructorCourse {
+  id: number;
+  title: string;
+  status: string;
+  studentsCount?: number;
+}
+
+interface InstructorDashboardData {
+  totalCourses: number;
+  totalStudents: number;
+  totalRevenue?: number;
+  recentCourses?: InstructorCourse[];
+}
+
 export default function InstructorOverviewPage() {
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<InstructorDashboardData | null>(null);
 
   useEffect(() => {
     const fetchDashboard = async () => {
@@ -77,7 +91,7 @@ export default function InstructorOverviewPage() {
             <span>Học viên</span>
             <span></span>
           </div>
-          {recentCourses.map((course: any, idx: number) => {
+          {recentCourses.map((course, idx: number) => {
             const statusBg =
               course.status === 'PUBLISHED'
                 ? 'bg-green-50 text-green-600'

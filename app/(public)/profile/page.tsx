@@ -3,9 +3,16 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
+interface UserProfile {
+  email: string;
+  fullName: string;
+  role: string;
+  createdAt: string;
+}
+
 export default function ProfilePage() {
   const router = useRouter();
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [motivation, setMotivation] = useState('');
   const [credentialUrl, setCredentialUrl] = useState('');
@@ -64,7 +71,7 @@ export default function ProfilePage() {
         const err = await res.json();
         setMessage(err.detail || 'Có lỗi xảy ra, vui lòng thử lại.');
       }
-    } catch (err) {
+    } catch {
       setMessage('Lỗi kết nối đến server.');
     }
   };

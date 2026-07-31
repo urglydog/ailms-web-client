@@ -42,7 +42,7 @@ export function LoginForm() {
               if (typeof decoded.role === 'string') roleStr = decoded.role;
               else if (Array.isArray(decoded.roles)) roleStr = decoded.roles[0] || '';
               else if (typeof decoded.roles === 'string') roleStr = decoded.roles;
-              else if (Array.isArray(decoded.authorities)) roleStr = decoded.authorities.map((a: any) => a.authority || a).join(',');
+              else if (Array.isArray(decoded.authorities)) roleStr = decoded.authorities.map((a: Record<string, unknown> | string) => (typeof a === 'string' ? a : (a as {authority?: string}).authority || '')).join(',');
               else if (typeof decoded.authorities === 'string') roleStr = decoded.authorities;
 
               if (roleStr.includes('ADMIN')) {

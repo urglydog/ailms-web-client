@@ -2,8 +2,15 @@
 
 import { useState, useEffect } from 'react';
 
+interface AdminDashboardData {
+  totalUsers: number;
+  totalCourses: number;
+  totalRevenue?: number;
+  recentUsers?: Array<{ id: number; fullName: string; role: string; createdAt: string }>;
+}
+
 export default function AdminOverviewPage() {
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<AdminDashboardData | null>(null);
 
   useEffect(() => {
     const fetchDashboard = async () => {

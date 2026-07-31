@@ -2,9 +2,25 @@
 
 import { useState, useEffect } from 'react';
 
+interface User {
+  id: number;
+  fullName: string;
+  email: string;
+  role: string;
+  isActive: boolean;
+}
+
+interface InstructorRequest {
+  id: number;
+  userId: number;
+  motivation: string;
+  credentialUrl?: string;
+  createdAt: string;
+}
+
 export default function AdminUsersPage() {
-  const [users, setUsers] = useState<any[]>([]);
-  const [requests, setRequests] = useState<any[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [requests, setRequests] = useState<InstructorRequest[]>([]);
   const [activeTab, setActiveTab] = useState<'users' | 'requests'>('users');
   const [loading, setLoading] = useState(true);
 
@@ -40,8 +56,8 @@ export default function AdminUsersPage() {
     if (!window.confirm(`Bạn có chắc muốn ${currentStatus ? 'khóa' : 'mở khóa'} người dùng này?`)) return;
     try {
       const token = localStorage.getItem('accessToken');
-      // Theo UserController, PUT /api/v1/users/{id} với payload UpdateUserReq
       const userToUpdate = users.find(u => u.id === userId);
+      if (!userToUpdate) return;
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/api/v1/users/${userId}`, {
         method: 'PUT',
         headers: { 
@@ -55,7 +71,7 @@ export default function AdminUsersPage() {
         })
       });
       if (res.ok) fetchUsers();
-    } catch (e) {
+    } catch {
       alert('Có lỗi xảy ra');
     }
   };
@@ -81,7 +97,7 @@ export default function AdminUsersPage() {
         const error = await res.json();
         alert(error.detail || 'Có lỗi xảy ra');
       }
-    } catch (e) {
+    } catch {
       alert('Lỗi kết nối');
     }
   };
