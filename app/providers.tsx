@@ -2,6 +2,7 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState } from 'react';
+import { NotificationProvider } from '@/components/providers/NotificationProvider';
 
 /**
  * React Query provider.
@@ -37,5 +38,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
       }),
   );
 
-  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+  return (
+    <QueryClientProvider client={queryClient}>
+      <NotificationProvider>
+        {children}
+      </NotificationProvider>
+    </QueryClientProvider>
+  );
 }
