@@ -7,13 +7,14 @@ interface InstructorCourse {
   id: number;
   title: string;
   status: string;
-  studentsCount?: number;
+  students?: number;
 }
 
 interface InstructorDashboardData {
   totalCourses: number;
   totalStudents: number;
-  totalRevenue?: number;
+  averageRating?: number;
+  revenue?: number;
   recentCourses?: InstructorCourse[];
 }
 

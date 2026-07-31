@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 interface AdminDashboardData {
   totalUsers: number;
   totalCourses: number;
+  pendingCourses?: number;
   totalRevenue?: number;
   recentUsers?: Array<{ id: number; fullName: string; role: string; createdAt: string }>;
 }
