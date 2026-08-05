@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import { IBM_Plex_Mono, Outfit, Plus_Jakarta_Sans } from 'next/font/google';
 import './globals.css';
 import { Providers } from './providers';
@@ -42,6 +43,13 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="vi" className={`${outfit.variable} ${jakarta.variable} ${plexMono.variable}`}>
+      <head>
+        <Script
+          src="https://accounts.google.com/gsi/client"
+          async
+          defer
+        />
+      </head>
       <body>
         <Providers>{children}</Providers>
       </body>
