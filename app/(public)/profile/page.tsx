@@ -2,12 +2,17 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import EditProfileModal from './edit-modal';
+import ChangePasswordModal from './change-password-modal';
 
 interface UserProfile {
+  id?: number;
   email: string;
   fullName: string;
   role: string;
   createdAt: string;
+  avatarUrl?: string;
+  preferredLanguage?: string;
 }
 
 export default function ProfilePage() {
@@ -18,6 +23,8 @@ export default function ProfilePage() {
   const [credentialUrl, setCredentialUrl] = useState('');
   const [requestStatus, setRequestStatus] = useState<string | null>(null);
   const [message, setMessage] = useState('');
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
 
   useEffect(() => {
     const fetchUserAndRequest = async () => {
@@ -88,7 +95,11 @@ export default function ProfilePage() {
         <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
           <div className="mb-6 flex items-center gap-4">
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-cyan-100 font-display text-2xl font-bold text-cyan-700">
-              {user.fullName?.charAt(0).toUpperCase()}
+              {user.avatarUrl ? (
+                <img src={user.avatarUrl} alt={user.fullName} className="h-16 w-16 rounded-full object-cover" />
+              ) : (
+                user.fullName?.charAt(0).toUpperCase()
+              )}
             </div>
             <div>
               <h2 className="font-display text-xl font-bold text-gray-900">{user.fullName}</h2>
@@ -104,11 +115,32 @@ export default function ProfilePage() {
               <div className="mt-1 font-medium text-gray-900">{user.email}</div>
             </div>
             <div>
+              <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Ngôn ngữ ưa thích</label>
+              <div className="mt-1 font-medium text-gray-900">
+                {user.preferredLanguage === 'en' ? 'English' : user.preferredLanguage === 'ja' ? '日本語' : 'Tiếng Việt'}
+              </div>
+            </div>
+            <div>
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Ngày tham gia</label>
               <div className="mt-1 font-medium text-gray-900">
                 {new Date(user.createdAt).toLocaleDateString('vi-VN')}
               </div>
             </div>
+          </div>
+
+          <div className="mt-6 flex gap-2">
+            <button
+              onClick={() => setShowEditModal(true)}
+              className="flex-1 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition-colors"
+            >
+              Chỉnh sửa hồ sơ
+            </button>
+            <button
+              onClick={() => setShowPasswordModal(true)}
+              className="flex-1 rounded-lg bg-gray-600 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-700 transition-colors"
+            >
+              Đổi mật khẩu
+            </button>
           </div>
         </div>
 
@@ -169,6 +201,24 @@ export default function ProfilePage() {
           </div>
         )}
       </div>
+
+      {showEditModal && user && (
+        <EditProfileModal
+          user={user}
+          onClose={() => setShowEditModal(false)}
+          onSuccess={(updatedUser) => {
+            setUser(updatedUser);
+            setShowEditModal(false);
+          }}
+        />
+      )}
+
+      {showPasswordModal && (
+        <ChangePasswordModal
+          onClose={() => setShowPasswordModal(false)}
+          onSuccess={() => setShowPasswordModal(false)}
+        />
+      )}
     </div>
   );
 }
