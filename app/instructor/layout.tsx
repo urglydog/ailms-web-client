@@ -1,12 +1,27 @@
+'use client';
+
 import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 import { LogoutSidebarButton } from '@/components/auth/LogoutSidebarButton';
+import { getCurrentRole } from '@/lib/auth/token';
 
 export default function InstructorLayout({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
+  const pathname = usePathname();
+
+  useEffect(() => {
+    const role = getCurrentRole();
+    if (role !== 'INSTRUCTOR') {
+      router.replace(role ? '/' : '/login');
+    }
+  }, [router]);
+
   const sidebarItems = [
-    { id: 'overview', label: 'Tổng quan', href: '/instructor', active: true },
-    { id: 'courseslist', label: 'Khóa học của tôi', href: '/instructor/courses', active: false },
-    { id: 'revenue', label: 'Thống kê doanh thu', href: '/instructor/revenue', active: false },
-    { id: 'students', label: 'Học viên', href: '/instructor/students', active: false },
+    { id: 'overview', label: 'Tổng quan', href: '/instructor' },
+    { id: 'courseslist', label: 'Khóa học của tôi', href: '/instructor/courses' },
+    { id: 'revenue', label: 'Thống kê doanh thu', href: '/instructor/revenue' },
+    { id: 'students', label: 'Học viên', href: '/instructor/students' },
   ];
 
   return (
@@ -24,17 +39,20 @@ export default function InstructorLayout({ children }: { children: React.ReactNo
         </div>
         
         <nav className="flex flex-col gap-1">
-          {sidebarItems.map((item) => (
-            <Link
-              key={item.id}
-              href={item.href}
-              className={`block rounded-lg px-3.5 py-2.5 text-[13.5px] font-semibold no-underline ${
-                item.active ? 'bg-cyan-400/15 text-cyan-300' : 'text-slate-300 hover:bg-slate-800'
-              }`}
-            >
-              {item.label}
-            </Link>
-          ))}
+          {sidebarItems.map((item) => {
+            const isActive = pathname === item.href || (item.href !== '/instructor' && pathname.startsWith(item.href));
+            return (
+              <Link
+                key={item.id}
+                href={item.href}
+                className={`block rounded-lg px-3.5 py-2.5 text-[13.5px] font-semibold no-underline ${
+                  isActive ? 'bg-cyan-400/15 text-cyan-300' : 'text-slate-300 hover:bg-slate-800'
+                }`}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
         </nav>
         
         <Link href="/" className="px-2 text-xs text-slate-400 no-underline hover:text-slate-300">

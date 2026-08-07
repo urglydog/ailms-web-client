@@ -1,48 +1,31 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { useQuery } from '@tanstack/react-query';
+import { api } from '@/lib/api/client';
+import { getAccessToken } from '@/lib/auth/token';
+import { useModerationQueue } from '@/hooks/useCourses';
 
 interface AdminDashboardData {
   totalUsers: number;
   totalCourses: number;
-  pendingCourses?: number;
-  totalRevenue?: number;
-  recentUsers?: Array<{ id: number; fullName: string; role: string; createdAt: string }>;
+  pendingCourses: number;
+  totalRevenue: number;
 }
 
 export default function AdminOverviewPage() {
-  const [data, setData] = useState<AdminDashboardData | null>(null);
+  const { data } = useQuery({
+    queryKey: ['dashboard', 'admin'],
+    queryFn: () => api.get<AdminDashboardData>('/api/v1/dashboard/admin', { token: getAccessToken() ?? undefined }),
+    enabled: !!getAccessToken(),
+  });
+  const { data: pendingPage } = useModerationQueue({ status: 'PENDING', size: 3 });
 
-  useEffect(() => {
-    const fetchDashboard = async () => {
-      try {
-        const token = localStorage.getItem('accessToken');
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/api/v1/dashboard/admin`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        if (res.ok) {
-          const json = await res.json();
-          setData(json);
-        }
-      } catch (e) {
-        console.error('Error fetching admin dashboard', e);
-      }
-    };
-    fetchDashboard();
-  }, []);
-
-  const totalCourses = data?.totalCourses ?? 125;
-  const pendingCoursesCount = data?.pendingCourses ?? 12;
-  const totalUsers = data?.totalUsers ?? 4521;
-  const totalRevenue = data?.totalRevenue ?? 145200000;
-
-  const pendingCourses = [
-    { id: 1, title: 'Python for Beginners 2026', instructor: 'Dr. Angela Yu' },
-    { id: 2, title: 'Advanced Next.js Architecture', instructor: 'Lee Robinson' },
-    { id: 3, title: 'Machine Learning A-Z', instructor: 'Kirill Eremenko' },
-  ];
+  const totalCourses = data?.totalCourses ?? 0;
+  const pendingCoursesCount = data?.pendingCourses ?? 0;
+  const totalUsers = data?.totalUsers ?? 0;
+  const totalRevenue = data?.totalRevenue ?? 0;
+  const pendingCourses = pendingPage?.content ?? [];
 
   return (
     <>
@@ -70,16 +53,25 @@ export default function AdminOverviewPage() {
       <div className="flex flex-col gap-2.5">
         <span className="font-display text-[15px] font-bold text-gray-900">Khóa học chờ duyệt gần đây</span>
         <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+          {pendingCourses.length === 0 && (
+            <div className="p-6 text-center text-sm text-gray-500">Không có khóa học nào đang chờ duyệt.</div>
+          )}
           {pendingCourses.map((course, idx) => (
             <div key={course.id} className={`flex items-center gap-3 px-4 py-3 ${idx < pendingCourses.length - 1 ? 'border-b border-gray-100' : ''}`}>
-              <div className="h-7 w-10 shrink-0 rounded-md bg-[repeating-linear-gradient(135deg,#0E7490,#0E7490_8px,#0891B2_8px,#0891B2_16px)]"></div>
+              <div
+                className="h-7 w-10 shrink-0 rounded-md bg-cover bg-center bg-[repeating-linear-gradient(135deg,#0E7490,#0E7490_8px,#0891B2_8px,#0891B2_16px)]"
+                style={course.thumbnailUrl ? { backgroundImage: `url(${course.thumbnailUrl})` } : undefined}
+              ></div>
               <span className="flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-[13px] font-semibold text-gray-900">
                 {course.title}
               </span>
-              <span className="text-[12.5px] text-gray-400">{course.instructor}</span>
-              <span className="cursor-pointer whitespace-nowrap text-[12px] font-bold text-cyan-600 hover:text-cyan-700">
+              <span className="text-[12.5px] text-gray-400">{course.categoryName}</span>
+              <Link
+                href={`/admin/moderation/${course.id}`}
+                className="cursor-pointer whitespace-nowrap text-[12px] font-bold text-cyan-600 no-underline hover:text-cyan-700"
+              >
                 Xem trước
-              </span>
+              </Link>
             </div>
           ))}
         </div>
