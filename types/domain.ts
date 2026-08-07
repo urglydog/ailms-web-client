@@ -182,3 +182,109 @@ export interface Page<T> {
   first: boolean;
   last: boolean;
 }
+
+// ── F2.1: Tạo & kiểm duyệt khóa học (Instructor + Admin) ─────────
+// Type độc lập với CourseSummary/CourseDetail phía trên — 2 nhóm type đó phục vụ
+// trang duyệt công khai (F2.2), có field khác hẳn (langs, coverColorA/B, reviewCount).
+
+export interface CreateCourseInput {
+  title: string;
+  description?: string;
+  categoryId: number;
+  level?: CourseLevel;
+  price: number;
+}
+
+export interface UpdateCourseInput {
+  title: string;
+  description?: string;
+  thumbnailUrl?: string;
+  categoryId: number;
+  level?: CourseLevel;
+  price: number;
+}
+
+export interface RejectCourseInput {
+  reason: string;
+}
+
+export interface InstructorCourseSummary {
+  id: number;
+  title: string;
+  slug: string;
+  status: CourseStatus;
+  thumbnailUrl: string | null;
+  categoryName: string;
+  price: number;
+  isFree: boolean;
+  avgRating: number;
+  totalLessons: number;
+  createdAt: string;
+}
+
+export interface LessonEditItem {
+  id: number;
+  title: string;
+  displayOrder: number;
+  isPreview: boolean;
+  status: LessonStatus;
+  videoSource: 'UPLOAD' | 'YOUTUBE' | null;
+  videoUrl: string | null;
+}
+
+export interface ChapterEditItem {
+  id: number;
+  title: string;
+  displayOrder: number;
+  lessons: LessonEditItem[];
+}
+
+export interface CourseEditDetail {
+  id: number;
+  title: string;
+  slug: string;
+  description: string | null;
+  thumbnailUrl: string | null;
+  level: CourseLevel;
+  price: number;
+  isFree: boolean;
+  status: CourseStatus;
+  rejectReason: string | null;
+  resubmitCount: number;
+  categoryId: number;
+  categoryName: string;
+  instructorId: number;
+  instructorName: string;
+  chapters: ChapterEditItem[];
+  missingConditions: string[];
+  canSubmit: boolean;
+}
+
+export interface CreateChapterInput {
+  title: string;
+}
+
+export interface UpdateChapterInput {
+  title: string;
+}
+
+export interface CreateLessonInput {
+  title: string;
+}
+
+export interface UpdateLessonInput {
+  title: string;
+  isPreview: boolean;
+}
+
+export interface ReorderInput {
+  orderedIds: number[];
+}
+
+export interface CreateCategoryInput {
+  name: string;
+}
+
+export interface UpdateCategoryInput {
+  name: string;
+}

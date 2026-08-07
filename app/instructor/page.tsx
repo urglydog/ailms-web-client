@@ -1,55 +1,33 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
-
-interface InstructorCourse {
-  id: number;
-  title: string;
-  status: string;
-  students?: number;
-}
+import { useQuery } from '@tanstack/react-query';
+import { CourseStatusBadge } from '@/components/course/CourseStatusBadge';
+import { useMyCourses } from '@/hooks/useCourses';
+import { api } from '@/lib/api/client';
+import { getAccessToken } from '@/lib/auth/token';
 
 interface InstructorDashboardData {
   totalCourses: number;
   totalStudents: number;
-  averageRating?: number;
-  revenue?: number;
-  recentCourses?: InstructorCourse[];
+  averageRating: number;
+  revenue: number;
 }
 
 export default function InstructorOverviewPage() {
-  const [data, setData] = useState<InstructorDashboardData | null>(null);
+  const { data } = useQuery({
+    queryKey: ['dashboard', 'instructor'],
+    queryFn: () =>
+      api.get<InstructorDashboardData>('/api/v1/dashboard/instructor', { token: getAccessToken() ?? undefined }),
+    enabled: !!getAccessToken(),
+  });
+  const { data: recentPage } = useMyCourses({ size: 5 });
 
-  useEffect(() => {
-    const fetchDashboard = async () => {
-      try {
-        const token = localStorage.getItem('accessToken');
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/api/v1/dashboard/instructor`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        if (res.ok) {
-          const json = await res.json();
-          setData(json);
-        }
-      } catch (e) {
-        console.error('Error fetching instructor dashboard', e);
-      }
-    };
-    fetchDashboard();
-  }, []);
-
-  const totalCourses = data?.totalCourses ?? 8;
-  const totalStudents = data?.totalStudents ?? 12450;
-  const averageRating = data?.averageRating ?? 4.8;
-  const revenue = data?.revenue ?? 15400000;
-  const recentCourses = data?.recentCourses ?? [
-    { id: 1, title: 'React Masterclass', status: 'PUBLISHED', students: 1250 },
-    { id: 2, title: 'Advanced CSS Layouts', status: 'PENDING', students: 0 },
-    { id: 3, title: 'JavaScript for Beginners', status: 'DRAFT', students: 0 },
-  ];
+  const totalCourses = data?.totalCourses ?? 0;
+  const totalStudents = data?.totalStudents ?? 0;
+  const averageRating = data?.averageRating ?? 0;
+  const revenue = data?.revenue ?? 0;
+  const recentCourses = recentPage?.content ?? [];
 
   return (
     <>
@@ -89,39 +67,40 @@ export default function InstructorOverviewPage() {
             <span></span>
             <span>Tên khóa học</span>
             <span>Trạng thái</span>
-            <span>Học viên</span>
+            <span>Giá</span>
             <span></span>
           </div>
-          {recentCourses.map((course, idx: number) => {
-            const statusBg =
-              course.status === 'PUBLISHED'
-                ? 'bg-green-50 text-green-600'
-                : course.status === 'PENDING'
-                ? 'bg-amber-50 text-amber-700'
-                : 'bg-gray-100 text-gray-500';
-
-            return (
+          {recentCourses.length === 0 && (
+            <div className="p-6 text-center text-sm text-gray-500">Chưa có khóa học nào.</div>
+          )}
+          {recentCourses.map((course, idx: number) => (
+            <div
+              key={course.id}
+              className={`grid grid-cols-[52px_1.6fr_110px_90px_140px] items-center gap-3 px-4 py-2.5 ${
+                idx < recentCourses.length - 1 ? 'border-b border-gray-100' : ''
+              }`}
+            >
               <div
-                key={course.id}
-                className={`grid grid-cols-[52px_1.6fr_110px_90px_140px] items-center gap-3 px-4 py-2.5 ${
-                  idx < recentCourses.length - 1 ? 'border-b border-gray-100' : ''
-                }`}
-              >
-                <div className="h-7 w-10 shrink-0 rounded-md bg-[repeating-linear-gradient(135deg,#0E7490,#0E7490_8px,#0891B2_8px,#0891B2_16px)]"></div>
-                <span className="overflow-hidden text-ellipsis whitespace-nowrap text-[13px] font-semibold text-gray-900">
-                  {course.title}
-                </span>
-                <span className={`w-fit rounded-full px-2.5 py-1 text-[10.5px] font-bold ${statusBg}`}>
-                  {course.status}
-                </span>
-                <span className="text-[13px] text-gray-500">{course.students}</span>
-                <div className="flex gap-2">
-                  <span className="cursor-pointer text-[12px] font-bold text-gray-500 hover:text-gray-700">Xem</span>
-                  <span className="cursor-pointer text-[12px] font-bold text-cyan-600 hover:text-cyan-700">Sửa</span>
-                </div>
+                className="h-7 w-10 shrink-0 rounded-md bg-cover bg-center bg-[repeating-linear-gradient(135deg,#0E7490,#0E7490_8px,#0891B2_8px,#0891B2_16px)]"
+                style={course.thumbnailUrl ? { backgroundImage: `url(${course.thumbnailUrl})` } : undefined}
+              ></div>
+              <span className="overflow-hidden text-ellipsis whitespace-nowrap text-[13px] font-semibold text-gray-900">
+                {course.title}
+              </span>
+              <CourseStatusBadge status={course.status} />
+              <span className="text-[13px] text-gray-500">
+                {course.isFree ? 'Miễn phí' : `${course.price.toLocaleString('vi-VN')}đ`}
+              </span>
+              <div className="flex gap-2">
+                <Link
+                  href={`/instructor/courses/${course.id}/edit`}
+                  className="cursor-pointer text-[12px] font-bold text-cyan-600 no-underline hover:text-cyan-700"
+                >
+                  Sửa
+                </Link>
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
       </div>
     </>
