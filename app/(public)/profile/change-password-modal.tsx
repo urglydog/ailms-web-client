@@ -53,8 +53,8 @@ export default function ChangePasswordModal({ onClose, onSuccess }: ChangePasswo
 
       setSuccess('Đổi mật khẩu thành công!');
       setTimeout(() => onSuccess(), 1500);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Có lỗi xảy ra');
     } finally {
       setLoading(false);
     }

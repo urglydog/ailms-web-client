@@ -1,4 +1,8 @@
-export async function handleGoogleSuccess(credentialResponse: any) {
+interface GoogleCredentialResponse {
+  credential?: string;
+}
+
+export async function handleGoogleSuccess(credentialResponse: GoogleCredentialResponse) {
   const idToken = credentialResponse.credential;
 
   try {
@@ -26,13 +30,17 @@ export async function handleGoogleSuccess(credentialResponse: any) {
     try {
       const payload = data.accessToken.split('.')[1];
       if (payload) {
-        const decoded = JSON.parse(atob(payload));
+        const decoded: unknown = JSON.parse(atob(payload));
+        const decodedPayload =
+          typeof decoded === 'object' && decoded !== null
+            ? (decoded as Record<string, unknown>)
+            : {};
         let roleStr = '';
-        if (typeof decoded.role === 'string') roleStr = decoded.role;
-        else if (Array.isArray(decoded.roles)) roleStr = decoded.roles[0] || '';
-        else if (typeof decoded.roles === 'string') roleStr = decoded.roles;
-        else if (Array.isArray(decoded.authorities)) roleStr = decoded.authorities.map((a: Record<string, unknown> | string) => (typeof a === 'string' ? a : (a as {authority?: string}).authority || '')).join(',');
-        else if (typeof decoded.authorities === 'string') roleStr = decoded.authorities;
+        if (typeof decodedPayload.role === 'string') roleStr = decodedPayload.role;
+        else if (Array.isArray(decodedPayload.roles)) roleStr = String(decodedPayload.roles[0] || '');
+        else if (typeof decodedPayload.roles === 'string') roleStr = decodedPayload.roles;
+        else if (Array.isArray(decodedPayload.authorities)) roleStr = decodedPayload.authorities.map((a: Record<string, unknown> | string) => (typeof a === 'string' ? a : (a as {authority?: string}).authority || '')).join(',');
+        else if (typeof decodedPayload.authorities === 'string') roleStr = decodedPayload.authorities;
 
         if (roleStr.includes('ADMIN')) {
           targetUrl = '/admin';
@@ -45,7 +53,7 @@ export async function handleGoogleSuccess(credentialResponse: any) {
     }
 
     window.location.href = targetUrl;
-  } catch (error: any) {
-    alert('Lỗi đăng nhập: ' + error.message);
+  } catch (error: unknown) {
+    alert('Lỗi đăng nhập: ' + (error instanceof Error ? error.message : 'Có lỗi xảy ra'));
   }
 }

@@ -44,9 +44,9 @@ export default function NotificationsPage() {
 
         const data = await res.json();
         setNotifications(data);
-      } catch (e: any) {
+      } catch (e: unknown) {
         console.error(e);
-        setError(e.message);
+        setError(e instanceof Error ? e.message : 'Không thể tải thông báo');
       } finally {
         setLoading(false);
       }
@@ -64,20 +64,6 @@ export default function NotificationsPage() {
       hour: '2-digit',
       minute: '2-digit'
     });
-  };
-
-  const getNotificationColor = (type: string) => {
-    switch (type) {
-      case 'SUCCESS':
-        return 'bg-green-50 border-green-200';
-      case 'WARNING':
-        return 'bg-yellow-50 border-yellow-200';
-      case 'ERROR':
-        return 'bg-red-50 border-red-200';
-      case 'INFO':
-      default:
-        return 'bg-blue-50 border-blue-200';
-    }
   };
 
   const getTypeLabel = (type: string) => {

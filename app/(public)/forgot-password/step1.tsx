@@ -34,8 +34,8 @@ export default function Step1ForgotPassword({ onSuccess }: Step1Props) {
       }
 
       onSuccess(email);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Có lỗi xảy ra');
     } finally {
       setLoading(false);
     }

@@ -51,8 +51,8 @@ export default function EditProfileModal({ user, onClose, onSuccess }: EditProfi
 
       const updatedUser = await res.json();
       onSuccess(updatedUser);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Có lỗi xảy ra');
     } finally {
       setLoading(false);
     }

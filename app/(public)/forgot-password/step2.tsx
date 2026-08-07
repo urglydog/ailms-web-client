@@ -50,8 +50,8 @@ export default function Step2ResetPassword({ email, onSuccess }: Step2Props) {
         localStorage.setItem('refreshToken', data.refreshToken);
       }
       onSuccess();
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Có lỗi xảy ra');
     } finally {
       setLoading(false);
     }
