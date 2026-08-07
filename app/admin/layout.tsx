@@ -1,16 +1,47 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { LogoutSidebarButton } from '@/components/auth/LogoutSidebarButton';
+import { useModerationQueue } from '@/hooks/useCourses';
+import { api } from '@/lib/api/client';
+import { getAccessToken, getCurrentRole } from '@/lib/auth/token';
+
+interface InstructorRequestSummary {
+  id: number;
+}
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
+
+  useEffect(() => {
+    const role = getCurrentRole();
+    if (role !== 'ADMIN') {
+      router.replace(role ? '/' : '/login');
+    }
+  }, [router]);
+
+  // size:1 vì chỉ cần totalElements để hiện badge, không cần nội dung trang.
+  const { data: pendingCoursesPage } = useModerationQueue({ status: 'PENDING', size: 1 });
+  const { data: pendingRequests } = useQuery({
+    queryKey: ['instructor-requests', 'PENDING'],
+    queryFn: () =>
+      api.get<InstructorRequestSummary[]>('/api/v1/instructor-requests?status=PENDING', {
+        token: getAccessToken() ?? undefined,
+      }),
+    enabled: !!getAccessToken(),
+  });
+
+  const pendingCoursesCount = pendingCoursesPage?.totalElements ?? 0;
+  const pendingRequestsCount = pendingRequests?.length ?? 0;
 
   const sidebarItems = [
     { id: 'overview', label: 'Tổng quan', href: '/admin', badge: 0 },
-    { id: 'moderation', label: 'Kiểm duyệt khóa học', href: '/admin/moderation', badge: 2 },
-    { id: 'users', label: 'Quản lý người dùng', href: '/admin/users', badge: 1 },
+    { id: 'moderation', label: 'Kiểm duyệt khóa học', href: '/admin/moderation', badge: pendingCoursesCount },
+    { id: 'users', label: 'Quản lý người dùng', href: '/admin/users', badge: pendingRequestsCount },
     { id: 'aiqueue', label: 'Giám sát AI Queue', href: '/admin/ai-queue', badge: 0 },
     { id: 'transactions', label: 'Đối soát giao dịch', href: '/admin/transactions', badge: 0 },
     { id: 'categories', label: 'Danh mục', href: '/admin/categories', badge: 0 },

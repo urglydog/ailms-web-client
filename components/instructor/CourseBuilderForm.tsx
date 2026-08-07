@@ -1,0 +1,238 @@
+'use client';
+
+import { useEffect, useRef, useState, type ChangeEvent, type FormEvent, type ReactNode } from 'react';
+import { ChapterEditorList } from '@/components/instructor/ChapterEditorList';
+import { SubmitChecklist } from '@/components/instructor/SubmitChecklist';
+import { CourseStatusBadge } from '@/components/course/CourseStatusBadge';
+import { useCategories } from '@/hooks/useCategories';
+import { useMyCourseDetail, useSubmitCourse, useUpdateCourse } from '@/hooks/useCourses';
+import { ApiError } from '@/lib/api/client';
+import type { CourseLevel } from '@/types/domain';
+
+const LEVEL_OPTIONS: Array<{ value: CourseLevel; label: string }> = [
+  { value: 'BEGINNER', label: 'Cơ bản' },
+  { value: 'INTERMEDIATE', label: 'Trung cấp' },
+  { value: 'ADVANCED', label: 'Nâng cao' },
+];
+
+interface CourseBuilderFormProps {
+  courseId: number;
+}
+
+export function CourseBuilderForm({ courseId }: CourseBuilderFormProps) {
+  const { data: categories } = useCategories();
+  const { data: course, isLoading } = useMyCourseDetail(courseId);
+
+  const updateCourse = useUpdateCourse(courseId);
+  const submitCourse = useSubmitCourse(courseId);
+
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [thumbnailUrl, setThumbnailUrl] = useState('');
+  const [categoryId, setCategoryId] = useState<number | ''>('');
+  const [level, setLevel] = useState<CourseLevel>('BEGINNER');
+  const [price, setPrice] = useState('0');
+
+  /**
+   * Chỉ đồng bộ state form từ server ĐÚNG 1 LẦN khi dữ liệu vừa tải xong.
+   * Không lặp lại ở mỗi lần refetch (vd. sau khi thêm/sửa/xoá chương-bài học —
+   * các thao tác đó tự lưu ngay và invalidate query), nếu không sẽ ghi đè mất
+   * nội dung form đang gõ dở mà chưa bấm "Lưu thay đổi" (bug ảnh bìa hay mất).
+   */
+  const initializedRef = useRef(false);
+  useEffect(() => {
+    if (course && !initializedRef.current) {
+      setTitle(course.title);
+      setDescription(course.description ?? '');
+      setThumbnailUrl(course.thumbnailUrl ?? '');
+      setCategoryId(course.categoryId);
+      setLevel(course.level);
+      setPrice(String(course.price));
+      initializedRef.current = true;
+    }
+  }, [course]);
+
+  /** Hiện dấu phân cách hàng nghìn khi gõ, nhưng state `price` vẫn chỉ giữ chuỗi số thuần. */
+  const handlePriceChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const digitsOnly = e.target.value.replace(/\D/g, '');
+    setPrice(digitsOnly || '0');
+  };
+  const priceDisplay = Number(price).toLocaleString('vi-VN');
+
+  const handleSave = (e: FormEvent) => {
+    e.preventDefault();
+    if (!categoryId) return;
+    updateCourse.mutate({
+      title: title.trim(),
+      description: description.trim() || undefined,
+      thumbnailUrl: thumbnailUrl.trim() || undefined,
+      categoryId: Number(categoryId),
+      level,
+      price: Number(price) || 0,
+    });
+  };
+
+  if (isLoading || !course) {
+    return <div className="p-10 text-center text-sm text-gray-500">Đang tải khóa học...</div>;
+  }
+
+  const errors = [updateCourse.error, submitCourse.error].filter(
+    (e): e is ApiError => e instanceof ApiError,
+  );
+
+  return (
+    <div className="flex flex-col gap-5">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <h1 className="m-0 font-display text-[22px] font-bold text-gray-900">Chỉnh sửa khóa học</h1>
+          <CourseStatusBadge status={course.status} />
+        </div>
+        {(course.status === 'DRAFT' || course.status === 'REJECTED') && (
+          <button
+            type="button"
+            disabled={!course.canSubmit || submitCourse.isPending}
+            onClick={() => submitCourse.mutate()}
+            title={course.canSubmit ? undefined : course.missingConditions.join('; ')}
+            className="rounded-full bg-cyan-600 px-5 py-[11px] text-[13.5px] font-bold text-white hover:bg-cyan-700 disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            {course.status === 'REJECTED' ? 'Gửi duyệt lại' : 'Gửi duyệt'}
+          </button>
+        )}
+      </div>
+
+      {course.status === 'REJECTED' && course.rejectReason && (
+        <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-[13px] text-red-700">
+          <span className="font-bold">Lý do bị từ chối: </span>
+          {course.rejectReason}
+          {course.resubmitCount > 0 && (
+            <span className="ml-2 text-red-500">(đã gửi lại {course.resubmitCount}/5 lần)</span>
+          )}
+        </div>
+      )}
+
+      {course.status === 'PUBLISHED' && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-[13px] text-amber-800">
+          Khóa học đã xuất bản — sửa tiêu đề/mô tả/giá/chương/bài học được áp dụng{' '}
+          <span className="font-bold">ngay lập tức, không cần Admin duyệt lại</span>. Khi nạp video ở
+          Giai đoạn 4, thêm hoặc thay video của một bài học mới cần Admin duyệt lại riêng bài đó.
+        </div>
+      )}
+
+      {errors.length > 0 && (
+        <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-[13px] text-red-700">
+          {errors.map((e) => e.message).join(' · ')}
+        </div>
+      )}
+
+      <div className="grid grid-cols-[1fr_320px] gap-5">
+        <form
+          id="course-metadata-form"
+          onSubmit={handleSave}
+          className="flex flex-col gap-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm"
+        >
+          <Field label="Tiêu đề khóa học">
+            <input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-cyan-400 focus:outline-none"
+            />
+          </Field>
+          <Field label="Mô tả">
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={4}
+              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-cyan-400 focus:outline-none"
+            />
+          </Field>
+          <Field label="Ảnh bìa (URL — tải ảnh trực tiếp sẽ có ở Giai đoạn 4)">
+            <input
+              value={thumbnailUrl}
+              onChange={(e) => setThumbnailUrl(e.target.value)}
+              placeholder="https://..."
+              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-cyan-400 focus:outline-none"
+            />
+            {thumbnailUrl && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={thumbnailUrl}
+                alt="Xem trước ảnh bìa"
+                className="mt-2 h-28 w-full rounded-lg object-cover"
+              />
+            )}
+          </Field>
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Danh mục">
+              <select
+                value={categoryId}
+                onChange={(e) => setCategoryId(e.target.value ? Number(e.target.value) : '')}
+                required
+                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-cyan-400 focus:outline-none"
+              >
+                <option value="">-- Chọn danh mục --</option>
+                {categories?.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </Field>
+            <Field label="Trình độ">
+              <select
+                value={level}
+                onChange={(e) => setLevel(e.target.value as CourseLevel)}
+                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-cyan-400 focus:outline-none"
+              >
+                {LEVEL_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </Field>
+          </div>
+          <Field label="Giá (đ, để 0 nếu miễn phí)">
+            <input
+              type="text"
+              inputMode="numeric"
+              value={priceDisplay}
+              onChange={handlePriceChange}
+              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-cyan-400 focus:outline-none"
+            />
+          </Field>
+
+        </form>
+
+        <div className="flex flex-col gap-4">
+          <SubmitChecklist missingConditions={course.missingConditions} canSubmit={course.canSubmit} />
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <h2 className="m-0 font-display text-[16px] font-bold text-gray-900">Chương &amp; bài học</h2>
+        <ChapterEditorList courseId={course.id} chapters={course.chapters} />
+      </div>
+
+      {/* `form="course-metadata-form"` submit nút này vào form phía trên dù nằm ngoài DOM của nó —
+          đặt ở cuối trang để nhìn tự nhiên hơn, sau khi đã xem/sửa xong cả chương & bài học. */}
+      <button
+        type="submit"
+        form="course-metadata-form"
+        disabled={updateCourse.isPending}
+        className="self-start rounded-full bg-gray-900 px-6 py-3 text-[13.5px] font-bold text-white hover:bg-gray-700 disabled:opacity-50"
+      >
+        {updateCourse.isPending ? 'Đang lưu...' : 'Lưu thay đổi'}
+      </button>
+    </div>
+  );
+}
+
+function Field({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <label className="flex flex-col gap-1.5">
+      <span className="text-[12.5px] font-semibold text-gray-600">{label}</span>
+      {children}
+    </label>
+  );
+}
