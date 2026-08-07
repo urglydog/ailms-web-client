@@ -1,26 +1,60 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
 import { CourseCard } from '@/components/course/CourseCard';
 import { CourseFilters } from '@/components/course/CourseFilters';
-import {
-  EMPTY_FILTERS,
-  filterCourses,
-  MOCK_COURSES,
-  type CourseFilterState,
-} from '@/lib/mock/courses';
+import { useCategories } from '@/hooks/useCategories';
+import { useCourseSearch } from '@/hooks/usePublicCourses';
+import { EMPTY_FILTERS } from '@/lib/api/publicCourses';
+import { ApiError } from '@/lib/api/client';
+import type { CourseFilterState, CourseSortBy } from '@/types/domain';
+
+const SORT_OPTIONS: Array<{ value: CourseSortBy; label: string }> = [
+  { value: 'relevance', label: 'Phù hợp nhất' },
+  { value: 'rating', label: 'Đánh giá cao' },
+  { value: 'reviews', label: 'Đánh giá nhiều' },
+  { value: 'newest', label: 'Mới nhất' },
+];
 
 /**
  * Danh sách khoá học + bộ lọc — dịch từ nhánh `isList` của design. UC09.
  *
- * Là Client Component vì bộ lọc là state tương tác. Giai đoạn 2 sẽ:
- *  - đẩy state lọc vào URL search param (chia sẻ được đường dẫn đã lọc),
- *  - thay `filterCourses` client-side bằng query gửi lên backend + phân trang.
+ * Client Component vì bộ lọc là state tương tác. Gọi 1 trang kích thước lớn
+ * (`publicCoursesApi.search` mặc định size=24) thay vì phân trang thật — khớp cảm
+ * giác "hiện hết trong 1 lưới" của mẫu thiết kế, phù hợp với lượng khóa mẫu hiện có.
+ * BE vẫn hỗ trợ phân trang thật (`Page<T>`) cho khi dữ liệu lớn hơn.
+ *
+ * Không có ô tìm kiếm riêng ở đây — chỉ 1 nơi tìm kiếm duy nhất là thanh header
+ * (`components/layout/Header.tsx`), điều hướng sang `?q=...`, đọc lại qua
+ * `useSearchParams` bên dưới.
+ *
+ * `useSearchParams` bắt buộc phải nằm trong `<Suspense>` (yêu cầu của Next.js App
+ * Router) — tách phần nội dung thật ra `CoursesPageContent`, export default chỉ lo
+ * bọc Suspense.
  */
 export default function CoursesPage() {
-  const [filters, setFilters] = useState<CourseFilterState>(EMPTY_FILTERS);
+  return (
+    <Suspense fallback={<div className="shell py-10 text-sm text-ink-muted">Đang tải…</div>}>
+      <CoursesPageContent />
+    </Suspense>
+  );
+}
 
-  const results = useMemo(() => filterCourses(MOCK_COURSES, filters), [filters]);
+function CoursesPageContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [filters, setFilters] = useState<CourseFilterState>(EMPTY_FILTERS);
+  const [sortBy, setSortBy] = useState<CourseSortBy>('newest');
+  const { data: categories } = useCategories();
+  const { data: results, isLoading, error } = useCourseSearch(filters, sortBy);
+
+  useEffect(() => {
+    const q = searchParams.get('q') ?? '';
+    setFilters((prev) => (prev.keyword === q ? prev : { ...prev, keyword: q }));
+  }, [searchParams]);
+
+  const courses = results ?? [];
 
   return (
     <div className="shell py-10">
@@ -29,28 +63,40 @@ export default function CoursesPage() {
         Mọi khoá học đều có thể lồng tiếng sang ngôn ngữ bạn chọn.
       </p>
 
-      {/* Ô tìm kiếm */}
-      <div className="mb-8">
-        <input
-          type="search"
-          value={filters.keyword}
-          onChange={(e) => setFilters({ ...filters, keyword: e.target.value })}
-          placeholder="Tìm theo tên khoá học hoặc giảng viên…"
-          aria-label="Tìm kiếm khoá học"
-          className="w-full max-w-xl rounded-full border border-line bg-surface-raised px-5 py-3
-                     text-sm text-ink placeholder:text-ink-faint focus:border-accent focus:outline-none"
-        />
-      </div>
-
       <div className="grid gap-10 lg:grid-cols-[240px_1fr]">
-        <CourseFilters filters={filters} onChange={setFilters} />
+        <CourseFilters filters={filters} onChange={setFilters} categories={categories ?? []} />
 
         <section aria-live="polite">
-          <p className="mb-4 text-sm text-ink-muted">
-            Tìm thấy <strong className="text-ink">{results.length}</strong> khoá học
-          </p>
+          {error && (
+            <div className="card mb-4 p-4 text-sm text-red-600">
+              {error instanceof ApiError ? error.message : 'Không tải được danh sách khoá học.'}
+            </div>
+          )}
 
-          {results.length === 0 ? (
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm text-ink-muted">
+              {isLoading ? 'Đang tải…' : (
+                <>Tìm thấy <strong className="text-ink">{courses.length}</strong> khoá học</>
+              )}
+            </p>
+            <label className="flex items-center gap-2 text-sm text-ink-muted">
+              Sắp xếp:
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as CourseSortBy)}
+                className="rounded-lg border border-line bg-surface-raised px-3 py-1.5 text-sm
+                           text-ink focus:border-accent focus:outline-none"
+              >
+                {SORT_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+
+          {!isLoading && courses.length === 0 ? (
             /* Trạng thái rỗng — design có nhánh showEmptyState riêng */
             <div className="card flex flex-col items-center gap-3 px-6 py-16 text-center">
               <span className="text-3xl" aria-hidden>
@@ -64,7 +110,10 @@ export default function CoursesPage() {
               </p>
               <button
                 type="button"
-                onClick={() => setFilters(EMPTY_FILTERS)}
+                onClick={() => {
+                  setFilters(EMPTY_FILTERS);
+                  router.push('/courses');
+                }}
                 className="mt-1 text-sm font-semibold text-accent underline-offset-4 hover:underline"
               >
                 Xoá toàn bộ bộ lọc
@@ -72,7 +121,7 @@ export default function CoursesPage() {
             </div>
           ) : (
             <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-              {results.map((course) => (
+              {courses.map((course) => (
                 <CourseCard key={course.id} course={course} />
               ))}
             </div>

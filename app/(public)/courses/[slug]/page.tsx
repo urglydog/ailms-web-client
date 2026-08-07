@@ -1,15 +1,18 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ChapterAccordion } from '@/components/course/ChapterAccordion';
+import { ReviewsSection } from '@/components/course/ReviewsSection';
 import { Badge } from '@/components/ui/Badge';
 import { StarRating } from '@/components/ui/StarRating';
-import { getCourseBySlug, getCourseReviews } from '@/lib/mock/courses';
+import { ApiError } from '@/lib/api/client';
+import { publicCoursesApi } from '@/lib/api/publicCourses';
 
 /**
  * Chi tiết khoá học — dịch từ nhánh `isDetail` của design. UC10.
  *
- * Server Component: nội dung khoá học là dữ liệu tĩnh theo request, fetch trực tiếp
- * phía server. Chỉ accordion là Client Component vì cần state mở/đóng.
+ * Server Component: gọi thẳng API công khai (`publicCoursesApi.getBySlug`) phía
+ * server, tốt cho SEO trang công khai. `ReviewsSection` là Client Component nhúng
+ * riêng vì cần state tương tác (form viết đánh giá) + token của người dùng.
  *
  * Giai đoạn 3 sẽ thay khối "Ghi danh" bằng luồng thật: khoá miễn phí ghi danh ngay
  * (UC12), khoá trả phí chuyển sang checkout (UC13 → UC14).
@@ -27,13 +30,19 @@ interface PageProps {
 
 export default async function CourseDetailPage({ params }: PageProps) {
   const { slug } = await params;
-  const course = getCourseBySlug(slug);
 
-  if (!course) {
-    notFound();
+  let course;
+  try {
+    course = await publicCoursesApi.getBySlug(slug);
+  } catch (err) {
+    // 404 khi khóa không tồn tại HOẶC chưa PUBLISHED (BR-ROLE-03) — cùng 1 xử lý,
+    // không phân biệt để tránh lộ sự tồn tại của khóa DRAFT/PENDING cho Guest.
+    if (err instanceof ApiError && err.status === 404) {
+      notFound();
+    }
+    throw err;
   }
 
-  const reviews = getCourseReviews();
   const totalLessons = course.chapters.reduce((sum, ch) => sum + ch.lessons.length, 0);
   const previewLesson = course.chapters
     .flatMap((ch) => ch.lessons)
@@ -69,20 +78,22 @@ export default async function CourseDetailPage({ params }: PageProps) {
 
             <p className="max-w-2xl text-[15px] leading-relaxed text-ink-muted">{course.description}</p>
 
-            {/* Ngôn ngữ lồng tiếng đã có (BR-DUB-07) */}
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-sm font-medium text-ink">Lồng tiếng sẵn có:</span>
-              {course.langs.map((lang) => (
-                <span
-                  key={lang.code}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-line
-                             bg-surface-raised px-2.5 py-1 text-[13px] text-ink-muted"
-                >
-                  <span aria-hidden>{lang.flag}</span>
-                  {lang.label}
-                </span>
-              ))}
-            </div>
+            {/* Ngôn ngữ lồng tiếng đã có (BR-DUB-07) — chưa có dữ liệu thật (Giai đoạn 5) */}
+            {course.langs.length > 0 && (
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-sm font-medium text-ink">Lồng tiếng sẵn có:</span>
+                {course.langs.map((lang) => (
+                  <span
+                    key={lang.code}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-line
+                               bg-surface-raised px-2.5 py-1 text-[13px] text-ink-muted"
+                  >
+                    <span aria-hidden>{lang.flag}</span>
+                    {lang.label}
+                  </span>
+                ))}
+              </div>
+            )}
           </header>
 
           {/* Nội dung khoá học */}
@@ -99,17 +110,7 @@ export default async function CourseDetailPage({ params }: PageProps) {
           {/* Đánh giá (UC23) */}
           <section>
             <h2 className="mb-4 font-display text-xl font-bold text-ink">Đánh giá từ học viên</h2>
-            <div className="flex flex-col gap-4">
-              {reviews.map((review) => (
-                <article key={review.id} className="card flex flex-col gap-2 p-5">
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="font-display text-sm font-semibold text-ink">{review.userName}</span>
-                    <StarRating rating={review.rating} />
-                  </div>
-                  <p className="text-sm leading-relaxed text-ink-muted">{review.comment}</p>
-                </article>
-              ))}
-            </div>
+            <ReviewsSection courseId={course.id} />
           </section>
         </div>
 
