@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { useLogin } from '@/hooks/useAuthMutations';
 import { useSearchParams } from 'next/navigation';
+import { GoogleSignInButton } from './GoogleSignInButton';
 
 export function LoginForm() {
 
@@ -67,20 +68,35 @@ export function LoginForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4">
       {successMessage && <div className="text-green-500 text-sm text-center font-medium">{successMessage}</div>}
       {error && <div className="text-red-500 text-sm text-center">{((error as unknown) as { response?: { data?: { detail?: string } } })?.response?.data?.detail || 'Đã có lỗi xảy ra'}</div>}
-      <Input 
-        id="email" label="Email" type="email" required 
-        value={email} onChange={e => setEmail(e.target.value)} 
-      />
-      <Input 
-        id="password" label="Mật khẩu" type="password" required 
-        value={password} onChange={e => setPassword(e.target.value)} 
-      />
-      <Button type="submit" disabled={isPending} className="mt-2 w-full" size="lg">
-        {isPending ? 'Đang xử lý...' : 'Đăng nhập'}
-      </Button>
-    </form>
+
+      {/* Google Sign-In Button */}
+      <GoogleSignInButton />
+
+      <div className="relative my-4">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-gray-300"></div>
+        </div>
+        <div className="relative flex justify-center text-sm">
+          <span className="px-2 bg-surface-raised text-ink-muted">hoặc đăng nhập với email</span>
+        </div>
+      </div>
+
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <Input
+          id="email" label="Email" type="email" required
+          value={email} onChange={e => setEmail(e.target.value)}
+        />
+        <Input
+          id="password" label="Mật khẩu" type="password" required
+          value={password} onChange={e => setPassword(e.target.value)}
+        />
+        <Button type="submit" disabled={isPending} className="mt-2 w-full" size="lg">
+          {isPending ? 'Đang xử lý...' : 'Đăng nhập'}
+        </Button>
+      </form>
+    </div>
   );
 }
