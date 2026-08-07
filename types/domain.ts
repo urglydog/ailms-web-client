@@ -97,12 +97,29 @@ export interface LessonSummary {
 
 export interface CourseReview {
   id: number;
+  courseId: number;
+  /** Chỉ Admin cần (trang kiểm duyệt gộp review từ nhiều khóa) — trang công khai không dùng. */
+  courseTitle: string;
   userName: string;
   userAvatarUrl: string | null;
   rating: number;
-  comment: string;
+  comment: string | null;
+  /** Admin ẩn nếu vi phạm tiêu chuẩn cộng đồng (UC44) — review ẩn không hiện ở trang công khai. */
+  isHidden: boolean;
   createdAt: string;
 }
+
+/** UC09 — bộ lọc duyệt khóa học công khai. Không có field ngôn ngữ lồng tiếng: chưa có dữ liệu
+ * lồng tiếng thật gắn với khóa học nào (Giai đoạn 5), bổ sung khi có dữ liệu thật. */
+export interface CourseFilterState {
+  category: string | null;
+  level: string | null;
+  priceType: 'all' | 'free' | 'paid';
+  keyword: string;
+}
+
+/** Không có từ khóa thì "relevance" cư xử giống hệt "newest" (không có gì để so khớp). */
+export type CourseSortBy = 'relevance' | 'rating' | 'reviews' | 'newest';
 
 // ── Dual Player (UC16, UC17) ────────────────────────────────────
 export interface AudioTrackInfo {
@@ -287,4 +304,23 @@ export interface CreateCategoryInput {
 
 export interface UpdateCategoryInput {
   name: string;
+}
+
+// ── F2.2: Khám phá công khai & Đánh giá ──────────────────────────
+
+export interface CreateReviewInput {
+  rating: number;
+  comment?: string;
+}
+
+/** "Khóa học của tôi" — khóa Student đã sở hữu (đọc, chưa có luồng ghi danh/mua thật — GĐ3). */
+export interface EnrolledCourse {
+  courseId: number;
+  courseTitle: string;
+  courseSlug: string;
+  thumbnailUrl: string | null;
+  categoryName: string;
+  isFree: boolean;
+  price: number;
+  alreadyReviewed: boolean;
 }

@@ -45,6 +45,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { id: 'aiqueue', label: 'Giám sát AI Queue', href: '/admin/ai-queue', badge: 0 },
     { id: 'transactions', label: 'Đối soát giao dịch', href: '/admin/transactions', badge: 0 },
     { id: 'categories', label: 'Danh mục', href: '/admin/categories', badge: 0 },
+    { id: 'reviews', label: 'Đánh giá', href: '/admin/reviews', badge: 0 },
     { id: 'settings', label: 'Cấu hình hệ thống', href: '/admin/settings', badge: 0 },
   ];
 

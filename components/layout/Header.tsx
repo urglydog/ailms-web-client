@@ -1,10 +1,13 @@
 'use client';
 import Link from 'next/link';
-import { useEffect, useState, useRef } from 'react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState, useRef, type KeyboardEvent } from 'react';
 import { useNotification } from '@/components/providers/NotificationProvider';
 
 export function Header() {
+  const router = useRouter();
   const { notifications, unreadCount, markAllAsRead } = useNotification();
+  const [searchText, setSearchText] = useState('');
   const [showNotifications, setShowNotifications] = useState(false);
   const notificationRef = useRef<HTMLDivElement>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -39,6 +42,21 @@ export function Header() {
       }
     }
   }, []);
+
+  /**
+   * Tìm khi Enter/click icon — KHÔNG tìm theo từng ký tự gõ (tránh gọi API mỗi keystroke,
+   * sẽ giật/lag khi catalog lớn lúc deploy thật). Luôn bắt đầu tìm kiếm mới ở `/courses`,
+   * không giữ các bộ lọc khác đang chọn trên trang đó — Header là component toàn cục,
+   * không biết state bộ lọc hiện tại của trang con.
+   */
+  const submitSearch = () => {
+    const trimmed = searchText.trim();
+    router.push(trimmed ? `/courses?q=${encodeURIComponent(trimmed)}` : '/courses');
+  };
+
+  const handleSearchKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') submitSearch();
+  };
 
   const handleLogoutConfirm = () => {
     localStorage.removeItem('accessToken');
@@ -75,15 +93,25 @@ export function Header() {
             </nav>
           </div>
 
-          {/* Search Bar */}
+          {/* Search Bar — tìm khi Enter hoặc click icon, không theo từng ký tự gõ */}
           <div className="hidden flex-1 items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 md:flex max-w-[340px]">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="11" cy="11" r="8"></circle>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-            <input 
-              type="text" 
-              placeholder="Tìm khóa học..." 
+            <button
+              type="button"
+              onClick={submitSearch}
+              aria-label="Tìm kiếm"
+              className="flex shrink-0 cursor-pointer items-center justify-center"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </button>
+            <input
+              type="text"
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              onKeyDown={handleSearchKeyDown}
+              placeholder="Tìm khóa học..."
               className="w-full min-w-0 bg-transparent text-[13.5px] text-gray-900 outline-none placeholder:text-gray-500 font-sans"
             />
           </div>

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { CourseCard } from '@/components/course/CourseCard';
-import { getFeaturedCourses } from '@/lib/mock/courses';
+import { publicCoursesApi, EMPTY_FILTERS } from '@/lib/api/publicCourses';
 
 const CATEGORY_PILLS = [
   { label: 'Lập trình Web' },
@@ -28,8 +28,8 @@ const HOW_IT_WORKS = [
   },
 ];
 
-export default function HomePage() {
-  const courses = getFeaturedCourses();
+export default async function HomePage() {
+  const courses = await publicCoursesApi.search(EMPTY_FILTERS, 'rating', 6);
 
   return (
     <>
