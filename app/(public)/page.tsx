@@ -2,6 +2,15 @@ import Link from 'next/link';
 import { CourseCard } from '@/components/course/CourseCard';
 import { publicCoursesApi, EMPTY_FILTERS } from '@/lib/api/publicCourses';
 
+/**
+ * Trang chủ gọi API thật (danh sách khóa nổi bật) — không có route segment động nên
+ * `next build` mặc định cố dựng tĩnh (SSG), gọi fetch này NGAY LÚC BUILD. Môi trường CI/CD
+ * (GitHub Actions) không có backend đang chạy ở hostname `backend` (đó là tên service nội
+ * bộ của Docker Compose) nên build sẽ lỗi `getaddrinfo EAI_AGAIN backend`. Ép render động
+ * (mỗi request) để fetch chỉ chạy lúc có người dùng thật truy cập, không chạy lúc build.
+ */
+export const dynamic = 'force-dynamic';
+
 const CATEGORY_PILLS = [
   { label: 'Lập trình Web' },
   { label: 'Data Science' },
