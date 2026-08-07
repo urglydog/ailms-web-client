@@ -247,6 +247,8 @@ export interface LessonEditItem {
   status: LessonStatus;
   videoSource: 'UPLOAD' | 'YOUTUBE' | null;
   videoUrl: string | null;
+  youtubeId: string | null;
+  durationSec: number | null;
 }
 
 export interface ChapterEditItem {
@@ -311,6 +313,20 @@ export interface UpdateCategoryInput {
 export interface CreateReviewInput {
   rating: number;
   comment?: string;
+}
+
+/** Giai đoạn 4 (UC34) — dán link YouTube công khai thay cho upload MP4. */
+export interface SetYoutubeVideoInput {
+  url: string;
+}
+
+/** Tài liệu đính kèm bài học (Giai đoạn 4, UC35) — tối đa 5 file/bài (BR-UPLOAD-01). */
+export interface LessonDocumentItem {
+  id: number;
+  fileName: string;
+  fileUrl: string;
+  fileType: string;
+  fileSize: number;
 }
 
 /** "Khóa học của tôi" — khóa Student đã sở hữu (đọc, chưa có luồng ghi danh/mua thật — GĐ3). */

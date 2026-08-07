@@ -8,6 +8,7 @@ interface LessonEditorRowProps {
   onRename: (title: string) => void;
   onTogglePreview: (isPreview: boolean) => void;
   onDelete: () => void;
+  onManageVideo: () => void;
   onDragStart: () => void;
   onDragEnd: () => void;
   isDropTarget: boolean;
@@ -24,6 +25,7 @@ export function LessonEditorRow({
   onRename,
   onTogglePreview,
   onDelete,
+  onManageVideo,
   onDragStart,
   onDragEnd,
   isDropTarget,
@@ -84,9 +86,8 @@ export function LessonEditorRow({
 
       <button
         type="button"
-        disabled
-        title="Nạp video sẽ có ở Giai đoạn 4"
-        className="shrink-0 cursor-not-allowed whitespace-nowrap rounded-full border border-gray-200 px-2.5 py-1 text-[11px] font-bold text-gray-300"
+        onClick={onManageVideo}
+        className="shrink-0 whitespace-nowrap rounded-full border border-cyan-200 px-2.5 py-1 text-[11px] font-bold text-cyan-700 hover:bg-cyan-50"
       >
         Quản lý video
       </button>

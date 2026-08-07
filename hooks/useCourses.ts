@@ -10,6 +10,7 @@ import type {
   CreateLessonInput,
   RejectCourseInput,
   ReorderInput,
+  SetYoutubeVideoInput,
   UpdateChapterInput,
   UpdateCourseInput,
   UpdateLessonInput,
@@ -172,5 +173,65 @@ export function useReorderLessons(courseId: number) {
     mutationFn: ({ chapterId, input }: { chapterId: number; input: ReorderInput }) =>
       lessonsApi.reorder(chapterId, input),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['courses', 'mine', courseId] }),
+  });
+}
+
+// ── Giai đoạn 4 — nạp video (UC34), tài liệu đính kèm (UC35), ảnh bìa ──
+
+export function useUploadLessonVideo(courseId: number) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ lessonId, file, onProgress }: {
+      lessonId: number;
+      file: File;
+      onProgress?: (percent: number) => void;
+    }) => lessonsApi.uploadVideo(lessonId, file, onProgress),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['courses', 'mine', courseId] }),
+  });
+}
+
+export function useSetYoutubeVideo(courseId: number) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ lessonId, input }: { lessonId: number; input: SetYoutubeVideoInput }) =>
+      lessonsApi.setYoutubeVideo(lessonId, input),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['courses', 'mine', courseId] }),
+  });
+}
+
+export function useLessonDocuments(lessonId: number | null) {
+  return useQuery({
+    queryKey: ['lessons', lessonId, 'documents'],
+    queryFn: () => lessonsApi.listDocuments(lessonId as number),
+    enabled: lessonId !== null && !!getAccessToken(),
+  });
+}
+
+export function useUploadLessonDocument(lessonId: number | null) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ file, onProgress }: { file: File; onProgress?: (percent: number) => void }) =>
+      lessonsApi.uploadDocument(lessonId as number, file, onProgress),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['lessons', lessonId, 'documents'] }),
+  });
+}
+
+export function useDeleteLessonDocument(lessonId: number | null) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (documentId: number) => lessonsApi.deleteDocument(documentId),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['lessons', lessonId, 'documents'] }),
+  });
+}
+
+export function useUploadCourseThumbnail(courseId: number) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ file, onProgress }: { file: File; onProgress?: (percent: number) => void }) =>
+      coursesApi.uploadThumbnail(courseId, file, onProgress),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['courses', 'mine', courseId] });
+      queryClient.invalidateQueries({ queryKey: ['courses', 'mine'] });
+    },
   });
 }

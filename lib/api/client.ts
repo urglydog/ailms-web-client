@@ -44,8 +44,10 @@ export class ApiError extends Error {
  * Chọn base URL đúng theo nơi code đang chạy.
  *
  * `typeof window === 'undefined'` nghĩa là đang ở Server Component / route handler.
+ *
+ * Export để {@link uploadFile} (XHR, không đi qua {@link request}) tái dùng logic này.
  */
-function resolveBaseUrl(): string {
+export function resolveBaseUrl(): string {
   if (typeof window === 'undefined') {
     return process.env.INTERNAL_API_URL ?? 'http://backend:8080';
   }
@@ -93,6 +95,73 @@ async function parseProblem(response: Response): Promise<ProblemDetail> {
       status: response.status,
       detail: `Yêu cầu thất bại với mã ${response.status}`,
       instance: response.url,
+      code: 'NON_JSON_RESPONSE',
+      timestamp: new Date().toISOString(),
+    };
+  }
+}
+
+/**
+ * Upload file có báo tiến độ (Giai đoạn 4 — UC34/UC35: nạp video/tài liệu). `fetch` không có
+ * cách nào báo tiến độ UPLOAD của request body ở mọi trình duyệt, nên dùng `XMLHttpRequest`
+ * (có `xhr.upload.onprogress`) thay vì {@link api}. Luôn gửi field `"file"` — khớp
+ * `@RequestPart("file")` phía backend.
+ */
+export function uploadFile<T>(
+  path: string,
+  file: File,
+  options: { token?: string; onProgress?: (percent: number) => void } = {},
+): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', `${resolveBaseUrl()}${path}`);
+    if (options.token) {
+      xhr.setRequestHeader('Authorization', `Bearer ${options.token}`);
+    }
+
+    xhr.upload.onprogress = (e) => {
+      if (options.onProgress && e.lengthComputable) {
+        options.onProgress(Math.round((e.loaded / e.total) * 100));
+      }
+    };
+
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        resolve(xhr.status === 204 || !xhr.responseText ? (undefined as T) : (JSON.parse(xhr.responseText) as T));
+        return;
+      }
+      reject(new ApiError(parseProblemFromXhr(xhr)));
+    };
+    xhr.onerror = () => {
+      reject(
+        new ApiError({
+          type: 'about:blank',
+          title: 'Network Error',
+          status: 0,
+          detail: 'Không kết nối được máy chủ',
+          instance: path,
+          code: 'NETWORK_ERROR',
+          timestamp: new Date().toISOString(),
+        }),
+      );
+    };
+
+    const formData = new FormData();
+    formData.append('file', file);
+    xhr.send(formData);
+  });
+}
+
+function parseProblemFromXhr(xhr: XMLHttpRequest): ProblemDetail {
+  try {
+    return JSON.parse(xhr.responseText) as ProblemDetail;
+  } catch {
+    return {
+      type: 'about:blank',
+      title: xhr.statusText,
+      status: xhr.status,
+      detail: `Yêu cầu thất bại với mã ${xhr.status}`,
+      instance: xhr.responseURL,
       code: 'NON_JSON_RESPONSE',
       timestamp: new Date().toISOString(),
     };
