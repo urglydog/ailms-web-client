@@ -1,4 +1,4 @@
-import { api } from '@/lib/api/client';
+import { api, uploadFile } from '@/lib/api/client';
 import { getAccessToken } from '@/lib/auth/token';
 import type {
   CourseEditDetail,
@@ -38,6 +38,13 @@ export const coursesApi = {
 
   update: (id: number, input: UpdateCourseInput) =>
     api.put<CourseEditDetail>(`/api/v1/courses/mine/${id}`, input, { token: authToken() }),
+
+  /** Giai đoạn 4 — upload ảnh bìa thật lên B2, thay ô nhập URL text tạm thời của F2.1. */
+  uploadThumbnail: (id: number, file: File, onProgress?: (percent: number) => void) =>
+    uploadFile<CourseEditDetail>(`/api/v1/courses/mine/${id}/thumbnail`, file, {
+      token: authToken(),
+      onProgress,
+    }),
 
   submit: (id: number) =>
     api.post<CourseEditDetail>(`/api/v1/courses/mine/${id}/submit`, undefined, { token: authToken() }),

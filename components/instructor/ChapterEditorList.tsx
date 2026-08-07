@@ -2,6 +2,7 @@
 
 import { useState, type DragEvent } from 'react';
 import { LessonEditorRow } from '@/components/instructor/LessonEditorRow';
+import { LessonMediaModal } from '@/components/instructor/LessonMediaModal';
 import {
   useCreateChapter,
   useCreateLesson,
@@ -27,6 +28,7 @@ export function ChapterEditorList({ courseId, chapters }: ChapterEditorListProps
   const [dropTargetChapterId, setDropTargetChapterId] = useState<number | null>(null);
   const [draggedLesson, setDraggedLesson] = useState<{ chapterId: number; lessonId: number } | null>(null);
   const [dropTargetLessonId, setDropTargetLessonId] = useState<number | null>(null);
+  const [manageVideoLessonId, setManageVideoLessonId] = useState<number | null>(null);
 
   const createChapter = useCreateChapter(courseId);
   const updateChapter = useUpdateChapter(courseId);
@@ -38,6 +40,10 @@ export function ChapterEditorList({ courseId, chapters }: ChapterEditorListProps
   const reorderLessons = useReorderLessons(courseId);
 
   const sortedChapters = [...chapters].sort((a, b) => a.displayOrder - b.displayOrder);
+  const activeLesson =
+    manageVideoLessonId !== null
+      ? (sortedChapters.flatMap((c) => c.lessons).find((l) => l.id === manageVideoLessonId) ?? null)
+      : null;
 
   const handleChapterDrop = (targetChapterId: number) => {
     const draggedId = draggedChapterId;
@@ -160,6 +166,7 @@ export function ChapterEditorList({ courseId, chapters }: ChapterEditorListProps
                     onDelete={() => {
                       if (window.confirm(`Xóa bài học "${lesson.title}"?`)) deleteLesson.mutate(lesson.id);
                     }}
+                    onManageVideo={() => setManageVideoLessonId(lesson.id)}
                   />
                 </div>
               ))}
@@ -225,6 +232,14 @@ export function ChapterEditorList({ courseId, chapters }: ChapterEditorListProps
           + Thêm chương
         </button>
       </form>
+
+      {activeLesson && (
+        <LessonMediaModal
+          courseId={courseId}
+          lesson={activeLesson}
+          onClose={() => setManageVideoLessonId(null)}
+        />
+      )}
     </div>
   );
 }
