@@ -1,6 +1,13 @@
-import { api } from '@/lib/api/client';
+import { api, uploadFile, uploadFileCancelable } from '@/lib/api/client';
 import { getAccessToken } from '@/lib/auth/token';
-import type { CreateLessonInput, LessonEditItem, ReorderInput, UpdateLessonInput } from '@/types/domain';
+import type {
+  CreateLessonInput,
+  LessonDocumentItem,
+  LessonEditItem,
+  ReorderInput,
+  SetYoutubeVideoInput,
+  UpdateLessonInput,
+} from '@/types/domain';
 
 function authToken() {
   return getAccessToken() ?? undefined;
@@ -18,4 +25,38 @@ export const lessonsApi = {
 
   reorder: (chapterId: number, input: ReorderInput) =>
     api.put<void>(`/api/v1/chapters/${chapterId}/lessons/reorder`, input, { token: authToken() }),
+
+  // ── Giai đoạn 4 (UC34) — nạp video bài giảng ───────────────────
+  // Cancelable: instructor có thể lỡ chọn nhầm file và cần hủy ngay giữa lúc đang tải.
+  uploadVideo: (lessonId: number, file: File, onProgress?: (percent: number) => void) =>
+    uploadFileCancelable<LessonEditItem>(`/api/v1/lessons/${lessonId}/video/upload`, file, {
+      token: authToken(),
+      onProgress,
+    }),
+
+  setYoutubeVideo: (lessonId: number, input: SetYoutubeVideoInput) =>
+    api.post<LessonEditItem>(`/api/v1/lessons/${lessonId}/video/youtube`, input, { token: authToken() }),
+
+  /** Xóa video hiện tại (MP4 hoặc YouTube) — bắt buộc trước khi đổi sang nguồn khác. */
+  deleteVideo: (lessonId: number) =>
+    api.delete<LessonEditItem>(`/api/v1/lessons/${lessonId}/video`, { token: authToken() }),
+
+  // ── Giai đoạn 4 (UC35) — tài liệu đính kèm ─────────────────────
+  listDocuments: (lessonId: number) =>
+    api.get<LessonDocumentItem[]>(`/api/v1/lessons/${lessonId}/documents`, { token: authToken() }),
+
+  /** BR-COURSE-06 — Admin xem tài liệu để kiểm duyệt (khóa đang PENDING), không cần sở hữu. */
+  listDocumentsForModeration: (lessonId: number) =>
+    api.get<LessonDocumentItem[]>(`/api/v1/courses/moderation/lessons/${lessonId}/documents`, {
+      token: authToken(),
+    }),
+
+  uploadDocument: (lessonId: number, file: File, onProgress?: (percent: number) => void) =>
+    uploadFile<LessonDocumentItem>(`/api/v1/lessons/${lessonId}/documents`, file, {
+      token: authToken(),
+      onProgress,
+    }),
+
+  deleteDocument: (documentId: number) =>
+    api.delete<void>(`/api/v1/lesson-documents/${documentId}`, { token: authToken() }),
 };

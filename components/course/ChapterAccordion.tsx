@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { Badge } from '@/components/ui/Badge';
+import { formatDuration } from '@/lib/format';
 import type { Chapter } from '@/types/domain';
 
 /**
@@ -13,12 +14,6 @@ import type { Chapter } from '@/types/domain';
  *    dùng được AI Tutor / Quiz / Flashcards.
  *  - Bài còn lại → chỉ học viên đã sở hữu khoá học, hiện icon khoá.
  */
-
-function formatDuration(sec: number): string {
-  const m = Math.floor(sec / 60);
-  const s = sec % 60;
-  return `${m}:${s.toString().padStart(2, '0')}`;
-}
 
 interface ChapterAccordionProps {
   chapters: Chapter[];

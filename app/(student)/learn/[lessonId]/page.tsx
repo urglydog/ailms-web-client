@@ -1,36 +1,63 @@
 'use client';
 
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 import { useState } from 'react';
 import { DualPlayer } from '@/components/player/DualPlayer';
 import { DubbingActivatePanel } from '@/components/player/DubbingActivatePanel';
 import { LanguageSwitcher } from '@/components/player/LanguageSwitcher';
 import { PipelineProgress } from '@/components/player/PipelineProgress';
-import { getPlayerLesson, MOCK_PIPELINE_STEPS } from '@/lib/mock/courses';
+import { useLessonPlayer } from '@/hooks/usePublicCourses';
+import { ApiError } from '@/lib/api/client';
+import { MOCK_PIPELINE_STEPS } from '@/lib/mock/courses';
 import type { PipelineStep } from '@/types/domain';
 
 /**
  * Trang học bài — dịch từ nhánh `isPlayer` của design.
  *
  * Gộp 4 use case vào một màn:
+ *  - UC11 Học thử Preview (video thật, không cần sở hữu khóa học — xem `useLessonPlayer`)
  *  - UC16 Dual Player (video muted + audio lồng tiếng)
  *  - UC17 chọn ngôn ngữ đã có bản lồng tiếng
  *  - UC18 kích hoạt lồng tiếng khi ngôn ngữ chưa có → panel `DubbingActivatePanel`
  *  - UC20 theo dõi tiến độ realtime → panel `PipelineProgress`
  *
- * Giai đoạn 0 dùng state local để **xem được cả 3 trạng thái** của khung phát.
- * Giai đoạn 5–6 sẽ thay bằng: React Query lấy `AudioTrack`, mutation gọi UC18, và
- * WebSocket nhận tiến độ thay cho `MOCK_PIPELINE_STEPS`.
+ * Chưa có bảng `voice_mappings`/`AudioTrack` thật (Giai đoạn 5) nên `languages` luôn rỗng —
+ * `LanguageSwitcher` không hiện gì, `mode` luôn ở `watching`. UC18/UC20 (state `need-activation`/
+ * `processing`) giữ nguyên UI đã dựng từ Giai đoạn 0 nhưng chưa có đường vào thật cho tới khi
+ * Giai đoạn 5 nối `languages` thật.
  */
 
 type PlayerMode = 'watching' | 'need-activation' | 'processing';
 
 export default function LearnPage() {
-  const lesson = getPlayerLesson(101);
+  const params = useParams<{ lessonId: string }>();
+  const lessonId = Number(params.lessonId);
 
-  const [activeLang, setActiveLang] = useState<string | null>('vi-VN');
+  const { data: lesson, isLoading, error } = useLessonPlayer(lessonId);
+
+  const [activeLang, setActiveLang] = useState<string | null>(null);
   const [mode, setMode] = useState<PlayerMode>('watching');
   const [steps, setSteps] = useState<PipelineStep[]>(MOCK_PIPELINE_STEPS);
+
+  if (isLoading) {
+    return <div className="p-16 text-center text-sm text-ink-muted">Đang tải bài học...</div>;
+  }
+
+  if (error || !lesson) {
+    return (
+      <div className="shell flex flex-col items-center gap-3 py-20 text-center">
+        <p className="text-sm text-ink-muted">
+          {error instanceof ApiError
+            ? error.message
+            : 'Không tìm thấy bài học, hoặc bài học này cần sở hữu khóa học mới xem được.'}
+        </p>
+        <Link href="/courses" className="text-sm font-semibold text-accent hover:underline">
+          ← Về kho khoá học
+        </Link>
+      </div>
+    );
+  }
 
   const activeLangLabel =
     lesson.languages.find((l) => l.code === activeLang)?.label ?? 'ngôn ngữ đã chọn';
@@ -67,16 +94,23 @@ export default function LearnPage() {
         <div className="grid gap-8 lg:grid-cols-[1fr_340px]">
           {/* ── Cột phát bài giảng ── */}
           <div className="flex min-w-0 flex-col gap-4">
-            <LanguageSwitcher
-              languages={lesson.languages}
-              activeCode={activeLang}
-              sourceLanguage={lesson.sourceLanguage}
-              onSelect={handleSelectLanguage}
-            />
+            {lesson.languages.length > 0 && (
+              <LanguageSwitcher
+                languages={lesson.languages}
+                activeCode={activeLang}
+                sourceLanguage={lesson.sourceLanguage}
+                onSelect={handleSelectLanguage}
+              />
+            )}
 
             {/* Khung phát: một trong ba trạng thái */}
             {mode === 'watching' && (
-              <DualPlayer videoUrl={lesson.videoUrl} track={lesson.activeTrack} />
+              <DualPlayer
+                videoSource={lesson.videoSource}
+                videoUrl={lesson.videoUrl}
+                youtubeId={lesson.youtubeId}
+                track={lesson.activeTrack}
+              />
             )}
 
             {mode === 'need-activation' && (

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { LogoutSidebarButton } from '@/components/auth/LogoutSidebarButton';
+import { UploadTray } from '@/components/instructor/UploadTray';
 import { getCurrentRole } from '@/lib/auth/token';
 
 export default function InstructorLayout({ children }: { children: React.ReactNode }) {
@@ -77,6 +78,8 @@ export default function InstructorLayout({ children }: { children: React.ReactNo
       <main className="flex-1 min-w-0 p-[28px_32px] flex flex-col gap-[22px]">
         {children}
       </main>
+
+      <UploadTray />
     </div>
   );
 }

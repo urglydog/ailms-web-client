@@ -4,9 +4,12 @@ import { useEffect, useRef, useState, type ChangeEvent, type FormEvent, type Rea
 import { ChapterEditorList } from '@/components/instructor/ChapterEditorList';
 import { SubmitChecklist } from '@/components/instructor/SubmitChecklist';
 import { CourseStatusBadge } from '@/components/course/CourseStatusBadge';
+import { UploadProgressBar } from '@/components/ui/UploadProgressBar';
 import { useCategories } from '@/hooks/useCategories';
 import { useMyCourseDetail, useSubmitCourse, useUpdateCourse } from '@/hooks/useCourses';
+import { useStartCourseThumbnailUpload } from '@/hooks/useUploadTray';
 import { ApiError } from '@/lib/api/client';
+import { useUploadTrayStore } from '@/lib/stores/uploadTrayStore';
 import type { CourseLevel } from '@/types/domain';
 
 const LEVEL_OPTIONS: Array<{ value: CourseLevel; label: string }> = [
@@ -25,6 +28,10 @@ export function CourseBuilderForm({ courseId }: CourseBuilderFormProps) {
 
   const updateCourse = useUpdateCourse(courseId);
   const submitCourse = useSubmitCourse(courseId);
+  const startThumbnailUpload = useStartCourseThumbnailUpload(courseId);
+  const thumbnailTask = useUploadTrayStore((s) =>
+    s.tasks.find((t) => t.targetType === 'course-thumbnail' && t.targetId === courseId),
+  );
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -58,6 +65,16 @@ export function CourseBuilderForm({ courseId }: CourseBuilderFormProps) {
     setPrice(digitsOnly || '0');
   };
   const priceDisplay = Number(price).toLocaleString('vi-VN');
+
+  /** Upload ngay khi chọn file — tách khỏi nút "Lưu thay đổi" chính, giống đổi ảnh đại diện. */
+  const handleThumbnailFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    startThumbnailUpload(file, `Ảnh bìa: ${title || course?.title || ''}`, (updated) =>
+      setThumbnailUrl(updated.thumbnailUrl ?? ''),
+    );
+  };
 
   const handleSave = (e: FormEvent) => {
     e.preventDefault();
@@ -112,9 +129,8 @@ export function CourseBuilderForm({ courseId }: CourseBuilderFormProps) {
 
       {course.status === 'PUBLISHED' && (
         <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-[13px] text-amber-800">
-          Khóa học đã xuất bản — sửa tiêu đề/mô tả/giá/chương/bài học được áp dụng{' '}
-          <span className="font-bold">ngay lập tức, không cần Admin duyệt lại</span>. Khi nạp video ở
-          Giai đoạn 4, thêm hoặc thay video của một bài học mới cần Admin duyệt lại riêng bài đó.
+          Khóa học đã xuất bản — sửa tiêu đề/mô tả/giá/chương/bài học/video được áp dụng{' '}
+          <span className="font-bold">ngay lập tức, không cần Admin duyệt lại</span>.
         </div>
       )}
 
@@ -146,20 +162,27 @@ export function CourseBuilderForm({ courseId }: CourseBuilderFormProps) {
               className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-cyan-400 focus:outline-none"
             />
           </Field>
-          <Field label="Ảnh bìa (URL — tải ảnh trực tiếp sẽ có ở Giai đoạn 4)">
-            <input
-              value={thumbnailUrl}
-              onChange={(e) => setThumbnailUrl(e.target.value)}
-              placeholder="https://..."
-              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-cyan-400 focus:outline-none"
-            />
+          <Field label="Ảnh bìa">
             {thumbnailUrl && (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={thumbnailUrl}
                 alt="Xem trước ảnh bìa"
-                className="mt-2 h-28 w-full rounded-lg object-cover"
+                className="h-28 w-full rounded-lg object-cover"
               />
+            )}
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={handleThumbnailFileChange}
+              disabled={thumbnailTask?.status === 'uploading'}
+              className="text-[12.5px] file:mr-3 file:rounded-md file:border-0 file:bg-gray-100 file:px-3 file:py-1.5 file:text-[12px] file:font-semibold"
+            />
+            {thumbnailTask?.status === 'uploading' && (
+              <UploadProgressBar percent={thumbnailTask.percent} label="Đang tải ảnh bìa lên..." />
+            )}
+            {thumbnailTask?.status === 'error' && (
+              <p className="text-[11.5px] text-red-600">{thumbnailTask.errorMessage}</p>
             )}
           </Field>
           <div className="grid grid-cols-2 gap-3">

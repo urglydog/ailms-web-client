@@ -10,6 +10,7 @@ import type {
   CreateLessonInput,
   RejectCourseInput,
   ReorderInput,
+  SetYoutubeVideoInput,
   UpdateChapterInput,
   UpdateCourseInput,
   UpdateLessonInput,
@@ -172,5 +173,51 @@ export function useReorderLessons(courseId: number) {
     mutationFn: ({ chapterId, input }: { chapterId: number; input: ReorderInput }) =>
       lessonsApi.reorder(chapterId, input),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['courses', 'mine', courseId] }),
+  });
+}
+
+// ── Giai đoạn 4 — nạp video (UC34), tài liệu đính kèm (UC35) ──
+// Upload có tiến độ (video/tài liệu/ảnh bìa) dùng `hooks/useUploadTray.ts` (khay tải lên toàn
+// cục kiểu Google Drive), KHÔNG dùng useMutation ở đây — xem comment trong file đó vì sao.
+
+export function useSetYoutubeVideo(courseId: number) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ lessonId, input }: { lessonId: number; input: SetYoutubeVideoInput }) =>
+      lessonsApi.setYoutubeVideo(lessonId, input),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['courses', 'mine', courseId] }),
+  });
+}
+
+export function useDeleteLessonVideo(courseId: number) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (lessonId: number) => lessonsApi.deleteVideo(lessonId),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['courses', 'mine', courseId] }),
+  });
+}
+
+export function useLessonDocuments(lessonId: number | null) {
+  return useQuery({
+    queryKey: ['lessons', lessonId, 'documents'],
+    queryFn: () => lessonsApi.listDocuments(lessonId as number),
+    enabled: lessonId !== null && !!getAccessToken(),
+  });
+}
+
+/** BR-COURSE-06 — Admin xem tài liệu để kiểm duyệt (khóa đang PENDING), không cần sở hữu. */
+export function useModerationLessonDocuments(lessonId: number | null) {
+  return useQuery({
+    queryKey: ['lessons', lessonId, 'documents', 'moderation'],
+    queryFn: () => lessonsApi.listDocumentsForModeration(lessonId as number),
+    enabled: lessonId !== null && !!getAccessToken(),
+  });
+}
+
+export function useDeleteLessonDocument(lessonId: number | null) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (documentId: number) => lessonsApi.deleteDocument(documentId),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['lessons', lessonId, 'documents'] }),
   });
 }

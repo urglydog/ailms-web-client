@@ -1,13 +1,19 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { Pill } from '@/components/ui/Pill';
-import { MOCK_CATEGORIES, MOCK_LANGUAGES, type CourseFilterState } from '@/lib/mock/courses';
+import { EMPTY_FILTERS } from '@/lib/api/publicCourses';
+import type { Category, CourseFilterState } from '@/types/domain';
 
 /**
- * Bốn nhóm bộ lọc của UC09: danh mục, trình độ, loại giá, ngôn ngữ lồng tiếng.
+ * Ba nhóm bộ lọc của UC09: danh mục, trình độ, loại giá.
  *
- * Giai đoạn 2 sẽ đẩy các giá trị này thành query param gửi lên backend thay vì lọc
- * ở client, và đồng bộ với URL để chia sẻ được đường dẫn đã lọc.
+ * Không có bộ lọc ngôn ngữ lồng tiếng: chưa có dữ liệu lồng tiếng thật gắn với khóa
+ * học nào (AudioTrack/VoiceMapping thuộc Giai đoạn 5) — lọc theo ngôn ngữ lúc này sẽ
+ * là bộ lọc giả không có dữ liệu thật. Bổ sung khi Giai đoạn 5 có dữ liệu.
+ *
+ * `categories` nhận qua prop (gọi `useCategories()` ở component cha) thay vì import
+ * thẳng dữ liệu mock, để danh mục hiển thị đúng dữ liệu thật từ Admin quản lý.
  */
 
 const LEVELS = [
@@ -25,18 +31,45 @@ const PRICE_TYPES = [
 interface CourseFiltersProps {
   filters: CourseFilterState;
   onChange: (next: CourseFilterState) => void;
+  categories: Category[];
 }
 
-export function CourseFilters({ filters, onChange }: CourseFiltersProps) {
-  /** Bấm lại giá trị đang chọn thì bỏ chọn — đỡ phải có nút "xoá lọc" riêng. */
+export function CourseFilters({ filters, onChange, categories }: CourseFiltersProps) {
+  const router = useRouter();
+
+  /** Bấm lại giá trị đang chọn thì bỏ chọn — đỡ phải có nút "xoá lọc" riêng cho từng nhóm. */
   const toggle = <K extends keyof CourseFilterState>(key: K, value: CourseFilterState[K]) => {
     onChange({ ...filters, [key]: filters[key] === value ? null : value });
   };
 
+  const hasActiveFilter =
+    filters.category !== null ||
+    filters.level !== null ||
+    filters.priceType !== 'all' ||
+    filters.keyword.trim() !== '';
+
+  const clearFilters = () => {
+    onChange(EMPTY_FILTERS);
+    router.push('/courses');
+  };
+
   return (
     <aside className="flex flex-col gap-6" aria-label="Bộ lọc khoá học">
+      <div className="flex items-center justify-between">
+        <span className="font-display text-sm font-bold text-ink">Bộ lọc</span>
+        {hasActiveFilter && (
+          <button
+            type="button"
+            onClick={clearFilters}
+            className="text-[13px] font-semibold text-accent underline-offset-4 hover:underline"
+          >
+            Xoá bộ lọc
+          </button>
+        )}
+      </div>
+
       <FilterGroup label="Danh mục">
-        {MOCK_CATEGORIES.map((cat) => (
+        {categories.map((cat) => (
           <Pill
             key={cat.slug}
             active={filters.category === cat.slug}
@@ -63,15 +96,6 @@ export function CourseFilters({ filters, onChange }: CourseFiltersProps) {
             onClick={() => onChange({ ...filters, priceType: p.value })}
           >
             {p.label}
-          </Pill>
-        ))}
-      </FilterGroup>
-
-      <FilterGroup label="Ngôn ngữ lồng tiếng">
-        {MOCK_LANGUAGES.map((lang) => (
-          <Pill key={lang.code} active={filters.lang === lang.code} onClick={() => toggle('lang', lang.code)}>
-            <span aria-hidden>{lang.flag}</span>
-            {lang.label}
           </Pill>
         ))}
       </FilterGroup>
