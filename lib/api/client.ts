@@ -101,19 +101,28 @@ async function parseProblem(response: Response): Promise<ProblemDetail> {
   }
 }
 
+/** Người dùng chủ động bấm "Hủy" giữa lúc upload — phân biệt với lỗi mạng/máy chủ thật. */
+export class UploadCancelledError extends Error {
+  constructor() {
+    super('Đã hủy tải lên');
+    this.name = 'UploadCancelledError';
+  }
+}
+
 /**
- * Upload file có báo tiến độ (Giai đoạn 4 — UC34/UC35: nạp video/tài liệu). `fetch` không có
- * cách nào báo tiến độ UPLOAD của request body ở mọi trình duyệt, nên dùng `XMLHttpRequest`
- * (có `xhr.upload.onprogress`) thay vì {@link api}. Luôn gửi field `"file"` — khớp
- * `@RequestPart("file")` phía backend.
+ * Upload file có báo tiến độ VÀ có thể hủy giữa chừng (Giai đoạn 4 — UC34: nạp video, lỡ chọn
+ * nhầm file cần hủy ngay). `fetch` không có cách nào báo tiến độ UPLOAD của request body ở mọi
+ * trình duyệt, nên dùng `XMLHttpRequest` (có `xhr.upload.onprogress` và `xhr.abort()`) thay vì
+ * {@link api}. Luôn gửi field `"file"` — khớp `@RequestPart("file")` phía backend.
  */
-export function uploadFile<T>(
+export function uploadFileCancelable<T>(
   path: string,
   file: File,
   options: { token?: string; onProgress?: (percent: number) => void } = {},
-): Promise<T> {
-  return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
+): { promise: Promise<T>; abort: () => void } {
+  const xhr = new XMLHttpRequest();
+
+  const promise = new Promise<T>((resolve, reject) => {
     xhr.open('POST', `${resolveBaseUrl()}${path}`);
     if (options.token) {
       xhr.setRequestHeader('Authorization', `Bearer ${options.token}`);
@@ -145,11 +154,23 @@ export function uploadFile<T>(
         }),
       );
     };
+    xhr.onabort = () => reject(new UploadCancelledError());
 
     const formData = new FormData();
     formData.append('file', file);
     xhr.send(formData);
   });
+
+  return { promise, abort: () => xhr.abort() };
+}
+
+/** Bản không cần hủy giữa chừng (tài liệu, ảnh bìa) — dựng trên {@link uploadFileCancelable}. */
+export function uploadFile<T>(
+  path: string,
+  file: File,
+  options: { token?: string; onProgress?: (percent: number) => void } = {},
+): Promise<T> {
+  return uploadFileCancelable<T>(path, file, options).promise;
 }
 
 function parseProblemFromXhr(xhr: XMLHttpRequest): ProblemDetail {

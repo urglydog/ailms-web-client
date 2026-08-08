@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { AdminLessonPreview } from '@/components/admin/AdminLessonPreview';
 import { RejectReasonModal } from '@/components/admin/RejectReasonModal';
 import { CourseStatusBadge } from '@/components/course/CourseStatusBadge';
 import { useApproveCourse, useModerationDetail, useRejectCourse } from '@/hooks/useCourses';
@@ -13,6 +14,19 @@ export default function AdminModerationDetailPage() {
   const router = useRouter();
   const courseId = Number(params.id);
   const [showRejectModal, setShowRejectModal] = useState(false);
+  const [expandedLessonIds, setExpandedLessonIds] = useState<Set<number>>(new Set());
+
+  const toggleLesson = (lessonId: number) => {
+    setExpandedLessonIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(lessonId)) {
+        next.delete(lessonId);
+      } else {
+        next.add(lessonId);
+      }
+      return next;
+    });
+  };
 
   const { data: course, isLoading, error } = useModerationDetail(courseId);
   const approve = useApproveCourse();
@@ -94,21 +108,34 @@ export default function AdminModerationDetailPage() {
                 <div className="mt-2 flex flex-col gap-1.5">
                   {[...chapter.lessons]
                     .sort((a, b) => a.displayOrder - b.displayOrder)
-                    .map((lesson) => (
-                      <div key={lesson.id} className="flex items-center gap-2 text-[12.5px] text-gray-600">
-                        <span
-                          className={`h-1.5 w-1.5 shrink-0 rounded-full ${
-                            lesson.status === 'READY' ? 'bg-green-500' : 'bg-gray-300'
-                          }`}
-                        />
-                        <span>{lesson.title}</span>
-                        {lesson.isPreview && (
-                          <span className="rounded-full bg-cyan-50 px-2 py-0.5 text-[10px] font-bold text-cyan-700">
-                            Preview
-                          </span>
-                        )}
-                      </div>
-                    ))}
+                    .map((lesson) => {
+                      const isExpanded = expandedLessonIds.has(lesson.id);
+                      return (
+                        <div key={lesson.id}>
+                          <button
+                            type="button"
+                            onClick={() => toggleLesson(lesson.id)}
+                            className="flex w-full items-center gap-2 rounded-md px-1 py-1 text-left text-[12.5px] text-gray-600 hover:bg-gray-100"
+                          >
+                            <span
+                              className={`h-1.5 w-1.5 shrink-0 rounded-full ${
+                                lesson.status === 'READY' ? 'bg-green-500' : 'bg-gray-300'
+                              }`}
+                            />
+                            <span className="min-w-0 flex-1 truncate">{lesson.title}</span>
+                            {lesson.isPreview && (
+                              <span className="shrink-0 rounded-full bg-cyan-50 px-2 py-0.5 text-[10px] font-bold text-cyan-700">
+                                Preview
+                              </span>
+                            )}
+                            <span aria-hidden className="shrink-0 text-gray-400">
+                              {isExpanded ? '▾' : '▸'}
+                            </span>
+                          </button>
+                          {isExpanded && <AdminLessonPreview lesson={lesson} />}
+                        </div>
+                      );
+                    })}
                 </div>
               </div>
             ))}

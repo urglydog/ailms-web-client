@@ -1,5 +1,13 @@
 import { api } from '@/lib/api/client';
-import type { Chapter, CourseDetail, CourseFilterState, CourseSortBy, CourseSummary, Page } from '@/types/domain';
+import type {
+  Chapter,
+  CourseDetail,
+  CourseFilterState,
+  CourseSortBy,
+  CourseSummary,
+  Page,
+  PlayerLesson,
+} from '@/types/domain';
 
 export const EMPTY_FILTERS: CourseFilterState = {
   category: null,
@@ -114,6 +122,37 @@ function toDetail(raw: RawDetail): CourseDetail {
   };
 }
 
+interface RawPlayerLesson {
+  lessonId: number;
+  lessonTitle: string;
+  courseId: number;
+  courseTitle: string;
+  courseSlug: string;
+  videoSource: 'UPLOAD' | 'YOUTUBE';
+  videoUrl: string;
+  youtubeId: string | null;
+  durationSec: number;
+}
+
+/** Lồng tiếng (`voice_mappings`) và tiến độ xem dở chưa có API — Giai đoạn 5/6. */
+function toPlayerLesson(raw: RawPlayerLesson): PlayerLesson {
+  return {
+    lessonId: raw.lessonId,
+    lessonTitle: raw.lessonTitle,
+    courseId: raw.courseId,
+    courseTitle: raw.courseTitle,
+    courseSlug: raw.courseSlug,
+    videoSource: raw.videoSource,
+    videoUrl: raw.videoUrl,
+    youtubeId: raw.youtubeId,
+    durationSec: raw.durationSec,
+    sourceLanguage: null,
+    languages: [],
+    activeTrack: null,
+    lastPositionSec: 0,
+  };
+}
+
 function buildQuery(params: Record<string, string | number | undefined | null>): string {
   const search = new URLSearchParams();
   Object.entries(params).forEach(([key, value]) => {
@@ -140,5 +179,11 @@ export const publicCoursesApi = {
   getBySlug: async (slug: string): Promise<CourseDetail> => {
     const raw = await api.get<RawDetail>(`/api/v1/courses/${slug}`);
     return toDetail(raw);
+  },
+
+  /** UC11 — Học thử Preview: chỉ trả về được nếu bài học đánh dấu Preview (BR-ENROLL-02). */
+  getLessonPlayer: async (lessonId: number): Promise<PlayerLesson> => {
+    const raw = await api.get<RawPlayerLesson>(`/api/v1/courses/lessons/${lessonId}/player`);
+    return toPlayerLesson(raw);
   },
 };

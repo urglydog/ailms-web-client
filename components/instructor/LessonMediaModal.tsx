@@ -3,12 +3,14 @@
 import { useState, type ChangeEvent, type FormEvent } from 'react';
 import {
   useDeleteLessonDocument,
+  useDeleteLessonVideo,
   useLessonDocuments,
   useSetYoutubeVideo,
-  useUploadLessonDocument,
-  useUploadLessonVideo,
 } from '@/hooks/useCourses';
+import { useStartLessonDocumentUpload, useStartLessonVideoUpload } from '@/hooks/useUploadTray';
 import { ApiError } from '@/lib/api/client';
+import { formatDuration, formatFileSize } from '@/lib/format';
+import { useUploadTrayStore } from '@/lib/stores/uploadTrayStore';
 import { UploadProgressBar } from '@/components/ui/UploadProgressBar';
 import type { LessonEditItem } from '@/types/domain';
 
@@ -20,30 +22,26 @@ interface LessonMediaModalProps {
 
 const MAX_DOCUMENTS = 5;
 
-function formatDuration(sec: number | null): string {
-  if (!sec) return '--:--';
-  const minutes = Math.floor(sec / 60);
-  const seconds = sec % 60;
-  return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-}
-
-function formatFileSize(bytes: number): string {
-  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
-
 /** F4.1/F4.2 (UC34, UC35) — mở từ nút "Quản lý video" ở mỗi hàng bài học. */
 export function LessonMediaModal({ courseId, lesson, onClose }: LessonMediaModalProps) {
   const [tab, setTab] = useState<'upload' | 'youtube'>(lesson.videoSource === 'YOUTUBE' ? 'youtube' : 'upload');
   const [youtubeUrl, setYoutubeUrl] = useState(lesson.videoSource === 'YOUTUBE' ? (lesson.videoUrl ?? '') : '');
-  const [videoProgress, setVideoProgress] = useState<number | null>(null);
-  const [docProgress, setDocProgress] = useState<number | null>(null);
 
-  const uploadVideo = useUploadLessonVideo(courseId);
+  const startVideoUpload = useStartLessonVideoUpload(courseId);
+  const startDocumentUpload = useStartLessonDocumentUpload();
   const setYoutube = useSetYoutubeVideo(courseId);
+  const deleteVideo = useDeleteLessonVideo(courseId);
   const { data: documents, isLoading: documentsLoading } = useLessonDocuments(lesson.id);
-  const uploadDocument = useUploadLessonDocument(lesson.id);
   const deleteDocument = useDeleteLessonDocument(lesson.id);
+
+  // Đọc tiến độ từ khay tải lên toàn cục (`UploadTray`) thay vì state riêng của modal — nhờ vậy
+  // tiến độ vẫn hiện đúng dù modal bị đóng rồi mở lại giữa chừng lúc đang tải.
+  const videoTask = useUploadTrayStore((s) =>
+    s.tasks.find((t) => t.targetType === 'lesson-video' && t.targetId === lesson.id),
+  );
+  const docTask = useUploadTrayStore((s) =>
+    s.tasks.find((t) => t.targetType === 'lesson-document' && t.targetId === lesson.id),
+  );
 
   const docs = documents ?? [];
 
@@ -51,11 +49,7 @@ export function LessonMediaModal({ courseId, lesson, onClose }: LessonMediaModal
     const file = e.target.files?.[0];
     e.target.value = '';
     if (!file) return;
-    setVideoProgress(0);
-    uploadVideo.mutate(
-      { lessonId: lesson.id, file, onProgress: setVideoProgress },
-      { onSettled: () => setVideoProgress(null) },
-    );
+    startVideoUpload(lesson.id, file, `Video: ${lesson.title}`);
   };
 
   const handleYoutubeSubmit = (e: FormEvent) => {
@@ -68,8 +62,13 @@ export function LessonMediaModal({ courseId, lesson, onClose }: LessonMediaModal
     const file = e.target.files?.[0];
     e.target.value = '';
     if (!file) return;
-    setDocProgress(0);
-    uploadDocument.mutate({ file, onProgress: setDocProgress }, { onSettled: () => setDocProgress(null) });
+    startDocumentUpload(lesson.id, file, `Tài liệu: ${file.name}`);
+  };
+
+  const handleDeleteVideo = () => {
+    if (window.confirm('Xóa video hiện tại? Bạn sẽ cần nạp video mới cho bài học này.')) {
+      deleteVideo.mutate(lesson.id);
+    }
   };
 
   return (
@@ -106,58 +105,113 @@ export function LessonMediaModal({ courseId, lesson, onClose }: LessonMediaModal
           )}
         </div>
 
-        <div className="mb-3 flex gap-1 rounded-lg bg-gray-100 p-1 text-[12.5px] font-semibold">
-          <button
-            type="button"
-            onClick={() => setTab('upload')}
-            className={`flex-1 rounded-md py-1.5 ${tab === 'upload' ? 'bg-white text-cyan-700 shadow-sm' : 'text-gray-500'}`}
-          >
-            Tải MP4 lên
-          </button>
-          <button
-            type="button"
-            onClick={() => setTab('youtube')}
-            className={`flex-1 rounded-md py-1.5 ${tab === 'youtube' ? 'bg-white text-cyan-700 shadow-sm' : 'text-gray-500'}`}
-          >
-            Dán link YouTube
-          </button>
-        </div>
-
-        {tab === 'upload' && (
-          <div className="mb-5 flex flex-col gap-2">
-            <input
-              type="file"
-              accept="video/mp4"
-              onChange={handleVideoFileChange}
-              disabled={videoProgress !== null}
-              className="text-[12.5px] file:mr-3 file:rounded-md file:border-0 file:bg-gray-100 file:px-3 file:py-1.5 file:text-[12px] file:font-semibold"
-            />
-            {videoProgress !== null && <UploadProgressBar percent={videoProgress} label="Đang tải video lên..." />}
-            {uploadVideo.error instanceof ApiError && (
-              <p className="text-[12px] text-red-600">{uploadVideo.error.message}</p>
+        {lesson.videoUrl && (
+          <div className="mb-5 aspect-video w-full overflow-hidden rounded-lg bg-black">
+            {lesson.videoSource === 'YOUTUBE' && lesson.youtubeId ? (
+              <iframe
+                key={lesson.youtubeId}
+                src={`https://www.youtube.com/embed/${lesson.youtubeId}`}
+                title={`Xem trước video — ${lesson.title}`}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="h-full w-full"
+              />
+            ) : (
+              <video key={lesson.videoUrl} controls src={lesson.videoUrl} className="h-full w-full" />
             )}
           </div>
         )}
 
-        {tab === 'youtube' && (
-          <form onSubmit={handleYoutubeSubmit} className="mb-5 flex flex-col gap-2">
-            <input
-              value={youtubeUrl}
-              onChange={(e) => setYoutubeUrl(e.target.value)}
-              placeholder="https://www.youtube.com/watch?v=..."
-              className="rounded-lg border border-gray-200 px-3 py-2 text-[13px] focus:border-cyan-400 focus:outline-none"
-            />
+        {lesson.videoSource ? (
+          <div className="mb-5 flex flex-col gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3 text-[12.5px] text-amber-800">
+            <span>
+              Bài học đã có video ({lesson.videoSource === 'YOUTUBE' ? 'link YouTube' : 'MP4 tải lên'}). Xóa video
+              hiện tại để đổi sang nguồn khác hoặc tải video mới.
+            </span>
             <button
-              type="submit"
-              disabled={setYoutube.isPending}
-              className="self-start rounded-lg bg-cyan-600 px-4 py-1.5 text-[12.5px] font-bold text-white hover:bg-cyan-700 disabled:cursor-not-allowed disabled:opacity-50"
+              type="button"
+              onClick={handleDeleteVideo}
+              disabled={deleteVideo.isPending}
+              className="self-start rounded-lg border border-red-300 bg-white px-3 py-1.5 text-[12px] font-bold text-red-600 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {setYoutube.isPending ? 'Đang kiểm tra...' : 'Lưu link YouTube'}
+              {deleteVideo.isPending ? 'Đang xóa...' : 'Xóa video'}
             </button>
-            {setYoutube.error instanceof ApiError && (
-              <p className="text-[12px] text-red-600">{setYoutube.error.message}</p>
+            {deleteVideo.error instanceof ApiError && (
+              <p className="text-[12px] text-red-600">{deleteVideo.error.message}</p>
             )}
-          </form>
+          </div>
+        ) : (
+          <>
+            <div className="mb-3 flex gap-1 rounded-lg bg-gray-100 p-1 text-[12.5px] font-semibold">
+              <button
+                type="button"
+                onClick={() => setTab('upload')}
+                disabled={videoTask?.status === 'uploading'}
+                className={`flex-1 rounded-md py-1.5 disabled:cursor-not-allowed ${tab === 'upload' ? 'bg-white text-cyan-700 shadow-sm' : 'text-gray-500'}`}
+              >
+                Tải MP4 lên
+              </button>
+              <button
+                type="button"
+                onClick={() => setTab('youtube')}
+                disabled={videoTask?.status === 'uploading'}
+                className={`flex-1 rounded-md py-1.5 disabled:cursor-not-allowed ${tab === 'youtube' ? 'bg-white text-cyan-700 shadow-sm' : 'text-gray-500'}`}
+              >
+                Dán link YouTube
+              </button>
+            </div>
+
+            {tab === 'upload' && (
+              <div className="mb-5 flex flex-col gap-2">
+                <input
+                  type="file"
+                  accept="video/mp4"
+                  onChange={handleVideoFileChange}
+                  disabled={videoTask?.status === 'uploading'}
+                  className="text-[12.5px] file:mr-3 file:rounded-md file:border-0 file:bg-gray-100 file:px-3 file:py-1.5 file:text-[12px] file:font-semibold"
+                />
+                {videoTask?.status === 'uploading' && (
+                  <div className="flex items-end gap-2">
+                    <div className="flex-1">
+                      <UploadProgressBar percent={videoTask.percent} label="Đang tải video lên..." />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => useUploadTrayStore.getState().cancelTask(videoTask.id)}
+                      className="shrink-0 pb-0.5 text-[11.5px] font-bold text-red-500 hover:text-red-700"
+                    >
+                      Hủy
+                    </button>
+                  </div>
+                )}
+                {videoTask?.status === 'error' && (
+                  <p className="text-[12px] text-red-600">{videoTask.errorMessage}</p>
+                )}
+              </div>
+            )}
+
+            {tab === 'youtube' && (
+              <form onSubmit={handleYoutubeSubmit} className="mb-5 flex flex-col gap-2">
+                <input
+                  value={youtubeUrl}
+                  onChange={(e) => setYoutubeUrl(e.target.value)}
+                  placeholder="https://www.youtube.com/watch?v=..."
+                  disabled={setYoutube.isPending}
+                  className="rounded-lg border border-gray-200 px-3 py-2 text-[13px] focus:border-cyan-400 focus:outline-none"
+                />
+                <button
+                  type="submit"
+                  disabled={setYoutube.isPending}
+                  className="self-start rounded-lg bg-cyan-600 px-4 py-1.5 text-[12.5px] font-bold text-white hover:bg-cyan-700 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {setYoutube.isPending ? 'Đang kiểm tra...' : 'Lưu link YouTube'}
+                </button>
+                {setYoutube.error instanceof ApiError && (
+                  <p className="text-[12px] text-red-600">{setYoutube.error.message}</p>
+                )}
+              </form>
+            )}
+          </>
         )}
 
         <hr className="my-4 border-gray-100" />
@@ -196,13 +250,13 @@ export function LessonMediaModal({ courseId, lesson, onClose }: LessonMediaModal
               type="file"
               accept=".pdf,.docx,.pptx,.zip,.txt"
               onChange={handleDocFileChange}
-              disabled={docProgress !== null}
+              disabled={docTask?.status === 'uploading'}
               className="text-[12.5px] file:mr-3 file:rounded-md file:border-0 file:bg-gray-100 file:px-3 file:py-1.5 file:text-[12px] file:font-semibold"
             />
-            {docProgress !== null && <UploadProgressBar percent={docProgress} label="Đang tải tài liệu lên..." />}
-            {uploadDocument.error instanceof ApiError && (
-              <p className="text-[12px] text-red-600">{uploadDocument.error.message}</p>
+            {docTask?.status === 'uploading' && (
+              <UploadProgressBar percent={docTask.percent} label="Đang tải tài liệu lên..." />
             )}
+            {docTask?.status === 'error' && <p className="text-[12px] text-red-600">{docTask.errorMessage}</p>}
           </div>
         ) : (
           <p className="text-[12px] text-amber-600">Đã đạt tối đa {MAX_DOCUMENTS} tài liệu — xóa bớt để thêm mới.</p>

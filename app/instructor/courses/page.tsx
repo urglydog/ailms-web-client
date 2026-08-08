@@ -26,7 +26,11 @@ export default function InstructorCoursesPage() {
   const courses = data?.content ?? [];
 
   const handleDelete = (id: number, title: string) => {
-    if (!window.confirm(`Xóa khóa học "${title}"? Nếu đã có học viên, khóa sẽ được lưu trữ thay vì xóa hẳn.`)) {
+    if (
+      !window.confirm(
+        `Xóa khóa học "${title}"? Nếu đã có học viên, khóa sẽ được lưu trữ thay vì xóa hẳn. Nếu chưa có học viên, toàn bộ chương, bài học, video và tài liệu đính kèm sẽ bị xóa vĩnh viễn.`,
+      )
+    ) {
       return;
     }
     deleteCourse.mutate(id);

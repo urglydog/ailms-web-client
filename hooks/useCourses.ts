@@ -176,25 +176,23 @@ export function useReorderLessons(courseId: number) {
   });
 }
 
-// ── Giai đoạn 4 — nạp video (UC34), tài liệu đính kèm (UC35), ảnh bìa ──
-
-export function useUploadLessonVideo(courseId: number) {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({ lessonId, file, onProgress }: {
-      lessonId: number;
-      file: File;
-      onProgress?: (percent: number) => void;
-    }) => lessonsApi.uploadVideo(lessonId, file, onProgress),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['courses', 'mine', courseId] }),
-  });
-}
+// ── Giai đoạn 4 — nạp video (UC34), tài liệu đính kèm (UC35) ──
+// Upload có tiến độ (video/tài liệu/ảnh bìa) dùng `hooks/useUploadTray.ts` (khay tải lên toàn
+// cục kiểu Google Drive), KHÔNG dùng useMutation ở đây — xem comment trong file đó vì sao.
 
 export function useSetYoutubeVideo(courseId: number) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ lessonId, input }: { lessonId: number; input: SetYoutubeVideoInput }) =>
       lessonsApi.setYoutubeVideo(lessonId, input),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['courses', 'mine', courseId] }),
+  });
+}
+
+export function useDeleteLessonVideo(courseId: number) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (lessonId: number) => lessonsApi.deleteVideo(lessonId),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['courses', 'mine', courseId] }),
   });
 }
@@ -207,12 +205,12 @@ export function useLessonDocuments(lessonId: number | null) {
   });
 }
 
-export function useUploadLessonDocument(lessonId: number | null) {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({ file, onProgress }: { file: File; onProgress?: (percent: number) => void }) =>
-      lessonsApi.uploadDocument(lessonId as number, file, onProgress),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['lessons', lessonId, 'documents'] }),
+/** BR-COURSE-06 — Admin xem tài liệu để kiểm duyệt (khóa đang PENDING), không cần sở hữu. */
+export function useModerationLessonDocuments(lessonId: number | null) {
+  return useQuery({
+    queryKey: ['lessons', lessonId, 'documents', 'moderation'],
+    queryFn: () => lessonsApi.listDocumentsForModeration(lessonId as number),
+    enabled: lessonId !== null && !!getAccessToken(),
   });
 }
 
@@ -221,17 +219,5 @@ export function useDeleteLessonDocument(lessonId: number | null) {
   return useMutation({
     mutationFn: (documentId: number) => lessonsApi.deleteDocument(documentId),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['lessons', lessonId, 'documents'] }),
-  });
-}
-
-export function useUploadCourseThumbnail(courseId: number) {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({ file, onProgress }: { file: File; onProgress?: (percent: number) => void }) =>
-      coursesApi.uploadThumbnail(courseId, file, onProgress),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['courses', 'mine', courseId] });
-      queryClient.invalidateQueries({ queryKey: ['courses', 'mine'] });
-    },
   });
 }
