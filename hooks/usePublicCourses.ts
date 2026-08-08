@@ -9,3 +9,12 @@ export function useCourseSearch(filters: CourseFilterState, sortBy: CourseSortBy
     queryFn: () => publicCoursesApi.search(filters, sortBy),
   });
 }
+
+/** UC11 — Học thử Preview, public không cần token. 403 nếu bài học không phải Preview. */
+export function useLessonPlayer(lessonId: number) {
+  return useQuery({
+    queryKey: ['lessons', lessonId, 'player'],
+    queryFn: () => publicCoursesApi.getLessonPlayer(lessonId),
+    retry: false,
+  });
+}

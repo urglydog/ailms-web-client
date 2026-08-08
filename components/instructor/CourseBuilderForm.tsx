@@ -6,8 +6,10 @@ import { SubmitChecklist } from '@/components/instructor/SubmitChecklist';
 import { CourseStatusBadge } from '@/components/course/CourseStatusBadge';
 import { UploadProgressBar } from '@/components/ui/UploadProgressBar';
 import { useCategories } from '@/hooks/useCategories';
-import { useMyCourseDetail, useSubmitCourse, useUpdateCourse, useUploadCourseThumbnail } from '@/hooks/useCourses';
+import { useMyCourseDetail, useSubmitCourse, useUpdateCourse } from '@/hooks/useCourses';
+import { useStartCourseThumbnailUpload } from '@/hooks/useUploadTray';
 import { ApiError } from '@/lib/api/client';
+import { useUploadTrayStore } from '@/lib/stores/uploadTrayStore';
 import type { CourseLevel } from '@/types/domain';
 
 const LEVEL_OPTIONS: Array<{ value: CourseLevel; label: string }> = [
@@ -26,7 +28,10 @@ export function CourseBuilderForm({ courseId }: CourseBuilderFormProps) {
 
   const updateCourse = useUpdateCourse(courseId);
   const submitCourse = useSubmitCourse(courseId);
-  const uploadThumbnail = useUploadCourseThumbnail(courseId);
+  const startThumbnailUpload = useStartCourseThumbnailUpload(courseId);
+  const thumbnailTask = useUploadTrayStore((s) =>
+    s.tasks.find((t) => t.targetType === 'course-thumbnail' && t.targetId === courseId),
+  );
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -34,7 +39,6 @@ export function CourseBuilderForm({ courseId }: CourseBuilderFormProps) {
   const [categoryId, setCategoryId] = useState<number | ''>('');
   const [level, setLevel] = useState<CourseLevel>('BEGINNER');
   const [price, setPrice] = useState('0');
-  const [thumbnailProgress, setThumbnailProgress] = useState<number | null>(null);
 
   /**
    * Chỉ đồng bộ state form từ server ĐÚNG 1 LẦN khi dữ liệu vừa tải xong.
@@ -67,13 +71,8 @@ export function CourseBuilderForm({ courseId }: CourseBuilderFormProps) {
     const file = e.target.files?.[0];
     e.target.value = '';
     if (!file) return;
-    setThumbnailProgress(0);
-    uploadThumbnail.mutate(
-      { file, onProgress: setThumbnailProgress },
-      {
-        onSuccess: (updated) => setThumbnailUrl(updated.thumbnailUrl ?? ''),
-        onSettled: () => setThumbnailProgress(null),
-      },
+    startThumbnailUpload(file, `Ảnh bìa: ${title || course?.title || ''}`, (updated) =>
+      setThumbnailUrl(updated.thumbnailUrl ?? ''),
     );
   };
 
@@ -94,7 +93,7 @@ export function CourseBuilderForm({ courseId }: CourseBuilderFormProps) {
     return <div className="p-10 text-center text-sm text-gray-500">Đang tải khóa học...</div>;
   }
 
-  const errors = [updateCourse.error, submitCourse.error, uploadThumbnail.error].filter(
+  const errors = [updateCourse.error, submitCourse.error].filter(
     (e): e is ApiError => e instanceof ApiError,
   );
 
@@ -176,11 +175,14 @@ export function CourseBuilderForm({ courseId }: CourseBuilderFormProps) {
               type="file"
               accept="image/jpeg,image/png,image/webp"
               onChange={handleThumbnailFileChange}
-              disabled={thumbnailProgress !== null}
+              disabled={thumbnailTask?.status === 'uploading'}
               className="text-[12.5px] file:mr-3 file:rounded-md file:border-0 file:bg-gray-100 file:px-3 file:py-1.5 file:text-[12px] file:font-semibold"
             />
-            {thumbnailProgress !== null && (
-              <UploadProgressBar percent={thumbnailProgress} label="Đang tải ảnh bìa lên..." />
+            {thumbnailTask?.status === 'uploading' && (
+              <UploadProgressBar percent={thumbnailTask.percent} label="Đang tải ảnh bìa lên..." />
+            )}
+            {thumbnailTask?.status === 'error' && (
+              <p className="text-[11.5px] text-red-600">{thumbnailTask.errorMessage}</p>
             )}
           </Field>
           <div className="grid grid-cols-2 gap-3">
