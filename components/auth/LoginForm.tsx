@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/Button';
 import { useLogin } from '@/hooks/useAuthMutations';
 import { useSearchParams } from 'next/navigation';
 import { GoogleSignInButton } from './GoogleSignInButton';
+import Link from 'next/link';
+import { toast } from 'sonner';
 
 export function LoginForm() {
 
@@ -89,10 +91,27 @@ export function LoginForm() {
           id="email" label="Email" type="email" required
           value={email} onChange={e => setEmail(e.target.value)}
         />
-        <Input
-          id="password" label="Mật khẩu" type="password" required
-          value={password} onChange={e => setPassword(e.target.value)}
-        />
+        <div className="flex flex-col gap-2">
+          <Input
+            id="password" label="Mật khẩu" type="password" required
+            value={password} onChange={e => setPassword(e.target.value)}
+          />
+          <div className="flex justify-end">
+            <Link 
+              href={`/forgot-password${email ? `?email=${encodeURIComponent(email)}` : ''}`}
+              onClick={(e) => {
+                if (!email) {
+                  e.preventDefault();
+                  toast.error('Vui lòng nhập email để đổi mật khẩu');
+                  document.getElementById('email')?.focus();
+                }
+              }}
+              className="text-sm font-semibold text-accent no-underline hover:underline"
+            >
+              Quên mật khẩu?
+            </Link>
+          </div>
+        </div>
         <Button type="submit" disabled={isPending} className="mt-2 w-full" size="lg">
           {isPending ? 'Đang xử lý...' : 'Đăng nhập'}
         </Button>

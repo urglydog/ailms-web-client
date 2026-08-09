@@ -5,11 +5,12 @@ import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 
 interface Step1Props {
+  initialEmail?: string;
   onSuccess: (email: string) => void;
 }
 
-export default function Step1ForgotPassword({ onSuccess }: Step1Props) {
-  const [email, setEmail] = useState('');
+export default function Step1ForgotPassword({ initialEmail = '', onSuccess }: Step1Props) {
+  const [email, setEmail] = useState(initialEmail);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 

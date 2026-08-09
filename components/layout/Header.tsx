@@ -15,6 +15,8 @@ export function Header() {
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const [userInfo, setUserInfo] = useState<{name: string, role: string} | null>(null);
 
+  const accountMenuRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
     if (token) {
@@ -41,6 +43,19 @@ export function Header() {
         console.error('Lỗi giải mã JWT:', e);
       }
     }
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
+        setShowNotifications(false);
+      }
+      if (accountMenuRef.current && !accountMenuRef.current.contains(event.target as Node)) {
+        setAccountMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   /**
@@ -176,7 +191,7 @@ export function Header() {
             </Link>
 
             {isLoggedIn ? (
-              <div className="relative ml-1">
+              <div className="relative ml-1" ref={accountMenuRef}>
                 <button
                   onClick={() => setAccountMenuOpen(!accountMenuOpen)}
                   className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-cyan-600 font-display text-[13px] font-bold text-white uppercase"
@@ -214,6 +229,9 @@ export function Header() {
                     </Link>
                     <Link href="/progress" className="rounded-lg px-3 py-2.5 text-[13.5px] text-gray-900 hover:bg-gray-50">
                       Báo cáo tiến độ
+                    </Link>
+                    <Link href="/payments" className="rounded-lg px-3 py-2.5 text-[13.5px] text-gray-900 hover:bg-gray-50">
+                      Lịch sử giao dịch
                     </Link>
                     <div className="my-1.5 h-px bg-gray-100"></div>
                     <button 
