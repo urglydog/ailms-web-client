@@ -1,17 +1,29 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
-import type { PaymentRes } from '@/types/domain';
 import { format, isSameDay } from 'date-fns';
 import { paymentsApi } from '@/lib/api/payments';
 import { toast } from 'sonner';
-import { parse } from 'date-fns';
+
+export interface AdminPayment {
+  txnRef: string;
+  userEmail: string;
+  courseTitle: string;
+  amount: number;
+  platformFee: number;
+  instructorEarning: number;
+  status: string;
+  paidAt: string | null;
+  gatewayTxnNo: string | null;
+  billingName?: string;
+  billingPhone?: string;
+}
 
 type SortField = 'txnRef' | 'userEmail' | 'amount' | 'paidAt';
 type SortOrder = 'asc' | 'desc';
 
 export default function AdminPaymentsPage() {
-  const [payments, setPayments] = useState<any[]>([]);
+  const [payments, setPayments] = useState<AdminPayment[]>([]);
   const [loading, setLoading] = useState(true);
   
   // Filters
@@ -28,7 +40,7 @@ export default function AdminPaymentsPage() {
   const itemsPerPage = 10;
   
   // Modal
-  const [selectedPayment, setSelectedPayment] = useState<any | null>(null);
+  const [selectedPayment, setSelectedPayment] = useState<AdminPayment | null>(null);
 
   useEffect(() => {
     fetchPayments();
@@ -109,12 +121,12 @@ export default function AdminPaymentsPage() {
     
     // Sắp xếp
     result.sort((a, b) => {
-      let valA = a[sortField];
-      let valB = b[sortField];
+      let valA: string | number = a[sortField] || 0;
+      let valB: string | number = b[sortField] || 0;
       
       if (sortField === 'paidAt') {
-        valA = valA ? new Date(valA).getTime() : 0;
-        valB = valB ? new Date(valB).getTime() : 0;
+        valA = a.paidAt ? new Date(a.paidAt).getTime() : 0;
+        valB = b.paidAt ? new Date(b.paidAt).getTime() : 0;
       }
       
       if (valA < valB) return sortOrder === 'asc' ? -1 : 1;

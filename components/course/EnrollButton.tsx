@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { enrollmentsApi } from '@/lib/api/enrollments';
-import { paymentsApi } from '@/lib/api/payments';
 import { toast } from 'sonner';
 
 interface EnrollButtonProps {
@@ -16,7 +15,6 @@ interface EnrollButtonProps {
 export function EnrollButton({ courseId, courseSlug, isFree, enrolled: initialEnrolled }: EnrollButtonProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [showModal, setShowModal] = useState(false);
   const [enrolled, setEnrolled] = useState(initialEnrolled);
 
   useEffect(() => {
@@ -46,26 +44,14 @@ export function EnrollButton({ courseId, courseSlug, isFree, enrolled: initialEn
       await enrollmentsApi.enrollFree(courseId);
       toast.success('Ghi danh thành công!');
       router.refresh();
-    } catch (err: any) {
-      toast.error(err.detail || 'Có lỗi xảy ra khi thực hiện');
+    } catch (err: unknown) {
+      toast.error((err as Record<string, string>)?.detail || 'Có lỗi xảy ra khi thực hiện');
     } finally {
       setLoading(false);
     }
   };
 
-  const handlePay = async (method: string) => {
-    try {
-      setLoading(true);
-      const res = await paymentsApi.create({
-        courseId,
-        paymentMethod: method,
-      });
-      window.location.href = res.paymentUrl;
-    } catch (err: any) {
-      toast.error(err.detail || 'Có lỗi xảy ra khi thực hiện');
-      setLoading(false);
-    }
-  };
+
 
   return (
     <button

@@ -12,7 +12,7 @@ export default function CheckoutPage() {
   const params = useParams();
   const courseSlug = decodeURIComponent(params.slug as string);
   
-  const [course, setCourse] = useState<any>(null);
+  const [course, setCourse] = useState<Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(true);
   const [payingMethod, setPayingMethod] = useState<string | null>(null);
   
@@ -23,9 +23,9 @@ export default function CheckoutPage() {
     if (!courseSlug) return;
     publicCoursesApi.getBySlug(courseSlug)
       .then((data) => {
-        setCourse(data);
+        setCourse(data as Record<string, unknown>);
       })
-      .catch((err) => {
+      .catch((_err) => {
         toast.error('Không thể tải thông tin khóa học');
         router.push('/courses');
       })
@@ -42,8 +42,9 @@ export default function CheckoutPage() {
         billingPhone
       });
       window.location.href = res.paymentUrl;
-    } catch (err: any) {
-      toast.error(err.detail || 'Có lỗi xảy ra khi thực hiện thanh toán');
+    } catch (err: unknown) {
+      const errorMsg = (err as Record<string, string>)?.detail || 'Có lỗi xảy ra khi thực hiện thanh toán';
+      toast.error(errorMsg);
       setPayingMethod(null);
     }
   };

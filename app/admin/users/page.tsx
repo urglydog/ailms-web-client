@@ -48,7 +48,7 @@ export default function AdminUsersPage() {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) setUsers(await res.json());
-    } catch (e) {
+    } catch {
       toast.error('Lỗi khi tải danh sách người dùng');
     }
   };
@@ -60,7 +60,7 @@ export default function AdminUsersPage() {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) setRequests(await res.json());
-    } catch (e) {
+    } catch {
       toast.error('Lỗi khi tải danh sách yêu cầu giảng viên');
     }
   };
@@ -156,13 +156,13 @@ export default function AdminUsersPage() {
     }
     
     result.sort((a, b) => {
-      let valA: any = a[sortField];
-      let valB: any = b[sortField];
+      let valA: string | number = (a as Record<string, string | number>)[sortField] || 0;
+      let valB: string | number = (b as Record<string, string | number>)[sortField] || 0;
       
       if (sortField === 'createdAt') {
-        valA = valA ? new Date(valA).getTime() : 0;
-        valB = valB ? new Date(valB).getTime() : 0;
-      } else if (typeof valA === 'string') {
+        valA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        valB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      } else if (typeof valA === 'string' && typeof valB === 'string') {
         valA = valA.toLowerCase();
         valB = valB.toLowerCase();
       }

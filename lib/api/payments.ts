@@ -10,5 +10,5 @@ export const paymentsApi = {
     api.get<PaymentRes[]>('/api/v1/payments/mine', { token: getAccessToken() ?? undefined }),
 
   listAllAdmin: () =>
-    api.get<any[]>('/api/v1/payments/admin/all', { token: getAccessToken() ?? undefined }),
+    api.get<Record<string, unknown>[]>('/api/v1/payments/admin/all', { token: getAccessToken() ?? undefined }),
 };
