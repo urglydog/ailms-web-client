@@ -50,7 +50,7 @@ export default function AdminPaymentsPage() {
     setLoading(true);
     paymentsApi
       .listAllAdmin()
-      .then((data) => setPayments(data))
+      .then((data) => setPayments(data as unknown as AdminPayment[]))
       .catch(() => toast.error('Lỗi khi tải lịch sử giao dịch'))
       .finally(() => setLoading(false));
   };

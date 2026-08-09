@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { api } from '@/lib/api/client';
 import { toast } from 'sonner';
 import Link from 'next/link';
 
-export default function VnpayReturnPage() {
+function VnpayReturnContent() {
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
 
@@ -89,5 +89,13 @@ export default function VnpayReturnPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function VnpayReturnPage() {
+  return (
+    <Suspense fallback={<div className="flex min-h-[60vh] items-center justify-center">Đang xử lý kết quả thanh toán...</div>}>
+      <VnpayReturnContent />
+    </Suspense>
   );
 }

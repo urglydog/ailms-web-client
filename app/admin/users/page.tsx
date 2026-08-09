@@ -156,8 +156,8 @@ export default function AdminUsersPage() {
     }
     
     result.sort((a, b) => {
-      let valA: string | number = (a as Record<string, string | number>)[sortField] || 0;
-      let valB: string | number = (b as Record<string, string | number>)[sortField] || 0;
+      let valA: string | number = (a as unknown as Record<string, string | number>)[sortField] || 0;
+      let valB: string | number = (b as unknown as Record<string, string | number>)[sortField] || 0;
       
       if (sortField === 'createdAt') {
         valA = a.createdAt ? new Date(a.createdAt).getTime() : 0;

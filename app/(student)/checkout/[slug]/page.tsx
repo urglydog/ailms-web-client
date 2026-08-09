@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Image from 'next/image';
 import { publicCoursesApi } from '@/lib/api/publicCourses';
+import type { CourseDetail } from '@/types/domain';
 import { paymentsApi } from '@/lib/api/payments';
 import { toast } from 'sonner';
 
@@ -12,7 +13,7 @@ export default function CheckoutPage() {
   const params = useParams();
   const courseSlug = decodeURIComponent(params.slug as string);
   
-  const [course, setCourse] = useState<Record<string, unknown> | null>(null);
+  const [course, setCourse] = useState<CourseDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [payingMethod, setPayingMethod] = useState<string | null>(null);
   
@@ -23,7 +24,7 @@ export default function CheckoutPage() {
     if (!courseSlug) return;
     publicCoursesApi.getBySlug(courseSlug)
       .then((data) => {
-        setCourse(data as Record<string, unknown>);
+        setCourse(data);
       })
       .catch((_err) => {
         toast.error('Không thể tải thông tin khóa học');
@@ -33,6 +34,7 @@ export default function CheckoutPage() {
   }, [courseSlug, router]);
 
   const handlePay = async (method: string) => {
+    if (!course) return;
     try {
       setPayingMethod(method);
       const res = await paymentsApi.create({
