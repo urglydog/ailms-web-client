@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { CourseStatusBadge } from '@/components/course/CourseStatusBadge';
 import { useModerationQueue } from '@/hooks/useCourses';
 import { ApiError } from '@/lib/api/client';
@@ -17,6 +17,11 @@ const STATUS_TABS: Array<{ id: CourseStatus; label: string }> = [
 export default function AdminModerationPage() {
   const [statusFilter, setStatusFilter] = useState<CourseStatus>('PENDING');
   const { data, isLoading, error } = useModerationQueue({ status: statusFilter });
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const courses = data?.content ?? [];
 
@@ -55,9 +60,9 @@ export default function AdminModerationPage() {
           <span></span>
         </div>
 
-        {isLoading && <div className="p-10 text-center text-sm text-gray-500">Đang tải...</div>}
+        {(!mounted || isLoading) && <div className="p-10 text-center text-sm text-gray-500">Đang tải...</div>}
 
-        {!isLoading && courses.length === 0 && (
+        {mounted && !isLoading && courses.length === 0 && (
           <div className="p-10 text-center text-sm text-gray-500">Không có khóa học nào ở trạng thái này.</div>
         )}
 
