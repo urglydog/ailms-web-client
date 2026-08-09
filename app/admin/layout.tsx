@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { LogoutSidebarButton } from '@/components/auth/LogoutSidebarButton';
 import { useModerationQueue } from '@/hooks/useCourses';
@@ -17,10 +17,40 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname();
   const router = useRouter();
 
+  const [userInfo, setUserInfo] = useState<{name: string, role: string, initials: string} | null>(null);
+
   useEffect(() => {
     const role = getCurrentRole();
     if (role !== 'ADMIN') {
       router.replace(role ? '/' : '/login');
+    }
+
+    // Lấy thông tin user
+    const token = getAccessToken();
+    if (token) {
+      try {
+        const payload = token.split('.')[1];
+        if (payload) {
+          const decoded = JSON.parse(atob(payload));
+          const nameStr = decoded.name || decoded.fullName || decoded.sub || decoded.email || 'Admin';
+          
+          let roleStr = 'Admin';
+          if (typeof decoded.role === 'string') roleStr = decoded.role;
+          else if (Array.isArray(decoded.roles)) roleStr = decoded.roles[0] || 'Admin';
+          else if (typeof decoded.roles === 'string') roleStr = decoded.roles;
+          
+          // Tạo 1-2 chữ cái đầu
+          const words = nameStr.split(' ');
+          let initials = words[0].charAt(0).toUpperCase();
+          if (words.length > 1) {
+            initials += words[words.length - 1].charAt(0).toUpperCase();
+          }
+
+          setUserInfo({ name: nameStr, role: roleStr, initials });
+        }
+      } catch (e) {
+        console.error(e);
+      }
     }
   }, [router]);
 
@@ -43,7 +73,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { id: 'moderation', label: 'Kiểm duyệt khóa học', href: '/admin/moderation', badge: pendingCoursesCount },
     { id: 'users', label: 'Quản lý người dùng', href: '/admin/users', badge: pendingRequestsCount },
     { id: 'aiqueue', label: 'Giám sát AI Queue', href: '/admin/ai-queue', badge: 0 },
-    { id: 'transactions', label: 'Đối soát giao dịch', href: '/admin/transactions', badge: 0 },
+    { id: 'transactions', label: 'Đối soát giao dịch', href: '/admin/transactions/payments', badge: 0 },
     { id: 'categories', label: 'Danh mục', href: '/admin/categories', badge: 0 },
     { id: 'reviews', label: 'Đánh giá', href: '/admin/reviews', badge: 0 },
     { id: 'settings', label: 'Cấu hình hệ thống', href: '/admin/settings', badge: 0 },
@@ -91,12 +121,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         
         <div className="mt-auto border-t border-white/10 pt-3">
           <div className="flex items-center gap-2.5 px-2">
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-600 font-display text-[12.5px] font-bold text-white">
-              QT
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-600 font-display text-[12.5px] font-bold text-white uppercase">
+              {userInfo?.initials || 'A'}
             </span>
             <div className="flex min-w-0 flex-col">
-              <span className="truncate text-[12.5px] font-semibold text-white">Đỗ Thị Quản Trị</span>
-              <span className="text-[11px] text-slate-400">Admin</span>
+              <span className="truncate text-[12.5px] font-semibold text-white">{userInfo?.name || 'Đang tải...'}</span>
+              <span className="text-[11px] text-slate-400">{userInfo?.role || 'Admin'}</span>
             </div>
           </div>
           <LogoutSidebarButton />

@@ -137,9 +137,25 @@ export default function LearnPage() {
 
             {/* Tab: Giai đoạn 7–8 sẽ nối Ghi chú, Học liệu, Socratic Tutor */}
             <div className="card p-5">
-              <p className="text-sm text-ink-muted">
-                Khu vực Ghi chú · Học liệu AI · Socratic Tutor sẽ được nối ở Giai đoạn 7 và 8.
-              </p>
+              {lesson.isPreview ? (
+                <div className="flex flex-col items-center justify-center py-6 text-center">
+                  <div className="mb-2 text-3xl">🔒</div>
+                  <h3 className="font-display font-semibold text-ink">Nội dung bị khóa</h3>
+                  <p className="mt-1 text-sm text-ink-muted mb-4">
+                    Tính năng Ghi chú, Học liệu AI và Socratic Tutor chỉ dành cho học viên đã sở hữu khóa học.
+                  </p>
+                  <Link
+                    href={`/courses/${lesson.courseSlug}`}
+                    className="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-dark no-underline"
+                  >
+                    Mua khóa học ngay
+                  </Link>
+                </div>
+              ) : (
+                <p className="text-sm text-ink-muted">
+                  Khu vực Ghi chú · Học liệu AI · Socratic Tutor sẽ được nối ở Giai đoạn 7 và 8.
+                </p>
+              )}
             </div>
           </div>
 

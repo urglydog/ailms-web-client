@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -13,6 +14,7 @@ interface UserProfile {
   createdAt: string;
   avatarUrl?: string;
   preferredLanguage?: string;
+  authProvider?: string;
 }
 
 export default function ProfilePage() {
@@ -128,19 +130,23 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          <div className="mt-6 flex gap-2">
-            <button
-              onClick={() => setShowEditModal(true)}
-              className="flex-1 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition-colors"
-            >
-              Chỉnh sửa hồ sơ
-            </button>
-            <button
-              onClick={() => setShowPasswordModal(true)}
-              className="flex-1 rounded-lg bg-gray-600 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-700 transition-colors"
-            >
-              Đổi mật khẩu
-            </button>
+          <div className="mt-6 flex flex-col gap-2">
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowEditModal(true)}
+                className="flex-1 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition-colors"
+              >
+                Chỉnh sửa hồ sơ
+              </button>
+              {user.authProvider !== 'GOOGLE' && (
+                <button
+                  onClick={() => setShowPasswordModal(true)}
+                  className="flex-1 rounded-lg bg-gray-600 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-700 transition-colors"
+                >
+                  Đổi mật khẩu
+                </button>
+              )}
+            </div>
           </div>
         </div>
 

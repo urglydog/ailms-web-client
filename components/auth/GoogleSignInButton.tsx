@@ -31,23 +31,36 @@ declare global {
 
 export function GoogleSignInButton() {
   useEffect(() => {
-    // Initialize Google Sign-In button
-    if (window.google?.accounts?.id) {
-      window.google.accounts.id.initialize({
-        client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
-        callback: handleGoogleSuccess,
-      });
-      window.google.accounts.id.renderButton(
-        document.getElementById('google-signin-button'),
-        {
-          theme: 'outline',
-          size: 'large',
-          width: '100%',
-          text: 'signin_with'
-        }
-      );
-    }
+    let attempts = 0;
+    const checkGoogle = setInterval(() => {
+      attempts++;
+      if (window.google?.accounts?.id) {
+        clearInterval(checkGoogle);
+        window.google.accounts.id.initialize({
+          client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+          callback: handleGoogleSuccess,
+        });
+        window.google.accounts.id.renderButton(
+          document.getElementById('google-signin-button'),
+          {
+            theme: 'outline',
+            size: 'large',
+            width: '100%',
+            text: 'signin_with'
+          }
+        );
+      } else if (attempts > 50) {
+        // Stop checking after 5 seconds
+        clearInterval(checkGoogle);
+      }
+    }, 100);
+
+    return () => clearInterval(checkGoogle);
   }, []);
 
-  return <div id="google-signin-button" className="flex justify-center"></div>;
+  return (
+    <div className="flex justify-center w-full">
+      <div id="google-signin-button" className="w-full flex justify-center"></div>
+    </div>
+  );
 }

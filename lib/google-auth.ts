@@ -1,3 +1,5 @@
+import { toast } from 'sonner';
+
 interface GoogleCredentialResponse {
   credential?: string;
 }
@@ -18,7 +20,7 @@ export async function handleGoogleSuccess(credentialResponse: GoogleCredentialRe
 
     if (!res.ok) {
       const err = await res.json();
-      throw new Error(err.message || 'Đăng nhập Google thất bại');
+      throw new Error(err.message || err.detail || 'Đăng nhập Google thất bại');
     }
 
     const data = await res.json();
@@ -52,8 +54,11 @@ export async function handleGoogleSuccess(credentialResponse: GoogleCredentialRe
       console.error('Lỗi giải mã token lúc đăng nhập Google:', e);
     }
 
-    window.location.href = targetUrl;
+    toast.success('Đăng nhập thành công!');
+    setTimeout(() => {
+      window.location.href = targetUrl;
+    }, 1000);
   } catch (error: unknown) {
-    alert('Lỗi đăng nhập: ' + (error instanceof Error ? error.message : 'Có lỗi xảy ra'));
+    toast.error('Lỗi đăng nhập: ' + (error instanceof Error ? error.message : 'Có lỗi xảy ra'));
   }
 }

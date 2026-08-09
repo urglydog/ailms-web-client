@@ -156,6 +156,7 @@ export interface PlayerLesson {
   /** Track đang chọn; null = đang phát âm thanh gốc */
   activeTrack: AudioTrackInfo | null;
   lastPositionSec: number;
+  isPreview: boolean;
 }
 
 // ── Tiến độ lồng tiếng (UC20) ───────────────────────────────────
@@ -339,4 +340,29 @@ export interface EnrolledCourse {
   isFree: boolean;
   price: number;
   alreadyReviewed: boolean;
+}
+
+// ── F3.2: Thanh toán & Đối soát ─────────────────────────────────
+
+export interface CreatePaymentReq {
+  courseId: number;
+  paymentMethod: string; // 'VNPAY' | 'MOMO'
+  billingName?: string;
+  billingPhone?: string;
+}
+
+export interface PaymentUrlRes {
+  paymentUrl: string;
+}
+
+export interface PaymentRes {
+  txnRef: string;
+  amount: number;
+  paymentMethod: string;
+  status: PaymentStatus;
+  paidAt: string | null;
+  courseTitle: string;
+  gatewayTxnNo: string | null;
+  billingName?: string;
+  billingPhone?: string;
 }

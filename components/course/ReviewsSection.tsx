@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import { useState, useEffect, type FormEvent } from 'react';
 import { StarRatingInput } from '@/components/ui/StarRatingInput';
 import { useCourseReviews, useCreateReview } from '@/hooks/useReviews';
 import { ApiError } from '@/lib/api/client';
@@ -31,8 +31,13 @@ export function ReviewsSection({ courseId }: { courseId: number }) {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
-  const isStudent = getCurrentRole() === 'STUDENT';
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  const isStudent = isMounted && getCurrentRole() === 'STUDENT';
   const reviews = data?.content ?? [];
 
   const handleSubmit = (e: FormEvent) => {
