@@ -48,7 +48,7 @@ export default function ChangePasswordModal({ onClose, onSuccess }: ChangePasswo
 
       if (!res.ok) {
         const err = await res.json();
-        throw new Error(err.message || 'Có lỗi xảy ra');
+        throw new Error(err.detail || 'Có lỗi xảy ra');
       }
 
       setSuccess('Đổi mật khẩu thành công!');

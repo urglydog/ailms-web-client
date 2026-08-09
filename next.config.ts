@@ -18,6 +18,8 @@ const nextConfig: NextConfig = {
       // Thumbnail của video YouTube (Lesson.videoSource = YOUTUBE)
       { protocol: 'https', hostname: 'i.ytimg.com' },
       { protocol: 'https', hostname: 'img.youtube.com' },
+      // Placeholder data
+      { protocol: 'https', hostname: 'picsum.photos' },
     ],
   },
 };

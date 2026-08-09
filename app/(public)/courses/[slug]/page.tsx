@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ChapterAccordion } from '@/components/course/ChapterAccordion';
+import { EnrollButton } from '@/components/course/EnrollButton';
 import { ReviewsSection } from '@/components/course/ReviewsSection';
 import { Badge } from '@/components/ui/Badge';
 import { StarRating } from '@/components/ui/StarRating';
@@ -131,14 +132,7 @@ export default async function CourseDetailPage({ params }: PageProps) {
               </div>
             )}
 
-            {/* Giai đoạn 3 sẽ nối vào UC12 (miễn phí) hoặc UC13 → UC14 (trả phí) */}
-            <button
-              type="button"
-              className="w-full rounded-full bg-accent px-6 py-3 font-display text-base
-                         font-semibold text-white hover:bg-accent-dark"
-            >
-              {course.isFree ? 'Đăng ký học ngay' : 'Mua khoá học'}
-            </button>
+            <EnrollButton courseId={course.id} courseSlug={course.slug} isFree={course.isFree} enrolled={course.enrolled} />
 
             {previewLesson && (
               <Link

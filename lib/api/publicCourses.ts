@@ -132,6 +132,7 @@ interface RawPlayerLesson {
   videoUrl: string;
   youtubeId: string | null;
   durationSec: number;
+  isPreview?: boolean;
 }
 
 /** Lồng tiếng (`voice_mappings`) và tiến độ xem dở chưa có API — Giai đoạn 5/6. */
@@ -142,6 +143,7 @@ function toPlayerLesson(raw: RawPlayerLesson): PlayerLesson {
     courseId: raw.courseId,
     courseTitle: raw.courseTitle,
     courseSlug: raw.courseSlug,
+    isPreview: raw.isPreview || false,
     videoSource: raw.videoSource,
     videoUrl: raw.videoUrl,
     youtubeId: raw.youtubeId,
