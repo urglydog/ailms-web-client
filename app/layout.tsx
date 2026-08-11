@@ -10,15 +10,14 @@ import { Providers } from './providers';
  * mạng của người dùng.
  */
 const outfit = Outfit({
-  subsets: ['latin', 'latin-ext'],
+  subsets: ['latin'],
   weight: ['500', '600', '700', '800'],
   variable: '--font-outfit',
   display: 'swap',
 });
 
 const jakarta = Plus_Jakarta_Sans({
-  // latin-ext cần cho dấu tiếng Việt
-  subsets: ['latin', 'latin-ext'],
+  subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
   variable: '--font-jakarta',
   display: 'swap',
