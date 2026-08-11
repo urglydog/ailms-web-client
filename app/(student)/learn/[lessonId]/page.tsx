@@ -1,33 +1,38 @@
 'use client';
 
+import { useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { DualPlayer } from '@/components/player/DualPlayer';
 import { DubbingActivatePanel } from '@/components/player/DubbingActivatePanel';
 import { LanguageSwitcher } from '@/components/player/LanguageSwitcher';
 import { PipelineProgress } from '@/components/player/PipelineProgress';
 import { useActivateDubbing } from '@/hooks/useDubbing';
 import { useDubbingSocket } from '@/hooks/useDubbingSocket';
+import { useEnrolledLessonPlayer } from '@/hooks/useEnrolledLessonPlayer';
+import { useLessonProgress } from '@/hooks/useLessonProgress';
 import { useLessonPlayer } from '@/hooks/usePublicCourses';
 import { ApiError } from '@/lib/api/client';
+import { getAccessToken } from '@/lib/auth/token';
 import { MOCK_PIPELINE_STEPS } from '@/lib/mock/courses';
 import type { PipelineStep } from '@/types/domain';
 
 /**
  * Trang học bài — dịch từ nhánh `isPlayer` của design.
  *
- * Gộp 4 use case vào một màn:
- *  - UC11 Học thử Preview (video thật, không cần sở hữu khóa học — xem `useLessonPlayer`)
- *  - UC16 Dual Player (video muted + audio lồng tiếng)
- *  - UC17 chọn ngôn ngữ đã có bản lồng tiếng
+ * Gộp 5 use case vào một màn:
+ *  - UC11 Học thử Preview (khách ẩn danh, chỉ bài Preview — `useLessonPlayer`)
+ *  - UC16/17 Dual Player + chọn ngôn ngữ cho học viên ĐÃ đăng nhập — `useEnrolledLessonPlayer`
  *  - UC18 kích hoạt lồng tiếng khi ngôn ngữ chưa có → panel `DubbingActivatePanel`
  *  - UC20 theo dõi tiến độ realtime → panel `PipelineProgress`
  *
- * Chưa có bảng `voice_mappings`/`AudioTrack` thật (Giai đoạn 5) nên `languages` luôn rỗng —
- * `LanguageSwitcher` không hiện gì, `mode` luôn ở `watching`. UC18/UC20 (state `need-activation`/
- * `processing`) giữ nguyên UI đã dựng từ Giai đoạn 0 nhưng chưa có đường vào thật cho tới khi
- * Giai đoạn 5 nối `languages` thật.
+ * Gọi CẢ HAI hook, mỗi hook tự `enabled` theo có/không JWT (loại trừ nhau — xem 2 dòng
+ * `useEnrolledLessonPlayer`/`useLessonPlayer` bên dưới) rồi dùng dữ liệu của hook đang chạy: giữ
+ * nguyên luồng khách xem thử dựng từ Giai đoạn 4, không phá khi thêm luồng đã đăng nhập.
+ *
+ * `videoRef`/`audioRef` được trang này sở hữu (không phải `DualPlayer`) để Giai đoạn 6 phần
+ * F6.2 (`useLessonProgress`) dùng chung, đo đúng thời gian phát thật của video đang hiển thị.
  */
 
 type PlayerMode = 'watching' | 'need-activation' | 'processing';
@@ -35,8 +40,27 @@ type PlayerMode = 'watching' | 'need-activation' | 'processing';
 export default function LearnPage() {
   const params = useParams<{ lessonId: string }>();
   const lessonId = Number(params.lessonId);
+  const hasToken = !!getAccessToken();
 
-  const { data: lesson, isLoading, error } = useLessonPlayer(lessonId);
+  const enrolled = useEnrolledLessonPlayer(lessonId);
+  const preview = useLessonPlayer(lessonId, { enabled: !hasToken });
+  const lesson = hasToken ? enrolled.data : preview.data;
+  const isLoading = hasToken ? enrolled.isLoading : preview.isLoading;
+  const error = hasToken ? enrolled.error : preview.error;
+
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const queryClient = useQueryClient();
+  // `languages[].track` chỉ mới sau khi gọi lại API — cần refetch mỗi khi có track mới sẵn sàng
+  // (BR-DUB-04 trả AVAILABLE ngay, hoặc job vừa COMPLETED), nếu không `available`/`track` trong
+  // cache vẫn cũ dù backend đã có audio.
+  const refetchLesson = useCallback(
+    () =>
+      queryClient.invalidateQueries({
+        queryKey: hasToken ? ['lessons', lessonId, 'player', 'enrolled'] : ['lessons', lessonId, 'player'],
+      }),
+    [queryClient, hasToken, lessonId],
+  );
 
   const [activeLang, setActiveLang] = useState<string | null>(null);
   const [mode, setMode] = useState<PlayerMode>('watching');
@@ -83,6 +107,7 @@ export default function LearnPage() {
     } else if (lastEvent.status === 'COMPLETED') {
       // Sự kiện CẤP-JOB — đây mới là lúc chắc chắn xong (đã concat + upload B2), không phải
       // chunk cuối "COMPLETED" (BR-CHUNK-05: còn phải ghép final.mp3 sau đó).
+      void refetchLesson();
       setMode('watching');
     } else {
       setJobError(
@@ -91,7 +116,15 @@ export default function LearnPage() {
           : 'Lồng tiếng thất bại, vui lòng thử lại sau.',
       );
     }
-  }, [lastEvent]);
+  }, [lastEvent, refetchLesson]);
+
+  // UC21 — chỉ ghi nhận tiến độ khi đã đăng nhập, đang thật sự xem (không phải lúc kích hoạt
+  // lồng tiếng), và biết chắc video là nguồn UPLOAD (YouTube chưa có <video> để gắn `videoRef`,
+  // theo dõi tiến độ nguồn YouTube để dành việc sau).
+  useLessonProgress(videoRef, lessonId, {
+    initialPositionSec: lesson?.lastPositionSec ?? 0,
+    enabled: hasToken && mode === 'watching' && lesson?.videoSource === 'UPLOAD',
+  });
 
   if (isLoading) {
     return <div className="p-16 text-center text-sm text-ink-muted">Đang tải bài học...</div>;
@@ -133,7 +166,8 @@ export default function LearnPage() {
       {
         onSuccess: (result) => {
           if (result.status === 'AVAILABLE') {
-            // BR-DUB-04: đã có audioUrl sẵn — Giai đoạn 6 sẽ nối activeTrack thật để phát ngay.
+            // BR-DUB-04: đã có audioUrl sẵn — refetch để `languages[].track` có ngay, phát luôn.
+            void refetchLesson();
             setMode('watching');
             return;
           }
@@ -187,7 +221,9 @@ export default function LearnPage() {
                 videoSource={lesson.videoSource}
                 videoUrl={lesson.videoUrl}
                 youtubeId={lesson.youtubeId}
-                track={lesson.activeTrack}
+                track={lesson.languages.find((l) => l.code === activeLang)?.track ?? null}
+                videoRef={videoRef}
+                audioRef={audioRef}
               />
             )}
 

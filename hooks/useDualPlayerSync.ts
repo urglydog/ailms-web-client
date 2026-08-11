@@ -33,15 +33,32 @@ const DRIFT_TOLERANCE_SEC = 0.2;
 interface UseDualPlayerSyncOptions {
   /** Tạm dừng đồng bộ khi đang phát âm thanh gốc (chưa chọn bản lồng tiếng). */
   enabled?: boolean;
+  /**
+   * Mốc bắt đầu (giây, tuyệt đối theo video) của file audio đang tải.
+   *
+   * Khi `AudioTrack.status = PARTIAL`, mỗi file chunk do `dubbing_service.py` sinh ra tự
+   * đánh mốc t=0 ở **đầu chunk đó**, không phải đầu video — khác với `finalUrl` (t=0 =
+   * đầu video). Nếu không trừ offset này, mọi thao tác đồng bộ (`seeked`, vòng kiểm 250ms)
+   * sẽ tua audio sai vị trí ngay khi đang phát playlist chunk. Mặc định 0 (đúng cho
+   * `finalUrl` hoặc chunk đầu tiên có `startSec = 0`).
+   */
+  timeOffsetSec?: number;
 }
 
 export function useDualPlayerSync(
   videoRef: React.RefObject<HTMLVideoElement | null>,
   audioRef: React.RefObject<HTMLAudioElement | null>,
-  { enabled = true }: UseDualPlayerSyncOptions = {},
+  { enabled = true, timeOffsetSec = 0 }: UseDualPlayerSyncOptions = {},
 ) {
   // Giữ trong ref để interval không phải tạo lại khi component re-render
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  // Offset đổi mỗi khi phát sang chunk khác (~10 phút/lần) — dùng ref để không phải
+  // gỡ/gắn lại listener mỗi lần đổi, chỉ đọc giá trị mới nhất trong closure có sẵn.
+  const offsetRef = useRef(timeOffsetSec);
+
+  useEffect(() => {
+    offsetRef.current = timeOffsetSec;
+  }, [timeOffsetSec]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -63,7 +80,7 @@ export function useDualPlayerSync(
     const handlePause = () => audio.pause();
 
     const handleSeeked = () => {
-      audio.currentTime = video.currentTime;
+      audio.currentTime = Math.max(0, video.currentTime - offsetRef.current);
     };
 
     /** Không được bỏ sót: đổi tốc độ video mà audio giữ nguyên là lệch vĩnh viễn. */
@@ -80,8 +97,9 @@ export function useDualPlayerSync(
       if (video.paused) {
         return;
       }
-      if (Math.abs(video.currentTime - audio.currentTime) > DRIFT_TOLERANCE_SEC) {
-        audio.currentTime = video.currentTime;
+      const targetAudioTime = Math.max(0, video.currentTime - offsetRef.current);
+      if (Math.abs(targetAudioTime - audio.currentTime) > DRIFT_TOLERANCE_SEC) {
+        audio.currentTime = targetAudioTime;
       }
     }, SYNC_INTERVAL_MS);
 
@@ -108,14 +126,14 @@ export function useDualPlayerSync(
  *    chờ buffer mà audio chạy tiếp thì lệch vĩnh viễn và vòng kiểm 250 ms cũng
  *    không cứu được vì nó chỉ so thời gian, không biết video đang đứng.
  *
- * Sẽ hiện thực đầy đủ ở Giai đoạn 6 cùng UC16; ở đây khai báo trước để hợp đồng
- * rõ ràng và test viết được sớm.
+ * Hiện thực đầy đủ ở {@link useYouTubeDualPlayerSync} (Giai đoạn 6, UC16).
  */
 export interface YouTubePlayerLike {
   getCurrentTime(): number;
   seekTo(seconds: number, allowSeekAhead: boolean): void;
   getPlayerState(): number;
   mute(): void;
+  unMute(): void;
   getPlaybackRate(): number;
 }
 
@@ -128,3 +146,171 @@ export const YT_STATE = {
   BUFFERING: 3,
   CUED: 5,
 } as const;
+
+/** Sự kiện tối thiểu cần dùng — không cài `@types/youtube`, tự khai báo phần dùng tới. */
+interface YouTubePlayerEvent {
+  target: YouTubePlayerLike;
+  data: number;
+}
+
+interface YouTubePlayerConstructorOptions {
+  videoId: string;
+  playerVars?: Record<string, number | string>;
+  events?: {
+    onReady?: (event: YouTubePlayerEvent) => void;
+    onStateChange?: (event: YouTubePlayerEvent) => void;
+    onPlaybackRateChange?: (event: YouTubePlayerEvent) => void;
+  };
+}
+
+interface YouTubeIframeApi {
+  Player: new (
+    element: HTMLElement | string,
+    options: YouTubePlayerConstructorOptions,
+  ) => YouTubePlayerLike & { destroy(): void };
+}
+
+declare global {
+  interface Window {
+    YT?: YouTubeIframeApi;
+    onYouTubeIframeAPIReady?: () => void;
+  }
+}
+
+let youtubeApiPromise: Promise<YouTubeIframeApi> | null = null;
+
+/** Nạp script `iframe_api` đúng 1 lần cho cả trang, dù mở nhiều `DualPlayer` liên tiếp. */
+function loadYouTubeIframeApi(): Promise<YouTubeIframeApi> {
+  if (window.YT?.Player) {
+    return Promise.resolve(window.YT);
+  }
+  if (youtubeApiPromise) {
+    return youtubeApiPromise;
+  }
+  youtubeApiPromise = new Promise((resolve) => {
+    const previous = window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady = () => {
+      previous?.();
+      resolve(window.YT as YouTubeIframeApi);
+    };
+    const script = document.createElement('script');
+    script.src = 'https://www.youtube.com/iframe_api';
+    document.head.appendChild(script);
+  });
+  return youtubeApiPromise;
+}
+
+interface UseYouTubeDualPlayerSyncOptions {
+  /** Có bản lồng tiếng đang phát qua `<audio>` hay không. false = để YouTube tự phát tiếng gốc. */
+  dubActive?: boolean;
+  /** Xem giải thích ở {@link UseDualPlayerSyncOptions.timeOffsetSec} — cùng ý nghĩa. */
+  timeOffsetSec?: number;
+}
+
+/**
+ * Đồng bộ Dual Player khi nguồn video là YouTube — cùng hợp đồng BR-SYNC-01 với
+ * {@link useDualPlayerSync} (4 sự kiện tương đương, vòng kiểm 250ms) nhưng đọc/ghi thời gian qua
+ * IFrame Player API thay vì thẻ `<video>` thường.
+ *
+ * Player luôn được tạo khi có `youtubeId` (kể cả chưa chọn ngôn ngữ lồng tiếng — video YouTube
+ * vẫn phải hiện ra và tự phát tiếng gốc); `dubActive` chỉ quyết định có `mute()` video + đồng bộ
+ * `<audio>` theo hay không, đổi được giữa chừng khi học viên chọn/bỏ chọn ngôn ngữ.
+ *
+ * Khác biệt quan trọng: dùng sự kiện `onPlaybackRateChange` có sẵn của IFrame API để đồng bộ
+ * tốc độ (không cần polling); trạng thái `BUFFERING` được coi như `pause` — video đứng chờ
+ * buffer mà audio chạy tiếp thì lệch vĩnh viễn, vòng kiểm 250ms không cứu được vì nó chỉ so
+ * thời gian chứ không biết video có đang thật sự chạy hay không.
+ */
+export function useYouTubeDualPlayerSync(
+  containerRef: React.RefObject<HTMLElement | null>,
+  audioRef: React.RefObject<HTMLAudioElement | null>,
+  youtubeId: string | null,
+  { dubActive = false, timeOffsetSec = 0 }: UseYouTubeDualPlayerSyncOptions = {},
+): void {
+  const playerRef = useRef<YouTubePlayerLike | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const offsetRef = useRef(timeOffsetSec);
+  const dubActiveRef = useRef(dubActive);
+
+  useEffect(() => {
+    offsetRef.current = timeOffsetSec;
+  }, [timeOffsetSec]);
+
+  useEffect(() => {
+    dubActiveRef.current = dubActive;
+    const player = playerRef.current;
+    if (!player) return;
+    if (dubActive) {
+      player.mute();
+    } else {
+      player.unMute();
+      audioRef.current?.pause();
+    }
+  }, [dubActive, audioRef]);
+
+  useEffect(() => {
+    if (!youtubeId || !containerRef.current) {
+      return;
+    }
+
+    let cancelled = false;
+    let player: (YouTubePlayerLike & { destroy(): void }) | null = null;
+
+    loadYouTubeIframeApi().then((YT) => {
+      if (cancelled || !containerRef.current) {
+        return;
+      }
+      player = new YT.Player(containerRef.current, {
+        videoId: youtubeId,
+        playerVars: { controls: 1, modestbranding: 1, rel: 0 },
+        events: {
+          onReady: (event) => {
+            if (dubActiveRef.current) {
+              event.target.mute();
+            }
+            playerRef.current = event.target;
+          },
+          onStateChange: (event) => {
+            const audio = audioRef.current;
+            if (!audio || !dubActiveRef.current) return;
+            if (event.data === YT_STATE.PLAYING) {
+              void audio.play().catch(() => {
+                // Autoplay bị chặn khi chưa có tương tác — lần play tiếp theo sẽ thành công.
+              });
+            } else if (event.data === YT_STATE.PAUSED || event.data === YT_STATE.BUFFERING) {
+              audio.pause();
+            }
+          },
+          onPlaybackRateChange: (event) => {
+            const audio = audioRef.current;
+            if (audio && dubActiveRef.current) {
+              audio.playbackRate = event.data;
+            }
+          },
+        },
+      });
+    });
+
+    intervalRef.current = setInterval(() => {
+      const audio = audioRef.current;
+      const p = playerRef.current;
+      if (!dubActiveRef.current || !audio || !p || p.getPlayerState() !== YT_STATE.PLAYING) {
+        return;
+      }
+      const targetAudioTime = Math.max(0, p.getCurrentTime() - offsetRef.current);
+      if (Math.abs(targetAudioTime - audio.currentTime) > DRIFT_TOLERANCE_SEC) {
+        audio.currentTime = targetAudioTime;
+      }
+    }, SYNC_INTERVAL_MS);
+
+    return () => {
+      cancelled = true;
+      if (intervalRef.current !== null) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+      playerRef.current = null;
+      player?.destroy();
+    };
+  }, [containerRef, audioRef, youtubeId]);
+}
