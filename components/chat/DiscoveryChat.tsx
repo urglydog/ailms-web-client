@@ -50,7 +50,7 @@ export function DiscoveryChat() {
         text: data.reply || 'Không có phản hồi.', 
         courses: data.courses 
       }]);
-    } catch (err) {
+    } catch {
       setMessages(prev => [...prev, { role: 'assistant', text: 'Xin lỗi, tôi đang gặp sự cố kết nối tới AI. Vui lòng kiểm tra lại.' }]);
     } finally {
       setLoading(false);
