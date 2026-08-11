@@ -14,6 +14,7 @@ const outfit = Outfit({
   weight: ['500', '600', '700', '800'],
   variable: '--font-outfit',
   display: 'swap',
+  preload: false,
 });
 
 const jakarta = Plus_Jakarta_Sans({
@@ -21,6 +22,7 @@ const jakarta = Plus_Jakarta_Sans({
   weight: ['400', '500', '600', '700'],
   variable: '--font-jakarta',
   display: 'swap',
+  preload: false,
 });
 
 const plexMono = IBM_Plex_Mono({
@@ -28,6 +30,7 @@ const plexMono = IBM_Plex_Mono({
   weight: ['400', '500'],
   variable: '--font-plex-mono',
   display: 'swap',
+  preload: false,
 });
 
 export const metadata: Metadata = {
