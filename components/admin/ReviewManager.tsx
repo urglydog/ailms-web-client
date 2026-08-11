@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAllReviews, useHideReview, useUnhideReview } from '@/hooks/useReviews';
 import { ApiError } from '@/lib/api/client';
 
@@ -10,10 +10,13 @@ function formatDate(iso: string): string {
 
 /** UC44 — bám khung `CategoryManager.tsx`: bảng + lỗi cục bộ + confirm trước khi hành động. */
 export function ReviewManager() {
+  const [mounted, setMounted] = useState(false);
   const { data, isLoading } = useAllReviews(0, 50);
   const hideReview = useHideReview();
   const unhideReview = useUnhideReview();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  useEffect(() => { setMounted(true); }, []);
 
   const reviews = data?.content ?? [];
 
@@ -52,14 +55,14 @@ export function ReviewManager() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {isLoading && (
+            {(!mounted || isLoading) && (
               <tr>
                 <td colSpan={7} className="px-6 py-6 text-center text-gray-500">
                   Đang tải...
                 </td>
               </tr>
             )}
-            {!isLoading && reviews.length === 0 && (
+            {mounted && !isLoading && reviews.length === 0 && (
               <tr>
                 <td colSpan={7} className="px-6 py-6 text-center text-gray-500">
                   Chưa có đánh giá nào.

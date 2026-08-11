@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { LogoutSidebarButton } from '@/components/auth/LogoutSidebarButton';
 import { UploadTray } from '@/components/instructor/UploadTray';
+import { InstructorChat } from '@/components/chat/InstructorChat';
 import { getCurrentRole } from '@/lib/auth/token';
 
 export default function InstructorLayout({ children }: { children: React.ReactNode }) {
@@ -80,6 +81,7 @@ export default function InstructorLayout({ children }: { children: React.ReactNo
       </main>
 
       <UploadTray />
+      <InstructorChat />
     </div>
   );
 }

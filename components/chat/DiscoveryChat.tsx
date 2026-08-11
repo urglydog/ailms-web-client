@@ -2,6 +2,8 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import { api } from '@/lib/api/client';
+import { getAccessToken } from '@/lib/auth/token';
 
 interface DiscoveryCourseCard {
   id: number;
@@ -37,13 +39,9 @@ export function DiscoveryChat() {
     setLoading(true);
 
     try {
-      // AI Worker HTTP API (Port 8002 as configured in .env)
-      const res = await fetch('http://localhost:8002/api/v1/discovery/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userMsg }),
+      const data = await api.post<any>('/api/v1/discovery/chat', { message: userMsg }, {
+        token: getAccessToken() || undefined
       });
-      const data = await res.json();
       
       setMessages(prev => [...prev, { 
         role: 'assistant', 
