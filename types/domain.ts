@@ -174,6 +174,48 @@ export interface PipelineStep {
   label: string;
   done: boolean;
   active: boolean;
+  /** F5.3 — chunk này hết retry (BR-CHUNK-04), vẫn phát bằng audio gốc riêng đoạn đó. */
+  failed?: boolean;
+}
+
+/**
+ * F5.3 — sự kiện realtime nhận qua STOMP `/topic/dubbing/{lessonId}`
+ * (`DubbingProgressSubscriber` forward nguyên văn payload Redis Pub/Sub của AI Worker).
+ *
+ * Có `chunkIndex` → sự kiện CẤP-CHUNK (một chunk 10 phút vừa xong/lỗi).
+ * Không có `chunkIndex` → sự kiện CẤP-JOB (toàn bộ pipeline vừa kết thúc) — đây mới là tín
+ * hiệu đáng tin để dừng progress bar, vì chunk cuối "COMPLETED" chưa có nghĩa là job đã xong
+ * (còn phải chờ FFmpeg concat + upload B2 + gọi callback `finish_*`).
+ */
+export interface DubbingChunkProgressEvent {
+  jobId: number;
+  lessonId: number;
+  chunkIndex: number;
+  totalChunks: number;
+  status: 'COMPLETED' | 'FAILED';
+}
+
+export interface DubbingJobFinishedEvent {
+  jobId: number;
+  lessonId: number;
+  status: 'COMPLETED' | 'FAILED' | 'SKIPPED';
+}
+
+export type DubbingProgressEvent = DubbingChunkProgressEvent | DubbingJobFinishedEvent;
+
+/** UC45 — 1 dòng trong bảng giám sát hàng đợi lồng tiếng của Admin. */
+export interface AiJobSummary {
+  id: number;
+  lessonId: number;
+  lessonTitle: string;
+  targetLanguage: string;
+  status: JobStatus;
+  totalChunks: number;
+  doneChunks: number;
+  progressPercent: number;
+  retryCount: number;
+  errorMessage: string | null;
+  createdAt: string;
 }
 
 // ── Lỗi API (RFC 7807 ProblemDetail từ backend) ─────────────────
@@ -307,6 +349,42 @@ export interface CreateCategoryInput {
 
 export interface UpdateCategoryInput {
   name: string;
+}
+
+// ── Giai đoạn 5: Lồng tiếng AI ───────────────────────────────────
+
+/** UC47 — Admin cấu hình giọng đọc theo ngôn ngữ (BR-DUB-07). */
+export interface VoiceMapping {
+  id: number;
+  language: string;
+  voiceName: string;
+  gender: string;
+  isDefault: boolean;
+  isActive: boolean;
+}
+
+export interface CreateVoiceMappingInput {
+  language: string;
+  voiceName: string;
+  gender: string;
+  isDefault: boolean;
+}
+
+export interface UpdateVoiceMappingInput {
+  gender: string;
+  isDefault: boolean;
+  isActive: boolean;
+}
+
+/**
+ * UC18 — kết quả gọi kích hoạt lồng tiếng:
+ * `CREATED` (job mới, subscribe WebSocket) · `PROCESSING` (job đã có, dedupe BR-DUB-05) ·
+ * `AVAILABLE` (đã có audioUrl sẵn, phát luôn — BR-DUB-04).
+ */
+export interface DubbingActivateResult {
+  status: 'CREATED' | 'PROCESSING' | 'AVAILABLE';
+  jobId: number | null;
+  audioUrl: string | null;
 }
 
 // ── F2.2: Khám phá công khai & Đánh giá ──────────────────────────

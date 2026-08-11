@@ -6,7 +6,8 @@ import type { PipelineStep } from '@/types/domain';
  * Panel "Đang xử lý lồng tiếng AI" — UC20 (theo dõi tiến độ thời gian thực).
  *
  * Dữ liệu đến từ WebSocket: backend subscribe Redis Pub/Sub `lms:dubbing:progress`
- * rồi forward xuống client. Giai đoạn 6 sẽ nối vào socket thật; hiện nhận qua prop.
+ * rồi forward xuống client qua `useDubbingSocket` (F5.3) — component này chỉ nhận qua prop,
+ * không tự kết nối socket.
  *
  * BR-CHUNK-03 — điểm cốt lõi: **ngay khi phân đoạn đầu tiên xong**, học viên đã vào
  * học được, không phải chờ hết video. Vì vậy panel này luôn kèm lối "xem tạm với âm
@@ -37,24 +38,34 @@ export function PipelineProgress({ steps, percent, onWatchOriginal }: PipelinePr
             <span
               className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[13px]
                 ${
-                  step.done
-                    ? 'bg-success text-white'
-                    : step.active
-                      ? 'border-2 border-accent-glow bg-transparent'
-                      : 'border border-white/25 bg-transparent'
+                  step.failed
+                    ? 'bg-red-500/80 text-white'
+                    : step.done
+                      ? 'bg-success text-white'
+                      : step.active
+                        ? 'border-2 border-accent-glow bg-transparent'
+                        : 'border border-white/25 bg-transparent'
                 }`}
             >
-              {step.done && <span aria-hidden>✓</span>}
-              {step.active && !step.done && (
+              {step.failed && <span aria-hidden>✕</span>}
+              {!step.failed && step.done && <span aria-hidden>✓</span>}
+              {!step.failed && step.active && !step.done && (
                 <span className="h-2 w-2 animate-ai-pulse rounded-full bg-accent-glow" aria-hidden />
               )}
             </span>
             <span
               className={`text-sm ${
-                step.done ? 'text-white/60' : step.active ? 'font-semibold text-white' : 'text-white/40'
+                step.failed
+                  ? 'text-red-400'
+                  : step.done
+                    ? 'text-white/60'
+                    : step.active
+                      ? 'font-semibold text-white'
+                      : 'text-white/40'
               }`}
             >
               {step.label}
+              {step.failed && ' — giữ âm thanh gốc cho đoạn này'}
             </span>
           </li>
         ))}
