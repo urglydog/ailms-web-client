@@ -63,6 +63,20 @@ export default function MyCoursesPage() {
           >
             <span className="text-[11px] font-semibold text-ink-faint">{course.categoryName}</span>
             <span className="font-display text-base font-semibold text-ink">{course.courseTitle}</span>
+
+            {/* UC22 — % tiến độ khóa học (BR-PROGRESS-02) */}
+            <div className="flex items-center gap-2">
+              <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-line/50">
+                <div
+                  className="h-full rounded-full bg-accent"
+                  style={{ width: `${Math.min(100, Math.max(0, course.progressPct))}%` }}
+                />
+              </div>
+              <span className="text-[11px] font-semibold text-ink-muted">
+                {Math.round(course.progressPct)}%
+              </span>
+            </div>
+
             <span
               className={`w-fit rounded-full px-2.5 py-1 text-[11px] font-bold ${
                 course.alreadyReviewed ? 'bg-green-50 text-green-600' : 'bg-amber-50 text-amber-700'

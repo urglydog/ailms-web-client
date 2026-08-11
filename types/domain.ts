@@ -49,6 +49,8 @@ export interface DubLanguage {
   flag: string;
   /** false = chưa có AudioTrack cho ngôn ngữ này -> hiện panel kích hoạt (UC18) */
   available: boolean;
+  /** Track thật của ngôn ngữ này (Giai đoạn 6) — null khi chưa `available` hoặc đang PROCESSING/FAILED. */
+  track?: AudioTrackInfo | null;
 }
 
 export interface CourseSummary {
@@ -418,6 +420,24 @@ export interface EnrolledCourse {
   isFree: boolean;
   price: number;
   alreadyReviewed: boolean;
+  /** UC22 — % bài COMPLETED / tổng bài READY (BR-PROGRESS-02). */
+  progressPct: number;
+  /** Chỉ có giá trị khi progressPct đạt 100. */
+  completedAt: string | null;
+  /** BR-PROGRESS-04 — MAX điểm Quiz mọi bộ. Luôn null ở Giai đoạn 6 (Quiz thật làm ở Giai đoạn 7). */
+  quizScore: number | null;
+}
+
+// ── F6.2: Tiến độ học tập (UC21, UC22) ───────────────────────────
+export interface LessonProgressRecordReq {
+  watchedSec: number;
+  lastPositionSec: number;
+}
+
+export interface LessonProgressRes {
+  watchedSec: number;
+  lastPositionSec: number;
+  isCompleted: boolean;
 }
 
 // ── F3.2: Thanh toán & Đối soát ─────────────────────────────────

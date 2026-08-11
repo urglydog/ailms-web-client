@@ -10,11 +10,17 @@ export function useCourseSearch(filters: CourseFilterState, sortBy: CourseSortBy
   });
 }
 
-/** UC11 — Học thử Preview, public không cần token. 403 nếu bài học không phải Preview. */
-export function useLessonPlayer(lessonId: number) {
+/**
+ * UC11 — Học thử Preview, public không cần token. 403 nếu bài học không phải Preview.
+ *
+ * `enabled` mặc định true — trang `learn/[lessonId]` tắt hẳn hook này khi đã đăng nhập
+ * (dùng `useEnrolledLessonPlayer` thay thế), giữ đúng luồng khách xem thử dựng từ Giai đoạn 4.
+ */
+export function useLessonPlayer(lessonId: number, options: { enabled?: boolean } = {}) {
   return useQuery({
     queryKey: ['lessons', lessonId, 'player'],
     queryFn: () => publicCoursesApi.getLessonPlayer(lessonId),
     retry: false,
+    enabled: options.enabled ?? true,
   });
 }
