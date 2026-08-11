@@ -1,7 +1,6 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { getAccessToken } from '@/lib/auth/token';
 import { useState, useEffect } from 'react';
 import { AiJobQueueManager } from '@/components/admin/AiJobQueueManager';
 
@@ -23,7 +22,7 @@ interface HealthData {
 
 const AI_WORKER_URL = process.env.NEXT_PUBLIC_AI_WORKER_URL || 'http://localhost:8002';
 
-async function fetchQueueStats(token: string): Promise<QueueStats> {
+async function fetchQueueStats(): Promise<QueueStats> {
   const res = await fetch(`${AI_WORKER_URL}/admin/queue-stats`, {
     headers: {
       'x-internal-token': 'dev-internal-token',
@@ -49,12 +48,9 @@ function StatCard({ label, value, color }: { label: string; value: number | stri
 }
 
 export default function AiQueuePage() {
-  const token = getAccessToken() ?? '';
-
   const { data: stats, isLoading, isError, refetch } = useQuery({
     queryKey: ['admin', 'queue-stats'],
-    queryFn: () => fetchQueueStats(token),
-    enabled: !!token,
+    queryFn: fetchQueueStats,
     refetchInterval: 8000,
   });
 
