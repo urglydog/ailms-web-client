@@ -16,6 +16,11 @@ interface DiscoveryCourseCard {
   level_label: string;
 }
 
+interface DiscoveryChatResponse {
+  reply?: string;
+  courses?: DiscoveryCourseCard[];
+}
+
 export function DiscoveryChat() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<{role: 'user' | 'assistant', text: string, courses?: DiscoveryCourseCard[]}[]>([]);
@@ -39,7 +44,7 @@ export function DiscoveryChat() {
     setLoading(true);
 
     try {
-      const data = await api.post<any>('/api/v1/discovery/chat', { message: userMsg }, {
+      const data = await api.post<DiscoveryChatResponse>('/api/v1/discovery/chat', { message: userMsg }, {
         token: getAccessToken() || undefined
       });
       
@@ -88,7 +93,7 @@ export function DiscoveryChat() {
             ✕
           </button>
         </div>
-          
+        
           <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4 bg-[#F8F9FA]">
             {messages.length === 0 && (
               <div className="text-center text-sm text-ink-muted mt-4">
