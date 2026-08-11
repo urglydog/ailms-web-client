@@ -5,7 +5,6 @@ import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api/client';
 import { getAccessToken } from '@/lib/auth/token';
 import { useModerationQueue } from '@/hooks/useCourses';
-import { useEffect, useState } from 'react';
 
 interface AdminDashboardData {
   totalUsers: number;
