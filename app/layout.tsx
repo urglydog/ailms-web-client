@@ -1,33 +1,37 @@
 import type { Metadata } from 'next';
 import Script from 'next/script';
-import { IBM_Plex_Mono, Outfit, Plus_Jakarta_Sans } from 'next/font/google';
+import localFont from 'next/font/local';
 import './globals.css';
 import { Providers } from './providers';
 
 /**
- * Font nạp qua `next/font` thay vì thẻ `<link>` Google Fonts: Next tự self-host,
- * nên không có request sang domain ngoài, không nhấp nháy font và không phụ thuộc
- * mạng của người dùng.
+ * Font tự lưu trữ (`.woff2` trong `app/fonts/`) thay vì `next/font/google`: file build ra
+ * KHÔNG BAO GIỜ cần tải gì từ `fonts.gstatic.com` nữa — CI (GitHub Actions) không có đường ra
+ * tới domain đó nên `next/font/google` từng làm `next build` fail toàn bộ (retry đủ 3 lần vẫn
+ * lỗi, không phải flake mạng tạm thời). File nguồn: lấy trực tiếp từ Google Fonts CSS2 API,
+ * subset `latin` (khớp đúng phạm vi ký tự mà cấu hình cũ đã dùng, không đổi hành vi hiển thị).
  */
-const outfit = Outfit({
-  subsets: ['latin'],
-  weight: ['500', '600', '700', '800'],
+const outfit = localFont({
+  src: './fonts/outfit-variable.woff2',
+  weight: '500 800',
   variable: '--font-outfit',
   display: 'swap',
   preload: false,
 });
 
-const jakarta = Plus_Jakarta_Sans({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
+const jakarta = localFont({
+  src: './fonts/plus-jakarta-sans-variable.woff2',
+  weight: '400 700',
   variable: '--font-jakarta',
   display: 'swap',
   preload: false,
 });
 
-const plexMono = IBM_Plex_Mono({
-  subsets: ['latin'],
-  weight: ['400', '500'],
+const plexMono = localFont({
+  src: [
+    { path: './fonts/ibm-plex-mono-400.woff2', weight: '400' },
+    { path: './fonts/ibm-plex-mono-500.woff2', weight: '500' },
+  ],
   variable: '--font-plex-mono',
   display: 'swap',
   preload: false,

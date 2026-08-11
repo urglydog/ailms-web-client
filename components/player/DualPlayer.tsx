@@ -1,26 +1,27 @@
 'use client';
 
-import { useRef, useState } from 'react';
-import { useDualPlayerSync } from '@/hooks/useDualPlayerSync';
+import { useEffect, useRef, useState, type RefObject } from 'react';
+import { useDualPlayerSync, useYouTubeDualPlayerSync } from '@/hooks/useDualPlayerSync';
 import type { AudioTrackInfo } from '@/types/domain';
 
 /**
  * Dual Player — UC16.
  *
- * Kiến trúc: `<video>` **luôn tắt tiếng** làm nguồn hình và nguồn thời gian chuẩn;
- * `<audio>` phát bản lồng tiếng `.mp3` bám theo. Logic đồng bộ nằm trong
- * {@link useDualPlayerSync} (BR-SYNC-01).
+ * Kiến trúc: nguồn hình (`<video>` cho UPLOAD, IFrame Player cho YOUTUBE) **luôn tắt tiếng**
+ * và là nguồn thời gian chuẩn; `<audio>` phát bản lồng tiếng `.mp3` bám theo. Logic đồng bộ nằm
+ * trong {@link useDualPlayerSync} (UPLOAD) / {@link useYouTubeDualPlayerSync} (YOUTUBE) — cùng
+ * hợp đồng BR-SYNC-01.
  *
  * BR-CHUNK-05 — chọn nguồn audio theo trạng thái track:
- *  - `finalUrl` đã có → phát file đó.
- *  - Chưa có (`status = PARTIAL`) → phát **playlist** các chunk theo dải thời gian.
+ *  - `finalUrl` đã có → phát file đó, offset đồng bộ = 0 (file đánh mốc t=0 từ đầu video).
+ *  - Chưa có (`status = PARTIAL`) → phát **playlist** các chunk theo dải thời gian. Mỗi file
+ *    chunk tự đánh mốc t=0 ở ĐẦU CHUNK ĐÓ (không phải đầu video) — phải trừ `chunk.startSec`
+ *    khi đồng bộ, nếu không audio sẽ bị tua sai vị trí ngay khi đổi sang phát playlist.
  *    Đây là điều làm nên "học ngay khi chunk đầu xong" (BR-CHUNK-03); nếu chỉ chờ
  *    `finalUrl` thì mất toàn bộ lợi ích của Layered Chunking.
  *
- * Giai đoạn 6 sẽ bổ sung: nguồn YouTube qua IFrame API (đồng bộ audio lồng tiếng thật), ghi
- * tiến độ mỗi 15 giây (BR-PROGRESS-03), và tính `watchedSec` không cộng đoạn tua nhanh
- * (BR-PROGRESS-01). Ở đây (chưa có audio lồng tiếng nào — `track` luôn null) nguồn YouTube chỉ
- * cần nhúng iframe phát thẳng audio gốc, không cần IFrame Player API.
+ * `videoRef`/`audioRef` nhận từ ngoài (optional) để trang cha dùng chung 1 cặp ref cho cả đồng bộ
+ * lẫn ghi nhận tiến độ (F6.2) — không truyền thì tự tạo ref nội bộ.
  */
 
 interface DualPlayerProps {
@@ -31,19 +32,29 @@ interface DualPlayerProps {
   /** null = đang phát âm thanh gốc của video */
   track: AudioTrackInfo | null;
   posterLabel?: string;
+  /** Chỉ dùng được khi `videoSource = UPLOAD` — YouTube không có thẻ `<video>` để gắn ref. */
+  videoRef?: RefObject<HTMLVideoElement | null>;
+  audioRef?: RefObject<HTMLAudioElement | null>;
 }
 
-/** Chọn URL audio hiện tại theo BR-CHUNK-05. */
-function resolveAudioSrc(track: AudioTrackInfo | null, currentSec: number): string | null {
+interface ResolvedAudio {
+  src: string | null;
+  /** Mốc bắt đầu (giây, tuyệt đối theo video) của file đang phát — 0 nếu là `finalUrl`. */
+  offsetSec: number;
+}
+
+/** Chọn URL audio + offset đồng bộ hiện tại theo BR-CHUNK-05. */
+function resolveAudio(track: AudioTrackInfo | null, currentSec: number): ResolvedAudio {
   if (!track) {
-    return null;
+    return { src: null, offsetSec: 0 };
   }
   if (track.finalUrl) {
-    return track.finalUrl;
+    return { src: track.finalUrl, offsetSec: 0 };
   }
   // Chưa ghép xong -> tìm chunk chứa mốc thời gian hiện tại
-  const chunk = track.chunks.find((c) => currentSec >= c.startSec && currentSec < c.endSec);
-  return chunk?.fileUrl ?? track.chunks[0]?.fileUrl ?? null;
+  const chunk =
+    track.chunks.find((c) => currentSec >= c.startSec && currentSec < c.endSec) ?? track.chunks[0];
+  return { src: chunk?.fileUrl ?? null, offsetSec: chunk?.startSec ?? 0 };
 }
 
 export function DualPlayer({
@@ -52,29 +63,49 @@ export function DualPlayer({
   youtubeId,
   track,
   posterLabel = 'khung video bài giảng',
+  videoRef: externalVideoRef,
+  audioRef: externalAudioRef,
 }: DualPlayerProps) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const audioRef = useRef<HTMLAudioElement>(null);
+  const internalVideoRef = useRef<HTMLVideoElement>(null);
+  const internalAudioRef = useRef<HTMLAudioElement>(null);
+  const videoRef = externalVideoRef ?? internalVideoRef;
+  const audioRef = externalAudioRef ?? internalAudioRef;
+  const youtubeContainerRef = useRef<HTMLDivElement>(null);
   const [currentSec, setCurrentSec] = useState(0);
 
-  const audioSrc = resolveAudioSrc(track, currentSec);
+  const { src: audioSrc, offsetSec } = resolveAudio(track, currentSec);
   const isYoutube = videoSource === 'YOUTUBE' && !!youtubeId;
 
-  // Chỉ đồng bộ khi thật sự có bản lồng tiếng để phát (chưa áp dụng cho nguồn YouTube — xem
-  // docblock của component: đồng bộ YouTube cần IFrame Player API riêng, để dành Giai đoạn 6).
-  useDualPlayerSync(videoRef, audioRef, { enabled: !isYoutube && audioSrc !== null });
+  useDualPlayerSync(videoRef, audioRef, {
+    enabled: !isYoutube && audioSrc !== null,
+    timeOffsetSec: offsetSec,
+  });
+  useYouTubeDualPlayerSync(youtubeContainerRef, audioRef, isYoutube ? youtubeId : null, {
+    dubActive: audioSrc !== null,
+    timeOffsetSec: offsetSec,
+  });
+
+  // Nguồn YouTube không có sự kiện `onTimeUpdate` của thẻ <video> để chọn chunk đang phát. Thời
+  // gian THẬT được `useYouTubeDualPlayerSync` theo dõi nội bộ qua IFrame Player API; ở đây chỉ
+  // cần một nguồn "đủ tốt" để quyết định LÚC NÀO đổi sang chunk kế tiếp (ranh giới cách nhau
+  // ~10 phút/lần nên sai số dưới 1 giây không ảnh hưởng) — suy ra từ chính `<audio>` đang phát
+  // cộng lại offset của chunk hiện tại, tự điều chỉnh đúng ngay tick kế tiếp sau khi đổi chunk.
+  useEffect(() => {
+    if (!isYoutube) return;
+    const interval = setInterval(() => {
+      const audio = audioRef.current;
+      if (audio && !audio.paused) {
+        setCurrentSec(audio.currentTime + offsetSec);
+      }
+    }, 1000);
+    return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isYoutube, audioRef]);
 
   return (
     <div className="relative aspect-video w-full overflow-hidden rounded-card bg-ink">
       {isYoutube ? (
-        <iframe
-          key={youtubeId}
-          src={`https://www.youtube.com/embed/${youtubeId}`}
-          title="Video bài giảng"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-          className="h-full w-full"
-        />
+        <div key={youtubeId} ref={youtubeContainerRef} className="h-full w-full" />
       ) : videoUrl ? (
         <video
           ref={videoRef}
@@ -96,7 +127,7 @@ export function DualPlayer({
         </div>
       )}
 
-      {!isYoutube && audioSrc && <audio ref={audioRef} src={audioSrc} preload="auto" />}
+      {audioSrc && <audio ref={audioRef} src={audioSrc} preload="auto" />}
 
       {track?.status === 'PARTIAL' && (
         <span

@@ -4,13 +4,6 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
 
   /**
-   * Tắt việc Next.js tự fetch font từ Google Fonts lúc build time.
-   * Trong môi trường CI không có internet, việc này gây lỗi timeout.
-   * Font vẫn hoạt động bình thường ở runtime qua Google Fonts CDN.
-   */
-  optimizeFonts: false,
-
-  /**
    * Chặn build khi có lỗi TypeScript hoặc ESLint.
    * Quy chuẩn dự án là zero `any` nên không được nới hai mục này.
    */
