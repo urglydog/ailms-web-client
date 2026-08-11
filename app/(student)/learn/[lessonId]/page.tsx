@@ -2,11 +2,13 @@
 
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { DualPlayer } from '@/components/player/DualPlayer';
 import { DubbingActivatePanel } from '@/components/player/DubbingActivatePanel';
 import { LanguageSwitcher } from '@/components/player/LanguageSwitcher';
 import { PipelineProgress } from '@/components/player/PipelineProgress';
+import { useActivateDubbing } from '@/hooks/useDubbing';
+import { useDubbingSocket } from '@/hooks/useDubbingSocket';
 import { useLessonPlayer } from '@/hooks/usePublicCourses';
 import { ApiError } from '@/lib/api/client';
 import { MOCK_PIPELINE_STEPS } from '@/lib/mock/courses';
@@ -39,6 +41,57 @@ export default function LearnPage() {
   const [activeLang, setActiveLang] = useState<string | null>(null);
   const [mode, setMode] = useState<PlayerMode>('watching');
   const [steps, setSteps] = useState<PipelineStep[]>(MOCK_PIPELINE_STEPS);
+  const [quotaExceeded, setQuotaExceeded] = useState(false);
+  const [activateError, setActivateError] = useState<string | null>(null);
+  const [jobError, setJobError] = useState<string | null>(null);
+  const activateDubbing = useActivateDubbing();
+
+  // UC20 — chỉ mở kết nối STOMP khi thật sự đang chờ pipeline chạy.
+  const { lastEvent } = useDubbingSocket(mode === 'processing' ? lessonId : null);
+
+  useEffect(() => {
+    if (!lastEvent) return;
+
+    if ('chunkIndex' in lastEvent) {
+      // Sự kiện CẤP-CHUNK — dựng/lấp đầy danh sách chunk theo totalChunks thật.
+      setSteps((prev) => {
+        const size = lastEvent.totalChunks;
+        const base: PipelineStep[] =
+          prev.length === size
+            ? prev
+            : Array.from({ length: size }, (_, i) => ({
+                key: `chunk-${i}`,
+                label: `Đoạn ${i + 1}/${size}`,
+                done: false,
+                active: i === 0,
+              }));
+        return base.map((step, i) => {
+          if (i === lastEvent.chunkIndex) {
+            return {
+              ...step,
+              done: lastEvent.status === 'COMPLETED',
+              failed: lastEvent.status === 'FAILED',
+              active: false,
+            };
+          }
+          if (i === lastEvent.chunkIndex + 1) {
+            return { ...step, active: true };
+          }
+          return step;
+        });
+      });
+    } else if (lastEvent.status === 'COMPLETED') {
+      // Sự kiện CẤP-JOB — đây mới là lúc chắc chắn xong (đã concat + upload B2), không phải
+      // chunk cuối "COMPLETED" (BR-CHUNK-05: còn phải ghép final.mp3 sau đó).
+      setMode('watching');
+    } else {
+      setJobError(
+        lastEvent.status === 'SKIPPED'
+          ? 'Bài học này không có lời thoại để lồng tiếng.'
+          : 'Lồng tiếng thất bại, vui lòng thử lại sau.',
+      );
+    }
+  }, [lastEvent]);
 
   if (isLoading) {
     return <div className="p-16 text-center text-sm text-ink-muted">Đang tải bài học...</div>;
@@ -70,10 +123,35 @@ export default function LearnPage() {
   };
 
   const handleActivate = () => {
-    // Giai đoạn 5: POST /api/v1/lessons/{id}/dubbing → trả jobId → subscribe WebSocket.
-    // Nếu bị dedupe (BR-DUB-05), backend trả jobId của job đang chạy chứ không tạo mới.
-    setMode('processing');
-    setSteps(MOCK_PIPELINE_STEPS);
+    if (!activeLang) return;
+    setQuotaExceeded(false);
+    setActivateError(null);
+    setJobError(null);
+
+    activateDubbing.mutate(
+      { lessonId, targetLanguage: activeLang },
+      {
+        onSuccess: (result) => {
+          if (result.status === 'AVAILABLE') {
+            // BR-DUB-04: đã có audioUrl sẵn — Giai đoạn 6 sẽ nối activeTrack thật để phát ngay.
+            setMode('watching');
+            return;
+          }
+          // CREATED hoặc PROCESSING (dedupe BR-DUB-05) — cả 2 trường hợp chỉ cần subscribe
+          // đúng `/topic/dubbing/{lessonId}`; học viên thứ 2 chọn cùng ngôn ngữ trong lúc job
+          // đang chạy sẽ nhận đúng luồng tiến độ của job đó, không tạo job mới.
+          setMode('processing');
+          setSteps(MOCK_PIPELINE_STEPS);
+        },
+        onError: (err) => {
+          if (err instanceof ApiError && err.isQuotaExceeded) {
+            setQuotaExceeded(true);
+            return;
+          }
+          setActivateError(err instanceof ApiError ? err.message : 'Không kích hoạt được lồng tiếng, vui lòng thử lại.');
+        },
+      },
+    );
   };
 
   const doneCount = steps.filter((s) => s.done).length;
@@ -119,7 +197,12 @@ export default function LearnPage() {
                   languageLabel={activeLangLabel}
                   onActivate={handleActivate}
                   onWatchOriginal={() => setMode('watching')}
+                  quotaExceeded={quotaExceeded}
+                  isSubmitting={activateDubbing.isPending}
                 />
+                {activateError && (
+                  <p className="px-6 pb-6 text-center text-sm text-red-400">{activateError}</p>
+                )}
               </div>
             )}
 
@@ -130,6 +213,9 @@ export default function LearnPage() {
                   percent={percent}
                   onWatchOriginal={() => setMode('watching')}
                 />
+                {jobError && (
+                  <p className="px-6 pb-6 text-center text-sm text-red-400">{jobError}</p>
+                )}
               </div>
             )}
 
