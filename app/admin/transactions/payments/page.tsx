@@ -342,6 +342,20 @@ export default function AdminPaymentsPage() {
                 </div>
 
                 <div>
+                  <p className="text-sm font-medium text-ink-muted mb-1">Phí nền tảng (30%)</p>
+                  <p className="font-medium text-warning font-semibold">
+                    {selectedPayment.platformFee ? selectedPayment.platformFee.toLocaleString('vi-VN') + 'đ' : '-'}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-sm font-medium text-ink-muted mb-1">Giảng viên nhận (70%)</p>
+                  <p className="font-medium text-success font-semibold">
+                    {selectedPayment.instructorEarning ? selectedPayment.instructorEarning.toLocaleString('vi-VN') + 'đ' : '-'}
+                  </p>
+                </div>
+
+                <div>
                   <p className="text-sm font-medium text-ink-muted mb-1">Trạng thái</p>
                   <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-medium border ${getStatusColor(selectedPayment.status)}`}>
                     {getStatusLabel(selectedPayment.status)}

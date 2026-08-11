@@ -2,6 +2,8 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import { api } from '@/lib/api/client';
+import { getAccessToken } from '@/lib/auth/token';
 
 interface DiscoveryCourseCard {
   id: number;
@@ -12,6 +14,11 @@ interface DiscoveryCourseCard {
   is_free: boolean;
   rating: number;
   level_label: string;
+}
+
+interface DiscoveryChatResponse {
+  reply?: string;
+  courses?: DiscoveryCourseCard[];
 }
 
 export function DiscoveryChat() {
@@ -37,13 +44,9 @@ export function DiscoveryChat() {
     setLoading(true);
 
     try {
-      // AI Worker HTTP API (Port 8002 as configured in .env)
-      const res = await fetch('http://localhost:8002/api/v1/discovery/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userMsg }),
+      const data = await api.post<DiscoveryChatResponse>('/api/v1/discovery/chat', { message: userMsg }, {
+        token: getAccessToken() || undefined
       });
-      const data = await res.json();
       
       setMessages(prev => [...prev, { 
         role: 'assistant', 
@@ -90,7 +93,7 @@ export function DiscoveryChat() {
             ✕
           </button>
         </div>
-          
+        
           <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4 bg-[#F8F9FA]">
             {messages.length === 0 && (
               <div className="text-center text-sm text-ink-muted mt-4">
