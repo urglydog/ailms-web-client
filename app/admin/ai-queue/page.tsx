@@ -3,6 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { getAccessToken } from '@/lib/auth/token';
 import { useState, useEffect } from 'react';
+import { AiJobQueueManager } from '@/components/admin/AiJobQueueManager';
 
 interface QueueStats {
   queues: Record<string, { pending: number }>;
@@ -196,6 +197,11 @@ export default function AiQueuePage() {
             </div>
           ))}
         </div>
+      </div>
+
+      <div className="flex flex-col gap-2.5">
+        <span className="font-display text-[15px] font-bold text-gray-900">Danh sách Job lồng tiếng</span>
+        <AiJobQueueManager />
       </div>
     </>
   );

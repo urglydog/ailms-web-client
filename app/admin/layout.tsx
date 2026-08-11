@@ -73,6 +73,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { id: 'moderation', label: 'Kiểm duyệt khóa học', href: '/admin/moderation', badge: pendingCoursesCount },
     { id: 'users', label: 'Quản lý người dùng', href: '/admin/users', badge: pendingRequestsCount },
     { id: 'aiqueue', label: 'Giám sát AI Queue', href: '/admin/ai-queue', badge: 0 },
+    { id: 'voice-mappings', label: 'Giọng đọc lồng tiếng', href: '/admin/voice-mappings', badge: 0 },
     { id: 'transactions', label: 'Đối soát giao dịch', href: '/admin/transactions/payments', badge: 0 },
     { id: 'categories', label: 'Danh mục', href: '/admin/categories', badge: 0 },
     { id: 'reviews', label: 'Đánh giá', href: '/admin/reviews', badge: 0 },
