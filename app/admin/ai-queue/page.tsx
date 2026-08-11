@@ -1,6 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+import { getAccessToken } from '@/lib/auth/token';
 import { useState, useEffect } from 'react';
 import { AiJobQueueManager } from '@/components/admin/AiJobQueueManager';
 
@@ -22,7 +23,7 @@ interface HealthData {
 
 const AI_WORKER_URL = process.env.NEXT_PUBLIC_AI_WORKER_URL || 'http://localhost:8002';
 
-async function fetchQueueStats(): Promise<QueueStats> {
+async function fetchQueueStats(_token: string): Promise<QueueStats> {
   const res = await fetch(`${AI_WORKER_URL}/admin/queue-stats`, {
     headers: {
       'x-internal-token': 'dev-internal-token',
@@ -48,9 +49,12 @@ function StatCard({ label, value, color }: { label: string; value: number | stri
 }
 
 export default function AiQueuePage() {
+  const token = getAccessToken() ?? '';
+
   const { data: stats, isLoading, isError, refetch } = useQuery({
     queryKey: ['admin', 'queue-stats'],
-    queryFn: fetchQueueStats,
+    queryFn: () => fetchQueueStats(token),
+    enabled: !!token,
     refetchInterval: 8000,
   });
 
@@ -194,7 +198,6 @@ export default function AiQueuePage() {
           ))}
         </div>
       </div>
-
       <div className="flex flex-col gap-2.5">
         <span className="font-display text-[15px] font-bold text-gray-900">Danh sách Job lồng tiếng</span>
         <AiJobQueueManager />
