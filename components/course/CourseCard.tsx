@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/Badge';
 import { StarRating } from '@/components/ui/StarRating';
@@ -32,14 +33,28 @@ export function CourseCard({ course }: { course: CourseSummary }) {
     >
       {/* Ảnh bìa */}
       <div
-        className="relative flex aspect-video items-center justify-center"
-        style={{
-          background: `repeating-linear-gradient(135deg, ${course.coverColorA}, ${course.coverColorA} 14px, ${course.coverColorB} 14px, ${course.coverColorB} 28px)`,
-        }}
+        className="relative flex aspect-video items-center justify-center overflow-hidden"
+        style={
+          course.thumbnailUrl
+            ? undefined
+            : {
+                background: `repeating-linear-gradient(135deg, ${course.coverColorA}, ${course.coverColorA} 14px, ${course.coverColorB} 14px, ${course.coverColorB} 28px)`,
+              }
+        }
       >
-        <span className="rounded-full bg-ink/35 px-2.5 py-1 font-mono text-[11px] tracking-wide text-white/85">
-          ảnh bìa khoá học
-        </span>
+        {course.thumbnailUrl ? (
+          <Image
+            src={course.thumbnailUrl}
+            alt={course.title}
+            fill
+            sizes="(min-width: 1280px) 25vw, (min-width: 640px) 33vw, 100vw"
+            className="object-cover"
+          />
+        ) : (
+          <span className="rounded-full bg-ink/35 px-2.5 py-1 font-mono text-[11px] tracking-wide text-white/85">
+            ảnh bìa khoá học
+          </span>
+        )}
 
         {/* Cờ các ngôn ngữ đã có bản lồng tiếng */}
         <div className="absolute right-2.5 top-2.5 flex gap-1">

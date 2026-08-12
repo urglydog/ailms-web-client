@@ -6,7 +6,8 @@ import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { DualPlayer } from '@/components/player/DualPlayer';
 import { DubbingActivatePanel } from '@/components/player/DubbingActivatePanel';
-import { LanguageSwitcher } from '@/components/player/LanguageSwitcher';
+import { LanguageDropdown } from '@/components/player/LanguageDropdown';
+import { LessonSidebar } from '@/components/player/LessonSidebar';
 import { PipelineProgress } from '@/components/player/PipelineProgress';
 import { useActivateDubbing } from '@/hooks/useDubbing';
 import { useDubbingSocket } from '@/hooks/useDubbingSocket';
@@ -33,6 +34,11 @@ import type { PipelineStep } from '@/types/domain';
  *
  * `videoRef`/`audioRef` được trang này sở hữu (không phải `DualPlayer`) để Giai đoạn 6 phần
  * F6.2 (`useLessonProgress`) dùng chung, đo đúng thời gian phát thật của video đang hiển thị.
+ *
+ * `<DualPlayer>` được mount CỐ ĐỊNH, không phụ thuộc `mode` — học viên luôn xem/nghe được (audio
+ * gốc khi chưa chọn/chưa có bản lồng tiếng) kể cả lúc đang chọn ngôn ngữ hay đang chờ lồng tiếng
+ * xử lý xong, vì có thể họ muốn xem tiếp trong lúc chờ thay vì nhìn màn hình chờ. `mode` giờ chỉ
+ * quyết định 1 card trạng thái nhỏ hiển thị DƯỚI dropdown ngôn ngữ (không đè lên video).
  */
 
 type PlayerMode = 'watching' | 'need-activation' | 'processing';
@@ -104,6 +110,12 @@ export default function LearnPage() {
           return step;
         });
       });
+      if (lastEvent.status === 'COMPLETED') {
+        // BR-CHUNK-03 — mỗi chunk xong là một cơ hội để phát ngay (không chỉ chunk đầu):
+        // refetch để `languages[].track.chunks` có file audio mới nhất, video đang mở sẵn
+        // (mount cố định) sẽ tự động phát được ngay khi mốc thời gian chạm tới chunk đó.
+        void refetchLesson();
+      }
     } else if (lastEvent.status === 'COMPLETED') {
       // Sự kiện CẤP-JOB — đây mới là lúc chắc chắn xong (đã concat + upload B2), không phải
       // chunk cuối "COMPLETED" (BR-CHUNK-05: còn phải ghép final.mp3 sau đó).
@@ -118,12 +130,14 @@ export default function LearnPage() {
     }
   }, [lastEvent, refetchLesson]);
 
-  // UC21 — chỉ ghi nhận tiến độ khi đã đăng nhập, đang thật sự xem (không phải lúc kích hoạt
-  // lồng tiếng), và biết chắc video là nguồn UPLOAD (YouTube chưa có <video> để gắn `videoRef`,
-  // theo dõi tiến độ nguồn YouTube để dành việc sau).
+  // UC21 — ghi nhận tiến độ theo thời gian phát THẬT của thẻ <video> (play/pause/seeking ở cấp
+  // hook, không quan tâm `mode`) — video giờ mount cố định và có thể đang phát audio gốc ngay cả
+  // lúc `mode` khác 'watching' (đang chọn ngôn ngữ/đang chờ lồng tiếng), đó vẫn là thời gian xem
+  // thật theo BR-PROGRESS-01 nên không có lý do loại trừ theo `mode` nữa. Chỉ cần đã đăng nhập và
+  // biết chắc nguồn là UPLOAD (YouTube chưa có <video> để gắn `videoRef`, để dành việc sau).
   useLessonProgress(videoRef, lessonId, {
     initialPositionSec: lesson?.lastPositionSec ?? 0,
-    enabled: hasToken && mode === 'watching' && lesson?.videoSource === 'UPLOAD',
+    enabled: hasToken && lesson?.videoSource === 'UPLOAD',
   });
 
   if (isLoading) {
@@ -203,11 +217,21 @@ export default function LearnPage() {
           <span className="text-ink-muted">{lesson.lessonTitle}</span>
         </nav>
 
-        <div className="grid gap-8 lg:grid-cols-[1fr_340px]">
+        <div className="grid gap-8 lg:grid-cols-[1fr_300px]">
           {/* ── Cột phát bài giảng ── */}
           <div className="flex min-w-0 flex-col gap-4">
+            {/* Video luôn hiển thị và phát được, bất kể mode — xem docblock đầu file */}
+            <DualPlayer
+              videoSource={lesson.videoSource}
+              videoUrl={lesson.videoUrl}
+              youtubeId={lesson.youtubeId}
+              track={lesson.languages.find((l) => l.code === activeLang)?.track ?? null}
+              videoRef={videoRef}
+              audioRef={audioRef}
+            />
+
             {lesson.languages.length > 0 && (
-              <LanguageSwitcher
+              <LanguageDropdown
                 languages={lesson.languages}
                 activeCode={activeLang}
                 sourceLanguage={lesson.sourceLanguage}
@@ -215,20 +239,8 @@ export default function LearnPage() {
               />
             )}
 
-            {/* Khung phát: một trong ba trạng thái */}
-            {mode === 'watching' && (
-              <DualPlayer
-                videoSource={lesson.videoSource}
-                videoUrl={lesson.videoUrl}
-                youtubeId={lesson.youtubeId}
-                track={lesson.languages.find((l) => l.code === activeLang)?.track ?? null}
-                videoRef={videoRef}
-                audioRef={audioRef}
-              />
-            )}
-
             {mode === 'need-activation' && (
-              <div className="overflow-hidden rounded-card bg-ink">
+              <div className="card p-4">
                 <DubbingActivatePanel
                   languageLabel={activeLangLabel}
                   onActivate={handleActivate}
@@ -237,20 +249,20 @@ export default function LearnPage() {
                   isSubmitting={activateDubbing.isPending}
                 />
                 {activateError && (
-                  <p className="px-6 pb-6 text-center text-sm text-red-400">{activateError}</p>
+                  <p className="mt-3 border-t border-line-soft pt-3 text-sm text-red-600">{activateError}</p>
                 )}
               </div>
             )}
 
             {mode === 'processing' && (
-              <div className="overflow-hidden rounded-card bg-ink">
+              <div className="card p-4">
                 <PipelineProgress
                   steps={steps}
                   percent={percent}
                   onWatchOriginal={() => setMode('watching')}
                 />
                 {jobError && (
-                  <p className="px-6 pb-6 text-center text-sm text-red-400">{jobError}</p>
+                  <p className="mt-3 border-t border-line-soft pt-3 text-sm text-red-600">{jobError}</p>
                 )}
               </div>
             )}
@@ -259,7 +271,9 @@ export default function LearnPage() {
 
             {/* Tab: Giai đoạn 7–8 sẽ nối Ghi chú, Học liệu, Socratic Tutor */}
             <div className="card p-5">
-              {lesson.isPreview ? (
+              {/* Khoá theo `enrolled` (đã sở hữu khoá học), KHÔNG theo `isPreview` — một bài học
+                  thử vẫn xem được đầy đủ bởi học viên đã sở hữu khoá (BR-ENROLL-02/03). */}
+              {!lesson.enrolled ? (
                 <div className="flex flex-col items-center justify-center py-6 text-center">
                   <div className="mb-2 text-3xl">🔒</div>
                   <h3 className="font-display font-semibold text-ink">Nội dung bị khóa</h3>
@@ -285,9 +299,13 @@ export default function LearnPage() {
           <aside className="lg:sticky lg:top-8 lg:self-start">
             <div className="card p-5">
               <h2 className="mb-3 font-display text-sm font-bold text-ink">Trong khoá học này</h2>
-              <p className="text-sm text-ink-muted">
-                Danh sách chương/bài và tiến độ học tập sẽ nối ở Giai đoạn 6 (UC21, UC22).
-              </p>
+              {lesson.chapters.length > 0 ? (
+                <LessonSidebar chapters={lesson.chapters} currentLessonId={lesson.lessonId} />
+              ) : (
+                <p className="text-sm text-ink-muted">
+                  Đăng nhập để xem toàn bộ chương trình học và theo dõi tiến độ của khoá này.
+                </p>
+              )}
             </div>
           </aside>
         </div>

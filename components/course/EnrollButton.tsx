@@ -10,9 +10,17 @@ interface EnrollButtonProps {
   courseSlug: string;
   isFree: boolean;
   enrolled: boolean;
+  /** Bài học đầu tiên của khoá (theo thứ tự chương/bài) — null nếu khoá chưa có bài nào. */
+  firstLessonId: number | null;
 }
 
-export function EnrollButton({ courseId, courseSlug, isFree, enrolled: initialEnrolled }: EnrollButtonProps) {
+export function EnrollButton({
+  courseId,
+  courseSlug,
+  isFree,
+  enrolled: initialEnrolled,
+  firstLessonId,
+}: EnrollButtonProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [enrolled, setEnrolled] = useState(initialEnrolled);
@@ -30,8 +38,11 @@ export function EnrollButton({ courseId, courseSlug, isFree, enrolled: initialEn
     return (
       <button
         type="button"
-        onClick={() => router.push(`/learn/${courseId}`)}
-        className="w-full rounded-full bg-success px-6 py-3 font-display text-base font-semibold text-white hover:bg-success/90"
+        // `/learn/{lessonId}` cần ID BÀI HỌC, không phải ID khoá học — bấm vào bài học đầu tiên
+        // theo đúng thứ tự chương/bài (BR-COURSE-01 đảm bảo khoá đã publish có ≥1 bài).
+        onClick={() => firstLessonId != null && router.push(`/learn/${firstLessonId}`)}
+        disabled={firstLessonId == null}
+        className="w-full rounded-full bg-success px-6 py-3 font-display text-base font-semibold text-white hover:bg-success/90 disabled:cursor-not-allowed disabled:opacity-50"
       >
         Học ngay
       </button>
