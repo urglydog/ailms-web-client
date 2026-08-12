@@ -159,6 +159,31 @@ export interface PlayerLesson {
   activeTrack: AudioTrackInfo | null;
   lastPositionSec: number;
   isPreview: boolean;
+  /**
+   * Học viên có thật sự sở hữu khóa học không — KHÁC `isPreview` (bài này có phải bài học thử
+   * hay không). Dùng field này để mở khoá Ghi chú/Học liệu AI/Socratic Tutor, không dùng
+   * `isPreview` (một bài preview vẫn xem được đầy đủ bởi học viên đã sở hữu khóa học).
+   * Luôn `false` ở luồng UC11 ẩn danh (chưa đăng nhập).
+   */
+  enrolled: boolean;
+  /** UC21/22 — sidebar "Trong khoá học này". Rỗng ở luồng UC11 ẩn danh (chưa đăng nhập). */
+  chapters: ChapterNav[];
+}
+
+export interface ChapterNav {
+  chapterId: number;
+  chapterTitle: string;
+  displayOrder: number;
+  lessons: LessonNav[];
+}
+
+export interface LessonNav {
+  lessonId: number;
+  lessonTitle: string;
+  displayOrder: number;
+  durationSec: number;
+  isPreview: boolean;
+  isCompleted: boolean;
 }
 
 // ── Tiến độ lồng tiếng (UC20) ───────────────────────────────────
@@ -426,6 +451,8 @@ export interface EnrolledCourse {
   completedAt: string | null;
   /** BR-PROGRESS-04 — MAX điểm Quiz mọi bộ. Luôn null ở Giai đoạn 6 (Quiz thật làm ở Giai đoạn 7). */
   quizScore: number | null;
+  /** "Học ngay" — bấm vào thẳng bài học này thay vì trang chi tiết khoá. null nếu khoá chưa có bài. */
+  firstLessonId: number | null;
 }
 
 // ── F6.2: Tiến độ học tập (UC21, UC22) ───────────────────────────

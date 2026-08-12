@@ -45,9 +45,9 @@ export default async function CourseDetailPage({ params }: PageProps) {
   }
 
   const totalLessons = course.chapters.reduce((sum, ch) => sum + ch.lessons.length, 0);
-  const previewLesson = course.chapters
-    .flatMap((ch) => ch.lessons)
-    .find((lesson) => lesson.isPreview);
+  const allLessons = course.chapters.flatMap((ch) => ch.lessons);
+  const previewLesson = allLessons.find((lesson) => lesson.isPreview);
+  const firstLesson = allLessons[0] ?? null;
 
   return (
     <div className="shell py-10">
@@ -132,7 +132,13 @@ export default async function CourseDetailPage({ params }: PageProps) {
               </div>
             )}
 
-            <EnrollButton courseId={course.id} courseSlug={course.slug} isFree={course.isFree} enrolled={course.enrolled} />
+            <EnrollButton
+              courseId={course.id}
+              courseSlug={course.slug}
+              isFree={course.isFree}
+              enrolled={course.enrolled}
+              firstLessonId={firstLesson?.id ?? null}
+            />
 
             {previewLesson && (
               <Link

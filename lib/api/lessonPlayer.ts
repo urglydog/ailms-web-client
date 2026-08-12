@@ -1,6 +1,14 @@
 import { api } from '@/lib/api/client';
 import { getAccessToken } from '@/lib/auth/token';
-import type { AudioChunkInfo, AudioTrackInfo, DubLanguage, PlayerLesson, TrackStatus } from '@/types/domain';
+import type {
+  AudioChunkInfo,
+  AudioTrackInfo,
+  ChapterNav,
+  DubLanguage,
+  LessonNav,
+  PlayerLesson,
+  TrackStatus,
+} from '@/types/domain';
 
 /** Cờ hiển thị theo mã ngôn ngữ — thuần trang trí (aria-hidden), không ảnh hưởng logic BR-DUB-07. */
 const LANGUAGE_FLAGS: Record<string, string> = {
@@ -42,6 +50,22 @@ interface RawLanguage {
   track: RawAudioTrack | null;
 }
 
+interface RawLessonNav {
+  lessonId: number;
+  lessonTitle: string;
+  displayOrder: number;
+  durationSec: number;
+  isPreview: boolean;
+  isCompleted: boolean;
+}
+
+interface RawChapterNav {
+  chapterId: number;
+  chapterTitle: string;
+  displayOrder: number;
+  lessons: RawLessonNav[];
+}
+
 interface RawEnrolledPlayerLesson {
   lessonId: number;
   lessonTitle: string;
@@ -54,8 +78,10 @@ interface RawEnrolledPlayerLesson {
   durationSec: number;
   sourceLanguage: string | null;
   isPreview: boolean;
+  enrolled: boolean;
   lastPositionSec: number;
   languages: RawLanguage[];
+  chapters: RawChapterNav[];
 }
 
 function toAudioTrackInfo(raw: RawAudioTrack): AudioTrackInfo {
@@ -85,6 +111,26 @@ function toDubLanguage(raw: RawLanguage): DubLanguage {
   };
 }
 
+function toLessonNav(raw: RawLessonNav): LessonNav {
+  return {
+    lessonId: raw.lessonId,
+    lessonTitle: raw.lessonTitle,
+    displayOrder: raw.displayOrder,
+    durationSec: raw.durationSec,
+    isPreview: raw.isPreview,
+    isCompleted: raw.isCompleted,
+  };
+}
+
+function toChapterNav(raw: RawChapterNav): ChapterNav {
+  return {
+    chapterId: raw.chapterId,
+    chapterTitle: raw.chapterTitle,
+    displayOrder: raw.displayOrder,
+    lessons: raw.lessons.map(toLessonNav),
+  };
+}
+
 function toPlayerLesson(raw: RawEnrolledPlayerLesson): PlayerLesson {
   return {
     lessonId: raw.lessonId,
@@ -98,8 +144,10 @@ function toPlayerLesson(raw: RawEnrolledPlayerLesson): PlayerLesson {
     durationSec: raw.durationSec,
     sourceLanguage: raw.sourceLanguage,
     isPreview: raw.isPreview,
+    enrolled: raw.enrolled,
     lastPositionSec: raw.lastPositionSec,
     languages: raw.languages.map(toDubLanguage),
+    chapters: raw.chapters.map(toChapterNav),
     // Không dùng field này nữa ở luồng đã đăng nhập — track được lấy từ `languages[].track`
     // (xem `learn/[lessonId]/page.tsx`). Giữ lại vì `PlayerLesson` dùng chung với UC11.
     activeTrack: null,

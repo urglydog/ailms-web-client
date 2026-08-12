@@ -152,6 +152,10 @@ function toPlayerLesson(raw: RawPlayerLesson): PlayerLesson {
     languages: [],
     activeTrack: null,
     lastPositionSec: 0,
+    // Chưa đăng nhập (UC11) — khách chưa từng sở hữu khoá nào, không có sidebar chương/bài +
+    // tiến độ, xem `useEnrolledLessonPlayer`.
+    enrolled: false,
+    chapters: [],
   };
 }
 

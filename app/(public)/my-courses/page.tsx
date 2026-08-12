@@ -58,7 +58,9 @@ export default function MyCoursesPage() {
         {courses.map((course) => (
           <Link
             key={course.courseId}
-            href={`/courses/${course.courseSlug}`}
+            // Đã sở hữu khoá này rồi — bấm vào thẳng bài học (không phải trang chi tiết để mua
+            // lại). Fallback trang chi tiết chỉ xảy ra khi khoá chưa có bài học nào.
+            href={course.firstLessonId != null ? `/learn/${course.firstLessonId}` : `/courses/${course.courseSlug}`}
             className="card-interactive flex flex-col gap-2 p-4 no-underline hover:no-underline"
           >
             <span className="text-[11px] font-semibold text-ink-faint">{course.categoryName}</span>
