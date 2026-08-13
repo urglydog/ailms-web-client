@@ -467,6 +467,30 @@ export interface LessonProgressRes {
   isCompleted: boolean;
 }
 
+// ── F8.1: Socratic AI Tutor (UC30) ───────────────────────────────
+
+export interface TutorAskReq {
+  question: string;
+  /** Bỏ trống ở tin đầu tiên — BE tự tạo hoặc tái sử dụng phiên gần nhất. */
+  sessionId?: number | null;
+}
+
+export interface TutorAskRes {
+  sessionId: number;
+  answer: string;
+  /** Giây, BR-TUTOR-02 — luôn có ≥1 phần tử khi câu trả lời liên quan bài giảng. */
+  citedTimestamps: number[];
+  tokenUsed: number | null;
+}
+
+/** Tin nhắn hiển thị trong `TutorPanel` — chỉ tồn tại trong state cục bộ của trang. */
+export interface TutorMessage {
+  id: string;
+  sender: 'USER' | 'AI';
+  content: string;
+  citedTimestamps: number[];
+}
+
 // ── F3.2: Thanh toán & Đối soát ─────────────────────────────────
 
 export interface CreatePaymentReq {
