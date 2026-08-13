@@ -4,11 +4,13 @@ import { useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { toast } from 'sonner';
 import { DualPlayer } from '@/components/player/DualPlayer';
 import { DubbingActivatePanel } from '@/components/player/DubbingActivatePanel';
 import { LanguageDropdown } from '@/components/player/LanguageDropdown';
 import { LessonSidebar } from '@/components/player/LessonSidebar';
 import { PipelineProgress } from '@/components/player/PipelineProgress';
+import { TutorPanel } from '@/components/tutor/TutorPanel';
 import { useActivateDubbing } from '@/hooks/useDubbing';
 import { useDubbingSocket } from '@/hooks/useDubbingSocket';
 import { useEnrolledLessonPlayer } from '@/hooks/useEnrolledLessonPlayer';
@@ -74,7 +76,22 @@ export default function LearnPage() {
   const [quotaExceeded, setQuotaExceeded] = useState(false);
   const [activateError, setActivateError] = useState<string | null>(null);
   const [jobError, setJobError] = useState<string | null>(null);
+  const [isTutorOpen, setIsTutorOpen] = useState(false);
   const activateDubbing = useActivateDubbing();
+
+  // UC30 — mốc thời gian trong câu trả lời Gia sư AI (BR-TUTOR-02). Nguồn YOUTUBE chưa
+  // gắn `useYouTubeDualPlayerSync` vào trang này (để dành việc sau, xem docblock đầu
+  // file) nên chỉ tua được cho nguồn UPLOAD ở F8.1 này.
+  const handleSeekToTimestamp = useCallback(
+    (sec: number) => {
+      if (lesson?.videoSource === 'UPLOAD' && videoRef.current) {
+        videoRef.current.currentTime = sec;
+      } else {
+        toast.info('Chưa hỗ trợ tua video YouTube theo mốc thời gian.');
+      }
+    },
+    [lesson?.videoSource],
+  );
 
   // UC20 — chỉ mở kết nối STOMP khi thật sự đang chờ pipeline chạy.
   const { lastEvent } = useDubbingSocket(mode === 'processing' ? lessonId : null);
@@ -269,7 +286,7 @@ export default function LearnPage() {
 
             <h1 className="font-display text-xl font-bold text-ink">{lesson.lessonTitle}</h1>
 
-            {/* Tab: Giai đoạn 7–8 sẽ nối Ghi chú, Học liệu, Socratic Tutor */}
+            {/* Tab: Giai đoạn 7 sẽ nối Ghi chú, Học liệu AI — Socratic Tutor đã nối (F8.1) */}
             <div className="card p-5">
               {/* Khoá theo `enrolled` (đã sở hữu khoá học), KHÔNG theo `isPreview` — một bài học
                   thử vẫn xem được đầy đủ bởi học viên đã sở hữu khoá (BR-ENROLL-02/03). */}
@@ -288,9 +305,18 @@ export default function LearnPage() {
                   </Link>
                 </div>
               ) : (
-                <p className="text-sm text-ink-muted">
-                  Khu vực Ghi chú · Học liệu AI · Socratic Tutor sẽ được nối ở Giai đoạn 7 và 8.
-                </p>
+                <div className="flex flex-col items-start gap-3">
+                  <p className="text-sm text-ink-muted">
+                    Khu vực Ghi chú · Học liệu AI sẽ được nối ở Giai đoạn 7.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setIsTutorOpen(true)}
+                    className="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-dark"
+                  >
+                    💬 Hỏi Gia sư AI Socratic
+                  </button>
+                </div>
               )}
             </div>
           </div>
@@ -310,6 +336,15 @@ export default function LearnPage() {
           </aside>
         </div>
       </div>
+
+      {lesson.enrolled && (
+        <TutorPanel
+          isOpen={isTutorOpen}
+          onClose={() => setIsTutorOpen(false)}
+          lessonId={lesson.lessonId}
+          onSeek={handleSeekToTimestamp}
+        />
+      )}
     </div>
   );
 }
