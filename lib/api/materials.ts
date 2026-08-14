@@ -1,0 +1,45 @@
+import { api } from '@/lib/api/client';
+import { getAccessToken } from '@/lib/auth/token';
+
+function authToken() {
+  return getAccessToken() ?? undefined;
+}
+
+export type MaterialType = 'MINDMAP' | 'QUIZ' | 'FLASHCARD';
+export type ScopeType = 'WHOLE_COURSE' | 'CHAPTER';
+export type GenStatus = 'PENDING' | 'COMPLETED' | 'FAILED';
+
+export interface MaterialGenerationReq {
+  courseId: number;
+  materialType: MaterialType;
+  language: string;
+  scopeType: ScopeType;
+  scopeRefId?: number;
+  quantityLevel?: string;
+  difficultyLevel?: string;
+}
+
+export interface MaterialGenerationRes {
+  id: number;
+  materialType: MaterialType;
+  language: string;
+  title: string | null;
+  versionNo: number;
+  status: GenStatus;
+  createdAt: string;
+}
+
+export interface MaterialDetailRes extends MaterialGenerationRes {
+  mermaidCode?: string;
+}
+
+export const materialsApi = {
+  requestGeneration: (input: MaterialGenerationReq) =>
+    api.post<MaterialGenerationRes>('/api/v1/materials', input, { token: authToken() }),
+
+  listForCourse: (courseId: number) =>
+    api.get<MaterialGenerationRes[]>(`/api/v1/materials?courseId=${courseId}`, { token: authToken() }),
+
+  getDetail: (id: number) =>
+    api.get<MaterialDetailRes>(`/api/v1/materials/${id}`, { token: authToken() }),
+};
