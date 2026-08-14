@@ -1,17 +1,22 @@
 'use client';
 
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useMaterialDetail } from '@/hooks/useMaterials';
 import { MermaidViewer } from '@/components/materials/MermaidViewer';
 import { ApiError } from '@/lib/api/client';
 
 export default function MaterialDetailPage() {
-  const params = useParams<{ id: string }>();
-  const id = Number(params.id);
+  const router = useRouter();
+  const params = useParams();
 
+  // Trích xuất id an toàn, tránh lỗi NaN khi params chưa sẵn sàng
+  const rawId = typeof params?.id === 'string' ? params.id : Array.isArray(params?.id) ? params.id[0] : '';
+  const id = rawId ? Number(rawId) : 0;
+
+  // Chỉ fetch dữ liệu khi id hợp lệ (id > 0)
   const { data: material, isLoading, error } = useMaterialDetail(id);
 
-  if (isLoading) {
+  if (!id || isLoading) {
     return (
       <div className="min-h-dvh bg-surface p-8 text-center text-ink-muted">
         Đang tải chi tiết học liệu...
@@ -26,7 +31,11 @@ export default function MaterialDetailPage() {
           <p className="text-sm text-ink-muted mb-4">
             {error instanceof ApiError ? error.message : 'Không tìm thấy học liệu này hoặc bạn không có quyền xem.'}
           </p>
-          <button onClick={() => window.history.back()} className="text-sm font-semibold text-accent hover:underline">
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="text-sm font-semibold text-accent hover:underline"
+          >
             ← Quay lại
           </button>
         </div>
@@ -39,7 +48,11 @@ export default function MaterialDetailPage() {
       <div className="shell py-8">
         <div className="mb-6 flex justify-between items-end border-b border-line pb-4">
           <div>
-            <button onClick={() => window.history.back()} className="text-sm text-ink-muted hover:text-ink transition-colors mb-4 block">
+            <button
+              type="button"
+              onClick={() => router.back()}
+              className="text-sm text-ink-muted hover:text-ink transition-colors mb-4 block"
+            >
               ← Quay lại danh sách
             </button>
             <h1 className="font-display text-2xl font-bold text-ink">
@@ -62,7 +75,7 @@ export default function MaterialDetailPage() {
           <div className="card p-6">
             <h2 className="text-lg font-bold font-display mb-4">Sơ đồ</h2>
             <MermaidViewer chart={material.mermaidCode} />
-            
+
             <div className="mt-8 pt-6 border-t border-line">
               <h3 className="text-sm font-bold text-ink mb-2">Mã nguồn (Mermaid)</h3>
               <pre className="p-4 bg-gray-50 border border-line-soft rounded-lg text-xs overflow-auto font-mono text-ink-muted">
