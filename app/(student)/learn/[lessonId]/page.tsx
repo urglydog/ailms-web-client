@@ -306,13 +306,16 @@ export default function LearnPage() {
                 </div>
               ) : (
                 <div className="flex flex-col items-start gap-3">
-                  <p className="text-sm text-ink-muted">
-                    Khu vực Ghi chú · Học liệu AI sẽ được nối ở Giai đoạn 7.
-                  </p>
+                  <Link
+                    href={`/materials?courseId=${lesson.courseId}`}
+                    className="rounded-full bg-surface-hover border border-line px-4 py-2 text-sm font-semibold text-ink hover:bg-line-soft transition-colors w-full text-center no-underline"
+                  >
+                    🧠 Mở Quản lý Học liệu AI
+                  </Link>
                   <button
                     type="button"
                     onClick={() => setIsTutorOpen(true)}
-                    className="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-dark"
+                    className="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-dark w-full"
                   >
                     💬 Hỏi Gia sư AI Socratic
                   </button>
