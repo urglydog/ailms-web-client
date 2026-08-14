@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import mermaid from 'mermaid';
 
 interface MermaidViewerProps {
@@ -8,7 +8,6 @@ interface MermaidViewerProps {
 }
 
 export function MermaidViewer({ chart }: MermaidViewerProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
   const [svgContent, setSvgContent] = useState<string>('');
   const [error, setError] = useState<boolean>(false);
 

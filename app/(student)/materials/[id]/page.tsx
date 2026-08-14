@@ -1,7 +1,6 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import Link from 'next/link';
 import { useMaterialDetail } from '@/hooks/useMaterials';
 import { MermaidViewer } from '@/components/materials/MermaidViewer';
 import { ApiError } from '@/lib/api/client';
