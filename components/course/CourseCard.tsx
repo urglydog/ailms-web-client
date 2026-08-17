@@ -1,8 +1,11 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/Badge';
 import { StarRating } from '@/components/ui/StarRating';
 import type { CourseSummary } from '@/types/domain';
+import { useMyEnrollments } from '@/hooks/useEnrollments';
 
 /**
  * Thẻ khoá học — dịch từ `CourseCard.dc.html` của Claude Design.
@@ -26,9 +29,17 @@ function formatPrice(price: number): string {
 }
 
 export function CourseCard({ course }: { course: CourseSummary }) {
+  const { data: enrollments } = useMyEnrollments();
+  const enrollment = enrollments?.find((e) => e.courseId === course.id);
+  const isOwned = !!enrollment;
+
+  const targetHref = isOwned && enrollment.firstLessonId 
+    ? `/learn/${enrollment.firstLessonId}` 
+    : `/courses/${course.slug}`;
+
   return (
     <Link
-      href={`/courses/${course.slug}`}
+      href={targetHref}
       className="card-interactive flex h-full flex-col overflow-hidden no-underline hover:no-underline"
     >
       {/* Ảnh bìa */}
@@ -90,14 +101,16 @@ export function CourseCard({ course }: { course: CourseSummary }) {
         />
 
         <div className="mt-auto flex items-center justify-between border-t border-line-soft pt-2">
-          {course.isFree ? (
+          {isOwned ? (
+            <span className="font-display text-[15px] font-bold text-accent">Đã sở hữu</span>
+          ) : course.isFree ? (
             <span className="font-display text-[15px] font-bold text-success">Miễn phí</span>
           ) : (
             <span className="font-display text-[15px] font-bold text-ink">
               {formatPrice(course.price)}
             </span>
           )}
-          <span className="text-xs font-semibold text-accent">Xem chi tiết →</span>
+          <span className="text-xs font-semibold text-accent">{isOwned ? 'Vào học ngay →' : 'Xem chi tiết →'}</span>
         </div>
       </div>
     </Link>

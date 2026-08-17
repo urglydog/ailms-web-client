@@ -17,7 +17,8 @@ import { useEnrolledLessonPlayer } from '@/hooks/useEnrolledLessonPlayer';
 import { useLessonProgress } from '@/hooks/useLessonProgress';
 import { useLessonPlayer } from '@/hooks/usePublicCourses';
 import { ApiError } from '@/lib/api/client';
-import { getAccessToken } from '@/lib/auth/token';
+import { LiveChatPanel } from '@/components/community/LiveChatPanel';
+import { decodeAccessToken, getAccessToken } from '@/lib/auth/token';
 import { MOCK_PIPELINE_STEPS } from '@/lib/mock/courses';
 import type { PipelineStep } from '@/types/domain';
 
@@ -325,7 +326,7 @@ export default function LearnPage() {
           </div>
 
           {/* ── Cột danh sách bài học ── */}
-          <aside className="lg:sticky lg:top-8 lg:self-start">
+          <aside className="lg:sticky lg:top-8 lg:self-start flex flex-col gap-6">
             <div className="card p-5">
               <h2 className="mb-3 font-display text-sm font-bold text-ink">Trong khoá học này</h2>
               {lesson.chapters.length > 0 ? (
@@ -336,6 +337,14 @@ export default function LearnPage() {
                 </p>
               )}
             </div>
+
+            {/* Live Q&A Panel */}
+            {lesson.enrolled && (
+              <LiveChatPanel 
+                lessonId={lesson.lessonId} 
+                userName={hasToken ? (decodeAccessToken()?.sub ?? 'Học viên') : 'Học viên'} 
+              />
+            )}
           </aside>
         </div>
       </div>

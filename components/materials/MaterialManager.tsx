@@ -51,8 +51,8 @@ export function MaterialManager({ courseId }: { courseId: number }) {
               onChange={(e) => setMaterialType(e.target.value as MaterialType)}
             >
               <option value="MINDMAP">Sơ đồ tư duy (Mindmap)</option>
-              <option value="QUIZ" disabled>Trắc nghiệm (Sắp ra mắt)</option>
-              <option value="FLASHCARD" disabled>Flashcard (Sắp ra mắt)</option>
+              <option value="QUIZ">Trắc nghiệm (Quiz)</option>
+              <option value="FLASHCARD">Flashcard</option>
             </select>
           </div>
           <div>
@@ -63,7 +63,7 @@ export function MaterialManager({ courseId }: { courseId: number }) {
               onChange={(e) => setScopeType(e.target.value as ScopeType)}
             >
               <option value="WHOLE_COURSE">Toàn bộ khóa học</option>
-              <option value="CHAPTER" disabled>Từng chương (Sắp ra mắt)</option>
+              <option value="CHAPTER">Từng chương</option>
             </select>
           </div>
           <div>
