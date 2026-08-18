@@ -83,6 +83,13 @@ export default function MaterialDetailPage() {
               </pre>
             </div>
           </div>
+        ) : material.materialType === 'QUIZ' || material.materialType === 'FLASHCARD' ? (
+          <div className="card p-6 text-center text-ink-muted">
+            <h2 className="text-lg font-bold font-display mb-2 text-ink">
+              Giao diện {material.materialType === 'QUIZ' ? 'Trắc nghiệm' : 'Flashcard'}
+            </h2>
+            <p>Phần hiển thị kết quả {material.materialType === 'QUIZ' ? 'Trắc nghiệm' : 'Flashcard'} sẽ được thiết kế ở đây sau khi hoàn thiện AI xử lý.</p>
+          </div>
         ) : (
           <div className="card p-6 text-center text-ink-muted">
             <p>Loại học liệu này chưa hỗ trợ hiển thị hoặc bị lỗi khi sinh.</p>

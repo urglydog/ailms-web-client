@@ -21,7 +21,7 @@ interface DecodedAccessToken {
   exp: number;
 }
 
-function decodeAccessToken(): DecodedAccessToken | null {
+export function decodeAccessToken(): DecodedAccessToken | null {
   const token = getAccessToken();
   if (!token) return null;
   try {
