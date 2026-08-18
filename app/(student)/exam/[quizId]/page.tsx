@@ -11,7 +11,7 @@ export default function AntiCheatExamPage() {
   const videoRef = useRef<HTMLVideoElement>(null);
   
   const [violationCount, setViolationCount] = useState(0);
-  const [isCameraActive, setIsCameraActive] = useState(false);
+
   const [isStarted, setIsStarted] = useState(false);
   const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
   
@@ -117,7 +117,7 @@ export default function AntiCheatExamPage() {
           } else {
             setFaceStatus('FACE_FOUND');
           }
-        } catch (e) {
+        } catch {
           // ignore detection error
         }
       }, 2000); // Quét mỗi 2s
@@ -135,10 +135,10 @@ export default function AntiCheatExamPage() {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       setMediaStream(stream);
-      setIsCameraActive(true);
+
       setIsStarted(true);
       toast.success('Bắt đầu làm bài. Vui lòng không chuyển tab!');
-    } catch (err) {
+    } catch {
       toast.error('Bạn phải cấp quyền sử dụng Camera để làm bài thi này!');
     }
   };
