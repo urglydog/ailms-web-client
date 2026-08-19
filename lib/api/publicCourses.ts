@@ -156,6 +156,8 @@ function toPlayerLesson(raw: RawPlayerLesson): PlayerLesson {
     // tiến độ, xem `useEnrolledLessonPlayer`.
     enrolled: false,
     chapters: [],
+    // UC11 ẩn danh chưa có API phụ đề (chỉ endpoint UC16/17 đã đăng nhập mới trả) — rỗng an toàn.
+    originalSubtitles: [],
   };
 }
 

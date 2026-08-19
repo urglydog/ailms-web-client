@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 /**
  * Đồng bộ Dual Player — hiện thực BR-SYNC-01.
@@ -221,16 +221,22 @@ interface UseYouTubeDualPlayerSyncOptions {
  * buffer mà audio chạy tiếp thì lệch vĩnh viễn, vòng kiểm 250ms không cứu được vì nó chỉ so
  * thời gian chứ không biết video có đang thật sự chạy hay không.
  */
+/**
+ * `currentSec` trả về là thời gian THẬT của video YouTube (`player.getCurrentTime()`), độc lập
+ * với `dubActive`/`timeOffsetSec` — dùng cho phụ đề (cần đồng bộ kể cả khi chưa chọn ngôn ngữ lồng
+ * tiếng), khác hẳn vòng đồng bộ `<audio>` bên dưới vốn chỉ chạy khi có bản lồng tiếng đang phát.
+ */
 export function useYouTubeDualPlayerSync(
   containerRef: React.RefObject<HTMLElement | null>,
   audioRef: React.RefObject<HTMLAudioElement | null>,
   youtubeId: string | null,
   { dubActive = false, timeOffsetSec = 0 }: UseYouTubeDualPlayerSyncOptions = {},
-): void {
+): { currentSec: number } {
   const playerRef = useRef<YouTubePlayerLike | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const offsetRef = useRef(timeOffsetSec);
   const dubActiveRef = useRef(dubActive);
+  const [currentSec, setCurrentSec] = useState(0);
 
   useEffect(() => {
     offsetRef.current = timeOffsetSec;
@@ -292,8 +298,11 @@ export function useYouTubeDualPlayerSync(
     });
 
     intervalRef.current = setInterval(() => {
-      const audio = audioRef.current;
       const p = playerRef.current;
+      if (p) {
+        setCurrentSec(p.getCurrentTime());
+      }
+      const audio = audioRef.current;
       if (!dubActiveRef.current || !audio || !p || p.getPlayerState() !== YT_STATE.PLAYING) {
         return;
       }
@@ -313,4 +322,6 @@ export function useYouTubeDualPlayerSync(
       player?.destroy();
     };
   }, [containerRef, audioRef, youtubeId]);
+
+  return { currentSec };
 }
