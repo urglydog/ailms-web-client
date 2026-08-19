@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type RefObject } from 'react';
 import { useDualPlayerSync, useYouTubeDualPlayerSync } from '@/hooks/useDualPlayerSync';
-import type { AudioTrackInfo } from '@/types/domain';
+import type { AudioTrackInfo, SubtitleSegment } from '@/types/domain';
 
 /**
  * Dual Player — UC16.
@@ -35,6 +35,17 @@ interface DualPlayerProps {
   /** Chỉ dùng được khi `videoSource = UPLOAD` — YouTube không có thẻ `<video>` để gắn ref. */
   videoRef?: RefObject<HTMLVideoElement | null>;
   audioRef?: RefObject<HTMLAudioElement | null>;
+  /** Phụ đề gốc — hiện khi `showOriginalSub` bật, đồng bộ theo thời gian phát thật. */
+  originalSubtitles?: SubtitleSegment[];
+  /** Phụ đề đã dịch, khớp ngôn ngữ đang chọn — hiện khi `showTranslatedSub` bật. */
+  translatedSubtitles?: SubtitleSegment[];
+  showOriginalSub?: boolean;
+  showTranslatedSub?: boolean;
+}
+
+/** Câu đang phát tại `currentSec`, hoặc `null` nếu đang ở khoảng lặng giữa 2 câu. */
+function findActiveSegment(segments: SubtitleSegment[], currentSec: number): SubtitleSegment | null {
+  return segments.find((s) => currentSec >= s.startSec && currentSec < s.endSec) ?? null;
 }
 
 interface ResolvedAudio {
@@ -65,42 +76,39 @@ export function DualPlayer({
   posterLabel = 'khung video bài giảng',
   videoRef: externalVideoRef,
   audioRef: externalAudioRef,
+  originalSubtitles = [],
+  translatedSubtitles = [],
+  showOriginalSub = false,
+  showTranslatedSub = false,
 }: DualPlayerProps) {
   const internalVideoRef = useRef<HTMLVideoElement>(null);
   const internalAudioRef = useRef<HTMLAudioElement>(null);
   const videoRef = externalVideoRef ?? internalVideoRef;
   const audioRef = externalAudioRef ?? internalAudioRef;
   const youtubeContainerRef = useRef<HTMLDivElement>(null);
+  // Thời gian phát hiện tại — nguồn UPLOAD cập nhật qua `onTimeUpdate` của `<video>`; nguồn
+  // YOUTUBE được đồng bộ lại từ `useYouTubeDualPlayerSync` bên dưới (đọc thẳng IFrame Player API,
+  // độc lập việc có đang lồng tiếng hay không — khác trước đây suy ra từ `<audio>` nên chỉ chạy
+  // khi có bản lồng tiếng đang phát, khiến phụ đề gốc không đồng bộ được lúc chưa chọn ngôn ngữ).
   const [currentSec, setCurrentSec] = useState(0);
 
-  const { src: audioSrc, offsetSec } = resolveAudio(track, currentSec);
   const isYoutube = videoSource === 'YOUTUBE' && !!youtubeId;
+  const { src: audioSrc, offsetSec } = resolveAudio(track, currentSec);
 
   useDualPlayerSync(videoRef, audioRef, {
     enabled: !isYoutube && audioSrc !== null,
     timeOffsetSec: offsetSec,
   });
-  useYouTubeDualPlayerSync(youtubeContainerRef, audioRef, isYoutube ? youtubeId : null, {
+  const { currentSec: youtubeSec } = useYouTubeDualPlayerSync(youtubeContainerRef, audioRef, isYoutube ? youtubeId : null, {
     dubActive: audioSrc !== null,
     timeOffsetSec: offsetSec,
   });
-
-  // Nguồn YouTube không có sự kiện `onTimeUpdate` của thẻ <video> để chọn chunk đang phát. Thời
-  // gian THẬT được `useYouTubeDualPlayerSync` theo dõi nội bộ qua IFrame Player API; ở đây chỉ
-  // cần một nguồn "đủ tốt" để quyết định LÚC NÀO đổi sang chunk kế tiếp (ranh giới cách nhau
-  // ~10 phút/lần nên sai số dưới 1 giây không ảnh hưởng) — suy ra từ chính `<audio>` đang phát
-  // cộng lại offset của chunk hiện tại, tự điều chỉnh đúng ngay tick kế tiếp sau khi đổi chunk.
   useEffect(() => {
-    if (!isYoutube) return;
-    const interval = setInterval(() => {
-      const audio = audioRef.current;
-      if (audio && !audio.paused) {
-        setCurrentSec(audio.currentTime + offsetSec);
-      }
-    }, 1000);
-    return () => clearInterval(interval);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isYoutube, audioRef]);
+    if (isYoutube) setCurrentSec(youtubeSec);
+  }, [isYoutube, youtubeSec]);
+
+  const activeOriginal = showOriginalSub ? findActiveSegment(originalSubtitles, currentSec) : null;
+  const activeTranslated = showTranslatedSub ? findActiveSegment(translatedSubtitles, currentSec) : null;
 
   return (
     <div className="relative aspect-video w-full overflow-hidden rounded-card bg-ink">
@@ -137,6 +145,21 @@ export function DualPlayer({
           <span className="h-1.5 w-1.5 animate-ai-pulse rounded-full bg-accent-glow" aria-hidden />
           Đang xử lý phần còn lại
         </span>
+      )}
+
+      {(activeTranslated || activeOriginal) && (
+        <div className="pointer-events-none absolute inset-x-0 bottom-4 flex flex-col items-center gap-1 px-4 text-center">
+          {activeTranslated && (
+            <span className="rounded-md bg-ink/80 px-3 py-1.5 text-base font-semibold leading-snug text-white shadow-lg">
+              {activeTranslated.text}
+            </span>
+          )}
+          {activeOriginal && (
+            <span className="rounded-md bg-ink/60 px-2.5 py-1 text-sm leading-snug text-white/85 shadow">
+              {activeOriginal.text}
+            </span>
+          )}
+        </div>
       )}
     </div>
   );

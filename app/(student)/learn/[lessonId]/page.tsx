@@ -78,6 +78,9 @@ export default function LearnPage() {
   const [activateError, setActivateError] = useState<string | null>(null);
   const [jobError, setJobError] = useState<string | null>(null);
   const [isTutorOpen, setIsTutorOpen] = useState(false);
+  // Ẩn/hiện phụ đề gốc & phụ đề đã dịch — mặc định TẮT, học viên chủ động tích chọn.
+  const [showOriginalSub, setShowOriginalSub] = useState(false);
+  const [showTranslatedSub, setShowTranslatedSub] = useState(false);
   const activateDubbing = useActivateDubbing();
 
   // UC30 — mốc thời gian trong câu trả lời Gia sư AI (BR-TUTOR-02). Nguồn YOUTUBE chưa
@@ -246,7 +249,46 @@ export default function LearnPage() {
               track={lesson.languages.find((l) => l.code === activeLang)?.track ?? null}
               videoRef={videoRef}
               audioRef={audioRef}
+              originalSubtitles={lesson.originalSubtitles}
+              translatedSubtitles={lesson.languages.find((l) => l.code === activeLang)?.subtitles ?? []}
+              showOriginalSub={showOriginalSub}
+              showTranslatedSub={showTranslatedSub}
             />
+
+            {/* Ẩn/hiện phụ đề — phụ đề dịch luôn khớp ngôn ngữ đang chọn ở dropdown bên dưới,
+                không có dropdown ngôn ngữ riêng cho phụ đề. */}
+            <div className="flex flex-wrap items-center gap-4 text-sm text-ink-muted">
+              <label
+                className={`flex items-center gap-1.5 ${lesson.originalSubtitles.length === 0 ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
+              >
+                <input
+                  type="checkbox"
+                  checked={showOriginalSub}
+                  disabled={lesson.originalSubtitles.length === 0}
+                  onChange={(e) => setShowOriginalSub(e.target.checked)}
+                  className="h-4 w-4 rounded border-line accent-accent"
+                />
+                Phụ đề gốc
+                {lesson.originalSubtitles.length === 0 && ' (bài học chưa có phụ đề gốc)'}
+              </label>
+              {(() => {
+                const translatedSubtitles = lesson.languages.find((l) => l.code === activeLang)?.subtitles ?? [];
+                const disabled = translatedSubtitles.length === 0;
+                return (
+                  <label className={`flex items-center gap-1.5 ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}>
+                    <input
+                      type="checkbox"
+                      checked={showTranslatedSub}
+                      disabled={disabled}
+                      onChange={(e) => setShowTranslatedSub(e.target.checked)}
+                      className="h-4 w-4 rounded border-line accent-accent"
+                    />
+                    Phụ đề đã dịch
+                    {disabled && ' (ngôn ngữ đang chọn chưa lồng tiếng xong)'}
+                  </label>
+                );
+              })()}
+            </div>
 
             {lesson.languages.length > 0 && (
               <LanguageDropdown

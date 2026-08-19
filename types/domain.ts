@@ -51,6 +51,16 @@ export interface DubLanguage {
   available: boolean;
   /** Track thật của ngôn ngữ này (Giai đoạn 6) — null khi chưa `available` hoặc đang PROCESSING/FAILED. */
   track?: AudioTrackInfo | null;
+  /** Phụ đề đã dịch sang ngôn ngữ này — rỗng nếu ngôn ngữ này chưa lồng tiếng xong. */
+  subtitles: SubtitleSegment[];
+}
+
+/** Một câu phụ đề kèm mốc thời gian chính xác tới mili-giây (khớp `TranscriptSegment` phía BE). */
+export interface SubtitleSegment {
+  seq: number;
+  startSec: number;
+  endSec: number;
+  text: string;
 }
 
 export interface CourseSummary {
@@ -168,6 +178,8 @@ export interface PlayerLesson {
   enrolled: boolean;
   /** UC21/22 — sidebar "Trong khoá học này". Rỗng ở luồng UC11 ẩn danh (chưa đăng nhập). */
   chapters: ChapterNav[];
+  /** Phụ đề ngôn ngữ GỐC — rỗng nếu bài học chưa từng lồng tiếng lần nào. */
+  originalSubtitles: SubtitleSegment[];
 }
 
 export interface ChapterNav {

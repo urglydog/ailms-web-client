@@ -7,6 +7,7 @@ import type {
   DubLanguage,
   LessonNav,
   PlayerLesson,
+  SubtitleSegment,
   TrackStatus,
 } from '@/types/domain';
 
@@ -43,11 +44,19 @@ interface RawAudioTrack {
   chunks: RawAudioChunk[];
 }
 
+interface RawSubtitleSegment {
+  seq: number;
+  startSec: number;
+  endSec: number;
+  text: string;
+}
+
 interface RawLanguage {
   code: string;
   label: string;
   available: boolean;
   track: RawAudioTrack | null;
+  subtitles: RawSubtitleSegment[];
 }
 
 interface RawLessonNav {
@@ -82,6 +91,11 @@ interface RawEnrolledPlayerLesson {
   lastPositionSec: number;
   languages: RawLanguage[];
   chapters: RawChapterNav[];
+  originalSubtitles: RawSubtitleSegment[];
+}
+
+function toSubtitleSegment(raw: RawSubtitleSegment): SubtitleSegment {
+  return { seq: raw.seq, startSec: raw.startSec, endSec: raw.endSec, text: raw.text };
 }
 
 function toAudioTrackInfo(raw: RawAudioTrack): AudioTrackInfo {
@@ -108,6 +122,7 @@ function toDubLanguage(raw: RawLanguage): DubLanguage {
     flag: flagFor(raw.code),
     available: raw.available,
     track: raw.track ? toAudioTrackInfo(raw.track) : null,
+    subtitles: raw.subtitles.map(toSubtitleSegment),
   };
 }
 
@@ -148,6 +163,7 @@ function toPlayerLesson(raw: RawEnrolledPlayerLesson): PlayerLesson {
     lastPositionSec: raw.lastPositionSec,
     languages: raw.languages.map(toDubLanguage),
     chapters: raw.chapters.map(toChapterNav),
+    originalSubtitles: raw.originalSubtitles.map(toSubtitleSegment),
     // Không dùng field này nữa ở luồng đã đăng nhập — track được lấy từ `languages[].track`
     // (xem `learn/[lessonId]/page.tsx`). Giữ lại vì `PlayerLesson` dùng chung với UC11.
     activeTrack: null,
