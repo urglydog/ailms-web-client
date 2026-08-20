@@ -16,11 +16,10 @@ export function MermaidViewer({ chart }: MermaidViewerProps) {
   // Trạng thái hướng của sơ đồ
   const [layout, setLayout] = useState<'TD' | 'LR' | 'BT' | 'RL'>('TD');
 
-  // Cố gắng tự động phát hiện layout ban đầu từ chuỗi chart do AI sinh ra
   useEffect(() => {
     const match = chart.match(/^(graph|flowchart)\s+(TD|LR|BT|RL)/i);
     if (match && match[2]) {
-      setLayout(match[2].toUpperCase() as any);
+      setLayout(match[2].toUpperCase() as 'TD' | 'LR' | 'BT' | 'RL');
     }
   }, [chart]);
 
@@ -42,11 +41,10 @@ export function MermaidViewer({ chart }: MermaidViewerProps) {
         // Thay đổi hướng sơ đồ dựa trên state `layout`
         const modifiedChart = chart.replace(/^(graph|flowchart)\s+(TD|LR|BT|RL)/i, `$1 ${layout}`);
         
-        // Tạo một ID duy nhất cho biểu đồ
         const id = `mermaid-${Math.random().toString(36).substring(2, 9)}`;
         const { svg } = await mermaid.render(id, modifiedChart);
         setSvgContent(svg);
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("Mermaid Render Error:", err);
         setError("Không thể vẽ Sơ đồ tư duy. Dữ liệu có thể bị lỗi định dạng.");
       } finally {
