@@ -11,7 +11,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@stomp/stompjs": "^7.0.0",
+    "@stomp/stompjs": "^7.3.0",
     "@tanstack/react-query": "5.64.1",
     "@vladmandic/face-api": "^1.7.15",
     "date-fns": "^4.4.0",

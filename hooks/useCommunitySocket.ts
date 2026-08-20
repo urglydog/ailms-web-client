@@ -10,6 +10,7 @@ export interface ChatMessage {
   senderName: string;
   content: string;
   timestamp: string;
+  parentId?: string;
 }
 
 export function useCommunitySocket(lessonId: number | null) {
@@ -65,18 +66,22 @@ export function useCommunitySocket(lessonId: number | null) {
     };
   }, [lessonId]);
 
-  const sendMessage = (content: string, senderName: string) => {
+  const sendMessage = (content: string, senderName: string, parentId?: string) => {
     if (clientRef.current && clientRef.current.connected) {
       const decoded = decodeAccessToken();
       const userId = decoded ? String(decoded.id) : crypto.randomUUID();
-      clientRef.current.publish({
-        destination: `/app/chat/${lessonId}`,
-        body: JSON.stringify({ 
+      const payload: Record<string, string> = { 
           id: userId, 
           content, 
           senderName, 
           timestamp: new Date().toISOString() 
-        }),
+      };
+      if (parentId) {
+          payload.parentId = parentId;
+      }
+      clientRef.current.publish({
+        destination: `/app/chat/${lessonId}`,
+        body: JSON.stringify(payload),
       });
     }
   };
