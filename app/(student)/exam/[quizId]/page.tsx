@@ -11,6 +11,7 @@ export default function AntiCheatExamPage() {
   const videoRef = useRef<HTMLVideoElement>(null);
   
   const [violationCount, setViolationCount] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [isStarted, setIsStarted] = useState(false);
   const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
@@ -41,6 +42,7 @@ export default function AntiCheatExamPage() {
 
   // Hàm xử lý vi phạm với debounce (tránh trigger liên tục)
   const handleViolation = useCallback((reason: string) => {
+    if (isSubmitting) return;
     const now = Date.now();
     if (now - lastViolationTime.current < 2000) return; // Debounce 2 giây
     lastViolationTime.current = now;
@@ -48,6 +50,7 @@ export default function AntiCheatExamPage() {
     setViolationCount((prev) => {
       const newCount = prev + 1;
       if (newCount >= 3) {
+        setIsSubmitting(true);
         toast.error('Bạn đã vi phạm quá 3 lần. Hệ thống tự động nộp bài!');
         setTimeout(() => router.push('/progress'), 2000);
       } else {
@@ -55,7 +58,7 @@ export default function AntiCheatExamPage() {
       }
       return newCount;
     });
-  }, [router]);
+  }, [router, isSubmitting]);
 
   // 1. Chống chuyển tab & Rời chuột khỏi màn hình
   useEffect(() => {
@@ -72,8 +75,8 @@ export default function AntiCheatExamPage() {
     };
 
     const handleMouseLeave = (e: MouseEvent) => {
-      // Chỉ tính vi phạm nếu chuột rời khỏi cửa sổ browser đi sang màn hình khác / mép màn hình
-      if (e.clientY <= 0 || e.clientX <= 0 || (e.clientX >= window.innerWidth || e.clientY >= window.innerHeight)) {
+      // Chỉ tính vi phạm nếu chuột rời khỏi cửa sổ browser đi sang màn hình khác / mép trên màn hình
+      if (e.clientY <= 5) {
         handleViolation('Chuột rời khỏi khung hình thi (Nghi ngờ xem tài liệu)');
       }
     };

@@ -12,6 +12,7 @@ export function LiveChatPanel({ lessonId, userName }: LiveChatPanelProps) {
   const { messages, sendMessage } = useCommunitySocket(lessonId);
   const [inputValue, setInputValue] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -52,6 +53,15 @@ export function LiveChatPanel({ lessonId, userName }: LiveChatPanelProps) {
                 <span className="text-[11px] text-ink-faint">
                   {new Date(msg.timestamp).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
                 </span>
+                <button
+                  onClick={() => {
+                    setInputValue(`@${msg.senderName} `);
+                    inputRef.current?.focus();
+                  }}
+                  className="text-[11px] text-accent hover:underline ml-1"
+                >
+                  Trả lời
+                </button>
               </div>
               <p className="text-sm text-ink leading-snug bg-gray-50 border border-line-soft rounded-lg rounded-tl-none p-2 w-fit">
                 {msg.content}
@@ -63,6 +73,7 @@ export function LiveChatPanel({ lessonId, userName }: LiveChatPanelProps) {
 
       <form onSubmit={handleSend} className="p-3 bg-surface-hover border-t border-line flex gap-2">
         <input
+          ref={inputRef}
           type="text"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
