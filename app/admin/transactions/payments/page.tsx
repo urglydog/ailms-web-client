@@ -12,6 +12,7 @@ export interface AdminPayment {
   amount: number;
   platformFee: number;
   instructorEarning: number;
+  paymentMethod: string;
   status: string;
   paidAt: string | null;
   gatewayTxnNo: string | null;
@@ -226,6 +227,9 @@ export default function AdminPaymentsPage() {
                   </th>
                   <th className="px-6 py-4">Phí nền tảng</th>
                   <th className="px-6 py-4">Thực nhận</th>
+                  <th className="px-6 py-4 cursor-pointer hover:bg-line/30" onClick={() => handleSort('paymentMethod' as SortField)}>
+                    Phương thức <SortIcon field={'paymentMethod' as SortField} />
+                  </th>
                   <th className="px-6 py-4">Trạng thái</th>
                   <th className="px-6 py-4 cursor-pointer hover:bg-line/30" onClick={() => handleSort('paidAt')}>
                     Thời gian <SortIcon field="paidAt" />
@@ -251,6 +255,11 @@ export default function AdminPaymentsPage() {
                       </td>
                       <td className="px-6 py-4 text-success font-semibold">
                         {p.instructorEarning ? p.instructorEarning.toLocaleString('vi-VN') + 'đ' : '-'}
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="inline-block bg-line/20 px-2.5 py-1 rounded-full text-xs font-semibold text-ink">
+                          {p.paymentMethod}
+                        </span>
                       </td>
                       <td className="px-6 py-4">
                         <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-medium border ${getStatusColor(p.status)}`}>
@@ -353,6 +362,11 @@ export default function AdminPaymentsPage() {
                   <p className="font-medium text-success font-semibold">
                     {selectedPayment.instructorEarning ? selectedPayment.instructorEarning.toLocaleString('vi-VN') + 'đ' : '-'}
                   </p>
+                </div>
+
+                <div>
+                  <p className="text-sm font-medium text-ink-muted mb-1">Phương thức TT</p>
+                  <p className="font-medium text-ink">{selectedPayment.paymentMethod}</p>
                 </div>
 
                 <div>

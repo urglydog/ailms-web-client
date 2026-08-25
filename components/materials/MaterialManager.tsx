@@ -105,7 +105,18 @@ export function MaterialManager({ courseId }: { courseId: number }) {
                     {m.materialType === 'MINDMAP' ? 'Sơ đồ tư duy' : m.materialType} - Phiên bản {m.versionNo}
                   </h3>
                   <p className="text-xs text-ink-muted mt-1">
-                    Trạng thái: <span className={m.status === 'COMPLETED' ? 'text-green-600' : m.status === 'FAILED' ? 'text-red-600' : 'text-orange-500'}>{m.status}</span>
+                    Trạng thái:{' '}
+                    {m.status === 'COMPLETED' ? (
+                      <span className="text-green-600 font-medium">Hoàn thành</span>
+                    ) : m.status === 'FAILED' ? (
+                      <span className="text-red-600 font-medium">Lỗi</span>
+                    ) : (
+                      <span className="text-orange-500 font-medium">
+                        {new Date().getTime() - new Date(m.createdAt).getTime() > 120000 
+                          ? 'Đang quá tải (Vui lòng chờ thêm hoặc tạo lại)' 
+                          : 'Đang xử lý (Vui lòng chờ)...'}
+                      </span>
+                    )}
                     <span className="mx-2">•</span>
                     {new Date(m.createdAt).toLocaleString('vi-VN')}
                   </p>

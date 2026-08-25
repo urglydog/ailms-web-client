@@ -6,6 +6,13 @@ export function useCourseMaterials(courseId: number) {
     queryKey: ['materials', 'course', courseId],
     queryFn: () => materialsApi.listForCourse(courseId),
     enabled: !!courseId,
+    refetchInterval: (query) => {
+      const data = query.state.data;
+      if (data && data.some(m => m.status === 'PENDING')) {
+        return 3000;
+      }
+      return false;
+    }
   });
 }
 
