@@ -60,18 +60,105 @@ interface RequestOptions extends Omit<RequestInit, 'body'> {
   token?: string;
 }
 
+let isRefreshing = false;
+let failedQueue: Array<{
+  resolve: (token: string) => void;
+  reject: (err: Error) => void;
+}> = [];
+
+function processQueue(error: Error | null, token: string | null = null) {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else if (token) {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+}
+
 async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const { body, token, headers, ...rest } = options;
+  
+  // Use provided token or fallback to localStorage if available (client-side only)
+  let currentToken = token;
+  if (!currentToken && typeof window !== 'undefined') {
+    currentToken = localStorage.getItem('accessToken') || undefined;
+  }
 
-  const response = await fetch(`${resolveBaseUrl()}${path}`, {
+  let response = await fetch(`${resolveBaseUrl()}${path}`, {
     ...rest,
     headers: {
       'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(currentToken ? { Authorization: `Bearer ${currentToken}` } : {}),
       ...headers,
     },
     ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
   });
+
+  if (response.status === 401 && typeof window !== 'undefined') {
+    const refreshToken = localStorage.getItem('refreshToken');
+    if (refreshToken) {
+      if (isRefreshing) {
+        try {
+          const newToken = await new Promise<string>((resolve, reject) => {
+            failedQueue.push({ resolve, reject });
+          });
+          // Retry with new token
+          response = await fetch(`${resolveBaseUrl()}${path}`, {
+            ...rest,
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${newToken}`,
+              ...headers,
+            },
+            ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
+          });
+        } catch (err) {
+          throw new ApiError(await parseProblem(response));
+        }
+      } else {
+        isRefreshing = true;
+        try {
+          const refreshRes = await fetch(`${resolveBaseUrl()}/api/v1/auth/refresh`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refreshToken }),
+          });
+          
+          if (refreshRes.ok) {
+            const data = await refreshRes.json();
+            localStorage.setItem('accessToken', data.accessToken);
+            localStorage.setItem('refreshToken', data.refreshToken);
+            processQueue(null, data.accessToken);
+            
+            // Retry the original request
+            response = await fetch(`${resolveBaseUrl()}${path}`, {
+              ...rest,
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${data.accessToken}`,
+                ...headers,
+              },
+              ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
+            });
+          } else {
+            processQueue(new Error('Refresh failed'));
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            window.location.href = '/login';
+          }
+        } catch (err) {
+          processQueue(err as Error);
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+          window.location.href = '/login';
+        } finally {
+          isRefreshing = false;
+        }
+      }
+    }
+  }
 
   if (!response.ok) {
     throw new ApiError(await parseProblem(response));
