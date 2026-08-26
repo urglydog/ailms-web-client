@@ -32,6 +32,10 @@ export function FlashcardViewer({ flashcards }: { flashcards: Flashcard[] }) {
 
   const card = flashcards[currentIdx];
 
+  if (!card) {
+    return <div className="text-center text-ink-muted">Lỗi hiển thị thẻ.</div>;
+  }
+
   return (
     <div className="flex flex-col items-center">
       <div className="w-full flex justify-between text-ink-muted mb-6 text-sm font-semibold">

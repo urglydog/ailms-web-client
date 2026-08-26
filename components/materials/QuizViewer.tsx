@@ -51,6 +51,10 @@ export function QuizViewer({ questions }: { questions: QuizQuestion[] }) {
   }
 
   const question = questions[currentIdx];
+  if (!question) {
+    return <div className="text-center text-ink-muted">Lỗi hiển thị câu hỏi.</div>;
+  }
+  
   const isAnswered = selectedOption !== null;
   const selectedIsCorrect = question.options.find((o) => o.id === selectedOption)?.isCorrect;
 
