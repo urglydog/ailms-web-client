@@ -21,7 +21,7 @@ function PayosReturnContent() {
       return;
     }
 
-    if (customStatus === 'success' && !isCancelled) {
+    if ((customStatus === 'success' || customStatus === 'PAID') && !isCancelled) {
       setStatus('success');
       toast.success('Thanh toán thành công! Hệ thống đang xử lý ghi danh.');
       
