@@ -31,6 +31,21 @@ export interface MaterialGenerationRes {
 
 export interface MaterialDetailRes extends MaterialGenerationRes {
   mermaidCode?: string;
+  flashcards?: {
+    id: number;
+    frontText: string;
+    backText: string;
+  }[];
+  quizQuestions?: {
+    id: number;
+    content: string;
+    displayOrder: number;
+    options: {
+      id: number;
+      content: string;
+      isCorrect: boolean;
+    }[];
+  }[];
 }
 
 export const materialsApi = {
