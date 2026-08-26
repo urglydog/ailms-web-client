@@ -114,7 +114,7 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
             },
             ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
           });
-        } catch (err) {
+        } catch {
           throw new ApiError(await parseProblem(response));
         }
       } else {
