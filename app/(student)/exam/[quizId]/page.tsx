@@ -3,6 +3,8 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { useStartQuiz, useSubmitQuiz } from '@/hooks/useQuizzes';
+import { StartRes, SubmitRes } from '@/lib/api/quizzes';
 
 export default function AntiCheatExamPage() {
   const router = useRouter();
@@ -23,6 +25,12 @@ export default function AntiCheatExamPage() {
   const lastViolationTime = useRef(0);
   const detectInterval = useRef<NodeJS.Timeout | null>(null);
 
+  const { mutate: startQuiz, isPending: isStarting } = useStartQuiz();
+  const { mutate: submitQuiz, isPending: isSubmitPending } = useSubmitQuiz();
+  const [attemptData, setAttemptData] = useState<StartRes | null>(null);
+  const [answers, setAnswers] = useState<Record<number, number>>({});
+  const [result, setResult] = useState<SubmitRes | null>(null);
+
   // Khởi tạo model
   useEffect(() => {
     const loadModels = async () => {
@@ -40,9 +48,28 @@ export default function AntiCheatExamPage() {
     loadModels();
   }, []);
 
+  // Hàm nộp bài
+  const submitExam = useCallback(() => {
+    if (isSubmitting || !attemptData) return;
+    setIsSubmitting(true);
+    submitQuiz(
+      { attemptId: attemptData.attemptId, data: { answers } },
+      {
+        onSuccess: (data) => {
+          setResult(data);
+          toast.success(`Đã nộp bài! Bạn đạt ${data.score} điểm.`);
+        },
+        onError: () => {
+          toast.error('Có lỗi xảy ra khi nộp bài.');
+          setIsSubmitting(false);
+        }
+      }
+    );
+  }, [isSubmitting, attemptData, answers, submitQuiz]);
+
   // Hàm xử lý vi phạm với debounce (tránh trigger liên tục)
   const handleViolation = useCallback((reason: string) => {
-    if (isSubmitting) return;
+    if (isSubmitting || result) return;
     const now = Date.now();
     if (now - lastViolationTime.current < 2000) return; // Debounce 2 giây
     lastViolationTime.current = now;
@@ -50,19 +77,18 @@ export default function AntiCheatExamPage() {
     setViolationCount((prev) => {
       const newCount = prev + 1;
       if (newCount >= 3) {
-        setIsSubmitting(true);
         toast.error('Bạn đã vi phạm quá 3 lần. Hệ thống tự động nộp bài!');
-        setTimeout(() => router.push('/progress'), 2000);
+        submitExam();
       } else {
         toast.warning(`Cảnh báo vi phạm (${newCount}/3): ${reason}`);
       }
       return newCount;
     });
-  }, [router, isSubmitting]);
+  }, [isSubmitting, result, submitExam]);
 
   // 1. Chống chuyển tab & Rời chuột khỏi màn hình
   useEffect(() => {
-    if (!isStarted) return;
+    if (!isStarted || result) return;
 
     const handleVisibilityChange = () => {
       if (document.hidden) {
@@ -90,11 +116,11 @@ export default function AntiCheatExamPage() {
       window.removeEventListener('blur', handleWindowBlur);
       document.removeEventListener('mouseleave', handleMouseLeave);
     };
-  }, [isStarted, handleViolation]);
+  }, [isStarted, result, handleViolation]);
 
   // 2. Face API Detection Loop
   useEffect(() => {
-    if (!isStarted || !videoRef.current || !isModelLoaded) return;
+    if (!isStarted || !videoRef.current || !isModelLoaded || result) return;
 
     const video = videoRef.current;
     
@@ -131,7 +157,7 @@ export default function AntiCheatExamPage() {
       video.removeEventListener('play', startDetection);
       if (detectInterval.current) clearInterval(detectInterval.current);
     };
-  }, [isStarted, isModelLoaded, handleViolation]);
+  }, [isStarted, isModelLoaded, result, handleViolation]);
 
   // Yêu cầu bật Camera
   const startExam = async () => {
@@ -139,8 +165,16 @@ export default function AntiCheatExamPage() {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       setMediaStream(stream);
 
-      setIsStarted(true);
-      toast.success('Bắt đầu làm bài. Vui lòng không chuyển tab!');
+      startQuiz(Number(quizId), {
+        onSuccess: (data) => {
+          setAttemptData(data);
+          setIsStarted(true);
+          toast.success('Bắt đầu làm bài. Vui lòng không chuyển tab!');
+        },
+        onError: () => {
+          toast.error('Không thể tải bài thi, có thể khóa học này chưa có Quiz chính thức.');
+        }
+      });
     } catch {
       toast.error('Bạn phải cấp quyền sử dụng Camera để làm bài thi này!');
     }
@@ -148,10 +182,34 @@ export default function AntiCheatExamPage() {
 
   // Gắn stream
   useEffect(() => {
-    if (isStarted && videoRef.current && mediaStream) {
+    if (isStarted && videoRef.current && mediaStream && !result) {
       videoRef.current.srcObject = mediaStream;
     }
-  }, [isStarted, mediaStream]);
+    // Dừng stream khi nộp bài
+    if (result && mediaStream) {
+      mediaStream.getTracks().forEach(t => t.stop());
+    }
+  }, [isStarted, mediaStream, result]);
+
+  if (result) {
+    return (
+      <div className="min-h-dvh bg-surface p-8 flex items-center justify-center">
+        <div className="card p-12 text-center max-w-lg mx-auto">
+          <h2 className="font-display text-2xl font-bold mb-4 text-green-600">Hoàn thành bài thi!</h2>
+          <div className="text-4xl font-bold text-accent mb-6">{result.score}/10 Điểm</div>
+          <p className="text-ink-muted mb-8">
+            Bạn đã trả lời đúng {result.correctCount} trên tổng số {result.totalQuestions} câu hỏi.
+          </p>
+          <button 
+            onClick={() => router.push('/progress')}
+            className="bg-ink text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-gray-800 transition-all"
+          >
+            Quay lại Tiến độ học tập
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-dvh bg-surface p-8">
@@ -161,7 +219,7 @@ export default function AntiCheatExamPage() {
             <h1 className="font-display text-2xl font-bold text-ink flex items-center gap-2">
               <span className="text-red-600">🔴</span> Phòng Thi Trực Tuyến
             </h1>
-            <p className="text-sm text-ink-muted mt-1">Mã bài thi: {quizId}</p>
+            <p className="text-sm text-ink-muted mt-1">Mã khóa học: {quizId}</p>
           </div>
           <div className="text-right">
             <div className="text-sm font-semibold text-ink-muted">Cảnh báo vi phạm</div>
@@ -182,29 +240,40 @@ export default function AntiCheatExamPage() {
             </ul>
             <button 
               onClick={startExam}
-              disabled={!isModelLoaded}
+              disabled={!isModelLoaded || isStarting}
               className="bg-accent text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-accent-dark hover:scale-105 transition-all disabled:opacity-50 disabled:hover:scale-100"
             >
-              {isModelLoaded ? 'Bật Camera & Bắt đầu thi' : 'Đang tải AI Model...'}
+              {isStarting ? 'Đang tải đề thi...' : isModelLoaded ? 'Bật Camera & Bắt đầu thi' : 'Đang tải AI Model...'}
             </button>
           </div>
         ) : (
           <div className="grid grid-cols-3 gap-8">
-            <div className="col-span-2 card p-6">
-              <h3 className="font-bold text-lg mb-4">Câu hỏi 1</h3>
-              <p className="text-sm mb-6">Trí tuệ nhân tạo (AI) là gì?</p>
-              
-              <div className="space-y-3">
-                {['Khả năng máy tính mô phỏng trí tuệ con người', 'Một phần mềm nghe nhạc', 'Một loại phần cứng', 'Một ngôn ngữ lập trình'].map((ans, i) => (
-                  <label key={i} className="flex items-center gap-3 p-3 border border-line rounded-lg hover:bg-surface-hover cursor-pointer">
-                    <input type="radio" name="q1" className="w-4 h-4 text-accent" />
-                    <span className="text-sm">{ans}</span>
-                  </label>
-                ))}
-              </div>
+            <div className="col-span-2 flex flex-col gap-6">
+              {attemptData?.questions.map((q, idx) => (
+                <div key={q.id} className="card p-6">
+                  <h3 className="font-bold text-lg mb-4">Câu hỏi {idx + 1}</h3>
+                  <p className="text-sm mb-6">{q.content}</p>
+                  
+                  <div className="space-y-3">
+                    {q.options.map((opt) => (
+                      <label key={opt.id} className="flex items-center gap-3 p-3 border border-line rounded-lg hover:bg-surface-hover cursor-pointer">
+                        <input 
+                          type="radio" 
+                          name={`question_${q.id}`} 
+                          value={opt.id}
+                          checked={answers[q.id] === opt.id}
+                          onChange={() => setAnswers(prev => ({ ...prev, [q.id]: opt.id }))}
+                          className="w-4 h-4 text-accent" 
+                        />
+                        <span className="text-sm">{opt.content}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
 
-            <div className="col-span-1 flex flex-col gap-4">
+            <div className="col-span-1 flex flex-col gap-4 sticky top-8 self-start">
               <div className="card overflow-hidden">
                 <div className={`text-white text-xs font-bold p-2 text-center transition-colors ${
                   faceStatus === 'DETECTING' ? 'bg-amber-500' :
@@ -223,8 +292,12 @@ export default function AntiCheatExamPage() {
                 />
               </div>
 
-              <button className="bg-ink text-white font-bold py-3 rounded-xl hover:bg-gray-800">
-                Nộp bài sớm
+              <button 
+                onClick={submitExam}
+                disabled={isSubmitting}
+                className="bg-ink text-white font-bold py-3 rounded-xl hover:bg-gray-800 disabled:opacity-50"
+              >
+                {isSubmitting ? 'Đang nộp...' : 'Nộp bài thi'}
               </button>
             </div>
           </div>
