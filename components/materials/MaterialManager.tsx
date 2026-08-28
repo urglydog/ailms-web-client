@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useCourseMaterials, useRequestMaterial } from '@/hooks/useMaterials';
+import { useCourseMaterials, useRequestMaterial, useAvailableLanguages, useCourseChapters } from '@/hooks/useMaterials';
 import type { MaterialType, ScopeType } from '@/lib/api/materials';
 import { toast } from 'sonner';
 import { ApiError } from '@/lib/api/client';
@@ -9,23 +9,40 @@ import Link from 'next/link';
 
 export function MaterialManager({ courseId }: { courseId: number }) {
   const { data: materials, isLoading, refetch } = useCourseMaterials(courseId);
+  const { data: availableLanguages } = useAvailableLanguages(courseId);
+  const { data: chapters } = useCourseChapters(courseId);
   const requestMutation = useRequestMaterial();
 
   const [materialType, setMaterialType] = useState<MaterialType>('MINDMAP');
   const [scopeType, setScopeType] = useState<ScopeType>('WHOLE_COURSE');
-  const [language, setLanguage] = useState('vi');
+  const [scopeRefId, setScopeRefId] = useState<number | undefined>(undefined);
+  const [customLessonIds, setCustomLessonIds] = useState<number[]>([]);
+  const [language, setLanguage] = useState<string>('');
+
+  // Auto-select first language if available
+  if (availableLanguages && availableLanguages.length > 0 && language === '') {
+    setLanguage(availableLanguages[0]!);
+  }
 
   const handleRequest = () => {
+    if (!language) {
+      toast.error('Vui lòng chọn ngôn ngữ');
+      return;
+    }
+    
     requestMutation.mutate(
       {
         courseId,
         materialType,
         language,
         scopeType,
+        scopeRefId: scopeType === 'CHAPTER' ? scopeRefId : undefined,
+        customLessonIds: scopeType === 'CUSTOM_LESSONS' ? customLessonIds : undefined,
       },
       {
         onSuccess: () => {
           toast.success('Đã gửi yêu cầu sinh học liệu. AI đang xử lý!');
+          setCustomLessonIds([]);
         },
         onError: (err) => {
           if (err instanceof ApiError) {
@@ -35,6 +52,12 @@ export function MaterialManager({ courseId }: { courseId: number }) {
           }
         },
       }
+    );
+  };
+
+  const toggleLesson = (id: number) => {
+    setCustomLessonIds(prev => 
+      prev.includes(id) ? prev.filter(l => l !== id) : [...prev, id]
     );
   };
 
@@ -60,10 +83,16 @@ export function MaterialManager({ courseId }: { courseId: number }) {
             <select
               className="w-full rounded-md border border-line p-2 text-sm"
               value={scopeType}
-              onChange={(e) => setScopeType(e.target.value as ScopeType)}
+              onChange={(e) => {
+                setScopeType(e.target.value as ScopeType);
+                if (e.target.value === 'CHAPTER' && chapters && chapters.length > 0) {
+                  setScopeRefId(chapters[0]?.id);
+                }
+              }}
             >
               <option value="WHOLE_COURSE">Toàn bộ khóa học</option>
               <option value="CHAPTER">Từng chương</option>
+              <option value="CUSTOM_LESSONS">Tùy chọn bài học</option>
             </select>
           </div>
           <div>
@@ -72,15 +101,62 @@ export function MaterialManager({ courseId }: { courseId: number }) {
               className="w-full rounded-md border border-line p-2 text-sm"
               value={language}
               onChange={(e) => setLanguage(e.target.value)}
+              disabled={!availableLanguages || availableLanguages.length === 0}
             >
-              <option value="vi">Tiếng Việt</option>
-              <option value="en">Tiếng Anh</option>
+              {availableLanguages && availableLanguages.length > 0 ? (
+                availableLanguages.map(lang => (
+                  <option key={lang} value={lang}>{lang === 'vi-VN' || lang === 'vi' ? 'Tiếng Việt' : lang === 'en-US' || lang === 'en' ? 'Tiếng Anh' : lang}</option>
+                ))
+              ) : (
+                <option value="">Chưa có transcript</option>
+              )}
             </select>
           </div>
         </div>
+        
+        {/* Render selection UI for Chapter or Custom Lessons */}
+        {scopeType === 'CHAPTER' && chapters && chapters.length > 0 && (
+          <div className="mb-6">
+            <label className="block text-sm font-semibold mb-1">Chọn chương</label>
+            <select
+              className="w-full sm:w-1/3 rounded-md border border-line p-2 text-sm"
+              value={scopeRefId || ''}
+              onChange={(e) => setScopeRefId(Number(e.target.value))}
+            >
+              {chapters.map(c => (
+                <option key={c.id} value={c.id}>{c.title}</option>
+              ))}
+            </select>
+          </div>
+        )}
+        
+        {scopeType === 'CUSTOM_LESSONS' && chapters && (
+          <div className="mb-6 border border-line rounded-md p-4 max-h-60 overflow-y-auto bg-surface-hover">
+            <label className="block text-sm font-semibold mb-2">Tick chọn bài học</label>
+            {chapters.map(chapter => (
+              <div key={chapter.id} className="mb-3">
+                <div className="font-medium text-ink mb-1">{chapter.title}</div>
+                <div className="pl-4 flex flex-col gap-1">
+                  {chapter.lessons.map(lesson => (
+                    <label key={lesson.id} className="flex items-center gap-2 cursor-pointer text-sm">
+                      <input 
+                        type="checkbox" 
+                        checked={customLessonIds.includes(lesson.id)}
+                        onChange={() => toggleLesson(lesson.id)}
+                        className="rounded border-line text-accent focus:ring-accent"
+                      />
+                      <span className="text-ink-muted">{lesson.title}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
         <button
           onClick={handleRequest}
-          disabled={requestMutation.isPending}
+          disabled={requestMutation.isPending || (!language && availableLanguages?.length === 0) || (scopeType === 'CUSTOM_LESSONS' && customLessonIds.length === 0)}
           className="rounded-full bg-accent px-6 py-2 text-sm font-semibold text-white hover:bg-accent-dark disabled:opacity-50"
         >
           {requestMutation.isPending ? 'Đang gửi...' : '✨ Tạo học liệu'}

@@ -6,7 +6,7 @@ function authToken() {
 }
 
 export type MaterialType = 'MINDMAP' | 'QUIZ' | 'FLASHCARD';
-export type ScopeType = 'WHOLE_COURSE' | 'CHAPTER';
+export type ScopeType = 'WHOLE_COURSE' | 'CHAPTER' | 'CUSTOM_LESSONS';
 export type GenStatus = 'PENDING' | 'COMPLETED' | 'FAILED';
 
 export interface MaterialGenerationReq {
@@ -15,6 +15,7 @@ export interface MaterialGenerationReq {
   language: string;
   scopeType: ScopeType;
   scopeRefId?: number;
+  customLessonIds?: number[];
   quantityLevel?: string;
   difficultyLevel?: string;
 }
@@ -57,4 +58,10 @@ export const materialsApi = {
 
   getDetail: (id: number) =>
     api.get<MaterialDetailRes>(`/api/v1/materials/${id}`, { token: authToken() }),
+
+  getAvailableLanguages: (courseId: number) =>
+    api.get<string[]>(`/api/v1/materials/available-languages?courseId=${courseId}`, { token: authToken() }),
+
+  getCourseChapters: (courseId: number) =>
+    api.get<import('@/types/domain').Chapter[]>(`/api/v1/materials/course-chapters?courseId=${courseId}`, { token: authToken() }),
 };
