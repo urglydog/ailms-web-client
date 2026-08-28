@@ -61,58 +61,72 @@ export function MaterialManager({ courseId }: { courseId: number }) {
     );
   };
 
-  return (
-    <div className="flex flex-col gap-8">
-      <div className="card p-6">
-        <h2 className="font-display text-xl font-bold mb-4">Tạo học liệu AI mới</h2>
-        <div className="grid gap-4 sm:grid-cols-3 mb-6">
-          <div>
-            <label className="block text-sm font-semibold mb-1">Loại học liệu</label>
-            <select
-              className="w-full rounded-md border border-line p-2 text-sm"
-              value={materialType}
-              onChange={(e) => setMaterialType(e.target.value as MaterialType)}
-            >
-              <option value="MINDMAP">Sơ đồ tư duy (Mindmap)</option>
-              <option value="QUIZ">Trắc nghiệm (Quiz)</option>
-              <option value="FLASHCARD">Flashcard</option>
-            </select>
+    const getLanguageName = (code: string) => {
+      try {
+        const displayNames = new Intl.DisplayNames(['vi'], { type: 'language' });
+        // Capitalize first letter
+        const name = displayNames.of(code) || code;
+        return name.charAt(0).toUpperCase() + name.slice(1);
+      } catch (e) {
+        if (code === 'vi-VN' || code === 'vi') return 'Tiếng Việt';
+        if (code === 'en-US' || code === 'en') return 'Tiếng Anh';
+        if (code.startsWith('zh-')) return 'Tiếng Trung';
+        return code;
+      }
+    };
+
+    return (
+      <div className="flex flex-col gap-8">
+        <div className="card p-6">
+          <h2 className="font-display text-xl font-bold mb-4">Tạo học liệu AI mới</h2>
+          <div className="grid gap-4 sm:grid-cols-3 mb-6">
+            <div>
+              <label className="block text-sm font-semibold mb-1">Loại học liệu</label>
+              <select
+                className="w-full rounded-md border border-line p-2 text-sm"
+                value={materialType}
+                onChange={(e) => setMaterialType(e.target.value as MaterialType)}
+              >
+                <option value="MINDMAP">Sơ đồ tư duy (Mindmap)</option>
+                <option value="QUIZ">Trắc nghiệm (Quiz)</option>
+                <option value="FLASHCARD">Flashcard</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-semibold mb-1">Phạm vi</label>
+              <select
+                className="w-full rounded-md border border-line p-2 text-sm"
+                value={scopeType}
+                onChange={(e) => {
+                  setScopeType(e.target.value as ScopeType);
+                  if (e.target.value === 'CHAPTER' && chapters && chapters.length > 0) {
+                    setScopeRefId(chapters[0]?.id);
+                  }
+                }}
+              >
+                <option value="WHOLE_COURSE">Toàn bộ khóa học</option>
+                <option value="CHAPTER">Từng chương</option>
+                <option value="CUSTOM_LESSONS">Tùy chọn bài học</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-semibold mb-1">Ngôn ngữ</label>
+              <select
+                className="w-full rounded-md border border-line p-2 text-sm"
+                value={language}
+                onChange={(e) => setLanguage(e.target.value)}
+                disabled={!availableLanguages || availableLanguages.length === 0}
+              >
+                {availableLanguages && availableLanguages.length > 0 ? (
+                  availableLanguages.map(lang => (
+                    <option key={lang} value={lang}>{getLanguageName(lang)}</option>
+                  ))
+                ) : (
+                  <option value="">Chưa có transcript</option>
+                )}
+              </select>
+            </div>
           </div>
-          <div>
-            <label className="block text-sm font-semibold mb-1">Phạm vi</label>
-            <select
-              className="w-full rounded-md border border-line p-2 text-sm"
-              value={scopeType}
-              onChange={(e) => {
-                setScopeType(e.target.value as ScopeType);
-                if (e.target.value === 'CHAPTER' && chapters && chapters.length > 0) {
-                  setScopeRefId(chapters[0]?.id);
-                }
-              }}
-            >
-              <option value="WHOLE_COURSE">Toàn bộ khóa học</option>
-              <option value="CHAPTER">Từng chương</option>
-              <option value="CUSTOM_LESSONS">Tùy chọn bài học</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-semibold mb-1">Ngôn ngữ</label>
-            <select
-              className="w-full rounded-md border border-line p-2 text-sm"
-              value={language}
-              onChange={(e) => setLanguage(e.target.value)}
-              disabled={!availableLanguages || availableLanguages.length === 0}
-            >
-              {availableLanguages && availableLanguages.length > 0 ? (
-                availableLanguages.map(lang => (
-                  <option key={lang} value={lang}>{lang === 'vi-VN' || lang === 'vi' ? 'Tiếng Việt' : lang === 'en-US' || lang === 'en' ? 'Tiếng Anh' : lang}</option>
-                ))
-              ) : (
-                <option value="">Chưa có transcript</option>
-              )}
-            </select>
-          </div>
-        </div>
         
         {/* Render selection UI for Chapter or Custom Lessons */}
         {scopeType === 'CHAPTER' && chapters && chapters.length > 0 && (
