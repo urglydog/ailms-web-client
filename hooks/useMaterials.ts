@@ -34,3 +34,19 @@ export function useRequestMaterial() {
     },
   });
 }
+
+export function useAvailableLanguages(courseId: number) {
+  return useQuery({
+    queryKey: ['materials', 'languages', courseId],
+    queryFn: () => materialsApi.getAvailableLanguages(courseId),
+    enabled: !!courseId,
+  });
+}
+
+export function useCourseChapters(courseId: number) {
+  return useQuery({
+    queryKey: ['materials', 'chapters', courseId],
+    queryFn: () => materialsApi.getCourseChapters(courseId),
+    enabled: !!courseId,
+  });
+}
