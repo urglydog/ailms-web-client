@@ -1,4 +1,9 @@
-import { apiClient } from './client';
+import { api } from '@/lib/api/client';
+import { getAccessToken } from '@/lib/auth/token';
+
+function authToken() {
+  return getAccessToken() ?? undefined;
+}
 
 export interface OptionDto {
   id: number;
@@ -41,18 +46,18 @@ export interface HistoryRes {
 
 export const quizApi = {
   setOfficial: (quizId: number) => {
-    return apiClient.put(`/api/v1/instructor/quizzes/${quizId}/set-official`, {});
+    return api.put(`/api/v1/instructor/quizzes/${quizId}/set-official`, {}, { token: authToken() });
   },
 
   startAttempt: (courseId: number) => {
-    return apiClient.get<StartRes>(`/api/v1/courses/${courseId}/quizzes/official/attempt`);
+    return api.get<StartRes>(`/api/v1/courses/${courseId}/quizzes/official/attempt`, { token: authToken() });
   },
 
   submitAttempt: (attemptId: number, data: SubmitReq) => {
-    return apiClient.post<SubmitRes>(`/api/v1/quizzes/attempts/${attemptId}/submit`, data);
+    return api.post<SubmitRes>(`/api/v1/quizzes/attempts/${attemptId}/submit`, data, { token: authToken() });
   },
 
   getAttemptHistory: (courseId: number) => {
-    return apiClient.get<HistoryRes[]>(`/api/v1/courses/${courseId}/quizzes/attempts`);
+    return api.get<HistoryRes[]>(`/api/v1/courses/${courseId}/quizzes/attempts`, { token: authToken() });
   },
 };

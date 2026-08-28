@@ -26,7 +26,7 @@ export default function AntiCheatExamPage() {
   const detectInterval = useRef<NodeJS.Timeout | null>(null);
 
   const { mutate: startQuiz, isPending: isStarting } = useStartQuiz();
-  const { mutate: submitQuiz, isPending: isSubmitPending } = useSubmitQuiz();
+  const { mutate: submitQuiz } = useSubmitQuiz();
   const [attemptData, setAttemptData] = useState<StartRes | null>(null);
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [result, setResult] = useState<SubmitRes | null>(null);
