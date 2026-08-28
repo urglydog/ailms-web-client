@@ -67,7 +67,7 @@ export function MaterialManager({ courseId }: { courseId: number }) {
         // Capitalize first letter
         const name = displayNames.of(code) || code;
         return name.charAt(0).toUpperCase() + name.slice(1);
-      } catch (_e) {
+      } catch {
         if (code === 'vi-VN' || code === 'vi') return 'Tiếng Việt';
         if (code === 'en-US' || code === 'en') return 'Tiếng Anh';
         if (code.startsWith('zh-')) return 'Tiếng Trung';
