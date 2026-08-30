@@ -12,7 +12,7 @@
 export type Role = 'STUDENT' | 'INSTRUCTOR' | 'ADMIN';
 export type CourseStatus = 'DRAFT' | 'PENDING' | 'PUBLISHED' | 'REJECTED' | 'ARCHIVED';
 export type PaymentStatus = 'PENDING' | 'PAID' | 'FAILED' | 'EXPIRED';
-export type JobStatus = 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED' | 'SKIPPED';
+export type JobStatus = 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED' | 'SKIPPED' | 'CANCELLED';
 /** PARTIAL = đã có chunk phát được nhưng chưa ghép final.mp3 (BR-CHUNK-05) */
 export type TrackStatus = 'PROCESSING' | 'PARTIAL' | 'COMPLETED' | 'FAILED';
 export type MaterialType = 'MINDMAP' | 'FLASHCARD' | 'QUIZ';
@@ -234,13 +234,31 @@ export interface DubbingChunkProgressEvent {
   status: 'COMPLETED' | 'FAILED';
 }
 
+/**
+ * Sự kiện tiến độ CHI TIẾT trong lúc một chunk đang xử lý dở (chưa xong hẳn) — phân biệt
+ * với {@link DubbingChunkProgressEvent} bằng field `stage` (chunk chỉ COMPLETED/FAILED khi
+ * `dubbing_service.py` publish KHÔNG có field này). `PREPARING`/`FINALIZING` là 2 giai đoạn
+ * cấp-job (tải audio nguồn / ghép file cuối), không có `chunkIndex`; các stage còn lại luôn
+ * gắn với 1 chunk cụ thể.
+ */
+export interface DubbingStageProgressEvent {
+  jobId: number;
+  lessonId: number;
+  stage: 'PREPARING' | 'ASR' | 'TRANSLATE' | 'TTS' | 'UPLOADING' | 'FINALIZING';
+  chunkIndex?: number;
+  totalChunks?: number;
+}
+
 export interface DubbingJobFinishedEvent {
   jobId: number;
   lessonId: number;
-  status: 'COMPLETED' | 'FAILED' | 'SKIPPED';
+  status: 'COMPLETED' | 'FAILED' | 'SKIPPED' | 'CANCELLED';
 }
 
-export type DubbingProgressEvent = DubbingChunkProgressEvent | DubbingJobFinishedEvent;
+export type DubbingProgressEvent =
+  | DubbingStageProgressEvent
+  | DubbingChunkProgressEvent
+  | DubbingJobFinishedEvent;
 
 /** UC45 — 1 dòng trong bảng giám sát hàng đợi lồng tiếng của Admin. */
 export interface AiJobSummary {
@@ -426,6 +444,21 @@ export interface DubbingActivateResult {
   audioUrl: string | null;
 }
 
+/** UC20 mở rộng — 1 giọng đọc khả dụng của 1 ngôn ngữ (nguồn: `voice_mappings` đang active). */
+export interface VoiceOption {
+  language: string;
+  voiceName: string;
+  gender: 'MALE' | 'FEMALE';
+  isDefault: boolean;
+}
+
+/** UC20 — kết quả huỷ job lồng tiếng đang chạy. */
+export interface DubbingCancelResult {
+  status: 'CANCELLED';
+  jobId: number | null;
+  audioUrl: string | null;
+}
+
 // ── F2.2: Khám phá công khai & Đánh giá ──────────────────────────
 
 export interface CreateReviewInput {
@@ -481,10 +514,18 @@ export interface LessonProgressRes {
 
 // ── F8.1: Socratic AI Tutor (UC30) ───────────────────────────────
 
+/** UC30 mở rộng — 1 tệp học viên gửi kèm câu hỏi. `dataBase64` KHÔNG có tiền tố
+ * `data:image/png;base64,` — chỉ phần dữ liệu thuần, cắt bỏ trước khi gửi (xem `filesToAttachmentReqs`). */
+export interface TutorAttachmentReq {
+  fileName: string;
+  dataBase64: string;
+}
+
 export interface TutorAskReq {
   question: string;
   /** Bỏ trống ở tin đầu tiên — BE tự tạo hoặc tái sử dụng phiên gần nhất. */
   sessionId?: number | null;
+  attachments?: TutorAttachmentReq[];
 }
 
 export interface TutorAskRes {
@@ -495,12 +536,33 @@ export interface TutorAskRes {
   tokenUsed: number | null;
 }
 
-/** Tin nhắn hiển thị trong `TutorPanel` — chỉ tồn tại trong state cục bộ của trang. */
+/** UC30 mở rộng — tệp đính kèm khi hiển thị (vừa gửi, hoặc phục hồi từ lịch sử). `previewUrl`
+ * chỉ dùng để XEM inline trong khung chat (ảnh) — không phải link tải xuống. */
+export interface TutorAttachment {
+  id: string;
+  fileName: string;
+  previewUrl: string;
+  mimeType: string;
+}
+
+/** Tin nhắn hiển thị trong `TutorPanel` — id có thể là số thật (BE) hoặc `local-...` tạm
+ * thời (vừa gửi, chưa có phản hồi). */
 export interface TutorMessage {
   id: string;
   sender: 'USER' | 'AI';
   content: string;
   citedTimestamps: number[];
+  attachments: TutorAttachment[];
+}
+
+/** UC30 mở rộng — 1 dòng trong danh sách "lịch sử trò chuyện" kiểu ChatGPT. */
+export interface TutorSession {
+  id: number;
+  /** Do học viên đổi tên, hoặc AI tự gợi ý sau lượt hỏi đầu, hoặc rút gọn câu hỏi đầu. */
+  title: string;
+  /** Thời điểm tin nhắn GẦN NHẤT — quyết định thứ tự trong nhóm "chưa ghim". */
+  lastActivityAt: string;
+  isPinned: boolean;
 }
 
 // ── F3.2: Thanh toán & Đối soát ─────────────────────────────────

@@ -15,6 +15,10 @@ import type { DubLanguage } from '@/types/domain';
  * chưa (tái dùng đúng màu `bg-star`/`animate-ai-pulse` đã dùng ở `Pill.tsx` để nhất quán).
  *
  * BR-DUB-09: ngôn ngữ trùng `sourceLanguage` của video bị vô hiệu hoá — không cho tạo job.
+ *
+ * UC20 mở rộng — số ngôn ngữ hỗ trợ có thể lên tới vài chục (mỗi ngôn ngữ đang active trong
+ * `voice_mappings`), nên thêm ô gõ-tìm ở đầu danh sách thay vì bắt cuộn tay; lọc theo cả
+ * `label` lẫn `code` (không phân biệt hoa/thường) để gõ tắt kiểu "vi"/"ja" cũng ra kết quả.
  */
 
 interface LanguageDropdownProps {
@@ -26,11 +30,23 @@ interface LanguageDropdownProps {
 
 export function LanguageDropdown({ languages, activeCode, sourceLanguage, onSelect }: LanguageDropdownProps) {
   const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const active = languages.find((l) => l.code === activeCode) ?? null;
+
+  const normalizedQuery = query.trim().toLowerCase();
+  const filteredLanguages = normalizedQuery
+    ? languages.filter(
+        (l) => l.label.toLowerCase().includes(normalizedQuery) || l.code.toLowerCase().includes(normalizedQuery),
+      )
+    : languages;
 
   useEffect(() => {
     if (!open) return;
+    setQuery('');
+    // Tự focus ô tìm ngay khi mở — học viên gõ được luôn, không cần bấm thêm 1 lần vào ô.
+    searchInputRef.current?.focus();
     const onPointerDown = (e: PointerEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) setOpen(false);
     };
@@ -91,13 +107,27 @@ export function LanguageDropdown({ languages, activeCode, sourceLanguage, onSele
       </button>
 
       {open && (
-        <ul
-          role="listbox"
-          aria-label="Danh sách ngôn ngữ"
-          className="absolute z-20 mt-2 min-w-[220px] overflow-hidden rounded-card border border-line
-                     bg-surface-raised py-1 shadow-card-hover"
+        <div
+          className="absolute z-20 mt-2 min-w-[240px] overflow-hidden rounded-card border border-line
+                     bg-surface-raised shadow-card-hover"
         >
-          {languages.map((lang) => {
+          <div className="border-b border-line-soft p-2">
+            <input
+              ref={searchInputRef}
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Tìm ngôn ngữ…"
+              aria-label="Tìm ngôn ngữ"
+              className="w-full rounded-full border border-line bg-surface px-3 py-1.5 text-[13px]
+                         text-ink outline-none placeholder:text-ink-faint focus:border-accent"
+            />
+          </div>
+          <ul role="listbox" aria-label="Danh sách ngôn ngữ" className="max-h-72 overflow-y-auto py-1">
+          {filteredLanguages.length === 0 && (
+            <li className="px-4 py-3 text-center text-[13px] text-ink-faint">Không tìm thấy ngôn ngữ nào</li>
+          )}
+          {filteredLanguages.map((lang) => {
             const isSource = lang.code === sourceLanguage;
             const isActive = lang.code === activeCode;
             return (
@@ -137,7 +167,8 @@ export function LanguageDropdown({ languages, activeCode, sourceLanguage, onSele
               </li>
             );
           })}
-        </ul>
+          </ul>
+        </div>
       )}
     </div>
   );
