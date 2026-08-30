@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, type RefObject } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState, type RefObject } from 'react';
 import { useDualPlayerSync, useYouTubeDualPlayerSync } from '@/hooks/useDualPlayerSync';
 import type { AudioTrackInfo, SubtitleSegment } from '@/types/domain';
 
@@ -54,6 +54,13 @@ interface ResolvedAudio {
   offsetSec: number;
 }
 
+/** UC30 — cho phép trang cha (Gia sư AI, `TutorPanel`) ra lệnh tua tới mốc thời gian, bất kể
+ * nguồn video là UPLOAD (`<video>`) hay YOUTUBE (IFrame Player API) — 2 cơ chế tua khác hẳn
+ * nhau bị `DualPlayer` che giấu hoàn toàn, trang cha không cần biết đang phát nguồn nào. */
+export interface DualPlayerHandle {
+  seekTo: (seconds: number) => void;
+}
+
 /** Chọn URL audio + offset đồng bộ hiện tại theo BR-CHUNK-05. */
 function resolveAudio(track: AudioTrackInfo | null, currentSec: number): ResolvedAudio {
   if (!track) {
@@ -68,7 +75,7 @@ function resolveAudio(track: AudioTrackInfo | null, currentSec: number): Resolve
   return { src: chunk?.fileUrl ?? null, offsetSec: chunk?.startSec ?? 0 };
 }
 
-export function DualPlayer({
+export const DualPlayer = forwardRef<DualPlayerHandle, DualPlayerProps>(function DualPlayer({
   videoSource,
   videoUrl,
   youtubeId,
@@ -80,7 +87,7 @@ export function DualPlayer({
   translatedSubtitles = [],
   showOriginalSub = false,
   showTranslatedSub = false,
-}: DualPlayerProps) {
+}: DualPlayerProps, ref) {
   const internalVideoRef = useRef<HTMLVideoElement>(null);
   const internalAudioRef = useRef<HTMLAudioElement>(null);
   const videoRef = externalVideoRef ?? internalVideoRef;
@@ -99,13 +106,23 @@ export function DualPlayer({
     enabled: !isYoutube && audioSrc !== null,
     timeOffsetSec: offsetSec,
   });
-  const { currentSec: youtubeSec } = useYouTubeDualPlayerSync(youtubeContainerRef, audioRef, isYoutube ? youtubeId : null, {
-    dubActive: audioSrc !== null,
-    timeOffsetSec: offsetSec,
-  });
+  const { currentSec: youtubeSec, seekTo: youtubeSeekTo } = useYouTubeDualPlayerSync(
+    youtubeContainerRef, audioRef, isYoutube ? youtubeId : null,
+    { dubActive: audioSrc !== null, timeOffsetSec: offsetSec },
+  );
   useEffect(() => {
     if (isYoutube) setCurrentSec(youtubeSec);
   }, [isYoutube, youtubeSec]);
+
+  useImperativeHandle(ref, () => ({
+    seekTo: (seconds: number) => {
+      if (isYoutube) {
+        youtubeSeekTo(seconds);
+      } else if (videoRef.current) {
+        videoRef.current.currentTime = seconds;
+      }
+    },
+  }), [isYoutube, youtubeSeekTo, videoRef]);
 
   const activeOriginal = showOriginalSub ? findActiveSegment(originalSubtitles, currentSec) : null;
   const activeTranslated = showTranslatedSub ? findActiveSegment(translatedSubtitles, currentSec) : null;
@@ -163,4 +180,4 @@ export function DualPlayer({
       )}
     </div>
   );
-}
+});

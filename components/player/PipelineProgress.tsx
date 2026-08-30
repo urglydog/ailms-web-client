@@ -20,9 +20,12 @@ interface PipelineProgressProps {
   steps: PipelineStep[];
   percent?: number;
   onWatchOriginal: () => void;
+  /** UC20 — huỷ job đang chạy thật (khác `onWatchOriginal`: chỉ ẩn panel, job vẫn chạy nền). */
+  onCancel: () => void;
+  isCancelling?: boolean;
 }
 
-export function PipelineProgress({ steps, percent, onWatchOriginal }: PipelineProgressProps) {
+export function PipelineProgress({ steps, percent, onWatchOriginal, onCancel, isCancelling }: PipelineProgressProps) {
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
@@ -92,13 +95,23 @@ export function PipelineProgress({ steps, percent, onWatchOriginal }: PipelinePr
         ))}
       </ol>
 
-      <button
-        type="button"
-        onClick={onWatchOriginal}
-        className="self-start text-[13px] font-medium text-ink-muted underline-offset-4 hover:text-accent hover:underline"
-      >
-        Ẩn tiến độ, xem video
-      </button>
+      <div className="flex items-center gap-4">
+        <button
+          type="button"
+          onClick={onWatchOriginal}
+          className="text-[13px] font-medium text-ink-muted underline-offset-4 hover:text-accent hover:underline"
+        >
+          Ẩn tiến độ, xem video
+        </button>
+        <button
+          type="button"
+          onClick={onCancel}
+          disabled={isCancelling}
+          className="text-[13px] font-medium text-red-600 underline-offset-4 hover:underline disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {isCancelling ? 'Đang huỷ...' : 'Huỷ lồng tiếng'}
+        </button>
+      </div>
     </div>
   );
 }

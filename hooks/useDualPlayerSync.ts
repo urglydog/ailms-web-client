@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 /**
  * Đồng bộ Dual Player — hiện thực BR-SYNC-01.
@@ -231,7 +231,7 @@ export function useYouTubeDualPlayerSync(
   audioRef: React.RefObject<HTMLAudioElement | null>,
   youtubeId: string | null,
   { dubActive = false, timeOffsetSec = 0 }: UseYouTubeDualPlayerSyncOptions = {},
-): { currentSec: number } {
+): { currentSec: number; seekTo: (seconds: number) => void } {
   const playerRef = useRef<YouTubePlayerLike | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const offsetRef = useRef(timeOffsetSec);
@@ -323,5 +323,11 @@ export function useYouTubeDualPlayerSync(
     };
   }, [containerRef, audioRef, youtubeId]);
 
-  return { currentSec };
+  /** UC30 — tua video theo mốc thời gian trích dẫn của Gia sư AI (BR-TUTOR-02). `allowSeekAhead:
+   * true` để tua được tới đoạn video YouTube chưa buffer, không chỉ trong phần đã tải. */
+  const seekTo = useCallback((seconds: number) => {
+    playerRef.current?.seekTo(seconds, true);
+  }, []);
+
+  return { currentSec, seekTo };
 }

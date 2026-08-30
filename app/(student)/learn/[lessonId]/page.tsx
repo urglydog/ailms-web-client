@@ -5,22 +5,60 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import { DualPlayer } from '@/components/player/DualPlayer';
+import { DualPlayer, type DualPlayerHandle } from '@/components/player/DualPlayer';
 import { DubbingActivatePanel } from '@/components/player/DubbingActivatePanel';
 import { LanguageDropdown } from '@/components/player/LanguageDropdown';
 import { LessonSidebar } from '@/components/player/LessonSidebar';
 import { PipelineProgress } from '@/components/player/PipelineProgress';
 import { TutorPanel } from '@/components/tutor/TutorPanel';
-import { useActivateDubbing } from '@/hooks/useDubbing';
+import { useActivateDubbing, useCancelDubbing } from '@/hooks/useDubbing';
 import { useDubbingSocket } from '@/hooks/useDubbingSocket';
 import { useEnrolledLessonPlayer } from '@/hooks/useEnrolledLessonPlayer';
 import { useLessonProgress } from '@/hooks/useLessonProgress';
 import { useLessonPlayer } from '@/hooks/usePublicCourses';
+import { useVoiceOptions } from '@/hooks/useVoiceOptions';
 import { ApiError } from '@/lib/api/client';
 import { LiveChatPanel } from '@/components/community/LiveChatPanel';
 import { decodeAccessToken, getAccessToken } from '@/lib/auth/token';
-import { MOCK_PIPELINE_STEPS } from '@/lib/mock/courses';
 import type { PipelineStep } from '@/types/domain';
+
+/** Nhãn hiển thị cho từng `stage` do AI Worker publish — xem `app/redis_client.py::publish_progress`. */
+const STAGE_LABELS: Record<string, string> = {
+  ASR: 'Đang bóc tách lời thoại (STT)',
+  TRANSLATE: 'Đang dịch nội dung',
+  TTS: 'Đang tổng hợp giọng đọc',
+  UPLOADING: 'Đang lưu file đoạn này',
+};
+
+const PREPARE_STEP: PipelineStep = {
+  key: 'prepare',
+  label: 'Đang tải & phân tích audio nguồn',
+  done: false,
+  active: true,
+};
+
+const FINALIZE_STEP: PipelineStep = {
+  key: 'finalize',
+  label: 'Đang ghép & lưu file hoàn chỉnh',
+  done: false,
+  active: false,
+};
+
+/** Dựng lại danh sách bước đầy đủ (2 bước cấp-job bọc quanh N bước/chunk) khi lần đầu biết
+ * `totalChunks` thật — trước đó chỉ có `PREPARE_STEP` làm placeholder (xem `PREPARING` bên dưới).
+ */
+function buildChunkSteps(totalChunks: number): PipelineStep[] {
+  return [
+    { ...PREPARE_STEP, done: true, active: false },
+    ...Array.from({ length: totalChunks }, (_, i) => ({
+      key: `chunk-${i}`,
+      label: `Đoạn ${i + 1}/${totalChunks} — đang chờ xử lý`,
+      done: false,
+      active: false,
+    })),
+    { ...FINALIZE_STEP },
+  ];
+}
 
 /**
  * Trang học bài — dịch từ nhánh `isPlayer` của design.
@@ -59,6 +97,7 @@ export default function LearnPage() {
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const dualPlayerRef = useRef<DualPlayerHandle>(null);
   const queryClient = useQueryClient();
   // `languages[].track` chỉ mới sau khi gọi lại API — cần refetch mỗi khi có track mới sẵn sàng
   // (BR-DUB-04 trả AVAILABLE ngay, hoặc job vừa COMPLETED), nếu không `available`/`track` trong
@@ -72,8 +111,12 @@ export default function LearnPage() {
   );
 
   const [activeLang, setActiveLang] = useState<string | null>(null);
+  // UC20 mở rộng — giọng đọc đang chọn cho `activeLang` (null = chưa có ngôn ngữ nào chọn,
+  // hoặc ngôn ngữ đó chỉ có 1 giọng nên không cần chọn). Reset mỗi khi đổi ngôn ngữ.
+  const [selectedVoiceName, setSelectedVoiceName] = useState<string | null>(null);
+  const { data: voiceOptions } = useVoiceOptions();
   const [mode, setMode] = useState<PlayerMode>('watching');
-  const [steps, setSteps] = useState<PipelineStep[]>(MOCK_PIPELINE_STEPS);
+  const [steps, setSteps] = useState<PipelineStep[]>([PREPARE_STEP]);
   const [quotaExceeded, setQuotaExceeded] = useState(false);
   const [activateError, setActivateError] = useState<string | null>(null);
   const [jobError, setJobError] = useState<string | null>(null);
@@ -82,20 +125,14 @@ export default function LearnPage() {
   const [showOriginalSub, setShowOriginalSub] = useState(false);
   const [showTranslatedSub, setShowTranslatedSub] = useState(false);
   const activateDubbing = useActivateDubbing();
+  const cancelDubbing = useCancelDubbing();
 
-  // UC30 — mốc thời gian trong câu trả lời Gia sư AI (BR-TUTOR-02). Nguồn YOUTUBE chưa
-  // gắn `useYouTubeDualPlayerSync` vào trang này (để dành việc sau, xem docblock đầu
-  // file) nên chỉ tua được cho nguồn UPLOAD ở F8.1 này.
-  const handleSeekToTimestamp = useCallback(
-    (sec: number) => {
-      if (lesson?.videoSource === 'UPLOAD' && videoRef.current) {
-        videoRef.current.currentTime = sec;
-      } else {
-        toast.info('Chưa hỗ trợ tua video YouTube theo mốc thời gian.');
-      }
-    },
-    [lesson?.videoSource],
-  );
+  // UC30 — mốc thời gian trong câu trả lời Gia sư AI (BR-TUTOR-02). `DualPlayer` che giấu 2 cơ
+  // chế tua khác hẳn nhau (thẻ <video> cho UPLOAD, IFrame Player API cho YOUTUBE) sau 1
+  // `seekTo()` chung qua `DualPlayerHandle` — trang này không cần biết đang phát nguồn nào.
+  const handleSeekToTimestamp = useCallback((sec: number) => {
+    dualPlayerRef.current?.seekTo(sec);
+  }, []);
 
   // UC20 — chỉ mở kết nối STOMP khi thật sự đang chờ pipeline chạy.
   const { lastEvent } = useDubbingSocket(mode === 'processing' ? lessonId : null);
@@ -103,30 +140,64 @@ export default function LearnPage() {
   useEffect(() => {
     if (!lastEvent) return;
 
-    if ('chunkIndex' in lastEvent) {
-      // Sự kiện CẤP-CHUNK — dựng/lấp đầy danh sách chunk theo totalChunks thật.
+    if ('stage' in lastEvent) {
+      // Sự kiện CHI TIẾT trong lúc 1 chunk đang xử lý dở — chỉ đổi NHÃN bước đang active,
+      // không đụng tới done/failed (những cờ đó chỉ sự kiện cấp-chunk COMPLETED/FAILED mới
+      // được quyết định, xem nhánh 'chunkIndex' bên dưới).
+      const { stage, chunkIndex, totalChunks } = lastEvent;
+
+      if (stage === 'PREPARING') {
+        setSteps([PREPARE_STEP]);
+        return;
+      }
+
+      if (stage === 'FINALIZING') {
+        setSteps((prev) =>
+          prev.map((step) =>
+            step.key === 'finalize' ? { ...step, active: true } : { ...step, done: true, active: false },
+          ),
+        );
+        return;
+      }
+
+      // ASR/TRANSLATE/TTS/UPLOADING — luôn kèm chunkIndex/totalChunks thật từ ai-worker.
       setSteps((prev) => {
-        const size = lastEvent.totalChunks;
-        const base: PipelineStep[] =
-          prev.length === size
-            ? prev
-            : Array.from({ length: size }, (_, i) => ({
-                key: `chunk-${i}`,
-                label: `Đoạn ${i + 1}/${size}`,
-                done: false,
-                active: i === 0,
-              }));
-        return base.map((step, i) => {
-          if (i === lastEvent.chunkIndex) {
+        const size = totalChunks ?? 0;
+        const chunkCount = prev.filter((s) => s.key.startsWith('chunk-')).length;
+        const base = chunkCount === size ? prev : buildChunkSteps(size);
+        return base.map((step) => {
+          if (step.key === `chunk-${chunkIndex}`) {
             return {
               ...step,
+              label: `Đoạn ${(chunkIndex ?? 0) + 1}/${size} — ${STAGE_LABELS[stage] ?? stage}`,
+              active: true,
+            };
+          }
+          if (step.key === 'prepare') {
+            return { ...step, done: true, active: false };
+          }
+          return step;
+        });
+      });
+      return;
+    }
+
+    if ('chunkIndex' in lastEvent) {
+      // Sự kiện CẤP-CHUNK — chunk vừa xong hẳn (thành công/thất bại), khác các sự kiện
+      // "stage" ở trên (chunk đang xử lý dở).
+      setSteps((prev) => {
+        const size = lastEvent.totalChunks;
+        const chunkCount = prev.filter((s) => s.key.startsWith('chunk-')).length;
+        const base = chunkCount === size ? prev : buildChunkSteps(size);
+        return base.map((step) => {
+          if (step.key === `chunk-${lastEvent.chunkIndex}`) {
+            return {
+              ...step,
+              label: `Đoạn ${lastEvent.chunkIndex + 1}/${size}`,
               done: lastEvent.status === 'COMPLETED',
               failed: lastEvent.status === 'FAILED',
               active: false,
             };
-          }
-          if (i === lastEvent.chunkIndex + 1) {
-            return { ...step, active: true };
           }
           return step;
         });
@@ -137,10 +208,18 @@ export default function LearnPage() {
         // (mount cố định) sẽ tự động phát được ngay khi mốc thời gian chạm tới chunk đó.
         void refetchLesson();
       }
-    } else if (lastEvent.status === 'COMPLETED') {
-      // Sự kiện CẤP-JOB — đây mới là lúc chắc chắn xong (đã concat + upload B2), không phải
-      // chunk cuối "COMPLETED" (BR-CHUNK-05: còn phải ghép final.mp3 sau đó).
+      return;
+    }
+
+    // Sự kiện CẤP-JOB — đây mới là lúc chắc chắn xong (đã concat + upload B2), không phải
+    // chunk cuối "COMPLETED" (BR-CHUNK-05: còn phải ghép final.mp3 sau đó).
+    if (lastEvent.status === 'COMPLETED') {
       void refetchLesson();
+      setMode('watching');
+    } else if (lastEvent.status === 'CANCELLED') {
+      // UC20 — do CHÍNH học viên này (hoặc ai đó đang theo dõi cùng job) chủ động huỷ,
+      // không phải lỗi — không hiện `jobError` (khối màu đỏ) cho trường hợp này.
+      toast.info('Đã huỷ lồng tiếng theo yêu cầu.');
       setMode('watching');
     } else {
       setJobError(
@@ -150,6 +229,21 @@ export default function LearnPage() {
       );
     }
   }, [lastEvent, refetchLesson]);
+
+  const handleCancelDubbing = () => {
+    if (!activeLang) return;
+    cancelDubbing.mutate(
+      { lessonId, targetLanguage: activeLang },
+      {
+        // Không cần tự setMode('watching') ở đây — sự kiện WS "CANCELLED" job-level (publish
+        // NGAY từ be/ khi huỷ, xem DubbingRequestService.cancelDubbing) sẽ tự làm việc đó qua
+        // nhánh xử lý lastEvent ở trên, tránh 2 nơi cùng quyết định 1 việc.
+        onError: (err) => {
+          toast.error(err instanceof ApiError ? err.message : 'Không huỷ được lồng tiếng, vui lòng thử lại.');
+        },
+      },
+    );
+  };
 
   // UC21 — ghi nhận tiến độ theo thời gian phát THẬT của thẻ <video> (play/pause/seeking ở cấp
   // hook, không quan tâm `mode`) — video giờ mount cố định và có thể đang phát audio gốc ngay cả
@@ -182,12 +276,17 @@ export default function LearnPage() {
 
   const activeLangLabel =
     lesson.languages.find((l) => l.code === activeLang)?.label ?? 'ngôn ngữ đã chọn';
+  const voicesForActiveLang = voiceOptions?.filter((v) => v.language === activeLang) ?? [];
 
   const handleSelectLanguage = (code: string) => {
     setActiveLang(code);
     const lang = lesson.languages.find((l) => l.code === code);
     // Ngôn ngữ chưa có AudioTrack → mở panel kích hoạt (UC18)
     setMode(lang?.available ? 'watching' : 'need-activation');
+    // UC20 mở rộng — mặc định chọn sẵn giọng isDefault của ngôn ngữ MỚI (nếu có), học viên
+    // đổi lại được trong `VoicePicker`; không tự ý giữ giọng của ngôn ngữ cũ.
+    const defaultVoice = voiceOptions?.find((v) => v.language === code && v.isDefault);
+    setSelectedVoiceName(defaultVoice?.voiceName ?? null);
   };
 
   const handleActivate = () => {
@@ -197,7 +296,7 @@ export default function LearnPage() {
     setJobError(null);
 
     activateDubbing.mutate(
-      { lessonId, targetLanguage: activeLang },
+      { lessonId, targetLanguage: activeLang, voiceName: selectedVoiceName },
       {
         onSuccess: (result) => {
           if (result.status === 'AVAILABLE') {
@@ -210,7 +309,7 @@ export default function LearnPage() {
           // đúng `/topic/dubbing/{lessonId}`; học viên thứ 2 chọn cùng ngôn ngữ trong lúc job
           // đang chạy sẽ nhận đúng luồng tiến độ của job đó, không tạo job mới.
           setMode('processing');
-          setSteps(MOCK_PIPELINE_STEPS);
+          setSteps([PREPARE_STEP]);
         },
         onError: (err) => {
           if (err instanceof ApiError && err.isQuotaExceeded) {
@@ -243,6 +342,7 @@ export default function LearnPage() {
           <div className="flex min-w-0 flex-col gap-4">
             {/* Video luôn hiển thị và phát được, bất kể mode — xem docblock đầu file */}
             <DualPlayer
+              ref={dualPlayerRef}
               videoSource={lesson.videoSource}
               videoUrl={lesson.videoUrl}
               youtubeId={lesson.youtubeId}
@@ -307,6 +407,9 @@ export default function LearnPage() {
                   onWatchOriginal={() => setMode('watching')}
                   quotaExceeded={quotaExceeded}
                   isSubmitting={activateDubbing.isPending}
+                  voices={voicesForActiveLang}
+                  selectedVoice={selectedVoiceName}
+                  onSelectVoice={setSelectedVoiceName}
                 />
                 {activateError && (
                   <p className="mt-3 border-t border-line-soft pt-3 text-sm text-red-600">{activateError}</p>
@@ -320,6 +423,8 @@ export default function LearnPage() {
                   steps={steps}
                   percent={percent}
                   onWatchOriginal={() => setMode('watching')}
+                  onCancel={handleCancelDubbing}
+                  isCancelling={cancelDubbing.isPending}
                 />
                 {jobError && (
                   <p className="mt-3 border-t border-line-soft pt-3 text-sm text-red-600">{jobError}</p>
