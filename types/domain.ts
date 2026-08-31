@@ -589,3 +589,87 @@ export interface PaymentRes {
   billingName?: string;
   billingPhone?: string;
 }
+
+// ── F11.1: Live Classroom — vòng đời phiên (UC50) ────────────────
+
+export type LiveVisibility = 'COURSE_ONLY' | 'PUBLIC';
+export type LiveSessionStatus = 'SCHEDULED' | 'LIVE' | 'ENDED';
+
+export interface CreateLiveSessionInput {
+  courseId: number;
+  title: string;
+  visibility: LiveVisibility;
+  /** Bỏ trống thì BE tự lấy theo preferredLanguage của giảng viên (BR-LIVE-04). */
+  sourceLanguage?: string;
+  /** Bỏ trống nghĩa là "sẵn sàng bắt đầu bất kỳ lúc nào", không phải lỗi. */
+  scheduledAt?: string;
+}
+
+export interface LiveSession {
+  id: number;
+  title: string;
+  visibility: LiveVisibility;
+  status: LiveSessionStatus;
+  roomName: string;
+  sourceLanguage: string;
+  scheduledAt: string | null;
+  startedAt: string | null;
+  endedAt: string | null;
+  courseId: number;
+  courseTitle: string;
+}
+
+/** UC50 — trả về sau khi bấm "Bắt đầu Live", đủ để connect LiveKit React SDK. */
+export interface LiveSessionStartRes {
+  accessToken: string;
+  serverUrl: string;
+  roomName: string;
+  identity: string;
+}
+
+// ── F11.2: Xem Live theo phân quyền (UC51) ───────────────────────
+
+export interface LiveViewSummary {
+  id: number;
+  title: string;
+  status: LiveSessionStatus;
+  scheduledAt: string | null;
+  startedAt: string | null;
+}
+
+/** `viewerToken`/`serverUrl`/`roomName` chỉ có giá trị khi `status === 'LIVE'`. */
+export interface LiveViewDetail {
+  id: number;
+  title: string;
+  visibility: LiveVisibility;
+  status: LiveSessionStatus;
+  sourceLanguage: string;
+  scheduledAt: string | null;
+  startedAt: string | null;
+  endedAt: string | null;
+  courseId: number;
+  courseTitle: string;
+  viewerToken: string | null;
+  serverUrl: string | null;
+  roomName: string | null;
+}
+
+// ── F11.3: Lồng tiếng Live thời gian thực (UC52) ─────────────────
+
+export type LiveTrackStatus = 'ACTIVE' | 'STOPPED';
+
+export interface LiveLanguageTrack {
+  id: number;
+  targetLanguage: string;
+  voiceName: string;
+  status: LiveTrackStatus;
+  activeListenerCount: number;
+  /** Tên track LiveKit thật, dạng `translated-{targetLanguage}` — dùng để subscribe đúng luồng. */
+  trackName: string;
+}
+
+export interface ActivateLiveLanguageTrackInput {
+  targetLanguage: string;
+  /** Chỉ có tác dụng khi đây là ngôn ngữ CHƯA có track ACTIVE nào (BR-LIVE-05). */
+  voiceName?: string;
+}

@@ -22,6 +22,7 @@ export default function InstructorLayout({ children }: { children: React.ReactNo
   const sidebarItems = [
     { id: 'overview', label: 'Tổng quan', href: '/instructor' },
     { id: 'courseslist', label: 'Khóa học của tôi', href: '/instructor/courses' },
+    { id: 'live', label: 'Live', href: '/instructor/live' },
     { id: 'revenue', label: 'Thống kê doanh thu', href: '/instructor/revenue' },
     { id: 'students', label: 'Học viên', href: '/instructor/students' },
   ];
