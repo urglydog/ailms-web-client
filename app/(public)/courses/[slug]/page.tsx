@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { ChapterAccordion } from '@/components/course/ChapterAccordion';
 import { EnrollButton } from '@/components/course/EnrollButton';
 import { ReviewsSection } from '@/components/course/ReviewsSection';
+import { CourseLiveBanner } from '@/components/live/CourseLiveBanner';
 import { Badge } from '@/components/ui/Badge';
 import { StarRating } from '@/components/ui/StarRating';
 import { ApiError } from '@/lib/api/client';
@@ -63,6 +64,8 @@ export default async function CourseDetailPage({ params }: PageProps) {
       <div className="grid gap-10 lg:grid-cols-[1fr_340px]">
         {/* ── Cột nội dung ── */}
         <div className="flex min-w-0 flex-col gap-8">
+          <CourseLiveBanner courseId={course.id} />
+
           <header className="flex flex-col gap-4">
             <h1 className="font-display text-3xl font-extrabold leading-tight text-ink">
               {course.title}
