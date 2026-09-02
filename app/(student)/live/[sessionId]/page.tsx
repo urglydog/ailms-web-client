@@ -9,22 +9,30 @@ import { LiveChatPanel } from '@/components/live/LiveChatPanel';
 import { LiveLanguagePicker } from '@/components/live/LiveLanguagePicker';
 import { RequireLoginModal } from '@/components/live/RequireLoginModal';
 import { useLiveLanguageSelection, useLiveLanguageTracks } from '@/hooks/useLiveLanguageTrack';
+import { useLiveOriginalSubtitle } from '@/hooks/useLiveOriginalSubtitle';
 import { useLiveSessionView } from '@/hooks/useLiveView';
 import { ApiError } from '@/lib/api/client';
 import { getAccessToken } from '@/lib/auth/token';
 
 const TRANSLATED_TRACK_PREFIX = 'translated-';
-/** Trùng `_SUBTITLE_TOPIC` phía `ai-worker/app/live/translation_agent.py` — đổi 1 bên thì phải đổi bên kia. */
+/** Trùng `_SUBTITLE_TOPIC` phía `ai-worker/app/live/{translation,transcription}_agent.py` — đổi 1
+ * bên thì phải đổi cả 3. */
 const SUBTITLE_TOPIC = 'lms.live-subtitle';
 /** Không thấy phụ đề mới trong ngần này giây thì tự xoá — tránh treo mãi 1 câu cũ khi giảng viên
  * ngừng nói hẳn (vd hết giờ live, chuyển chủ đề im lặng suy nghĩ...). */
 const SUBTITLE_STALE_MS = 12000;
 
-interface SubtitlePayload {
-  targetLanguage: string;
-  original: string;
-  translated: string;
-}
+/** F11.5 mở rộng — 2 dạng payload trên CÙNG 1 kênh, phân biệt bằng `kind`:
+ * - `original`: "chạy chữ" theo `recognizing`, độc lập hoàn toàn với lồng tiếng. `sourceTrackId`
+ *   (F11.7) phân biệt NGUỒN: `null` = luồng độc lập từ Transcription Agent (1 luồng/phiên, không
+ *   theo ngôn ngữ — provider Azure LUÔN dùng luồng này); có giá trị = phát RA TỪ chính phiên dịch
+ *   của track đó (chỉ provider Gemini, `GeminiTranslationProvider` — đồng bộ tuyệt đối với bản
+ *   dịch CÙNG track vì cùng 1 phiên nhận diện).
+ * - `translation`: từ Translation Agent (1 luồng/ngôn ngữ đang active) — cũng "chạy chữ" theo
+ *   `recognizing` để chạy gần đồng bộ với phụ đề gốc, không đợi tới lúc audio dịch xong mới hiện. */
+type SubtitlePayload =
+  | { kind: 'original'; text: string; sourceTrackId: number | null }
+  | { kind: 'translation'; targetLanguage: string; text: string };
 
 function formatDateTime(iso: string): string {
   return new Date(iso).toLocaleString('vi-VN', {
@@ -116,7 +124,11 @@ export default function LiveViewPage() {
       )}
 
       {session.status === 'LIVE' && session.viewerToken && session.serverUrl && (
-        <LiveKitRoom serverUrl={session.serverUrl} token={session.viewerToken} connect audio video={false}>
+        // Người xem CHỈ subscribe, không publish gì (token canPublish=false trừ chat data) — bỏ
+        // prop `audio`: có nó thì LiveKitRoom tự bật+publish MIC của người xem sau khi connect, bị
+        // BE từ chối ngay ("insufficient permissions to publish", thấy thật trong console lúc test
+        // 01/09/2026) vì token viewer không có quyền publish audio/video.
+        <LiveKitRoom serverUrl={session.serverUrl} token={session.viewerToken} connect video={false}>
           <LiveRoomContent sessionId={sessionId} sourceLanguage={session.sourceLanguage} isAuthenticated={isAuthenticated} />
           <RoomAudioRenderer />
         </LiveKitRoom>
@@ -126,9 +138,17 @@ export default function LiveViewPage() {
 }
 
 /**
- * Gộp state ngôn ngữ đang chọn (`useLiveLanguageSelection`) vào 1 chỗ DUY NHẤT rồi chia cho cả
- * khung video (phụ đề cần biết đang dịch ngôn ngữ nào) lẫn bộ chọn ngôn ngữ — gọi hook này 2 lần
- * ở 2 component riêng sẽ tạo 2 state độc lập, kích hoạt/rời phòng 2 lần chồng nhau.
+ * F11.5 mở rộng — 3 việc TÁCH RỜI, không còn gộp chung như trước:
+ *  1. `audioSelection` — đang NGHE gì (âm thanh gốc hoặc lồng tiếng ngôn ngữ X). Điều khiển việc
+ *     subscribe/unsubscribe track audio thật qua LiveKit.
+ *  2. `originalSubtitle` — có xem "Phụ đề gốc" hay không. Độc lập hoàn toàn với lồng tiếng: bật
+ *     được dù chưa ai kích hoạt ngôn ngữ nào (luồng Transcription Agent riêng phía AI Worker).
+ *  3. `subtitleSelection` — đang XEM PHỤ ĐỀ DỊCH ngôn ngữ nào (có thể KHÁC ngôn ngữ đang nghe, vd
+ *     nghe tiếng gốc nhưng xem phụ đề tiếng Nhật).
+ * Cả 3 dùng nguyên `LiveLanguageTrack` (activate/deactivate) ở tầng BE — trừ (2) dùng API riêng
+ * (`/original-subtitle`, không có khái niệm "ngôn ngữ"). (1) và (3) chọn CÙNG 1 ngôn ngữ thì gọi
+ * activate() 2 lần độc lập (đơn giản hoá có chủ đích — đếm người nghe hơi lệch 1 chút, không ảnh
+ * hưởng đúng/sai, chỉ ảnh hưởng số hiển thị badge).
  */
 function LiveRoomContent({
   sessionId,
@@ -140,85 +160,102 @@ function LiveRoomContent({
   isAuthenticated: boolean;
 }) {
   const { data: activeTracks } = useLiveLanguageTracks(sessionId);
-  const { selectedLanguage, selectLanguage, clearSelection, isPending, error } = useLiveLanguageSelection(sessionId);
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const [showOriginalSub, setShowOriginalSub] = useState(false);
-  const [showTranslatedSub, setShowTranslatedSub] = useState(false);
-  const { originalText, translatedText } = useLiveSubtitles(selectedLanguage);
+  const audioSelection = useLiveLanguageSelection(sessionId);
+  const subtitleSelection = useLiveLanguageSelection(sessionId);
+  const originalSubtitle = useLiveOriginalSubtitle(sessionId);
+  const [loginModalAction, setLoginModalAction] = useState<string | null>(null);
+  // F11.7 — track đang XEM PHỤ ĐỀ DỊCH (nếu có) để useLiveSubtitles biết ưu tiên "gốc đồng bộ"
+  // đúng track đó (chỉ có khi provider=Gemini) thay vì luôn nhận luồng gốc độc lập chung.
+  const subtitleTrackId = activeTracks?.find((t) => t.targetLanguage === subtitleSelection.selectedLanguage)?.id ?? null;
+  const { originalText, translatedText } = useLiveSubtitles(subtitleSelection.selectedLanguage, subtitleTrackId);
 
   const micTracks = useTracks([Track.Source.Microphone]);
   useEffect(() => {
     for (const ref of micTracks) {
       if (!(ref.publication instanceof RemoteTrackPublication)) continue;
       const isTranslatedTrack = ref.publication.trackName.startsWith(TRANSLATED_TRACK_PREFIX);
-      const shouldSubscribe = selectedLanguage
-        ? ref.publication.trackName === `${TRANSLATED_TRACK_PREFIX}${selectedLanguage}`
+      const shouldSubscribe = audioSelection.selectedLanguage
+        ? ref.publication.trackName === `${TRANSLATED_TRACK_PREFIX}${audioSelection.selectedLanguage}`
         : !isTranslatedTrack;
       if (ref.publication.isSubscribed !== shouldSubscribe) {
         ref.publication.setSubscribed(shouldSubscribe);
       }
     }
-  }, [micTracks, selectedLanguage]);
+  }, [micTracks, audioSelection.selectedLanguage]);
+
+  const handleToggleOriginalSubtitle = (checked: boolean) => {
+    if (!isAuthenticated) {
+      setLoginModalAction('xem phụ đề gốc');
+      return;
+    }
+    originalSubtitle.toggle(checked);
+  };
 
   return (
     <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
       <div className="flex flex-col gap-4">
         <LiveVideoStage
-          showOriginalSub={showOriginalSub}
-          showTranslatedSub={showTranslatedSub}
+          showOriginalSub={originalSubtitle.enabled}
+          showTranslatedSub={!!subtitleSelection.selectedLanguage}
           originalText={originalText}
           translatedText={translatedText}
         />
 
-        <div className="card flex flex-wrap items-center gap-4 p-4">
-          <div className="flex items-center gap-3">
-            <span className="text-[13px] font-medium text-ink">Lồng tiếng:</span>
+        <div className="card flex flex-col gap-3 p-4">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="w-24 shrink-0 text-[13px] font-medium text-ink">Nghe:</span>
             <LiveLanguagePicker
               isAuthenticated={isAuthenticated}
               sourceLanguage={sourceLanguage}
               activeTracks={activeTracks ?? []}
-              selectedLanguage={selectedLanguage}
-              onSelect={selectLanguage}
-              onClearSelection={clearSelection}
-              onRequireLogin={() => setShowLoginModal(true)}
-              isPending={isPending}
+              selectedLanguage={audioSelection.selectedLanguage}
+              onSelect={audioSelection.selectLanguage}
+              onClearSelection={audioSelection.clearSelection}
+              onRequireLogin={() => setLoginModalAction('nghe lồng tiếng')}
+              isPending={audioSelection.isPending}
             />
           </div>
 
-          <div className="flex items-center gap-3 border-l border-line-soft pl-4">
-            <label className="flex cursor-pointer items-center gap-1.5 text-[12.5px] text-ink-muted">
-              <input
-                type="checkbox"
-                checked={showOriginalSub}
-                onChange={(e) => setShowOriginalSub(e.target.checked)}
-              />
-              Phụ đề gốc
-            </label>
-            <label
-              className={`flex items-center gap-1.5 text-[12.5px] ${
-                selectedLanguage ? 'cursor-pointer text-ink-muted' : 'cursor-not-allowed text-ink-faint'
-              }`}
-              title={selectedLanguage ? undefined : 'Chọn ngôn ngữ lồng tiếng trước đã'}
-            >
-              <input
-                type="checkbox"
-                checked={showTranslatedSub}
-                disabled={!selectedLanguage}
-                onChange={(e) => setShowTranslatedSub(e.target.checked)}
-              />
-              Phụ đề dịch
-            </label>
+          <div className="flex flex-wrap items-center gap-3 border-t border-line-soft pt-3">
+            <span className="w-24 shrink-0 text-[13px] font-medium text-ink">Phụ đề dịch:</span>
+            <LiveLanguagePicker
+              isAuthenticated={isAuthenticated}
+              sourceLanguage={sourceLanguage}
+              activeTracks={activeTracks ?? []}
+              selectedLanguage={subtitleSelection.selectedLanguage}
+              onSelect={subtitleSelection.selectLanguage}
+              onClearSelection={subtitleSelection.clearSelection}
+              onRequireLogin={() => setLoginModalAction('xem phụ đề dịch')}
+              isPending={subtitleSelection.isPending}
+              noneLabel="Không hiện phụ đề dịch"
+              showDelayHint={false}
+            />
           </div>
+
+          <label className="flex w-fit cursor-pointer items-center gap-1.5 border-t border-line-soft pt-3 text-[12.5px] text-ink-muted">
+            <input
+              type="checkbox"
+              checked={originalSubtitle.enabled}
+              disabled={originalSubtitle.isPending}
+              onChange={(e) => handleToggleOriginalSubtitle(e.target.checked)}
+            />
+            Phụ đề gốc
+          </label>
         </div>
 
-        {error instanceof ApiError && <p className="text-[12.5px] text-red-600">{error.message}</p>}
+        {audioSelection.error instanceof ApiError && (
+          <p className="text-[12.5px] text-red-600">{audioSelection.error.message}</p>
+        )}
+        {subtitleSelection.error instanceof ApiError && (
+          <p className="text-[12.5px] text-red-600">{subtitleSelection.error.message}</p>
+        )}
       </div>
       <LiveChatPanel isAuthenticated={isAuthenticated} />
 
       <RequireLoginModal
-        open={showLoginModal}
-        onClose={() => setShowLoginModal(false)}
-        actionLabel="chọn ngôn ngữ lồng tiếng"
+        open={loginModalAction !== null}
+        onClose={() => setLoginModalAction(null)}
+        actionLabel={loginModalAction ?? ''}
       />
     </div>
   );
@@ -226,14 +263,25 @@ function LiveRoomContent({
 
 /**
  * UC52 mở rộng — nhận phụ đề gốc/dịch qua Data Message (BR-LIVE-12: không lưu, chỉ phát cho ai
- * đang xem lúc đó). Nhiều track (nhiều ngôn ngữ đang có người nghe) có thể cùng phát — chỉ nhận
- * `translated` của ĐÚNG `targetLanguage` đang chọn, còn `original` thì ngôn ngữ nào cũng như nhau
- * (cùng 1 giọng nguồn) nên nhận từ track nào tới trước cũng được.
+ * đang xem lúc đó). `kind: "translation"` chỉ nhận đúng `targetLanguage` đang chọn xem phụ đề, dù
+ * có nhiều track khác đang chạy song song cho các ngôn ngữ khác.
+ *
+ * F11.7 — `kind: "original"` giờ có 2 NGUỒN, phân biệt bằng `sourceTrackId`:
+ *  - `sourceTrackId: null` — luồng ĐỘC LẬP từ Transcription Agent (1 luồng/phiên, không theo ngôn
+ *    ngữ). Provider Azure LUÔN dùng luồng này (không có luồng nào khác).
+ *  - `sourceTrackId: <id>` — phát RA TỪ chính phiên dịch của track đó (chỉ provider Gemini) —
+ *    đồng bộ tuyệt đối với `kind: "translation"` CÙNG track vì cùng 1 phiên nhận diện.
+ * Ưu tiên đúng track đang xem phụ đề dịch NẾU luồng đó thực sự có dữ liệu (Gemini); không có
+ * (Azure, hoặc chưa xem phụ đề dịch nào) thì rơi về luồng độc lập — không cần biết provider nào
+ * đang chạy, chỉ phản ứng theo dữ liệu thực tế đang chảy vào.
  */
-function useLiveSubtitles(selectedLanguage: string | null) {
-  const [originalText, setOriginalText] = useState('');
+function useLiveSubtitles(subtitleLanguage: string | null, subtitleTrackId: number | null) {
+  const [independentText, setIndependentText] = useState('');
+  const [syncedText, setSyncedText] = useState('');
   const [translatedText, setTranslatedText] = useState('');
-  const clearTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const independentClearTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const syncedClearTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const translatedClearTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useDataChannel(SUBTITLE_TOPIC, (msg) => {
     let payload: SubtitlePayload;
@@ -242,23 +290,35 @@ function useLiveSubtitles(selectedLanguage: string | null) {
     } catch {
       return; // payload hỏng — bỏ qua, không phải lỗi nghiêm trọng
     }
-    if (payload.original) setOriginalText(payload.original);
-    if (selectedLanguage && payload.targetLanguage === selectedLanguage && payload.translated) {
-      setTranslatedText(payload.translated);
+    if (payload.kind === 'original') {
+      if (payload.sourceTrackId === null) {
+        setIndependentText(payload.text);
+        if (independentClearTimerRef.current) clearTimeout(independentClearTimerRef.current);
+        independentClearTimerRef.current = setTimeout(() => setIndependentText(''), SUBTITLE_STALE_MS);
+      } else if (payload.sourceTrackId === subtitleTrackId) {
+        setSyncedText(payload.text);
+        if (syncedClearTimerRef.current) clearTimeout(syncedClearTimerRef.current);
+        syncedClearTimerRef.current = setTimeout(() => setSyncedText(''), SUBTITLE_STALE_MS);
+      }
+      // sourceTrackId thuộc 1 track khác (đang chạy song song, không phải track đang xem) — bỏ qua.
+    } else if (payload.kind === 'translation' && subtitleLanguage && payload.targetLanguage === subtitleLanguage) {
+      setTranslatedText(payload.text);
+      if (translatedClearTimerRef.current) clearTimeout(translatedClearTimerRef.current);
+      translatedClearTimerRef.current = setTimeout(() => setTranslatedText(''), SUBTITLE_STALE_MS);
     }
-    if (clearTimerRef.current) clearTimeout(clearTimerRef.current);
-    clearTimerRef.current = setTimeout(() => {
-      setOriginalText('');
-      setTranslatedText('');
-    }, SUBTITLE_STALE_MS);
   });
 
-  // Đổi ngôn ngữ dịch — phụ đề dịch cũ không còn khớp ngôn ngữ mới, xoá ngay thay vì hiện sai.
+  // Đổi track/ngôn ngữ phụ đề dịch — bản "gốc đồng bộ" cũ (nếu có) không còn khớp track mới, xoá
+  // ngay để không lỡ hiện phụ đề gốc của 1 track khác trong lúc chờ dữ liệu mới.
   useEffect(() => {
+    setSyncedText('');
     setTranslatedText('');
-  }, [selectedLanguage]);
+  }, [subtitleTrackId, subtitleLanguage]);
 
-  return { originalText, translatedText };
+  return {
+    originalText: subtitleTrackId !== null && syncedText ? syncedText : independentText,
+    translatedText,
+  };
 }
 
 /** Chỉ subscribe — người xem không publish gì (token `canPublish=false`, xem `LiveViewService`). */
