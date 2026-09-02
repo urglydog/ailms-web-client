@@ -129,6 +129,19 @@ export function MaterialManager({ courseId }: { courseId: number }) {
           </div>
         
         {/* Render selection UI for Chapter or Custom Lessons */}
+        {scopeType === 'WHOLE_COURSE' && chapters && chapters.length > 0 && (
+          <div className="mb-6 p-4 bg-surface-hover rounded-md text-sm border border-line">
+            <span className="font-semibold text-ink block mb-2">Học liệu sẽ được tổng hợp từ các video đã có lồng tiếng sau:</span>
+            <ul className="list-disc pl-5 text-ink-muted flex flex-col gap-1">
+              {chapters.map(c => (
+                <li key={c.id}>
+                  <span className="font-medium text-ink">{c.title}</span>: {c.lessons.map(l => l.title).join(', ')}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         {scopeType === 'CHAPTER' && chapters && chapters.length > 0 && (
           <div className="mb-6">
             <label className="block text-sm font-semibold mb-1">Chọn chương</label>
@@ -141,6 +154,16 @@ export function MaterialManager({ courseId }: { courseId: number }) {
                 <option key={c.id} value={c.id}>{c.title}</option>
               ))}
             </select>
+            {scopeRefId && (
+              <div className="p-4 bg-surface-hover rounded-md text-sm border border-line mt-3">
+                <span className="font-semibold text-ink block mb-2">Các video khả dụng trong chương này:</span>
+                <ul className="list-disc pl-5 text-ink-muted">
+                  {chapters.find(c => c.id === scopeRefId)?.lessons.map(l => (
+                    <li key={l.id}>{l.title}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         )}
         
