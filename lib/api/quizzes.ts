@@ -28,11 +28,30 @@ export interface SubmitReq {
   answers: Record<number, number>;
 }
 
+export interface AnswerDetailDto {
+  questionId: number;
+  content: string;
+  selectedOptionId: number | null;
+  correctOptionId: number | null;
+  isCorrect: boolean;
+  options: OptionDto[];
+}
+
 export interface SubmitRes {
   attemptId: number;
   score: number;
   correctCount: number;
   totalQuestions: number;
+  details: AnswerDetailDto[];
+}
+
+export interface ExplainReq {
+  questionId: number;
+  selectedOptionId: number | null;
+}
+
+export interface ExplainRes {
+  explanation: string;
 }
 
 export interface HistoryRes {
@@ -59,5 +78,9 @@ export const quizApi = {
 
   getAttemptHistory: (courseId: number) => {
     return api.get<HistoryRes[]>(`/api/v1/courses/${courseId}/quizzes/attempts`, { token: authToken() });
+  },
+
+  explainWrongAnswer: (data: ExplainReq) => {
+    return api.post<ExplainRes>(`/api/v1/quizzes/tutor/explain`, data, { token: authToken() });
   },
 };

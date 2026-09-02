@@ -22,3 +22,9 @@ export const useQuizHistory = (courseId: number) => {
     enabled: !!courseId,
   });
 };
+
+export const useExplainWrongAnswer = () => {
+  return useMutation({
+    mutationFn: (data: import('@/lib/api/quizzes').ExplainReq) => quizApi.explainWrongAnswer(data),
+  });
+};
