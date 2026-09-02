@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { useReviewFlashcard } from '@/hooks/useFlashcards';
 import { toast } from 'sonner';
 
@@ -19,7 +19,7 @@ export function FlashcardViewer({ flashcards }: { flashcards: Flashcard[] }) {
   const [currentIdx, setCurrentIdx] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const { mutate: reviewCard } = useReviewFlashcard();
-  const [localStats, setLocalStats] = useState<Record<number, any>>({});
+  const [localStats, setLocalStats] = useState<Record<number, { isDue?: boolean; easiness?: number; intervalDays?: number; nextReviewAt?: string }>>({});
 
   if (!flashcards || flashcards.length === 0) {
     return <div className="text-center text-ink-muted">Chưa có flashcard nào.</div>;

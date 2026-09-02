@@ -8,7 +8,7 @@ export const useReviewFlashcard = () => {
   return useMutation({
     mutationFn: ({ flashcardId, data }: { flashcardId: number; data: FlashcardReviewReq }) =>
       flashcardsApi.reviewCard(flashcardId, data),
-    onSuccess: (res) => {
+    onSuccess: (res: any) => {
       // Refresh material detail to get new flashcard stats if needed
       // Or we can just let the component handle the local state update for faster UI
     },
