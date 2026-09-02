@@ -36,6 +36,11 @@ export interface MaterialDetailRes extends MaterialGenerationRes {
     id: number;
     frontText: string;
     backText: string;
+    nextReviewAt: string;
+    intervalDays: number;
+    repetitions: number;
+    easiness: number;
+    isDue: boolean;
   }[];
   quizQuestions?: {
     id: number;
