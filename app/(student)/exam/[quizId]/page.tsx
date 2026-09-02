@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { useStartQuiz, useSubmitQuiz } from '@/hooks/useQuizzes';
+import { useStartQuiz, useSubmitQuiz, useExplainWrongAnswer } from '@/hooks/useQuizzes';
 import { StartRes, SubmitRes } from '@/lib/api/quizzes';
 
 export default function AntiCheatExamPage() {
@@ -27,9 +27,26 @@ export default function AntiCheatExamPage() {
 
   const { mutate: startQuiz, isPending: isStarting } = useStartQuiz();
   const { mutate: submitQuiz } = useSubmitQuiz();
+  const { mutate: explainWrongAnswer } = useExplainWrongAnswer();
   const [attemptData, setAttemptData] = useState<StartRes | null>(null);
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [result, setResult] = useState<SubmitRes | null>(null);
+  
+  // State for AI Explanations
+  const [explanations, setExplanations] = useState<Record<number, { loading: boolean; text?: string }>>({});
+
+  const handleExplain = (questionId: number, selectedOptionId: number | null) => {
+    setExplanations(prev => ({ ...prev, [questionId]: { loading: true } }));
+    explainWrongAnswer({ questionId, selectedOptionId }, {
+      onSuccess: (data) => {
+        setExplanations(prev => ({ ...prev, [questionId]: { loading: false, text: data.explanation } }));
+      },
+      onError: () => {
+        setExplanations(prev => ({ ...prev, [questionId]: { loading: false, text: 'Có lỗi khi gọi AI. Vui lòng thử lại.' } }));
+        toast.error('Có lỗi khi lấy giải thích từ AI.');
+      }
+    });
+  };
 
   // Khởi tạo model
   useEffect(() => {
@@ -193,19 +210,80 @@ export default function AntiCheatExamPage() {
 
   if (result) {
     return (
-      <div className="min-h-dvh bg-surface p-8 flex items-center justify-center">
-        <div className="card p-12 text-center max-w-lg mx-auto">
-          <h2 className="font-display text-2xl font-bold mb-4 text-green-600">Hoàn thành bài thi!</h2>
-          <div className="text-4xl font-bold text-accent mb-6">{result.score}/10 Điểm</div>
-          <p className="text-ink-muted mb-8">
-            Bạn đã trả lời đúng {result.correctCount} trên tổng số {result.totalQuestions} câu hỏi.
-          </p>
-          <button 
-            onClick={() => router.push('/progress')}
-            className="bg-ink text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-gray-800 transition-all"
-          >
-            Quay lại Tiến độ học tập
-          </button>
+      <div className="min-h-dvh bg-surface p-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="card p-12 text-center mb-8">
+            <h2 className="font-display text-2xl font-bold mb-4 text-green-600">Hoàn thành bài thi!</h2>
+            <div className="text-4xl font-bold text-accent mb-6">{result.score}/10 Điểm</div>
+            <p className="text-ink-muted mb-8">
+              Bạn đã trả lời đúng {result.correctCount} trên tổng số {result.totalQuestions} câu hỏi.
+            </p>
+            <button 
+              onClick={() => router.push('/progress')}
+              className="bg-ink text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-gray-800 transition-all"
+            >
+              Quay lại Tiến độ học tập
+            </button>
+          </div>
+
+          <div className="space-y-6">
+            <h3 className="font-display text-xl font-bold mb-4">Chi tiết bài làm (Socratic Tutor)</h3>
+            {result.details?.map((detail, idx) => (
+              <div key={detail.questionId} className={`card p-6 border-l-4 ${detail.isCorrect ? 'border-green-500' : 'border-red-500'}`}>
+                <div className="flex justify-between items-start mb-4">
+                  <h4 className="font-bold text-lg">Câu {idx + 1}</h4>
+                  {detail.isCorrect ? (
+                    <span className="text-green-600 font-bold bg-green-50 px-3 py-1 rounded-full text-sm">Đúng ✓</span>
+                  ) : (
+                    <span className="text-red-600 font-bold bg-red-50 px-3 py-1 rounded-full text-sm">Sai ✕</span>
+                  )}
+                </div>
+                <p className="mb-4">{detail.content}</p>
+                
+                <div className="space-y-2 mb-6">
+                  {detail.options.map(opt => {
+                    const isSelected = detail.selectedOptionId === opt.id;
+                    const isCorrect = detail.correctOptionId === opt.id;
+                    let style = "p-3 border rounded-lg text-sm ";
+                    if (isCorrect) style += "border-green-500 bg-green-50 text-green-900 font-medium";
+                    else if (isSelected) style += "border-red-500 bg-red-50 text-red-900";
+                    else style += "border-line text-ink-muted opacity-70";
+
+                    return (
+                      <div key={opt.id} className={style}>
+                        {opt.content} {isSelected && !isCorrect && "(Bạn chọn)"} {isCorrect && "(Đáp án đúng)"}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {!detail.isCorrect && (
+                  <div className="mt-4 pt-4 border-t border-line">
+                    {!explanations[detail.questionId] ? (
+                      <button 
+                        onClick={() => handleExplain(detail.questionId, detail.selectedOptionId)}
+                        className="text-accent text-sm font-semibold hover:underline flex items-center gap-1"
+                      >
+                        🤖 Hỏi Gia sư AI tại sao sai?
+                      </button>
+                    ) : (
+                      <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                        <div className="flex items-center gap-2 font-bold text-blue-900 mb-2">
+                          <span>🤖 Gia sư AI giải thích:</span>
+                          {explanations[detail.questionId].loading && <span className="animate-pulse text-blue-500">Đang suy nghĩ...</span>}
+                        </div>
+                        {explanations[detail.questionId].text && (
+                          <div className="text-sm text-blue-800 whitespace-pre-wrap leading-relaxed">
+                            {explanations[detail.questionId].text}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     );
