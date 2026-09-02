@@ -15,6 +15,7 @@ function injectTimestampLinks(content: string): string {
 export function MarkdownRenderer({ content, onSeek }: { content: string; onSeek?: (sec: number) => void }) {
   const processedContent = onSeek ? injectTimestampLinks(content) : content;
 
+  /* eslint-disable @typescript-eslint/no-explicit-any */
   const components: Components = {
     a: ({ href, children, ...props }: any) => {
       if (href?.startsWith('tutor-seek:')) {
@@ -51,6 +52,7 @@ export function MarkdownRenderer({ content, onSeek }: { content: string; onSeek?
     th: ({ children, ...props }: any) => <th className="border border-line bg-surface px-2 py-1 text-left font-semibold" {...props}>{children}</th>,
     td: ({ children, ...props }: any) => <td className="border border-line px-2 py-1" {...props}>{children}</td>,
   };
+  /* eslint-enable @typescript-eslint/no-explicit-any */
 
   return (
     <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
