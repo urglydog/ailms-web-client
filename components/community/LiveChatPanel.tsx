@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useCommunitySocket, ChatMessage } from '@/hooks/useCommunitySocket';
+import { toast } from 'sonner';
 
 interface LiveChatPanelProps {
   lessonId: number;
@@ -34,7 +35,7 @@ export function LiveChatPanel({ lessonId, userName }: LiveChatPanelProps) {
 
   const handleReplyClick = (msg: ChatMessage) => {
     if (msg.senderName === userName) {
-      alert('Bạn không thể trả lời tin nhắn của chính mình!');
+      toast.error('Bạn không thể trả lời tin nhắn của chính mình!');
       return;
     }
     // Giữ cấu trúc 1 cấp: Nếu reply 1 reply khác, ta gán parentId bằng parent gốc
@@ -76,7 +77,7 @@ export function LiveChatPanel({ lessonId, userName }: LiveChatPanelProps) {
         </span>
         <button
           onClick={() => handleReplyClick(msg)}
-          className="text-[11px] text-accent hover:underline ml-1 font-semibold"
+          className="text-[11px] text-accent hover:underline ml-1 font-semibold whitespace-nowrap shrink-0"
         >
           Trả lời
         </button>
