@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { useExplainWrongAnswer } from '@/hooks/useQuizzes';
+import { toast } from 'sonner';
 
 interface QuizOption {
   id: number;
@@ -20,6 +22,23 @@ export function QuizViewer({ questions }: { questions: QuizQuestion[] }) {
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [score, setScore] = useState(0);
+
+  // AI Tutor State
+  const { mutate: explainWrongAnswer } = useExplainWrongAnswer();
+  const [explanations, setExplanations] = useState<Record<number, { loading: boolean; text?: string }>>({});
+
+  const handleExplain = (qId: number, selectedOpt: number | null) => {
+    setExplanations(prev => ({ ...prev, [qId]: { loading: true } }));
+    explainWrongAnswer({ questionId: qId, selectedOptionId: selectedOpt }, {
+      onSuccess: (data) => {
+        setExplanations(prev => ({ ...prev, [qId]: { loading: false, text: data.explanation } }));
+      },
+      onError: () => {
+        setExplanations(prev => ({ ...prev, [qId]: { loading: false, text: 'Có lỗi khi kết nối AI.' } }));
+        toast.error('Có lỗi khi lấy giải thích.');
+      }
+    });
+  };
 
   if (!questions || questions.length === 0) {
     return <div className="text-center text-ink-muted">Chưa có câu hỏi trắc nghiệm nào.</div>;
@@ -41,6 +60,7 @@ export function QuizViewer({ questions }: { questions: QuizQuestion[] }) {
             setScore(0);
             setSelectedOption(null);
             setShowResult(false);
+            setExplanations({});
           }}
           className="btn-primary"
         >
@@ -122,6 +142,31 @@ export function QuizViewer({ questions }: { questions: QuizQuestion[] }) {
             );
           })}
         </div>
+
+        {isAnswered && !selectedIsCorrect && (
+          <div className="mt-6 pt-6 border-t border-line">
+            {!explanations[question.id] ? (
+              <button 
+                onClick={() => handleExplain(question.id, selectedOption)}
+                className="text-accent text-sm font-semibold hover:underline flex items-center gap-1"
+              >
+                🤖 Hỏi Gia sư AI tại sao sai?
+              </button>
+            ) : (
+              <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                <div className="flex items-center gap-2 font-bold text-blue-900 mb-2">
+                  <span>🤖 Gia sư AI giải thích:</span>
+                  {explanations[question.id]?.loading && <span className="animate-pulse text-blue-500">Đang suy nghĩ...</span>}
+                </div>
+                {explanations[question.id]?.text && (
+                  <div className="text-sm text-blue-800 whitespace-pre-wrap leading-relaxed">
+                    {explanations[question.id]?.text}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="mt-8 flex justify-end">
           <button
