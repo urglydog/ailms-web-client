@@ -13,7 +13,7 @@ interface GoogleAccountsId {
   }): void;
   renderButton(
     element: HTMLElement | null,
-    options: { theme: string; size: string; width: string; text: string }
+    options: { theme: string; size: string; width?: string; text: string }
   ): void;
 }
 
@@ -45,7 +45,6 @@ export function GoogleSignInButton() {
           {
             theme: 'outline',
             size: 'large',
-            width: '100%',
             text: 'signin_with'
           }
         );
