@@ -270,11 +270,11 @@ export default function AntiCheatExamPage() {
                       <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
                         <div className="flex items-center gap-2 font-bold text-blue-900 mb-2">
                           <span>🤖 Gia sư AI giải thích:</span>
-                          {explanations[detail.questionId].loading && <span className="animate-pulse text-blue-500">Đang suy nghĩ...</span>}
+                          {explanations[detail.questionId]?.loading && <span className="animate-pulse text-blue-500">Đang suy nghĩ...</span>}
                         </div>
-                        {explanations[detail.questionId].text && (
+                        {explanations[detail.questionId]?.text && (
                           <div className="text-sm text-blue-800 whitespace-pre-wrap leading-relaxed">
-                            {explanations[detail.questionId].text}
+                            {explanations[detail.questionId]?.text}
                           </div>
                         )}
                       </div>
