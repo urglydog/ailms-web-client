@@ -9,7 +9,11 @@ import { ApiError } from '@/lib/api/client';
 import { MarkdownRenderer } from '@/components/ui/MarkdownRenderer';
 import type { TutorAttachment, TutorSession } from '@/types/domain';
 
-
+/** UC30 mở rộng — giới hạn tệp đính kèm (khớp `lms.rules.max-tutor-attachments-per-turn`/
+ * `max-tutor-attachment-size-mb` bên be/, kiểm ở đây chỉ để phản hồi sớm cho học viên). */
+const MAX_ATTACHMENTS = 3;
+const MAX_ATTACHMENT_SIZE_MB = 8;
+const ACCEPTED_FILE_TYPES = 'image/*,.txt,.md,.py,.js,.jsx,.ts,.tsx,.java,.c,.cpp,.h,.cs,.go,.rs,.json,.csv,.pdf,application/pdf';
 
 /** Ảnh render TRỰC TIẾP trong khung chat (chỉ để xem, không phải link "tải xuống") — tệp khác
  * hiện dạng nhãn tên file, không có gì để bấm tải lại (đỡ tốn hạn mức băng thông B2). */
