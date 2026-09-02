@@ -27,6 +27,13 @@ interface LiveLanguagePickerProps {
   onClearSelection: () => void;
   onRequireLogin: () => void;
   isPending: boolean;
+  /** F11.5 mở rộng — component này giờ dùng lại cho CẢ 2 mục đích: chọn ngôn ngữ NGHE (mặc định)
+   * và chọn ngôn ngữ XEM PHỤ ĐỀ DỊCH (không liên quan tới audio) — 2 nhãn khác nghĩa nhau nên cho
+   * tuỳ biến thay vì hardcode "Âm thanh gốc" cho cả 2 ngữ cảnh. */
+  noneLabel?: string;
+  /** Dòng chú thích độ trễ audio (BR-LIVE-08) — chỉ có ý nghĩa khi dùng cho mục đích NGHE, tắt đi
+   * khi dùng cho phụ đề (không phát âm thanh gì cả). */
+  showDelayHint?: boolean;
 }
 
 /**
@@ -45,6 +52,8 @@ export function LiveLanguagePicker({
   onClearSelection,
   onRequireLogin,
   isPending,
+  noneLabel = '🌐 Âm thanh gốc',
+  showDelayHint = true,
 }: LiveLanguagePickerProps) {
   const { data: voiceOptions } = useVoiceOptions();
   const [open, setOpen] = useState(false);
@@ -123,7 +132,7 @@ export function LiveLanguagePicker({
         {selectedLanguage ? (
           <span>🔊 {languageDisplayName(selectedLanguage)}</span>
         ) : (
-          <span className="text-ink-muted">🌐 Âm thanh gốc</span>
+          <span className="text-ink-muted">{noneLabel}</span>
         )}
         <svg width="10" height="10" viewBox="0 0 12 12" aria-hidden className="text-ink-faint">
           <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
@@ -172,7 +181,7 @@ export function LiveLanguagePicker({
                       selectedLanguage === null ? 'bg-accent/10 font-semibold text-accent' : 'text-ink hover:bg-surface'
                     }`}
                   >
-                    🌐 Âm thanh gốc
+                    {noneLabel}
                   </button>
                 </li>
                 {filteredLanguages.length === 0 && (
@@ -216,7 +225,7 @@ export function LiveLanguagePicker({
         </div>
       )}
 
-      {selectedLanguage && (
+      {selectedLanguage && showDelayHint && (
         <p className="mt-1.5 text-[11px] text-ink-faint">
           Âm thanh lồng tiếng có thể trễ vài giây so với hình ảnh.
         </p>
