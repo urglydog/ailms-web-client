@@ -39,7 +39,11 @@ export function MermaidViewer({ chart }: MermaidViewerProps) {
         setError(null);
         
         // Thay đổi hướng sơ đồ dựa trên state `layout`
-        const modifiedChart = chart.replace(/^(graph|flowchart)\s+(TD|LR|BT|RL)/i, `$1 ${layout}`);
+        let modifiedChart = chart.replace(/^(graph|flowchart)\s+(TD|LR|BT|RL)/i, `$1 ${layout}`);
+        
+        // Khắc phục lỗi "Unsupported markdown: list" bằng cách thay thế gạch đầu dòng thành ký tự bullet
+        modifiedChart = modifiedChart.replace(/<br\s*\/?>\s*[-*]\s/g, '<br/>• ')
+                                     .replace(/\n\s*[-*]\s/g, '<br/>• ');
         
         const id = `mermaid-${Math.random().toString(36).substring(2, 9)}`;
         const { svg } = await mermaid.render(id, modifiedChart);
