@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useExplainWrongAnswer } from '@/hooks/useQuizzes';
 import { toast } from 'sonner';
+import { MarkdownRenderer } from '@/components/ui/MarkdownRenderer';
 
 interface QuizOption {
   id: number;
@@ -159,8 +160,8 @@ export function QuizViewer({ questions }: { questions: QuizQuestion[] }) {
                   {explanations[question.id]?.loading && <span className="animate-pulse text-blue-500">Đang suy nghĩ...</span>}
                 </div>
                 {explanations[question.id]?.text && (
-                  <div className="text-sm text-blue-800 whitespace-pre-wrap leading-relaxed">
-                    {explanations[question.id]?.text}
+                  <div className="text-sm text-blue-800 leading-relaxed">
+                    <MarkdownRenderer content={explanations[question.id]!.text!} />
                   </div>
                 )}
               </div>

@@ -3,77 +3,17 @@
 import { formatDistanceToNow } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { useEffect, useRef, useState, type DragEvent } from 'react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 import { toast } from 'sonner';
 import { useTutorChat } from '@/hooks/useTutorChat';
 import { ApiError } from '@/lib/api/client';
+import { MarkdownRenderer } from '@/components/ui/MarkdownRenderer';
 import type { TutorAttachment, TutorSession } from '@/types/domain';
-
-const TIMESTAMP_RE = /\[(\d{1,3}):([0-5]?\d)\]/g;
 
 /** UC30 mở rộng — giới hạn tệp đính kèm (khớp `lms.rules.max-tutor-attachments-per-turn`/
  * `max-tutor-attachment-size-mb` bên be/, kiểm ở đây chỉ để phản hồi sớm cho học viên). */
 const MAX_ATTACHMENTS = 3;
 const MAX_ATTACHMENT_SIZE_MB = 8;
 const ACCEPTED_FILE_TYPES = 'image/*,.txt,.md,.py,.js,.jsx,.ts,.tsx,.java,.c,.cpp,.h,.cs,.go,.rs,.json,.csv,.pdf,application/pdf';
-
-/** `[MM:SS]` (BR-TUTOR-02) -> link Markdown giả `[▶ MM:SS](tutor-seek:giay)` — override
- * component `a` bên dưới bắt đúng scheme này để render thành nút tua, không phải link thật. */
-function injectTimestampLinks(content: string): string {
-  return content.replace(TIMESTAMP_RE, (_match, m: string, s: string) => {
-    const sec = Number(m) * 60 + Number(s);
-    return `[▶ ${m.padStart(2, '0')}:${s.padStart(2, '0')}](tutor-seek:${sec})`;
-  });
-}
-
-/** UC30 mở rộng — trả lời có định dạng Markdown (danh sách/bảng/tiêu đề/in đậm) thay vì văn
- * bản thô, dễ đọc hơn hẳn cho nội dung nhiều ý. Mốc thời gian vẫn là nút bấm tua được, không
- * phải link thật (xem `injectTimestampLinks`). */
-function MarkdownMessage({ content, onSeek }: { content: string; onSeek: (sec: number) => void }) {
-  return (
-    <ReactMarkdown
-      remarkPlugins={[remarkGfm]}
-      components={{
-        a: ({ href, children }) => {
-          if (href?.startsWith('tutor-seek:')) {
-            const sec = Number(href.slice('tutor-seek:'.length));
-            return (
-              <button
-                type="button"
-                onClick={() => onSeek(sec)}
-                className="mx-0.5 inline rounded-full bg-accent/10 px-2 py-0.5 text-xs font-semibold text-accent hover:bg-accent/20"
-              >
-                {children}
-              </button>
-            );
-          }
-          return (
-            <a href={href} target="_blank" rel="noopener noreferrer" className="text-accent underline">
-              {children}
-            </a>
-          );
-        },
-        p: ({ children }) => <p className="mb-1.5 last:mb-0">{children}</p>,
-        ul: ({ children }) => <ul className="mb-1.5 list-disc pl-5 last:mb-0">{children}</ul>,
-        ol: ({ children }) => <ol className="mb-1.5 list-decimal pl-5 last:mb-0">{children}</ol>,
-        li: ({ children }) => <li className="mb-0.5">{children}</li>,
-        h3: ({ children }) => <h3 className="mb-1 mt-2 text-[13px] font-bold first:mt-0">{children}</h3>,
-        strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
-        code: ({ children }) => <code className="rounded bg-ink/[0.06] px-1 py-0.5 font-mono text-[12px]">{children}</code>,
-        table: ({ children }) => (
-          <div className="mb-1.5 overflow-x-auto last:mb-0">
-            <table className="w-full border-collapse text-[13px]">{children}</table>
-          </div>
-        ),
-        th: ({ children }) => <th className="border border-line bg-surface px-2 py-1 text-left font-semibold">{children}</th>,
-        td: ({ children }) => <td className="border border-line px-2 py-1">{children}</td>,
-      }}
-    >
-      {injectTimestampLinks(content)}
-    </ReactMarkdown>
-  );
-}
 
 /** Ảnh render TRỰC TIẾP trong khung chat (chỉ để xem, không phải link "tải xuống") — tệp khác
  * hiện dạng nhãn tên file, không có gì để bấm tải lại (đỡ tốn hạn mức băng thông B2). */
@@ -432,7 +372,7 @@ export function TutorPanel({ isOpen, onClose, lessonId, onSeek }: TutorPanelProp
                             : 'rounded-bl-none border border-line bg-white text-ink shadow-sm'
                         }`}
                       >
-                        {msg.sender === 'AI' ? <MarkdownMessage content={msg.content} onSeek={onSeek} /> : msg.content}
+                        {msg.sender === 'AI' ? <MarkdownRenderer content={msg.content} onSeek={onSeek} /> : msg.content}
                       </div>
                     )}
                   </div>

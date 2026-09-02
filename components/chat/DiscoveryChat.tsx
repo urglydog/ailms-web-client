@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api/client';
 import { getAccessToken } from '@/lib/auth/token';
+import { MarkdownRenderer } from '@/components/ui/MarkdownRenderer';
 
 interface DiscoveryCourseCard {
   id: number;
@@ -104,9 +105,9 @@ export function DiscoveryChat() {
             {messages.map((msg, i) => (
               <div key={i} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
                 <div className={`max-w-[85%] rounded-2xl px-4 py-2 text-sm ${
-                  msg.role === 'user' ? 'bg-accent text-white rounded-br-none' : 'bg-white border border-line text-ink rounded-bl-none shadow-sm'
+                  msg.role === 'user' ? 'bg-accent text-white rounded-br-none whitespace-pre-wrap' : 'bg-white border border-line text-ink rounded-bl-none shadow-sm'
                 }`}>
-                  {msg.text}
+                  {msg.role === 'user' ? msg.text : <MarkdownRenderer content={msg.text} />}
                 </div>
                 
                 {msg.courses && msg.courses.length > 0 && (

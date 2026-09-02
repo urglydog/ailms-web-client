@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { useStartQuiz, useSubmitQuiz, useExplainWrongAnswer } from '@/hooks/useQuizzes';
 import { StartRes, SubmitRes } from '@/lib/api/quizzes';
+import { MarkdownRenderer } from '@/components/ui/MarkdownRenderer';
 
 export default function AntiCheatExamPage() {
   const router = useRouter();
@@ -273,8 +274,8 @@ export default function AntiCheatExamPage() {
                           {explanations[detail.questionId]?.loading && <span className="animate-pulse text-blue-500">Đang suy nghĩ...</span>}
                         </div>
                         {explanations[detail.questionId]?.text && (
-                          <div className="text-sm text-blue-800 whitespace-pre-wrap leading-relaxed">
-                            {explanations[detail.questionId]?.text}
+                          <div className="text-sm text-blue-800 leading-relaxed">
+                            <MarkdownRenderer content={explanations[detail.questionId]!.text!} />
                           </div>
                         )}
                       </div>
