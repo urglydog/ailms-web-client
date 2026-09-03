@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { materialsApi } from '@/lib/api/materials';
+import { materialsApi, InstructorMaterial } from '@/lib/api/materials';
 import { toast } from 'sonner';
 import React, { useState } from 'react';
 
@@ -11,7 +11,7 @@ interface CourseMaterialsManagerProps {
 
 export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps) {
   const queryClient = useQueryClient();
-  const [selectedQuiz, setSelectedQuiz] = useState<Record<string, unknown> | null>(null);
+  const [selectedQuiz, setSelectedQuiz] = useState<InstructorMaterial | null>(null);
 
   const { data: materials, isLoading } = useQuery({
     queryKey: ['instructor-materials', courseId],
@@ -121,7 +121,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
   );
 }
 
-function QuizSettingsModal({ quiz, onClose, onSave, isSaving }: { quiz: Record<string, unknown>; onClose: () => void; onSave: (data: Record<string, unknown>) => void; isSaving: boolean }) {
+function QuizSettingsModal({ quiz, onClose, onSave, isSaving }: { quiz: InstructorMaterial; onClose: () => void; onSave: (data: Record<string, unknown>) => void; isSaving: boolean }) {
   const [randomPickCount, setRandomPickCount] = useState<string>(quiz.randomPickCount ? String(quiz.randomPickCount) : '');
   const [maxAttempts, setMaxAttempts] = useState<string>(quiz.maxAttempts ? String(quiz.maxAttempts) : '');
   const [durationMinutes, setDurationMinutes] = useState<string>(quiz.durationMinutes ? String(quiz.durationMinutes) : '');
