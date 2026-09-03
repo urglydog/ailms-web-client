@@ -43,7 +43,8 @@ export function MermaidViewer({ chart }: MermaidViewerProps) {
         
         // Khắc phục lỗi "Unsupported markdown: list" bằng cách thay thế gạch đầu dòng thành ký tự bullet
         modifiedChart = modifiedChart.replace(/<br\s*\/?>\s*[-*]\s/g, '<br/>• ')
-                                     .replace(/\n\s*[-*]\s/g, '<br/>• ');
+                                     .replace(/\n\s*[-*]\s/g, '<br/>• ')
+                                     .replace(/\["(\d+)\.\s/g, '["$1) ');
         
         const id = `mermaid-${Math.random().toString(36).substring(2, 9)}`;
         const { svg } = await mermaid.render(id, modifiedChart);
