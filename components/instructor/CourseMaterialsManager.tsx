@@ -74,9 +74,9 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                   <button
                     onClick={() => {
                       if (mat.materialType === 'MINDMAP') {
-                        toggleMindmapMutation.mutate({ id: mat.materialId, isOfficial: !mat.isOfficial });
+                        toggleMindmapMutation.mutate({ id: mat.materialId as number, isOfficial: !mat.isOfficial });
                       } else if (mat.materialType === 'FLASHCARD') {
-                        toggleFlashcardMutation.mutate({ id: mat.materialId, isOfficial: !mat.isOfficial });
+                        toggleFlashcardMutation.mutate({ id: mat.materialId as number, isOfficial: !mat.isOfficial });
                       }
                     }}
                     className={`inline-flex items-center rounded-md px-3 py-1.5 text-xs font-semibold shadow-sm ring-1 ring-inset ${
@@ -113,7 +113,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
         <QuizSettingsModal 
           quiz={selectedQuiz} 
           onClose={() => setSelectedQuiz(null)} 
-          onSave={(data) => updateQuizSettingsMutation.mutate({ id: selectedQuiz.materialId, data })}
+          onSave={(data) => updateQuizSettingsMutation.mutate({ id: selectedQuiz.materialId as number, data })}
           isSaving={updateQuizSettingsMutation.isPending}
         />
       )}
