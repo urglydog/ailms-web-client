@@ -42,9 +42,10 @@ export function MermaidViewer({ chart }: MermaidViewerProps) {
         let modifiedChart = chart.replace(/^(graph|flowchart)\s+(TD|LR|BT|RL)/i, `$1 ${layout}`);
         
         // Khắc phục lỗi "Unsupported markdown: list" bằng cách thay thế gạch đầu dòng thành ký tự bullet
+        // Mermaid hiểu nhầm "1. " và "1) " là ordered list markdown. Thay thành "(1) "
         modifiedChart = modifiedChart.replace(/<br\s*\/?>\s*[-*]\s/g, '<br/>• ')
                                      .replace(/\n\s*[-*]\s/g, '<br/>• ')
-                                     .replace(/\["(\d+)\.\s/g, '["$1) ');
+                                     .replace(/\["(\d+)[\.)]\s/g, '["($1) ');
         
         const id = `mermaid-${Math.random().toString(36).substring(2, 9)}`;
         const { svg } = await mermaid.render(id, modifiedChart);
@@ -155,7 +156,7 @@ export function MermaidViewer({ chart }: MermaidViewerProps) {
       </div>
 
       {/* Vùng hiển thị sơ đồ */}
-      <div className="relative w-full min-h-[400px] h-[600px] bg-white rounded-2xl border border-line p-4 overflow-auto flex items-center justify-center">
+      <div className="relative w-full min-h-[400px] h-[600px] bg-white rounded-2xl border border-line p-4 overflow-auto">
         {loading && (
           <div className="absolute inset-0 bg-white/50 flex items-center justify-center z-10 backdrop-blur-sm">
             <span className="text-accent text-sm">Đang tải...</span>
@@ -170,7 +171,7 @@ export function MermaidViewer({ chart }: MermaidViewerProps) {
           <div 
             ref={containerRef}
             dangerouslySetInnerHTML={{ __html: svgContent }}
-            className="mermaid-container w-full h-full flex items-center justify-center [&>svg]:max-w-full [&>svg]:max-h-full transition-opacity duration-300"
+            className="mermaid-container min-w-max min-h-max p-4 transition-opacity duration-300"
             style={{ opacity: loading ? 0.3 : 1 }}
           />
         )}
