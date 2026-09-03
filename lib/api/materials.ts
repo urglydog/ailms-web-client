@@ -72,7 +72,7 @@ export const materialsApi = {
     
   // Instructor APIs
   getInstructorMaterials: (courseId: number) =>
-    api.get<any[]>(`/api/v1/instructor/materials/courses/${courseId}`, { token: authToken() }),
+    api.get<Record<string, unknown>[]>(`/api/v1/instructor/materials/courses/${courseId}`, { token: authToken() }),
     
   setMindmapOfficial: (id: number, isOfficial: boolean) =>
     api.put(`/api/v1/instructor/materials/mindmaps/${id}/set-official?isOfficial=${isOfficial}`, undefined, { token: authToken() }),
@@ -83,6 +83,6 @@ export const materialsApi = {
   setQuizOfficial: (id: number) =>
     api.put(`/api/v1/instructor/quizzes/${id}/set-official`, undefined, { token: authToken() }),
     
-  updateQuizSettings: (id: number, req: any) =>
+  updateQuizSettings: (id: number, req: Record<string, unknown>) =>
     api.put(`/api/v1/instructor/quizzes/${id}/settings`, req, { token: authToken() })
 };

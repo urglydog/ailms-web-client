@@ -34,7 +34,7 @@ export default function AiAnalyticsPage() {
       toast.success('Đã cập nhật trạng thái AI của người dùng');
       queryClient.invalidateQueries({ queryKey: ['admin-ai-usage'] });
     },
-    onError: (err: any) => {
+    onError: (err: Error) => {
       toast.error(err.message || 'Có lỗi xảy ra');
     },
   });

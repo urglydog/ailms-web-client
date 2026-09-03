@@ -11,7 +11,7 @@ interface CourseMaterialsManagerProps {
 
 export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps) {
   const queryClient = useQueryClient();
-  const [selectedQuiz, setSelectedQuiz] = useState<any>(null);
+  const [selectedQuiz, setSelectedQuiz] = useState<Record<string, unknown> | null>(null);
 
   const { data: materials, isLoading } = useQuery({
     queryKey: ['instructor-materials', courseId],
@@ -38,14 +38,14 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
   });
 
   const updateQuizSettingsMutation = useMutation({
-    mutationFn: (variables: { id: number; data: any }) =>
+    mutationFn: (variables: { id: number; data: Record<string, unknown> }) =>
       materialsApi.updateQuizSettings(variables.id, variables.data),
     onSuccess: () => {
       toast.success('Đã cập nhật cấu hình Quiz');
       queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] });
       setSelectedQuiz(null);
     },
-    onError: (err: any) => {
+    onError: (err: Error) => {
       toast.error(err.message || 'Lỗi khi cập nhật Quiz');
     }
   });
@@ -121,7 +121,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
   );
 }
 
-function QuizSettingsModal({ quiz, onClose, onSave, isSaving }: { quiz: any; onClose: () => void; onSave: (data: any) => void; isSaving: boolean }) {
+function QuizSettingsModal({ quiz, onClose, onSave, isSaving }: { quiz: Record<string, unknown>; onClose: () => void; onSave: (data: Record<string, unknown>) => void; isSaving: boolean }) {
   const [randomPickCount, setRandomPickCount] = useState<string>(quiz.randomPickCount ? String(quiz.randomPickCount) : '');
   const [maxAttempts, setMaxAttempts] = useState<string>(quiz.maxAttempts ? String(quiz.maxAttempts) : '');
   const [durationMinutes, setDurationMinutes] = useState<string>(quiz.durationMinutes ? String(quiz.durationMinutes) : '');
