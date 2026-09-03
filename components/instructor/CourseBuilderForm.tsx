@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type ChangeEvent, type FormEvent, type ReactNode } from 'react';
 import { ChapterEditorList } from '@/components/instructor/ChapterEditorList';
+import { CourseMaterialsManager } from '@/components/instructor/CourseMaterialsManager';
 import { SubmitChecklist } from '@/components/instructor/SubmitChecklist';
 import { CourseStatusBadge } from '@/components/course/CourseStatusBadge';
 import { UploadProgressBar } from '@/components/ui/UploadProgressBar';
@@ -230,6 +231,11 @@ export function CourseBuilderForm({ courseId }: CourseBuilderFormProps) {
         <div className="flex flex-col gap-4">
           <SubmitChecklist missingConditions={course.missingConditions} canSubmit={course.canSubmit} />
         </div>
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <h2 className="m-0 font-display text-[16px] font-bold text-gray-900">Quản lý Học liệu AI (Mindmap, Quiz, Flashcard)</h2>
+        <CourseMaterialsManager courseId={course.id} />
       </div>
 
       <div className="flex flex-col gap-3">

@@ -68,10 +68,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pendingCoursesCount = pendingCoursesPage?.totalElements ?? 0;
   const pendingRequestsCount = pendingRequests?.length ?? 0;
 
-  const sidebarItems = [
+    const sidebarItems = [
     { id: 'overview', label: 'Tổng quan', href: '/admin', badge: 0 },
     { id: 'moderation', label: 'Kiểm duyệt khóa học', href: '/admin/moderation', badge: pendingCoursesCount },
     { id: 'users', label: 'Quản lý người dùng', href: '/admin/users', badge: pendingRequestsCount },
+    { id: 'aianalytics', label: 'AI Analytics', href: '/admin/ai-analytics', badge: 0 },
     { id: 'aiqueue', label: 'Giám sát AI Queue', href: '/admin/ai-queue', badge: 0 },
     { id: 'voice-mappings', label: 'Giọng đọc lồng tiếng', href: '/admin/voice-mappings', badge: 0 },
     { id: 'transactions', label: 'Đối soát giao dịch', href: '/admin/transactions/payments', badge: 0 },
