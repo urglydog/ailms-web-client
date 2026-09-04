@@ -10,7 +10,7 @@ export default function InstructorMaterialsPage() {
   const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
 
   // Chọn khóa học đầu tiên làm mặc định nếu chưa chọn
-  const activeCourseId = selectedCourseId ?? (courses.length > 0 ? courses[0].id : null);
+  const activeCourseId = selectedCourseId ?? courses[0]?.id ?? null;
 
   return (
     <div className="flex flex-col gap-6">
