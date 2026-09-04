@@ -18,9 +18,38 @@ interface AssistantDataPayload {
   negative_count?: number;
 }
 
-interface InstructorChatResponse {
-  reply?: string;
-  data?: AssistantDataPayload;
+function renderFormattedMessage(text: string) {
+  const lines = text.split('\n');
+  return (
+    <div className="space-y-1.5 leading-relaxed">
+      {lines.map((line, idx) => {
+        if (!line.trim()) return <div key={idx} className="h-1" />;
+        const parts = line.split(/(\*\*.*?\*\*|`.*?`)/g);
+
+        return (
+          <p key={idx} className="m-0">
+            {parts.map((part, pIdx) => {
+              if (part.startsWith('**') && part.endsWith('**')) {
+                return (
+                  <strong key={pIdx} className="font-bold text-gray-900">
+                    {part.slice(2, -2)}
+                  </strong>
+                );
+              }
+              if (part.startsWith('`') && part.endsWith('`')) {
+                return (
+                  <code key={pIdx} className="rounded bg-blue-50 px-1.5 py-0.5 font-mono text-[11px] text-blue-700 border border-blue-100">
+                    {part.slice(1, -1)}
+                  </code>
+                );
+              }
+              return part;
+            })}
+          </p>
+        );
+      })}
+    </div>
+  );
 }
 
 export function InstructorChat() {
@@ -119,7 +148,7 @@ export function InstructorChat() {
                     : 'bg-white border border-gray-200 text-gray-800 rounded-bl-sm shadow-sm'
                 }`}
               >
-                <p className="whitespace-pre-wrap leading-relaxed">{msg.text}</p>
+                {renderFormattedMessage(msg.text)}
               </div>
               
               {msg.data && msg.data.function === 'get_my_course_stats' && (
