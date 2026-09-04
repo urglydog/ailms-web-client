@@ -36,6 +36,7 @@ export interface InstructorMaterial {
   status: string;
   isOfficial: boolean;
   materialId?: number;
+  questionCount?: number;
   randomPickCount?: number | null;
   allowReview?: boolean;
   startTime?: string | null;
@@ -45,6 +46,7 @@ export interface InstructorMaterial {
   isProctored?: boolean;
   maxViolations?: number | null;
 }
+
 
 
 export interface MaterialGenerationRes {
