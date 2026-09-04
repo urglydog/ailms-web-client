@@ -310,8 +310,8 @@ function MaterialWorkspaceViewer({
             </div>
             <p className="text-xs text-gray-500 mt-0.5">
               Loại: <strong className="text-indigo-600">{detail?.materialType || material?.materialType}</strong> • 
-              Ngôn ngữ: <strong className="text-gray-700">{detail?.language || material?.language}</strong> • 
-              Phiên bản: #{detail?.versionNo || material?.versionNo}
+              Ngôn ngữ: <strong className="text-gray-700">{detail?.language || material?.language || 'Tiếng Việt'}</strong> • 
+              Phiên bản: #{detail?.versionNo || material?.versionNo || 1}
             </p>
           </div>
         </div>
