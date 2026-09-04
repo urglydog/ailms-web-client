@@ -42,7 +42,10 @@ export interface InstructorMaterial {
   endTime?: string | null;
   durationMinutes?: number | null;
   maxAttempts?: number | null;
+  isProctored?: boolean;
+  maxViolations?: number | null;
 }
+
 
 export interface MaterialGenerationRes {
   id: number;
