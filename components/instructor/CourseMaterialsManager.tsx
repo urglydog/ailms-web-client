@@ -584,10 +584,25 @@ function GenerateAiOfficialModal({ courseId, initialType, onClose, onSuccess }: 
     });
   };
 
+  const modalTitles = {
+    MINDMAP: '🧠 Sinh Sơ Đồ Tư Duy (Mindmap) AI',
+    FLASHCARD: '🃏 Sinh Bộ Thẻ Ôn Tập (Flashcard) AI',
+    QUIZ: '📝 Sinh Bài Thi Trắc Nghiệm (Quiz) AI',
+  };
+
+  const modalDescriptions = {
+    MINDMAP: 'AI sẽ tự động tổng hợp kiến thức từ video bài giảng thành sơ đồ node tư duy trực quan.',
+    FLASHCARD: 'AI sẽ trích xuất các thuật ngữ & khái niệm quan trọng thành bộ thẻ học 2 mặt.',
+    QUIZ: 'AI sẽ tạo bộ câu hỏi trắc nghiệm kèm phương án lựa chọn và đáp án giải thích.',
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
       <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl my-8">
-        <h3 className="text-lg font-bold text-gray-900 border-b pb-3 mb-4">🤖 Sinh AI Official Mới</h3>
+        <div className="border-b pb-3 mb-4">
+          <h3 className="text-lg font-bold text-gray-900">{modalTitles[materialType]}</h3>
+          <p className="text-xs text-gray-500 mt-1">{modalDescriptions[materialType]}</p>
+        </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
@@ -597,9 +612,9 @@ function GenerateAiOfficialModal({ courseId, initialType, onClose, onSuccess }: 
               onChange={(e) => setMaterialType(e.target.value as 'QUIZ' | 'FLASHCARD' | 'MINDMAP')}
               className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-cyan-500 focus:outline-none"
             >
-              <option value="QUIZ">Quiz Bài thi trắc nghiệm</option>
-              <option value="FLASHCARD">Bộ Flashcard ôn tập</option>
-              <option value="MINDMAP">Sơ đồ Mindmap bài học</option>
+              <option value="MINDMAP">🧠 Sơ đồ Mindmap bài học</option>
+              <option value="FLASHCARD">🃏 Bộ Flashcard ôn tập</option>
+              <option value="QUIZ">📝 Quiz Bài thi trắc nghiệm</option>
             </select>
           </label>
 
@@ -632,36 +647,53 @@ function GenerateAiOfficialModal({ courseId, initialType, onClose, onSuccess }: 
             </label>
           )}
 
-          <div className="grid grid-cols-2 gap-3">
+          {/* Các tùy chọn đặc thù theo từng loại học liệu */}
+          {materialType === 'QUIZ' && (
+            <div className="grid grid-cols-2 gap-3">
+              <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
+                Độ khó câu hỏi
+                <select 
+                  value={difficultyLevel}
+                  onChange={(e) => setDifficultyLevel(e.target.value as 'EASY' | 'MEDIUM' | 'HARD')}
+                  className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-cyan-500 focus:outline-none"
+                >
+                  <option value="EASY">Cơ bản (Easy)</option>
+                  <option value="MEDIUM">Vừa (Medium)</option>
+                  <option value="HARD">Nâng cao (Hard)</option>
+                </select>
+              </label>
+              <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
+                Số lượng câu hỏi
+                <select 
+                  value={quantityLevel}
+                  onChange={(e) => setQuantityLevel(e.target.value as 'FEW' | 'MEDIUM' | 'MORE')}
+                  className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-cyan-500 focus:outline-none"
+                >
+                  <option value="FEW">Ít (~10 câu)</option>
+                  <option value="MEDIUM">Vừa (~20 câu)</option>
+                  <option value="MORE">Nhiều (~30 câu)</option>
+                </select>
+              </label>
+            </div>
+          )}
+
+          {materialType === 'FLASHCARD' && (
             <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
-              Độ khó
-              <select 
-                value={difficultyLevel}
-                onChange={(e) => setDifficultyLevel(e.target.value as 'EASY' | 'MEDIUM' | 'HARD')}
-                className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-cyan-500 focus:outline-none"
-              >
-                <option value="EASY">Cơ bản (Easy)</option>
-                <option value="MEDIUM">Vừa (Medium)</option>
-                <option value="HARD">Nâng cao (Hard)</option>
-              </select>
-            </label>
-            <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
-              Mức số lượng
+              Số lượng thẻ Flashcard
               <select 
                 value={quantityLevel}
                 onChange={(e) => setQuantityLevel(e.target.value as 'FEW' | 'MEDIUM' | 'MORE')}
                 className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-cyan-500 focus:outline-none"
               >
-                <option value="FEW">Ít (Vừa đủ)</option>
-                <option value="MEDIUM">Vừa phải</option>
-                <option value="MORE">Nhiều</option>
+                <option value="FEW">Ít (~10 thẻ)</option>
+                <option value="MEDIUM">Vừa (~20 thẻ)</option>
+                <option value="MORE">Nhiều (~30 thẻ)</option>
               </select>
             </label>
-          </div>
-
+          )}
 
           <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
-            Ngôn ngữ (từ Kho bài giảng)
+            Ngôn ngữ nguồn (từ Kho bài giảng)
             <select 
               value={language}
               onChange={(e) => setLanguage(e.target.value)}
@@ -676,6 +708,7 @@ function GenerateAiOfficialModal({ courseId, initialType, onClose, onSuccess }: 
               )}
             </select>
           </label>
+
 
           <div className="mt-4 flex justify-end gap-3 border-t pt-4">
             <button type="button" onClick={onClose} className="rounded-lg px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-100">
