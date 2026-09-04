@@ -18,6 +18,7 @@ const STATUS_TABS: Array<{ id: CourseStatus | 'ALL'; label: string }> = [
 
 export default function InstructorCoursesPage() {
   const [statusFilter, setStatusFilter] = useState<CourseStatus | 'ALL'>('ALL');
+  const [deleteTarget, setDeleteTarget] = useState<{ id: number; title: string } | null>(null);
   const { data, isLoading, error } = useMyCourses(
     statusFilter === 'ALL' ? {} : { status: statusFilter },
   );
@@ -25,15 +26,11 @@ export default function InstructorCoursesPage() {
 
   const courses = data?.content ?? [];
 
-  const handleDelete = (id: number, title: string) => {
-    if (
-      !window.confirm(
-        `Xóa khóa học "${title}"? Nếu đã có học viên, khóa sẽ được lưu trữ thay vì xóa hẳn. Nếu chưa có học viên, toàn bộ chương, bài học, video và tài liệu đính kèm sẽ bị xóa vĩnh viễn.`,
-      )
-    ) {
-      return;
+  const confirmDelete = () => {
+    if (deleteTarget) {
+      deleteCourse.mutate(deleteTarget.id);
+      setDeleteTarget(null);
     }
-    deleteCourse.mutate(id);
   };
 
   return (
@@ -115,7 +112,7 @@ export default function InstructorCoursesPage() {
                 Sửa
               </Link>
               <button
-                onClick={() => handleDelete(course.id, course.title)}
+                onClick={() => setDeleteTarget({ id: course.id, title: course.title })}
                 className="cursor-pointer text-[12px] font-bold text-red-500 hover:text-red-700"
               >
                 Xóa
@@ -124,6 +121,34 @@ export default function InstructorCoursesPage() {
           </div>
         ))}
       </div>
+
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl border border-gray-100">
+            <div className="flex items-center gap-3 text-red-600 mb-3">
+              <span className="text-2xl">⚠️</span>
+              <h3 className="font-bold text-base text-gray-900">Xác nhận xóa khóa học</h3>
+            </div>
+            <p className="text-xs text-gray-600 mb-6 leading-relaxed">
+              Bạn có chắc chắn muốn xóa khóa học <strong className="text-gray-900">&quot;{deleteTarget.title}&quot;</strong>? Nếu đã có học viên, khóa sẽ chuyển sang lưu trữ. Nếu chưa có học viên, toàn bộ nội dung sẽ bị xóa vĩnh viễn.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setDeleteTarget(null)}
+                className="rounded-xl px-4 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-100 transition-all"
+              >
+                Hủy
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="rounded-xl bg-red-600 px-4 py-2 text-xs font-bold text-white shadow hover:bg-red-700 transition-all"
+              >
+                Xác nhận xóa
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
