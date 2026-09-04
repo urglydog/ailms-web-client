@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useCourseMaterials, useRequestMaterial, useAvailableLanguages, useCourseChapters } from '@/hooks/useMaterials';
-import type { MaterialType, ScopeType } from '@/lib/api/materials';
+import { materialsApi, type MaterialType, type ScopeType, type InstructorMaterial } from '@/lib/api/materials';
 import { toast } from 'sonner';
 import { ApiError } from '@/lib/api/client';
 import Link from 'next/link';
@@ -12,6 +13,12 @@ export function MaterialManager({ courseId }: { courseId: number }) {
   const { data: availableLanguages } = useAvailableLanguages(courseId);
   const { data: chapters } = useCourseChapters(courseId);
   const requestMutation = useRequestMaterial();
+
+  const { data: officialMaterials } = useQuery<InstructorMaterial[]>({
+    queryKey: ['official-materials', courseId],
+    queryFn: () => materialsApi.getInstructorMaterials(courseId),
+    enabled: !!courseId,
+  });
 
   const [materialType, setMaterialType] = useState<MaterialType>('MINDMAP');
   const [scopeType, setScopeType] = useState<ScopeType>('WHOLE_COURSE');
@@ -61,73 +68,139 @@ export function MaterialManager({ courseId }: { courseId: number }) {
     );
   };
 
-    const getLanguageName = (code: string) => {
-      try {
-        const displayNames = new Intl.DisplayNames(['vi'], { type: 'language' });
-        // Capitalize first letter
-        const name = displayNames.of(code) || code;
-        return name.charAt(0).toUpperCase() + name.slice(1);
-      } catch {
-        if (code === 'vi-VN' || code === 'vi') return 'Tiếng Việt';
-        if (code === 'en-US' || code === 'en') return 'Tiếng Anh';
-        if (code.startsWith('zh-')) return 'Tiếng Trung';
-        return code;
-      }
-    };
+  const getLanguageName = (code: string) => {
+    try {
+      const displayNames = new Intl.DisplayNames(['vi'], { type: 'language' });
+      const name = displayNames.of(code) || code;
+      return name.charAt(0).toUpperCase() + name.slice(1);
+    } catch {
+      if (code === 'vi-VN' || code === 'vi') return 'Tiếng Việt';
+      if (code === 'en-US' || code === 'en') return 'Tiếng Anh';
+      if (code.startsWith('zh-')) return 'Tiếng Trung';
+      return code;
+    }
+  };
 
-    return (
-      <div className="flex flex-col gap-8">
-        <div className="card p-6">
-          <h2 className="font-display text-xl font-bold mb-4">Tạo học liệu AI mới</h2>
-          <div className="grid gap-4 sm:grid-cols-3 mb-6">
+  const filteredOfficial = officialMaterials?.filter(m => m.isOfficial);
+
+  return (
+    <div className="flex flex-col gap-8">
+
+      {/* Official Materials & Exams Section */}
+      {filteredOfficial && filteredOfficial.length > 0 && (
+        <div className="card p-6 bg-gradient-to-r from-blue-950 via-slate-900 to-indigo-950 text-white rounded-2xl shadow-xl border border-indigo-900/40">
+          <div className="flex items-center justify-between mb-4 border-b border-indigo-800/50 pb-3">
             <div>
-              <label className="block text-sm font-semibold mb-1">Loại học liệu</label>
-              <select
-                className="w-full rounded-md border border-line p-2 text-sm"
-                value={materialType}
-                onChange={(e) => setMaterialType(e.target.value as MaterialType)}
-              >
-                <option value="MINDMAP">Sơ đồ tư duy (Mindmap)</option>
-                <option value="QUIZ">Trắc nghiệm (Quiz)</option>
-                <option value="FLASHCARD">Flashcard</option>
-              </select>
+              <h2 className="font-display text-lg font-bold flex items-center gap-2 text-white">
+                <span>🎓</span> Bài Thi & Học Liệu Chính Thức Khóa Học
+              </h2>
+              <p className="text-xs text-blue-200 mt-0.5">
+                Các bài kiểm tra trắc nghiệm, sơ đồ tư duy & bộ thẻ ôn tập do Giảng viên phát hành.
+              </p>
             </div>
-            <div>
-              <label className="block text-sm font-semibold mb-1">Phạm vi</label>
-              <select
-                className="w-full rounded-md border border-line p-2 text-sm"
-                value={scopeType}
-                onChange={(e) => {
-                  setScopeType(e.target.value as ScopeType);
-                  if (e.target.value === 'CHAPTER' && chapters && chapters.length > 0) {
-                    setScopeRefId(chapters[0]?.id);
-                  }
-                }}
-              >
-                <option value="WHOLE_COURSE">Toàn bộ khóa học</option>
-                <option value="CHAPTER">Từng chương</option>
-                <option value="CUSTOM_LESSONS">Tùy chọn bài học</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-semibold mb-1">Ngôn ngữ</label>
-              <select
-                className="w-full rounded-md border border-line p-2 text-sm"
-                value={language}
-                onChange={(e) => setLanguage(e.target.value)}
-                disabled={!availableLanguages || availableLanguages.length === 0}
-              >
-                {availableLanguages && availableLanguages.length > 0 ? (
-                  availableLanguages.map(lang => (
-                    <option key={lang} value={lang}>{getLanguageName(lang)}</option>
-                  ))
-                ) : (
-                  <option value="">Chưa có transcript</option>
-                )}
-              </select>
-            </div>
+            <span className="bg-emerald-500/20 text-emerald-300 font-extrabold text-xs px-3 py-1 rounded-full border border-emerald-500/30">
+              {filteredOfficial.length} Mục chính thức
+            </span>
           </div>
-        
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {filteredOfficial.map((item) => (
+              <div key={item.id} className="bg-white/10 backdrop-blur-md border border-white/10 rounded-xl p-4 flex flex-col justify-between space-y-3 hover:border-indigo-400/50 transition-all">
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-extrabold uppercase px-2 py-0.5 rounded bg-indigo-500/30 text-indigo-200 border border-indigo-400/30">
+                      {item.materialType}
+                    </span>
+                    {item.isProctored && (
+                      <span className="text-[11px] font-extrabold text-red-300 bg-red-950/60 px-2 py-0.5 rounded-full border border-red-500/50 flex items-center gap-1">
+                        <span>🔴</span> AI Anti-Cheat
+                      </span>
+                    )}
+                  </div>
+                  <h3 className="font-bold text-sm text-white">{item.title || 'Học liệu khóa học'}</h3>
+                  <div className="text-xs text-blue-200/80 space-y-1">
+                    {item.materialType === 'QUIZ' && item.questionCount && (
+                      <p>• Quy mô bài thi: <strong>{item.questionCount} câu hỏi</strong></p>
+                    )}
+                    {item.durationMinutes && (
+                      <p>• Thời gian làm bài: <strong>{item.durationMinutes} phút</strong></p>
+                    )}
+                  </div>
+                </div>
+
+                {item.materialType === 'QUIZ' && item.materialId ? (
+                  <Link
+                    href={item.isProctored ? `/exam/${item.materialId}` : `/materials/${item.id}`}
+                    className="w-full text-center bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-bold py-2.5 rounded-lg shadow transition-all block"
+                  >
+                    {item.isProctored ? '✍️ Vào Thi AI Anti-Cheat' : '✍️ Vào Làm Bài Thi'}
+                  </Link>
+                ) : (
+                  <Link
+                    href={`/materials/${item.id}`}
+                    className="w-full text-center bg-white/20 hover:bg-white/30 text-white text-xs font-bold py-2.5 rounded-lg transition-all block border border-white/20"
+                  >
+                    👁️ Xem Học Liệu
+                  </Link>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Student Personal Generation Form */}
+      <div className="card p-6">
+        <h2 className="font-display text-xl font-bold mb-4">Tạo học liệu AI mới</h2>
+        <div className="grid gap-4 sm:grid-cols-3 mb-6">
+          <div>
+            <label className="block text-sm font-semibold mb-1">Loại học liệu</label>
+            <select
+              className="w-full rounded-md border border-line p-2 text-sm"
+              value={materialType}
+              onChange={(e) => setMaterialType(e.target.value as MaterialType)}
+            >
+              <option value="MINDMAP">Sơ đồ tư duy (Mindmap)</option>
+              <option value="QUIZ">Trắc nghiệm (Quiz)</option>
+              <option value="FLASHCARD">Flashcard</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-semibold mb-1">Phạm vi</label>
+            <select
+              className="w-full rounded-md border border-line p-2 text-sm"
+              value={scopeType}
+              onChange={(e) => {
+                setScopeType(e.target.value as ScopeType);
+                if (e.target.value === 'CHAPTER' && chapters && chapters.length > 0) {
+                  setScopeRefId(chapters[0]?.id);
+                }
+              }}
+            >
+              <option value="WHOLE_COURSE">Toàn bộ khóa học</option>
+              <option value="CHAPTER">Từng chương</option>
+              <option value="CUSTOM_LESSONS">Tùy chọn bài học</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-semibold mb-1">Ngôn ngữ</label>
+            <select
+              className="w-full rounded-md border border-line p-2 text-sm"
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
+              disabled={!availableLanguages || availableLanguages.length === 0}
+            >
+              {availableLanguages && availableLanguages.length > 0 ? (
+                availableLanguages.map(lang => (
+                  <option key={lang} value={lang}>{getLanguageName(lang)}</option>
+                ))
+              ) : (
+                <option value="">Chưa có transcript</option>
+              )}
+            </select>
+          </div>
+        </div>
+      
         {/* Render selection UI for Chapter or Custom Lessons */}
         {scopeType === 'WHOLE_COURSE' && chapters && chapters.length > 0 && (
           <div className="mb-6 p-4 bg-surface-hover rounded-md text-sm border border-line">
@@ -202,7 +275,7 @@ export function MaterialManager({ courseId }: { courseId: number }) {
 
       <div className="card p-6">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="font-display text-xl font-bold">Lịch sử tạo</h2>
+          <h2 className="font-display text-xl font-bold">Lịch sử tạo cá nhân</h2>
           <button onClick={() => refetch()} className="text-sm text-accent hover:underline">
             Làm mới
           </button>
@@ -246,7 +319,7 @@ export function MaterialManager({ courseId }: { courseId: number }) {
             ))}
           </div>
         ) : (
-          <p className="text-sm text-ink-muted">Chưa có học liệu nào được tạo.</p>
+          <p className="text-sm text-ink-muted">Chưa có học liệu cá nhân nào được tạo.</p>
         )}
       </div>
     </div>

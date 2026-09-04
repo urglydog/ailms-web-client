@@ -35,6 +35,8 @@ export interface InstructorMaterial {
   createdAt: string;
   status: string;
   isOfficial: boolean;
+  language?: string;
+  versionNo?: number;
   materialId?: number;
   questionCount?: number;
   randomPickCount?: number | null;

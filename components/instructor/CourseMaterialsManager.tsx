@@ -5,6 +5,7 @@ import { materialsApi, InstructorMaterial, MaterialDetailRes } from '@/lib/api/m
 import { toast } from 'sonner';
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { MermaidViewer } from '@/components/materials/MermaidViewer';
 
 interface CourseMaterialsManagerProps {
   courseId: number;
@@ -65,6 +66,33 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
 
   if (isLoading) return <div className="p-6 text-center text-sm text-gray-500 animate-pulse">Đang tải danh sách học liệu Giảng viên...</div>;
 
+  // Nếu Giảng viên bấm Xem Chi Tiết -> Hiển thị Workspace Mở Rộng Đầy Đủ Không Gian (Không phải Popup nhỏ)
+  if (inspectGenerationId) {
+    const activeMat = materials?.find(m => m.id === inspectGenerationId);
+    return (
+      <MaterialWorkspaceViewer 
+        generationId={inspectGenerationId} 
+        material={activeMat}
+        onBack={() => setInspectGenerationId(null)} 
+        onConfigureQuiz={() => {
+          if (activeMat && activeMat.materialType === 'QUIZ') {
+            setSelectedQuiz(activeMat);
+          }
+        }}
+        onToggleOfficial={() => {
+          if (!activeMat || !activeMat.materialId) return;
+          if (activeMat.materialType === 'MINDMAP') {
+            toggleMindmapMutation.mutate({ id: activeMat.materialId, isOfficial: !activeMat.isOfficial });
+          } else if (activeMat.materialType === 'FLASHCARD') {
+            toggleFlashcardMutation.mutate({ id: activeMat.materialId, isOfficial: !activeMat.isOfficial });
+          } else if (activeMat.materialType === 'QUIZ') {
+            setQuizOfficialMutation.mutate(activeMat.materialId);
+          }
+        }}
+      />
+    );
+  }
+
   return (
     <div className="flex flex-col gap-5">
       {/* Top Banner & Quick Actions */}
@@ -107,7 +135,6 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
         </div>
       </div>
 
-
       {/* Materials List */}
       <div className="flex flex-col gap-3">
         {materials?.map((mat) => (
@@ -145,12 +172,12 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
 
             {mat.status === 'COMPLETED' && (
               <div className="flex items-center gap-2 w-full sm:w-auto justify-end border-t sm:border-t-0 pt-2 sm:pt-0">
-                {/* Xem chi tiết nội dung */}
+                {/* Mở Workspace Xem / Chỉnh sửa */}
                 <button
                   onClick={() => setInspectGenerationId(mat.id)}
-                  className="inline-flex items-center gap-1 rounded-lg bg-gray-100 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-200 transition-all"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-50 border border-indigo-200 px-3.5 py-1.5 text-xs font-bold text-indigo-700 hover:bg-indigo-100 transition-all shadow-sm"
                 >
-                  👁️ Xem Chi Tiết
+                  🖥️ Quản Lý Nội Dung Workspace
                 </button>
 
                 {/* Đánh dấu Official */}
@@ -179,7 +206,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                     onClick={() => setSelectedQuiz(mat)}
                     className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-blue-700 transition-all"
                   >
-                    ⚙️ Cấu hình Bài Thi Quiz
+                    ⚙️ Cấu hình Quiz
                   </button>
                 )}
 
@@ -209,15 +236,6 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
           onClose={() => setSelectedQuiz(null)} 
           onSave={(data) => updateQuizSettingsMutation.mutate({ id: selectedQuiz.materialId as number, data })}
           isSaving={updateQuizSettingsMutation.isPending}
-          onInspect={() => setInspectGenerationId(selectedQuiz.id)}
-        />
-      )}
-
-      {/* Inspect Material Content Modal */}
-      {inspectGenerationId && (
-        <MaterialContentInspectorModal 
-          generationId={inspectGenerationId} 
-          onClose={() => setInspectGenerationId(null)} 
         />
       )}
 
@@ -238,19 +256,235 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
   );
 }
 
+/** Workspace Xem & Chỉnh Sửa Học Liệu Trực Quan Mở Rộng Đầy Đủ Không Gian */
+function MaterialWorkspaceViewer({ 
+  generationId, 
+  material,
+  onBack,
+  onConfigureQuiz,
+  onToggleOfficial
+}: { 
+  generationId: number; 
+  material?: InstructorMaterial;
+  onBack: () => void; 
+  onConfigureQuiz: () => void;
+  onToggleOfficial: () => void;
+}) {
+  const { data: detail, isLoading } = useQuery<MaterialDetailRes>({
+    queryKey: ['material-detail', generationId],
+    queryFn: () => materialsApi.getDetail(generationId),
+    enabled: !!generationId,
+  });
+
+  const [activeTab, setActiveTab] = useState<'VIEW' | 'RAW_CODE'>('VIEW');
+  const [flippedCards, setFlippedCards] = useState<Record<number, boolean>>({});
+
+  const toggleCard = (id: number) => {
+    setFlippedCards(prev => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  return (
+    <div className="flex flex-col gap-6 rounded-2xl bg-white p-6 shadow-sm border border-gray-200 min-h-[750px]">
+      {/* Top Workspace Bar */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b pb-4 gap-4">
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={onBack}
+            className="flex items-center gap-1.5 text-xs font-bold text-gray-700 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-xl transition-all"
+          >
+            ← Quay lại danh sách
+          </button>
+          <div>
+            <div className="flex items-center gap-2">
+              <h2 className="text-lg font-bold text-gray-900">{detail?.title || material?.title || 'Học liệu AI'}</h2>
+              {material?.isOfficial && (
+                <span className="bg-emerald-100 text-emerald-800 text-xs font-extrabold px-2.5 py-0.5 rounded-full border border-emerald-200">
+                  ★ Official
+                </span>
+              )}
+              {material?.isProctored && (
+                <span className="bg-red-100 text-red-800 text-xs font-extrabold px-2.5 py-0.5 rounded-full border border-red-200">
+                  🔴 AI Anti-Cheat
+                </span>
+              )}
+            </div>
+            <p className="text-xs text-gray-500 mt-0.5">
+              Loại: <strong className="text-indigo-600">{detail?.materialType || material?.materialType}</strong> • 
+              Ngôn ngữ: <strong className="text-gray-700">{detail?.language || material?.language || 'Tiếng Việt'}</strong> • 
+              Phiên bản: #{detail?.versionNo || material?.versionNo || 1}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          {material?.materialType === 'QUIZ' && (
+            <button
+              onClick={onConfigureQuiz}
+              className="inline-flex items-center gap-1.5 rounded-xl bg-blue-600 px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-blue-700 transition-all"
+            >
+              ⚙️ Cấu hình Quiz & Thi Cử
+            </button>
+          )}
+
+          <button
+            onClick={onToggleOfficial}
+            className={`inline-flex items-center rounded-xl px-4 py-2 text-xs font-bold transition-all border ${
+              material?.isOfficial 
+                ? 'bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100' 
+                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 shadow-sm'
+            }`}
+          >
+            {material?.isOfficial ? '★ Đang là Official' : '☆ Phát hành làm Official'}
+          </button>
+        </div>
+      </div>
+
+      {isLoading ? (
+        <div className="py-20 text-center text-gray-500 animate-pulse font-medium">Đang tải toàn bộ dữ liệu học liệu vào Workspace...</div>
+      ) : detail ? (
+        <div className="flex flex-col gap-6">
+
+          {/* Render Quiz Workspace */}
+          {detail.materialType === 'QUIZ' && detail.quizQuestions && (
+            <div className="space-y-6">
+              <div className="flex items-center justify-between bg-indigo-50 border border-indigo-100 rounded-2xl p-4">
+                <div>
+                  <h3 className="font-bold text-sm text-indigo-950">Bộ Câu Hỏi Bài Thi Quiz Trắc Nghiệm AI</h3>
+                  <p className="text-xs text-indigo-700 mt-0.5">Dưới đây là {detail.quizQuestions.length} câu hỏi được tổng hợp tự động từ bài giảng.</p>
+                </div>
+                <span className="bg-indigo-600 text-white font-extrabold text-xs px-3 py-1 rounded-full">
+                  {detail.quizQuestions.length} Câu hỏi
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4">
+                {detail.quizQuestions.map((q, idx) => (
+                  <div key={q.id} className="p-5 rounded-2xl border border-gray-200 bg-gray-50/70 space-y-3 shadow-sm hover:border-blue-300 transition-all">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="font-bold text-base text-gray-900">
+                        <span className="text-blue-600 mr-2">Câu {idx + 1}:</span> {q.content}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mt-3">
+                      {q.options.map((opt) => (
+                        <div 
+                          key={opt.id} 
+                          className={`p-3.5 rounded-xl text-sm font-medium border flex items-center justify-between transition-all ${
+                            opt.isCorrect 
+                              ? 'bg-emerald-100/80 border-emerald-400 text-emerald-950 font-bold shadow-sm' 
+                              : 'bg-white border-gray-200 text-gray-700'
+                          }`}
+                        >
+                          <span>{opt.content}</span>
+                          {opt.isCorrect && (
+                            <span className="text-xs bg-emerald-600 text-white px-2.5 py-1 rounded-md font-extrabold flex items-center gap-1">
+                              Đáp án đúng ✓
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Render Mindmap Workspace */}
+          {detail.materialType === 'MINDMAP' && detail.mermaidCode && (
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 border-b pb-2">
+                <button
+                  onClick={() => setActiveTab('VIEW')}
+                  className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${
+                    activeTab === 'VIEW' ? 'bg-blue-600 text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  🧠 Trực Quan Sơ Đồ Node
+                </button>
+                <button
+                  onClick={() => setActiveTab('RAW_CODE')}
+                  className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${
+                    activeTab === 'RAW_CODE' ? 'bg-blue-600 text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  💻 Mã Cấu Trúc Mermaid Code
+                </button>
+              </div>
+
+              {activeTab === 'VIEW' ? (
+                <MermaidViewer chart={detail.mermaidCode} />
+              ) : (
+                <pre className="p-5 rounded-2xl bg-slate-900 text-cyan-300 font-mono text-xs overflow-x-auto min-h-[400px] border border-slate-800">
+                  {detail.mermaidCode}
+                </pre>
+              )}
+            </div>
+          )}
+
+          {/* Render Flashcards Workspace */}
+          {detail.materialType === 'FLASHCARD' && detail.flashcards && (
+            <div className="space-y-6">
+              <div className="bg-purple-50 border border-purple-100 rounded-2xl p-4 flex items-center justify-between">
+                <div>
+                  <h3 className="font-bold text-sm text-purple-950">Bộ Thẻ Học Flashcards 2 Mặt Trực Quan</h3>
+                  <p className="text-xs text-purple-700 mt-0.5">Bấm vào bất kỳ thẻ nào bên dưới để xem lật mặt sau.</p>
+                </div>
+                <span className="bg-purple-600 text-white font-extrabold text-xs px-3 py-1 rounded-full">
+                  {detail.flashcards.length} Thẻ ôn tập
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {detail.flashcards.map((card, idx) => {
+                  const isFlipped = flippedCards[card.id];
+                  return (
+                    <div 
+                      key={card.id} 
+                      onClick={() => toggleCard(card.id)}
+                      className={`cursor-pointer min-h-[160px] p-5 rounded-2xl border transition-all duration-300 flex flex-col justify-between shadow-sm hover:shadow-md ${
+                        isFlipped 
+                          ? 'bg-gradient-to-br from-indigo-900 to-purple-950 text-white border-purple-800' 
+                          : 'bg-purple-50/60 text-purple-950 border-purple-200 hover:border-purple-400'
+                      }`}
+                    >
+                      <div className="flex justify-between items-center text-xs font-extrabold opacity-80 mb-2">
+                        <span>Thẻ #{idx + 1}</span>
+                        <span className="underline">{isFlipped ? '🔄 Mặt Sau (Khái niệm)' : '🔄 Mặt Trước (Thuật ngữ)'}</span>
+                      </div>
+                      
+                      <div className="text-base font-bold my-auto leading-relaxed">
+                        {isFlipped ? card.backText : card.frontText}
+                      </div>
+
+                      <div className="text-[11px] opacity-70 mt-3 text-right">
+                        {isFlipped ? 'Nhấn để lật lại mặt trước' : 'Nhấn để xem giải nghĩa khái niệm'}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 /** Modal Cấu hình Quiz Thi Cử & Proctoring */
 function QuizSettingsModal({ 
   quiz, 
   onClose, 
   onSave, 
-  isSaving,
-  onInspect
+  isSaving
 }: { 
   quiz: InstructorMaterial; 
   onClose: () => void; 
   onSave: (data: Record<string, unknown>) => void; 
   isSaving: boolean;
-  onInspect: () => void;
 }) {
   const [randomPickCount, setRandomPickCount] = useState<string>(quiz.randomPickCount ? String(quiz.randomPickCount) : '');
   const [maxAttempts, setMaxAttempts] = useState<string>(quiz.maxAttempts ? String(quiz.maxAttempts) : '1');
@@ -267,7 +501,6 @@ function QuizSettingsModal({
       const start = new Date(startTime);
       if (!isNaN(start.getTime())) {
         const calculatedEnd = new Date(start.getTime() + Number(durationMinutes) * 60 * 1000);
-        // Format to ISO string YYYY-MM-THH:mm
         const tzOffset = calculatedEnd.getTimezoneOffset() * 60000;
         const localISOTime = new Date(calculatedEnd.getTime() - tzOffset).toISOString().slice(0, 16);
         setEndTime(localISOTime);
@@ -308,12 +541,6 @@ function QuizSettingsModal({
             </h3>
             <p className="text-xs text-gray-500 mt-0.5">{quiz.title || 'Bài thi Quiz khóa học'}</p>
           </div>
-          <button 
-            onClick={onInspect}
-            className="text-xs font-bold text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg hover:bg-indigo-100 transition-all border border-indigo-200 flex items-center gap-1"
-          >
-            <span>👁️</span> Xem bộ câu hỏi
-          </button>
         </div>
         
         <div className="flex flex-col gap-4 max-h-[70vh] overflow-y-auto pr-1">
@@ -440,99 +667,6 @@ function QuizSettingsModal({
             className="rounded-lg bg-cyan-600 px-5 py-2 text-sm font-bold text-white hover:bg-cyan-700 disabled:opacity-50 shadow"
           >
             {isSaving ? 'Đang lưu...' : 'Lưu cấu hình'}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/** Modal Xem Chi Tiết Nội Dung Học Liệu AI (Quiz Questions / Mindmap / Flashcards) */
-function MaterialContentInspectorModal({ generationId, onClose }: { generationId: number; onClose: () => void }) {
-  const { data: detail, isLoading } = useQuery<MaterialDetailRes>({
-    queryKey: ['material-detail', generationId],
-    queryFn: () => materialsApi.getDetail(generationId),
-    enabled: !!generationId,
-  });
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
-      <div className="w-full max-w-3xl max-h-[85vh] flex flex-col rounded-2xl bg-white p-6 shadow-2xl my-8">
-        <div className="flex justify-between items-center border-b pb-4 mb-4">
-          <div>
-            <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-              <span>👁️ Chi Tiết Nội Dung:</span>
-              <span className="text-cyan-600">{detail?.title || 'Học liệu AI'}</span>
-            </h3>
-            <p className="text-xs text-gray-500">Loại: {detail?.materialType} • Ngôn ngữ: {detail?.language}</p>
-          </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-700 font-bold text-xl px-2">
-            ✕
-          </button>
-        </div>
-
-        {isLoading ? (
-          <div className="py-12 text-center text-gray-500 animate-pulse font-medium">Đang tải nội dung chi tiết...</div>
-        ) : detail ? (
-          <div className="overflow-y-auto pr-2 space-y-4 flex-1">
-            {/* Quiz Questions */}
-            {detail.materialType === 'QUIZ' && detail.quizQuestions && (
-              <div className="space-y-4">
-                <div className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-                  Danh sách {detail.quizQuestions.length} câu hỏi trong đề:
-                </div>
-                {detail.quizQuestions.map((q, idx) => (
-                  <div key={q.id} className="p-4 rounded-xl border border-gray-200 bg-gray-50 space-y-2">
-                    <div className="font-bold text-sm text-gray-900">
-                      Câu {idx + 1}: {q.content}
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
-                      {q.options.map((opt) => (
-                        <div 
-                          key={opt.id} 
-                          className={`p-2.5 rounded-lg text-xs font-medium border flex items-center justify-between ${
-                            opt.isCorrect 
-                              ? 'bg-emerald-100 border-emerald-400 text-emerald-950 font-bold' 
-                              : 'bg-white border-gray-200 text-gray-700'
-                          }`}
-                        >
-                          <span>{opt.content}</span>
-                          {opt.isCorrect && <span className="text-[10px] bg-emerald-600 text-white px-2 py-0.5 rounded font-bold">Đáp án đúng ✓</span>}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Flashcards */}
-            {detail.materialType === 'FLASHCARD' && detail.flashcards && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {detail.flashcards.map((card, idx) => (
-                  <div key={card.id} className="p-4 rounded-xl border border-purple-200 bg-purple-50/40 space-y-2">
-                    <div className="text-xs font-bold text-purple-700 uppercase">Mặt trước #{idx + 1}</div>
-                    <div className="text-sm font-semibold text-gray-900">{card.frontText}</div>
-                    <div className="border-t border-purple-100 pt-2 mt-2 text-xs font-medium text-purple-900">
-                      <span className="font-bold text-purple-700">Mặt sau:</span> {card.backText}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Mindmap */}
-            {detail.materialType === 'MINDMAP' && detail.mermaidCode && (
-              <pre className="p-4 rounded-xl bg-slate-900 text-cyan-300 font-mono text-xs overflow-x-auto">
-                {detail.mermaidCode}
-              </pre>
-            )}
-          </div>
-        ) : null}
-
-        <div className="mt-6 pt-4 border-t text-right">
-          <button onClick={onClose} className="rounded-xl bg-gray-900 px-5 py-2 text-sm font-bold text-white hover:bg-gray-800">
-            Đóng
           </button>
         </div>
       </div>
@@ -693,22 +827,30 @@ function GenerateAiOfficialModal({ courseId, initialType, onClose, onSuccess }: 
           )}
 
           <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
-            Ngôn ngữ nguồn (từ Kho bài giảng)
+            Ngôn ngữ lồng tiếng & Bài giảng
             <select 
               value={language}
               onChange={(e) => setLanguage(e.target.value)}
-              className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-cyan-500 focus:outline-none"
+              className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-cyan-500 focus:outline-none font-medium bg-white"
             >
               {languages && languages.length > 0 ? (
                 languages.map((lang) => (
-                  <option key={lang} value={lang}>{lang.toUpperCase()}</option>
+                  <option key={lang} value={lang}>
+                    {lang.startsWith('vi') ? '🇻🇳 Tiếng Việt (Việt Nam) ✓ (Đã lồng tiếng)' :
+                     lang.startsWith('en') ? '🇺🇸 Tiếng Anh (Hoa Kỳ) ✓ (Đã lồng tiếng)' :
+                     lang.startsWith('ja') ? '🇯🇵 Tiếng Nhật (Nhật Bản) ✓ (Đã lồng tiếng)' :
+                     lang.startsWith('zh') ? '🇨🇳 Tiếng Trung (Trung Quốc) ✓ (Đã lồng tiếng)' :
+                     lang + ' ✓ (Đã lồng tiếng)'}
+                  </option>
                 ))
               ) : (
-                <option value="vi">VI (Tiếng Việt)</option>
+                <>
+                  <option value="vi">🇻🇳 Tiếng Việt (Việt Nam) ✓ (Ngôn ngữ gốc)</option>
+                  <option value="en">🇺🇸 Tiếng Anh (Hoa Kỳ)</option>
+                </>
               )}
             </select>
           </label>
-
 
           <div className="mt-4 flex justify-end gap-3 border-t pt-4">
             <button type="button" onClick={onClose} className="rounded-lg px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-100">
