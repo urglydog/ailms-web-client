@@ -196,9 +196,10 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
         {(!materials || materials.length === 0) && (
           <div className="p-12 text-center text-sm text-gray-500 card bg-white">
             <p className="font-semibold text-gray-700">Chưa có học liệu AI Official nào cho khóa học này.</p>
-            <p className="text-xs text-gray-400 mt-1">Bấm nút "Sinh AI Official Mới" phía trên để tạo bài Quiz hoặc Mindmap/Flashcard cho học viên.</p>
+            <p className="text-xs text-gray-400 mt-1">Bấm các nút sinh học liệu phía trên để tạo bài Quiz hoặc Mindmap/Flashcard cho học viên.</p>
           </div>
         )}
+
       </div>
 
       {/* Quiz Settings Modal */}
@@ -540,8 +541,8 @@ function MaterialContentInspectorModal({ generationId, onClose }: { generationId
 }
 
 /** Modal Sinh AI Official Mới Cho Giảng Viên */
-function GenerateAiOfficialModal({ courseId, onClose, onSuccess }: { courseId: number; onClose: () => void; onSuccess: () => void }) {
-  const [materialType, setMaterialType] = useState<'QUIZ' | 'FLASHCARD' | 'MINDMAP'>('QUIZ');
+function GenerateAiOfficialModal({ courseId, initialType, onClose, onSuccess }: { courseId: number; initialType?: 'QUIZ' | 'FLASHCARD' | 'MINDMAP' | null; onClose: () => void; onSuccess: () => void }) {
+  const [materialType, setMaterialType] = useState<'QUIZ' | 'FLASHCARD' | 'MINDMAP'>(initialType || 'QUIZ');
   const [scopeType, setScopeType] = useState<'WHOLE_COURSE' | 'CHAPTER' | 'CUSTOM_LESSONS'>('WHOLE_COURSE');
   const [scopeRefId, setScopeRefId] = useState<number | undefined>(undefined);
   const [difficultyLevel, setDifficultyLevel] = useState<'EASY' | 'MEDIUM' | 'HARD'>('MEDIUM');
@@ -593,7 +594,7 @@ function GenerateAiOfficialModal({ courseId, onClose, onSuccess }: { courseId: n
             Loại học liệu
             <select 
               value={materialType}
-              onChange={(e) => setMaterialType(e.target.value as any)}
+              onChange={(e) => setMaterialType(e.target.value as 'QUIZ' | 'FLASHCARD' | 'MINDMAP')}
               className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-cyan-500 focus:outline-none"
             >
               <option value="QUIZ">Quiz Bài thi trắc nghiệm</option>
@@ -606,7 +607,7 @@ function GenerateAiOfficialModal({ courseId, onClose, onSuccess }: { courseId: n
             Phạm vi tạo học liệu
             <select 
               value={scopeType}
-              onChange={(e) => setScopeType(e.target.value as any)}
+              onChange={(e) => setScopeType(e.target.value as 'WHOLE_COURSE' | 'CHAPTER')}
               className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-cyan-500 focus:outline-none"
             >
               <option value="WHOLE_COURSE">Toàn bộ khóa học</option>
@@ -636,7 +637,7 @@ function GenerateAiOfficialModal({ courseId, onClose, onSuccess }: { courseId: n
               Độ khó
               <select 
                 value={difficultyLevel}
-                onChange={(e) => setDifficultyLevel(e.target.value as any)}
+                onChange={(e) => setDifficultyLevel(e.target.value as 'EASY' | 'MEDIUM' | 'HARD')}
                 className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-cyan-500 focus:outline-none"
               >
                 <option value="EASY">Cơ bản (Easy)</option>
@@ -648,7 +649,7 @@ function GenerateAiOfficialModal({ courseId, onClose, onSuccess }: { courseId: n
               Mức số lượng
               <select 
                 value={quantityLevel}
-                onChange={(e) => setQuantityLevel(e.target.value as any)}
+                onChange={(e) => setQuantityLevel(e.target.value as 'FEW' | 'MEDIUM' | 'MORE')}
                 className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-cyan-500 focus:outline-none"
               >
                 <option value="FEW">Ít (Vừa đủ)</option>
@@ -657,6 +658,7 @@ function GenerateAiOfficialModal({ courseId, onClose, onSuccess }: { courseId: n
               </select>
             </label>
           </div>
+
 
           <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
             Ngôn ngữ (từ Kho bài giảng)
