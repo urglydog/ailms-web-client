@@ -102,6 +102,11 @@ export function Header() {
               <Link href="/courses" className="rounded-lg px-2.5 py-2 text-sm font-semibold text-gray-900 hover:bg-gray-50 no-underline">
                 Khóa học
               </Link>
+              {/* F11.9 — lối vào mới cho trang khám phá buổi live, không gate theo đăng nhập
+                  (Guest vẫn xem được buổi Public — BR-LIVE-01). */}
+              <Link href="/live" className="rounded-lg px-2.5 py-2 text-sm font-semibold text-gray-900 hover:bg-gray-50 no-underline">
+                Live
+              </Link>
               <Link href="/about" className="rounded-lg px-2.5 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 no-underline">
                 Về chúng tôi
               </Link>

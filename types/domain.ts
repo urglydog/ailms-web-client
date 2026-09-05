@@ -608,6 +608,8 @@ export interface CreateLiveSessionInput {
 export interface LiveSession {
   id: number;
   title: string;
+  /** F11.9 mở rộng — `null` nghĩa là giảng viên chưa tự tải ảnh riêng, dùng `courseThumbnailUrl` thay. */
+  thumbnailUrl: string | null;
   visibility: LiveVisibility;
   status: LiveSessionStatus;
   roomName: string;
@@ -617,6 +619,7 @@ export interface LiveSession {
   endedAt: string | null;
   courseId: number;
   courseTitle: string;
+  courseThumbnailUrl: string | null;
 }
 
 /** UC50 — trả về sau khi bấm "Bắt đầu Live", đủ để connect LiveKit React SDK. */
@@ -652,6 +655,25 @@ export interface LiveViewDetail {
   viewerToken: string | null;
   serverUrl: string | null;
   roomName: string | null;
+}
+
+/** F11.9 — 1 dòng trong trang khám phá `/live` (tab Công khai + Khóa học của tôi dùng chung shape
+ * này — khác `LiveViewSummary`, vốn scoped sẵn theo 1 khóa học nên không cần lặp lại tên khóa). */
+export interface LiveFeedItem {
+  id: number;
+  title: string;
+  /** F11.9 mở rộng — BE đã tự áp dụng fallback về ảnh bìa khóa học nếu buổi live chưa có ảnh
+   * riêng, FE dùng thẳng — vẫn có thể `null` nếu khóa học cũng chưa có ảnh bìa nào. */
+  thumbnailUrl: string | null;
+  status: LiveSessionStatus;
+  scheduledAt: string | null;
+  startedAt: string | null;
+  courseId: number;
+  courseTitle: string;
+  /** Điều hướng sang `/courses/{slug}` — route khóa học dùng slug, không phải id. */
+  courseSlug: string;
+  instructorName: string;
+  sourceLanguage: string;
 }
 
 // ── F11.3: Lồng tiếng Live thời gian thực (UC52) ─────────────────

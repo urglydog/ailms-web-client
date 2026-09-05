@@ -3,9 +3,12 @@
 import { LiveKitRoom, useLocalParticipant, useTracks, VideoTrack } from '@livekit/components-react';
 import { Track } from 'livekit-client';
 import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ChangeEvent } from 'react';
 import { LiveChatPanel } from '@/components/live/LiveChatPanel';
+import { UploadProgressBar } from '@/components/ui/UploadProgressBar';
 import { useEndLiveSession, useLiveSession, useStartLiveSession } from '@/hooks/useLiveSessions';
+import { useStartLiveThumbnailUpload } from '@/hooks/useUploadTray';
+import { useUploadTrayStore } from '@/lib/stores/uploadTrayStore';
 import { ApiError } from '@/lib/api/client';
 import type { LiveSessionStartRes } from '@/types/domain';
 
@@ -22,6 +25,17 @@ export default function LiveControlRoomPage() {
   const startLive = useStartLiveSession();
   const endLive = useEndLiveSession();
   const [liveKit, setLiveKit] = useState<LiveSessionStartRes | null>(null);
+  const startThumbnailUpload = useStartLiveThumbnailUpload(sessionId);
+  const thumbnailTask = useUploadTrayStore((s) =>
+    s.tasks.find((t) => t.targetType === 'live-thumbnail' && t.targetId === sessionId),
+  );
+
+  const handleThumbnailFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file || !session) return;
+    startThumbnailUpload(file, `Ảnh buổi live: ${session.title}`);
+  };
 
   // Phiên ĐÃ live (tải lại trang, hoặc vào lại sau khi rớt mạng trong 60s ân hạn BR-LIVE-09)
   // -> tự lấy token mới, không bắt bấm nút lại.
@@ -46,12 +60,44 @@ export default function LiveControlRoomPage() {
   }
 
   if (!liveKit) {
+    const previewUrl = session.thumbnailUrl ?? session.courseThumbnailUrl;
     return (
       <div className="mx-auto flex max-w-lg flex-col items-center gap-4 rounded-xl border border-gray-200 bg-white p-8 text-center">
         <h1 className="m-0 font-display text-lg font-bold text-gray-900">{session.title}</h1>
         <p className="text-[13px] text-gray-500">
           Khóa học: {session.courseTitle} · Ngôn ngữ nói: {session.sourceLanguage}
         </p>
+
+        {/* F11.9 mở rộng — ảnh hiện trên trang khám phá /live, không bắt buộc (mặc định dùng
+            ảnh bìa khóa học nếu bỏ trống). Sửa được bất kỳ lúc nào, kể cả sau khi đã live. */}
+        <div className="w-full text-left">
+          <span className="mb-1.5 block text-[12.5px] font-semibold text-gray-700">
+            Ảnh thumbnail cho trang khám phá Live
+          </span>
+          {previewUrl && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={previewUrl} alt="Xem trước thumbnail" className="mb-2 h-32 w-full rounded-lg object-cover" />
+          )}
+          <input
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            onChange={handleThumbnailFileChange}
+            disabled={thumbnailTask?.status === 'uploading'}
+            className="text-[12.5px] file:mr-3 file:rounded-md file:border-0 file:bg-gray-100 file:px-3 file:py-1.5 file:text-[12px] file:font-semibold"
+          />
+          {!session.thumbnailUrl && (
+            <p className="mt-1 text-[11px] text-gray-400">
+              Chưa tải ảnh riêng — đang dùng tạm ảnh bìa khóa học.
+            </p>
+          )}
+          {thumbnailTask?.status === 'uploading' && (
+            <UploadProgressBar percent={thumbnailTask.percent} label="Đang tải ảnh lên..." />
+          )}
+          {thumbnailTask?.status === 'error' && (
+            <p className="text-[11.5px] text-red-600">{thumbnailTask.errorMessage}</p>
+          )}
+        </div>
+
         {startLive.error instanceof ApiError && (
           <p className="text-[12.5px] text-red-600">{startLive.error.message}</p>
         )}

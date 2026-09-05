@@ -1,6 +1,6 @@
 import { api } from '@/lib/api/client';
 import { getAccessToken } from '@/lib/auth/token';
-import type { LiveViewDetail, LiveViewSummary } from '@/types/domain';
+import type { LiveFeedItem, LiveViewDetail, LiveViewSummary } from '@/types/domain';
 
 /**
  * UC51 — xem phiên Live. PUBLIC endpoint (BE tự lọc quyền theo BR-LIVE-01) — Guest gọi được,
@@ -17,4 +17,12 @@ export const liveViewApi = {
     api.get<LiveViewDetail>(`/api/v1/live-sessions/${sessionId}/view`, {
       token: getAccessToken() ?? undefined,
     }),
+
+  /** F11.9 — tab "Công khai" trang `/live`. PUBLIC thật sự — Guest không có token vẫn gọi được. */
+  listPublicFeed: () => api.get<LiveFeedItem[]>('/api/v1/live-sessions/public'),
+
+  /** F11.9 — tab "Khóa học của tôi". Bắt buộc JWT (BE trả 401 nếu thiếu) — FE chỉ gọi hàm này khi
+   * đã xác nhận có token, xem `useEnrolledLiveFeed`. */
+  listEnrolledFeed: () =>
+    api.get<LiveFeedItem[]>('/api/v1/live-sessions/enrolled', { token: getAccessToken() ?? undefined }),
 };
