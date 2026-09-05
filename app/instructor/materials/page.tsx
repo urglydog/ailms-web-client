@@ -4,7 +4,10 @@ import React, { useState } from 'react';
 import { useMyCourses } from '@/hooks/useCourses';
 import { CourseMaterialsManager } from '@/components/instructor/CourseMaterialsManager';
 
+import { useRouter } from 'next/navigation';
+
 export default function InstructorMaterialsPage() {
+  const router = useRouter();
   const { data, isLoading } = useMyCourses({});
   const courses = data?.content ?? [];
   const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
@@ -30,7 +33,10 @@ export default function InstructorMaterialsPage() {
           <label className="text-xs font-bold text-gray-600 whitespace-nowrap">Khóa học:</label>
           <select
             value={activeCourseId ?? ''}
-            onChange={(e) => setSelectedCourseId(Number(e.target.value))}
+            onChange={(e) => {
+              setSelectedCourseId(Number(e.target.value));
+              router.push('/instructor/materials');
+            }}
             disabled={isLoading || courses.length === 0}
             className="w-full sm:w-64 rounded-xl border border-gray-300 bg-gray-50 px-3.5 py-2 text-sm font-semibold text-gray-800 focus:border-cyan-500 focus:bg-white focus:outline-none shadow-sm transition-all"
           >

@@ -1,16 +1,30 @@
 'use client';
 
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
-import { useStartQuiz, useSubmitQuiz, useExplainWrongAnswer } from '@/hooks/useQuizzes';
+import { useStartQuiz, useSubmitQuiz, useExplainWrongAnswer, useQuizHistory } from '@/hooks/useQuizzes';
 import { StartRes, SubmitRes } from '@/lib/api/quizzes';
+import Link from 'next/link';
 import { MarkdownRenderer } from '@/components/ui/MarkdownRenderer';
 
 export default function AntiCheatExamPage() {
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
   const quizId = params.quizId;
+  const title = searchParams.get('title') || 'Bài kiểm tra';
+  const duration = searchParams.get('duration');
+  const maxAttempts = searchParams.get('attempts');
+  const questionCount = searchParams.get('count');
+  const startTime = searchParams.get('start');
+  const endTime = searchParams.get('end');
+  const attemptCount = searchParams.get('attemptCount');
+  const proctoredParam = searchParams.get('proctored');
+  const isProctored = proctoredParam === 'true';
+
+  const { data: history, isLoading: isLoadingHistory } = useQuizHistory(Number(quizId));
+
   const videoRef = useRef<HTMLVideoElement>(null);
   
   const [violationCount, setViolationCount] = useState(0);
@@ -58,6 +72,10 @@ export default function AntiCheatExamPage() {
 
   // Khởi tạo model
   useEffect(() => {
+    if (!isProctored) {
+        setIsModelLoaded(true);
+        return;
+    }
     const loadModels = async () => {
       try {
         const faceapi = await import('@vladmandic/face-api');
@@ -71,7 +89,7 @@ export default function AntiCheatExamPage() {
       }
     };
     loadModels();
-  }, []);
+  }, [isProctored]);
 
   // Hàm nộp bài
   const submitExam = useCallback(() => {
@@ -117,7 +135,7 @@ export default function AntiCheatExamPage() {
 
   // 1. Chống chuyển tab & Rời chuột khỏi màn hình
   useEffect(() => {
-    if (!isStarted || result) return;
+    if (!isStarted || result || !isProctored) return;
 
     const handleVisibilityChange = () => {
       if (document.hidden) {
@@ -145,11 +163,11 @@ export default function AntiCheatExamPage() {
       window.removeEventListener('blur', handleWindowBlur);
       document.removeEventListener('mouseleave', handleMouseLeave);
     };
-  }, [isStarted, result, handleViolation]);
+  }, [isStarted, result, isProctored, handleViolation]);
 
   // 2. Face API Detection Loop
   useEffect(() => {
-    if (!isStarted || !videoRef.current || !isModelLoaded || result) return;
+    if (!isProctored || !isStarted || !videoRef.current || !isModelLoaded || result) return;
 
     const video = videoRef.current;
     
@@ -186,35 +204,44 @@ export default function AntiCheatExamPage() {
       video.removeEventListener('play', startDetection);
       if (detectInterval.current) clearInterval(detectInterval.current);
     };
-  }, [isStarted, isModelLoaded, result, handleViolation]);
+  }, [isStarted, isProctored, isModelLoaded, result, handleViolation]);
 
-  // Yêu cầu bật Camera
+  // Yêu cầu bật Camera (nếu proctored)
   const startExam = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      setMediaStream(stream);
-
-      startQuiz(Number(quizId), {
-        onSuccess: (data) => {
-          setAttemptData(data);
-          setIsStarted(true);
-          toast.success('Bắt đầu làm bài. Vui lòng không chuyển tab!');
-        },
-        onError: (err: unknown) => {
-          const error = err as { message?: string; response?: { data?: { message?: string; detail?: string } } };
-          toast.error(error.message || error.response?.data?.message || error.response?.data?.detail || 'Không thể tải bài thi, có thể khóa học này chưa có Quiz chính thức.');
-        }
-      });
-    } catch {
-      toast.error('Bạn phải cấp quyền sử dụng Camera để làm bài thi này!');
+    if (isProctored) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        setMediaStream(stream);
+      } catch {
+        toast.error('Bạn phải cấp quyền sử dụng Camera để làm bài thi này!');
+        return;
+      }
     }
+
+    startQuiz(Number(quizId), {
+      onSuccess: (data) => {
+        setAttemptData(data);
+        setIsStarted(true);
+        if (isProctored) {
+          toast.success('Bắt đầu làm bài. Vui lòng không chuyển tab!');
+        } else {
+          toast.success('Bắt đầu làm bài!');
+        }
+      },
+      onError: (err: unknown) => {
+        const error = err as { message?: string; response?: { data?: { message?: string; detail?: string } } };
+        toast.error(error.message || error.response?.data?.message || error.response?.data?.detail || 'Không thể tải bài thi.');
+        if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
+      }
+    });
   };
 
-  // Đồng hồ đếm ngược: bắt đầu khi exam started và có durationMinutes
+  // Đồng hồ đếm ngược: bắt đầu khi exam started và có duration
   useEffect(() => {
-    if (!isStarted || !attemptData?.durationMinutes || result) return;
+    const examDurationMinutes = duration ? Number(duration) : null;
+    if (!isStarted || !examDurationMinutes || result) return;
     // Khởi tạo thời gian
-    const totalSeconds = attemptData.durationMinutes * 60;
+    const totalSeconds = examDurationMinutes * 60;
     setTimeLeft(totalSeconds);
     startTimeRef.current = new Date();
     timerRef.current = setInterval(() => {
@@ -233,7 +260,7 @@ export default function AntiCheatExamPage() {
       if (timerRef.current) clearInterval(timerRef.current);
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isStarted, attemptData?.durationMinutes, result]);
+  }, [isStarted, duration, result]);
 
   // Gắn stream
   useEffect(() => {
@@ -375,7 +402,7 @@ export default function AntiCheatExamPage() {
         <div className="flex justify-between items-center mb-8 border-b border-line pb-4">
           <div>
             <h1 className="font-display text-2xl font-bold text-ink flex items-center gap-2">
-              <span className="text-red-600">🔴</span> Phòng Thi Trực Tuyến
+              {isProctored ? <><span className="text-red-600">🔴</span> Phòng Thi Trực Tuyến (Có giám sát)</> : <>📄 Bài Thi Trắc Nghiệm</>}
             </h1>
             <p className="text-sm text-ink-muted mt-1">Mã đề thi: {quizId}</p>
           </div>
@@ -391,31 +418,102 @@ export default function AntiCheatExamPage() {
                 <span>{formatTime(timeLeft)}</span>
               </div>
             )}
-            <div className="text-right">
-              <div className="text-sm font-semibold text-ink-muted">Cảnh báo vi phạm</div>
-              <div className={`text-xl font-bold ${violationCount >= 2 ? 'text-red-600' : 'text-amber-600'}`}>
-                {violationCount} / 3
+            {isProctored && (
+              <div className="text-right">
+                <div className="text-sm font-semibold text-ink-muted">Cảnh báo vi phạm</div>
+                <div className={`text-xl font-bold ${violationCount >= 2 ? 'text-red-600' : 'text-amber-600'}`}>
+                  {violationCount} / 3
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
 
         {!isStarted ? (
-          <div className="card p-12 text-center flex flex-col items-center">
-            <h2 className="font-display text-xl font-bold mb-4">Nội quy phòng thi AI</h2>
-            <ul className="text-left text-sm text-ink-muted mb-8 space-y-2 list-disc ml-4">
-              <li>Yêu cầu bật Camera liên tục trong suốt quá trình thi.</li>
-              <li>Hệ thống AI sẽ nhận diện khuôn mặt liên tục.</li>
-              <li><strong className="text-red-600">Tuyệt đối không:</strong> Chuyển tab, rời chuột khỏi viền trình duyệt, hoặc quay mặt đi chỗ khác.</li>
-              <li>Vi phạm quá 3 lần hệ thống sẽ tự động thu bài.</li>
-            </ul>
-            <button 
-              onClick={startExam}
-              disabled={!isModelLoaded || isStarting}
-              className="bg-accent text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-accent-dark hover:scale-105 transition-all disabled:opacity-50 disabled:hover:scale-100"
-            >
-              {isStarting ? 'Đang tải đề thi...' : isModelLoaded ? 'Bật Camera & Bắt đầu thi' : 'Đang tải AI Model...'}
-            </button>
+          <div className="max-w-5xl mx-auto mt-8">
+            <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden mb-8">
+              <div className="flex items-start gap-4 p-6 border-b border-gray-100">
+                <div className="w-14 h-14 rounded-md flex items-center justify-center font-bold text-2xl shadow-sm bg-pink-500 text-white flex-shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                </div>
+                <div>
+                  <div className="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1">Trắc Nghiệm {isProctored && '- Có giám sát Camera'}</div>
+                  <h3 className="font-bold text-orange-600 text-2xl">{title}</h3>
+                </div>
+              </div>
+
+              <div className="p-8 text-sm text-gray-800 space-y-8 bg-gray-50/30">
+                <div className="space-y-1">
+                  {startTime && <p><strong className="font-semibold text-gray-900 w-20 inline-block">Opened:</strong> {new Date(startTime).toLocaleString('en-GB')}</p>}
+                  {endTime && <p><strong className="font-semibold text-gray-900 w-20 inline-block">Closed:</strong> {new Date(endTime).toLocaleString('en-GB')}</p>}
+                </div>
+
+                <div className="space-y-4 pt-6 border-t border-gray-200">
+                  <p>Bài thi gồm {questionCount || '...'} câu</p>
+                  <p>Thời gian làm bài: {duration ? `${duration} phút` : 'Không giới hạn'}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-4 mb-8 text-sm text-gray-800">
+              <p>Attempts allowed: {maxAttempts || 'Không giới hạn'}</p>
+              {isProctored && <p className="text-red-600 font-semibold">Để thực hiện bài trắc nghiệm này bạn cần bật Camera để AI giám sát. Không được chuyển tab hay rời khỏi màn hình.</p>}
+              <p>Thời gian làm bài: {duration ? `${duration} phút` : 'Không giới hạn'}</p>
+            </div>
+
+            {history && history.length > 0 && (
+              <div className="mb-8">
+                <h3 className="text-xl text-orange-600 mb-4">Tổng quan các lần làm bài trước của bạn</h3>
+                <div className="overflow-hidden border border-gray-200 rounded-md">
+                  <table className="w-full text-sm text-left">
+                    <thead className="bg-[#8ebb83] text-white">
+                      <tr>
+                        <th className="px-4 py-3 font-semibold">Trạng thái</th>
+                        <th className="px-4 py-3 font-semibold text-center w-32">Xem lại</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200 bg-white">
+                      {history.map((h, idx) => (
+                        <tr key={h.id} className="hover:bg-gray-50">
+                          <td className="px-4 py-4">
+                            <div className="font-medium text-gray-900">Đã xong</div>
+                            <div className="text-gray-500 text-xs mt-1">Đã nộp {new Date(h.submittedAt).toLocaleString('en-GB')}</div>
+                            <div className="text-blue-600 font-medium text-xs mt-1">Điểm: {h.score.toFixed(1)}/10</div>
+                          </td>
+                          <td className="px-4 py-4 text-center">
+                            <Link href={`/exam/${quizId}/history`} className="text-blue-600 hover:underline">
+                              Xem chi tiết
+                            </Link>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            <div className="flex flex-col items-center mt-8 space-y-4 pb-8">
+              {(!maxAttempts || attemptCount === null || parseInt(attemptCount) < parseInt(maxAttempts)) ? (
+                <button
+                  onClick={startExam}
+                  disabled={(!isProctored ? false : !isModelLoaded) || isStarting}
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-6 rounded border shadow-sm transition-colors disabled:opacity-50"
+                >
+                  {isStarting ? 'Đang chuẩn bị...' : (!isProctored ? 'Bắt đầu làm bài' : isModelLoaded ? 'Bật Camera & Bắt đầu thi' : 'Đang tải AI Model...')}
+                </button>
+              ) : (
+                <div className="text-gray-500 font-medium">
+                  Không cho phép nhiều lần thử
+                </div>
+              )}
+              <button
+                onClick={() => router.back()}
+                className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-6 rounded border shadow-sm transition-colors"
+              >
+                Trở về khóa học
+              </button>
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-3 gap-8">
@@ -445,23 +543,25 @@ export default function AntiCheatExamPage() {
             </div>
 
             <div className="col-span-1 flex flex-col gap-4 sticky top-8 self-start">
-              <div className="card overflow-hidden">
-                <div className={`text-white text-xs font-bold p-2 text-center transition-colors ${
-                  faceStatus === 'DETECTING' ? 'bg-amber-500' :
-                  faceStatus === 'FACE_FOUND' ? 'bg-green-600' : 'bg-red-600 animate-pulse'
-                }`}>
-                  {faceStatus === 'DETECTING' && 'Đang quét khuôn mặt...'}
-                  {faceStatus === 'FACE_FOUND' && 'Camera Giám Sát AI (Bình thường)'}
-                  {faceStatus === 'NO_FACE' && 'CẢNH BÁO: KHÔNG THẤY KHUÔN MẶT'}
+              {isProctored && (
+                <div className="card overflow-hidden">
+                  <div className={`text-white text-xs font-bold p-2 text-center transition-colors ${
+                    faceStatus === 'DETECTING' ? 'bg-amber-500' :
+                    faceStatus === 'FACE_FOUND' ? 'bg-green-600' : 'bg-red-600 animate-pulse'
+                  }`}>
+                    {faceStatus === 'DETECTING' && 'Đang quét khuôn mặt...'}
+                    {faceStatus === 'FACE_FOUND' && 'Camera Giám Sát AI (Bình thường)'}
+                    {faceStatus === 'NO_FACE' && 'CẢNH BÁO: KHÔNG THẤY KHUÔN MẶT'}
+                  </div>
+                  <video 
+                    ref={videoRef}
+                    autoPlay
+                    playsInline
+                    muted
+                    className="w-full aspect-video object-cover bg-black"
+                  />
                 </div>
-                <video 
-                  ref={videoRef}
-                  autoPlay
-                  playsInline
-                  muted
-                  className="w-full aspect-video object-cover bg-black"
-                />
-              </div>
+              )}
 
               <button 
                 onClick={submitExam}

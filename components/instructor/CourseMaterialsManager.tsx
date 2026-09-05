@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { materialsApi, InstructorMaterial, MaterialDetailRes } from '@/lib/api/materials';
 import { toast } from 'sonner';
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { MermaidViewer } from '@/components/materials/MermaidViewer';
 
 interface CourseMaterialsManagerProps {
@@ -16,7 +16,15 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
   const queryClient = useQueryClient();
 
   const [selectedQuiz, setSelectedQuiz] = useState<InstructorMaterial | null>(null);
-  const [inspectGenerationId, setInspectGenerationId] = useState<number | null>(null);
+  const searchParams = useSearchParams();
+  const inspectGenerationId = searchParams.get('inspect') ? Number(searchParams.get('inspect')) : null;
+  const setInspectGenerationId = (id: number | null) => {
+    if (id) {
+      router.push(`?inspect=${id}`);
+    } else {
+      router.push(`/instructor/materials`);
+    }
+  };
   const [genMaterialType, setGenMaterialType] = useState<'QUIZ' | 'FLASHCARD' | 'MINDMAP' | null>(null);
 
   const { data: materials, isLoading } = useQuery({
@@ -164,7 +172,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                 <div className="text-xs text-gray-500 mt-0.5 flex items-center gap-3">
                   <span>Tạo lúc: {new Date(mat.createdAt).toLocaleDateString('vi-VN')}</span>
                   {mat.materialType === 'QUIZ' && mat.questionCount !== undefined && (
-                    <span className="font-semibold text-indigo-600">• Quy mô đề: {mat.questionCount} câu hỏi</span>
+                    <span className="font-semibold text-indigo-600">• Quy mô đề: {mat.randomPickCount ? mat.randomPickCount : mat.questionCount} câu hỏi</span>
                   )}
                 </div>
               </div>
@@ -303,12 +311,7 @@ function MaterialWorkspaceViewer({
       {/* Top Workspace Bar */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b pb-4 gap-4">
         <div className="flex items-center gap-3">
-          <button 
-            onClick={onBack}
-            className="flex items-center gap-1.5 text-xs font-bold text-gray-700 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-xl transition-all"
-          >
-            ← Quay lại danh sách
-          </button>
+          {/* Removed Back to list button */}
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-lg font-bold text-gray-900">{detail?.title || material?.title || 'Học liệu AI'}</h2>
@@ -350,6 +353,13 @@ function MaterialWorkspaceViewer({
             }`}
           >
             {material?.isOfficial ? '★ Đang là Official' : '☆ Phát hành làm Official'}
+          </button>
+          <button
+            onClick={onBack}
+            className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors ml-2"
+            title="Đóng Workspace"
+          >
+            ✕
           </button>
         </div>
       </div>
@@ -522,8 +532,8 @@ function QuizSettingsModal({
   const [allowReview, setAllowReview] = useState<boolean>(quiz.allowReview ?? true);
   const [isProctored, setIsProctored] = useState<boolean>(quiz.isProctored ?? false);
   const [maxViolations, setMaxViolations] = useState<string>(quiz.maxViolations ? String(quiz.maxViolations) : '3');
-  const [startTime, setStartTime] = useState<string>(quiz.startTime ? new Date(quiz.startTime).toISOString().slice(0, 16) : '');
-  const [endTime, setEndTime] = useState<string>(quiz.endTime ? new Date(quiz.endTime).toISOString().slice(0, 16) : '');
+  const [startTime, setStartTime] = useState<string>(quiz.startTime ? quiz.startTime.substring(0, 16) : '');
+  const [endTime, setEndTime] = useState<string>(quiz.endTime ? quiz.endTime.substring(0, 16) : '');
 
   // Tự động tính toán Thời gian đóng bài = Thời gian mở bài + Thời gian làm bài (Phút)
   useEffect(() => {
@@ -553,8 +563,8 @@ function QuizSettingsModal({
       randomPickCount: pick,
       durationMinutes: dur,
       maxAttempts: att,
-      startTime: startTime ? new Date(startTime).toISOString() : null,
-      endTime: endTime ? new Date(endTime).toISOString() : null,
+      startTime: startTime ? startTime + ":00" : null,
+      endTime: endTime ? endTime + ":00" : null,
       allowReview,
       isProctored,
       maxViolations: viol
