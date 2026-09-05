@@ -710,7 +710,7 @@ function GenerateAiOfficialModal({ courseId, initialType, onClose, onSuccess }: 
   const [scopeType, setScopeType] = useState<'WHOLE_COURSE' | 'CHAPTER' | 'CUSTOM_LESSONS'>('WHOLE_COURSE');
   const [scopeRefId, setScopeRefId] = useState<number | undefined>(undefined);
   const [difficultyLevel, setDifficultyLevel] = useState<'EASY' | 'MEDIUM' | 'HARD'>('MEDIUM');
-  const [quantityLevel, setQuantityLevel] = useState<'FEW' | 'MEDIUM' | 'MORE'>('MEDIUM');
+  const [quantityLevel, setQuantityLevel] = useState<'FEWER' | 'STANDARD' | 'MORE'>('STANDARD');
   const [language, setLanguage] = useState<string>('vi');
 
   const { data: languages } = useQuery({
@@ -830,11 +830,11 @@ function GenerateAiOfficialModal({ courseId, initialType, onClose, onSuccess }: 
                 Số lượng câu hỏi
                 <select 
                   value={quantityLevel}
-                  onChange={(e) => setQuantityLevel(e.target.value as 'FEW' | 'MEDIUM' | 'MORE')}
+                  onChange={(e) => setQuantityLevel(e.target.value as 'FEWER' | 'STANDARD' | 'MORE')}
                   className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-cyan-500 focus:outline-none"
                 >
-                  <option value="FEW">Ít (~10 câu)</option>
-                  <option value="MEDIUM">Vừa (~20 câu)</option>
+                  <option value="FEWER">Ít (~10 câu)</option>
+                  <option value="STANDARD">Vừa (~20 câu)</option>
                   <option value="MORE">Nhiều (~30 câu)</option>
                 </select>
               </label>
@@ -846,11 +846,11 @@ function GenerateAiOfficialModal({ courseId, initialType, onClose, onSuccess }: 
               Số lượng thẻ Flashcard
               <select 
                 value={quantityLevel}
-                onChange={(e) => setQuantityLevel(e.target.value as 'FEW' | 'MEDIUM' | 'MORE')}
+                onChange={(e) => setQuantityLevel(e.target.value as 'FEWER' | 'STANDARD' | 'MORE')}
                 className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-cyan-500 focus:outline-none"
               >
-                <option value="FEW">Ít (~10 thẻ)</option>
-                <option value="MEDIUM">Vừa (~20 thẻ)</option>
+                <option value="FEWER">Ít (~10 thẻ)</option>
+                <option value="STANDARD">Vừa (~20 thẻ)</option>
                 <option value="MORE">Nhiều (~30 thẻ)</option>
               </select>
             </label>
