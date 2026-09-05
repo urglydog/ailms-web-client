@@ -68,8 +68,8 @@ export const quizApi = {
     return api.put(`/api/v1/instructor/quizzes/${quizId}/set-official`, {}, { token: authToken() });
   },
 
-  startAttempt: (courseId: number) => {
-    return api.get<StartRes>(`/api/v1/courses/${courseId}/quizzes/official/attempt`, { token: authToken() });
+  startAttempt: (quizId: number) => {
+    return api.get<StartRes>(`/api/v1/quizzes/${quizId}/start-attempt`, { token: authToken() });
   },
 
   submitAttempt: (attemptId: number, data: SubmitReq) => {
