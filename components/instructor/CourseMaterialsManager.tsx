@@ -846,11 +846,11 @@ function GenerateAiOfficialModal({ courseId, initialType, onClose, onSuccess }: 
               Số lượng thẻ Flashcard
               <select 
                 value={quantityLevel}
-                onChange={(e) => setQuantityLevel(e.target.value as 'FEW' | 'MEDIUM' | 'MORE')}
+                onChange={(e) => setQuantityLevel(e.target.value as 'FEWER' | 'STANDARD' | 'MORE')}
                 className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-cyan-500 focus:outline-none"
               >
-                <option value="FEW">Ít (~10 thẻ)</option>
-                <option value="MEDIUM">Vừa (~20 thẻ)</option>
+                <option value="FEWER">Ít (~10 thẻ)</option>
+                <option value="STANDARD">Vừa (~20 thẻ)</option>
                 <option value="MORE">Nhiều (~30 thẻ)</option>
               </select>
             </label>
