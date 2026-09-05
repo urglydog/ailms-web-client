@@ -63,6 +63,7 @@ export default function NewLiveSessionPage() {
       <h1 className="m-0 font-display text-[22px] font-bold text-gray-900">Tạo buổi Live mới</h1>
       <p className="text-[13px] text-gray-500">
         Đặt lịch trước hoặc để trống giờ bắt đầu để bấm &quot;Bắt đầu Live&quot; bất kỳ lúc nào sau khi tạo.
+        Ảnh thumbnail cho trang khám phá Live sẽ thêm được ở bước kế tiếp, ngay sau khi tạo xong.
       </p>
       <form
         onSubmit={handleSubmit}
