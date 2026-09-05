@@ -23,7 +23,7 @@ export default function AntiCheatExamPage() {
   const proctoredParam = searchParams.get('proctored');
   const isProctored = proctoredParam === 'true';
 
-  const { data: history, isLoading: isLoadingHistory } = useQuizHistory(Number(quizId));
+  const { data: history } = useQuizHistory(Number(quizId));
 
   const videoRef = useRef<HTMLVideoElement>(null);
   
@@ -473,7 +473,7 @@ export default function AntiCheatExamPage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200 bg-white">
-                      {history.map((h, idx) => (
+                      {history.map((h) => (
                         <tr key={h.id} className="hover:bg-gray-50">
                           <td className="px-4 py-4">
                             <div className="font-medium text-gray-900">Đã xong</div>
