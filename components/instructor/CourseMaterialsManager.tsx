@@ -279,7 +279,12 @@ function MaterialWorkspaceViewer({
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<'VIEW' | 'RAW_CODE'>('VIEW');
   const [flippedCards, setFlippedCards] = useState<Record<number, boolean>>({});
-  const [editingQuestion, setEditingQuestion] = useState<any | null>(null);
+  const [editingQuestion, setEditingQuestion] = useState<{
+    id: number;
+    content: string;
+    displayOrder: number;
+    options: { id: number; content: string; isCorrect: boolean }[];
+  } | null>(null);
 
   const deleteQuestionMutation = useMutation({
     mutationFn: (id: number) => materialsApi.deleteQuizQuestion(id),
@@ -895,9 +900,22 @@ function GenerateAiOfficialModal({ courseId, initialType, onClose, onSuccess }: 
   );
 }
 
-function QuizQuestionEditorModal({ question, onClose, onSuccess }: { question: any, onClose: () => void, onSuccess: () => void }) {
+interface QuizQuestionEditorProps {
+  question: {
+    id: number;
+    content: string;
+    displayOrder: number;
+    options: { id: number; content: string; isCorrect: boolean }[];
+  };
+  onClose: () => void;
+  onSuccess: () => void;
+}
+
+function QuizQuestionEditorModal({ question, onClose, onSuccess }: QuizQuestionEditorProps) {
   const [content, setContent] = useState(question.content);
-  const [options, setOptions] = useState<any[]>(JSON.parse(JSON.stringify(question.options)));
+  const [options, setOptions] = useState<{ id: number; content: string; isCorrect: boolean }[]>(
+    JSON.parse(JSON.stringify(question.options))
+  );
 
   const updateMutation = useMutation({
     mutationFn: () => materialsApi.updateQuizQuestion(question.id, { content, options }),
