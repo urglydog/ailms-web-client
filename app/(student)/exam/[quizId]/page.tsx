@@ -189,8 +189,8 @@ export default function AntiCheatExamPage() {
           setIsStarted(true);
           toast.success('Bắt đầu làm bài. Vui lòng không chuyển tab!');
         },
-        onError: () => {
-          toast.error('Không thể tải bài thi, có thể khóa học này chưa có Quiz chính thức.');
+        onError: (err: any) => {
+          toast.error(err.message || err.response?.data?.message || err.response?.data?.detail || 'Không thể tải bài thi, có thể khóa học này chưa có Quiz chính thức.');
         }
       });
     } catch {
