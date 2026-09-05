@@ -15,11 +15,19 @@ export const useSubmitQuiz = () => {
   });
 };
 
-export const useQuizHistory = (courseId: number) => {
+export const useQuizHistory = (quizId: number) => {
   return useQuery({
-    queryKey: ['quizHistory', courseId],
-    queryFn: () => quizApi.getAttemptHistory(courseId),
-    enabled: !!courseId,
+    queryKey: ['quizHistory', quizId],
+    queryFn: () => quizApi.getAttemptHistory(quizId),
+    enabled: !!quizId,
+  });
+};
+
+export const useAttemptDetail = (attemptId: number) => {
+  return useQuery({
+    queryKey: ['attemptDetail', attemptId],
+    queryFn: () => quizApi.getAttemptDetail(attemptId),
+    enabled: !!attemptId,
   });
 };
 
