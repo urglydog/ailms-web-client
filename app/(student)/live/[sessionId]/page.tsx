@@ -169,9 +169,16 @@ function LiveRoomContent({
   const subtitleTrackId = activeTracks?.find((t) => t.targetLanguage === subtitleSelection.selectedLanguage)?.id ?? null;
   const { originalText, translatedText } = useLiveSubtitles(subtitleSelection.selectedLanguage, subtitleTrackId);
 
-  const micTracks = useTracks([Track.Source.Microphone]);
+  // BUG THẬT (05/09/2026): chỉ lọc `Track.Source.Microphone` — giảng viên phát audio nguồn qua
+  // "chia sẻ màn hình + chia sẻ âm thanh hệ thống" (control room, ví dụ mở 1 tab video làm nguồn,
+  // đúng kiểu bạn đã test) publish audio ở `Track.Source.ScreenShareAudio`, KHÁC hẳn Microphone —
+  // track đó không nằm trong danh sách này nên không bao giờ bị unsubscribe, cứ phát mãi dù đã
+  // chọn nghe bản dịch. Track dịch (Translation Agent) LUÔN publish ở source Microphone (cố định
+  // trong `translation_agent.py`) bất kể nguồn gốc thật của giảng viên là mic hay screen-share-audio
+  // — nên phải lọc CẢ 2 nguồn gốc mới bắt đủ mọi trường hợp audio gốc có thể tới từ đâu.
+  const originalAudioTracks = useTracks([Track.Source.Microphone, Track.Source.ScreenShareAudio]);
   useEffect(() => {
-    for (const ref of micTracks) {
+    for (const ref of originalAudioTracks) {
       if (!(ref.publication instanceof RemoteTrackPublication)) continue;
       const isTranslatedTrack = ref.publication.trackName.startsWith(TRANSLATED_TRACK_PREFIX);
       const shouldSubscribe = audioSelection.selectedLanguage
@@ -181,7 +188,7 @@ function LiveRoomContent({
         ref.publication.setSubscribed(shouldSubscribe);
       }
     }
-  }, [micTracks, audioSelection.selectedLanguage]);
+  }, [originalAudioTracks, audioSelection.selectedLanguage]);
 
   const handleToggleOriginalSubtitle = (checked: boolean) => {
     if (!isAuthenticated) {
