@@ -116,5 +116,11 @@ export const materialsApi = {
     api.put(`/api/v1/instructor/quizzes/${id}/set-official`, undefined, { token: authToken() }),
     
   updateQuizSettings: (id: number, req: Record<string, unknown>) =>
-    api.put(`/api/v1/instructor/quizzes/${id}/settings`, req, { token: authToken() })
+    api.put(`/api/v1/instructor/quizzes/${id}/settings`, req, { token: authToken() }),
+
+  updateQuizQuestion: (questionId: number, req: Record<string, unknown>) =>
+    api.put(`/api/v1/instructor/quizzes/questions/${questionId}`, req, { token: authToken() }),
+
+  deleteQuizQuestion: (questionId: number) =>
+    api.delete(`/api/v1/instructor/quizzes/questions/${questionId}`, { token: authToken() })
 };
