@@ -4,6 +4,22 @@ import { useState } from 'react';
 import { useReviewFlashcard } from '@/hooks/useFlashcards';
 import { toast } from 'sonner';
 
+/** Map mã ngôn ngữ backend → BCP-47 tag cho Web Speech API */
+const LANGUAGE_MAP: Record<string, string> = {
+  vi: 'vi-VN',
+  en: 'en-US',
+  ja: 'ja-JP',
+  ko: 'ko-KR',
+  zh: 'zh-CN',
+  fr: 'fr-FR',
+  de: 'de-DE',
+  es: 'es-ES',
+  pt: 'pt-PT',
+  ru: 'ru-RU',
+  th: 'th-TH',
+  id: 'id-ID',
+};
+
 interface Flashcard {
   id: number;
   frontText: string;
@@ -15,7 +31,8 @@ interface Flashcard {
   isDue?: boolean;
 }
 
-export function FlashcardViewer({ flashcards }: { flashcards: Flashcard[] }) {
+/** `language` khớp với trường `language` của MaterialGeneration (ví dụ: 'vi', 'en', 'ja'). */
+export function FlashcardViewer({ flashcards, language }: { flashcards: Flashcard[]; language?: string }) {
   const [currentIdx, setCurrentIdx] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const { mutate: reviewCard } = useReviewFlashcard();
@@ -47,14 +64,27 @@ export function FlashcardViewer({ flashcards }: { flashcards: Flashcard[] }) {
 
   const handleSpeak = (text: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    if ('speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'vi-VN'; // Assuming Vietnamese content
-      window.speechSynthesis.speak(utterance);
-    } else {
+    if (!('speechSynthesis' in window)) {
       toast.error('Trình duyệt không hỗ trợ phát âm thanh.');
+      return;
     }
+    // Chuyển mã ngôn ngữ backend sang BCP-47; nếu không xác định thì dùng ngôn ngữ mặc định trình duyệt
+    const langCode = language?.toLowerCase().split('-')[0] ?? '';
+    const bcp47 = LANGUAGE_MAP[langCode] ?? '';
+    if (!bcp47) {
+      // Ngôn ngữ không xác định — ẩn tính năng, không nên phát sai
+      toast.info('Ngôn ngữ của bộ thẻ chưa được hỗ trợ phát âm.');
+      return;
+    }
+    window.speechSynthesis.cancel(); // Dừng bất kỳ phát âm đang chạy
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = bcp47;
+    window.speechSynthesis.speak(utterance);
   };
+
+  /** Ẩn nút phát âm nếu ngôn ngữ không xác định hoặc không được hỗ trợ */
+  const langCode = language?.toLowerCase().split('-')[0] ?? '';
+  const isSpeakSupported = !!LANGUAGE_MAP[langCode] && 'speechSynthesis' in (typeof window !== 'undefined' ? window : {});
 
   const handleRate = (quality: number, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -89,13 +119,15 @@ export function FlashcardViewer({ flashcards }: { flashcards: Flashcard[] }) {
           
           {/* Front */}
           <div className="absolute inset-0 backface-hidden bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border-2 border-line-soft flex flex-col items-center justify-center p-8 group-hover:border-accent/30 transition-colors">
+            {isSpeakSupported && (
             <button 
               onClick={(e) => handleSpeak(card.frontText, e)}
               className="absolute top-4 right-4 p-2 text-ink-muted hover:text-accent bg-surface hover:bg-surface-hover rounded-full transition-colors"
-              title="Nghe phát âm"
+              title={`Nghe phát âm (${LANGUAGE_MAP[langCode]})`}
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
             </button>
+            )}
             <h3 className="text-3xl font-display font-medium text-ink text-center leading-relaxed">
               {card.frontText}
             </h3>
@@ -114,13 +146,15 @@ export function FlashcardViewer({ flashcards }: { flashcards: Flashcard[] }) {
 
           {/* Back */}
           <div className="absolute inset-0 backface-hidden bg-accent text-white rounded-2xl shadow-lg flex flex-col items-center justify-center p-8 rotate-y-180">
+            {isSpeakSupported && (
             <button 
               onClick={(e) => handleSpeak(card.backText, e)}
               className="absolute top-4 right-4 p-2 text-white/70 hover:text-white bg-black/10 hover:bg-black/20 rounded-full transition-colors"
-              title="Nghe phát âm"
+              title={`Nghe phát âm (${LANGUAGE_MAP[langCode]})`}
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
             </button>
+            )}
             <h3 className="text-3xl font-display font-medium text-center leading-relaxed">
               {card.backText}
             </h3>
