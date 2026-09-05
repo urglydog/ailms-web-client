@@ -929,9 +929,7 @@ function QuizQuestionEditorModal({ question, onClose, onSuccess }: QuizQuestionE
   });
 
   const handleToggleCorrect = (idx: number) => {
-    const newOpts = [...options];
-    newOpts.forEach((o, i) => o.isCorrect = i === idx);
-    setOptions(newOpts);
+    setOptions(options.map((o, i) => ({ ...o, isCorrect: i === idx })));
   };
 
   return (
@@ -961,9 +959,7 @@ function QuizQuestionEditorModal({ question, onClose, onSuccess }: QuizQuestionE
                 type="text" 
                 value={opt.content} 
                 onChange={e => {
-                  const newOpts = [...options];
-                  newOpts[idx].content = e.target.value;
-                  setOptions(newOpts);
+                  setOptions(options.map((o, i) => i === idx ? { ...o, content: e.target.value } : o));
                 }} 
                 className={`flex-1 p-2 bg-transparent border-b ${opt.isCorrect ? 'border-emerald-200 focus:border-emerald-500' : 'border-gray-300 focus:border-indigo-500'} focus:outline-none text-sm font-medium`} 
               />
