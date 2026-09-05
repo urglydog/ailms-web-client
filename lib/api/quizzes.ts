@@ -22,6 +22,9 @@ export interface StartRes {
   attemptId: number;
   quizId: number;
   questions: QuestionDto[];
+  isProctored?: boolean;
+  maxViolations?: number;
+  durationMinutes?: number | null;
 }
 
 export interface SubmitReq {
