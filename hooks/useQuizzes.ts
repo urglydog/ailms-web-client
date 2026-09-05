@@ -4,7 +4,7 @@ import { StartRes, SubmitReq, SubmitRes, HistoryRes } from '@/lib/api/quizzes';
 
 export const useStartQuiz = () => {
   return useMutation({
-    mutationFn: (courseId: number) => quizApi.startAttempt(courseId),
+    mutationFn: (quizId: number) => quizApi.startAttempt(quizId),
   });
 };
 

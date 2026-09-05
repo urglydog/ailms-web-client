@@ -82,75 +82,11 @@ export function MaterialManager({ courseId }: { courseId: number }) {
   };
 
   const filteredOfficial = officialMaterials?.filter(m => m.isOfficial);
+  const [activeTab, setActiveTab] = useState<'OFFICIAL' | 'PERSONAL'>('OFFICIAL');
 
-  return (
-    <div className="flex flex-col gap-8">
-
-      {/* Official Materials & Exams Section */}
-      {filteredOfficial && filteredOfficial.length > 0 && (
-        <div className="card p-6 bg-gradient-to-r from-blue-950 via-slate-900 to-indigo-950 text-white rounded-2xl shadow-xl border border-indigo-900/40">
-          <div className="flex items-center justify-between mb-4 border-b border-indigo-800/50 pb-3">
-            <div>
-              <h2 className="font-display text-lg font-bold flex items-center gap-2 text-white">
-                <span>🎓</span> Bài Thi & Học Liệu Chính Thức Khóa Học
-              </h2>
-              <p className="text-xs text-blue-200 mt-0.5">
-                Các bài kiểm tra trắc nghiệm, sơ đồ tư duy & bộ thẻ ôn tập do Giảng viên phát hành.
-              </p>
-            </div>
-            <span className="bg-emerald-500/20 text-emerald-300 font-extrabold text-xs px-3 py-1 rounded-full border border-emerald-500/30">
-              {filteredOfficial.length} Mục chính thức
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {filteredOfficial.map((item) => (
-              <div key={item.id} className="bg-white/10 backdrop-blur-md border border-white/10 rounded-xl p-4 flex flex-col justify-between space-y-3 hover:border-indigo-400/50 transition-all">
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-extrabold uppercase px-2 py-0.5 rounded bg-indigo-500/30 text-indigo-200 border border-indigo-400/30">
-                      {item.materialType}
-                    </span>
-                    {item.isProctored && (
-                      <span className="text-[11px] font-extrabold text-red-300 bg-red-950/60 px-2 py-0.5 rounded-full border border-red-500/50 flex items-center gap-1">
-                        <span>🔴</span> AI Anti-Cheat
-                      </span>
-                    )}
-                  </div>
-                  <h3 className="font-bold text-sm text-white">{item.title || 'Học liệu khóa học'}</h3>
-                  <div className="text-xs text-blue-200/80 space-y-1">
-                    {item.materialType === 'QUIZ' && item.questionCount && (
-                      <p>• Quy mô bài thi: <strong>{item.questionCount} câu hỏi</strong></p>
-                    )}
-                    {item.durationMinutes && (
-                      <p>• Thời gian làm bài: <strong>{item.durationMinutes} phút</strong></p>
-                    )}
-                  </div>
-                </div>
-
-                {item.materialType === 'QUIZ' && item.materialId ? (
-                  <Link
-                    href={item.isProctored ? `/exam/${item.materialId}` : `/materials/${item.id}`}
-                    className="w-full text-center bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-bold py-2.5 rounded-lg shadow transition-all block"
-                  >
-                    {item.isProctored ? '✍️ Vào Thi AI Anti-Cheat' : '✍️ Vào Làm Bài Thi'}
-                  </Link>
-                ) : (
-                  <Link
-                    href={`/materials/${item.id}`}
-                    className="w-full text-center bg-white/20 hover:bg-white/30 text-white text-xs font-bold py-2.5 rounded-lg transition-all block border border-white/20"
-                  >
-                    👁️ Xem Học Liệu
-                  </Link>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Student Personal Generation Form */}
-      <div className="card p-6">
+  const personalTabContent = (
+    <>
+      <div className="card p-6 mb-8">
         <h2 className="font-display text-xl font-bold mb-4">Tạo học liệu AI mới</h2>
         <div className="grid gap-4 sm:grid-cols-3 mb-6">
           <div>
@@ -322,6 +258,99 @@ export function MaterialManager({ courseId }: { courseId: number }) {
           <p className="text-sm text-ink-muted">Chưa có học liệu cá nhân nào được tạo.</p>
         )}
       </div>
+    </>
+  );
+
+  return (
+    <div className="flex flex-col gap-8">
+      {/* Tabs Navigation */}
+      <div className="flex border-b border-line gap-6">
+        <button
+          onClick={() => setActiveTab('OFFICIAL')}
+          className={`pb-3 text-sm font-bold border-b-2 transition-colors ${
+            activeTab === 'OFFICIAL' ? 'border-accent text-accent' : 'border-transparent text-ink-muted hover:text-ink'
+          }`}
+        >
+          Kho Học Liệu Official
+        </button>
+        <button
+          onClick={() => setActiveTab('PERSONAL')}
+          className={`pb-3 text-sm font-bold border-b-2 transition-colors ${
+            activeTab === 'PERSONAL' ? 'border-accent text-accent' : 'border-transparent text-ink-muted hover:text-ink'
+          }`}
+        >
+          Tạo Học Liệu Cá Nhân
+        </button>
+      </div>
+
+      {activeTab === 'OFFICIAL' ? (
+        <div className="card p-6 bg-gradient-to-r from-blue-950 via-slate-900 to-indigo-950 text-white rounded-2xl shadow-xl border border-indigo-900/40">
+          <div className="flex items-center justify-between mb-4 border-b border-indigo-800/50 pb-3">
+            <div>
+              <h2 className="font-display text-lg font-bold flex items-center gap-2 text-white">
+                <span>🎓</span> Bài Thi & Học Liệu Chính Thức Khóa Học
+              </h2>
+              <p className="text-xs text-blue-200 mt-0.5">
+                Các bài kiểm tra trắc nghiệm, sơ đồ tư duy & bộ thẻ ôn tập do Giảng viên phát hành.
+              </p>
+            </div>
+            <span className="bg-emerald-500/20 text-emerald-300 font-extrabold text-xs px-3 py-1 rounded-full border border-emerald-500/30">
+              {filteredOfficial?.length || 0} Mục chính thức
+            </span>
+          </div>
+
+          {/* Official materials content */}
+          {filteredOfficial && filteredOfficial.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {filteredOfficial.map((item) => (
+                <div key={item.id} className="bg-white/10 backdrop-blur-md border border-white/10 rounded-xl p-4 flex flex-col justify-between space-y-3 hover:border-indigo-400/50 transition-all">
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-extrabold uppercase px-2 py-0.5 rounded bg-indigo-500/30 text-indigo-200 border border-indigo-400/30">
+                        {item.materialType}
+                      </span>
+                      {item.isProctored && (
+                        <span className="text-[11px] font-extrabold text-red-300 bg-red-950/60 px-2 py-0.5 rounded-full border border-red-500/50 flex items-center gap-1">
+                          <span>🔴</span> AI Anti-Cheat
+                        </span>
+                      )}
+                    </div>
+                    <h3 className="font-bold text-sm text-white">{item.title || 'Học liệu khóa học'}</h3>
+                    <div className="text-xs text-blue-200/80 space-y-1">
+                      {item.materialType === 'QUIZ' && item.questionCount && (
+                        <p>• Quy mô bài thi: <strong>{item.questionCount} câu hỏi</strong></p>
+                      )}
+                      {item.durationMinutes && (
+                        <p>• Thời gian làm bài: <strong>{item.durationMinutes} phút</strong></p>
+                      )}
+                    </div>
+                  </div>
+
+                  {item.materialType === 'QUIZ' && item.materialId ? (
+                    <Link
+                      href={item.isProctored ? `/exam/${item.materialId}` : `/materials/${item.id}`}
+                      className="w-full text-center bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-bold py-2.5 rounded-lg shadow transition-all block"
+                    >
+                      {item.isProctored ? '✍️ Vào Thi AI Anti-Cheat' : '✍️ Vào Làm Bài Thi'}
+                    </Link>
+                  ) : (
+                    <Link
+                      href={`/materials/${item.id}`}
+                      className="w-full text-center bg-white/20 hover:bg-white/30 text-white text-xs font-bold py-2.5 rounded-lg transition-all block border border-white/20"
+                    >
+                      👁️ Xem Học Liệu
+                    </Link>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-blue-200/60 text-sm font-medium border border-dashed border-indigo-800/50 rounded-xl bg-indigo-900/20">
+              Giảng viên chưa phát hành Học liệu Official nào cho khóa học này.
+            </div>
+          )}
+        </div>
+      ) : personalTabContent}
     </div>
   );
 }
