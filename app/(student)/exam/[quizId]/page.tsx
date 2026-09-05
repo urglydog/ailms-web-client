@@ -23,6 +23,10 @@ export default function AntiCheatExamPage() {
   const [isModelLoaded, setIsModelLoaded] = useState(false);
   const [faceStatus, setFaceStatus] = useState<'DETECTING' | 'FACE_FOUND' | 'NO_FACE'>('DETECTING');
   
+  // Đồng hồ đếm ngược (giây)
+  const [timeLeft, setTimeLeft] = useState<number | null>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
   const lastViolationTime = useRef(0);
   const detectInterval = useRef<NodeJS.Timeout | null>(null);
 
@@ -32,6 +36,9 @@ export default function AntiCheatExamPage() {
   const [attemptData, setAttemptData] = useState<StartRes | null>(null);
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [result, setResult] = useState<SubmitRes | null>(null);
+  const [submitTime, setSubmitTime] = useState<Date | null>(null);
+  const [elapsedSeconds, setElapsedSeconds] = useState<number>(0);
+  const startTimeRef = useRef<Date | null>(null);
   
   // State for AI Explanations
   const [explanations, setExplanations] = useState<Record<number, { loading: boolean; text?: string }>>({});
@@ -68,22 +75,26 @@ export default function AntiCheatExamPage() {
 
   // Hàm nộp bài
   const submitExam = useCallback(() => {
-    if (isSubmitting || !attemptData) return;
+    if (!attemptData || isSubmitting) return;
     setIsSubmitting(true);
-    submitQuiz(
-      { attemptId: attemptData.attemptId, data: { answers } },
-      {
-        onSuccess: (data) => {
-          setResult(data);
-          toast.success(`Đã nộp bài! Bạn đạt ${data.score} điểm.`);
-        },
-        onError: () => {
-          toast.error('Có lỗi xảy ra khi nộp bài.');
-          setIsSubmitting(false);
-        }
+    // Dừng timer khi nộp bài
+    if (timerRef.current) clearInterval(timerRef.current);
+    // Tính thời gian làm bài thực tế
+    const elapsed = startTimeRef.current ? Math.floor((Date.now() - startTimeRef.current.getTime()) / 1000) : 0;
+    setElapsedSeconds(elapsed);
+    submitQuiz({ attemptId: attemptData.attemptId, data: { answers } }, {
+      onSuccess: (data) => {
+        setResult(data);
+        setSubmitTime(new Date());
+        // Dừng stream
+        if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
+      },
+      onError: () => {
+        toast.error('Có lỗi khi nộp bài. Vui lòng thử lại.');
+        setIsSubmitting(false);
       }
-    );
-  }, [isSubmitting, attemptData, answers, submitQuiz]);
+    });
+  }, [attemptData, answers, isSubmitting, submitQuiz, mediaStream]);
 
   // Hàm xử lý vi phạm với debounce (tránh trigger liên tục)
   const handleViolation = useCallback((reason: string) => {
@@ -199,6 +210,31 @@ export default function AntiCheatExamPage() {
     }
   };
 
+  // Đồng hồ đếm ngược: bắt đầu khi exam started và có durationMinutes
+  useEffect(() => {
+    if (!isStarted || !attemptData?.durationMinutes || result) return;
+    // Khởi tạo thời gian
+    const totalSeconds = attemptData.durationMinutes * 60;
+    setTimeLeft(totalSeconds);
+    startTimeRef.current = new Date();
+    timerRef.current = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev === null || prev <= 1) {
+          // Hết giờ → tự nộp bài
+          clearInterval(timerRef.current!);
+          toast.warning('⏱ Hết giờ! Bài thi đã được tự động nộp.');
+          setTimeout(() => submitExam(), 300);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isStarted, attemptData?.durationMinutes, result]);
+
   // Gắn stream
   useEffect(() => {
     if (isStarted && videoRef.current && mediaStream && !result) {
@@ -210,22 +246,64 @@ export default function AntiCheatExamPage() {
     }
   }, [isStarted, mediaStream, result]);
 
+  // Format thời gian mm:ss
+  const formatTime = (seconds: number) => {
+    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+    const s = (seconds % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  };
+
   if (result) {
+    const scoreNum = Number(result.score);
+    const isPassed = scoreNum >= 5;
+    const formatElapsed = (s: number) => {
+      const m = Math.floor(s / 60);
+      const sec = s % 60;
+      return m > 0 ? `${m} phút ${sec} giây` : `${sec} giây`;
+    };
     return (
       <div className="min-h-dvh bg-surface p-8">
         <div className="max-w-4xl mx-auto">
-          <div className="card p-12 text-center mb-8">
-            <h2 className="font-display text-2xl font-bold mb-4 text-green-600">Hoàn thành bài thi!</h2>
-            <div className="text-4xl font-bold text-accent mb-6">{result.score}/10 Điểm</div>
-            <p className="text-ink-muted mb-8">
-              Bạn đã trả lời đúng {result.correctCount} trên tổng số {result.totalQuestions} câu hỏi.
-            </p>
-            <button 
-              onClick={() => router.push('/progress')}
-              className="bg-ink text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-gray-800 transition-all"
-            >
-              Quay lại Tiến độ học tập
-            </button>
+          {/* Kết quả chính */}
+          <div className={`card p-10 text-center mb-8 border-t-4 ${isPassed ? 'border-green-500' : 'border-red-500'}`}>
+            <div className={`text-5xl mb-4 ${isPassed ? '' : ''}`}>{isPassed ? '🎉' : '📝'}</div>
+            <h2 className={`font-display text-2xl font-bold mb-2 ${isPassed ? 'text-green-600' : 'text-red-600'}`}>
+              {isPassed ? 'Xuất sắc! Bài thi hoàn thành' : 'Bài thi đã nộp'}
+            </h2>
+            <div className={`text-5xl font-extrabold my-4 ${isPassed ? 'text-green-600' : 'text-red-500'}`}>
+              {result.score}/10
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 text-sm">
+              <div className="bg-surface-hover rounded-xl p-3">
+                <div className="text-ink-muted text-xs font-semibold uppercase mb-1">Câu đúng</div>
+                <div className="text-2xl font-bold text-green-600">{result.correctCount}</div>
+              </div>
+              <div className="bg-surface-hover rounded-xl p-3">
+                <div className="text-ink-muted text-xs font-semibold uppercase mb-1">Câu sai</div>
+                <div className="text-2xl font-bold text-red-500">{result.totalQuestions - result.correctCount}</div>
+              </div>
+              <div className="bg-surface-hover rounded-xl p-3">
+                <div className="text-ink-muted text-xs font-semibold uppercase mb-1">Tổng câu</div>
+                <div className="text-2xl font-bold text-ink">{result.totalQuestions}</div>
+              </div>
+              <div className="bg-surface-hover rounded-xl p-3">
+                <div className="text-ink-muted text-xs font-semibold uppercase mb-1">Thời gian</div>
+                <div className="text-sm font-bold text-ink">{formatElapsed(elapsedSeconds)}</div>
+              </div>
+            </div>
+            {submitTime && (
+              <p className="text-xs text-ink-muted mt-4">
+                📅 Nộp lúc: {submitTime.toLocaleString('vi-VN')}
+              </p>
+            )}
+            <div className="flex justify-center gap-4 mt-8">
+              <button 
+                onClick={() => router.push('/my-courses')}
+                className="bg-ink text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-gray-800 transition-all"
+              >
+                Về khóa học
+              </button>
+            </div>
           </div>
 
           <div className="space-y-6">
@@ -299,12 +377,25 @@ export default function AntiCheatExamPage() {
             <h1 className="font-display text-2xl font-bold text-ink flex items-center gap-2">
               <span className="text-red-600">🔴</span> Phòng Thi Trực Tuyến
             </h1>
-            <p className="text-sm text-ink-muted mt-1">Mã khóa học: {quizId}</p>
+            <p className="text-sm text-ink-muted mt-1">Mã đề thi: {quizId}</p>
           </div>
-          <div className="text-right">
-            <div className="text-sm font-semibold text-ink-muted">Cảnh báo vi phạm</div>
-            <div className={`text-xl font-bold ${violationCount >= 2 ? 'text-red-600' : 'text-amber-600'}`}>
-              {violationCount} / 3
+          <div className="flex items-center gap-6">
+            {/* Đồng hồ đếm ngược */}
+            {isStarted && timeLeft !== null && (
+              <div className={`flex items-center gap-2 font-mono text-xl font-bold px-4 py-2 rounded-xl border-2 ${
+                timeLeft <= 60 ? 'border-red-500 text-red-600 bg-red-50 animate-pulse' :
+                timeLeft <= 180 ? 'border-amber-400 text-amber-600 bg-amber-50' :
+                'border-line text-ink bg-surface-hover'
+              }`}>
+                <span>⏱</span>
+                <span>{formatTime(timeLeft)}</span>
+              </div>
+            )}
+            <div className="text-right">
+              <div className="text-sm font-semibold text-ink-muted">Cảnh báo vi phạm</div>
+              <div className={`text-xl font-bold ${violationCount >= 2 ? 'text-red-600' : 'text-amber-600'}`}>
+                {violationCount} / 3
+              </div>
             </div>
           </div>
         </div>

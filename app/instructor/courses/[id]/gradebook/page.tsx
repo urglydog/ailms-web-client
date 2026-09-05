@@ -59,17 +59,19 @@ export default function InstructorGradebookPage() {
             <div className="flex items-center gap-2 text-sm text-ink-muted mb-1">
               <button onClick={() => router.push('/instructor')} className="hover:underline">Giảng viên</button>
               <span>/</span>
-              <span>Quản lý Bảng điểm</span>
+              <button onClick={() => router.push('/instructor/materials')} className="hover:underline text-accent">Kho Học Liệu & Đề Thi</button>
+              <span>/</span>
+              <span>Bảng điểm</span>
             </div>
             <h1 className="font-display text-2xl font-bold text-ink">
               Bảng Điểm Lớp Học: <span className="text-accent">{gradebook.courseTitle}</span>
             </h1>
           </div>
           <button 
-            onClick={() => router.push(`/instructor/courses/${courseId}/materials`)}
+            onClick={() => router.push('/instructor/materials')}
             className="bg-ink text-white px-4 py-2 rounded-xl text-sm font-bold shadow hover:bg-gray-800 transition-all"
           >
-            Quản lý Học liệu & Quiz
+            📚 Kho Học Liệu & Đề Thi
           </button>
         </div>
 

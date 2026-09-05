@@ -112,7 +112,7 @@ export default function MaterialDetailPage() {
         ) : material.materialType === 'FLASHCARD' ? (
           <div className="py-4">
             {material.flashcards && material.flashcards.length > 0 ? (
-              <FlashcardViewer flashcards={material.flashcards} />
+          <FlashcardViewer flashcards={material.flashcards} language={material.language} />
             ) : (
               <div className="card p-6 text-center text-ink-muted">
                 {material.status === 'COMPLETED' ? 'Bộ flashcard này không có thẻ nào.' : 'Bộ flashcard đang được AI xử lý, vui lòng quay lại sau...'}
