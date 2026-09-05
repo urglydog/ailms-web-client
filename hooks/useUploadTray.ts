@@ -2,8 +2,9 @@ import { useQueryClient } from '@tanstack/react-query';
 import { coursesApi } from '@/lib/api/courses';
 import { ApiError, UploadCancelledError } from '@/lib/api/client';
 import { lessonsApi } from '@/lib/api/lessons';
+import { liveApi } from '@/lib/api/live';
 import { useUploadTrayStore } from '@/lib/stores/uploadTrayStore';
-import type { CourseEditDetail } from '@/types/domain';
+import type { CourseEditDetail, LiveSession } from '@/types/domain';
 
 /**
  * Bắt đầu upload (video/tài liệu/ảnh bìa) và đẩy tiến độ vào {@link useUploadTrayStore} —
@@ -82,6 +83,25 @@ export function useStartCourseThumbnailUpload(courseId: number) {
       .then((updated) => {
         useUploadTrayStore.getState().markSuccess(id);
         queryClient.invalidateQueries({ queryKey: ['courses', 'mine', courseId] });
+        onDone?.(updated);
+      })
+      .catch((err) => useUploadTrayStore.getState().markError(id, toErrorMessage(err)));
+  };
+}
+
+/** F11.9 mở rộng — ảnh riêng cho buổi live, cùng khuôn với ảnh bìa khóa học ở trên. */
+export function useStartLiveThumbnailUpload(sessionId: number) {
+  const queryClient = useQueryClient();
+
+  return (file: File, label: string, onDone?: (updated: LiveSession) => void) => {
+    const id = newTaskId();
+    useUploadTrayStore.getState().addTask({ id, label, targetType: 'live-thumbnail', targetId: sessionId });
+
+    liveApi
+      .uploadThumbnail(sessionId, file, (percent) => useUploadTrayStore.getState().updateProgress(id, percent))
+      .then((updated) => {
+        useUploadTrayStore.getState().markSuccess(id);
+        queryClient.invalidateQueries({ queryKey: ['live-sessions', sessionId] });
         onDone?.(updated);
       })
       .catch((err) => useUploadTrayStore.getState().markError(id, toErrorMessage(err)));

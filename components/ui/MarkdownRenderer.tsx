@@ -1,4 +1,4 @@
-import ReactMarkdown from 'react-markdown';
+import ReactMarkdown, { defaultUrlTransform } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
 import type { Components } from 'react-markdown';
@@ -10,6 +10,22 @@ function injectTimestampLinks(content: string): string {
     const sec = Number(m) * 60 + Number(s);
     return `[▶ ${m.padStart(2, '0')}:${s.padStart(2, '0')}](tutor-seek:${sec})`;
   });
+}
+
+/**
+ * BUG THẬT (05/09/2026): `react-markdown` mặc định LỌC BỎ mọi href không thuộc giao thức
+ * an toàn của nó (`http(s)`/`mailto`/`ircs`/`xmpp` — xem `defaultUrlTransform` trong
+ * `node_modules/react-markdown/lib/index.js`), thay bằng chuỗi rỗng `""`. Link nội bộ
+ * `tutor-seek:<giây>` mình tự tạo ở `injectTimestampLinks` bị strip mất TRƯỚC KHI tới
+ * component `a` bên dưới — `href` nhận được luôn là `""`, không bao giờ khớp
+ * `startsWith('tutor-seek:')`, nên rơi vào nhánh `<a href="" target="_blank">` mặc định:
+ * bấm vào mở tab mới trỏ về CHÍNH trang đang xem (href rỗng), video không hề được tua.
+ * Fix: thêm `tutor-seek:` vào danh sách được phép, mọi URL khác vẫn qua đúng
+ * `defaultUrlTransform` như cũ (không tắt hẳn sanitize — Gemini generation content vẫn
+ * cần được lọc URL an toàn bình thường, ví dụ link nguồn từ Google Search Grounding).
+ */
+function urlTransform(url: string): string {
+  return url.startsWith('tutor-seek:') ? url : defaultUrlTransform(url);
 }
 
 export function MarkdownRenderer({ content, onSeek }: { content: string; onSeek?: (sec: number) => void }) {
@@ -55,7 +71,7 @@ export function MarkdownRenderer({ content, onSeek }: { content: string; onSeek?
   /* eslint-enable @typescript-eslint/no-explicit-any */
 
   return (
-    <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
+    <ReactMarkdown remarkPlugins={[remarkGfm]} components={components} urlTransform={urlTransform}>
       {processedContent}
     </ReactMarkdown>
   );

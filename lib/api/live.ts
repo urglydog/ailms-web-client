@@ -1,4 +1,4 @@
-import { api } from '@/lib/api/client';
+import { api, uploadFile } from '@/lib/api/client';
 import { getAccessToken } from '@/lib/auth/token';
 import type { CreateLiveSessionInput, LiveSession, LiveSessionStartRes } from '@/types/domain';
 
@@ -21,5 +21,12 @@ export const liveApi = {
   end: (sessionId: number) =>
     api.post<LiveSession>(`/api/v1/live-sessions/${sessionId}/end`, undefined, {
       token: getAccessToken() ?? undefined,
+    }),
+
+  /** F11.9 mở rộng — ảnh riêng cho buổi live, không bắt buộc (fallback ảnh bìa khóa học ở BE). */
+  uploadThumbnail: (sessionId: number, file: File, onProgress?: (percent: number) => void) =>
+    uploadFile<LiveSession>(`/api/v1/live-sessions/${sessionId}/thumbnail`, file, {
+      token: getAccessToken() ?? undefined,
+      onProgress,
     }),
 };
