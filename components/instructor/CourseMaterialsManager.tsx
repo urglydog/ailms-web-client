@@ -276,8 +276,23 @@ function MaterialWorkspaceViewer({
     enabled: !!generationId,
   });
 
+  const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<'VIEW' | 'RAW_CODE'>('VIEW');
   const [flippedCards, setFlippedCards] = useState<Record<number, boolean>>({});
+  const [editingQuestion, setEditingQuestion] = useState<{
+    id: number;
+    content: string;
+    displayOrder: number;
+    options: { id: number; content: string; isCorrect: boolean }[];
+  } | null>(null);
+
+  const deleteQuestionMutation = useMutation({
+    mutationFn: (id: number) => materialsApi.deleteQuizQuestion(id),
+    onSuccess: () => {
+      toast.success('Đã xóa câu hỏi');
+      queryClient.invalidateQueries({ queryKey: ['material-detail', generationId] });
+    }
+  });
 
   const toggleCard = (id: number) => {
     setFlippedCards(prev => ({ ...prev, [id]: !prev[id] }));
@@ -363,6 +378,10 @@ function MaterialWorkspaceViewer({
                     <div className="flex items-start justify-between gap-3">
                       <div className="font-bold text-base text-gray-900">
                         <span className="text-blue-600 mr-2">Câu {idx + 1}:</span> {q.content}
+                      </div>
+                      <div className="flex gap-2 shrink-0">
+                        <button onClick={() => setEditingQuestion(q)} className="text-xs font-semibold bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg hover:bg-gray-200 border border-gray-200">Sửa</button>
+                        <button onClick={() => { if(confirm('Bạn chắc chắn muốn xóa câu hỏi này?')) deleteQuestionMutation.mutate(q.id); }} className="text-xs font-semibold bg-red-50 text-red-600 px-3 py-1.5 rounded-lg hover:bg-red-100 border border-red-200">Xóa</button>
                       </div>
                     </div>
 
@@ -470,6 +489,17 @@ function MaterialWorkspaceViewer({
 
         </div>
       ) : null}
+
+      {editingQuestion && (
+        <QuizQuestionEditorModal
+          question={editingQuestion}
+          onClose={() => setEditingQuestion(null)}
+          onSuccess={() => {
+            setEditingQuestion(null);
+            queryClient.invalidateQueries({ queryKey: ['material-detail', generationId] });
+          }}
+        />
+      )}
     </div>
   );
 }
@@ -865,6 +895,88 @@ function GenerateAiOfficialModal({ courseId, initialType, onClose, onSuccess }: 
             </button>
           </div>
         </form>
+      </div>
+    </div>
+  );
+}
+
+interface QuizQuestionEditorProps {
+  question: {
+    id: number;
+    content: string;
+    displayOrder: number;
+    options: { id: number; content: string; isCorrect: boolean }[];
+  };
+  onClose: () => void;
+  onSuccess: () => void;
+}
+
+function QuizQuestionEditorModal({ question, onClose, onSuccess }: QuizQuestionEditorProps) {
+  const [content, setContent] = useState(question.content);
+  const [options, setOptions] = useState<{ id: number; content: string; isCorrect: boolean }[]>(
+    JSON.parse(JSON.stringify(question.options))
+  );
+
+  const updateMutation = useMutation({
+    mutationFn: () => materialsApi.updateQuizQuestion(question.id, { content, options }),
+    onSuccess: () => {
+      toast.success('Đã lưu thay đổi câu hỏi');
+      onSuccess();
+    },
+    onError: (err: Error) => {
+      toast.error(err.message || 'Không thể lưu câu hỏi');
+    }
+  });
+
+  const handleToggleCorrect = (idx: number) => {
+    setOptions(options.map((o, i) => ({ ...o, isCorrect: i === idx })));
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+      <div className="bg-white p-6 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
+        <h3 className="font-bold text-lg mb-4 text-gray-900">Chỉnh sửa Nội Dung Câu Hỏi</h3>
+        
+        <label className="block text-sm font-semibold text-gray-700 mb-1">Nội dung câu hỏi</label>
+        <textarea 
+          value={content} 
+          onChange={e => setContent(e.target.value)} 
+          className="w-full border border-gray-300 p-3 rounded-xl mb-5 focus:border-indigo-500 focus:outline-none" 
+          rows={3}
+        />
+        
+        <label className="block text-sm font-semibold text-gray-700 mb-2">Các đáp án (Chọn 1 đáp án đúng)</label>
+        <div className="space-y-3">
+          {options.map((opt, idx) => (
+            <div key={idx} className={`flex gap-3 items-center p-3 rounded-xl border ${opt.isCorrect ? 'bg-emerald-50 border-emerald-300' : 'bg-gray-50 border-gray-200'}`}>
+              <input 
+                type="radio" 
+                checked={opt.isCorrect} 
+                onChange={() => handleToggleCorrect(idx)} 
+                className="w-5 h-5 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+              />
+              <input 
+                type="text" 
+                value={opt.content} 
+                onChange={e => {
+                  setOptions(options.map((o, i) => i === idx ? { ...o, content: e.target.value } : o));
+                }} 
+                className={`flex-1 p-2 bg-transparent border-b ${opt.isCorrect ? 'border-emerald-200 focus:border-emerald-500' : 'border-gray-300 focus:border-indigo-500'} focus:outline-none text-sm font-medium`} 
+              />
+            </div>
+          ))}
+        </div>
+        
+        <div className="mt-6 flex justify-end gap-3 border-t pt-4">
+          <button onClick={onClose} className="px-5 py-2 bg-gray-100 font-semibold text-gray-700 rounded-lg hover:bg-gray-200">Hủy</button>
+          <button 
+            onClick={() => updateMutation.mutate()} 
+            disabled={updateMutation.isPending}
+            className="px-5 py-2 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 shadow disabled:opacity-50"
+          >
+            {updateMutation.isPending ? 'Đang lưu...' : 'Lưu Thay Đổi'}
+          </button>
+        </div>
       </div>
     </div>
   );
