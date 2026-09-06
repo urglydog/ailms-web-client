@@ -3,10 +3,15 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, useRef, type KeyboardEvent } from 'react';
 import { useNotification } from '@/components/providers/NotificationProvider';
+import { useCart } from '@/hooks/useCart';
 
 export function Header() {
   const router = useRouter();
   const { notifications, unreadCount, markAllAsRead } = useNotification();
+  // Giỏ hàng (06/09/2026, mở rộng ngoài đặc tả gốc) — badge số lượng THẬT, thay số "2" gắn
+  // cứng cũ (icon giỏ hàng vốn để sẵn từ trước nhưng chưa từng nối API/route thật).
+  const { data: cartItems } = useCart();
+  const cartCount = cartItems?.length ?? 0;
   const [searchText, setSearchText] = useState('');
   const [showNotifications, setShowNotifications] = useState(false);
   const notificationRef = useRef<HTMLDivElement>(null);
@@ -190,9 +195,11 @@ export function Header() {
                 <circle cx="20" cy="21" r="1"></circle>
                 <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
               </svg>
-              <span className="absolute -right-1 -top-1 flex min-w-[18px] h-[18px] items-center justify-center rounded-full bg-cyan-600 px-1 text-[10.5px] font-bold text-white">
-                2
-              </span>
+              {cartCount > 0 && (
+                <span className="absolute -right-1 -top-1 flex min-w-[18px] h-[18px] items-center justify-center rounded-full bg-cyan-600 px-1 text-[10.5px] font-bold text-white">
+                  {cartCount}
+                </span>
+              )}
             </Link>
 
             {isLoggedIn ? (

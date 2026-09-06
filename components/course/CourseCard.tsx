@@ -2,10 +2,12 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import type { MouseEvent } from 'react';
 import { Badge } from '@/components/ui/Badge';
 import { StarRating } from '@/components/ui/StarRating';
 import type { CourseSummary } from '@/types/domain';
 import { useMyEnrollments } from '@/hooks/useEnrollments';
+import { useAddToCart, useCart } from '@/hooks/useCart';
 
 /**
  * Thẻ khoá học — dịch từ `CourseCard.dc.html` của Claude Design.
@@ -33,8 +35,24 @@ export function CourseCard({ course }: { course: CourseSummary }) {
   const enrollment = enrollments?.find((e) => e.courseId === course.id);
   const isOwned = !!enrollment;
 
-  const targetHref = isOwned && enrollment.firstLessonId 
-    ? `/learn/${enrollment.firstLessonId}` 
+  // Giỏ hàng (06/09/2026, mở rộng ngoài đặc tả gốc) — chỉ khóa TRẢ PHÍ, CHƯA sở hữu mới cần
+  // nút này (khóa miễn phí ghi danh thẳng, không qua giỏ hàng).
+  const { data: cartItems } = useCart();
+  const inCart = cartItems?.some((item) => item.courseId === course.id) ?? false;
+  const addToCart = useAddToCart();
+  const canAddToCart = !isOwned && !course.isFree;
+
+  const handleAddToCart = (e: MouseEvent) => {
+    // Cả thẻ là 1 <Link> — chặn điều hướng khi bấm đúng nút này (BR-CART-02: bấm lại khi đã
+    // có trong giỏ chỉ là no-op, không gọi lại API cho đỡ tốn request).
+    e.preventDefault();
+    e.stopPropagation();
+    if (inCart || addToCart.isPending) return;
+    addToCart.mutate(course.id);
+  };
+
+  const targetHref = isOwned && enrollment.firstLessonId
+    ? `/learn/${enrollment.firstLessonId}`
     : `/courses/${course.slug}`;
 
   return (
@@ -100,7 +118,7 @@ export function CourseCard({ course }: { course: CourseSummary }) {
           levelLabel={LEVEL_LABEL[course.level]}
         />
 
-        <div className="mt-auto flex items-center justify-between border-t border-line-soft pt-2">
+        <div className="mt-auto flex items-center justify-between gap-2 border-t border-line-soft pt-2">
           {isOwned ? (
             <span className="font-display text-[15px] font-bold text-accent">Đã sở hữu</span>
           ) : course.isFree ? (
@@ -110,7 +128,24 @@ export function CourseCard({ course }: { course: CourseSummary }) {
               {formatPrice(course.price)}
             </span>
           )}
-          <span className="text-xs font-semibold text-accent">{isOwned ? 'Vào học ngay →' : 'Xem chi tiết →'}</span>
+
+          {/* Giỏ hàng (06/09/2026, mở rộng ngoài đặc tả gốc) — thay hẳn gợi ý "Xem chi tiết →"
+              cũ: cả thẻ đã là 1 <Link> nên bấm đâu cũng vào được trang chi tiết, không cần
+              nhắc lại; chỗ này dành cho hành động THẬT SỰ hữu ích hơn — thêm vào giỏ. */}
+          {canAddToCart && (
+            <button
+              type="button"
+              onClick={handleAddToCart}
+              disabled={inCart || addToCart.isPending}
+              className={`shrink-0 rounded-full px-3.5 py-2 text-[13px] font-semibold transition-colors ${
+                inCart
+                  ? 'bg-success/10 text-success'
+                  : 'bg-accent text-white hover:bg-accent-dark'
+              } disabled:cursor-not-allowed`}
+            >
+              {inCart ? '✓ Đã có trong giỏ' : addToCart.isPending ? 'Đang thêm...' : 'Thêm vào giỏ hàng'}
+            </button>
+          )}
         </div>
       </div>
     </Link>
