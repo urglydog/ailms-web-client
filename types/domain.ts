@@ -525,6 +525,9 @@ export interface TutorAskReq {
   question: string;
   /** Bỏ trống ở tin đầu tiên — BE tự tạo hoặc tái sử dụng phiên gần nhất. */
   sessionId?: number | null;
+  /** UC30 mở rộng (06/09/2026) — bài học học viên ĐANG MỞ lúc hỏi, dùng làm ngữ cảnh MẶC ĐỊNH
+   * (không nói rõ bài nào thì trả lời theo bài này; nói rõ 1 bài KHÁC trong khóa thì AI tự đổi). */
+  currentLessonId: number;
   attachments?: TutorAttachmentReq[];
 }
 
@@ -534,6 +537,9 @@ export interface TutorAskRes {
   /** Giây, BR-TUTOR-02 — luôn có ≥1 phần tử khi câu trả lời liên quan bài giảng. */
   citedTimestamps: number[];
   tokenUsed: number | null;
+  /** Bài học THẬT SỰ được dùng làm ngữ cảnh — có thể khác `currentLessonId` đã gửi lên nếu học
+   * viên hỏi rõ về 1 bài khác. Dùng để biết `citedTimestamps` thuộc video bài học nào. */
+  contextLessonId: number;
 }
 
 /** UC30 mở rộng — tệp đính kèm khi hiển thị (vừa gửi, hoặc phục hồi từ lịch sử). `previewUrl`
@@ -553,6 +559,10 @@ export interface TutorMessage {
   content: string;
   citedTimestamps: number[];
   attachments: TutorAttachment[];
+  /** UC30 mở rộng (06/09/2026) — bài học `citedTimestamps` thực sự thuộc về, null ở tin nhắn
+   * USER. Có thể khác bài học đang mở nếu học viên hỏi rõ về 1 bài khác trong khóa — click vào
+   * mốc thời gian phải điều hướng đúng bài này thay vì tua nhầm video đang mở. */
+  contextLessonId: number | null;
 }
 
 /** UC30 mở rộng — 1 dòng trong danh sách "lịch sử trò chuyện" kiểu ChatGPT. */

@@ -42,16 +42,29 @@ function fileToBase64(file: File): Promise<string> {
  * (do đã lỡ ghi nhận sessionId mới từ lượt trước) đúng lúc `messages` mới thực sự đổi, nên cuộn
  * MƯỢT (trượt dài) thay vì cuộn NGAY tới cuối. Gộp 1 state đảm bảo 2 giá trị luôn đổi CÙNG LÚC
  * trong đúng 1 lượt render.
+ *
+ * BUG THẬT (06/09/2026 — đã sửa lại lần 2): PHIÊN BẢN CŨ coi mỗi bài học có danh sách lịch sử
+ * chat RIÊNG (reset `chat` mỗi khi đổi `lessonId`) — học viên phản ánh: đổi bài trong CÙNG 1
+ * khóa lại thấy danh sách lịch sử KHÁC hẳn, vô lý vì đang cùng 1 khóa học. Sửa lại: 1 (học
+ * viên, khóa học) dùng CHUNG 1 danh sách lịch sử cho MỌI bài học trong khóa — hook giờ nhận
+ * `courseId` (khóa với danh sách phiên chat) + `currentLessonId` (bài đang mở, chỉ dùng làm
+ * ngữ cảnh MẶC ĐỊNH cho từng lượt hỏi, xem `mutation.mutationFn` bên dưới). Chỉ reset `chat`
+ * khi đổi SANG KHÓA HỌC KHÁC (`courseId` đổi), không reset khi chỉ đổi bài học trong cùng khóa.
  */
-export function useTutorChat(lessonId: number) {
+export function useTutorChat(courseId: number, currentLessonId: number) {
   const [chat, setChat] = useState<ActiveChat>({ sessionId: null, messages: [] });
   const [isRestoring, setIsRestoring] = useState(true);
   const queryClient = useQueryClient();
-  const sessionsQueryKey = ['tutor', lessonId, 'sessions'] as const;
+  const sessionsQueryKey = ['tutor', courseId, 'sessions'] as const;
+
+  useEffect(() => {
+    setChat({ sessionId: null, messages: [] });
+    setIsRestoring(true);
+  }, [courseId]);
 
   const sessionsQuery = useQuery({
     queryKey: sessionsQueryKey,
-    queryFn: () => tutorApi.listSessions(lessonId),
+    queryFn: () => tutorApi.listSessions(courseId),
   });
 
   // Phục hồi phiên GẦN NHẤT đúng 1 lần khi danh sách phiên vừa tải xong — `chat.sessionId !==
@@ -64,21 +77,21 @@ export function useTutorChat(lessonId: number) {
       return;
     }
     tutorApi
-      .getMessages(lessonId, latest.id)
+      .getMessages(courseId, latest.id)
       .then((msgs) => setChat({ sessionId: latest.id, messages: msgs.map(toTutorMessage) }))
       .catch(() => {
         // Phuc hoi that bai (vd phien vua bi xoa) khong nghiem trong — coi nhu bat dau moi.
       })
       .finally(() => setIsRestoring(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps -- chi chay lai khi CO du lieu sessions moi, khong phai moi lan chat doi
-  }, [sessionsQuery.data, lessonId]);
+  }, [sessionsQuery.data, courseId]);
 
   const mutation = useMutation({
     mutationFn: async ({ question, files }: { question: string; files: File[] }) => {
       const attachments = await Promise.all(
         files.map(async (f) => ({ fileName: f.name, dataBase64: await fileToBase64(f) })),
       );
-      return tutorApi.ask(lessonId, { question, sessionId: chat.sessionId, attachments });
+      return tutorApi.ask(courseId, { question, sessionId: chat.sessionId, currentLessonId, attachments });
     },
     onMutate: ({ question, files }: { question: string; files: File[] }) => {
       // Xem truoc CUC BO bang blob URL — chi de hien thi ngay trong phien lam viec nay,
@@ -93,7 +106,7 @@ export function useTutorChat(lessonId: number) {
         ...prev,
         messages: [
           ...prev.messages,
-          { id: `local-${Date.now()}`, sender: 'USER', content: question, citedTimestamps: [], attachments: localAttachments },
+          { id: `local-${Date.now()}`, sender: 'USER', content: question, citedTimestamps: [], attachments: localAttachments, contextLessonId: null },
         ],
       }));
     },
@@ -102,7 +115,14 @@ export function useTutorChat(lessonId: number) {
         sessionId: res.sessionId,
         messages: [
           ...prev.messages,
-          { id: `ai-${res.sessionId}-${prev.messages.length}`, sender: 'AI', content: res.answer, citedTimestamps: res.citedTimestamps, attachments: [] },
+          {
+            id: `ai-${res.sessionId}-${prev.messages.length}`,
+            sender: 'AI',
+            content: res.answer,
+            citedTimestamps: res.citedTimestamps,
+            attachments: [],
+            contextLessonId: res.contextLessonId,
+          },
         ],
       }));
       // Cau hoi dau tien cua 1 phien moi doi tieu de tu "Cuoc tro chuyen moi" thanh ten that
@@ -122,24 +142,24 @@ export function useTutorChat(lessonId: number) {
 
   const switchSession = async (targetSessionId: number) => {
     if (targetSessionId === chat.sessionId) return;
-    const msgs = await tutorApi.getMessages(lessonId, targetSessionId);
+    const msgs = await tutorApi.getMessages(courseId, targetSessionId);
     setChat({ sessionId: targetSessionId, messages: msgs.map(toTutorMessage) });
   };
 
   const startNewChat = async () => {
-    const session = await tutorApi.startNewSession(lessonId);
+    const session = await tutorApi.startNewSession(courseId);
     setChat({ sessionId: session.id, messages: [] });
     void queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
   };
 
   const renameSession = async (targetSessionId: number, title: string) => {
-    await tutorApi.renameSession(lessonId, targetSessionId, title);
+    await tutorApi.renameSession(courseId, targetSessionId, title);
     void queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
   };
 
   const togglePin = async (targetSessionId: number, pinned: boolean) => {
     try {
-      await tutorApi.pinSession(lessonId, targetSessionId, pinned);
+      await tutorApi.pinSession(courseId, targetSessionId, pinned);
       void queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
     } catch (err) {
       toast.error(err instanceof ApiError ? err.message : 'Không ghim được cuộc trò chuyện này.');
@@ -147,7 +167,7 @@ export function useTutorChat(lessonId: number) {
   };
 
   const removeSession = async (targetSessionId: number) => {
-    await tutorApi.deleteSession(lessonId, targetSessionId);
+    await tutorApi.deleteSession(courseId, targetSessionId);
     // Xoa dung phien DANG MO -> ve trang thai rong, khong con gi de hien; chon phien khac
     // (hoac "cuoc tro chuyen moi") se tu load lai binh thuong qua switchSession/startNewChat.
     setChat((prev) => (prev.sessionId === targetSessionId ? { sessionId: null, messages: [] } : prev));
