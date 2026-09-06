@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { enrollmentsApi } from '@/lib/api/enrollments';
 import { toast } from 'sonner';
+import { useAddToCart, useCart } from '@/hooks/useCart';
 
 interface EnrollButtonProps {
   courseId: number;
@@ -24,6 +25,12 @@ export function EnrollButton({
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [enrolled, setEnrolled] = useState(initialEnrolled);
+  // Giỏ hàng (06/09/2026, mở rộng ngoài đặc tả gốc) — khóa TRẢ PHÍ vừa mua ngay được, vừa
+  // thêm vào giỏ để gộp thanh toán sau cùng các khóa khác (giống Udemy). Gọi hook TRƯỚC mọi
+  // return sớm bên dưới (rules-of-hooks) dù chỉ dùng ở nhánh trả phí/chưa sở hữu.
+  const { data: cartItems } = useCart();
+  const inCart = cartItems?.some((item) => item.courseId === courseId) ?? false;
+  const addToCart = useAddToCart();
 
   useEffect(() => {
     // Check if user is actually enrolled (since public API always returns false)
@@ -62,18 +69,38 @@ export function EnrollButton({
     }
   };
 
-
+  if (isFree) {
+    return (
+      <button
+        type="button"
+        onClick={handleEnrollFree}
+        disabled={loading}
+        className={`w-full rounded-full bg-accent px-6 py-3 font-display text-base font-semibold text-white hover:bg-accent-dark ${
+          loading ? 'opacity-50 cursor-not-allowed' : ''
+        }`}
+      >
+        {loading ? 'Đang xử lý...' : 'Đăng ký học ngay'}
+      </button>
+    );
+  }
 
   return (
-    <button
-      type="button"
-      onClick={() => isFree ? handleEnrollFree() : router.push(`/checkout/${courseSlug}`)}
-      disabled={loading}
-      className={`w-full rounded-full bg-accent px-6 py-3 font-display text-base font-semibold text-white hover:bg-accent-dark ${
-        loading ? 'opacity-50 cursor-not-allowed' : ''
-      }`}
-    >
-      {loading ? 'Đang xử lý...' : isFree ? 'Đăng ký học ngay' : 'Mua khoá học'}
-    </button>
+    <div className="flex flex-col gap-2.5">
+      <button
+        type="button"
+        onClick={() => router.push(`/checkout/${courseSlug}`)}
+        className="w-full rounded-full bg-accent px-6 py-3 font-display text-base font-semibold text-white hover:bg-accent-dark"
+      >
+        Mua ngay
+      </button>
+      <button
+        type="button"
+        onClick={() => !inCart && addToCart.mutate(courseId)}
+        disabled={inCart || addToCart.isPending}
+        className="w-full rounded-full border border-line bg-white px-6 py-3 font-display text-base font-semibold text-ink hover:border-accent hover:text-accent disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        {inCart ? 'Đã có trong giỏ hàng ✓' : addToCart.isPending ? 'Đang thêm...' : 'Thêm vào giỏ hàng'}
+      </button>
+    </div>
   );
 }

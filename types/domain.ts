@@ -600,6 +600,27 @@ export interface PaymentRes {
   billingPhone?: string;
 }
 
+/** Giỏ hàng (06/09/2026) — TÍNH NĂNG MỞ RỘNG, không nằm trong 49 use case đặc tả gốc. Gộp
+ * thanh toán nhiều khóa học tự chọn (checkbox) trong 1 lần "Proceed to Checkout". */
+export interface CreateBatchPaymentReq {
+  courseIds: number[];
+  paymentMethod: string;
+  billingName?: string;
+  billingPhone?: string;
+}
+
+/** 1 dòng trong giỏ hàng — đủ dữ liệu để hiển thị trực tiếp, không cần gọi thêm API chi tiết
+ * khóa học. */
+export interface CartItem {
+  courseId: number;
+  courseTitle: string;
+  courseSlug: string;
+  thumbnailUrl: string | null;
+  instructorName: string;
+  price: number;
+  addedAt: string;
+}
+
 // ── F11.1: Live Classroom — vòng đời phiên (UC50) ────────────────
 
 export type LiveVisibility = 'COURSE_ONLY' | 'PUBLIC';

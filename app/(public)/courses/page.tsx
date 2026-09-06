@@ -5,6 +5,7 @@ import { Suspense, useEffect, useState } from 'react';
 import { CourseCard } from '@/components/course/CourseCard';
 import { CourseFilters } from '@/components/course/CourseFilters';
 import { useCategories } from '@/hooks/useCategories';
+import { useMyEnrollments } from '@/hooks/useEnrollments';
 import { useCourseSearch } from '@/hooks/usePublicCourses';
 import { EMPTY_FILTERS } from '@/lib/api/publicCourses';
 import { ApiError } from '@/lib/api/client';
@@ -48,13 +49,19 @@ function CoursesPageContent() {
   const [sortBy, setSortBy] = useState<CourseSortBy>('newest');
   const { data: categories } = useCategories();
   const { data: results, isLoading, error } = useCourseSearch(filters, sortBy);
+  const { data: enrollments } = useMyEnrollments();
 
   useEffect(() => {
     const q = searchParams.get('q') ?? '';
     setFilters((prev) => (prev.keyword === q ? prev : { ...prev, keyword: q }));
   }, [searchParams]);
 
-  const courses = results ?? [];
+  // Khóa học ĐÃ SỞ HỮU không còn liệt kê ở đây nữa (06/09/2026) — trang này chỉ nên gợi ý
+  // khóa CHƯA mua. Khách chưa đăng nhập (`enrollments` là `undefined`) thì không lọc gì.
+  const allResults = results ?? [];
+  const courses = enrollments
+    ? allResults.filter((course) => !enrollments.some((e) => e.courseId === course.id))
+    : allResults;
 
   return (
     <div className="shell py-10">

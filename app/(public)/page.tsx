@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { CourseCard } from '@/components/course/CourseCard';
+import { FeaturedCourseGrid } from '@/components/course/FeaturedCourseGrid';
 import { publicCoursesApi, EMPTY_FILTERS } from '@/lib/api/publicCourses';
 
 /**
@@ -114,11 +114,7 @@ export default async function HomePage() {
           <p className="m-0 text-[14.5px] text-gray-500">Mỗi khóa học đều hỗ trợ lồng tiếng AI đa ngôn ngữ.</p>
         </div>
 
-        <div className="grid gap-[22px] md:grid-cols-2 lg:grid-cols-3">
-          {courses.map((course) => (
-            <CourseCard key={course.id} course={course} />
-          ))}
-        </div>
+        <FeaturedCourseGrid courses={courses} />
       </section>
 
       {/* ── Quy trình 3 bước ── */}
