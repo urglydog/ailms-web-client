@@ -2,15 +2,19 @@
 
 import { useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
+import { CourseOverviewTab } from '@/components/course/CourseOverviewTab';
+import { ReviewsSection } from '@/components/course/ReviewsSection';
+import { MaterialManager } from '@/components/materials/MaterialManager';
 import { DualPlayer, type DualPlayerHandle } from '@/components/player/DualPlayer';
 import { DubbingActivatePanel } from '@/components/player/DubbingActivatePanel';
 import { LanguageDropdown } from '@/components/player/LanguageDropdown';
 import { LessonSidebar } from '@/components/player/LessonSidebar';
 import { PipelineProgress } from '@/components/player/PipelineProgress';
-import { TutorPanel } from '@/components/tutor/TutorPanel';
+import { TranscriptPanel } from '@/components/player/TranscriptPanel';
+import { TutorEmbedded } from '@/components/tutor/TutorEmbedded';
 import { useActivateDubbing, useCancelDubbing } from '@/hooks/useDubbing';
 import { useDubbingSocket } from '@/hooks/useDubbingSocket';
 import { useEnrolledLessonPlayer } from '@/hooks/useEnrolledLessonPlayer';
@@ -21,6 +25,35 @@ import { ApiError } from '@/lib/api/client';
 import { LiveChatPanel } from '@/components/community/LiveChatPanel';
 import { decodeAccessToken, getAccessToken } from '@/lib/auth/token';
 import type { PipelineStep } from '@/types/domain';
+
+type MainTab = 'overview' | 'qna' | 'reviews' | 'materials';
+type SidebarTab = 'content' | 'tutor';
+
+const MAIN_TABS: Array<{ key: MainTab; label: string }> = [
+  { key: 'overview', label: 'Tổng quan' },
+  { key: 'qna', label: 'Hỏi đáp' },
+  { key: 'reviews', label: 'Đánh giá' },
+  { key: 'materials', label: 'Học liệu' },
+];
+
+/** Thông báo khoá thống nhất cho 3 mục cần sở hữu khoá học (Hỏi đáp/Học liệu/Gia sư AI) — thay
+ * cho khối CTA rời trước đây, giờ mỗi mục tự hiện đúng ngay trong tab/khu vực của nó. */
+function LockedFeatureNotice({ feature, courseSlug }: { feature: string; courseSlug: string }) {
+  return (
+    <div className="flex flex-col items-center justify-center gap-2 py-8 text-center">
+      <div className="text-2xl">🔒</div>
+      <p className="text-sm text-ink-muted">
+        {feature} chỉ dành cho học viên đã sở hữu khóa học.
+      </p>
+      <Link
+        href={`/courses/${courseSlug}`}
+        className="mt-1 rounded-full bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-dark no-underline"
+      >
+        Mua khóa học ngay
+      </Link>
+    </div>
+  );
+}
 
 /** Nhãn hiển thị cho từng `stage` do AI Worker publish — xem `app/redis_client.py::publish_progress`. */
 const STAGE_LABELS: Record<string, string> = {
@@ -86,6 +119,7 @@ type PlayerMode = 'watching' | 'need-activation' | 'processing';
 
 export default function LearnPage() {
   const params = useParams<{ lessonId: string }>();
+  const router = useRouter();
   const lessonId = Number(params.lessonId);
   const hasToken = !!getAccessToken();
 
@@ -120,19 +154,57 @@ export default function LearnPage() {
   const [quotaExceeded, setQuotaExceeded] = useState(false);
   const [activateError, setActivateError] = useState<string | null>(null);
   const [jobError, setJobError] = useState<string | null>(null);
-  const [isTutorOpen, setIsTutorOpen] = useState(false);
+  // Giao diện tham khảo Udemy (06/09/2026) — tab dưới video (Tổng quan/Hỏi đáp/Đánh giá/Học liệu)
+  // và tab trong sidebar (Nội dung khóa học/AI Gia sư), thay cho panel Gia sư AI trượt nổi + nút
+  // "Mở Quản lý Học liệu AI" điều hướng sang trang riêng trước đây.
+  const [mainTab, setMainTab] = useState<MainTab>('overview');
+  const [sidebarTab, setSidebarTab] = useState<SidebarTab>('content');
   // Ẩn/hiện phụ đề gốc & phụ đề đã dịch — mặc định TẮT, học viên chủ động tích chọn.
   const [showOriginalSub, setShowOriginalSub] = useState(false);
   const [showTranslatedSub, setShowTranslatedSub] = useState(false);
+  // Giao diện tham khảo Udemy (06/09/2026) — nút Transcript trên thanh điều khiển video BẬT thì
+  // tab "content" của sidebar hiện bản ghi lời thoại THAY CHO danh sách bài học (không phải 1 tab
+  // riêng) — xem `TranscriptPanel.tsx`. `playerCurrentSec` chỉ được `DualPlayer` đẩy lên khi
+  // `showTranscript` đang bật (tránh re-render trang liên tục lúc panel ẩn, mặc định).
+  const [showTranscript, setShowTranscript] = useState(false);
+  const [playerCurrentSec, setPlayerCurrentSec] = useState(0);
+  // Tự động chuyển sang bài tiếp theo khi phát hết bài hiện tại — nhớ lựa chọn của học viên giữa
+  // các bài (localStorage), mặc định BẬT giống hành vi gốc của Udemy (nguồn tham khảo giao diện).
+  const [autoNextEnabled, setAutoNextEnabled] = useState(() => {
+    if (typeof window === 'undefined') return true;
+    try {
+      return localStorage.getItem('lms:autoNextLesson') !== 'false';
+    } catch {
+      return true;
+    }
+  });
+  useEffect(() => {
+    try {
+      localStorage.setItem('lms:autoNextLesson', String(autoNextEnabled));
+    } catch {
+      // Trình duyệt chặn localStorage (vd chế độ ẩn danh khắt khe) — bỏ qua, không phải chức năng cốt lõi.
+    }
+  }, [autoNextEnabled]);
   const activateDubbing = useActivateDubbing();
   const cancelDubbing = useCancelDubbing();
 
   // UC30 — mốc thời gian trong câu trả lời Gia sư AI (BR-TUTOR-02). `DualPlayer` che giấu 2 cơ
   // chế tua khác hẳn nhau (thẻ <video> cho UPLOAD, IFrame Player API cho YOUTUBE) sau 1
   // `seekTo()` chung qua `DualPlayerHandle` — trang này không cần biết đang phát nguồn nào.
-  const handleSeekToTimestamp = useCallback((sec: number) => {
+  //
+  // UC30 mở rộng (06/09/2026) — Gia sư AI giờ có thể trả lời về 1 bài học KHÁC bài đang mở
+  // (học viên hỏi rõ, xem `TutorEmbedded`/`useTutorChat`) — mốc thời gian trích dẫn khi đó
+  // thuộc video bài học ĐÓ, không phải bài đang mở. `contextLessonId` khác `lessonId` hiện tại
+  // (hoặc null, từ `TranscriptPanel` — luôn cùng bài đang mở) thì điều hướng sang đúng bài đó
+  // thay vì tua nhầm video đang mở; TẠM chưa tự seek tiếp sau khi trang mới tải xong (đơn giản
+  // hoá phạm vi — học viên tự kéo tới đúng mốc [MM:SS] đã hiện sẵn trong nội dung trả lời).
+  const handleSeekToTimestamp = useCallback((sec: number, contextLessonId?: number | null) => {
+    if (contextLessonId != null && contextLessonId !== lessonId) {
+      router.push(`/learn/${contextLessonId}`);
+      return;
+    }
     dualPlayerRef.current?.seekTo(sec);
-  }, []);
+  }, [lessonId, router]);
 
   // UC20 — chỉ mở kết nối STOMP khi thật sự đang chờ pipeline chạy.
   const { lastEvent } = useDubbingSocket(mode === 'processing' ? lessonId : null);
@@ -278,6 +350,33 @@ export default function LearnPage() {
     lesson.languages.find((l) => l.code === activeLang)?.label ?? 'ngôn ngữ đã chọn';
   const voicesForActiveLang = voiceOptions?.filter((v) => v.language === activeLang) ?? [];
 
+  // Giao diện tham khảo Udemy (06/09/2026) — tự động chuyển bài. Không có field `nextLessonId`
+  // riêng từ BE, tự làm phẳng `chapters[].lessons[]` (đã sắp theo `displayOrder`) rồi tìm bài NGAY
+  // SAU bài hiện tại; bài cuối cùng của khoá học thì không có bài tiếp theo, giữ nguyên.
+  const flatLessons = lesson.chapters.flatMap((c) => c.lessons);
+  const currentLessonIndex = flatLessons.findIndex((l) => l.lessonId === lesson.lessonId);
+  const nextLessonId =
+    currentLessonIndex >= 0 && currentLessonIndex < flatLessons.length - 1
+      ? (flatLessons[currentLessonIndex + 1]?.lessonId ?? null)
+      : null;
+
+  const handleVideoEnded = () => {
+    if (autoNextEnabled && nextLessonId) {
+      toast.info('Đang chuyển sang bài học tiếp theo…');
+      router.push(`/learn/${nextLessonId}`);
+    }
+  };
+
+  const handleToggleTranscript = () => {
+    setShowTranscript((prev) => {
+      const next = !prev;
+      // Đang ở tab AI Gia sư mà bật Transcript lên -> chuyển ngay về tab content để thấy liền,
+      // khỏi phải tự bấm thêm 1 lần (giống Udemy tự mở lại panel Transcript khi bấm nút này).
+      if (next) setSidebarTab('content');
+      return next;
+    });
+  };
+
   const handleSelectLanguage = (code: string) => {
     setActiveLang(code);
     const lang = lesson.languages.find((l) => l.code === code);
@@ -327,7 +426,11 @@ export default function LearnPage() {
 
   return (
     <div className="min-h-dvh bg-surface">
-      <div className="shell py-8">
+      {/* Trang học bài dùng khung riêng RỘNG HƠN `.shell` (max-w-shell = 1280px, dùng chung toàn
+          site — không đụng vào, tránh ảnh hưởng mọi trang khác) — Udemy để trang xem bài học
+          tràn gần hết chiều ngang trình duyệt thay vì bó trong khung nội dung thường, video vì
+          vậy hiển thị to hơn hẳn thay vì còn dư 2 khoảng trống 2 bên. */}
+      <div className="mx-auto w-full max-w-[1800px] px-4 py-8 md:px-8">
         {/* Breadcrumb */}
         <nav aria-label="Đường dẫn" className="mb-4 text-[13px] text-ink-faint">
           <Link href={`/courses/${lesson.courseSlug}`} className="font-semibold no-underline">
@@ -337,7 +440,9 @@ export default function LearnPage() {
           <span className="text-ink-muted">{lesson.lessonTitle}</span>
         </nav>
 
-        <div className="grid gap-8 lg:grid-cols-[1fr_300px]">
+        {/* Giao diện tham khảo Udemy — video lớn nhất, sidebar phải hẹp có tab, tab dưới video
+            thay cho các khối CTA/card rời trước đây. */}
+        <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
           {/* ── Cột phát bài giảng ── */}
           <div className="flex min-w-0 flex-col gap-4">
             {/* Video luôn hiển thị và phát được, bất kể mode — xem docblock đầu file */}
@@ -353,42 +458,15 @@ export default function LearnPage() {
               translatedSubtitles={lesson.languages.find((l) => l.code === activeLang)?.subtitles ?? []}
               showOriginalSub={showOriginalSub}
               showTranslatedSub={showTranslatedSub}
+              onToggleShowOriginalSub={() => setShowOriginalSub((v) => !v)}
+              onToggleShowTranslatedSub={() => setShowTranslatedSub((v) => !v)}
+              onEnded={handleVideoEnded}
+              onTimeUpdate={setPlayerCurrentSec}
+              showTranscript={showTranscript}
+              onToggleTranscript={handleToggleTranscript}
+              autoNextEnabled={autoNextEnabled}
+              onToggleAutoNext={() => setAutoNextEnabled((v) => !v)}
             />
-
-            {/* Ẩn/hiện phụ đề — phụ đề dịch luôn khớp ngôn ngữ đang chọn ở dropdown bên dưới,
-                không có dropdown ngôn ngữ riêng cho phụ đề. */}
-            <div className="flex flex-wrap items-center gap-4 text-sm text-ink-muted">
-              <label
-                className={`flex items-center gap-1.5 ${lesson.originalSubtitles.length === 0 ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
-              >
-                <input
-                  type="checkbox"
-                  checked={showOriginalSub}
-                  disabled={lesson.originalSubtitles.length === 0}
-                  onChange={(e) => setShowOriginalSub(e.target.checked)}
-                  className="h-4 w-4 rounded border-line accent-accent"
-                />
-                Phụ đề gốc
-                {lesson.originalSubtitles.length === 0 && ' (bài học chưa có phụ đề gốc)'}
-              </label>
-              {(() => {
-                const translatedSubtitles = lesson.languages.find((l) => l.code === activeLang)?.subtitles ?? [];
-                const disabled = translatedSubtitles.length === 0;
-                return (
-                  <label className={`flex items-center gap-1.5 ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}>
-                    <input
-                      type="checkbox"
-                      checked={showTranslatedSub}
-                      disabled={disabled}
-                      onChange={(e) => setShowTranslatedSub(e.target.checked)}
-                      className="h-4 w-4 rounded border-line accent-accent"
-                    />
-                    Phụ đề đã dịch
-                    {disabled && ' (ngôn ngữ đang chọn chưa lồng tiếng xong)'}
-                  </label>
-                );
-              })()}
-            </div>
 
             {lesson.languages.length > 0 && (
               <LanguageDropdown
@@ -434,76 +512,113 @@ export default function LearnPage() {
 
             <h1 className="font-display text-xl font-bold text-ink">{lesson.lessonTitle}</h1>
 
-            {/* Tab: Giai đoạn 7 sẽ nối Ghi chú, Học liệu AI — Socratic Tutor đã nối (F8.1) */}
-            <div className="card p-5">
-              {/* Khoá theo `enrolled` (đã sở hữu khoá học), KHÔNG theo `isPreview` — một bài học
-                  thử vẫn xem được đầy đủ bởi học viên đã sở hữu khoá (BR-ENROLL-02/03). */}
-              {!lesson.enrolled ? (
-                <div className="flex flex-col items-center justify-center py-6 text-center">
-                  <div className="mb-2 text-3xl">🔒</div>
-                  <h3 className="font-display font-semibold text-ink">Nội dung bị khóa</h3>
-                  <p className="mt-1 text-sm text-ink-muted mb-4">
-                    Tính năng Ghi chú, Học liệu AI và Socratic Tutor chỉ dành cho học viên đã sở hữu khóa học.
-                  </p>
-                  <Link
-                    href={`/courses/${lesson.courseSlug}`}
-                    className="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-dark no-underline"
-                  >
-                    Mua khóa học ngay
-                  </Link>
-                </div>
-              ) : (
-                <div className="flex flex-col items-start gap-3">
-                  <Link
-                    href={`/materials?courseId=${lesson.courseId}`}
-                    className="rounded-full bg-surface-hover border border-line px-4 py-2 text-sm font-semibold text-ink hover:bg-line-soft transition-colors w-full text-center no-underline"
-                  >
-                    🧠 Mở Quản lý Học liệu AI
-                  </Link>
+            {/* Tổng quan / Hỏi đáp / Đánh giá / Học liệu — thay cho panel Gia sư AI trượt nổi +
+                nút "Mở Quản lý Học liệu AI" điều hướng trang riêng trước đây. */}
+            <div className="card overflow-hidden p-0">
+              <div className="flex overflow-x-auto border-b border-line">
+                {MAIN_TABS.map((tab) => (
                   <button
+                    key={tab.key}
                     type="button"
-                    onClick={() => setIsTutorOpen(true)}
-                    className="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-dark w-full"
+                    onClick={() => setMainTab(tab.key)}
+                    className={`shrink-0 border-b-2 px-5 py-3 text-sm font-semibold transition-colors ${
+                      mainTab === tab.key
+                        ? 'border-accent text-accent'
+                        : 'border-transparent text-ink-muted hover:text-ink'
+                    }`}
                   >
-                    💬 Hỏi Gia sư AI Socratic
+                    {tab.label}
                   </button>
-                </div>
-              )}
+                ))}
+              </div>
+
+              <div className="p-5">
+                {mainTab === 'overview' && <CourseOverviewTab courseSlug={lesson.courseSlug} />}
+
+                {mainTab === 'qna' && (
+                  lesson.enrolled ? (
+                    <LiveChatPanel
+                      lessonId={lesson.lessonId}
+                      userName={hasToken ? (decodeAccessToken()?.sub ?? 'Học viên') : 'Học viên'}
+                    />
+                  ) : (
+                    <LockedFeatureNotice feature="Hỏi đáp bài học" courseSlug={lesson.courseSlug} />
+                  )
+                )}
+
+                {mainTab === 'reviews' && <ReviewsSection courseId={lesson.courseId} />}
+
+                {mainTab === 'materials' && (
+                  lesson.enrolled ? (
+                    <MaterialManager courseId={lesson.courseId} />
+                  ) : (
+                    <LockedFeatureNotice feature="Học liệu AI" courseSlug={lesson.courseSlug} />
+                  )
+                )}
+              </div>
             </div>
           </div>
 
-          {/* ── Cột danh sách bài học ── */}
-          <aside className="lg:sticky lg:top-8 lg:self-start flex flex-col gap-6">
-            <div className="card p-5">
-              <h2 className="mb-3 font-display text-sm font-bold text-ink">Trong khoá học này</h2>
-              {lesson.chapters.length > 0 ? (
-                <LessonSidebar chapters={lesson.chapters} currentLessonId={lesson.lessonId} />
+          {/* ── Cột sidebar: Nội dung khóa học / AI Gia sư ── */}
+          <aside className="lg:sticky lg:top-6 lg:self-start">
+            <div className="card flex h-[calc(100vh-140px)] min-h-[520px] flex-col overflow-hidden p-0">
+              <div className="flex shrink-0 border-b border-line">
+                <button
+                  type="button"
+                  onClick={() => setSidebarTab('content')}
+                  className={`flex-1 border-b-2 px-3 py-3 text-[13px] font-semibold transition-colors ${
+                    sidebarTab === 'content'
+                      ? 'border-accent text-accent'
+                      : 'border-transparent text-ink-muted hover:text-ink'
+                  }`}
+                >
+                  {showTranscript ? '📝 Bản ghi lời thoại' : '📚 Nội dung khóa học'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSidebarTab('tutor')}
+                  className={`flex-1 border-b-2 px-3 py-3 text-[13px] font-semibold transition-colors ${
+                    sidebarTab === 'tutor'
+                      ? 'border-accent text-accent'
+                      : 'border-transparent text-ink-muted hover:text-ink'
+                  }`}
+                >
+                  🤖 AI Gia sư
+                </button>
+              </div>
+
+              {sidebarTab === 'content' ? (
+                showTranscript ? (
+                  <div className="min-h-0 flex-1 overflow-hidden">
+                    <TranscriptPanel
+                      originalSubtitles={lesson.originalSubtitles}
+                      translatedSubtitles={lesson.languages.find((l) => l.code === activeLang)?.subtitles ?? []}
+                      currentSec={playerCurrentSec}
+                      onSeek={handleSeekToTimestamp}
+                    />
+                  </div>
+                ) : (
+                  <div className="flex-1 overflow-y-auto p-4">
+                    {lesson.chapters.length > 0 ? (
+                      <LessonSidebar chapters={lesson.chapters} currentLessonId={lesson.lessonId} />
+                    ) : (
+                      <p className="text-sm text-ink-muted">
+                        Đăng nhập để xem toàn bộ chương trình học và theo dõi tiến độ của khoá này.
+                      </p>
+                    )}
+                  </div>
+                )
+              ) : lesson.enrolled ? (
+                <TutorEmbedded courseId={lesson.courseId} lessonId={lesson.lessonId} onSeek={handleSeekToTimestamp} />
               ) : (
-                <p className="text-sm text-ink-muted">
-                  Đăng nhập để xem toàn bộ chương trình học và theo dõi tiến độ của khoá này.
-                </p>
+                <div className="flex-1">
+                  <LockedFeatureNotice feature="Gia sư AI" courseSlug={lesson.courseSlug} />
+                </div>
               )}
             </div>
-
-            {/* Live Q&A Panel */}
-            {lesson.enrolled && (
-              <LiveChatPanel 
-                lessonId={lesson.lessonId} 
-                userName={hasToken ? (decodeAccessToken()?.sub ?? 'Học viên') : 'Học viên'} 
-              />
-            )}
           </aside>
         </div>
       </div>
-
-      {lesson.enrolled && (
-        <TutorPanel
-          isOpen={isTutorOpen}
-          onClose={() => setIsTutorOpen(false)}
-          lessonId={lesson.lessonId}
-          onSeek={handleSeekToTimestamp}
-        />
-      )}
     </div>
   );
 }
