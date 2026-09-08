@@ -22,7 +22,7 @@ export default function AntiCheatExamPage() {
   const proctoredParam = searchParams.get('proctored');
   const isProctored = proctoredParam === 'true';
 
-  const { data: history } = useQuizHistory(Number(quizId));
+  const { data: history, refetch: refetchHistory } = useQuizHistory(Number(quizId));
 
   const videoRef = useRef<HTMLVideoElement>(null);
   
@@ -303,7 +303,7 @@ export default function AntiCheatExamPage() {
               {isPassed ? 'Xuất sắc! Bài thi hoàn thành' : 'Bài thi đã nộp'}
             </h2>
             <div className={`text-5xl font-extrabold my-4 ${isPassed ? 'text-green-600' : 'text-red-500'}`}>
-              {result.score}/10
+              {Number(result.score).toFixed(2).replace(/\.?0+$/, '')}/10
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 text-sm">
               <div className="bg-surface-hover rounded-xl p-3">
@@ -330,8 +330,17 @@ export default function AntiCheatExamPage() {
             )}
             <div className="flex justify-center gap-4 mt-8">
               <button 
+                onClick={() => {
+                  setResult(null);
+                  refetchHistory();
+                }}
+                className="bg-accent text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-accent-hover transition-all"
+              >
+                Xem tổng quan bài thi
+              </button>
+              <button 
                 onClick={() => router.push('/my-courses')}
-                className="bg-ink text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-gray-800 transition-all"
+                className="bg-surface-hover text-ink border border-line px-8 py-3 rounded-full font-bold shadow-sm hover:bg-line transition-all"
               >
                 Về khóa học
               </button>
@@ -471,6 +480,7 @@ export default function AntiCheatExamPage() {
               const ongoingAttempt = history?.find(h => h.status === 'IN_PROGRESS');
               const completedCount = history?.filter(h => h.status === 'COMPLETED').length || 0;
               const isClosed = endTime ? new Date() > new Date(endTime) : false;
+              const isNotOpenYet = startTime ? new Date() < new Date(startTime) : false;
               const maxAtt = parseInt(maxAttempts || '0');
               const canStartNewAttempt = !maxAttempts || maxAtt <= 0 || completedCount < maxAtt;
 
@@ -525,11 +535,19 @@ export default function AntiCheatExamPage() {
                       >
                         {isStarting ? 'Đang chuẩn bị...' : 'Tiếp tục làm bài'}
                       </button>
+                    ) : isNotOpenYet ? (
+                      <div className="text-amber-600 font-bold p-4 bg-amber-50 rounded-lg">
+                        Bài thi chưa mở. Vui lòng quay lại sau.
+                      </div>
                     ) : isClosed ? (
                       <div className="text-red-500 font-bold p-4 bg-red-50 rounded-lg">
                         Bài thi đã đóng. Bạn không thể làm bài nữa.
                       </div>
-                    ) : canStartNewAttempt ? (
+                    ) : !canStartNewAttempt ? (
+                      <div className="text-ink-muted font-semibold p-4 bg-surface-hover rounded-lg border border-line">
+                        Bạn đã hết số lần làm bài cho phép ({maxAttempts} lần).
+                      </div>
+                    ) : (
                       <button
                         onClick={startExam}
                         disabled={(!isProctored ? false : !isModelLoaded) || isStarting}
@@ -537,10 +555,6 @@ export default function AntiCheatExamPage() {
                       >
                         {isStarting ? 'Đang chuẩn bị...' : (!isProctored ? 'Bắt đầu làm bài mới' : isModelLoaded ? 'Bật Camera & Bắt đầu thi' : 'Đang tải AI Model...')}
                       </button>
-                    ) : (
-                      <div className="text-ink-muted font-semibold p-4 bg-surface-hover rounded-lg border border-line">
-                        Bạn đã hết số lần làm bài cho phép ({maxAttempts} lần).
-                      </div>
                     )}
                     <button
                       onClick={() => router.back()}
