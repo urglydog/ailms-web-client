@@ -15,7 +15,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
   const router = useRouter();
   const queryClient = useQueryClient();
 
-  const [selectedQuiz, setSelectedQuiz] = useState<InstructorMaterial | null>(null);
+  const queryClient = useQueryClient();
   const searchParams = useSearchParams();
   const inspectGenerationId = searchParams.get('inspect') ? Number(searchParams.get('inspect')) : null;
   const setInspectGenerationId = (id: number | null) => {
@@ -59,18 +59,6 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
     },
   });
 
-  const updateQuizSettingsMutation = useMutation({
-    mutationFn: (variables: { id: number; data: Record<string, unknown> }) =>
-      materialsApi.updateQuizSettings(variables.id, variables.data),
-    onSuccess: () => {
-      toast.success('Đã cập nhật cấu hình Quiz');
-      queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] });
-      setSelectedQuiz(null);
-    },
-    onError: (err: Error) => {
-      toast.error(err.message || 'Lỗi khi cập nhật Quiz');
-    }
-  });
 
   if (isLoading) return <div className="p-6 text-center text-sm text-gray-500 animate-pulse">Đang tải danh sách học liệu Giảng viên...</div>;
 
@@ -82,11 +70,6 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
         generationId={inspectGenerationId} 
         material={activeMat}
         onBack={() => setInspectGenerationId(null)} 
-        onConfigureQuiz={() => {
-          if (activeMat && activeMat.materialType === 'QUIZ') {
-            setSelectedQuiz(activeMat);
-          }
-        }}
         onToggleOfficial={() => {
           if (!activeMat || !activeMat.materialId) return;
           if (activeMat.materialType === 'MINDMAP') {
@@ -114,29 +97,16 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
           </p>
         </div>
         
-        {/* 3 Dedicated Creation Buttons */}
         <div className="flex flex-wrap items-center gap-2">
           <button
-            onClick={() => setGenMaterialType('MINDMAP')}
-            className="rounded-xl bg-blue-600 px-3.5 py-2 text-xs font-bold text-white shadow hover:bg-blue-700 transition-all flex items-center gap-1.5"
-          >
-            <span>🧠</span> + Sinh Mindmap
-          </button>
-          <button
-            onClick={() => setGenMaterialType('FLASHCARD')}
-            className="rounded-xl bg-purple-600 px-3.5 py-2 text-xs font-bold text-white shadow hover:bg-purple-700 transition-all flex items-center gap-1.5"
-          >
-            <span>🃏</span> + Sinh Flashcard
-          </button>
-          <button
             onClick={() => setGenMaterialType('QUIZ')}
-            className="rounded-xl bg-orange-600 px-3.5 py-2 text-xs font-bold text-white shadow hover:bg-orange-700 transition-all flex items-center gap-1.5"
+            className="rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-bold text-white shadow hover:bg-blue-700 transition-all flex items-center gap-2"
           >
-            <span>📝</span> + Sinh Quiz Thi Cử
+            <span>🤖</span> Tạo Học Liệu AI
           </button>
           <button
             onClick={() => router.push(`/instructor/courses/${courseId}/gradebook`)}
-            className="rounded-xl bg-white px-3.5 py-2 text-xs font-bold text-blue-950 shadow hover:bg-blue-50 transition-all flex items-center gap-1.5 ml-1"
+            className="rounded-xl bg-white px-4 py-2.5 text-sm font-bold text-blue-950 shadow hover:bg-blue-50 transition-all flex items-center gap-2 ml-1"
           >
             <span>📊</span> Bảng Điểm Lớp
           </button>
@@ -237,21 +207,10 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
 
       </div>
 
-      {/* Quiz Settings Modal */}
-      {selectedQuiz && (
-        <QuizSettingsModal 
-          quiz={selectedQuiz} 
-          onClose={() => setSelectedQuiz(null)} 
-          onSave={(data) => updateQuizSettingsMutation.mutate({ id: selectedQuiz.materialId as number, data })}
-          isSaving={updateQuizSettingsMutation.isPending}
-        />
-      )}
-
       {/* Generate AI Official Modal */}
       {genMaterialType && (
         <GenerateAiOfficialModal 
           courseId={courseId}
-          initialType={genMaterialType} 
           onClose={() => setGenMaterialType(null)}
           onSuccess={() => {
             setGenMaterialType(null);
@@ -269,13 +228,11 @@ function MaterialWorkspaceViewer({
   generationId, 
   material,
   onBack,
-  onConfigureQuiz,
   onToggleOfficial
 }: { 
   generationId: number; 
   material?: InstructorMaterial;
   onBack: () => void; 
-  onConfigureQuiz: () => void;
   onToggleOfficial: () => void;
 }) {
   const { data: detail, isLoading } = useQuery<MaterialDetailRes>({
@@ -285,7 +242,17 @@ function MaterialWorkspaceViewer({
   });
 
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState<'VIEW' | 'RAW_CODE'>('VIEW');
+  const [activeTab, setActiveTab] = useState<'VIEW' | 'RAW_CODE' | 'QUESTIONS' | 'SETTINGS'>('VIEW');
+
+  // Cập nhật tab mặc định dựa trên loại học liệu
+  useEffect(() => {
+    if (detail?.materialType === 'QUIZ') {
+      setActiveTab('QUESTIONS');
+    } else if (detail?.materialType === 'MINDMAP') {
+      setActiveTab('VIEW');
+    }
+  }, [detail?.materialType]);
+
   const [flippedCards, setFlippedCards] = useState<Record<number, boolean>>({});
   const [editingQuestion, setEditingQuestion] = useState<{
     id: number;
@@ -335,14 +302,7 @@ function MaterialWorkspaceViewer({
         </div>
 
         <div className="flex items-center gap-2">
-          {material?.materialType === 'QUIZ' && (
-            <button
-              onClick={onConfigureQuiz}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-blue-600 px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-blue-700 transition-all"
-            >
-              ⚙️ Cấu hình Quiz & Thi Cử
-            </button>
-          )}
+          {/* Removed old configure quiz button */}
 
           <button
             onClick={onToggleOfficial}
@@ -372,51 +332,66 @@ function MaterialWorkspaceViewer({
           {/* Render Quiz Workspace */}
           {detail.materialType === 'QUIZ' && detail.quizQuestions && (
             <div className="space-y-6">
-              <div className="flex items-center justify-between bg-indigo-50 border border-indigo-100 rounded-2xl p-4">
-                <div>
-                  <h3 className="font-bold text-sm text-indigo-950">Bộ Câu Hỏi Bài Thi Quiz Trắc Nghiệm AI</h3>
-                  <p className="text-xs text-indigo-700 mt-0.5">Dưới đây là {detail.quizQuestions.length} câu hỏi được tổng hợp tự động từ bài giảng.</p>
-                </div>
-                <span className="bg-indigo-600 text-white font-extrabold text-xs px-3 py-1 rounded-full">
-                  {detail.quizQuestions.length} Câu hỏi
-                </span>
+              <div className="flex items-center gap-2 border-b pb-2">
+                <button
+                  onClick={() => setActiveTab('QUESTIONS')}
+                  className={`px-4 py-2 text-sm font-bold rounded-xl transition-all ${
+                    activeTab === 'QUESTIONS' ? 'bg-indigo-600 text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  📝 Ngân Hàng Câu Hỏi ({detail.quizQuestions.length})
+                </button>
+                <button
+                  onClick={() => setActiveTab('SETTINGS')}
+                  className={`px-4 py-2 text-sm font-bold rounded-xl transition-all ${
+                    activeTab === 'SETTINGS' ? 'bg-indigo-600 text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  ⚙️ Cấu Hình Bài Thi
+                </button>
               </div>
 
-              <div className="grid grid-cols-1 gap-4">
-                {detail.quizQuestions.map((q, idx) => (
-                  <div key={q.id} className="p-5 rounded-2xl border border-gray-200 bg-gray-50/70 space-y-3 shadow-sm hover:border-blue-300 transition-all">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="font-bold text-base text-gray-900">
-                        <span className="text-blue-600 mr-2">Câu {idx + 1}:</span> {q.content}
-                      </div>
-                      <div className="flex gap-2 shrink-0">
-                        <button onClick={() => setEditingQuestion(q)} className="text-xs font-semibold bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg hover:bg-gray-200 border border-gray-200">Sửa</button>
-                        <button onClick={() => { if(confirm('Bạn chắc chắn muốn xóa câu hỏi này?')) deleteQuestionMutation.mutate(q.id); }} className="text-xs font-semibold bg-red-50 text-red-600 px-3 py-1.5 rounded-lg hover:bg-red-100 border border-red-200">Xóa</button>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mt-3">
-                      {q.options.map((opt) => (
-                        <div 
-                          key={opt.id} 
-                          className={`p-3.5 rounded-xl text-sm font-medium border flex items-center justify-between transition-all ${
-                            opt.isCorrect 
-                              ? 'bg-emerald-100/80 border-emerald-400 text-emerald-950 font-bold shadow-sm' 
-                              : 'bg-white border-gray-200 text-gray-700'
-                          }`}
-                        >
-                          <span>{opt.content}</span>
-                          {opt.isCorrect && (
-                            <span className="text-xs bg-emerald-600 text-white px-2.5 py-1 rounded-md font-extrabold flex items-center gap-1">
-                              Đáp án đúng ✓
-                            </span>
-                          )}
+              {activeTab === 'QUESTIONS' && (
+                <div className="grid grid-cols-1 gap-4">
+                  {detail.quizQuestions.map((q, idx) => (
+                    <div key={q.id} className="p-5 rounded-2xl border border-gray-200 bg-gray-50/70 space-y-3 shadow-sm hover:border-blue-300 transition-all">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="font-bold text-base text-gray-900">
+                          <span className="text-blue-600 mr-2">Câu {idx + 1}:</span> {q.content}
                         </div>
-                      ))}
+                        <div className="flex gap-2 shrink-0">
+                          <button onClick={() => setEditingQuestion(q)} className="text-xs font-semibold bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg hover:bg-gray-200 border border-gray-200">Sửa</button>
+                          <button onClick={() => { if(confirm('Bạn chắc chắn muốn xóa câu hỏi này?')) deleteQuestionMutation.mutate(q.id); }} className="text-xs font-semibold bg-red-50 text-red-600 px-3 py-1.5 rounded-lg hover:bg-red-100 border border-red-200">Xóa</button>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mt-3">
+                        {q.options.map((opt) => (
+                          <div 
+                            key={opt.id} 
+                            className={`p-3.5 rounded-xl text-sm font-medium border flex items-center justify-between transition-all ${
+                              opt.isCorrect 
+                                ? 'bg-emerald-100/80 border-emerald-400 text-emerald-950 font-bold shadow-sm' 
+                                : 'bg-white border-gray-200 text-gray-700'
+                            }`}
+                          >
+                            <span>{opt.content}</span>
+                            {opt.isCorrect && (
+                              <span className="text-xs bg-emerald-600 text-white px-2.5 py-1 rounded-md font-extrabold flex items-center gap-1">
+                                Đáp án đúng ✓
+                              </span>
+                            )}
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
+
+              {activeTab === 'SETTINGS' && material && (
+                <QuizSettingsTab quiz={material} />
+              )}
             </div>
           )}
 
@@ -514,18 +489,9 @@ function MaterialWorkspaceViewer({
   );
 }
 
-/** Modal Cấu hình Quiz Thi Cử & Proctoring */
-function QuizSettingsModal({ 
-  quiz, 
-  onClose, 
-  onSave, 
-  isSaving
-}: { 
-  quiz: InstructorMaterial; 
-  onClose: () => void; 
-  onSave: (data: Record<string, unknown>) => void; 
-  isSaving: boolean;
-}) {
+/** Tab Cấu hình Quiz Thi Cử & Proctoring (Mới) */
+function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
+  const queryClient = useQueryClient();
   const [randomPickCount, setRandomPickCount] = useState<string>(quiz.randomPickCount ? String(quiz.randomPickCount) : '');
   const [maxAttempts, setMaxAttempts] = useState<string>(quiz.maxAttempts ? String(quiz.maxAttempts) : '1');
   const [durationMinutes, setDurationMinutes] = useState<string>(quiz.durationMinutes ? String(quiz.durationMinutes) : '15');
@@ -535,18 +501,17 @@ function QuizSettingsModal({
   const [startTime, setStartTime] = useState<string>(quiz.startTime ? quiz.startTime.substring(0, 16) : '');
   const [endTime, setEndTime] = useState<string>(quiz.endTime ? quiz.endTime.substring(0, 16) : '');
 
-  // Tự động tính toán Thời gian đóng bài = Thời gian mở bài + Thời gian làm bài (Phút)
-  useEffect(() => {
-    if (startTime && durationMinutes && !isNaN(Number(durationMinutes))) {
-      const start = new Date(startTime);
-      if (!isNaN(start.getTime())) {
-        const calculatedEnd = new Date(start.getTime() + Number(durationMinutes) * 60 * 1000);
-        const tzOffset = calculatedEnd.getTimezoneOffset() * 60000;
-        const localISOTime = new Date(calculatedEnd.getTime() - tzOffset).toISOString().slice(0, 16);
-        setEndTime(localISOTime);
-      }
+  const updateQuizSettingsMutation = useMutation({
+    mutationFn: (data: Record<string, unknown>) =>
+      materialsApi.updateQuizSettings(quiz.materialId as number, data),
+    onSuccess: () => {
+      toast.success('Đã lưu cấu hình Quiz thành công!');
+      queryClient.invalidateQueries({ queryKey: ['instructor-materials'] });
+    },
+    onError: (err: Error) => {
+      toast.error(err.message || 'Lỗi khi lưu cấu hình Quiz');
     }
-  }, [startTime, durationMinutes]);
+  });
 
   const handleSave = () => {
     const pick = randomPickCount ? Math.max(1, parseInt(randomPickCount)) : null;
@@ -559,7 +524,7 @@ function QuizSettingsModal({
       return;
     }
 
-    onSave({
+    updateQuizSettingsMutation.mutate({
       randomPickCount: pick,
       durationMinutes: dur,
       maxAttempts: att,
@@ -572,31 +537,105 @@ function QuizSettingsModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
-      <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl my-8 border border-gray-100">
-        <div className="flex justify-between items-center border-b pb-3 mb-4">
-          <div>
-            <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-              <span>⚙️ Cấu hình Bài Thi Quiz</span>
-            </h3>
-            <p className="text-xs text-gray-500 mt-0.5">{quiz.title || 'Bài thi Quiz khóa học'}</p>
-          </div>
+    <div className="bg-white p-2">
+      <div className="flex justify-between items-center pb-4 mb-6 border-b">
+        <div>
+          <h3 className="text-xl font-bold text-gray-900">Cấu Hình Bài Thi</h3>
+          <p className="text-sm text-gray-500 mt-1">Quản lý thời gian, số lượt làm bài, sinh đề ngẫu nhiên và tính năng giám sát</p>
         </div>
-        
-        <div className="flex flex-col gap-4 max-h-[70vh] overflow-y-auto pr-1">
-          {/* Total questions hint badge */}
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 text-xs text-blue-900 font-medium flex items-center justify-between">
-            <span>Tổng số câu hỏi hiện có trong bộ đề:</span>
-            <span className="font-extrabold text-sm text-blue-700 bg-white px-2.5 py-0.5 rounded-md border border-blue-200">
-              {quiz.questionCount ?? 'Không xác định'} câu
+        <button 
+          onClick={handleSave}
+          disabled={updateQuizSettingsMutation.isPending}
+          className="rounded-xl bg-cyan-600 px-6 py-2.5 text-sm font-bold text-white hover:bg-cyan-700 disabled:opacity-50 shadow-md transition-all"
+        >
+          {updateQuizSettingsMutation.isPending ? 'Đang lưu...' : '💾 Lưu Cấu Hình'}
+        </button>
+      </div>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="space-y-6">
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-sm text-blue-900 flex items-center justify-between">
+            <span className="font-semibold">Tổng số câu hỏi hiện có trong Ngân hàng đề:</span>
+            <span className="font-black text-lg text-blue-700 bg-white px-3 py-1 rounded-md border border-blue-200">
+              {quiz.questionCount ?? 0} câu
             </span>
           </div>
 
-          {/* AI Anti-Cheat Proctoring Box */}
-          <div className="rounded-xl border border-red-200 bg-red-50/60 p-4 space-y-3 shadow-inner">
+          <label className="flex flex-col gap-2 text-sm font-bold text-gray-700">
+            Số câu hỏi bốc ngẫu nhiên mỗi lượt thi
+            <span className="font-normal text-xs text-gray-500">Mỗi lượt thi sẽ xáo trộn và bốc ngẫu nhiên số lượng câu hỏi từ ngân hàng đề. Để trống nếu muốn dùng tất cả {quiz.questionCount} câu.</span>
+            <input 
+              type="number" 
+              min="1"
+              max={quiz.questionCount ?? 100}
+              value={randomPickCount}
+              onChange={(e) => setRandomPickCount(e.target.value)}
+              placeholder={`Lấy tất cả ${quiz.questionCount ?? ''} câu`}
+              className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none"
+            />
+          </label>
+
+          <label className="flex flex-col gap-2 text-sm font-bold text-gray-700">
+            Thời gian làm bài (Phút)
+            <input 
+              type="number" 
+              min="1"
+              value={durationMinutes}
+              onChange={(e) => setDurationMinutes(e.target.value)}
+              className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none"
+            />
+          </label>
+
+          <label className="flex flex-col gap-2 text-sm font-bold text-gray-700">
+            Số lượt làm bài tối đa
+            <span className="font-normal text-xs text-gray-500">Nếu sinh viên được làm nhiều lần, hệ thống sẽ lưu điểm cao nhất.</span>
+            <input 
+              type="number" 
+              min="1"
+              value={maxAttempts}
+              onChange={(e) => setMaxAttempts(e.target.value)}
+              className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none"
+            />
+          </label>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <label className="flex flex-col gap-2 text-sm font-bold text-gray-700">
+              Khung giờ mở bài
+              <input 
+                type="datetime-local" 
+                value={startTime}
+                onChange={(e) => setStartTime(e.target.value)}
+                className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:border-cyan-500 outline-none"
+              />
+            </label>
+            <label className="flex flex-col gap-2 text-sm font-bold text-gray-700">
+              Khung giờ đóng bài
+              <span className="font-normal text-[10px] text-gray-500 -mt-1">Để trống nếu mở mãi mãi</span>
+              <input 
+                type="datetime-local" 
+                value={endTime}
+                onChange={(e) => setEndTime(e.target.value)}
+                className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:border-cyan-500 outline-none"
+              />
+            </label>
+          </div>
+
+          <label className="flex items-center gap-3 text-sm font-bold text-gray-700 bg-gray-50 p-4 rounded-xl border">
+            <input 
+              type="checkbox" 
+              checked={allowReview}
+              onChange={(e) => setAllowReview(e.target.checked)}
+              className="h-5 w-5 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500"
+            />
+            Cho phép học viên xem lại đáp án sau khi nộp bài
+          </label>
+        </div>
+
+        <div className="space-y-6">
+          <div className="rounded-2xl border border-red-200 bg-red-50/60 p-6 space-y-4 shadow-sm">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-bold text-red-950 flex items-center gap-1.5">
-                <span>🔴</span> Giám Sát Thi Cử AI (Anti-Cheat Proctoring)
+              <span className="text-base font-black text-red-950 flex items-center gap-2">
+                <span>🔴</span> Giám Sát Thi Cử AI (Anti-Cheat)
               </span>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input 
@@ -605,109 +644,29 @@ function QuizSettingsModal({
                   onChange={(e) => setIsProctored(e.target.checked)}
                   className="sr-only peer" 
                 />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+                <div className="w-14 h-7 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-red-600"></div>
               </label>
             </div>
-            <p className="text-xs text-red-700 leading-relaxed">
-              Bật tính năng để theo dõi chuyển tab, rời màn hình và webcam khuôn mặt học viên qua camera trong suốt giờ thi.
+            <p className="text-sm text-red-800 leading-relaxed border-l-2 border-red-300 pl-3">
+              Yêu cầu bật Camera. Hệ thống AI sẽ tự động giám sát khuôn mặt, cảnh báo khi học viên rời khỏi màn hình hoặc chuyển sang tab khác.
             </p>
 
             {isProctored && (
-              <label className="flex flex-col gap-1 text-xs font-semibold text-red-900 pt-2 border-t border-red-200">
-                Số lần vi phạm tối đa trước khi tự động thu bài
-                <input 
-                  type="number" 
-                  min="1"
-                  max="10"
-                  value={maxViolations}
-                  onChange={(e) => setMaxViolations(e.target.value)}
-                  className="rounded-lg border border-red-300 px-3 py-1.5 text-sm bg-white focus:border-red-500 focus:outline-none"
-                />
-              </label>
+              <div className="pt-4 border-t border-red-200">
+                <label className="flex flex-col gap-2 text-sm font-bold text-red-900">
+                  Số lần vi phạm tối đa trước khi tự động thu bài
+                  <input 
+                    type="number" 
+                    min="1"
+                    max="10"
+                    value={maxViolations}
+                    onChange={(e) => setMaxViolations(e.target.value)}
+                    className="rounded-xl border border-red-300 px-4 py-2.5 text-sm bg-white focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none w-full sm:w-1/2"
+                  />
+                </label>
+              </div>
             )}
           </div>
-
-          <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
-            Số câu hỏi bốc ngẫu nhiên (để trống nếu lấy toàn bộ {quiz.questionCount ?? ''} câu)
-            <input 
-              type="number" 
-              min="1"
-              max={quiz.questionCount ?? 100}
-              value={randomPickCount}
-              onChange={(e) => setRandomPickCount(e.target.value)}
-              placeholder={`Lấy tất cả ${quiz.questionCount ?? ''} câu`}
-              className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-cyan-500 focus:outline-none"
-            />
-          </label>
-
-          <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
-            Thời gian làm bài (Phút)
-            <input 
-              type="number" 
-              min="1"
-              value={durationMinutes}
-              onChange={(e) => setDurationMinutes(e.target.value)}
-              className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-cyan-500 focus:outline-none"
-            />
-          </label>
-
-          <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
-            Số lần làm bài tối đa cho mỗi sinh viên
-            <input 
-              type="number" 
-              min="1"
-              value={maxAttempts}
-              onChange={(e) => setMaxAttempts(e.target.value)}
-              className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-cyan-500 focus:outline-none"
-            />
-          </label>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
-              Thời gian mở bài
-              <input 
-                type="datetime-local" 
-                value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
-                className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-cyan-500 focus:outline-none"
-              />
-            </label>
-            <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
-              Thời gian đóng bài (tự động tính)
-              <input 
-                type="datetime-local" 
-                value={endTime}
-                onChange={(e) => setEndTime(e.target.value)}
-                className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-cyan-500 focus:outline-none bg-gray-50"
-              />
-            </label>
-          </div>
-
-          <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 pt-1">
-            <input 
-              type="checkbox" 
-              checked={allowReview}
-              onChange={(e) => setAllowReview(e.target.checked)}
-              className="h-4 w-4 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500"
-            />
-            Cho phép xem lại đáp án chi tiết sau khi nộp
-          </label>
-        </div>
-
-        <div className="mt-6 flex justify-end gap-3 border-t pt-4">
-          <button 
-            onClick={onClose}
-            className="rounded-lg px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-100"
-          >
-            Hủy
-          </button>
-          <button 
-            onClick={handleSave}
-            disabled={isSaving}
-            className="rounded-lg bg-cyan-600 px-5 py-2 text-sm font-bold text-white hover:bg-cyan-700 disabled:opacity-50 shadow"
-          >
-            {isSaving ? 'Đang lưu...' : 'Lưu cấu hình'}
-          </button>
         </div>
       </div>
     </div>
@@ -715,8 +674,8 @@ function QuizSettingsModal({
 }
 
 /** Modal Sinh AI Official Mới Cho Giảng Viên */
-function GenerateAiOfficialModal({ courseId, initialType, onClose, onSuccess }: { courseId: number; initialType?: 'QUIZ' | 'FLASHCARD' | 'MINDMAP' | null; onClose: () => void; onSuccess: () => void }) {
-  const [materialType, setMaterialType] = useState<'QUIZ' | 'FLASHCARD' | 'MINDMAP'>(initialType || 'QUIZ');
+function GenerateAiOfficialModal({ courseId, onClose, onSuccess }: { courseId: number; onClose: () => void; onSuccess: () => void }) {
+  const [materialType, setMaterialType] = useState<'QUIZ' | 'FLASHCARD' | 'MINDMAP' | null>(null);
   const [scopeType, setScopeType] = useState<'WHOLE_COURSE' | 'CHAPTER' | 'CUSTOM_LESSONS'>('WHOLE_COURSE');
   const [scopeRefId, setScopeRefId] = useState<number | undefined>(undefined);
   const [difficultyLevel, setDifficultyLevel] = useState<'EASY' | 'MEDIUM' | 'HARD'>('MEDIUM');
@@ -747,6 +706,10 @@ function GenerateAiOfficialModal({ courseId, initialType, onClose, onSuccess }: 
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!materialType) {
+      toast.error("Vui lòng chọn loại học liệu bạn muốn tạo");
+      return;
+    }
     generateMutation.mutate({
       courseId,
       materialType,
@@ -758,51 +721,68 @@ function GenerateAiOfficialModal({ courseId, initialType, onClose, onSuccess }: 
     });
   };
 
-  const modalTitles = {
-    MINDMAP: '🧠 Sinh Sơ Đồ Tư Duy (Mindmap) AI',
-    FLASHCARD: '🃏 Sinh Bộ Thẻ Ôn Tập (Flashcard) AI',
-    QUIZ: '📝 Sinh Bài Thi Trắc Nghiệm (Quiz) AI',
-  };
-
-  const modalDescriptions = {
-    MINDMAP: 'AI sẽ tự động tổng hợp kiến thức từ video bài giảng thành sơ đồ node tư duy trực quan.',
-    FLASHCARD: 'AI sẽ trích xuất các thuật ngữ & khái niệm quan trọng thành bộ thẻ học 2 mặt.',
-    QUIZ: 'AI sẽ tạo bộ câu hỏi trắc nghiệm kèm phương án lựa chọn và đáp án giải thích.',
-  };
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
-      <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl my-8">
-        <div className="border-b pb-3 mb-4">
-          <h3 className="text-lg font-bold text-gray-900">{modalTitles[materialType]}</h3>
-          <p className="text-xs text-gray-500 mt-1">{modalDescriptions[materialType]}</p>
+      <div className="w-full max-w-2xl rounded-3xl bg-white p-8 shadow-2xl my-8">
+        <div className="border-b pb-4 mb-6">
+          <h3 className="text-2xl font-black text-gray-900">✨ Tạo Học Liệu AI Tự Động</h3>
+          <p className="text-sm text-gray-500 mt-1">Lựa chọn loại học liệu bạn muốn AI tự động tổng hợp từ nội dung bài giảng.</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
-            Loại học liệu
-            <select 
-              value={materialType}
-              onChange={(e) => setMaterialType(e.target.value as 'QUIZ' | 'FLASHCARD' | 'MINDMAP')}
-              className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-cyan-500 focus:outline-none"
+        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+          
+          {/* Bước 1: Chọn Loại Học Liệu (Card Layout) */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div 
+              onClick={() => setMaterialType('QUIZ')}
+              className={`cursor-pointer rounded-2xl p-4 border-2 transition-all flex flex-col items-center text-center gap-2 ${
+                materialType === 'QUIZ' ? 'border-cyan-500 bg-cyan-50/50 shadow-md scale-[1.02]' : 'border-gray-200 hover:border-cyan-300 bg-white'
+              }`}
             >
-              <option value="MINDMAP">🧠 Sơ đồ Mindmap bài học</option>
-              <option value="FLASHCARD">🃏 Bộ Flashcard ôn tập</option>
-              <option value="QUIZ">📝 Quiz Bài thi trắc nghiệm</option>
-            </select>
-          </label>
+              <div className="text-4xl">📝</div>
+              <div className="font-bold text-gray-900">Bài Thi Trắc Nghiệm</div>
+              <div className="text-xs text-gray-500">Sinh câu hỏi trắc nghiệm kèm giải thích</div>
+            </div>
 
-          <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
-            Phạm vi tạo học liệu
-            <select 
-              value={scopeType}
-              onChange={(e) => setScopeType(e.target.value as 'WHOLE_COURSE' | 'CHAPTER')}
-              className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-cyan-500 focus:outline-none"
+            <div 
+              onClick={() => setMaterialType('FLASHCARD')}
+              className={`cursor-pointer rounded-2xl p-4 border-2 transition-all flex flex-col items-center text-center gap-2 ${
+                materialType === 'FLASHCARD' ? 'border-purple-500 bg-purple-50/50 shadow-md scale-[1.02]' : 'border-gray-200 hover:border-purple-300 bg-white'
+              }`}
             >
-              <option value="WHOLE_COURSE">Toàn bộ khóa học</option>
-              <option value="CHAPTER">Theo chương cụ thể</option>
-            </select>
-          </label>
+              <div className="text-4xl">🃏</div>
+              <div className="font-bold text-gray-900">Thẻ Flashcard</div>
+              <div className="text-xs text-gray-500">Trích xuất thuật ngữ & khái niệm 2 mặt</div>
+            </div>
+
+            <div 
+              onClick={() => setMaterialType('MINDMAP')}
+              className={`cursor-pointer rounded-2xl p-4 border-2 transition-all flex flex-col items-center text-center gap-2 ${
+                materialType === 'MINDMAP' ? 'border-blue-500 bg-blue-50/50 shadow-md scale-[1.02]' : 'border-gray-200 hover:border-blue-300 bg-white'
+              }`}
+            >
+              <div className="text-4xl">🧠</div>
+              <div className="font-bold text-gray-900">Sơ Đồ Tư Duy</div>
+              <div className="text-xs text-gray-500">Vẽ sơ đồ luồng kiến thức trực quan</div>
+            </div>
+          </div>
+
+          {/* Bước 2: Hiển thị các Option nếu đã chọn loại */}
+          {materialType && (
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-300 flex flex-col gap-4 bg-gray-50 p-5 rounded-2xl border border-gray-200">
+              <h4 className="font-bold text-gray-800 border-b pb-2">Cấu Hình Chi Tiết</h4>
+              
+              <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
+                Phạm vi tạo học liệu
+                <select 
+                  value={scopeType}
+                  onChange={(e) => setScopeType(e.target.value as 'WHOLE_COURSE' | 'CHAPTER')}
+                  className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:border-cyan-500 outline-none bg-white"
+                >
+                  <option value="WHOLE_COURSE">Toàn bộ khóa học</option>
+                  <option value="CHAPTER">Theo chương cụ thể</option>
+                </select>
+              </label>
 
           {scopeType === 'CHAPTER' && (
             <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
@@ -892,18 +872,20 @@ function GenerateAiOfficialModal({ courseId, initialType, onClose, onSuccess }: 
             </select>
           </label>
 
-          <div className="mt-4 flex justify-end gap-3 border-t pt-4">
-            <button type="button" onClick={onClose} className="rounded-lg px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-100">
+          <div className="mt-6 flex justify-end gap-3 border-t pt-5">
+            <button type="button" onClick={onClose} className="rounded-xl px-5 py-2.5 text-sm font-bold text-gray-600 hover:bg-gray-200 transition-colors">
               Hủy
             </button>
             <button 
               type="submit" 
-              disabled={generateMutation.isPending}
-              className="rounded-lg bg-cyan-600 px-5 py-2 text-sm font-bold text-white hover:bg-cyan-700 disabled:opacity-50"
+              disabled={generateMutation.isPending || !materialType}
+              className="rounded-xl bg-cyan-600 px-6 py-2.5 text-sm font-bold text-white hover:bg-cyan-700 disabled:opacity-50 shadow-md"
             >
-              {generateMutation.isPending ? 'Đang gửi yêu cầu AI...' : 'Bắt đầu sinh AI'}
+              {generateMutation.isPending ? 'Đang gọi AI...' : '✨ Bắt Đầu Sinh'}
             </button>
           </div>
+          </div>
+          )}
         </form>
       </div>
     </div>

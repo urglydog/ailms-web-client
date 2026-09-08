@@ -25,6 +25,7 @@ export interface StartRes {
   isProctored?: boolean;
   maxViolations?: number;
   durationMinutes?: number | null;
+  startedAt?: string;
 }
 
 export interface SubmitReq {
@@ -64,6 +65,7 @@ export interface HistoryRes {
   totalQuestions: number;
   submittedAt: string;
   quizId: number;
+  status: string;
 }
 
 export const quizApi = {
