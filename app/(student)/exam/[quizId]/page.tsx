@@ -332,6 +332,8 @@ export default function AntiCheatExamPage() {
               <button 
                 onClick={() => {
                   setResult(null);
+                  setIsStarted(false);
+                  setAttemptData(null);
                   refetchHistory();
                 }}
                 className="bg-accent text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-accent-hover transition-all"
