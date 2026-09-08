@@ -178,15 +178,6 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                   {mat.isOfficial ? '★ Đang là Official' : '☆ Đánh dấu Official'}
                 </button>
 
-                {/* Cấu hình Quiz & Thi cử */}
-                {mat.materialType === 'QUIZ' && mat.materialId && (
-                  <button
-                    onClick={() => setSelectedQuiz(mat)}
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-blue-700 transition-all"
-                  >
-                    ⚙️ Cấu hình Quiz
-                  </button>
-                )}
 
               </div>
             )}
