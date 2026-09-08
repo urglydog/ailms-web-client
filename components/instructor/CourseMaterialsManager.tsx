@@ -15,7 +15,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
   const router = useRouter();
   const queryClient = useQueryClient();
 
-  const queryClient = useQueryClient();
+
   const searchParams = useSearchParams();
   const inspectGenerationId = searchParams.get('inspect') ? Number(searchParams.get('inspect')) : null;
   const setInspectGenerationId = (id: number | null) => {
