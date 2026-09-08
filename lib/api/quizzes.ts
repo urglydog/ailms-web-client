@@ -81,8 +81,8 @@ export const quizApi = {
     return api.post<SubmitRes>(`/api/v1/quizzes/attempts/${attemptId}/submit`, data, { token: authToken() });
   },
 
-  getAttemptHistory: (courseId: number) => {
-    return api.get<HistoryRes[]>(`/api/v1/courses/${courseId}/quizzes/attempts`, { token: authToken() });
+  getAttemptHistory: (quizId: number) => {
+    return api.get<HistoryRes[]>(`/api/v1/quizzes/${quizId}/attempts`, { token: authToken() });
   },
 
   getAttemptDetail: (attemptId: number) => {
