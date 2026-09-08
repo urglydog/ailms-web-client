@@ -19,7 +19,6 @@ export default function AntiCheatExamPage() {
   const questionCount = searchParams.get('count');
   const startTime = searchParams.get('start');
   const endTime = searchParams.get('end');
-  const attemptCount = searchParams.get('attemptCount');
   const proctoredParam = searchParams.get('proctored');
   const isProctored = proctoredParam === 'true';
 
@@ -236,31 +235,37 @@ export default function AntiCheatExamPage() {
     });
   };
 
-  // Đồng hồ đếm ngược: bắt đầu khi exam started và có duration
+  // Đồng hồ đếm ngược tuyệt đối dựa vào startedAt
   useEffect(() => {
     const examDurationMinutes = duration ? Number(duration) : null;
-    if (!isStarted || !examDurationMinutes || result) return;
-    // Khởi tạo thời gian
-    const totalSeconds = examDurationMinutes * 60;
-    setTimeLeft(totalSeconds);
-    startTimeRef.current = new Date();
-    timerRef.current = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev === null || prev <= 1) {
-          // Hết giờ → tự nộp bài
-          clearInterval(timerRef.current!);
-          toast.warning('⏱ Hết giờ! Bài thi đã được tự động nộp.');
-          setTimeout(() => submitExam(), 300);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+    if (!isStarted || !examDurationMinutes || result || !attemptData?.startedAt) return;
+    
+    const startTimeMs = new Date(attemptData.startedAt).getTime();
+    const durationMs = examDurationMinutes * 60 * 1000;
+    const expireTimeMs = startTimeMs + durationMs;
+    
+    startTimeRef.current = new Date(startTimeMs);
+
+    const updateTimer = () => {
+      const remainingMs = expireTimeMs - Date.now();
+      if (remainingMs <= 1000) {
+        if (timerRef.current) clearInterval(timerRef.current);
+        setTimeLeft(0);
+        toast.warning('⏱ Hết giờ! Bài thi đã được tự động nộp.');
+        setTimeout(() => submitExam(), 300);
+      } else {
+        setTimeLeft(Math.floor(remainingMs / 1000));
+      }
+    };
+
+    updateTimer(); // Call immediately
+    timerRef.current = setInterval(updateTimer, 1000);
+    
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isStarted, duration, result]);
+  }, [isStarted, duration, result, attemptData?.startedAt]);
 
   // Gắn stream
   useEffect(() => {
@@ -456,64 +461,97 @@ export default function AntiCheatExamPage() {
             </div>
 
             <div className="space-y-4 mb-8 text-sm text-gray-800">
-              <p>Attempts allowed: {maxAttempts || 'Không giới hạn'}</p>
-              {isProctored && <p className="text-red-600 font-semibold">Để thực hiện bài trắc nghiệm này bạn cần bật Camera để AI giám sát. Không được chuyển tab hay rời khỏi màn hình.</p>}
-              <p>Thời gian làm bài: {duration ? `${duration} phút` : 'Không giới hạn'}</p>
+              <p>Số lần làm bài cho phép: <span className="font-bold">{maxAttempts || 'Không giới hạn'}</span></p>
+              <p>Thời gian làm bài: <span className="font-bold">{duration ? `${duration} phút` : 'Không giới hạn'}</span></p>
+              {isProctored && <p className="text-red-600 font-semibold p-4 bg-red-50 rounded-lg border border-red-200 mt-2">⚠️ Để thực hiện bài trắc nghiệm này bạn cần bật Camera để AI giám sát. Không được chuyển tab hay rời khỏi màn hình.</p>}
             </div>
 
-            {history && history.length > 0 && (
-              <div className="mb-8">
-                <h3 className="text-xl text-orange-600 mb-4">Tổng quan các lần làm bài trước của bạn</h3>
-                <div className="overflow-hidden border border-gray-200 rounded-md">
-                  <table className="w-full text-sm text-left">
-                    <thead className="bg-[#8ebb83] text-white">
-                      <tr>
-                        <th className="px-4 py-3 font-semibold">Trạng thái</th>
-                        <th className="px-4 py-3 font-semibold text-center w-32">Xem lại</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-200 bg-white">
-                      {history.map((h) => (
-                        <tr key={h.id} className="hover:bg-gray-50">
-                          <td className="px-4 py-4">
-                            <div className="font-medium text-gray-900">Đã xong</div>
-                            <div className="text-gray-500 text-xs mt-1">Đã nộp {new Date(h.submittedAt).toLocaleString('en-GB')}</div>
-                            <div className="text-blue-600 font-medium text-xs mt-1">Điểm: {h.score.toFixed(1)}/10</div>
-                          </td>
-                          <td className="px-4 py-4 text-center">
-                            <Link href={`/exam/${quizId}/history`} className="text-blue-600 hover:underline">
-                              Xem chi tiết
-                            </Link>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
+            {(() => {
+              const sortedHistory = [...(history || [])].sort((a, b) => new Date(a.submittedAt).getTime() - new Date(b.submittedAt).getTime());
+              const ongoingAttempt = history?.find(h => h.status === 'IN_PROGRESS');
+              const completedCount = history?.filter(h => h.status === 'COMPLETED').length || 0;
+              const isClosed = endTime ? new Date() > new Date(endTime) : false;
+              const maxAtt = parseInt(maxAttempts || '0');
+              const canStartNewAttempt = !maxAttempts || maxAtt <= 0 || completedCount < maxAtt;
 
-            <div className="flex flex-col items-center mt-8 space-y-4 pb-8">
-              {(!maxAttempts || attemptCount === null || parseInt(attemptCount) < parseInt(maxAttempts)) ? (
-                <button
-                  onClick={startExam}
-                  disabled={(!isProctored ? false : !isModelLoaded) || isStarting}
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-6 rounded border shadow-sm transition-colors disabled:opacity-50"
-                >
-                  {isStarting ? 'Đang chuẩn bị...' : (!isProctored ? 'Bắt đầu làm bài' : isModelLoaded ? 'Bật Camera & Bắt đầu thi' : 'Đang tải AI Model...')}
-                </button>
-              ) : (
-                <div className="text-gray-500 font-medium">
-                  Không cho phép nhiều lần thử
-                </div>
-              )}
-              <button
-                onClick={() => router.back()}
-                className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-6 rounded border shadow-sm transition-colors"
-              >
-                Trở về khóa học
-              </button>
-            </div>
+              return (
+                <>
+                  {sortedHistory.length > 0 && (
+                    <div className="mb-8">
+                      <h3 className="text-xl font-bold text-ink mb-4">Tổng quan các lần làm bài trước của bạn</h3>
+                      <div className="overflow-hidden border border-line rounded-xl shadow-sm">
+                        <table className="w-full text-sm text-left">
+                          <thead className="bg-surface-hover text-ink font-semibold border-b border-line">
+                            <tr>
+                              <th className="px-6 py-4">Lần thi</th>
+                              <th className="px-6 py-4">Trạng thái</th>
+                              <th className="px-6 py-4 text-center">Điểm / 10</th>
+                              <th className="px-6 py-4 text-center">Xem lại</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-line bg-surface">
+                            {sortedHistory.map((h, index) => {
+                              if (h.status === 'IN_PROGRESS') return null;
+                              return (
+                                <tr key={h.id} className="hover:bg-surface-hover transition-colors">
+                                  <td className="px-6 py-4 font-bold text-ink">{index + 1}</td>
+                                  <td className="px-6 py-4">
+                                    <div className="font-medium text-green-600">Đã xong</div>
+                                    <div className="text-ink-muted text-xs mt-1">Đã nộp {new Date(h.submittedAt).toLocaleString('vi-VN')}</div>
+                                  </td>
+                                  <td className="px-6 py-4 text-center">
+                                    <span className="font-bold text-lg">{h.score.toFixed(1)}</span>
+                                  </td>
+                                  <td className="px-6 py-4 text-center">
+                                    <Link href={`/exam/${quizId}/history/${h.id}`} className="text-accent font-semibold hover:underline">
+                                      Xem chi tiết
+                                    </Link>
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex flex-col items-center mt-8 space-y-4 pb-8">
+                    {ongoingAttempt ? (
+                      <button
+                        onClick={startExam}
+                        disabled={isStarting}
+                        className="bg-accent hover:bg-accent-hover text-white font-bold py-3 px-8 rounded-xl shadow-lg transition-all"
+                      >
+                        {isStarting ? 'Đang chuẩn bị...' : 'Tiếp tục làm bài'}
+                      </button>
+                    ) : isClosed ? (
+                      <div className="text-red-500 font-bold p-4 bg-red-50 rounded-lg">
+                        Bài thi đã đóng. Bạn không thể làm bài nữa.
+                      </div>
+                    ) : canStartNewAttempt ? (
+                      <button
+                        onClick={startExam}
+                        disabled={(!isProctored ? false : !isModelLoaded) || isStarting}
+                        className="bg-accent hover:bg-accent-hover text-white font-bold py-3 px-8 rounded-xl shadow-lg transition-all disabled:opacity-50"
+                      >
+                        {isStarting ? 'Đang chuẩn bị...' : (!isProctored ? 'Bắt đầu làm bài mới' : isModelLoaded ? 'Bật Camera & Bắt đầu thi' : 'Đang tải AI Model...')}
+                      </button>
+                    ) : (
+                      <div className="text-ink-muted font-semibold p-4 bg-surface-hover rounded-lg border border-line">
+                        Bạn đã hết số lần làm bài cho phép ({maxAttempts} lần).
+                      </div>
+                    )}
+                    <button
+                      onClick={() => router.back()}
+                      className="text-ink-muted hover:text-ink font-semibold py-2 px-6 transition-colors"
+                    >
+                      Trở về khóa học
+                    </button>
+                  </div>
+                </>
+              );
+            })()}
           </div>
         ) : (
           <div className="grid grid-cols-3 gap-8">
