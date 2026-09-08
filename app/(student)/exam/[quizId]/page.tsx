@@ -410,6 +410,157 @@ export default function AntiCheatExamPage() {
     );
   }
 
+  if (!isStarted) {
+    const sortedHistory = [...(history || [])].sort((a, b) => new Date(a.submittedAt).getTime() - new Date(b.submittedAt).getTime());
+    const ongoingAttempt = history?.find(h => h.status === 'IN_PROGRESS');
+    const completedCount = history?.filter(h => h.status === 'COMPLETED').length || 0;
+    const isClosed = endTime ? new Date() > new Date(endTime) : false;
+    const isNotOpenYet = startTime ? new Date() < new Date(startTime) : false;
+    const maxAtt = parseInt(maxAttempts || '0');
+    const canStartNewAttempt = !maxAttempts || maxAtt <= 0 || completedCount < maxAtt;
+
+    return (
+      <div className="min-h-dvh bg-surface p-4 sm:p-8">
+        <div className="max-w-5xl mx-auto mt-4 sm:mt-8">
+          <div className="flex items-center gap-2 mb-6">
+            <button onClick={() => router.push('/my-courses')} className="text-accent hover:underline text-sm font-semibold">Khóa học</button>
+            <span className="text-ink-muted">/</span>
+            <span className="text-ink text-sm font-medium">{title}</span>
+          </div>
+
+          <div className="bg-surface border border-line rounded-xl shadow-sm overflow-hidden mb-8">
+            <div className="flex items-start gap-4 p-6 border-b border-line bg-surface-hover">
+              <div className="w-14 h-14 rounded-md flex items-center justify-center font-bold text-2xl shadow-sm bg-accent text-white flex-shrink-0">
+                📝
+              </div>
+              <div>
+                <div className="text-xs text-ink-muted uppercase font-bold tracking-wider mb-1">Trắc Nghiệm {isProctored && '- Có giám sát Camera'}</div>
+                <h3 className="font-display font-bold text-ink text-2xl">{title}</h3>
+              </div>
+            </div>
+
+            <div className="p-6 sm:p-8 text-sm text-ink space-y-8">
+              <div className="flex flex-col md:flex-row gap-8">
+                <div className="flex-1 space-y-4">
+                  <div className="flex items-center gap-3">
+                    <span className="w-24 font-semibold text-ink-muted">Mở bài:</span>
+                    <span className="font-medium text-ink">{startTime ? new Date(startTime).toLocaleString('vi-VN') : 'Không giới hạn'}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="w-24 font-semibold text-ink-muted">Đóng bài:</span>
+                    <span className="font-medium text-ink">{endTime ? new Date(endTime).toLocaleString('vi-VN') : 'Không giới hạn'}</span>
+                  </div>
+                </div>
+                
+                <div className="flex-1 space-y-4 border-t md:border-t-0 md:border-l border-line pt-4 md:pt-0 md:pl-8">
+                  <div className="flex items-center gap-3">
+                    <span className="w-32 font-semibold text-ink-muted">Số câu:</span>
+                    <span className="font-medium text-ink">{questionCount || '...'} câu</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="w-32 font-semibold text-ink-muted">Thời gian:</span>
+                    <span className="font-medium text-ink">{duration ? `${duration} phút` : 'Không giới hạn'}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="w-32 font-semibold text-ink-muted">Số lượt làm:</span>
+                    <span className="font-medium text-ink">{maxAttempts ? `${maxAttempts} lần` : 'Không giới hạn'}</span>
+                  </div>
+                </div>
+              </div>
+
+              {isProctored && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4 mt-6">
+                  <p className="text-red-700 font-semibold text-sm flex items-center gap-2">
+                    <span>⚠️</span>
+                    Để thực hiện bài trắc nghiệm này bạn cần bật Camera để AI giám sát. Không được chuyển tab hay rời khỏi màn hình.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {sortedHistory.length > 0 && (
+            <div className="mb-8">
+              <h3 className="text-xl font-bold text-ink mb-4">Tổng quan các lần làm bài trước của bạn</h3>
+              <div className="overflow-hidden border border-line rounded-xl shadow-sm bg-surface">
+                <table className="w-full text-sm text-left">
+                  <thead className="bg-surface-hover text-ink font-semibold border-b border-line">
+                    <tr>
+                      <th className="px-6 py-4">Lần thi</th>
+                      <th className="px-6 py-4">Trạng thái</th>
+                      <th className="px-6 py-4 text-center">Điểm / 10</th>
+                      <th className="px-6 py-4 text-center">Xem lại</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-line">
+                    {sortedHistory.map((h, index) => {
+                      if (h.status === 'IN_PROGRESS') return null;
+                      return (
+                        <tr key={h.id} className="hover:bg-surface-hover transition-colors">
+                          <td className="px-6 py-4 font-bold text-ink">{index + 1}</td>
+                          <td className="px-6 py-4">
+                            <div className="font-medium text-green-600">Đã xong</div>
+                            <div className="text-ink-muted text-xs mt-1">Đã nộp {new Date(h.submittedAt).toLocaleString('vi-VN')}</div>
+                          </td>
+                          <td className="px-6 py-4 text-center">
+                            <span className="font-bold text-lg text-ink">{h.score.toFixed(1)}</span>
+                          </td>
+                          <td className="px-6 py-4 text-center">
+                            <Link href={`/exam/${quizId}/history/${h.id}`} className="text-accent font-semibold hover:underline">
+                              Xem chi tiết
+                            </Link>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          <div className="flex flex-col items-center mt-8 space-y-4 pb-8">
+            {ongoingAttempt ? (
+              <button
+                onClick={startExam}
+                disabled={isStarting}
+                className="bg-accent hover:bg-accent-hover text-white font-bold py-3 px-8 rounded-full shadow-lg transition-all"
+              >
+                {isStarting ? 'Đang chuẩn bị...' : 'Tiếp tục làm bài'}
+              </button>
+            ) : isNotOpenYet ? (
+              <div className="text-amber-600 font-bold p-4 bg-amber-50 rounded-lg">
+                Bài thi chưa mở. Vui lòng quay lại sau.
+              </div>
+            ) : isClosed ? (
+              <div className="text-red-500 font-bold p-4 bg-red-50 rounded-lg">
+                Bài thi đã đóng. Bạn không thể làm bài nữa.
+              </div>
+            ) : !canStartNewAttempt ? (
+              <div className="text-ink-muted font-semibold p-4 bg-surface-hover rounded-lg border border-line">
+                Bạn đã hết số lần làm bài cho phép ({maxAttempts} lần).
+              </div>
+            ) : (
+              <button
+                onClick={startExam}
+                disabled={(!isProctored ? false : !isModelLoaded) || isStarting}
+                className="bg-accent hover:bg-accent-hover text-white font-bold py-3 px-8 rounded-full shadow-lg transition-all disabled:opacity-50"
+              >
+                {isStarting ? 'Đang chuẩn bị...' : (!isProctored ? 'Bắt đầu làm bài mới' : isModelLoaded ? 'Bật Camera & Bắt đầu thi' : 'Đang tải AI Model...')}
+              </button>
+            )}
+            <button
+              onClick={() => router.back()}
+              className="text-ink-muted hover:text-ink font-semibold py-2 px-6 transition-colors"
+            >
+              Trở về khóa học
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-dvh bg-surface p-8">
       <div className="shell max-w-4xl mx-auto">
@@ -442,132 +593,6 @@ export default function AntiCheatExamPage() {
             )}
           </div>
         </div>
-
-        {!isStarted ? (
-          <div className="max-w-5xl mx-auto mt-8">
-            <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden mb-8">
-              <div className="flex items-start gap-4 p-6 border-b border-gray-100">
-                <div className="w-14 h-14 rounded-md flex items-center justify-center font-bold text-2xl shadow-sm bg-pink-500 text-white flex-shrink-0">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                </div>
-                <div>
-                  <div className="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1">Trắc Nghiệm {isProctored && '- Có giám sát Camera'}</div>
-                  <h3 className="font-bold text-orange-600 text-2xl">{title}</h3>
-                </div>
-              </div>
-
-              <div className="p-8 text-sm text-gray-800 space-y-8 bg-gray-50/30">
-                <div className="space-y-1">
-                  {startTime && <p><strong className="font-semibold text-gray-900 w-20 inline-block">Opened:</strong> {new Date(startTime).toLocaleString('en-GB')}</p>}
-                  {endTime && <p><strong className="font-semibold text-gray-900 w-20 inline-block">Closed:</strong> {new Date(endTime).toLocaleString('en-GB')}</p>}
-                </div>
-
-                <div className="space-y-4 pt-6 border-t border-gray-200">
-                  <p>Bài thi gồm {questionCount || '...'} câu</p>
-                  <p>Thời gian làm bài: {duration ? `${duration} phút` : 'Không giới hạn'}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-4 mb-8 text-sm text-gray-800">
-              <p>Số lần làm bài cho phép: <span className="font-bold">{maxAttempts || 'Không giới hạn'}</span></p>
-              <p>Thời gian làm bài: <span className="font-bold">{duration ? `${duration} phút` : 'Không giới hạn'}</span></p>
-              {isProctored && <p className="text-red-600 font-semibold p-4 bg-red-50 rounded-lg border border-red-200 mt-2">⚠️ Để thực hiện bài trắc nghiệm này bạn cần bật Camera để AI giám sát. Không được chuyển tab hay rời khỏi màn hình.</p>}
-            </div>
-
-            {(() => {
-              const sortedHistory = [...(history || [])].sort((a, b) => new Date(a.submittedAt).getTime() - new Date(b.submittedAt).getTime());
-              const ongoingAttempt = history?.find(h => h.status === 'IN_PROGRESS');
-              const completedCount = history?.filter(h => h.status === 'COMPLETED').length || 0;
-              const isClosed = endTime ? new Date() > new Date(endTime) : false;
-              const isNotOpenYet = startTime ? new Date() < new Date(startTime) : false;
-              const maxAtt = parseInt(maxAttempts || '0');
-              const canStartNewAttempt = !maxAttempts || maxAtt <= 0 || completedCount < maxAtt;
-
-              return (
-                <>
-                  {sortedHistory.length > 0 && (
-                    <div className="mb-8">
-                      <h3 className="text-xl font-bold text-ink mb-4">Tổng quan các lần làm bài trước của bạn</h3>
-                      <div className="overflow-hidden border border-line rounded-xl shadow-sm">
-                        <table className="w-full text-sm text-left">
-                          <thead className="bg-surface-hover text-ink font-semibold border-b border-line">
-                            <tr>
-                              <th className="px-6 py-4">Lần thi</th>
-                              <th className="px-6 py-4">Trạng thái</th>
-                              <th className="px-6 py-4 text-center">Điểm / 10</th>
-                              <th className="px-6 py-4 text-center">Xem lại</th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-line bg-surface">
-                            {sortedHistory.map((h, index) => {
-                              if (h.status === 'IN_PROGRESS') return null;
-                              return (
-                                <tr key={h.id} className="hover:bg-surface-hover transition-colors">
-                                  <td className="px-6 py-4 font-bold text-ink">{index + 1}</td>
-                                  <td className="px-6 py-4">
-                                    <div className="font-medium text-green-600">Đã xong</div>
-                                    <div className="text-ink-muted text-xs mt-1">Đã nộp {new Date(h.submittedAt).toLocaleString('vi-VN')}</div>
-                                  </td>
-                                  <td className="px-6 py-4 text-center">
-                                    <span className="font-bold text-lg">{h.score.toFixed(1)}</span>
-                                  </td>
-                                  <td className="px-6 py-4 text-center">
-                                    <Link href={`/exam/${quizId}/history/${h.id}`} className="text-accent font-semibold hover:underline">
-                                      Xem chi tiết
-                                    </Link>
-                                  </td>
-                                </tr>
-                              );
-                            })}
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="flex flex-col items-center mt-8 space-y-4 pb-8">
-                    {ongoingAttempt ? (
-                      <button
-                        onClick={startExam}
-                        disabled={isStarting}
-                        className="bg-accent hover:bg-accent-hover text-white font-bold py-3 px-8 rounded-xl shadow-lg transition-all"
-                      >
-                        {isStarting ? 'Đang chuẩn bị...' : 'Tiếp tục làm bài'}
-                      </button>
-                    ) : isNotOpenYet ? (
-                      <div className="text-amber-600 font-bold p-4 bg-amber-50 rounded-lg">
-                        Bài thi chưa mở. Vui lòng quay lại sau.
-                      </div>
-                    ) : isClosed ? (
-                      <div className="text-red-500 font-bold p-4 bg-red-50 rounded-lg">
-                        Bài thi đã đóng. Bạn không thể làm bài nữa.
-                      </div>
-                    ) : !canStartNewAttempt ? (
-                      <div className="text-ink-muted font-semibold p-4 bg-surface-hover rounded-lg border border-line">
-                        Bạn đã hết số lần làm bài cho phép ({maxAttempts} lần).
-                      </div>
-                    ) : (
-                      <button
-                        onClick={startExam}
-                        disabled={(!isProctored ? false : !isModelLoaded) || isStarting}
-                        className="bg-accent hover:bg-accent-hover text-white font-bold py-3 px-8 rounded-xl shadow-lg transition-all disabled:opacity-50"
-                      >
-                        {isStarting ? 'Đang chuẩn bị...' : (!isProctored ? 'Bắt đầu làm bài mới' : isModelLoaded ? 'Bật Camera & Bắt đầu thi' : 'Đang tải AI Model...')}
-                      </button>
-                    )}
-                    <button
-                      onClick={() => router.back()}
-                      className="text-ink-muted hover:text-ink font-semibold py-2 px-6 transition-colors"
-                    >
-                      Trở về khóa học
-                    </button>
-                  </div>
-                </>
-              );
-            })()}
-          </div>
-        ) : (
           <div className="grid grid-cols-3 gap-8">
             <div className="col-span-2 flex flex-col gap-6">
               {attemptData?.questions.map((q, idx) => (
@@ -624,7 +649,6 @@ export default function AntiCheatExamPage() {
               </button>
             </div>
           </div>
-        )}
       </div>
     </div>
   );
