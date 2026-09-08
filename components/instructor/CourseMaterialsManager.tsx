@@ -495,8 +495,15 @@ function MaterialWorkspaceViewer({
 /** Tab Cấu hình Quiz Thi Cử & Proctoring (Mới) */
 function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
   const queryClient = useQueryClient();
+  
+  type ExamPolicy = 'PRACTICE_UNLIMITED' | 'PRACTICE_LIMITED' | 'EXAM_STRICT';
+  const initialPolicy = !quiz.maxAttempts 
+    ? 'PRACTICE_UNLIMITED' 
+    : (quiz.maxAttempts === 1 ? 'EXAM_STRICT' : 'PRACTICE_LIMITED');
+
+  const [examPolicy, setExamPolicy] = useState<ExamPolicy>(initialPolicy);
   const [randomPickCount, setRandomPickCount] = useState<string>(quiz.randomPickCount ? String(quiz.randomPickCount) : '');
-  const [maxAttempts, setMaxAttempts] = useState<string>(quiz.maxAttempts ? String(quiz.maxAttempts) : '1');
+  const [customAttempts, setCustomAttempts] = useState<string>(quiz.maxAttempts && quiz.maxAttempts > 1 ? String(quiz.maxAttempts) : '2');
   const [durationMinutes, setDurationMinutes] = useState<string>(quiz.durationMinutes ? String(quiz.durationMinutes) : '15');
   const [allowReview, setAllowReview] = useState<boolean>(quiz.allowReview ?? true);
   const [isProctored, setIsProctored] = useState<boolean>(quiz.isProctored ?? false);
@@ -516,14 +523,39 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
     }
   });
 
+  const handlePolicyChange = (policy: ExamPolicy) => {
+    setExamPolicy(policy);
+    if (policy === 'PRACTICE_UNLIMITED') {
+      setAllowReview(true);
+    } else if (policy === 'PRACTICE_LIMITED') {
+      setAllowReview(true);
+    } else if (policy === 'EXAM_STRICT') {
+      setAllowReview(false);
+    }
+  };
+
   const handleSave = () => {
     const pick = randomPickCount ? Math.max(1, parseInt(randomPickCount)) : null;
     const dur = durationMinutes ? Math.max(1, parseInt(durationMinutes)) : null;
-    const att = maxAttempts ? Math.max(1, parseInt(maxAttempts)) : null;
+    
+    let att: number | null = null;
+    if (examPolicy === 'EXAM_STRICT') {
+      att = 1;
+    } else if (examPolicy === 'PRACTICE_LIMITED') {
+      att = customAttempts ? Math.max(1, parseInt(customAttempts)) : 2;
+    }
+
     const viol = maxViolations ? Math.max(1, parseInt(maxViolations)) : 3;
 
+    if (examPolicy === 'EXAM_STRICT') {
+      if (!startTime || !endTime) {
+        toast.error('Vui lòng thiết lập thời gian Mở/Đóng bài thi cho chế độ Thi chính thức!');
+        return;
+      }
+    }
+
     if (startTime && endTime && new Date(startTime) >= new Date(endTime)) {
-      toast.error('Thời gian đóng bài phải diễn ra sau thời gian mở bài!');
+      toast.error('Thời gian đóng bài phải lớn hơn thời gian mở bài!');
       return;
     }
 
@@ -557,70 +589,97 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="space-y-6">
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-sm text-blue-900 flex items-center justify-between">
-            <span className="font-semibold">Tổng số câu hỏi hiện có trong Ngân hàng đề:</span>
-            <span className="font-black text-lg text-blue-700 bg-white px-3 py-1 rounded-md border border-blue-200">
-              {quiz.questionCount ?? 0} câu
-            </span>
+          
+          {/* Policy Selector */}
+          <div className="flex flex-col gap-3">
+            <label className="text-sm font-bold text-gray-700">Chế độ bài thi</label>
+            <div className="grid grid-cols-1 gap-3">
+              <label className={`cursor-pointer flex items-start gap-3 p-4 rounded-xl border-2 transition-all ${examPolicy === 'PRACTICE_UNLIMITED' ? 'border-cyan-500 bg-cyan-50' : 'border-gray-200 hover:border-cyan-300'}`}>
+                <input 
+                  type="radio" 
+                  name="examPolicy" 
+                  checked={examPolicy === 'PRACTICE_UNLIMITED'} 
+                  onChange={() => handlePolicyChange('PRACTICE_UNLIMITED')}
+                  className="mt-1 w-4 h-4 text-cyan-600 focus:ring-cyan-500" 
+                />
+                <div>
+                  <div className="font-bold text-gray-900 text-sm">Luyện tập (Vô hạn)</div>
+                  <div className="text-xs text-gray-500 mt-0.5">Sinh viên làm bao nhiêu lần tùy ý. Tự động lưu điểm cao nhất.</div>
+                </div>
+              </label>
+
+              <label className={`cursor-pointer flex items-start gap-3 p-4 rounded-xl border-2 transition-all ${examPolicy === 'PRACTICE_LIMITED' ? 'border-cyan-500 bg-cyan-50' : 'border-gray-200 hover:border-cyan-300'}`}>
+                <input 
+                  type="radio" 
+                  name="examPolicy" 
+                  checked={examPolicy === 'PRACTICE_LIMITED'} 
+                  onChange={() => handlePolicyChange('PRACTICE_LIMITED')}
+                  className="mt-1 w-4 h-4 text-cyan-600 focus:ring-cyan-500" 
+                />
+                <div className="w-full">
+                  <div className="font-bold text-gray-900 text-sm">Ôn tập có giới hạn</div>
+                  <div className="text-xs text-gray-500 mt-0.5 mb-2">Giới hạn số lần làm. Tự động lưu điểm cao nhất.</div>
+                  {examPolicy === 'PRACTICE_LIMITED' && (
+                    <input 
+                      type="number" 
+                      min="2"
+                      value={customAttempts}
+                      onChange={(e) => setCustomAttempts(e.target.value)}
+                      placeholder="Số lần"
+                      className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none w-24"
+                    />
+                  )}
+                </div>
+              </label>
+
+              <label className={`cursor-pointer flex items-start gap-3 p-4 rounded-xl border-2 transition-all ${examPolicy === 'EXAM_STRICT' ? 'border-cyan-500 bg-cyan-50' : 'border-gray-200 hover:border-cyan-300'}`}>
+                <input 
+                  type="radio" 
+                  name="examPolicy" 
+                  checked={examPolicy === 'EXAM_STRICT'} 
+                  onChange={() => handlePolicyChange('EXAM_STRICT')}
+                  className="mt-1 w-4 h-4 text-cyan-600 focus:ring-cyan-500" 
+                />
+                <div>
+                  <div className="font-bold text-gray-900 text-sm">Thi chính thức (1 Lần)</div>
+                  <div className="text-xs text-gray-500 mt-0.5">Mỗi sinh viên chỉ được làm 1 lần duy nhất. Bắt buộc nhập thời gian Mở/Đóng.</div>
+                </div>
+              </label>
+            </div>
           </div>
 
-          <label className="flex flex-col gap-2 text-sm font-bold text-gray-700">
-            Số câu hỏi bốc ngẫu nhiên mỗi lượt thi
-            <span className="font-normal text-xs text-gray-500">Mỗi lượt thi sẽ xáo trộn và bốc ngẫu nhiên số lượng câu hỏi từ ngân hàng đề. Để trống nếu muốn dùng tất cả {quiz.questionCount} câu.</span>
-            <input 
-              type="number" 
-              min="1"
-              max={quiz.questionCount ?? 100}
-              value={randomPickCount}
-              onChange={(e) => setRandomPickCount(e.target.value)}
-              placeholder={`Lấy tất cả ${quiz.questionCount ?? ''} câu`}
-              className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none"
-            />
-          </label>
-
-          <label className="flex flex-col gap-2 text-sm font-bold text-gray-700">
-            Thời gian làm bài (Phút)
-            <input 
-              type="number" 
-              min="1"
-              value={durationMinutes}
-              onChange={(e) => setDurationMinutes(e.target.value)}
-              className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none"
-            />
-          </label>
-
-          <label className="flex flex-col gap-2 text-sm font-bold text-gray-700">
-            Số lượt làm bài tối đa
-            <span className="font-normal text-xs text-gray-500">Nếu sinh viên được làm nhiều lần, hệ thống sẽ lưu điểm cao nhất.</span>
-            <input 
-              type="number" 
-              min="1"
-              value={maxAttempts}
-              onChange={(e) => setMaxAttempts(e.target.value)}
-              className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none"
-            />
-          </label>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <label className="flex flex-col gap-2 text-sm font-bold text-gray-700">
-              Khung giờ mở bài
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-gray-100">
+            <div className="flex flex-col gap-2">
+              <div className="flex justify-between items-center">
+                <label className="text-sm font-bold text-gray-700">Khung giờ mở bài</label>
+                {startTime && examPolicy !== 'EXAM_STRICT' && (
+                  <button type="button" onClick={() => setStartTime('')} className="text-[10px] text-red-500 hover:text-red-700 font-semibold bg-red-50 px-2 py-0.5 rounded">Xóa</button>
+                )}
+              </div>
               <input 
                 type="datetime-local" 
                 value={startTime}
                 onChange={(e) => setStartTime(e.target.value)}
-                className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:border-cyan-500 outline-none"
+                className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:border-cyan-500 outline-none w-full"
               />
-            </label>
-            <label className="flex flex-col gap-2 text-sm font-bold text-gray-700">
-              Khung giờ đóng bài
-              <span className="font-normal text-[10px] text-gray-500 -mt-1">Để trống nếu mở mãi mãi</span>
+            </div>
+            <div className="flex flex-col gap-2">
+              <div className="flex justify-between items-end">
+                <div>
+                  <label className="text-sm font-bold text-gray-700 block">Khung giờ đóng bài</label>
+                  <span className="font-normal text-[10px] text-gray-500">Mở mãi mãi nếu không thiết lập</span>
+                </div>
+                {endTime && examPolicy !== 'EXAM_STRICT' && (
+                  <button type="button" onClick={() => setEndTime('')} className="text-[10px] text-red-500 hover:text-red-700 font-semibold bg-red-50 px-2 py-0.5 rounded mb-1">Xóa</button>
+                )}
+              </div>
               <input 
                 type="datetime-local" 
                 value={endTime}
                 onChange={(e) => setEndTime(e.target.value)}
-                className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:border-cyan-500 outline-none"
+                className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:border-cyan-500 outline-none w-full"
               />
-            </label>
+            </div>
           </div>
 
           <label className="flex items-center gap-3 text-sm font-bold text-gray-700 bg-gray-50 p-4 rounded-xl border">
@@ -632,6 +691,31 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
             />
             Cho phép học viên xem lại đáp án sau khi nộp bài
           </label>
+          
+          <div className="grid grid-cols-2 gap-4 border-t border-gray-100 pt-4">
+            <label className="flex flex-col gap-2 text-sm font-bold text-gray-700">
+              Thời gian làm bài (Phút)
+              <input 
+                type="number" 
+                min="1"
+                value={durationMinutes}
+                onChange={(e) => setDurationMinutes(e.target.value)}
+                className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none"
+              />
+            </label>
+            <label className="flex flex-col gap-2 text-sm font-bold text-gray-700">
+              Số câu hỏi mỗi lượt
+              <input 
+                type="number" 
+                min="1"
+                max={quiz.questionCount ?? 100}
+                value={randomPickCount}
+                onChange={(e) => setRandomPickCount(e.target.value)}
+                placeholder={`Mặc định: ${quiz.questionCount ?? '0'} câu`}
+                className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none"
+              />
+            </label>
+          </div>
         </div>
 
         <div className="space-y-6">

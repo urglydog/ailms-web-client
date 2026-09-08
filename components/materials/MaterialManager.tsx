@@ -270,22 +270,41 @@ export function MaterialManager({ courseId }: { courseId: number }) {
     const isAfterEnd = endTime ? now > endTime : false;
     const outOfAttempts = (item.maxAttempts && item.attemptCount !== undefined) ? item.attemptCount >= item.maxAttempts : false;
 
+    const href = item.materialType === 'QUIZ' && item.materialId
+      ? `/exam/${item.materialId}?title=${encodeURIComponent(item.title || '')}&duration=${item.durationMinutes || ''}&attempts=${item.maxAttempts || ''}&count=${item.randomPickCount || item.questionCount || ''}&start=${item.startTime || ''}&end=${item.endTime || ''}&attemptCount=${item.attemptCount || 0}&proctored=${item.isProctored || false}`
+      : `/materials/${item.id}`;
+
     return (
-      <div key={item.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 mb-3 bg-white border border-gray-200 rounded-md hover:border-gray-300 transition-colors">
-        <div className="flex-1">
-          <div className="flex items-center gap-2 mb-1">
-            <h3 className="font-semibold text-gray-900 text-base">{item.title || 'Học liệu khóa học'}</h3>
-            <span className="text-[10px] uppercase font-semibold text-gray-500 bg-gray-100 px-2 py-0.5 rounded-sm">
+      <Link 
+        key={item.id} 
+        href={href}
+        className="block flex flex-col sm:flex-row items-start sm:items-center justify-between p-5 mb-3 bg-white border border-gray-200 rounded-xl hover:border-accent hover:shadow-sm transition-all cursor-pointer group"
+      >
+        <div className="flex-1 w-full">
+          <div className="flex items-center gap-2 mb-2">
+            <h3 className="font-bold text-gray-900 text-lg group-hover:text-accent transition-colors">{item.title || 'Học liệu khóa học'}</h3>
+            <span className="text-[10px] uppercase font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded-md">
               {item.materialType === 'QUIZ' ? 'Bài Thi' : item.materialType === 'FLASHCARD' ? 'Flashcard' : 'Mindmap'}
             </span>
             {item.isProctored && (
-              <span className="text-[10px] font-semibold text-red-600 border border-red-200 bg-white px-2 py-0.5 rounded-sm">
+              <span className="text-[10px] font-bold text-red-600 border border-red-200 bg-red-50 px-2 py-0.5 rounded-md">
                 AI Proctored
               </span>
             )}
+            
+            {/* Status indicators */}
+            {item.materialType === 'QUIZ' && isBeforeStart && (
+               <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md ml-auto sm:ml-2">Chưa mở</span>
+            )}
+            {item.materialType === 'QUIZ' && isAfterEnd && (
+               <span className="text-[10px] font-bold text-gray-600 bg-gray-100 px-2 py-0.5 rounded-md ml-auto sm:ml-2">Đã đóng</span>
+            )}
+            {item.materialType === 'QUIZ' && outOfAttempts && !isAfterEnd && (
+               <span className="text-[10px] font-bold text-gray-600 bg-gray-100 px-2 py-0.5 rounded-md ml-auto sm:ml-2">Hết lượt</span>
+            )}
           </div>
           
-          <div className="text-sm text-gray-600 flex flex-wrap gap-x-6 gap-y-1 mt-2">
+          <div className="text-sm text-gray-600 flex flex-wrap gap-x-6 gap-y-2 mt-2">
             {item.materialType === 'QUIZ' && (
               <>
                 <div className="flex items-center gap-1">
@@ -313,45 +332,7 @@ export function MaterialManager({ courseId }: { courseId: number }) {
             )}
           </div>
         </div>
-        
-        <div className="mt-4 sm:mt-0 sm:ml-4 shrink-0 w-full sm:w-auto flex flex-col sm:items-end">
-          {item.materialType === 'QUIZ' && item.materialId ? (
-            isBeforeStart ? (
-              <button disabled className="w-full sm:w-auto bg-gray-50 text-gray-400 font-medium py-2 px-6 text-sm rounded border border-gray-200 cursor-not-allowed">
-                Chưa mở
-              </button>
-            ) : isAfterEnd ? (
-              <Link 
-                href={`/exam/${item.materialId}?title=${encodeURIComponent(item.title || '')}&duration=${item.durationMinutes || ''}&attempts=${item.maxAttempts || ''}&count=${item.randomPickCount || item.questionCount || ''}&start=${item.startTime || ''}&end=${item.endTime || ''}&attemptCount=${item.attemptCount || 0}&proctored=${item.isProctored || false}`}
-                className="w-full sm:w-auto bg-white hover:bg-gray-50 text-gray-700 font-medium py-2 px-6 text-sm rounded border border-gray-300 transition-colors inline-block text-center"
-              >
-                Đã Đóng (Xem Lịch Sử)
-              </Link>
-            ) : outOfAttempts ? (
-              <Link 
-                href={`/exam/${item.materialId}?title=${encodeURIComponent(item.title || '')}&duration=${item.durationMinutes || ''}&attempts=${item.maxAttempts || ''}&count=${item.randomPickCount || item.questionCount || ''}&start=${item.startTime || ''}&end=${item.endTime || ''}&attemptCount=${item.attemptCount || 0}&proctored=${item.isProctored || false}`}
-                className="w-full sm:w-auto bg-white hover:bg-gray-50 text-gray-700 font-medium py-2 px-6 text-sm rounded border border-gray-300 transition-colors inline-block text-center"
-              >
-                Hết Lượt (Xem Lịch Sử)
-              </Link>
-            ) : (
-              <Link
-                href={`/exam/${item.materialId}?title=${encodeURIComponent(item.title || '')}&duration=${item.durationMinutes || ''}&attempts=${item.maxAttempts || ''}&count=${item.randomPickCount || item.questionCount || ''}&start=${item.startTime || ''}&end=${item.endTime || ''}&attemptCount=${item.attemptCount || 0}&proctored=${item.isProctored || false}`}
-                className="w-full sm:w-auto bg-black hover:bg-gray-800 text-white font-medium py-2 px-8 text-sm rounded shadow-sm transition-colors inline-block text-center"
-              >
-                Vào Làm Bài
-              </Link>
-            )
-          ) : (
-            <Link
-              href={`/materials/${item.id}`}
-              className="w-full sm:w-auto bg-white hover:bg-gray-50 text-gray-900 font-medium py-2 px-8 text-sm rounded border border-gray-300 transition-colors inline-block text-center"
-            >
-              Xem
-            </Link>
-          )}
-        </div>
-      </div>
+      </Link>
     );
   };
 
