@@ -26,6 +26,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
     }
   };
   const [genMaterialType, setGenMaterialType] = useState<'QUIZ' | 'FLASHCARD' | 'MINDMAP' | null>(null);
+  const [activeFilterTab, setActiveFilterTab] = useState<'ALL' | 'QUIZ' | 'FLASHCARD' | 'MINDMAP'>('ALL');
 
   const { data: materials, isLoading } = useQuery({
     queryKey: ['instructor-materials', courseId],
@@ -84,6 +85,22 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
     );
   }
 
+  if (genMaterialType) {
+    return (
+      <GenerateAiOfficialView 
+        courseId={courseId}
+        initialType={genMaterialType}
+        onClose={() => setGenMaterialType(null)}
+        onSuccess={() => {
+          setGenMaterialType(null);
+          queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] });
+        }}
+      />
+    );
+  }
+
+  const filteredMaterials = materials?.filter(mat => activeFilterTab === 'ALL' || mat.materialType === activeFilterTab) || [];
+
   return (
     <div className="flex flex-col gap-5">
       {/* Top Banner & Quick Actions */}
@@ -113,9 +130,16 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
         </div>
       </div>
 
+      <div className="flex border-b border-gray-200 mt-2">
+        <button onClick={() => setActiveFilterTab('ALL')} className={`px-4 py-2 text-sm font-bold border-b-2 ${activeFilterTab === 'ALL' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>Tất cả</button>
+        <button onClick={() => setActiveFilterTab('QUIZ')} className={`px-4 py-2 text-sm font-bold border-b-2 ${activeFilterTab === 'QUIZ' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>Bài Thi Trắc Nghiệm</button>
+        <button onClick={() => setActiveFilterTab('FLASHCARD')} className={`px-4 py-2 text-sm font-bold border-b-2 ${activeFilterTab === 'FLASHCARD' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>Thẻ Flashcard</button>
+        <button onClick={() => setActiveFilterTab('MINDMAP')} className={`px-4 py-2 text-sm font-bold border-b-2 ${activeFilterTab === 'MINDMAP' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>Sơ Đồ Tư Duy</button>
+      </div>
+
       {/* Materials List */}
       <div className="flex flex-col gap-3">
-        {materials?.map((mat) => (
+        {filteredMaterials.map((mat) => (
           <div key={mat.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:border-blue-200 transition-all">
             <div className="flex items-center gap-3">
               <span className={`inline-flex items-center rounded-md px-2.5 py-1 text-xs font-bold ring-1 ring-inset ${
@@ -189,26 +213,14 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
           </div>
         ))}
 
-        {(!materials || materials.length === 0) && (
+        {(!filteredMaterials || filteredMaterials.length === 0) && (
           <div className="p-12 text-center text-sm text-gray-500 card bg-white">
-            <p className="font-semibold text-gray-700">Chưa có học liệu AI Official nào cho khóa học này.</p>
+            <p className="font-semibold text-gray-700">Chưa có học liệu AI Official nào cho mục này.</p>
             <p className="text-xs text-gray-400 mt-1">Bấm các nút sinh học liệu phía trên để tạo bài Quiz hoặc Mindmap/Flashcard cho học viên.</p>
           </div>
         )}
 
       </div>
-
-      {/* Generate AI Official Modal */}
-      {genMaterialType && (
-        <GenerateAiOfficialModal 
-          courseId={courseId}
-          onClose={() => setGenMaterialType(null)}
-          onSuccess={() => {
-            setGenMaterialType(null);
-            queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] });
-          }}
-        />
-      )}
 
     </div>
   );
@@ -664,9 +676,9 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
   );
 }
 
-/** Modal Sinh AI Official Mới Cho Giảng Viên */
-function GenerateAiOfficialModal({ courseId, onClose, onSuccess }: { courseId: number; onClose: () => void; onSuccess: () => void }) {
-  const [materialType, setMaterialType] = useState<'QUIZ' | 'FLASHCARD' | 'MINDMAP' | null>(null);
+/** Giao diện Sinh AI Official Mới Cho Giảng Viên */
+function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: { courseId: number; initialType: 'QUIZ' | 'FLASHCARD' | 'MINDMAP'; onClose: () => void; onSuccess: () => void }) {
+  const [materialType, setMaterialType] = useState<'QUIZ' | 'FLASHCARD' | 'MINDMAP'>(initialType);
   const [scopeType, setScopeType] = useState<'WHOLE_COURSE' | 'CHAPTER' | 'CUSTOM_LESSONS'>('WHOLE_COURSE');
   const [scopeRefId, setScopeRefId] = useState<number | undefined>(undefined);
   const [difficultyLevel, setDifficultyLevel] = useState<'EASY' | 'MEDIUM' | 'HARD'>('MEDIUM');
@@ -713,9 +725,8 @@ function GenerateAiOfficialModal({ courseId, onClose, onSuccess }: { courseId: n
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
-      <div className="w-full max-w-2xl rounded-3xl bg-white p-8 shadow-2xl my-8">
-        <div className="border-b pb-4 mb-6">
+    <div className="w-full rounded-3xl bg-white p-8 shadow-sm border border-gray-200">
+      <div className="border-b pb-4 mb-6">
           <h3 className="text-2xl font-black text-gray-900">✨ Tạo Học Liệu AI Tự Động</h3>
           <p className="text-sm text-gray-500 mt-1">Lựa chọn loại học liệu bạn muốn AI tự động tổng hợp từ nội dung bài giảng.</p>
         </div>
@@ -879,7 +890,6 @@ function GenerateAiOfficialModal({ courseId, onClose, onSuccess }: { courseId: n
           )}
         </form>
       </div>
-    </div>
   );
 }
 

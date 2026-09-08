@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { quizApi } from '@/lib/api/quizzes';
 import { StartRes, SubmitReq, SubmitRes, HistoryRes } from '@/lib/api/quizzes';
 
@@ -9,9 +9,14 @@ export const useStartQuiz = () => {
 };
 
 export const useSubmitQuiz = () => {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ attemptId, data }: { attemptId: number; data: SubmitReq }) =>
       quizApi.submitAttempt(attemptId, data),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['quizHistory'] });
+      queryClient.invalidateQueries({ queryKey: ['course-materials'] });
+    }
   });
 };
 
