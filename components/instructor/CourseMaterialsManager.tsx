@@ -5,7 +5,7 @@ import { materialsApi, InstructorMaterial, MaterialDetailRes } from '@/lib/api/m
 import { toast } from 'sonner';
 import React, { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { MermaidViewer } from '@/components/materials/MermaidViewer';
+// Removed MermaidViewer import as it is completely replaced by MindmapEditor for Mindmaps
 import { MindmapEditor } from '@/components/materials/MindmapEditor';
 
 interface CourseMaterialsManagerProps {
@@ -244,7 +244,7 @@ function MaterialWorkspaceViewer({
   });
 
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState<'VIEW' | 'RAW_CODE' | 'QUESTIONS' | 'SETTINGS' | 'DRAG_DROP'>('VIEW');
+  const [activeTab, setActiveTab] = useState<'VIEW' | 'RAW_CODE' | 'QUESTIONS' | 'SETTINGS'>('VIEW');
 
   // Cập nhật tab mặc định dựa trên loại học liệu
   useEffect(() => {
@@ -399,34 +399,25 @@ function MaterialWorkspaceViewer({
               <div className="flex items-center gap-2 border-b pb-2">
                 <button
                   onClick={() => setActiveTab('VIEW')}
-                  className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === 'VIEW' ? 'bg-blue-600 text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === 'VIEW' ? 'bg-accent text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     }`}
                 >
-                  Trực Quan (Tĩnh)
-                </button>
-                <button
-                  onClick={() => setActiveTab('DRAG_DROP')}
-                  className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === 'DRAG_DROP' ? 'bg-accent text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                    }`}
-                >
-                  Kéo Thả (React Flow)
+                  Trực Quan & Tương Tác
                 </button>
                 <button
                   onClick={() => setActiveTab('RAW_CODE')}
                   className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === 'RAW_CODE' ? 'bg-slate-800 text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     }`}
                 >
-                  Mã Mermaid
+                  Mã Mermaid (Raw)
                 </button>
               </div>
 
               {activeTab === 'VIEW' ? (
-                <MermaidViewer chart={detail.mermaidCode} />
-              ) : activeTab === 'DRAG_DROP' ? (
                 <MindmapEditor 
                   initialMermaidCode={detail.mermaidCode} 
                   onSave={(_code) => {
-                    toast.success('Đã xuất cấu trúc mới (Demo Save)');
+                    toast.success('Đã áp dụng sơ đồ cấu trúc mới (Demo Cục Bộ)');
                     // TODO: Gọi mutation updateMermaidCode lên API
                   }}
                 />
