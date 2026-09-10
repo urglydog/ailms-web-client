@@ -5,7 +5,7 @@ import { materialsApi, InstructorMaterial, MaterialDetailRes } from '@/lib/api/m
 import { toast } from 'sonner';
 import React, { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-// Removed MermaidViewer import as it is completely replaced by MindmapEditor for Mindmaps
+import { MermaidViewer } from '@/components/materials/MermaidViewer';
 import { MindmapEditor } from '@/components/materials/MindmapEditor';
 
 interface CourseMaterialsManagerProps {
@@ -34,6 +34,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
     queryFn: () => materialsApi.getInstructorMaterials(courseId),
     enabled: !!courseId,
   });
+
 
   const toggleMindmapMutation = useMutation({
     mutationFn: (variables: { id: number; isOfficial: boolean }) =>
@@ -244,7 +245,17 @@ function MaterialWorkspaceViewer({
   });
 
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState<'VIEW' | 'RAW_CODE' | 'QUESTIONS' | 'SETTINGS'>('VIEW');
+  const [activeTab, setActiveTab] = useState<'VIEW' | 'RAW_CODE' | 'QUESTIONS' | 'SETTINGS' | 'DRAG_DROP'>('VIEW');
+
+  const updateMermaidMutation = useMutation({
+    mutationFn: (variables: { id: number; mermaidCode: string }) => materialsApi.updateMaterial(variables.id, { mermaidCode: variables.mermaidCode }),
+    onSuccess: () => {
+      toast.success('Đã lưu sơ đồ Mindmap thành công!');
+      queryClient.invalidateQueries({ queryKey: ['instructor-materials'] });
+      queryClient.invalidateQueries({ queryKey: ['material-detail'] });
+    },
+    onError: () => toast.error('Có lỗi xảy ra khi lưu sơ đồ!'),
+  });
 
   // Cập nhật tab mặc định dựa trên loại học liệu
   useEffect(() => {
@@ -399,26 +410,34 @@ function MaterialWorkspaceViewer({
               <div className="flex items-center gap-2 border-b pb-2">
                 <button
                   onClick={() => setActiveTab('VIEW')}
-                  className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === 'VIEW' ? 'bg-accent text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === 'VIEW' ? 'bg-blue-600 text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     }`}
                 >
-                  Trực Quan & Tương Tác
+                  Trực Quan (Tĩnh)
+                </button>
+                <button
+                  onClick={() => setActiveTab('DRAG_DROP')}
+                  className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === 'DRAG_DROP' ? 'bg-accent text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                >
+                  Kéo Thả (React Flow)
                 </button>
                 <button
                   onClick={() => setActiveTab('RAW_CODE')}
                   className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === 'RAW_CODE' ? 'bg-slate-800 text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     }`}
                 >
-                  Mã Mermaid (Raw)
+                  Mã Mermaid
                 </button>
               </div>
 
               {activeTab === 'VIEW' ? (
+                <MermaidViewer chart={detail.mermaidCode} />
+              ) : activeTab === 'DRAG_DROP' ? (
                 <MindmapEditor 
                   initialMermaidCode={detail.mermaidCode} 
-                  onSave={(_code) => {
-                    toast.success('Đã áp dụng sơ đồ cấu trúc mới (Demo Cục Bộ)');
-                    // TODO: Gọi mutation updateMermaidCode lên API
+                  onSave={(code) => {
+                    updateMermaidMutation.mutate({ id: detail.id, mermaidCode: code });
                   }}
                 />
               ) : (
