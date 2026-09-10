@@ -59,7 +59,15 @@ export default function AttemptHistoryPage() {
                 >
                   <div className="flex justify-between items-center mb-2">
                     <span className="font-bold text-sm">Lần {history.length - idx}</span>
-                    <span className="text-xs text-ink-muted">{new Date(h.submittedAt).toLocaleDateString('vi-VN')}</span>
+                    <span className="text-xs text-ink-muted">
+                      {(() => {
+                        const d = h.submittedAt;
+                        if (Array.isArray(d)) {
+                          return new Date(d[0] || 0, (d[1] || 1) - 1, d[2] || 1, d[3] || 0, d[4] || 0, d[5] || 0).toLocaleDateString('vi-VN');
+                        }
+                        return new Date(d).toLocaleDateString('vi-VN');
+                      })()}
+                    </span>
                   </div>
                   <div className="text-xl font-bold text-blue-600">
                     {h.score.toFixed(1)} / 10

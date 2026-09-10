@@ -412,7 +412,7 @@ export default function AntiCheatExamPage() {
       if (!d) return 0;
       if (Array.isArray(d)) {
         // Jackson LocalDateTime array: [year, month, day, hour, minute, second]
-        return new Date(d[0], d[1] - 1, d[2], d[3] || 0, d[4] || 0, d[5] || 0).getTime();
+        return new Date(d[0] || 0, (d[1] || 1) - 1, d[2] || 1, d[3] || 0, d[4] || 0, d[5] || 0).getTime();
       }
       return new Date(d).getTime();
     };
@@ -510,7 +510,7 @@ export default function AntiCheatExamPage() {
 
                       const formatSubmittedAt = (d: string | number[]) => {
                         if (Array.isArray(d)) {
-                          return new Date(d[0], d[1] - 1, d[2], d[3] || 0, d[4] || 0, d[5] || 0).toLocaleString('vi-VN');
+                          return new Date(d[0] || 0, (d[1] || 1) - 1, d[2] || 1, d[3] || 0, d[4] || 0, d[5] || 0).toLocaleString('vi-VN');
                         }
                         return new Date(d).toLocaleString('vi-VN');
                       };
