@@ -423,7 +423,11 @@ export default function AntiCheatExamPage() {
     const completedAttempts = sortedHistory.filter(h => h.status === 'COMPLETED');
     const completedCount = completedAttempts.length;
     const highestAttempt = completedAttempts.length > 0 
-      ? completedAttempts.reduce((max, attempt) => attempt.score > max.score ? attempt : max, completedAttempts[0])
+      ? completedAttempts.reduce((prev, current) => {
+          const prevScore = prev?.score || 0;
+          const currentScore = current?.score || 0;
+          return currentScore > prevScore ? current : prev;
+        }, completedAttempts[0])
       : null;
     const isClosed = endTime ? new Date() > new Date(endTime) : false;
     const isNotOpenYet = startTime ? new Date() < new Date(startTime) : false;
