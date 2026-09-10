@@ -206,6 +206,27 @@ export function MindmapEditor({ initialMermaidCode, onSave }: MindmapEditorProps
     []
   );
 
+  const onNodeDoubleClick = useCallback((_event: React.MouseEvent, node: Node) => {
+    const currentLabel = node.data.label as string;
+    const newLabel = window.prompt('Nhập nội dung mới cho nhánh này:', currentLabel);
+    if (newLabel !== null && newLabel.trim() !== '') {
+      setNodes((nds) =>
+        nds.map((n) => {
+          if (n.id === node.id) {
+            return {
+              ...n,
+              data: {
+                ...n.data,
+                label: newLabel.trim()
+              }
+            };
+          }
+          return n;
+        })
+      );
+    }
+  }, []);
+
   const onEdgesChange = useCallback(
     (changes: EdgeChange[]) => setEdges((eds) => applyEdgeChanges(changes, eds)),
     []
@@ -236,6 +257,7 @@ export function MindmapEditor({ initialMermaidCode, onSave }: MindmapEditorProps
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
+        onNodeDoubleClick={onNodeDoubleClick}
         fitView
       >
         <Controls />
