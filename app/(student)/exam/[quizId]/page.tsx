@@ -21,6 +21,7 @@ export default function AntiCheatExamPage() {
   const endTime = searchParams.get('end');
   const proctoredParam = searchParams.get('proctored');
   const isProctored = proctoredParam === 'true';
+  const returnUrl = searchParams.get('returnUrl');
 
   const { data: history } = useQuizHistory(Number(quizId));
 
@@ -428,10 +429,23 @@ export default function AntiCheatExamPage() {
     return (
       <div className="min-h-dvh bg-surface p-4 sm:p-8">
         <div className="max-w-5xl mx-auto mt-4 sm:mt-8">
-          <div className="flex items-center gap-2 mb-6">
-            <button onClick={() => router.push('/my-courses')} className="text-accent hover:underline text-sm font-semibold">Khóa học</button>
-            <span className="text-ink-muted">/</span>
-            <span className="text-ink text-sm font-medium">{title}</span>
+          <div className="flex items-center gap-2 mb-6 flex-wrap">
+            <button onClick={() => router.push('/my-courses')} className="text-accent hover:underline text-sm font-semibold whitespace-nowrap">Khóa học của tôi</button>
+            {title.split(' / ').map((part, idx, arr) => (
+              <div key={idx} className="flex items-center gap-2">
+                <span className="text-ink-muted">/</span>
+                {idx < arr.length - 1 ? (
+                  <button 
+                    onClick={() => router.push(returnUrl || '/my-courses')} 
+                    className="text-accent hover:underline text-sm font-semibold whitespace-nowrap"
+                  >
+                    {part}
+                  </button>
+                ) : (
+                  <span className="text-ink text-sm font-medium">{part}</span>
+                )}
+              </div>
+            ))}
           </div>
 
           <div className="bg-surface border border-line rounded-xl shadow-sm overflow-hidden mb-8">

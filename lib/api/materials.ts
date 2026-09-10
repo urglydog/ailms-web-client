@@ -102,6 +102,12 @@ export const materialsApi = {
   getCourseChapters: (courseId: number) =>
     api.get<import('@/types/domain').Chapter[]>(`/api/v1/materials/course-chapters?courseId=${courseId}`, { token: authToken() }),
     
+  renameMaterial: (id: number, title: string) =>
+    api.patch(`/api/v1/materials/${id}`, { title }, { token: authToken() }),
+
+  deleteMaterial: (id: number) =>
+    api.delete(`/api/v1/materials/${id}`, { token: authToken() }),
+    
   // Instructor APIs
   // Instructor APIs
   getInstructorMaterials: (courseId: number) =>

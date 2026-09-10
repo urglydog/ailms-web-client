@@ -35,6 +35,26 @@ export function useRequestMaterial() {
   });
 }
 
+export function useRenameMaterial(courseId: number) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, title }: { id: number; title: string }) => materialsApi.renameMaterial(id, title),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['materials', 'course', courseId] });
+    },
+  });
+}
+
+export function useDeleteMaterial(courseId: number) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => materialsApi.deleteMaterial(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['materials', 'course', courseId] });
+    },
+  });
+}
+
 export function useAvailableLanguages(courseId: number) {
   return useQuery({
     queryKey: ['materials', 'languages', courseId],
