@@ -24,24 +24,91 @@ interface MindmapEditorProps {
 }
 
 /**
- * Phân tích Mermaid Graph TD siêu việt hỗ trợ:
- * - A["Label"] --> B["Label"]
- * - C --> D
- * - Đa kết nối trên 1 dòng
+ * Thuật toán Auto Layout BFS: Xếp các node thành dạng Cây từ trên xuống
  */
+function applyTreeLayout(nodes: Node[], edges: Edge[]) {
+  const incoming = new Map<string, number>();
+  const childrenMap = new Map<string, string[]>();
+  nodes.forEach(n => {
+    incoming.set(n.id, 0);
+    childrenMap.set(n.id, []);
+  });
+  
+  edges.forEach(e => {
+    incoming.set(e.target, (incoming.get(e.target) || 0) + 1);
+    const childrenList = childrenMap.get(e.source);
+    if (childrenList) childrenList.push(e.target);
+  });
+
+  const roots = nodes.filter(n => incoming.get(n.id) === 0);
+  if (roots.length === 0 && nodes.length > 0) roots.push(nodes[0] as Node); 
+
+  const levels = new Map<string, number>();
+  const levelGroups = new Map<number, Node[]>();
+
+  roots.forEach(r => levels.set(r.id, 0));
+  const queue = [...roots];
+
+  while(queue.length > 0) {
+    const curr = queue.shift()!;
+    const currLvl = levels.get(curr.id) || 0;
+    
+    if (!levelGroups.has(currLvl)) levelGroups.set(currLvl, []);
+    // Tránh push trùng vào levelGroups
+    if (!levelGroups.get(currLvl)!.find(n => n.id === curr.id)) {
+        levelGroups.get(currLvl)!.push(curr);
+    }
+
+    const children = childrenMap.get(curr.id) || [];
+    children.forEach(childId => {
+      if (!levels.has(childId)) {
+        levels.set(childId, currLvl + 1);
+        const childNode = nodes.find(n => n.id === childId);
+        if (childNode) queue.push(childNode as Node);
+      }
+    });
+  }
+
+  // Quét các Node bị cô lập
+  nodes.forEach(n => {
+    if (!levels.has(n.id)) {
+       const lvl = 0;
+       levels.set(n.id, lvl);
+       if (!levelGroups.has(lvl)) levelGroups.set(lvl, []);
+       levelGroups.get(lvl)!.push(n);
+    }
+  });
+
+  // Calculate X, Y based on level and index in level (Center alignment)
+  const X_SPACING = 350;
+  const Y_SPACING = 150;
+
+  levelGroups.forEach((levelNodes, level) => {
+    const totalWidth = (levelNodes.length - 1) * X_SPACING;
+    const startX = -totalWidth / 2; // Căn giữa
+    
+    levelNodes.forEach((node, idx) => {
+      node.position = {
+        x: startX + idx * X_SPACING,
+        y: level * Y_SPACING
+      };
+    });
+  });
+
+  return nodes;
+}
+
 function parseMermaidToFlow(code: string) {
-  const nodes: Node[] = [];
+  let nodes: Node[] = [];
   const edges: Edge[] = [];
   const nodeMap = new Map<string, Node>();
   
   const lines = code.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('graph') && !l.startsWith('mindmap'));
 
   lines.forEach((line) => {
-    // Tách các cụm bằng dấu mũi tên -->
     const edgeParts = line.split(/\s*-->\s*/);
     
     const partIds = edgeParts.map((part) => {
-      // Regex lấy ID và Label (chấp nhận Unicode/Tiếng Nhật làm ID):
       const match = part.match(/^([^\[\]\(\)\s]+)(?:\["?(.*?)"?\]|\("?(.*?)"?\))?$/);
       if (match) {
         const id = match[1] || '';
@@ -50,24 +117,23 @@ function parseMermaidToFlow(code: string) {
         if (!nodeMap.has(id)) {
            const newNode = {
              id,
-             // Auto grid layout cơ bản
-             position: { x: (nodeMap.size % 4) * 300 + 50, y: Math.floor(nodeMap.size / 4) * 150 + 50 },
+             position: { x: 0, y: 0 },
              data: { label: label || id },
              style: {
                background: '#F0F9FF',
                border: '2px solid #0284C7',
-               borderRadius: '8px',
-               padding: '10px 15px',
+               borderRadius: '12px',
+               padding: '12px 20px',
                fontWeight: 'bold',
                color: '#0369A1',
-               minWidth: '150px',
+               minWidth: '200px',
+               boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
                textAlign: 'center' as const
              }
            };
            nodes.push(newNode);
            nodeMap.set(id, newNode);
         } else if (label) {
-           // Cập nhật lại nhãn nếu trước đó chỉ định nghĩa ID
            const existing = nodeMap.get(id)!;
            existing.data.label = label;
         }
@@ -76,12 +142,10 @@ function parseMermaidToFlow(code: string) {
       return null;
     });
 
-    // Tạo Edges
     for (let i = 0; i < partIds.length - 1; i++) {
       const source = partIds[i];
       const target = partIds[i+1];
       if (source && target) {
-        // Tránh trùng lặp Edge
         const edgeId = `e-${source}-${target}`;
         if (!edges.find(e => e.id === edgeId)) {
           edges.push({
@@ -89,7 +153,8 @@ function parseMermaidToFlow(code: string) {
             source,
             target,
             markerEnd: { type: MarkerType.ArrowClosed },
-            style: { stroke: '#0891B2', strokeWidth: 2 }
+            style: { stroke: '#0EA5E9', strokeWidth: 3 },
+            animated: true
           });
         }
       }
@@ -104,13 +169,15 @@ function parseMermaidToFlow(code: string) {
     });
   }
 
+  // Áp dụng thuật toán Auto Layout
+  nodes = applyTreeLayout(nodes, edges);
+
   return { nodes, edges };
 }
 
 function parseFlowToMermaid(nodes: Node[], edges: Edge[]) {
   let mermaid = 'graph TD\n';
   nodes.forEach(n => {
-    // Render Node label
     const label = (n.data.label as string) || n.id;
     mermaid += `    ${n.id}["${label}"]\n`;
   });
@@ -124,11 +191,15 @@ export function MindmapEditor({ initialMermaidCode, onSave }: MindmapEditorProps
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
 
-  useEffect(() => {
+  const initData = useCallback(() => {
     const { nodes: n, edges: e } = parseMermaidToFlow(initialMermaidCode);
     setNodes(n);
     setEdges(e);
   }, [initialMermaidCode]);
+
+  useEffect(() => {
+    initData();
+  }, [initData]);
 
   const onNodesChange = useCallback(
     (changes: NodeChange[]) => setNodes((nds) => applyNodeChanges(changes, nds)),
@@ -141,7 +212,12 @@ export function MindmapEditor({ initialMermaidCode, onSave }: MindmapEditorProps
   );
 
   const onConnect = useCallback(
-    (params: Connection) => setEdges((eds) => addEdge({ ...params, markerEnd: { type: MarkerType.ArrowClosed }, style: { stroke: '#0891B2', strokeWidth: 2 } }, eds)),
+    (params: Connection) => setEdges((eds) => addEdge({ 
+      ...params, 
+      markerEnd: { type: MarkerType.ArrowClosed }, 
+      style: { stroke: '#0EA5E9', strokeWidth: 3 },
+      animated: true 
+    }, eds)),
     []
   );
 
@@ -153,7 +229,7 @@ export function MindmapEditor({ initialMermaidCode, onSave }: MindmapEditorProps
   };
 
   return (
-    <div style={{ height: '600px', width: '100%', border: '1px solid #E5E7EB', borderRadius: '12px' }}>
+    <div style={{ height: '700px', width: '100%', border: '1px solid #E5E7EB', borderRadius: '12px' }}>
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -163,18 +239,24 @@ export function MindmapEditor({ initialMermaidCode, onSave }: MindmapEditorProps
         fitView
       >
         <Controls />
-        <Background gap={12} size={1} />
+        <Background gap={16} size={1} />
         
-        {onSave && (
-          <Panel position="top-right">
+        <Panel position="top-right" className="flex gap-2">
+          <button 
+            onClick={initData}
+            className="bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-lg font-bold shadow-sm transition-colors text-sm"
+          >
+            ↺ Xếp Lại Cây
+          </button>
+          {onSave && (
             <button 
               onClick={handleSave}
-              className="bg-accent hover:bg-accent-dark text-white px-4 py-2 rounded-lg font-bold shadow-md transition-colors"
+              className="bg-accent hover:bg-accent-dark text-white px-4 py-2 rounded-lg font-bold shadow-md transition-colors text-sm"
             >
-              💾 Lưu sơ đồ Mindmap
+              💾 Áp dụng thay đổi
             </button>
-          </Panel>
-        )}
+          )}
+        </Panel>
       </ReactFlow>
     </div>
   );
