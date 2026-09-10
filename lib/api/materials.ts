@@ -105,6 +105,9 @@ export const materialsApi = {
   renameMaterial: (id: number, title: string) =>
     api.patch(`/api/v1/materials/${id}`, { title }, { token: authToken() }),
 
+  updateMaterial: (id: number, data: { title?: string; mermaidCode?: string }) =>
+    api.patch(`/api/v1/materials/${id}`, data, { token: authToken() }),
+
   deleteMaterial: (id: number) =>
     api.delete(`/api/v1/materials/${id}`, { token: authToken() }),
     
