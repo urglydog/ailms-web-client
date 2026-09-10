@@ -59,11 +59,11 @@ export interface ExplainRes {
 }
 
 export interface HistoryRes {
-  id: number;
+  attemptId: number;
   score: number;
   correctCount: number;
   totalQuestions: number;
-  submittedAt: string;
+  submittedAt: string | number[];
   quizId: number;
   status: string;
 }
