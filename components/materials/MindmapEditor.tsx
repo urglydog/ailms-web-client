@@ -206,26 +206,12 @@ export function MindmapEditor({ initialMermaidCode, onSave }: MindmapEditorProps
     []
   );
 
+  const [editingNode, setEditingNode] = useState<{ id: string; label: string } | null>(null);
+
   const onNodeDoubleClick = useCallback((_event: React.MouseEvent, node: Node) => {
-    const currentLabel = node.data.label as string;
-    const newLabel = window.prompt('Nhập nội dung mới cho nhánh này:', currentLabel);
-    if (newLabel !== null && newLabel.trim() !== '') {
-      setNodes((nds) =>
-        nds.map((n) => {
-          if (n.id === node.id) {
-            return {
-              ...n,
-              data: {
-                ...n.data,
-                label: newLabel.trim()
-              }
-            };
-          }
-          return n;
-        })
-      );
-    }
+    setEditingNode({ id: node.id, label: (node.data.label as string) || '' });
   }, []);
+
 
   const onEdgesChange = useCallback(
     (changes: EdgeChange[]) => setEdges((eds) => applyEdgeChanges(changes, eds)),
@@ -250,7 +236,7 @@ export function MindmapEditor({ initialMermaidCode, onSave }: MindmapEditorProps
   };
 
   return (
-    <div style={{ height: '700px', width: '100%', border: '1px solid #E5E7EB', borderRadius: '12px' }}>
+    <div style={{ height: '700px', width: '100%', border: '1px solid #E5E7EB', borderRadius: '12px', position: 'relative' }}>
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -280,6 +266,41 @@ export function MindmapEditor({ initialMermaidCode, onSave }: MindmapEditorProps
           )}
         </Panel>
       </ReactFlow>
+
+      {/* Custom Edit Modal */}
+      {editingNode && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[2px] rounded-xl">
+          <div className="bg-white p-6 rounded-2xl shadow-2xl border border-gray-100 w-96 max-w-[90%] transform transition-all">
+            <h3 className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
+              <span className="text-accent">✏️</span> Đổi tên nhánh sơ đồ
+            </h3>
+            <textarea
+              autoFocus
+              value={editingNode.label}
+              onChange={(e) => setEditingNode({ ...editingNode, label: e.target.value })}
+              className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-accent/20 focus:border-accent resize-none h-28 text-gray-700 outline-none transition-all font-medium"
+              placeholder="Nhập nội dung mới..."
+            />
+            <div className="flex gap-2 justify-end mt-5">
+              <button 
+                onClick={() => setEditingNode(null)} 
+                className="px-4 py-2.5 bg-gray-50 text-gray-600 rounded-xl text-xs font-bold hover:bg-gray-100 border border-gray-200 transition-colors"
+              >
+                Hủy bỏ
+              </button>
+              <button 
+                onClick={() => {
+                  setNodes((nds) => nds.map((n) => n.id === editingNode.id ? { ...n, data: { ...n.data, label: editingNode.label.trim() } } : n));
+                  setEditingNode(null);
+                }}
+                className="px-5 py-2.5 bg-accent text-white rounded-xl text-xs font-bold hover:bg-accent/90 shadow-sm transition-colors"
+              >
+                Cập nhật
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
