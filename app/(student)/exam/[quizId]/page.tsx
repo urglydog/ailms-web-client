@@ -420,7 +420,11 @@ export default function AntiCheatExamPage() {
 
     const sortedHistory = [...(history || [])].sort((a, b) => parseDate(a.submittedAt) - parseDate(b.submittedAt));
     const ongoingAttempt = history?.find(h => h.status === 'IN_PROGRESS');
-    const completedCount = history?.filter(h => h.status === 'COMPLETED').length || 0;
+    const completedAttempts = sortedHistory.filter(h => h.status === 'COMPLETED');
+    const completedCount = completedAttempts.length;
+    const highestAttempt = completedAttempts.length > 0 
+      ? completedAttempts.reduce((max, attempt) => attempt.score > max.score ? attempt : max, completedAttempts[0])
+      : null;
     const isClosed = endTime ? new Date() > new Date(endTime) : false;
     const isNotOpenYet = startTime ? new Date() < new Date(startTime) : false;
     const maxAtt = parseInt(maxAttempts || '0');
@@ -491,7 +495,6 @@ export default function AntiCheatExamPage() {
               {isProctored && (
                 <div className="bg-red-50 border border-red-200 rounded-lg p-4 mt-6">
                   <p className="text-red-700 font-semibold text-sm flex items-center gap-2">
-                    <span>⚠️</span>
                     Để thực hiện bài trắc nghiệm này bạn cần bật Camera để AI giám sát. Không được chuyển tab hay rời khỏi màn hình.
                   </p>
                 </div>
@@ -500,6 +503,19 @@ export default function AntiCheatExamPage() {
           </div>
 
           <div className="mb-8">
+            {highestAttempt && (
+              <div className="mb-8 p-6 bg-emerald-50 border border-emerald-200 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
+                <div>
+                  <h3 className="text-emerald-950 font-extrabold text-xl">Điểm chính thức của bạn</h3>
+                  <p className="text-emerald-700 text-sm mt-1 font-medium">Hệ thống ghi nhận điểm cao nhất trong số các lần thi của bạn.</p>
+                </div>
+                <div className="text-left sm:text-right bg-white px-6 py-3 rounded-xl shadow-sm border border-emerald-100 min-w-[140px]">
+                  <div className="text-3xl font-black text-emerald-600">{highestAttempt.correctCount} <span className="text-emerald-400 text-xl">/ {highestAttempt.totalQuestions}</span></div>
+                  <div className="text-emerald-800 font-bold mt-1 text-sm">{Number(highestAttempt.score).toFixed(2).replace(/\.?0+$/, '')} điểm (Hệ 10)</div>
+                </div>
+              </div>
+            )}
+
             <h3 className="text-xl font-bold text-ink mb-4">Tổng quan các lần làm bài trước của bạn</h3>
             <div className="overflow-hidden border border-line rounded-xl shadow-sm bg-surface">
               <table className="w-full text-sm text-left">
