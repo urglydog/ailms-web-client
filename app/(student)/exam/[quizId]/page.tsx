@@ -516,7 +516,7 @@ export default function AntiCheatExamPage() {
                       };
 
                       return (
-                        <tr key={h.attemptId} className="hover:bg-surface-hover transition-colors">
+                        <tr key={h.id} className="hover:bg-surface-hover transition-colors">
                           <td className="px-6 py-4 font-bold text-ink">{index + 1}</td>
                           <td className="px-6 py-4">
                             <div className="font-medium text-green-600">Đã xong</div>
