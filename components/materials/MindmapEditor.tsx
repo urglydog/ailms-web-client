@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect, useState, useMemo } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   ReactFlow,
   Controls,
@@ -33,7 +33,7 @@ function parseMermaidToFlow(code: string) {
   const edges: Edge[] = [];
   const lines = code.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('graph') && !l.startsWith('mindmap'));
   
-  let yOffset = 50;
+
   const nodeMap = new Map<string, Node>();
 
   lines.forEach((line, index) => {

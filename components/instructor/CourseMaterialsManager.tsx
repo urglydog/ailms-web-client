@@ -425,7 +425,7 @@ function MaterialWorkspaceViewer({
               ) : activeTab === 'DRAG_DROP' ? (
                 <MindmapEditor 
                   initialMermaidCode={detail.mermaidCode} 
-                  onSave={(code) => {
+                  onSave={(_code) => {
                     toast.success('Đã xuất cấu trúc mới (Demo Save)');
                     // TODO: Gọi mutation updateMermaidCode lên API
                   }}

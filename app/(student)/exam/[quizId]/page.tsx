@@ -115,6 +115,7 @@ export default function AntiCheatExamPage() {
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isStarted, isSubmitting, result]); // Omitting submitExam to avoid infinite re-renders if not memoized properly
 
   // Hàm nộp bài
