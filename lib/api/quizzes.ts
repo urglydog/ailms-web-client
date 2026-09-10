@@ -63,7 +63,7 @@ export interface HistoryRes {
   score: number;
   correctCount: number;
   totalQuestions: number;
-  submittedAt: string;
+  submittedAt: string | number[];
   quizId: number;
   status: string;
 }

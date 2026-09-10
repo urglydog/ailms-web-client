@@ -408,7 +408,16 @@ export default function AntiCheatExamPage() {
   }
 
   if (!isStarted) {
-    const sortedHistory = [...(history || [])].sort((a, b) => new Date(a.submittedAt).getTime() - new Date(b.submittedAt).getTime());
+    const parseDate = (d: string | number[] | undefined) => {
+      if (!d) return 0;
+      if (Array.isArray(d)) {
+        // Jackson LocalDateTime array: [year, month, day, hour, minute, second]
+        return new Date(d[0] || 0, (d[1] || 1) - 1, d[2] || 1, d[3] || 0, d[4] || 0, d[5] || 0).getTime();
+      }
+      return new Date(d).getTime();
+    };
+
+    const sortedHistory = [...(history || [])].sort((a, b) => parseDate(a.submittedAt) - parseDate(b.submittedAt));
     const ongoingAttempt = history?.find(h => h.status === 'IN_PROGRESS');
     const completedCount = history?.filter(h => h.status === 'COMPLETED').length || 0;
     const isClosed = endTime ? new Date() > new Date(endTime) : false;
@@ -498,12 +507,20 @@ export default function AntiCheatExamPage() {
                   ) : (
                     sortedHistory.map((h, index) => {
                       if (h.status === 'IN_PROGRESS') return null;
+
+                      const formatSubmittedAt = (d: string | number[]) => {
+                        if (Array.isArray(d)) {
+                          return new Date(d[0] || 0, (d[1] || 1) - 1, d[2] || 1, d[3] || 0, d[4] || 0, d[5] || 0).toLocaleString('vi-VN');
+                        }
+                        return new Date(d).toLocaleString('vi-VN');
+                      };
+
                       return (
                         <tr key={h.id} className="hover:bg-surface-hover transition-colors">
                           <td className="px-6 py-4 font-bold text-ink">{index + 1}</td>
                           <td className="px-6 py-4">
                             <div className="font-medium text-green-600">Đã xong</div>
-                            <div className="text-ink-muted text-xs mt-1">Đã nộp {new Date(h.submittedAt).toLocaleString('vi-VN')}</div>
+                            <div className="text-ink-muted text-xs mt-1">Đã nộp {formatSubmittedAt(h.submittedAt)}</div>
                           </td>
                           <td className="px-6 py-4 text-center">
                             <span className="font-bold text-lg text-ink">{h.score.toFixed(1)}</span>
