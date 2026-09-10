@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useCourseMaterials, useRequestMaterial, useAvailableLanguages, useCourseChapters, useRenameMaterial, useDeleteMaterial } from '@/hooks/useMaterials';
-import { materialsApi, type MaterialType, type ScopeType, type InstructorMaterial, type MaterialGenerationRes } from '@/lib/api/materials';
+import { materialsApi, type MaterialType, type ScopeType, type InstructorMaterial } from '@/lib/api/materials';
 import { toast } from 'sonner';
 import { ApiError } from '@/lib/api/client';
 import Link from 'next/link';
@@ -282,7 +282,7 @@ export function MaterialManager({ courseId }: { courseId: number }) {
             {/* Sort */}
             <select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as any)}
+              onChange={(e) => setSortBy(e.target.value as 'NEWEST' | 'OLDEST' | 'NAME_ASC')}
               className="rounded-md border border-line bg-surface px-3 py-1 text-sm text-ink outline-none focus:border-accent"
             >
               <option value="NEWEST">Mới nhất</option>
