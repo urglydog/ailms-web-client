@@ -404,9 +404,15 @@ export function MaterialManager({ courseId }: { courseId: number }) {
         <div className="flex-1 w-full">
           <div className="flex items-center gap-2 mb-2">
             <h3 className="font-bold text-gray-900 text-lg group-hover:text-accent transition-colors">{item.title || 'Học liệu khóa học'}</h3>
-            <span className="text-[10px] uppercase font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded-md">
-              {item.materialType === 'QUIZ' ? 'Bài Thi' : item.materialType === 'FLASHCARD' ? 'Flashcard' : 'Mindmap'}
-            </span>
+            {item.materialType === 'QUIZ' ? (
+              <span className="text-[10px] uppercase font-bold text-accent-dark bg-accent/10 border border-accent/20 px-2 py-0.5 rounded-md shadow-sm">
+                THI CHÍNH THỨC
+              </span>
+            ) : (
+              <span className="text-[10px] uppercase font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded-md">
+                {item.materialType === 'FLASHCARD' ? 'Flashcard' : 'Mindmap'}
+              </span>
+            )}
             {item.isProctored && (
               <span className="text-[10px] font-bold text-red-600 border border-red-200 bg-red-50 px-2 py-0.5 rounded-md">
                 AI Proctored

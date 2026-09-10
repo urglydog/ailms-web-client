@@ -91,6 +91,33 @@ export default function AntiCheatExamPage() {
     loadModels();
   }, [isProctored]);
 
+  // Anti-Cheat: Track tab switching
+  useEffect(() => {
+    if (!isStarted || isSubmitting || !!result) return;
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        setViolationCount(prev => {
+          const newCount = prev + 1;
+          if (newCount >= 3) {
+            toast.error('Phát hiện gian lận chuyển Tab quá 3 lần. Hệ thống tự động nộp bài!');
+            // Delay slightly to allow toast to render
+            setTimeout(() => submitExam(), 500);
+          } else {
+            toast.warning(`Cảnh báo gian lận (${newCount}/3): Bạn đã chuyển Tab. Hệ thống sẽ tự động nộp bài nếu vi phạm 3 lần!`);
+          }
+          return newCount;
+        });
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isStarted, isSubmitting, result]); // Omitting submitExam to avoid infinite re-renders if not memoized properly
+
   // Hàm nộp bài
   const submitExam = useCallback(() => {
     if (!attemptData || isSubmitting) return;
