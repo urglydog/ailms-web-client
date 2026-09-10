@@ -2,17 +2,22 @@
 
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useCourseMaterials, useRequestMaterial, useAvailableLanguages, useCourseChapters } from '@/hooks/useMaterials';
+import { useCourseMaterials, useRequestMaterial, useAvailableLanguages, useCourseChapters, useRenameMaterial, useDeleteMaterial } from '@/hooks/useMaterials';
 import { materialsApi, type MaterialType, type ScopeType, type InstructorMaterial } from '@/lib/api/materials';
 import { toast } from 'sonner';
 import { ApiError } from '@/lib/api/client';
 import Link from 'next/link';
+import { usePathname, useSearchParams } from 'next/navigation';
 
 export function MaterialManager({ courseId }: { courseId: number }) {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { data: materials, isLoading, refetch } = useCourseMaterials(courseId);
   const { data: availableLanguages } = useAvailableLanguages(courseId);
   const { data: chapters } = useCourseChapters(courseId);
   const requestMutation = useRequestMaterial();
+  const renameMutation = useRenameMaterial(courseId);
+  const deleteMutation = useDeleteMaterial(courseId);
 
   const { data: officialMaterials } = useQuery<InstructorMaterial[]>({
     queryKey: ['official-materials', courseId],
@@ -25,6 +30,11 @@ export function MaterialManager({ courseId }: { courseId: number }) {
   const [scopeRefId, setScopeRefId] = useState<number | undefined>(undefined);
   const [customLessonIds, setCustomLessonIds] = useState<number[]>([]);
   const [language, setLanguage] = useState<string>('');
+
+  const [filterType, setFilterType] = useState<MaterialType | 'ALL'>('ALL');
+  const [sortBy, setSortBy] = useState<'NEWEST' | 'OLDEST' | 'NAME_ASC'>('NEWEST');
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editTitle, setEditTitle] = useState('');
 
   // Auto-select first language if available
   if (availableLanguages && availableLanguages.length > 0 && language === '') {
@@ -81,8 +91,54 @@ export function MaterialManager({ courseId }: { courseId: number }) {
     }
   };
 
+  const handleRenameSubmit = (id: number) => {
+    if (editTitle.trim() !== '') {
+      renameMutation.mutate({ id, title: editTitle.trim() }, {
+        onSuccess: () => {
+          toast.success('Đã cập nhật tên học liệu');
+          setEditingId(null);
+        },
+        onError: () => toast.error('Có lỗi xảy ra khi cập nhật tên')
+      });
+    } else {
+      setEditingId(null);
+    }
+  };
+
+  const handleDelete = (id: number) => {
+    if (window.confirm('Bạn có chắc chắn muốn xóa học liệu này không?')) {
+      deleteMutation.mutate(id, {
+        onSuccess: () => toast.success('Đã xóa học liệu'),
+        onError: () => toast.error('Có lỗi xảy ra khi xóa học liệu')
+      });
+    }
+  };
+
   const filteredOfficial = officialMaterials?.filter(m => m.isOfficial);
   const [activeTab, setActiveTab] = useState<'OFFICIAL' | 'PERSONAL'>('OFFICIAL');
+
+  const getFilteredAndSortedMaterials = () => {
+    if (!materials) return [];
+    
+    let result = [...materials];
+    
+    if (filterType !== 'ALL') {
+      result = result.filter(m => m.materialType === filterType);
+    }
+    
+    result.sort((a, b) => {
+      if (sortBy === 'NEWEST') return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      if (sortBy === 'OLDEST') return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+      if (sortBy === 'NAME_ASC') {
+        const titleA = a.title || 'Học liệu không tên';
+        const titleB = b.title || 'Học liệu không tên';
+        return titleA.localeCompare(titleB, 'vi');
+      }
+      return 0;
+    });
+    
+    return result;
+  };
 
   const personalTabContent = (
     <>
@@ -210,52 +266,116 @@ export function MaterialManager({ courseId }: { courseId: number }) {
       </div>
 
       <div className="card p-6">
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 border-b border-line pb-4">
           <h2 className="font-display text-xl font-bold">Lịch sử tạo cá nhân</h2>
-          <button onClick={() => refetch()} className="text-sm text-accent hover:underline">
-            Làm mới
-          </button>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full sm:w-auto">
+            {/* Filter */}
+            <div className="flex flex-wrap gap-2">
+              <button onClick={() => setFilterType('ALL')} className={`px-3 py-1 text-xs font-semibold rounded-full border ${filterType === 'ALL' ? 'bg-ink text-white border-ink' : 'bg-surface hover:bg-surface-hover border-line text-ink-muted'}`}>Tất cả</button>
+              <button onClick={() => setFilterType('MINDMAP')} className={`px-3 py-1 text-xs font-semibold rounded-full border ${filterType === 'MINDMAP' ? 'bg-ink text-white border-ink' : 'bg-surface hover:bg-surface-hover border-line text-ink-muted'}`}>Sơ đồ tư duy</button>
+              <button onClick={() => setFilterType('FLASHCARD')} className={`px-3 py-1 text-xs font-semibold rounded-full border ${filterType === 'FLASHCARD' ? 'bg-ink text-white border-ink' : 'bg-surface hover:bg-surface-hover border-line text-ink-muted'}`}>Flashcard</button>
+              <button onClick={() => setFilterType('QUIZ')} className={`px-3 py-1 text-xs font-semibold rounded-full border ${filterType === 'QUIZ' ? 'bg-ink text-white border-ink' : 'bg-surface hover:bg-surface-hover border-line text-ink-muted'}`}>Trắc nghiệm</button>
+            </div>
+            
+            <div className="h-4 w-px bg-line hidden sm:block"></div>
+            
+            {/* Sort */}
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as 'NEWEST' | 'OLDEST' | 'NAME_ASC')}
+              className="rounded-md border border-line bg-surface px-3 py-1 text-sm text-ink outline-none focus:border-accent"
+            >
+              <option value="NEWEST">Mới nhất</option>
+              <option value="OLDEST">Cũ nhất</option>
+              <option value="NAME_ASC">Tên A-Z</option>
+            </select>
+            
+            <button onClick={() => refetch()} className="text-sm text-accent hover:underline whitespace-nowrap hidden sm:block ml-2">
+              Làm mới
+            </button>
+          </div>
         </div>
         {isLoading ? (
           <p className="text-sm text-ink-muted">Đang tải...</p>
         ) : materials && materials.length > 0 ? (
           <div className="flex flex-col gap-3">
-            {materials.map((m) => (
-              <div key={m.id} className="flex items-center justify-between border border-line-soft rounded-lg p-4">
-                <div>
-                  <h3 className="font-semibold text-ink">
-                    {m.materialType === 'MINDMAP' ? 'Sơ đồ tư duy' : m.materialType} - Phiên bản {m.versionNo}
-                  </h3>
-                  <p className="text-xs text-ink-muted mt-1">
-                    Trạng thái:{' '}
-                    {m.status === 'COMPLETED' ? (
-                      <span className="text-green-600 font-medium">Hoàn thành</span>
-                    ) : m.status === 'FAILED' ? (
-                      <span className="text-red-600 font-medium">Lỗi</span>
-                    ) : (
-                      <span className="text-orange-500 font-medium">
-                        {new Date().getTime() - new Date(m.createdAt).getTime() > 120000 
-                          ? 'Đang quá tải (Vui lòng chờ thêm hoặc tạo lại)' 
-                          : 'Đang xử lý (Vui lòng chờ)...'}
-                      </span>
-                    )}
-                    <span className="mx-2">•</span>
-                    {new Date(m.createdAt).toLocaleString('vi-VN')}
-                  </p>
+            {getFilteredAndSortedMaterials().map((m) => (
+              <div key={m.id} className="flex items-center justify-between border border-line-soft rounded-lg p-4 group">
+                <div className="flex-1 mr-4">
+                  {editingId === m.id ? (
+                    <div className="flex flex-wrap items-center gap-2 mb-1">
+                      <input
+                        autoFocus
+                        type="text"
+                        value={editTitle}
+                        onChange={(e) => setEditTitle(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleRenameSubmit(m.id)}
+                        onBlur={() => handleRenameSubmit(m.id)}
+                        className="border border-accent rounded px-2 py-1 text-sm text-ink w-full max-w-xs outline-none"
+                      />
+                      <span className="text-xs text-ink-muted hidden sm:inline">Enter để lưu</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 
+                        className="font-semibold text-ink cursor-pointer hover:text-accent group/title"
+                        onClick={() => { setEditingId(m.id); setEditTitle(m.title || 'Học liệu không tên'); }}
+                        title="Click để đổi tên"
+                      >
+                        {m.title || 'Học liệu không tên'}
+                      </h3>
+                      <span className="text-[10px] text-ink-muted bg-surface-hover px-2 py-0.5 rounded opacity-0 group-hover/title:opacity-100 transition-opacity">✏️ Đổi tên</span>
+                    </div>
+                  )}
+                  
+                  <div className="text-xs text-ink-muted flex items-center gap-2 flex-wrap">
+                    <span className="font-medium bg-line-soft px-1.5 py-0.5 rounded text-[10px]">
+                      {m.materialType === 'MINDMAP' ? 'SƠ ĐỒ TƯ DUY' : m.materialType === 'FLASHCARD' ? 'FLASHCARD' : 'TRẮC NGHIỆM'}
+                    </span>
+                    <span>•</span>
+                    <span>Trạng thái:{' '}
+                      {m.status === 'COMPLETED' ? (
+                        <span className="text-green-600 font-medium">Hoàn thành</span>
+                      ) : m.status === 'FAILED' ? (
+                        <span className="text-red-600 font-medium">Lỗi</span>
+                      ) : (
+                        <span className="text-orange-500 font-medium">
+                          {new Date().getTime() - new Date(m.createdAt).getTime() > 120000 
+                            ? 'Đang chờ lâu' 
+                            : 'Đang xử lý'}
+                        </span>
+                      )}
+                    </span>
+                    <span>•</span>
+                    <span>{new Date(m.createdAt).toLocaleString('vi-VN')}</span>
+                  </div>
                 </div>
-                {m.status === 'COMPLETED' && (
-                  <Link
-                    href={`/materials/${m.id}`}
-                    className="rounded-full bg-surface-hover px-4 py-2 text-sm font-semibold text-ink hover:bg-line-soft"
+                <div className="flex items-center gap-3">
+                  {m.status === 'COMPLETED' && (
+                    <Link
+                      href={`/materials/${m.id}`}
+                      className="rounded-full bg-surface-hover px-4 py-2 text-sm font-semibold text-ink hover:bg-line-soft whitespace-nowrap"
+                    >
+                      Xem
+                    </Link>
+                  )}
+                  <button
+                    onClick={() => handleDelete(m.id)}
+                    className="p-2 text-ink-muted hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
+                    title="Xóa học liệu"
                   >
-                    Xem chi tiết
-                  </Link>
-                )}
+                    🗑️
+                  </button>
+                </div>
               </div>
             ))}
+            
+            {getFilteredAndSortedMaterials().length === 0 && (
+              <p className="text-sm text-ink-muted text-center py-6 bg-surface-hover rounded-lg">Không tìm thấy học liệu phù hợp với bộ lọc.</p>
+            )}
           </div>
         ) : (
-          <p className="text-sm text-ink-muted">Chưa có học liệu cá nhân nào được tạo.</p>
+          <p className="text-sm text-ink-muted text-center py-6">Chưa có học liệu cá nhân nào được tạo.</p>
         )}
       </div>
     </>
@@ -270,8 +390,9 @@ export function MaterialManager({ courseId }: { courseId: number }) {
     const isAfterEnd = endTime ? now > endTime : false;
     const outOfAttempts = (item.maxAttempts && item.attemptCount !== undefined) ? item.attemptCount >= item.maxAttempts : false;
 
+    const currentUrl = `${pathname}?${searchParams.toString()}`;
     const href = item.materialType === 'QUIZ' && item.materialId
-      ? `/exam/${item.materialId}?title=${encodeURIComponent(item.title || '')}&duration=${item.durationMinutes || ''}&attempts=${item.maxAttempts || ''}&count=${item.randomPickCount || item.questionCount || ''}&start=${item.startTime || ''}&end=${item.endTime || ''}&attemptCount=${item.attemptCount || 0}&proctored=${item.isProctored || false}`
+      ? `/exam/${item.materialId}?title=${encodeURIComponent(item.title || '')}&duration=${item.durationMinutes || ''}&attempts=${item.maxAttempts || ''}&count=${item.randomPickCount || item.questionCount || ''}&start=${item.startTime || ''}&end=${item.endTime || ''}&attemptCount=${item.attemptCount || 0}&proctored=${item.isProctored || false}&returnUrl=${encodeURIComponent(currentUrl)}`
       : `/materials/${item.id}`;
 
     return (

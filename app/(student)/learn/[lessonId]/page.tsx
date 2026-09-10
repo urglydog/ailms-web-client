@@ -2,8 +2,8 @@
 
 import { useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
-import { useParams, useRouter } from 'next/navigation';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useParams, useRouter, useSearchParams, usePathname } from 'next/navigation';
+import { useCallback, useEffect, useRef, useState, Suspense } from 'react';
 import { toast } from 'sonner';
 import { CourseOverviewTab } from '@/components/course/CourseOverviewTab';
 import { ReviewsSection } from '@/components/course/ReviewsSection';
@@ -117,9 +117,11 @@ function buildChunkSteps(totalChunks: number): PipelineStep[] {
 
 type PlayerMode = 'watching' | 'need-activation' | 'processing';
 
-export default function LearnPage() {
+function LearnPageContent() {
   const params = useParams<{ lessonId: string }>();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
   const lessonId = Number(params.lessonId);
   const hasToken = !!getAccessToken();
 
@@ -157,7 +159,15 @@ export default function LearnPage() {
   // Giao diện tham khảo Udemy (06/09/2026) — tab dưới video (Tổng quan/Hỏi đáp/Đánh giá/Học liệu)
   // và tab trong sidebar (Nội dung khóa học/AI Gia sư), thay cho panel Gia sư AI trượt nổi + nút
   // "Mở Quản lý Học liệu AI" điều hướng sang trang riêng trước đây.
-  const [mainTab, setMainTab] = useState<MainTab>('overview');
+  const tabParam = searchParams.get('tab') as MainTab | null;
+  const mainTab: MainTab = tabParam && MAIN_TABS.some(t => t.key === tabParam) ? tabParam : 'overview';
+
+  const setMainTab = (tab: MainTab) => {
+    const newSearchParams = new URLSearchParams(searchParams.toString());
+    newSearchParams.set('tab', tab);
+    router.replace(`${pathname}?${newSearchParams.toString()}`, { scroll: false });
+  };
+
   const [sidebarTab, setSidebarTab] = useState<SidebarTab>('content');
   // Ẩn/hiện phụ đề gốc & phụ đề đã dịch — mặc định TẮT, học viên chủ động tích chọn.
   const [showOriginalSub, setShowOriginalSub] = useState(false);
@@ -622,5 +632,13 @@ export default function LearnPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LearnPage() {
+  return (
+    <Suspense fallback={<div className="p-16 text-center text-sm text-ink-muted">Đang tải giao diện...</div>}>
+      <LearnPageContent />
+    </Suspense>
   );
 }
