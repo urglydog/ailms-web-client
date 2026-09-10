@@ -569,24 +569,10 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
 
   const handleStartTimeChange = (val: string) => {
     setStartTime(val);
-    if (val && durationMinutes) {
-      const start = new Date(val);
-      const durationMs = parseInt(durationMinutes) * 60000;
-      const end = new Date(start.getTime() + durationMs);
-      const pad = (n: number) => n.toString().padStart(2, '0');
-      setEndTime(`${end.getFullYear()}-${pad(end.getMonth() + 1)}-${pad(end.getDate())}T${pad(end.getHours())}:${pad(end.getMinutes())}`);
-    }
   };
 
   const handleDurationChange = (val: string) => {
     setDurationMinutes(val);
-    if (startTime && val) {
-      const start = new Date(startTime);
-      const durationMs = parseInt(val) * 60000;
-      const end = new Date(start.getTime() + durationMs);
-      const pad = (n: number) => n.toString().padStart(2, '0');
-      setEndTime(`${end.getFullYear()}-${pad(end.getMonth() + 1)}-${pad(end.getDate())}T${pad(end.getHours())}:${pad(end.getMinutes())}`);
-    }
   };
 
   const updateQuizSettingsMutation = useMutation({
