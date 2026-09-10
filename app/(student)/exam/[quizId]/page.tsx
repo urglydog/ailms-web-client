@@ -507,7 +507,7 @@ export default function AntiCheatExamPage() {
                   <tr>
                     <th className="px-6 py-4">Lần thi</th>
                     <th className="px-6 py-4">Trạng thái</th>
-                    <th className="px-6 py-4 text-center">Điểm / 10</th>
+                    <th className="px-6 py-4 text-center">Kết quả</th>
                     <th className="px-6 py-4 text-center">Xem lại</th>
                   </tr>
                 </thead>
@@ -537,7 +537,8 @@ export default function AntiCheatExamPage() {
                             <div className="text-ink-muted text-xs mt-1">Đã nộp {formatSubmittedAt(h.submittedAt)}</div>
                           </td>
                           <td className="px-6 py-4 text-center">
-                            <span className="font-bold text-lg text-ink">{h.score.toFixed(1)}</span>
+                            <div className="font-bold text-lg text-ink">{h.correctCount} / {h.totalQuestions} <span className="text-sm font-normal text-ink-muted">câu</span></div>
+                            <div className="text-xs font-semibold text-accent mt-1">{Number(h.score).toFixed(2).replace(/\.?0+$/, '')} điểm</div>
                           </td>
                           <td className="px-6 py-4 text-center">
                             <Link href={`/exam/${quizId}/history`} className="text-accent font-semibold hover:underline">

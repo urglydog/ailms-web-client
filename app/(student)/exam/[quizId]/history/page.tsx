@@ -89,7 +89,7 @@ export default function AttemptHistoryPage() {
                   <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
                     <div className="bg-gray-50 border-b border-gray-200 p-4">
                       <h2 className="font-bold text-lg">Chi tiết bài làm</h2>
-                      <p className="text-sm text-ink-muted">Điểm số: <strong className="text-blue-600">{attemptDetail.score.toFixed(1)}</strong></p>
+                      <p className="text-sm text-ink-muted">Điểm số: <strong className="text-blue-600">{Number(attemptDetail.score).toFixed(2).replace(/\.?0+$/, '')}</strong></p>
                     </div>
                     
                     <div className="p-6 space-y-8">
