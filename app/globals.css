@@ -17,7 +17,7 @@
   }
 
   a:hover {
-    @apply text-accent-dark underline;
+    @apply text-accent-dark;
   }
 
   /* Vòng focus nhìn thấy rõ — yêu cầu a11y, không được bỏ outline mà không thay thế */
