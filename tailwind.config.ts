@@ -1,14 +1,13 @@
 import type { Config } from 'tailwindcss';
 
 /**
- * Design token trích từ Claude Design project "LinguaLearn Interactive Prototype".
- *
- * Bảng màu và font là quyết định có chủ đích, không phải mặc định:
- *  - Accent cyan/teal đơn sắc, CỐ TÌNH tránh "AI purple" và tông beige/đồng
- *    thường thấy ở sản phẩm cao cấp (theo taste-skill).
- *  - Font Outfit + Plus Jakarta Sans, CỐ TÌNH tránh Inter/Fraunces mặc định.
- *
- * Đổi các giá trị này là đổi nhận diện của cả sản phẩm — cần lý do rõ ràng.
+ * Enterprise/Academic Design System
+ * 
+ * Loại bỏ hoàn toàn phong cách "AI Vibe" (tím gradient, nút pill, phát sáng chói lóa).
+ * Thay vào đó sử dụng phong cách nghiêm túc, sắc nét, mật độ thông tin cao:
+ * - Màu chủ đạo: Slate/Zinc (Xám thép) kết hợp Xanh Navy đậm (Học thuật).
+ * - Góc bo (Border Radius): 6px-8px (Gọn gàng, vuông vức hơn).
+ * - Bóng đổ (Shadow): Cực kỳ tinh tế, chỉ dùng màu đen mờ (black opacity), không glow màu.
  */
 const config: Config = {
   content: [
@@ -20,87 +19,44 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        /** Accent chính — dùng cho link, nút chính, số liệu nhấn mạnh */
+        /** Accent chính — Màu Xanh Tín nhiệm / Học thuật (Enterprise Blue/Navy) */
         accent: {
-          DEFAULT: '#0891B2',
-          dark: '#0E7490',
-          /** Dùng cho hiệu ứng glow của trạng thái "AI đang xử lý" */
-          glow: '#22D3EE',
+          DEFAULT: '#2563EB', // Blue 600
+          dark: '#1D4ED8',    // Blue 700
+          glow: 'transparent',// Không dùng glow
         },
         ink: {
-          /** Màu chữ chính */
-          DEFAULT: '#131620',
-          /** Chữ phụ, nhãn */
-          muted: '#5B6472',
-          /** Chữ mờ nhất, breadcrumb */
-          faint: '#94A0AF',
+          DEFAULT: '#0F172A', // Slate 900 (Đen ngả xám thép)
+          muted: '#64748B',   // Slate 500
+          faint: '#94A3B8',   // Slate 400
         },
         line: {
-          /** Viền card, viền header */
-          DEFAULT: '#E4E7EC',
-          /** Đường phân cách bên trong card */
-          soft: '#EEF0F3',
-          /** Dấu chấm phân tách */
-          dot: '#C9D0D8',
+          DEFAULT: '#E2E8F0', // Viền mỏng, nhạt
+          soft: '#F1F5F9',    // Đường phân cách mờ
+          dot: '#CBD5E1',
         },
         surface: {
-          /** Nền trang */
-          DEFAULT: '#F7F8FA',
-          /** Nền card */
+          DEFAULT: '#F8FAFC', // Slate 50 (Nền trang rất nhẹ)
           raised: '#FFFFFF',
+          hover: '#F1F5F9',
         },
-        /** Khoá học miễn phí */
         success: '#16A34A',
-        /** Sao đánh giá */
         star: '#F59E0B',
       },
       fontFamily: {
-        /** Tiêu đề, số liệu, giá */
         display: ['var(--font-outfit)', 'sans-serif'],
-        /** Nội dung */
         sans: ['var(--font-jakarta)', 'sans-serif'],
-        /** Nhãn kỹ thuật, mốc thời gian */
         mono: ['var(--font-plex-mono)', 'monospace'],
       },
       borderRadius: {
-        card: '16px',
+        card: '8px', // Bỏ 16px. Dùng 8px chuẩn Enterprise
       },
       boxShadow: {
-        card: '0 1px 2px rgba(19, 22, 32, 0.04)',
-        'card-hover': '0 14px 30px rgba(19, 22, 32, 0.10)',
+        card: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+        'card-hover': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
       },
       maxWidth: {
         shell: '1280px',
-      },
-      keyframes: {
-        /** Dấu chấm nhấp nháy: AI đang xử lý */
-        aiPulse: {
-          '0%, 100%': { opacity: '1', transform: 'scale(1)' },
-          '50%': { opacity: '0.55', transform: 'scale(0.85)' },
-        },
-        /** Vầng sáng lan ra từ nút kích hoạt lồng tiếng */
-        aiGlow: {
-          '0%, 100%': {
-            boxShadow: '0 0 0 0 rgba(34, 211, 238, 0.35), 0 8px 24px rgba(8, 145, 178, 0.25)',
-          },
-          '50%': {
-            boxShadow: '0 0 0 8px rgba(34, 211, 238, 0), 0 8px 30px rgba(8, 145, 178, 0.35)',
-          },
-        },
-        aiSpin: {
-          from: { transform: 'rotate(0deg)' },
-          to: { transform: 'rotate(360deg)' },
-        },
-        skeletonShine: {
-          '0%': { backgroundPosition: '-200px 0' },
-          '100%': { backgroundPosition: '200px 0' },
-        },
-      },
-      animation: {
-        'ai-pulse': 'aiPulse 1.4s ease-in-out infinite',
-        'ai-glow': 'aiGlow 2s ease-in-out infinite',
-        'ai-spin': 'aiSpin 0.8s linear infinite',
-        'skeleton-shine': 'skeletonShine 1.2s linear infinite',
       },
     },
   },
