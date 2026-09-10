@@ -50,7 +50,7 @@ export default function InstructorLayout({ children }: { children: React.ReactNo
                 key={item.id}
                 href={item.href}
                 className={`block rounded-lg px-3.5 py-2.5 text-[13.5px] font-semibold no-underline ${
-                  isActive ? 'bg-cyan-400/15 text-cyan-300' : 'text-slate-300 hover:bg-slate-800'
+                  isActive ? 'bg-accent/10 text-accent font-semibold' : 'text-slate-300 hover:bg-slate-800'
                 }`}
               >
                 {item.label}

@@ -55,7 +55,7 @@ export default async function HomePage() {
             <div className="flex items-center gap-[18px]">
               <Link
                 href="/courses"
-                className="cursor-pointer whitespace-nowrap rounded-full bg-cyan-600 px-[26px] py-[14px] text-[15px] font-bold text-white no-underline hover:bg-cyan-700"
+                className="cursor-pointer whitespace-nowrap rounded-lg bg-accent px-[26px] py-[14px] text-[15px] font-bold text-white no-underline hover:bg-accent-dark btn-tactile shadow-sm"
               >
                 Khám phá khóa học
               </Link>
