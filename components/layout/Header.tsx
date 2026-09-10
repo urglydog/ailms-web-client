@@ -96,7 +96,7 @@ export function Header() {
           {/* Logo & Nav */}
           <div className="flex min-w-0 shrink-0 items-center gap-5">
             <Link href="/" className="flex shrink-0 cursor-pointer items-center gap-2.5 no-underline">
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-400 to-cyan-600 font-display text-base font-bold text-white">
+              <span className="flex h-8 w-8 items-center justify-center rounded-md bg-accent font-display text-base font-bold text-white">
                 L
               </span>
               <span className="whitespace-nowrap font-display text-[19px] font-bold text-gray-900">
@@ -108,7 +108,7 @@ export function Header() {
                 Khóa học
               </Link>
               {isLoggedIn && (
-                <Link href="/my-courses" className="rounded-lg px-2.5 py-2 text-sm font-semibold text-cyan-600 hover:bg-cyan-50 no-underline">
+                <Link href="/my-courses" className="rounded-lg px-2.5 py-2 text-sm font-semibold text-gray-900 hover:bg-gray-50 no-underline">
                   Khóa học của tôi
                 </Link>
               )}
@@ -264,13 +264,13 @@ export function Header() {
               <>
                 <Link
                   href="/login"
-                  className="cursor-pointer whitespace-nowrap rounded-full px-3.5 py-2 text-[13.5px] font-semibold text-gray-900 hover:bg-gray-50 no-underline"
+                  className="cursor-pointer whitespace-nowrap rounded-lg px-3.5 py-2 text-[13.5px] font-semibold text-gray-900 hover:bg-gray-50 no-underline"
                 >
                   Đăng nhập
                 </Link>
                 <Link
                   href="/register"
-                  className="cursor-pointer whitespace-nowrap rounded-full bg-cyan-600 px-4 py-2 text-[13.5px] font-bold text-white hover:bg-cyan-700 no-underline"
+                  className="cursor-pointer whitespace-nowrap rounded-lg bg-accent px-4 py-2 text-[13.5px] font-bold text-white hover:bg-accent-dark no-underline"
                 >
                   Đăng ký
                 </Link>

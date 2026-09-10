@@ -35,8 +35,8 @@ export function Button({
 }: ButtonProps) {
   return (
     <button
-      className={`inline-flex items-center justify-center gap-2 rounded-full font-display
-                  font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50
+      className={`inline-flex items-center justify-center gap-2 rounded-lg font-sans
+                  font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50 btn-tactile
                   ${VARIANTS[variant]} ${SIZES[size]} ${className}`}
       {...rest}
     >

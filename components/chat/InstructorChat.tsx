@@ -107,13 +107,15 @@ export function InstructorChat() {
       {/* Floating Toggle Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-xl hover:scale-105 active:scale-95 transition-all"
+        className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-xl bg-accent text-white shadow-md btn-tactile"
         title="Trợ lý Giảng viên AI"
       >
         {isOpen ? (
           <span className="text-xl font-bold">✕</span>
         ) : (
-          <span className="text-2xl">🤖</span>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          </svg>
         )}
       </button>
 
@@ -125,7 +127,7 @@ export function InstructorChat() {
         style={{ height: '520px' }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between bg-gradient-to-r from-blue-600 to-indigo-600 p-4 text-white rounded-t-2xl">
+        <div className="flex items-center justify-between bg-accent p-4 text-white rounded-t-2xl">
           <div className="flex items-center gap-2.5">
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-sm">
               🤖
