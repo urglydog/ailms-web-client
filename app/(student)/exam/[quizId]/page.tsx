@@ -22,20 +22,20 @@ export default function AntiCheatExamPage() {
   const proctoredParam = searchParams.get('proctored');
   const isProctored = proctoredParam === 'true';
 
-  const { data: history, refetch: refetchHistory } = useQuizHistory(Number(quizId));
+  const { data: history } = useQuizHistory(Number(quizId));
 
   const videoRef = useRef<HTMLVideoElement>(null);
-  
+
   const [violationCount, setViolationCount] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [isStarted, setIsStarted] = useState(false);
   const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
-  
+
   // Trạng thái AI
   const [isModelLoaded, setIsModelLoaded] = useState(false);
   const [faceStatus, setFaceStatus] = useState<'DETECTING' | 'FACE_FOUND' | 'NO_FACE'>('DETECTING');
-  
+
   // Đồng hồ đếm ngược (giây)
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -52,7 +52,7 @@ export default function AntiCheatExamPage() {
   const [submitTime, setSubmitTime] = useState<Date | null>(null);
   const [elapsedSeconds, setElapsedSeconds] = useState<number>(0);
   const startTimeRef = useRef<Date | null>(null);
-  
+
   // State for AI Explanations
   const [explanations, setExplanations] = useState<Record<number, { loading: boolean; text?: string }>>({});
 
@@ -72,8 +72,8 @@ export default function AntiCheatExamPage() {
   // Khởi tạo model
   useEffect(() => {
     if (!isProctored) {
-        setIsModelLoaded(true);
-        return;
+      setIsModelLoaded(true);
+      return;
     }
     const loadModels = async () => {
       try {
@@ -84,7 +84,7 @@ export default function AntiCheatExamPage() {
       } catch (err) {
         console.error("Failed to load face-api models", err);
         // Fallback for demo
-        setIsModelLoaded(true); 
+        setIsModelLoaded(true);
       }
     };
     loadModels();
@@ -169,20 +169,20 @@ export default function AntiCheatExamPage() {
     if (!isProctored || !isStarted || !videoRef.current || !isModelLoaded || result) return;
 
     const video = videoRef.current;
-    
+
     const startDetection = () => {
       if (detectInterval.current) clearInterval(detectInterval.current);
-      
+
       detectInterval.current = setInterval(async () => {
         if (video.paused || video.ended) return;
-        
+
         try {
           const faceapi = await import('@vladmandic/face-api');
           const detections = await faceapi.detectAllFaces(
-            video, 
+            video,
             new faceapi.TinyFaceDetectorOptions({ inputSize: 160, scoreThreshold: 0.3 })
           );
-          
+
           if (detections.length === 0) {
             setFaceStatus('NO_FACE');
             handleViolation('Không phát hiện thấy khuôn mặt trong Camera');
@@ -239,11 +239,11 @@ export default function AntiCheatExamPage() {
   useEffect(() => {
     const examDurationMinutes = duration ? Number(duration) : null;
     if (!isStarted || !examDurationMinutes || result || !attemptData?.startedAt) return;
-    
+
     const startTimeMs = new Date(attemptData.startedAt).getTime();
     const durationMs = examDurationMinutes * 60 * 1000;
     const expireTimeMs = startTimeMs + durationMs;
-    
+
     startTimeRef.current = new Date(startTimeMs);
 
     const updateTimer = () => {
@@ -260,11 +260,11 @@ export default function AntiCheatExamPage() {
 
     updateTimer(); // Call immediately
     timerRef.current = setInterval(updateTimer, 1000);
-    
+
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isStarted, duration, result, attemptData?.startedAt]);
 
   // Gắn stream
@@ -329,18 +329,13 @@ export default function AntiCheatExamPage() {
               </p>
             )}
             <div className="flex justify-center gap-4 mt-8">
-              <button 
-                onClick={() => {
-                  setResult(null);
-                  setIsStarted(false);
-                  setAttemptData(null);
-                  refetchHistory();
-                }}
+              <Link
+                href={`/exam/${quizId}/history`}
                 className="bg-accent text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-accent-hover transition-all"
               >
-                Xem tổng quan bài thi
-              </button>
-              <button 
+                Xem lại đáp án
+              </Link>
+              <button
                 onClick={() => router.push('/my-courses')}
                 className="bg-surface-hover text-ink border border-line px-8 py-3 rounded-full font-bold shadow-sm hover:bg-line transition-all"
               >
@@ -362,7 +357,7 @@ export default function AntiCheatExamPage() {
                   )}
                 </div>
                 <p className="mb-4">{detail.content}</p>
-                
+
                 <div className="space-y-2 mb-6">
                   {detail.options.map(opt => {
                     const isSelected = detail.selectedOptionId === opt.id;
@@ -383,7 +378,7 @@ export default function AntiCheatExamPage() {
                 {!detail.isCorrect && (
                   <div className="mt-4 pt-4 border-t border-line">
                     {!explanations[detail.questionId] ? (
-                      <button 
+                      <button
                         onClick={() => handleExplain(detail.questionId, detail.selectedOptionId)}
                         className="text-accent text-sm font-semibold hover:underline flex items-center gap-1"
                       >
@@ -453,7 +448,7 @@ export default function AntiCheatExamPage() {
                     <span className="font-medium text-ink">{endTime ? new Date(endTime).toLocaleString('vi-VN') : 'Không giới hạn'}</span>
                   </div>
                 </div>
-                
+
                 <div className="flex-1 space-y-4 border-t md:border-t-0 md:border-l border-line pt-4 md:pt-0 md:pl-8">
                   <div className="flex items-center gap-3">
                     <span className="w-32 font-semibold text-ink-muted">Số câu:</span>
@@ -481,21 +476,27 @@ export default function AntiCheatExamPage() {
             </div>
           </div>
 
-          {sortedHistory.length > 0 && (
-            <div className="mb-8">
-              <h3 className="text-xl font-bold text-ink mb-4">Tổng quan các lần làm bài trước của bạn</h3>
-              <div className="overflow-hidden border border-line rounded-xl shadow-sm bg-surface">
-                <table className="w-full text-sm text-left">
-                  <thead className="bg-surface-hover text-ink font-semibold border-b border-line">
+          <div className="mb-8">
+            <h3 className="text-xl font-bold text-ink mb-4">Tổng quan các lần làm bài trước của bạn</h3>
+            <div className="overflow-hidden border border-line rounded-xl shadow-sm bg-surface">
+              <table className="w-full text-sm text-left">
+                <thead className="bg-surface-hover text-ink font-semibold border-b border-line">
+                  <tr>
+                    <th className="px-6 py-4">Lần thi</th>
+                    <th className="px-6 py-4">Trạng thái</th>
+                    <th className="px-6 py-4 text-center">Điểm / 10</th>
+                    <th className="px-6 py-4 text-center">Xem lại</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-line">
+                  {sortedHistory.length === 0 ? (
                     <tr>
-                      <th className="px-6 py-4">Lần thi</th>
-                      <th className="px-6 py-4">Trạng thái</th>
-                      <th className="px-6 py-4 text-center">Điểm / 10</th>
-                      <th className="px-6 py-4 text-center">Xem lại</th>
+                      <td colSpan={4} className="px-6 py-8 text-center text-ink-muted">
+                        Bạn chưa có lượt làm bài nào cho bài thi này.
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody className="divide-y divide-line">
-                    {sortedHistory.map((h, index) => {
+                  ) : (
+                    sortedHistory.map((h, index) => {
                       if (h.status === 'IN_PROGRESS') return null;
                       return (
                         <tr key={h.id} className="hover:bg-surface-hover transition-colors">
@@ -508,18 +509,18 @@ export default function AntiCheatExamPage() {
                             <span className="font-bold text-lg text-ink">{h.score.toFixed(1)}</span>
                           </td>
                           <td className="px-6 py-4 text-center">
-                            <Link href={`/exam/${quizId}/history/${h.id}`} className="text-accent font-semibold hover:underline">
+                            <Link href={`/exam/${quizId}/history`} className="text-accent font-semibold hover:underline">
                               Xem chi tiết
                             </Link>
                           </td>
                         </tr>
                       );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+                    })
+                  )}
+                </tbody>
+              </table>
             </div>
-          )}
+          </div>
 
           <div className="flex flex-col items-center mt-8 space-y-4 pb-8">
             {ongoingAttempt ? (
@@ -576,11 +577,10 @@ export default function AntiCheatExamPage() {
           <div className="flex items-center gap-6">
             {/* Đồng hồ đếm ngược */}
             {isStarted && timeLeft !== null && (
-              <div className={`flex items-center gap-2 font-mono text-xl font-bold px-4 py-2 rounded-xl border-2 ${
-                timeLeft <= 60 ? 'border-red-500 text-red-600 bg-red-50 animate-pulse' :
-                timeLeft <= 180 ? 'border-amber-400 text-amber-600 bg-amber-50' :
-                'border-line text-ink bg-surface-hover'
-              }`}>
+              <div className={`flex items-center gap-2 font-mono text-xl font-bold px-4 py-2 rounded-xl border-2 ${timeLeft <= 60 ? 'border-red-500 text-red-600 bg-red-50 animate-pulse' :
+                  timeLeft <= 180 ? 'border-amber-400 text-amber-600 bg-amber-50' :
+                    'border-line text-ink bg-surface-hover'
+                }`}>
                 <span>⏱</span>
                 <span>{formatTime(timeLeft)}</span>
               </div>
@@ -595,62 +595,61 @@ export default function AntiCheatExamPage() {
             )}
           </div>
         </div>
-          <div className="grid grid-cols-3 gap-8">
-            <div className="col-span-2 flex flex-col gap-6">
-              {attemptData?.questions.map((q, idx) => (
-                <div key={q.id} className="card p-6">
-                  <h3 className="font-bold text-lg mb-4">Câu hỏi {idx + 1}</h3>
-                  <p className="text-sm mb-6">{q.content}</p>
-                  
-                  <div className="space-y-3">
-                    {q.options.map((opt) => (
-                      <label key={opt.id} className="flex items-center gap-3 p-3 border border-line rounded-lg hover:bg-surface-hover cursor-pointer">
-                        <input 
-                          type="radio" 
-                          name={`question_${q.id}`} 
-                          value={opt.id}
-                          checked={answers[q.id] === opt.id}
-                          onChange={() => setAnswers(prev => ({ ...prev, [q.id]: opt.id }))}
-                          className="w-4 h-4 text-accent" 
-                        />
-                        <span className="text-sm">{opt.content}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
+        <div className="grid grid-cols-3 gap-8">
+          <div className="col-span-2 flex flex-col gap-6">
+            {attemptData?.questions.map((q, idx) => (
+              <div key={q.id} className="card p-6">
+                <h3 className="font-bold text-lg mb-4">Câu hỏi {idx + 1}</h3>
+                <p className="text-sm mb-6">{q.content}</p>
 
-            <div className="col-span-1 flex flex-col gap-4 sticky top-8 self-start">
-              {isProctored && (
-                <div className="card overflow-hidden">
-                  <div className={`text-white text-xs font-bold p-2 text-center transition-colors ${
-                    faceStatus === 'DETECTING' ? 'bg-amber-500' :
+                <div className="space-y-3">
+                  {q.options.map((opt) => (
+                    <label key={opt.id} className="flex items-center gap-3 p-3 border border-line rounded-lg hover:bg-surface-hover cursor-pointer">
+                      <input
+                        type="radio"
+                        name={`question_${q.id}`}
+                        value={opt.id}
+                        checked={answers[q.id] === opt.id}
+                        onChange={() => setAnswers(prev => ({ ...prev, [q.id]: opt.id }))}
+                        className="w-4 h-4 text-accent"
+                      />
+                      <span className="text-sm">{opt.content}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="col-span-1 flex flex-col gap-4 sticky top-8 self-start">
+            {isProctored && (
+              <div className="card overflow-hidden">
+                <div className={`text-white text-xs font-bold p-2 text-center transition-colors ${faceStatus === 'DETECTING' ? 'bg-amber-500' :
                     faceStatus === 'FACE_FOUND' ? 'bg-green-600' : 'bg-red-600 animate-pulse'
                   }`}>
-                    {faceStatus === 'DETECTING' && 'Đang quét khuôn mặt...'}
-                    {faceStatus === 'FACE_FOUND' && 'Camera Giám Sát AI (Bình thường)'}
-                    {faceStatus === 'NO_FACE' && 'CẢNH BÁO: KHÔNG THẤY KHUÔN MẶT'}
-                  </div>
-                  <video 
-                    ref={videoRef}
-                    autoPlay
-                    playsInline
-                    muted
-                    className="w-full aspect-video object-cover bg-black"
-                  />
+                  {faceStatus === 'DETECTING' && 'Đang quét khuôn mặt...'}
+                  {faceStatus === 'FACE_FOUND' && 'Camera Giám Sát AI (Bình thường)'}
+                  {faceStatus === 'NO_FACE' && 'CẢNH BÁO: KHÔNG THẤY KHUÔN MẶT'}
                 </div>
-              )}
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  playsInline
+                  muted
+                  className="w-full aspect-video object-cover bg-black"
+                />
+              </div>
+            )}
 
-              <button 
-                onClick={submitExam}
-                disabled={isSubmitting}
-                className="bg-ink text-white font-bold py-3 rounded-xl hover:bg-gray-800 disabled:opacity-50"
-              >
-                {isSubmitting ? 'Đang nộp...' : 'Nộp bài thi'}
-              </button>
-            </div>
+            <button
+              onClick={submitExam}
+              disabled={isSubmitting}
+              className="bg-ink text-white font-bold py-3 rounded-xl hover:bg-gray-800 disabled:opacity-50"
+            >
+              {isSubmitting ? 'Đang nộp...' : 'Nộp bài thi'}
+            </button>
           </div>
+        </div>
       </div>
     </div>
   );

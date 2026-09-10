@@ -433,9 +433,11 @@ export default function LearnPage() {
       <div className="mx-auto w-full max-w-[1800px] px-4 py-8 md:px-8">
         {/* Breadcrumb */}
         <nav aria-label="Đường dẫn" className="mb-4 text-[13px] text-ink-faint">
-          <Link href={`/courses/${lesson.courseSlug}`} className="font-semibold no-underline">
-            {lesson.courseTitle}
+          <Link href="/my-courses" className="font-semibold no-underline">
+            Khóa học của tôi
           </Link>
+          <span> / </span>
+          <span className="text-ink-muted">{lesson.courseTitle}</span>
           <span> / </span>
           <span className="text-ink-muted">{lesson.lessonTitle}</span>
         </nav>

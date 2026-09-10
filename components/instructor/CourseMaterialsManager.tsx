@@ -492,11 +492,76 @@ function MaterialWorkspaceViewer({
   );
 }
 
+function CustomDateTimePicker({ value, onChange, label, onClear, hint }: { value: string; onChange: (v: string) => void; label: string; onClear?: () => void; hint?: string }) {
+  const [datePart, timePart] = value ? value.split('T') : ['', ''];
+  const [hour, minute] = timePart ? timePart.split(':') : ['00', '00'];
+
+  const handleDate = (d: string) => {
+    if (!d) return onChange('');
+    onChange(`${d}T${hour}:${minute}`);
+  }
+
+  const handleTime = (h: string, m: string) => {
+    if (!datePart) {
+        const now = new Date();
+        const pad = (n: number) => n.toString().padStart(2, '0');
+        onChange(`${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${h}:${m}`);
+        return;
+    }
+    onChange(`${datePart}T${h}:${m}`);
+  }
+
+  const handleSetNow = () => {
+    const now = new Date();
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    onChange(`${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`);
+  }
+
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="flex justify-between items-end">
+        <div>
+          <label className="text-sm font-bold text-gray-700 block">{label}</label>
+          {hint && <span className="font-normal text-[10px] text-gray-500 mt-0.5 block">{hint}</span>}
+        </div>
+        {onClear && value && (
+          <button type="button" onClick={onClear} className="text-[10px] text-red-500 hover:text-red-700 font-semibold bg-red-50 px-2 py-0.5 rounded mb-1">Xóa</button>
+        )}
+      </div>
+      <div className="flex items-stretch rounded-xl border border-gray-300 focus-within:border-cyan-500 focus-within:ring-1 focus-within:ring-cyan-500 overflow-hidden bg-white shadow-sm">
+        <input 
+          type="date" 
+          value={datePart}
+          onChange={e => handleDate(e.target.value)}
+          className="px-3 py-2 text-sm outline-none border-r border-gray-200 hover:bg-gray-50 flex-1 min-w-[120px] bg-transparent"
+        />
+        <select value={hour} onChange={e => handleTime(e.target.value, minute || '00')} className="pl-3 pr-1 py-2 text-sm font-medium outline-none hover:bg-gray-50 cursor-pointer text-center bg-transparent appearance-none">
+          {Array.from({length: 24}).map((_, i) => {
+             const v = i.toString().padStart(2, '0');
+             return <option key={v} value={v}>{v}</option>
+          })}
+        </select>
+        <span className="text-gray-400 font-bold self-center">:</span>
+        <select value={minute} onChange={e => handleTime(hour || '00', e.target.value)} className="pl-1 pr-3 py-2 text-sm font-medium outline-none hover:bg-gray-50 cursor-pointer text-center bg-transparent appearance-none">
+          {Array.from({length: 60}).map((_, i) => {
+             const v = i.toString().padStart(2, '0');
+             return <option key={v} value={v}>{v}</option>
+          })}
+        </select>
+        <button type="button" onClick={handleSetNow} title="Hôm nay / Bây giờ" className="px-3 py-2 text-xs font-bold text-cyan-700 bg-cyan-50 hover:bg-cyan-100 border-l border-cyan-100 transition-colors flex items-center justify-center">
+          🕒 Hiện tại
+        </button>
+      </div>
+    </div>
+  )
+}
+
 /** Tab Cấu hình Quiz Thi Cử & Proctoring (Mới) */
 function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
   const queryClient = useQueryClient();
   
   type ExamPolicy = 'PRACTICE_UNLIMITED' | 'PRACTICE_LIMITED' | 'EXAM_STRICT';
+  
   const initialPolicy = !quiz.maxAttempts 
     ? 'PRACTICE_UNLIMITED' 
     : (quiz.maxAttempts === 1 ? 'EXAM_STRICT' : 'PRACTICE_LIMITED');
@@ -510,6 +575,28 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
   const [maxViolations, setMaxViolations] = useState<string>(quiz.maxViolations ? String(quiz.maxViolations) : '3');
   const [startTime, setStartTime] = useState<string>(quiz.startTime ? quiz.startTime.substring(0, 16) : '');
   const [endTime, setEndTime] = useState<string>(quiz.endTime ? quiz.endTime.substring(0, 16) : '');
+
+  const handleStartTimeChange = (val: string) => {
+    setStartTime(val);
+    if (val && durationMinutes) {
+      const start = new Date(val);
+      const durationMs = parseInt(durationMinutes) * 60000;
+      const end = new Date(start.getTime() + durationMs);
+      const pad = (n: number) => n.toString().padStart(2, '0');
+      setEndTime(`${end.getFullYear()}-${pad(end.getMonth() + 1)}-${pad(end.getDate())}T${pad(end.getHours())}:${pad(end.getMinutes())}`);
+    }
+  };
+
+  const handleDurationChange = (val: string) => {
+    setDurationMinutes(val);
+    if (startTime && val) {
+      const start = new Date(startTime);
+      const durationMs = parseInt(val) * 60000;
+      const end = new Date(start.getTime() + durationMs);
+      const pad = (n: number) => n.toString().padStart(2, '0');
+      setEndTime(`${end.getFullYear()}-${pad(end.getMonth() + 1)}-${pad(end.getDate())}T${pad(end.getHours())}:${pad(end.getMinutes())}`);
+    }
+  };
 
   const updateQuizSettingsMutation = useMutation({
     mutationFn: (data: Record<string, unknown>) =>
@@ -548,8 +635,8 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
     const viol = maxViolations ? Math.max(1, parseInt(maxViolations)) : 3;
 
     if (examPolicy === 'EXAM_STRICT') {
-      if (!startTime || !endTime) {
-        toast.error('Vui lòng thiết lập thời gian Mở/Đóng bài thi cho chế độ Thi chính thức!');
+      if (!startTime) {
+        toast.error('Vui lòng thiết lập thời gian Mở bài thi cho chế độ Thi chính thức!');
         return;
       }
     }
@@ -642,44 +729,27 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
                 />
                 <div>
                   <div className="font-bold text-gray-900 text-sm">Thi chính thức (1 Lần)</div>
-                  <div className="text-xs text-gray-500 mt-0.5">Mỗi sinh viên chỉ được làm 1 lần duy nhất. Bắt buộc nhập thời gian Mở/Đóng.</div>
+                  <div className="text-xs text-gray-500 mt-0.5">Mỗi sinh viên chỉ được làm 1 lần duy nhất. Bắt buộc nhập thời gian Mở bài.</div>
                 </div>
               </label>
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-gray-100">
-            <div className="flex flex-col gap-2">
-              <div className="flex justify-between items-center">
-                <label className="text-sm font-bold text-gray-700">Khung giờ mở bài</label>
-                {startTime && examPolicy !== 'EXAM_STRICT' && (
-                  <button type="button" onClick={() => setStartTime('')} className="text-[10px] text-red-500 hover:text-red-700 font-semibold bg-red-50 px-2 py-0.5 rounded">Xóa</button>
-                )}
-              </div>
-              <input 
-                type="datetime-local" 
-                value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
-                className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:border-cyan-500 outline-none w-full"
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <div className="flex justify-between items-end">
-                <div>
-                  <label className="text-sm font-bold text-gray-700 block">Khung giờ đóng bài</label>
-                  <span className="font-normal text-[10px] text-gray-500">Mở mãi mãi nếu không thiết lập</span>
-                </div>
-                {endTime && examPolicy !== 'EXAM_STRICT' && (
-                  <button type="button" onClick={() => setEndTime('')} className="text-[10px] text-red-500 hover:text-red-700 font-semibold bg-red-50 px-2 py-0.5 rounded mb-1">Xóa</button>
-                )}
-              </div>
-              <input 
-                type="datetime-local" 
-                value={endTime}
-                onChange={(e) => setEndTime(e.target.value)}
-                className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:border-cyan-500 outline-none w-full"
-              />
-            </div>
+            <CustomDateTimePicker 
+              label="Khung giờ mở bài"
+              value={startTime}
+              onChange={handleStartTimeChange}
+              onClear={examPolicy !== 'EXAM_STRICT' ? () => handleStartTimeChange('') : undefined}
+            />
+            
+            <CustomDateTimePicker 
+              label="Khung giờ đóng bài"
+              hint="Mở mãi mãi nếu không thiết lập"
+              value={endTime}
+              onChange={setEndTime}
+              onClear={() => setEndTime('')}
+            />
           </div>
 
           <label className="flex items-center gap-3 text-sm font-bold text-gray-700 bg-gray-50 p-4 rounded-xl border">
@@ -699,7 +769,7 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
                 type="number" 
                 min="1"
                 value={durationMinutes}
-                onChange={(e) => setDurationMinutes(e.target.value)}
+                onChange={(e) => handleDurationChange(e.target.value)}
                 className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none"
               />
             </label>
