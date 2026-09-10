@@ -22,7 +22,7 @@ export default function AntiCheatExamPage() {
   const proctoredParam = searchParams.get('proctored');
   const isProctored = proctoredParam === 'true';
 
-  const { data: history, refetch: refetchHistory } = useQuizHistory(Number(quizId));
+  const { data: history } = useQuizHistory(Number(quizId));
 
   const videoRef = useRef<HTMLVideoElement>(null);
 
