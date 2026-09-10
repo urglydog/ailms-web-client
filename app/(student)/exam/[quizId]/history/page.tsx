@@ -1,7 +1,7 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuizHistory, useAttemptDetail } from '@/hooks/useQuizzes';
 import { ApiError } from '@/lib/api/client';
 
@@ -14,6 +14,12 @@ export default function AttemptHistoryPage() {
 
   const { data: history, isLoading: isLoadingHistory, error: historyError } = useQuizHistory(quizId);
   const { data: attemptDetail, isLoading: isLoadingDetail } = useAttemptDetail(selectedAttemptId || 0);
+
+  useEffect(() => {
+    if (history && history.length > 0 && history[0] && !selectedAttemptId) {
+      setSelectedAttemptId(history[0].id);
+    }
+  }, [history, selectedAttemptId]);
 
   if (!quizId) return <div className="p-8 text-center">Mã bài thi không hợp lệ</div>;
 
