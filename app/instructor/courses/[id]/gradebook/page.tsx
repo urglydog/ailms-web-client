@@ -71,7 +71,7 @@ export default function InstructorGradebookPage() {
             onClick={() => router.push('/instructor/materials')}
             className="bg-ink text-white px-4 py-2 rounded-xl text-sm font-bold shadow hover:bg-gray-800 transition-all"
           >
-            📚 Kho Học Liệu & Đề Thi
+            Kho Học Liệu & Đề Thi
           </button>
         </div>
 
@@ -101,7 +101,7 @@ export default function InstructorGradebookPage() {
             <h2 className="font-display font-bold text-lg text-ink">Danh Sách Bảng Điểm Chi Tiết</h2>
             {!gradebook.hasOfficialQuiz && (
               <span className="text-xs font-semibold text-amber-600 bg-amber-50 px-3 py-1 rounded-full border border-amber-200">
-                ⚠️ Khóa học chưa xuất bản Quiz chính thức
+                Khóa học chưa xuất bản Quiz chính thức
               </span>
             )}
           </div>
@@ -165,7 +165,7 @@ export default function InstructorGradebookPage() {
                           onClick={() => setSelectedAttemptId(student.latestAttemptId)}
                           className="bg-accent text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-accent-dark transition-all flex items-center gap-1 ml-auto"
                         >
-                          🔍 Soi Bài Làm
+                          Chi Tiết Bài Làm
                         </button>
                       ) : (
                         <span className="text-xs text-ink-muted italic">Không có bài nộp</span>
@@ -193,7 +193,7 @@ export default function InstructorGradebookPage() {
             <div className="flex justify-between items-center border-b border-line pb-4 mb-4">
               <div>
                 <h3 className="text-lg font-bold text-ink flex items-center gap-2">
-                  <span>🔍 Chi Tiết Bài Làm Học Viên:</span>
+                  <span>Chi Tiết Bài Làm Học Viên:</span>
                   <span className="text-accent">{attemptDetail?.studentName}</span>
                 </h3>
                 <p className="text-xs text-ink-muted">{attemptDetail?.studentEmail} • Nộp lúc: {attemptDetail?.submittedAt ? new Date(attemptDetail.submittedAt).toLocaleString('vi-VN') : ''}</p>

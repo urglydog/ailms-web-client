@@ -106,11 +106,11 @@ export function CourseCard({ course }: { course: CourseSummary }) {
       </div>
 
       {/* Nội dung */}
-      <div className="flex flex-1 flex-col gap-2 p-4">
-        <span className="line-clamp-2 min-h-[44px] font-display text-base font-semibold leading-snug text-ink">
+      <div className="flex flex-1 flex-col gap-1.5 p-3">
+        <span className="line-clamp-2 min-h-[38px] font-display text-sm font-semibold leading-snug text-ink">
           {course.title}
         </span>
-        <span className="text-[13px] text-ink-muted">GV. {course.instructorName}</span>
+        <span className="text-xs text-ink-muted">GV. {course.instructorName}</span>
 
         <StarRating
           rating={course.avgRating}

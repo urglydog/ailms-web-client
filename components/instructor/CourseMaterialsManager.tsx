@@ -338,14 +338,14 @@ function MaterialWorkspaceViewer({
                   className={`px-4 py-2 text-sm font-bold rounded-xl transition-all ${activeTab === 'QUESTIONS' ? 'bg-indigo-600 text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     }`}
                 >
-                  📝 Ngân Hàng Câu Hỏi ({detail.quizQuestions.length})
+                  Ngân Hàng Câu Hỏi ({detail.quizQuestions.length})
                 </button>
                 <button
                   onClick={() => setActiveTab('SETTINGS')}
                   className={`px-4 py-2 text-sm font-bold rounded-xl transition-all ${activeTab === 'SETTINGS' ? 'bg-indigo-600 text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     }`}
                 >
-                  ⚙️ Cấu Hình Bài Thi
+                  Cấu Hình Bài Thi
                 </button>
               </div>
 
@@ -401,14 +401,14 @@ function MaterialWorkspaceViewer({
                   className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === 'VIEW' ? 'bg-blue-600 text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     }`}
                 >
-                  🧠 Trực Quan Sơ Đồ Node
+                  Trực Quan Sơ Đồ Node
                 </button>
                 <button
                   onClick={() => setActiveTab('RAW_CODE')}
                   className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === 'RAW_CODE' ? 'bg-blue-600 text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     }`}
                 >
-                  💻 Mã Cấu Trúc Mermaid Code
+                  Mã Cấu Trúc Mermaid Code
                 </button>
               </div>
 
@@ -449,7 +449,7 @@ function MaterialWorkspaceViewer({
                     >
                       <div className="flex justify-between items-center text-xs font-extrabold opacity-80 mb-2">
                         <span>Thẻ #{idx + 1}</span>
-                        <span className="underline">{isFlipped ? '🔄 Mặt Sau (Khái niệm)' : '🔄 Mặt Trước (Thuật ngữ)'}</span>
+                        <span className="underline">{isFlipped ? 'Mặt Sau (Khái niệm)' : 'Mặt Trước (Thuật ngữ)'}</span>
                       </div>
 
                       <div className="text-base font-bold my-auto leading-relaxed">
@@ -484,24 +484,6 @@ function MaterialWorkspaceViewer({
 }
 
 function CustomDateTimePicker({ value, onChange, label, onClear, hint }: { value: string; onChange: (v: string) => void; label: string; onClear?: () => void; hint?: string }) {
-  const [datePart, timePart] = value ? value.split('T') : ['', ''];
-  const [hour, minute] = timePart ? timePart.split(':') : ['00', '00'];
-
-  const handleDate = (d: string) => {
-    if (!d) return onChange('');
-    onChange(`${d}T${hour}:${minute}`);
-  }
-
-  const handleTime = (h: string, m: string) => {
-    if (!datePart) {
-      const now = new Date();
-      const pad = (n: number) => n.toString().padStart(2, '0');
-      onChange(`${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${h}:${m}`);
-      return;
-    }
-    onChange(`${datePart}T${h}:${m}`);
-  }
-
   const handleSetNow = () => {
     const now = new Date();
     const pad = (n: number) => n.toString().padStart(2, '0');
@@ -509,38 +491,25 @@ function CustomDateTimePicker({ value, onChange, label, onClear, hint }: { value
   }
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-1.5">
       <div className="flex justify-between items-end">
         <div>
-          <label className="text-sm font-bold text-gray-700 block">{label}</label>
-          {hint && <span className="font-normal text-[10px] text-gray-500 mt-0.5 block">{hint}</span>}
+          <label className="text-sm font-semibold text-gray-700 block">{label}</label>
+          {hint && <span className="font-normal text-[11px] text-gray-500 mt-0.5 block">{hint}</span>}
         </div>
         {onClear && value && (
-          <button type="button" onClick={onClear} className="text-[10px] text-red-500 hover:text-red-700 font-semibold bg-red-50 px-2 py-0.5 rounded mb-1">Xóa</button>
+          <button type="button" onClick={onClear} className="text-[11px] text-red-600 hover:text-red-800 font-semibold bg-red-50 hover:bg-red-100 px-2 py-0.5 rounded transition-colors">Xóa</button>
         )}
       </div>
-      <div className="flex items-stretch rounded-xl border border-gray-300 focus-within:border-cyan-500 focus-within:ring-1 focus-within:ring-cyan-500 overflow-hidden bg-white shadow-sm">
+      <div className="flex items-stretch rounded-lg border border-gray-300 focus-within:border-cyan-500 focus-within:ring-1 focus-within:ring-cyan-500 overflow-hidden bg-white shadow-sm transition-all">
         <input
-          type="date"
-          value={datePart}
-          onChange={e => handleDate(e.target.value)}
-          className="px-3 py-2 text-sm outline-none border-r border-gray-200 hover:bg-gray-50 flex-1 min-w-[120px] bg-transparent"
+          type="datetime-local"
+          value={value}
+          onChange={e => onChange(e.target.value)}
+          className="px-3 py-2 text-sm outline-none hover:bg-gray-50 flex-1 min-w-[150px] bg-transparent text-gray-800"
         />
-        <select value={hour} onChange={e => handleTime(e.target.value, minute || '00')} className="pl-3 pr-1 py-2 text-sm font-medium outline-none hover:bg-gray-50 cursor-pointer text-center bg-transparent appearance-none">
-          {Array.from({ length: 24 }).map((_, i) => {
-            const v = i.toString().padStart(2, '0');
-            return <option key={v} value={v}>{v}</option>
-          })}
-        </select>
-        <span className="text-gray-400 font-bold self-center">:</span>
-        <select value={minute} onChange={e => handleTime(hour || '00', e.target.value)} className="pl-1 pr-3 py-2 text-sm font-medium outline-none hover:bg-gray-50 cursor-pointer text-center bg-transparent appearance-none">
-          {Array.from({ length: 60 }).map((_, i) => {
-            const v = i.toString().padStart(2, '0');
-            return <option key={v} value={v}>{v}</option>
-          })}
-        </select>
-        <button type="button" onClick={handleSetNow} title="Hôm nay / Bây giờ" className="px-3 py-2 text-xs font-bold text-cyan-700 bg-cyan-50 hover:bg-cyan-100 border-l border-cyan-100 transition-colors flex items-center justify-center">
-          🕒 Hiện tại
+        <button type="button" onClick={handleSetNow} title="Hiện tại" className="px-3 py-2 text-xs font-semibold text-gray-600 bg-gray-50 hover:bg-gray-100 hover:text-cyan-700 border-l border-gray-200 transition-colors flex items-center justify-center">
+          Hiện tại
         </button>
       </div>
     </div>
@@ -769,7 +738,7 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
           <div className="rounded-2xl border border-red-200 bg-red-50/60 p-6 space-y-4 shadow-sm">
             <div className="flex items-center justify-between">
               <span className="text-base font-black text-red-950 flex items-center gap-2">
-                <span>🔴</span> Giám Sát Thi Cử AI (Anti-Cheat)
+                Giám Sát Thi Cử AI (Anti-Cheat)
               </span>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input
@@ -858,7 +827,7 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
   return (
     <div className="w-full rounded-3xl bg-white p-8 shadow-sm border border-gray-200">
       <div className="border-b pb-4 mb-6">
-        <h3 className="text-2xl font-black text-gray-900">✨ Tạo Học Liệu AI Tự Động</h3>
+        <h3 className="text-2xl font-black text-gray-900">Tạo Học Liệu AI Tự Động</h3>
         <p className="text-sm text-gray-500 mt-1">Lựa chọn loại học liệu bạn muốn AI tự động tổng hợp từ nội dung bài giảng.</p>
       </div>
 
