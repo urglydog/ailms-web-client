@@ -251,7 +251,7 @@ function MaterialWorkspaceViewer({
     mutationFn: (variables: { id: number; mermaidCode: string }) => materialsApi.updateMaterial(variables.id, { mermaidCode: variables.mermaidCode }),
     onSuccess: () => {
       toast.success('Đã lưu sơ đồ Mindmap thành công!');
-      queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] });
+      queryClient.invalidateQueries({ queryKey: ['instructor-materials'] });
       queryClient.invalidateQueries({ queryKey: ['material-detail'] });
     },
     onError: () => toast.error('Có lỗi xảy ra khi lưu sơ đồ!'),
