@@ -535,14 +535,14 @@ function CustomDateTimePicker({ value, onChange, label, onClear, hint }: { value
           onChange={e => handleDate(e.target.value)}
           className="px-3 py-2 text-sm outline-none border-r border-gray-200 hover:bg-gray-50 flex-1 min-w-[120px] bg-transparent"
         />
-        <select value={hour} onChange={e => handleTime(e.target.value, minute)} className="pl-3 pr-1 py-2 text-sm font-medium outline-none hover:bg-gray-50 cursor-pointer text-center bg-transparent appearance-none">
+        <select value={hour} onChange={e => handleTime(e.target.value, minute || '00')} className="pl-3 pr-1 py-2 text-sm font-medium outline-none hover:bg-gray-50 cursor-pointer text-center bg-transparent appearance-none">
           {Array.from({length: 24}).map((_, i) => {
              const v = i.toString().padStart(2, '0');
              return <option key={v} value={v}>{v}</option>
           })}
         </select>
         <span className="text-gray-400 font-bold self-center">:</span>
-        <select value={minute} onChange={e => handleTime(hour, e.target.value)} className="pl-1 pr-3 py-2 text-sm font-medium outline-none hover:bg-gray-50 cursor-pointer text-center bg-transparent appearance-none">
+        <select value={minute} onChange={e => handleTime(hour || '00', e.target.value)} className="pl-1 pr-3 py-2 text-sm font-medium outline-none hover:bg-gray-50 cursor-pointer text-center bg-transparent appearance-none">
           {Array.from({length: 60}).map((_, i) => {
              const v = i.toString().padStart(2, '0');
              return <option key={v} value={v}>{v}</option>
