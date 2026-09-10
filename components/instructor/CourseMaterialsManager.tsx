@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import React, { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { MermaidViewer } from '@/components/materials/MermaidViewer';
+import { MindmapEditor } from '@/components/materials/MindmapEditor';
 
 interface CourseMaterialsManagerProps {
   courseId: number;
@@ -243,7 +244,7 @@ function MaterialWorkspaceViewer({
   });
 
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState<'VIEW' | 'RAW_CODE' | 'QUESTIONS' | 'SETTINGS'>('VIEW');
+  const [activeTab, setActiveTab] = useState<'VIEW' | 'RAW_CODE' | 'QUESTIONS' | 'SETTINGS' | 'DRAG_DROP'>('VIEW');
 
   // Cập nhật tab mặc định dựa trên loại học liệu
   useEffect(() => {
@@ -401,19 +402,34 @@ function MaterialWorkspaceViewer({
                   className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === 'VIEW' ? 'bg-blue-600 text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     }`}
                 >
-                  Trực Quan Sơ Đồ Node
+                  Trực Quan (Tĩnh)
+                </button>
+                <button
+                  onClick={() => setActiveTab('DRAG_DROP')}
+                  className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === 'DRAG_DROP' ? 'bg-accent text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                >
+                  Kéo Thả (React Flow)
                 </button>
                 <button
                   onClick={() => setActiveTab('RAW_CODE')}
-                  className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === 'RAW_CODE' ? 'bg-blue-600 text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === 'RAW_CODE' ? 'bg-slate-800 text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     }`}
                 >
-                  Mã Cấu Trúc Mermaid Code
+                  Mã Mermaid
                 </button>
               </div>
 
               {activeTab === 'VIEW' ? (
                 <MermaidViewer chart={detail.mermaidCode} />
+              ) : activeTab === 'DRAG_DROP' ? (
+                <MindmapEditor 
+                  initialMermaidCode={detail.mermaidCode} 
+                  onSave={(code) => {
+                    toast.success('Đã xuất cấu trúc mới (Demo Save)');
+                    // TODO: Gọi mutation updateMermaidCode lên API
+                  }}
+                />
               ) : (
                 <pre className="p-5 rounded-2xl bg-slate-900 text-cyan-300 font-mono text-xs overflow-x-auto min-h-[400px] border border-slate-800">
                   {detail.mermaidCode}

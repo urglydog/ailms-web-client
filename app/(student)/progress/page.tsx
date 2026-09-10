@@ -58,7 +58,7 @@ export default function ProgressPage() {
         {courses.map((course) => (
           <Link
             key={course.courseId}
-            href={`/courses/${course.courseSlug}`}
+            href={course.firstLessonId != null ? `/learn/${course.firstLessonId}` : `/courses/${course.courseSlug}`}
             className="card-interactive flex flex-col gap-3 p-4 no-underline hover:no-underline sm:flex-row sm:items-center sm:justify-between"
           >
             <div className="min-w-0">
