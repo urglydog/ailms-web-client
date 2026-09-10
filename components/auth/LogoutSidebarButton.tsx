@@ -1,9 +1,15 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 
 export function LogoutSidebarButton() {
   const [showConfirm, setShowConfirm] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('accessToken');
@@ -11,17 +17,8 @@ export function LogoutSidebarButton() {
     window.location.href = '/login';
   };
 
-  return (
-    <>
-      <button
-        onClick={() => setShowConfirm(true)}
-        className="mt-4 px-2 text-left text-xs font-semibold text-red-400 no-underline hover:text-red-300 w-full flex items-center gap-2"
-      >
-        <span>🚪</span> Đăng xuất
-      </button>
-
-      {showConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+  const modalContent = showConfirm && mounted ? (
+    <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
           <div className="w-full max-w-sm rounded-2xl bg-slate-900 border border-slate-800 p-6 shadow-2xl text-white">
             <div className="flex items-center gap-3 text-red-400 mb-3">
               <span className="text-2xl">⚠️</span>
@@ -46,7 +43,18 @@ export function LogoutSidebarButton() {
             </div>
           </div>
         </div>
-      )}
+  ) : null;
+
+  return (
+    <>
+      <button
+        onClick={() => setShowConfirm(true)}
+        className="mt-4 px-2 text-left text-xs font-semibold text-red-400 no-underline hover:text-red-300 w-full flex items-center gap-2"
+      >
+        <span>🚪</span> Đăng xuất
+      </button>
+      
+      {mounted && typeof document !== 'undefined' ? createPortal(modalContent, document.body) : null}
     </>
   );
 }
