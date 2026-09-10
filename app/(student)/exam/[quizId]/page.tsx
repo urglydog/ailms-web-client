@@ -578,8 +578,8 @@ export default function AntiCheatExamPage() {
             {/* Đồng hồ đếm ngược */}
             {isStarted && timeLeft !== null && (
               <div className={`flex items-center gap-2 font-mono text-xl font-bold px-4 py-2 rounded-xl border-2 ${timeLeft <= 60 ? 'border-red-500 text-red-600 bg-red-50 animate-pulse' :
-                  timeLeft <= 180 ? 'border-amber-400 text-amber-600 bg-amber-50' :
-                    'border-line text-ink bg-surface-hover'
+                timeLeft <= 180 ? 'border-amber-400 text-amber-600 bg-amber-50' :
+                  'border-line text-ink bg-surface-hover'
                 }`}>
                 <span>⏱</span>
                 <span>{formatTime(timeLeft)}</span>
@@ -625,7 +625,7 @@ export default function AntiCheatExamPage() {
             {isProctored && (
               <div className="card overflow-hidden">
                 <div className={`text-white text-xs font-bold p-2 text-center transition-colors ${faceStatus === 'DETECTING' ? 'bg-amber-500' :
-                    faceStatus === 'FACE_FOUND' ? 'bg-green-600' : 'bg-red-600 animate-pulse'
+                  faceStatus === 'FACE_FOUND' ? 'bg-green-600' : 'bg-red-600 animate-pulse'
                   }`}>
                   {faceStatus === 'DETECTING' && 'Đang quét khuôn mặt...'}
                   {faceStatus === 'FACE_FOUND' && 'Camera Giám Sát AI (Bình thường)'}

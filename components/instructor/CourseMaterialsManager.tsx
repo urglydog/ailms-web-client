@@ -67,10 +67,10 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
   if (inspectGenerationId) {
     const activeMat = materials?.find(m => m.id === inspectGenerationId);
     return (
-      <MaterialWorkspaceViewer 
-        generationId={inspectGenerationId} 
+      <MaterialWorkspaceViewer
+        generationId={inspectGenerationId}
         material={activeMat}
-        onBack={() => setInspectGenerationId(null)} 
+        onBack={() => setInspectGenerationId(null)}
         onToggleOfficial={() => {
           if (!activeMat || !activeMat.materialId) return;
           if (activeMat.materialType === 'MINDMAP') {
@@ -87,7 +87,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
 
   if (genMaterialType) {
     return (
-      <GenerateAiOfficialView 
+      <GenerateAiOfficialView
         courseId={courseId}
         initialType={genMaterialType}
         onClose={() => setGenMaterialType(null)}
@@ -113,7 +113,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
             Sinh sơ đồ Mindmap, bộ Flashcard hoặc Bài thi trắc nghiệm Official cho toàn bộ học viên.
           </p>
         </div>
-        
+
         <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={() => setGenMaterialType('QUIZ')}
@@ -142,11 +142,10 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
         {filteredMaterials.map((mat) => (
           <div key={mat.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:border-blue-200 transition-all">
             <div className="flex items-center gap-3">
-              <span className={`inline-flex items-center rounded-md px-2.5 py-1 text-xs font-bold ring-1 ring-inset ${
-                mat.materialType === 'MINDMAP' ? 'bg-blue-50 text-blue-700 ring-blue-600/20' :
-                mat.materialType === 'FLASHCARD' ? 'bg-purple-50 text-purple-700 ring-purple-600/20' :
-                'bg-orange-50 text-orange-700 ring-orange-600/20'
-              }`}>
+              <span className={`inline-flex items-center rounded-md px-2.5 py-1 text-xs font-bold ring-1 ring-inset ${mat.materialType === 'MINDMAP' ? 'bg-blue-50 text-blue-700 ring-blue-600/20' :
+                  mat.materialType === 'FLASHCARD' ? 'bg-purple-50 text-purple-700 ring-purple-600/20' :
+                    'bg-orange-50 text-orange-700 ring-orange-600/20'
+                }`}>
                 {mat.materialType}
               </span>
               <div>
@@ -193,11 +192,10 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                       setQuizOfficialMutation.mutate(mat.materialId);
                     }
                   }}
-                  className={`inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-semibold transition-all border ${
-                    mat.isOfficial 
-                      ? 'bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100' 
+                  className={`inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-semibold transition-all border ${mat.isOfficial
+                      ? 'bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100'
                       : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                  }`}
+                    }`}
                 >
                   {mat.isOfficial ? '★ Đang là Official' : '☆ Đánh dấu Official'}
                 </button>
@@ -227,15 +225,15 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
 }
 
 /** Workspace Xem & Chỉnh Sửa Học Liệu Trực Quan Mở Rộng Đầy Đủ Không Gian */
-function MaterialWorkspaceViewer({ 
-  generationId, 
+function MaterialWorkspaceViewer({
+  generationId,
   material,
   onBack,
   onToggleOfficial
-}: { 
-  generationId: number; 
+}: {
+  generationId: number;
   material?: InstructorMaterial;
-  onBack: () => void; 
+  onBack: () => void;
   onToggleOfficial: () => void;
 }) {
   const { data: detail, isLoading } = useQuery<MaterialDetailRes>({
@@ -297,8 +295,8 @@ function MaterialWorkspaceViewer({
               )}
             </div>
             <p className="text-xs text-gray-500 mt-0.5">
-              Loại: <strong className="text-indigo-600">{detail?.materialType || material?.materialType}</strong> • 
-              Ngôn ngữ: <strong className="text-gray-700">{detail?.language || material?.language || 'Tiếng Việt'}</strong> • 
+              Loại: <strong className="text-indigo-600">{detail?.materialType || material?.materialType}</strong> •
+              Ngôn ngữ: <strong className="text-gray-700">{detail?.language || material?.language || 'Tiếng Việt'}</strong> •
               Phiên bản: #{detail?.versionNo || material?.versionNo || 1}
             </p>
           </div>
@@ -309,11 +307,10 @@ function MaterialWorkspaceViewer({
 
           <button
             onClick={onToggleOfficial}
-            className={`inline-flex items-center rounded-xl px-4 py-2 text-xs font-bold transition-all border ${
-              material?.isOfficial 
-                ? 'bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100' 
+            className={`inline-flex items-center rounded-xl px-4 py-2 text-xs font-bold transition-all border ${material?.isOfficial
+                ? 'bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100'
                 : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 shadow-sm'
-            }`}
+              }`}
           >
             {material?.isOfficial ? '★ Đang là Official' : '☆ Phát hành làm Official'}
           </button>
@@ -338,17 +335,15 @@ function MaterialWorkspaceViewer({
               <div className="flex items-center gap-2 border-b pb-2">
                 <button
                   onClick={() => setActiveTab('QUESTIONS')}
-                  className={`px-4 py-2 text-sm font-bold rounded-xl transition-all ${
-                    activeTab === 'QUESTIONS' ? 'bg-indigo-600 text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
+                  className={`px-4 py-2 text-sm font-bold rounded-xl transition-all ${activeTab === 'QUESTIONS' ? 'bg-indigo-600 text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
                 >
                   📝 Ngân Hàng Câu Hỏi ({detail.quizQuestions.length})
                 </button>
                 <button
                   onClick={() => setActiveTab('SETTINGS')}
-                  className={`px-4 py-2 text-sm font-bold rounded-xl transition-all ${
-                    activeTab === 'SETTINGS' ? 'bg-indigo-600 text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
+                  className={`px-4 py-2 text-sm font-bold rounded-xl transition-all ${activeTab === 'SETTINGS' ? 'bg-indigo-600 text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
                 >
                   ⚙️ Cấu Hình Bài Thi
                 </button>
@@ -364,19 +359,18 @@ function MaterialWorkspaceViewer({
                         </div>
                         <div className="flex gap-2 shrink-0">
                           <button onClick={() => setEditingQuestion(q)} className="text-xs font-semibold bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg hover:bg-gray-200 border border-gray-200">Sửa</button>
-                          <button onClick={() => { if(confirm('Bạn chắc chắn muốn xóa câu hỏi này?')) deleteQuestionMutation.mutate(q.id); }} className="text-xs font-semibold bg-red-50 text-red-600 px-3 py-1.5 rounded-lg hover:bg-red-100 border border-red-200">Xóa</button>
+                          <button onClick={() => { if (confirm('Bạn chắc chắn muốn xóa câu hỏi này?')) deleteQuestionMutation.mutate(q.id); }} className="text-xs font-semibold bg-red-50 text-red-600 px-3 py-1.5 rounded-lg hover:bg-red-100 border border-red-200">Xóa</button>
                         </div>
                       </div>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mt-3">
                         {q.options.map((opt) => (
-                          <div 
-                            key={opt.id} 
-                            className={`p-3.5 rounded-xl text-sm font-medium border flex items-center justify-between transition-all ${
-                              opt.isCorrect 
-                                ? 'bg-emerald-100/80 border-emerald-400 text-emerald-950 font-bold shadow-sm' 
+                          <div
+                            key={opt.id}
+                            className={`p-3.5 rounded-xl text-sm font-medium border flex items-center justify-between transition-all ${opt.isCorrect
+                                ? 'bg-emerald-100/80 border-emerald-400 text-emerald-950 font-bold shadow-sm'
                                 : 'bg-white border-gray-200 text-gray-700'
-                            }`}
+                              }`}
                           >
                             <span>{opt.content}</span>
                             {opt.isCorrect && (
@@ -404,17 +398,15 @@ function MaterialWorkspaceViewer({
               <div className="flex items-center gap-2 border-b pb-2">
                 <button
                   onClick={() => setActiveTab('VIEW')}
-                  className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${
-                    activeTab === 'VIEW' ? 'bg-blue-600 text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
+                  className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === 'VIEW' ? 'bg-blue-600 text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
                 >
                   🧠 Trực Quan Sơ Đồ Node
                 </button>
                 <button
                   onClick={() => setActiveTab('RAW_CODE')}
-                  className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${
-                    activeTab === 'RAW_CODE' ? 'bg-blue-600 text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
+                  className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === 'RAW_CODE' ? 'bg-blue-600 text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
                 >
                   💻 Mã Cấu Trúc Mermaid Code
                 </button>
@@ -447,20 +439,19 @@ function MaterialWorkspaceViewer({
                 {detail.flashcards.map((card, idx) => {
                   const isFlipped = flippedCards[card.id];
                   return (
-                    <div 
-                      key={card.id} 
+                    <div
+                      key={card.id}
                       onClick={() => toggleCard(card.id)}
-                      className={`cursor-pointer min-h-[160px] p-5 rounded-2xl border transition-all duration-300 flex flex-col justify-between shadow-sm hover:shadow-md ${
-                        isFlipped 
-                          ? 'bg-gradient-to-br from-indigo-900 to-purple-950 text-white border-purple-800' 
+                      className={`cursor-pointer min-h-[160px] p-5 rounded-2xl border transition-all duration-300 flex flex-col justify-between shadow-sm hover:shadow-md ${isFlipped
+                          ? 'bg-gradient-to-br from-indigo-900 to-purple-950 text-white border-purple-800'
                           : 'bg-purple-50/60 text-purple-950 border-purple-200 hover:border-purple-400'
-                      }`}
+                        }`}
                     >
                       <div className="flex justify-between items-center text-xs font-extrabold opacity-80 mb-2">
                         <span>Thẻ #{idx + 1}</span>
                         <span className="underline">{isFlipped ? '🔄 Mặt Sau (Khái niệm)' : '🔄 Mặt Trước (Thuật ngữ)'}</span>
                       </div>
-                      
+
                       <div className="text-base font-bold my-auto leading-relaxed">
                         {isFlipped ? card.backText : card.frontText}
                       </div>
@@ -503,10 +494,10 @@ function CustomDateTimePicker({ value, onChange, label, onClear, hint }: { value
 
   const handleTime = (h: string, m: string) => {
     if (!datePart) {
-        const now = new Date();
-        const pad = (n: number) => n.toString().padStart(2, '0');
-        onChange(`${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${h}:${m}`);
-        return;
+      const now = new Date();
+      const pad = (n: number) => n.toString().padStart(2, '0');
+      onChange(`${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${h}:${m}`);
+      return;
     }
     onChange(`${datePart}T${h}:${m}`);
   }
@@ -529,23 +520,23 @@ function CustomDateTimePicker({ value, onChange, label, onClear, hint }: { value
         )}
       </div>
       <div className="flex items-stretch rounded-xl border border-gray-300 focus-within:border-cyan-500 focus-within:ring-1 focus-within:ring-cyan-500 overflow-hidden bg-white shadow-sm">
-        <input 
-          type="date" 
+        <input
+          type="date"
           value={datePart}
           onChange={e => handleDate(e.target.value)}
           className="px-3 py-2 text-sm outline-none border-r border-gray-200 hover:bg-gray-50 flex-1 min-w-[120px] bg-transparent"
         />
         <select value={hour} onChange={e => handleTime(e.target.value, minute || '00')} className="pl-3 pr-1 py-2 text-sm font-medium outline-none hover:bg-gray-50 cursor-pointer text-center bg-transparent appearance-none">
-          {Array.from({length: 24}).map((_, i) => {
-             const v = i.toString().padStart(2, '0');
-             return <option key={v} value={v}>{v}</option>
+          {Array.from({ length: 24 }).map((_, i) => {
+            const v = i.toString().padStart(2, '0');
+            return <option key={v} value={v}>{v}</option>
           })}
         </select>
         <span className="text-gray-400 font-bold self-center">:</span>
         <select value={minute} onChange={e => handleTime(hour || '00', e.target.value)} className="pl-1 pr-3 py-2 text-sm font-medium outline-none hover:bg-gray-50 cursor-pointer text-center bg-transparent appearance-none">
-          {Array.from({length: 60}).map((_, i) => {
-             const v = i.toString().padStart(2, '0');
-             return <option key={v} value={v}>{v}</option>
+          {Array.from({ length: 60 }).map((_, i) => {
+            const v = i.toString().padStart(2, '0');
+            return <option key={v} value={v}>{v}</option>
           })}
         </select>
         <button type="button" onClick={handleSetNow} title="Hôm nay / Bây giờ" className="px-3 py-2 text-xs font-bold text-cyan-700 bg-cyan-50 hover:bg-cyan-100 border-l border-cyan-100 transition-colors flex items-center justify-center">
@@ -559,11 +550,11 @@ function CustomDateTimePicker({ value, onChange, label, onClear, hint }: { value
 /** Tab Cấu hình Quiz Thi Cử & Proctoring (Mới) */
 function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
   const queryClient = useQueryClient();
-  
+
   type ExamPolicy = 'PRACTICE_UNLIMITED' | 'PRACTICE_LIMITED' | 'EXAM_STRICT';
-  
-  const initialPolicy = !quiz.maxAttempts 
-    ? 'PRACTICE_UNLIMITED' 
+
+  const initialPolicy = !quiz.maxAttempts
+    ? 'PRACTICE_UNLIMITED'
     : (quiz.maxAttempts === 1 ? 'EXAM_STRICT' : 'PRACTICE_LIMITED');
 
   const [examPolicy, setExamPolicy] = useState<ExamPolicy>(initialPolicy);
@@ -624,7 +615,7 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
   const handleSave = () => {
     const pick = randomPickCount ? Math.max(1, parseInt(randomPickCount)) : null;
     const dur = durationMinutes ? Math.max(1, parseInt(durationMinutes)) : null;
-    
+
     let att: number | null = null;
     if (examPolicy === 'EXAM_STRICT') {
       att = 1;
@@ -665,7 +656,7 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
           <h3 className="text-xl font-bold text-gray-900">Cấu Hình Bài Thi</h3>
           <p className="text-sm text-gray-500 mt-1">Quản lý thời gian, số lượt làm bài, sinh đề ngẫu nhiên và tính năng giám sát</p>
         </div>
-        <button 
+        <button
           onClick={handleSave}
           disabled={updateQuizSettingsMutation.isPending}
           className="rounded-xl bg-cyan-600 px-6 py-2.5 text-sm font-bold text-white hover:bg-cyan-700 disabled:opacity-50 shadow-md transition-all"
@@ -673,21 +664,21 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
           {updateQuizSettingsMutation.isPending ? 'Đang lưu...' : '💾 Lưu Cấu Hình'}
         </button>
       </div>
-      
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="space-y-6">
-          
+
           {/* Policy Selector */}
           <div className="flex flex-col gap-3">
             <label className="text-sm font-bold text-gray-700">Chế độ bài thi</label>
             <div className="grid grid-cols-1 gap-3">
               <label className={`cursor-pointer flex items-start gap-3 p-4 rounded-xl border-2 transition-all ${examPolicy === 'PRACTICE_UNLIMITED' ? 'border-cyan-500 bg-cyan-50' : 'border-gray-200 hover:border-cyan-300'}`}>
-                <input 
-                  type="radio" 
-                  name="examPolicy" 
-                  checked={examPolicy === 'PRACTICE_UNLIMITED'} 
+                <input
+                  type="radio"
+                  name="examPolicy"
+                  checked={examPolicy === 'PRACTICE_UNLIMITED'}
                   onChange={() => handlePolicyChange('PRACTICE_UNLIMITED')}
-                  className="mt-1 w-4 h-4 text-cyan-600 focus:ring-cyan-500" 
+                  className="mt-1 w-4 h-4 text-cyan-600 focus:ring-cyan-500"
                 />
                 <div>
                   <div className="font-bold text-gray-900 text-sm">Luyện tập (Vô hạn)</div>
@@ -696,19 +687,19 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
               </label>
 
               <label className={`cursor-pointer flex items-start gap-3 p-4 rounded-xl border-2 transition-all ${examPolicy === 'PRACTICE_LIMITED' ? 'border-cyan-500 bg-cyan-50' : 'border-gray-200 hover:border-cyan-300'}`}>
-                <input 
-                  type="radio" 
-                  name="examPolicy" 
-                  checked={examPolicy === 'PRACTICE_LIMITED'} 
+                <input
+                  type="radio"
+                  name="examPolicy"
+                  checked={examPolicy === 'PRACTICE_LIMITED'}
                   onChange={() => handlePolicyChange('PRACTICE_LIMITED')}
-                  className="mt-1 w-4 h-4 text-cyan-600 focus:ring-cyan-500" 
+                  className="mt-1 w-4 h-4 text-cyan-600 focus:ring-cyan-500"
                 />
                 <div className="w-full">
                   <div className="font-bold text-gray-900 text-sm">Ôn tập có giới hạn</div>
                   <div className="text-xs text-gray-500 mt-0.5 mb-2">Giới hạn số lần làm. Tự động lưu điểm cao nhất.</div>
                   {examPolicy === 'PRACTICE_LIMITED' && (
-                    <input 
-                      type="number" 
+                    <input
+                      type="number"
                       min="2"
                       value={customAttempts}
                       onChange={(e) => setCustomAttempts(e.target.value)}
@@ -720,12 +711,12 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
               </label>
 
               <label className={`cursor-pointer flex items-start gap-3 p-4 rounded-xl border-2 transition-all ${examPolicy === 'EXAM_STRICT' ? 'border-cyan-500 bg-cyan-50' : 'border-gray-200 hover:border-cyan-300'}`}>
-                <input 
-                  type="radio" 
-                  name="examPolicy" 
-                  checked={examPolicy === 'EXAM_STRICT'} 
+                <input
+                  type="radio"
+                  name="examPolicy"
+                  checked={examPolicy === 'EXAM_STRICT'}
                   onChange={() => handlePolicyChange('EXAM_STRICT')}
-                  className="mt-1 w-4 h-4 text-cyan-600 focus:ring-cyan-500" 
+                  className="mt-1 w-4 h-4 text-cyan-600 focus:ring-cyan-500"
                 />
                 <div>
                   <div className="font-bold text-gray-900 text-sm">Thi chính thức (1 Lần)</div>
@@ -736,14 +727,14 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-gray-100">
-            <CustomDateTimePicker 
+            <CustomDateTimePicker
               label="Khung giờ mở bài"
               value={startTime}
               onChange={handleStartTimeChange}
               onClear={examPolicy !== 'EXAM_STRICT' ? () => handleStartTimeChange('') : undefined}
             />
-            
-            <CustomDateTimePicker 
+
+            <CustomDateTimePicker
               label="Khung giờ đóng bài"
               hint="Mở mãi mãi nếu không thiết lập"
               value={endTime}
@@ -753,20 +744,20 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
           </div>
 
           <label className="flex items-center gap-3 text-sm font-bold text-gray-700 bg-gray-50 p-4 rounded-xl border">
-            <input 
-              type="checkbox" 
+            <input
+              type="checkbox"
               checked={allowReview}
               onChange={(e) => setAllowReview(e.target.checked)}
               className="h-5 w-5 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500"
             />
             Cho phép học viên xem lại đáp án sau khi nộp bài
           </label>
-          
+
           <div className="grid grid-cols-2 gap-4 border-t border-gray-100 pt-4">
             <label className="flex flex-col gap-2 text-sm font-bold text-gray-700">
               Thời gian làm bài (Phút)
-              <input 
-                type="number" 
+              <input
+                type="number"
                 min="1"
                 value={durationMinutes}
                 onChange={(e) => handleDurationChange(e.target.value)}
@@ -775,8 +766,8 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
             </label>
             <label className="flex flex-col gap-2 text-sm font-bold text-gray-700">
               Số câu hỏi mỗi lượt
-              <input 
-                type="number" 
+              <input
+                type="number"
                 min="1"
                 max={quiz.questionCount ?? 100}
                 value={randomPickCount}
@@ -795,11 +786,11 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
                 <span>🔴</span> Giám Sát Thi Cử AI (Anti-Cheat)
               </span>
               <label className="relative inline-flex items-center cursor-pointer">
-                <input 
-                  type="checkbox" 
+                <input
+                  type="checkbox"
                   checked={isProctored}
                   onChange={(e) => setIsProctored(e.target.checked)}
-                  className="sr-only peer" 
+                  className="sr-only peer"
                 />
                 <div className="w-14 h-7 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-red-600"></div>
               </label>
@@ -812,8 +803,8 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
               <div className="pt-4 border-t border-red-200">
                 <label className="flex flex-col gap-2 text-sm font-bold text-red-900">
                   Số lần vi phạm tối đa trước khi tự động thu bài
-                  <input 
-                    type="number" 
+                  <input
+                    type="number"
                     min="1"
                     max="10"
                     value={maxViolations}
@@ -881,169 +872,166 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
   return (
     <div className="w-full rounded-3xl bg-white p-8 shadow-sm border border-gray-200">
       <div className="border-b pb-4 mb-6">
-          <h3 className="text-2xl font-black text-gray-900">✨ Tạo Học Liệu AI Tự Động</h3>
-          <p className="text-sm text-gray-500 mt-1">Lựa chọn loại học liệu bạn muốn AI tự động tổng hợp từ nội dung bài giảng.</p>
-        </div>
+        <h3 className="text-2xl font-black text-gray-900">✨ Tạo Học Liệu AI Tự Động</h3>
+        <p className="text-sm text-gray-500 mt-1">Lựa chọn loại học liệu bạn muốn AI tự động tổng hợp từ nội dung bài giảng.</p>
+      </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-          
-          {/* Bước 1: Chọn Loại Học Liệu (Card Layout) */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div 
-              onClick={() => setMaterialType('QUIZ')}
-              className={`cursor-pointer rounded-2xl p-4 border-2 transition-all flex flex-col items-center text-center gap-2 ${
-                materialType === 'QUIZ' ? 'border-cyan-500 bg-cyan-50/50 shadow-md scale-[1.02]' : 'border-gray-200 hover:border-cyan-300 bg-white'
-              }`}
-            >
-              <div className="text-4xl">📝</div>
-              <div className="font-bold text-gray-900">Bài Thi Trắc Nghiệm</div>
-              <div className="text-xs text-gray-500">Sinh câu hỏi trắc nghiệm kèm giải thích</div>
-            </div>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-6">
 
-            <div 
-              onClick={() => setMaterialType('FLASHCARD')}
-              className={`cursor-pointer rounded-2xl p-4 border-2 transition-all flex flex-col items-center text-center gap-2 ${
-                materialType === 'FLASHCARD' ? 'border-purple-500 bg-purple-50/50 shadow-md scale-[1.02]' : 'border-gray-200 hover:border-purple-300 bg-white'
+        {/* Bước 1: Chọn Loại Học Liệu (Card Layout) */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div
+            onClick={() => setMaterialType('QUIZ')}
+            className={`cursor-pointer rounded-2xl p-4 border-2 transition-all flex flex-col items-center text-center gap-2 ${materialType === 'QUIZ' ? 'border-cyan-500 bg-cyan-50/50 shadow-md scale-[1.02]' : 'border-gray-200 hover:border-cyan-300 bg-white'
               }`}
-            >
-              <div className="text-4xl">🃏</div>
-              <div className="font-bold text-gray-900">Thẻ Flashcard</div>
-              <div className="text-xs text-gray-500">Trích xuất thuật ngữ & khái niệm 2 mặt</div>
-            </div>
-
-            <div 
-              onClick={() => setMaterialType('MINDMAP')}
-              className={`cursor-pointer rounded-2xl p-4 border-2 transition-all flex flex-col items-center text-center gap-2 ${
-                materialType === 'MINDMAP' ? 'border-blue-500 bg-blue-50/50 shadow-md scale-[1.02]' : 'border-gray-200 hover:border-blue-300 bg-white'
-              }`}
-            >
-              <div className="text-4xl">🧠</div>
-              <div className="font-bold text-gray-900">Sơ Đồ Tư Duy</div>
-              <div className="text-xs text-gray-500">Vẽ sơ đồ luồng kiến thức trực quan</div>
-            </div>
+          >
+            <div className="text-4xl">📝</div>
+            <div className="font-bold text-gray-900">Bài Thi Trắc Nghiệm</div>
+            <div className="text-xs text-gray-500">Sinh câu hỏi trắc nghiệm kèm giải thích</div>
           </div>
 
-          {/* Bước 2: Hiển thị các Option nếu đã chọn loại */}
-          {materialType && (
-            <div className="animate-in fade-in slide-in-from-bottom-4 duration-300 flex flex-col gap-4 bg-gray-50 p-5 rounded-2xl border border-gray-200">
-              <h4 className="font-bold text-gray-800 border-b pb-2">Cấu Hình Chi Tiết</h4>
-              
-              <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
-                Phạm vi tạo học liệu
-                <select 
-                  value={scopeType}
-                  onChange={(e) => setScopeType(e.target.value as 'WHOLE_COURSE' | 'CHAPTER')}
-                  className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:border-cyan-500 outline-none bg-white"
-                >
-                  <option value="WHOLE_COURSE">Toàn bộ khóa học</option>
-                  <option value="CHAPTER">Theo chương cụ thể</option>
-                </select>
-              </label>
+          <div
+            onClick={() => setMaterialType('FLASHCARD')}
+            className={`cursor-pointer rounded-2xl p-4 border-2 transition-all flex flex-col items-center text-center gap-2 ${materialType === 'FLASHCARD' ? 'border-purple-500 bg-purple-50/50 shadow-md scale-[1.02]' : 'border-gray-200 hover:border-purple-300 bg-white'
+              }`}
+          >
+            <div className="text-4xl">🃏</div>
+            <div className="font-bold text-gray-900">Thẻ Flashcard</div>
+            <div className="text-xs text-gray-500">Trích xuất thuật ngữ & khái niệm 2 mặt</div>
+          </div>
 
-          {scopeType === 'CHAPTER' && (
+          <div
+            onClick={() => setMaterialType('MINDMAP')}
+            className={`cursor-pointer rounded-2xl p-4 border-2 transition-all flex flex-col items-center text-center gap-2 ${materialType === 'MINDMAP' ? 'border-blue-500 bg-blue-50/50 shadow-md scale-[1.02]' : 'border-gray-200 hover:border-blue-300 bg-white'
+              }`}
+          >
+            <div className="text-4xl">🧠</div>
+            <div className="font-bold text-gray-900">Sơ Đồ Tư Duy</div>
+            <div className="text-xs text-gray-500">Vẽ sơ đồ luồng kiến thức trực quan</div>
+          </div>
+        </div>
+
+        {/* Bước 2: Hiển thị các Option nếu đã chọn loại */}
+        {materialType && (
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-300 flex flex-col gap-4 bg-gray-50 p-5 rounded-2xl border border-gray-200">
+            <h4 className="font-bold text-gray-800 border-b pb-2">Cấu Hình Chi Tiết</h4>
+
             <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
-              Chọn chương
-              <select 
-                value={scopeRefId}
-                onChange={(e) => setScopeRefId(Number(e.target.value))}
-                required
-                className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-cyan-500 focus:outline-none"
+              Phạm vi tạo học liệu
+              <select
+                value={scopeType}
+                onChange={(e) => setScopeType(e.target.value as 'WHOLE_COURSE' | 'CHAPTER')}
+                className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:border-cyan-500 outline-none bg-white"
               >
-                <option value="">-- Chọn chương --</option>
-                {chapters?.map((ch) => (
-                  <option key={ch.id} value={ch.id}>{ch.title}</option>
-                ))}
+                <option value="WHOLE_COURSE">Toàn bộ khóa học</option>
+                <option value="CHAPTER">Theo chương cụ thể</option>
               </select>
             </label>
-          )}
 
-          {/* Các tùy chọn đặc thù theo từng loại học liệu */}
-          {materialType === 'QUIZ' && (
-            <div className="grid grid-cols-2 gap-3">
+            {scopeType === 'CHAPTER' && (
               <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
-                Độ khó câu hỏi
-                <select 
-                  value={difficultyLevel}
-                  onChange={(e) => setDifficultyLevel(e.target.value as 'EASY' | 'MEDIUM' | 'HARD')}
+                Chọn chương
+                <select
+                  value={scopeRefId}
+                  onChange={(e) => setScopeRefId(Number(e.target.value))}
+                  required
                   className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-cyan-500 focus:outline-none"
                 >
-                  <option value="EASY">Cơ bản (Easy)</option>
-                  <option value="MEDIUM">Vừa (Medium)</option>
-                  <option value="HARD">Nâng cao (Hard)</option>
+                  <option value="">-- Chọn chương --</option>
+                  {chapters?.map((ch) => (
+                    <option key={ch.id} value={ch.id}>{ch.title}</option>
+                  ))}
                 </select>
               </label>
+            )}
+
+            {/* Các tùy chọn đặc thù theo từng loại học liệu */}
+            {materialType === 'QUIZ' && (
+              <div className="grid grid-cols-2 gap-3">
+                <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
+                  Độ khó câu hỏi
+                  <select
+                    value={difficultyLevel}
+                    onChange={(e) => setDifficultyLevel(e.target.value as 'EASY' | 'MEDIUM' | 'HARD')}
+                    className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-cyan-500 focus:outline-none"
+                  >
+                    <option value="EASY">Cơ bản (Easy)</option>
+                    <option value="MEDIUM">Vừa (Medium)</option>
+                    <option value="HARD">Nâng cao (Hard)</option>
+                  </select>
+                </label>
+                <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
+                  Số lượng câu hỏi
+                  <select
+                    value={quantityLevel}
+                    onChange={(e) => setQuantityLevel(e.target.value as 'FEWER' | 'STANDARD' | 'MORE')}
+                    className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-cyan-500 focus:outline-none"
+                  >
+                    <option value="FEWER">Ít (~10 câu)</option>
+                    <option value="STANDARD">Vừa (~20 câu)</option>
+                    <option value="MORE">Nhiều (~30 câu)</option>
+                  </select>
+                </label>
+              </div>
+            )}
+
+            {materialType === 'FLASHCARD' && (
               <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
-                Số lượng câu hỏi
-                <select 
+                Số lượng thẻ Flashcard
+                <select
                   value={quantityLevel}
                   onChange={(e) => setQuantityLevel(e.target.value as 'FEWER' | 'STANDARD' | 'MORE')}
                   className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-cyan-500 focus:outline-none"
                 >
-                  <option value="FEWER">Ít (~10 câu)</option>
-                  <option value="STANDARD">Vừa (~20 câu)</option>
-                  <option value="MORE">Nhiều (~30 câu)</option>
+                  <option value="FEWER">Ít (~10 thẻ)</option>
+                  <option value="STANDARD">Vừa (~20 thẻ)</option>
+                  <option value="MORE">Nhiều (~30 thẻ)</option>
                 </select>
               </label>
-            </div>
-          )}
+            )}
 
-          {materialType === 'FLASHCARD' && (
             <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
-              Số lượng thẻ Flashcard
-              <select 
-                value={quantityLevel}
-                onChange={(e) => setQuantityLevel(e.target.value as 'FEWER' | 'STANDARD' | 'MORE')}
-                className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-cyan-500 focus:outline-none"
+              Ngôn ngữ lồng tiếng & Bài giảng
+              <select
+                value={language}
+                onChange={(e) => setLanguage(e.target.value)}
+                className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-cyan-500 focus:outline-none font-medium bg-white"
               >
-                <option value="FEWER">Ít (~10 thẻ)</option>
-                <option value="STANDARD">Vừa (~20 thẻ)</option>
-                <option value="MORE">Nhiều (~30 thẻ)</option>
+                {languages && languages.length > 0 ? (
+                  languages.map((lang) => (
+                    <option key={lang} value={lang}>
+                      {lang.startsWith('vi') ? '🇻🇳 Tiếng Việt (Việt Nam) ✓ (Đã lồng tiếng)' :
+                        lang.startsWith('en') ? '🇺🇸 Tiếng Anh (Hoa Kỳ) ✓ (Đã lồng tiếng)' :
+                          lang.startsWith('ja') ? '🇯🇵 Tiếng Nhật (Nhật Bản) ✓ (Đã lồng tiếng)' :
+                            lang.startsWith('zh') ? '🇨🇳 Tiếng Trung (Trung Quốc) ✓ (Đã lồng tiếng)' :
+                              lang + ' ✓ (Đã lồng tiếng)'}
+                    </option>
+                  ))
+                ) : (
+                  <>
+                    <option value="vi">🇻🇳 Tiếng Việt (Việt Nam) ✓ (Ngôn ngữ gốc)</option>
+                    <option value="en">🇺🇸 Tiếng Anh (Hoa Kỳ)</option>
+                  </>
+                )}
               </select>
             </label>
-          )}
 
-          <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
-            Ngôn ngữ lồng tiếng & Bài giảng
-            <select 
-              value={language}
-              onChange={(e) => setLanguage(e.target.value)}
-              className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-cyan-500 focus:outline-none font-medium bg-white"
-            >
-              {languages && languages.length > 0 ? (
-                languages.map((lang) => (
-                  <option key={lang} value={lang}>
-                    {lang.startsWith('vi') ? '🇻🇳 Tiếng Việt (Việt Nam) ✓ (Đã lồng tiếng)' :
-                     lang.startsWith('en') ? '🇺🇸 Tiếng Anh (Hoa Kỳ) ✓ (Đã lồng tiếng)' :
-                     lang.startsWith('ja') ? '🇯🇵 Tiếng Nhật (Nhật Bản) ✓ (Đã lồng tiếng)' :
-                     lang.startsWith('zh') ? '🇨🇳 Tiếng Trung (Trung Quốc) ✓ (Đã lồng tiếng)' :
-                     lang + ' ✓ (Đã lồng tiếng)'}
-                  </option>
-                ))
-              ) : (
-                <>
-                  <option value="vi">🇻🇳 Tiếng Việt (Việt Nam) ✓ (Ngôn ngữ gốc)</option>
-                  <option value="en">🇺🇸 Tiếng Anh (Hoa Kỳ)</option>
-                </>
-              )}
-            </select>
-          </label>
-
-          <div className="mt-6 flex justify-end gap-3 border-t pt-5">
-            <button type="button" onClick={onClose} className="rounded-xl px-5 py-2.5 text-sm font-bold text-gray-600 hover:bg-gray-200 transition-colors">
-              Hủy
-            </button>
-            <button 
-              type="submit" 
-              disabled={generateMutation.isPending || !materialType}
-              className="rounded-xl bg-cyan-600 px-6 py-2.5 text-sm font-bold text-white hover:bg-cyan-700 disabled:opacity-50 shadow-md"
-            >
-              {generateMutation.isPending ? 'Đang gọi AI...' : '✨ Bắt Đầu Sinh'}
-            </button>
+            <div className="mt-6 flex justify-end gap-3 border-t pt-5">
+              <button type="button" onClick={onClose} className="rounded-xl px-5 py-2.5 text-sm font-bold text-gray-600 hover:bg-gray-200 transition-colors">
+                Hủy
+              </button>
+              <button
+                type="submit"
+                disabled={generateMutation.isPending || !materialType}
+                className="rounded-xl bg-cyan-600 px-6 py-2.5 text-sm font-bold text-white hover:bg-cyan-700 disabled:opacity-50 shadow-md"
+              >
+                {generateMutation.isPending ? 'Đang gọi AI...' : '✨ Bắt Đầu Sinh'}
+              </button>
+            </div>
           </div>
-          </div>
-          )}
-        </form>
-      </div>
+        )}
+      </form>
+    </div>
   );
 }
 
@@ -1083,41 +1071,41 @@ function QuizQuestionEditorModal({ question, onClose, onSuccess }: QuizQuestionE
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
       <div className="bg-white p-6 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
         <h3 className="font-bold text-lg mb-4 text-gray-900">Chỉnh sửa Nội Dung Câu Hỏi</h3>
-        
+
         <label className="block text-sm font-semibold text-gray-700 mb-1">Nội dung câu hỏi</label>
-        <textarea 
-          value={content} 
-          onChange={e => setContent(e.target.value)} 
-          className="w-full border border-gray-300 p-3 rounded-xl mb-5 focus:border-indigo-500 focus:outline-none" 
+        <textarea
+          value={content}
+          onChange={e => setContent(e.target.value)}
+          className="w-full border border-gray-300 p-3 rounded-xl mb-5 focus:border-indigo-500 focus:outline-none"
           rows={3}
         />
-        
+
         <label className="block text-sm font-semibold text-gray-700 mb-2">Các đáp án (Chọn 1 đáp án đúng)</label>
         <div className="space-y-3">
           {options.map((opt, idx) => (
             <div key={idx} className={`flex gap-3 items-center p-3 rounded-xl border ${opt.isCorrect ? 'bg-emerald-50 border-emerald-300' : 'bg-gray-50 border-gray-200'}`}>
-              <input 
-                type="radio" 
-                checked={opt.isCorrect} 
-                onChange={() => handleToggleCorrect(idx)} 
+              <input
+                type="radio"
+                checked={opt.isCorrect}
+                onChange={() => handleToggleCorrect(idx)}
                 className="w-5 h-5 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
               />
-              <input 
-                type="text" 
-                value={opt.content} 
+              <input
+                type="text"
+                value={opt.content}
                 onChange={e => {
                   setOptions(options.map((o, i) => i === idx ? { ...o, content: e.target.value } : o));
-                }} 
-                className={`flex-1 p-2 bg-transparent border-b ${opt.isCorrect ? 'border-emerald-200 focus:border-emerald-500' : 'border-gray-300 focus:border-indigo-500'} focus:outline-none text-sm font-medium`} 
+                }}
+                className={`flex-1 p-2 bg-transparent border-b ${opt.isCorrect ? 'border-emerald-200 focus:border-emerald-500' : 'border-gray-300 focus:border-indigo-500'} focus:outline-none text-sm font-medium`}
               />
             </div>
           ))}
         </div>
-        
+
         <div className="mt-6 flex justify-end gap-3 border-t pt-4">
           <button onClick={onClose} className="px-5 py-2 bg-gray-100 font-semibold text-gray-700 rounded-lg hover:bg-gray-200">Hủy</button>
-          <button 
-            onClick={() => updateMutation.mutate()} 
+          <button
+            onClick={() => updateMutation.mutate()}
             disabled={updateMutation.isPending}
             className="px-5 py-2 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 shadow disabled:opacity-50"
           >
