@@ -9,6 +9,7 @@ import { QuizViewer } from '@/components/materials/QuizViewer';
 import { FlashcardViewer } from '@/components/materials/FlashcardViewer';
 import { FlashcardStudyMode } from '@/components/materials/FlashcardStudyMode';
 import { ApiError } from '@/lib/api/client';
+import { toast } from 'sonner';
 
 export default function MaterialDetailPage() {
   const router = useRouter();
@@ -96,7 +97,20 @@ export default function MaterialDetailPage() {
             <MermaidViewer chart={material.mermaidCode} />
 
             <div className="mt-8 pt-6 border-t border-line">
-              <h3 className="text-sm font-bold text-ink mb-2">Mã nguồn (Mermaid)</h3>
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-sm font-bold text-ink">Mã nguồn (Mermaid)</h3>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(material.mermaidCode || '');
+                    toast.success('Đã copy!');
+                  }}
+                  className="flex items-center gap-1.5 text-xs font-mono text-ink-muted hover:text-ink bg-gray-100 hover:bg-gray-200 px-2.5 py-1.5 rounded transition-colors"
+                  title="Copy to clipboard"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                  {material.mermaidCode ? material.mermaidCode.split('\n').length : 0} lines
+                </button>
+              </div>
               <pre className="p-4 bg-gray-50 border border-line-soft rounded-lg text-xs overflow-auto font-mono text-ink-muted">
                 {material.mermaidCode}
               </pre>
@@ -120,17 +134,15 @@ export default function MaterialDetailPage() {
                 <div className="flex items-center gap-4 mb-6 border-b border-line pb-3">
                   <button
                     onClick={() => setFlashcardMode('study')}
-                    className={`pb-2 text-sm font-bold border-b-2 transition-colors ${
-                      flashcardMode === 'study' ? 'border-accent text-accent' : 'border-transparent text-ink-muted hover:text-ink'
-                    }`}
+                    className={`pb-2 text-sm font-bold border-b-2 transition-colors ${flashcardMode === 'study' ? 'border-accent text-accent' : 'border-transparent text-ink-muted hover:text-ink'
+                      }`}
                   >
                     📖 Ôn tập (Study Mode)
                   </button>
                   <button
                     onClick={() => setFlashcardMode('browse')}
-                    className={`pb-2 text-sm font-bold border-b-2 transition-colors ${
-                      flashcardMode === 'browse' ? 'border-accent text-accent' : 'border-transparent text-ink-muted hover:text-ink'
-                    }`}
+                    className={`pb-2 text-sm font-bold border-b-2 transition-colors ${flashcardMode === 'browse' ? 'border-accent text-accent' : 'border-transparent text-ink-muted hover:text-ink'
+                      }`}
                   >
                     📋 Duyệt tất cả (Browse)
                   </button>

@@ -427,7 +427,7 @@ function MaterialWorkspaceViewer({
                     onClick={() => setActiveTab('DRAG_DROP')}
                     className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all ${activeTab === 'DRAG_DROP' ? 'bg-accent text-white shadow-sm' : 'text-blue-700 hover:bg-blue-50'}`}
                   >
-                    ✏️ Chỉnh Sửa 
+                    ✏️ Chỉnh Sửa
                   </button>
                   <button
                     onClick={() => setActiveTab('RAW_CODE')}
@@ -439,8 +439,21 @@ function MaterialWorkspaceViewer({
               </div>
 
               {activeTab === 'RAW_CODE' ? (
-                <div className="w-full relative">
-                  <pre className="p-6 rounded-2xl bg-slate-900 text-cyan-300 font-mono text-xs overflow-x-auto min-h-[500px] border border-slate-800 leading-relaxed shadow-inner">
+                <div className="w-full relative group">
+                  <div className="absolute top-4 right-4 z-10 flex items-center gap-2 text-slate-400 bg-slate-800/80 backdrop-blur px-3 py-1.5 rounded-lg border border-slate-700 hover:bg-slate-700 hover:text-white transition-colors cursor-pointer">
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(detail.mermaidCode || '');
+                        toast.success('Đã copy!');
+                      }}
+                      className="flex items-center gap-2 text-xs font-mono w-full h-full outline-none"
+                      title="Copy to clipboard"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                      {detail.mermaidCode ? detail.mermaidCode.split('\n').length : 0} lines
+                    </button>
+                  </div>
+                  <pre className="p-6 pt-16 rounded-2xl bg-slate-900 text-cyan-300 font-mono text-xs overflow-x-auto min-h-[500px] border border-slate-800 leading-relaxed shadow-inner">
                     {detail.mermaidCode}
                   </pre>
                 </div>
