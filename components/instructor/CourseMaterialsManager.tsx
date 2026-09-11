@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import React, { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { MindmapEditor } from '@/components/materials/MindmapEditor';
+import { MermaidViewer } from '@/components/materials/MermaidViewer';
 
 interface CourseMaterialsManagerProps {
   courseId: number;
@@ -444,11 +445,8 @@ function MaterialWorkspaceViewer({
                   </pre>
                 </div>
               ) : activeTab === 'VIEW' ? (
-                <div className="w-full h-[700px] border border-gray-200 rounded-2xl overflow-hidden bg-gray-50 shadow-inner">
-                  <MindmapEditor
-                    initialMermaidCode={detail.mermaidCode}
-                    readOnly={true}
-                  />
+                <div className="w-full bg-white rounded-2xl shadow-sm border border-gray-200">
+                  <MermaidViewer chart={detail.mermaidCode} />
                 </div>
               ) : (
                 <div className="w-full h-[700px] border border-gray-200 rounded-2xl overflow-hidden bg-gray-50 shadow-inner">
