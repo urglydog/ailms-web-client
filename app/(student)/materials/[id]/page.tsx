@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useMaterialDetail } from '@/hooks/useMaterials';
-import { MermaidViewer } from '@/components/materials/MermaidViewer';
+import { MindmapEditor } from '@/components/materials/MindmapEditor';
 import { QuizViewer } from '@/components/materials/QuizViewer';
 import { FlashcardViewer } from '@/components/materials/FlashcardViewer';
 import { FlashcardStudyMode } from '@/components/materials/FlashcardStudyMode';
@@ -93,7 +93,9 @@ export default function MaterialDetailPage() {
         {material.materialType === 'MINDMAP' && material.mermaidCode ? (
           <div className="card p-6">
             <h2 className="text-lg font-bold font-display mb-4">Sơ đồ</h2>
-            <MermaidViewer chart={material.mermaidCode} />
+            <div className="w-full bg-white rounded-xl shadow-inner overflow-hidden border border-gray-200">
+              <MindmapEditor initialMermaidCode={material.mermaidCode} readOnly={true} />
+            </div>
 
             <div className="mt-8 pt-6 border-t border-line">
               <h3 className="text-sm font-bold text-ink mb-2">Mã nguồn (Mermaid)</h3>

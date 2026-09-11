@@ -21,6 +21,7 @@ import '@xyflow/react/dist/style.css';
 interface MindmapEditorProps {
   initialMermaidCode: string;
   onSave?: (newMermaidCode: string) => void;
+  readOnly?: boolean;
 }
 
 /**
@@ -214,7 +215,7 @@ function parseFlowToMermaid(nodes: Node[], edges: Edge[]) {
   return mermaid;
 }
 
-export function MindmapEditor({ initialMermaidCode, onSave }: MindmapEditorProps) {
+export function MindmapEditor({ initialMermaidCode, onSave, readOnly = false }: MindmapEditorProps) {
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
   const [confirmStep, setConfirmStep] = useState<0 | 1 | 2>(0); // 0=none, 1=first confirm, 2=second confirm
@@ -237,8 +238,9 @@ export function MindmapEditor({ initialMermaidCode, onSave }: MindmapEditorProps
   const [editingNode, setEditingNode] = useState<{ id: string; label: string } | null>(null);
 
   const onNodeDoubleClick = useCallback((_event: React.MouseEvent, node: Node) => {
+    if (readOnly) return;
     setEditingNode({ id: node.id, label: (node.data.label as string) || '' });
-  }, []);
+  }, [readOnly]);
 
   const onEdgesChange = useCallback(
     (changes: EdgeChange[]) => setEdges((eds) => applyEdgeChanges(changes, eds)),
@@ -295,6 +297,7 @@ export function MindmapEditor({ initialMermaidCode, onSave }: MindmapEditorProps
 
   // Keyboard Delete handler
   useEffect(() => {
+    if (readOnly) return;
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'Delete' || e.key === 'Backspace') {
         // Don't delete if editing text
@@ -306,7 +309,7 @@ export function MindmapEditor({ initialMermaidCode, onSave }: MindmapEditorProps
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [handleDeleteSelected, editingNode]);
+  }, [handleDeleteSelected, editingNode, readOnly]);
 
   // 2-step save flow
   const handleSaveClick = () => setConfirmStep(1);
@@ -326,17 +329,21 @@ export function MindmapEditor({ initialMermaidCode, onSave }: MindmapEditorProps
       <ReactFlow
         nodes={nodes}
         edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
-        onNodeDoubleClick={onNodeDoubleClick}
+        onNodesChange={readOnly ? undefined : onNodesChange}
+        onEdgesChange={readOnly ? undefined : onEdgesChange}
+        onConnect={readOnly ? undefined : onConnect}
+        onNodeDoubleClick={readOnly ? undefined : onNodeDoubleClick}
+        nodesDraggable={!readOnly}
+        nodesConnectable={!readOnly}
+        elementsSelectable={!readOnly}
         deleteKeyCode={null}
         fitView
       >
         <Controls />
         <Background gap={16} size={1} />
         
-        <Panel position="top-right" className="flex gap-2 flex-wrap">
+        {!readOnly && (
+          <Panel position="top-right" className="flex gap-2 flex-wrap">
           <button 
             onClick={handleAddNode}
             className="bg-green-50 border border-green-300 text-green-700 hover:bg-green-100 px-3 py-2 rounded-lg font-bold shadow-sm transition-colors text-sm"
@@ -365,7 +372,8 @@ export function MindmapEditor({ initialMermaidCode, onSave }: MindmapEditorProps
               💾 Lưu thay đổi
             </button>
           )}
-        </Panel>
+          </Panel>
+        )}
       </ReactFlow>
 
       {/* Custom Edit Modal */}
