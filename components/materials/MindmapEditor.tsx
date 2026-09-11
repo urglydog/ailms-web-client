@@ -111,7 +111,7 @@ function parseMermaidToFlow(code: string) {
     if (line.startsWith('%% POSITIONS: ')) {
       try {
         savedPositions = JSON.parse(line.replace('%% POSITIONS: ', ''));
-      } catch (e) {
+      } catch {
         console.error("Failed to parse mindmap positions");
       }
       return;

@@ -805,69 +805,6 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
   );
 }
 
-function InlineMindmapViewer({ generationId }: { generationId: number }) {
-  const { data: detail, isLoading } = useQuery<MaterialDetailRes>({
-    queryKey: ['material-detail', generationId],
-    queryFn: () => materialsApi.getDetail(generationId),
-    enabled: !!generationId,
-  });
-  const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState<'VIEW' | 'RAW_CODE' | 'DRAG_DROP'>('VIEW');
-
-  const updateMermaidMutation = useMutation({
-    mutationFn: (variables: { id: number; mermaidCode: string }) => materialsApi.updateMaterial(variables.id, { mermaidCode: variables.mermaidCode }),
-    onSuccess: () => {
-      toast.success('Đã lưu sơ đồ Mindmap thành công!');
-      queryClient.invalidateQueries({ queryKey: ['instructor-materials'] });
-      queryClient.invalidateQueries({ queryKey: ['material-detail', generationId] });
-    },
-    onError: () => toast.error('Có lỗi xảy ra khi lưu sơ đồ!'),
-  });
-
-  if (isLoading) return <div className="p-4 text-sm text-gray-500 animate-pulse">Đang tải chi tiết Mindmap...</div>;
-  if (!detail || !detail.mermaidCode) return null;
-
-  return (
-    <div className="mt-2 border-t border-gray-100 pt-4 space-y-4 w-full">
-      <div className="flex items-center gap-2 border-b border-gray-100 pb-2">
-        <button
-          onClick={() => setActiveTab('VIEW')}
-          className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === 'VIEW' ? 'bg-blue-600 text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
-        >
-          Trực Quan (Tĩnh)
-        </button>
-        <button
-          onClick={() => setActiveTab('DRAG_DROP')}
-          className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === 'DRAG_DROP' ? 'bg-accent text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
-        >
-          ✏️ Chỉnh sửa (React Flow)
-        </button>
-        <button
-          onClick={() => setActiveTab('RAW_CODE')}
-          className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === 'RAW_CODE' ? 'bg-slate-800 text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
-        >
-          Mã Mermaid
-        </button>
-      </div>
-
-      {activeTab === 'VIEW' ? (
-        <MermaidViewer chart={detail.mermaidCode} />
-      ) : activeTab === 'DRAG_DROP' ? (
-        <MindmapEditor 
-          initialMermaidCode={detail.mermaidCode} 
-          onSave={(code) => {
-            updateMermaidMutation.mutate({ id: detail.id, mermaidCode: code });
-          }}
-        />
-      ) : (
-        <pre className="p-5 rounded-2xl bg-slate-900 text-cyan-300 font-mono text-xs overflow-x-auto min-h-[400px] border border-slate-800">
-          {detail.mermaidCode}
-        </pre>
-      )}
-    </div>
-  );
-}
-
 /** Giao diện Sinh AI Official Mới Cho Giảng Viên */
 function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: { courseId: number; initialType: 'QUIZ' | 'FLASHCARD' | 'MINDMAP'; onClose: () => void; onSuccess: () => void }) {
   const [materialType, setMaterialType] = useState<'QUIZ' | 'FLASHCARD' | 'MINDMAP'>(initialType);
