@@ -263,7 +263,7 @@ function MaterialWorkspaceViewer({
     if (detail?.materialType === 'QUIZ') {
       setActiveTab('QUESTIONS');
     } else if (detail?.materialType === 'MINDMAP') {
-      setActiveTab('DRAG_DROP');
+      setActiveTab('VIEW');
     } else {
       setActiveTab('VIEW');
     }
@@ -417,16 +417,22 @@ function MaterialWorkspaceViewer({
                 </div>
                 <div className="flex bg-white rounded-lg p-1 border border-blue-200">
                   <button
-                    onClick={() => setActiveTab('DRAG_DROP')}
-                    className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all ${activeTab !== 'RAW_CODE' ? 'bg-blue-600 text-white shadow-sm' : 'text-blue-700 hover:bg-blue-50'}`}
+                    onClick={() => setActiveTab('VIEW')}
+                    className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all ${activeTab === 'VIEW' ? 'bg-blue-600 text-white shadow-sm' : 'text-blue-700 hover:bg-blue-50'}`}
                   >
-                    Bảng Vẽ Trực Quan
+                    Xem Tĩnh
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('DRAG_DROP')}
+                    className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all ${activeTab === 'DRAG_DROP' ? 'bg-accent text-white shadow-sm' : 'text-blue-700 hover:bg-blue-50'}`}
+                  >
+                    ✏️ Chỉnh Sửa 
                   </button>
                   <button
                     onClick={() => setActiveTab('RAW_CODE')}
                     className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all ${activeTab === 'RAW_CODE' ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-50'}`}
                   >
-                    Mã Nguồn Mermaid
+                    Mã Mermaid
                   </button>
                 </div>
               </div>
@@ -437,12 +443,20 @@ function MaterialWorkspaceViewer({
                     {detail.mermaidCode}
                   </pre>
                 </div>
+              ) : activeTab === 'VIEW' ? (
+                <div className="w-full h-[700px] border border-gray-200 rounded-2xl overflow-hidden bg-gray-50 shadow-inner">
+                  <MindmapEditor
+                    initialMermaidCode={detail.mermaidCode}
+                    readOnly={true}
+                  />
+                </div>
               ) : (
                 <div className="w-full h-[700px] border border-gray-200 rounded-2xl overflow-hidden bg-gray-50 shadow-inner">
                   <MindmapEditor
                     initialMermaidCode={detail.mermaidCode}
                     onSave={(code) => {
                       updateMermaidMutation.mutate({ id: detail.id, mermaidCode: code });
+                      setActiveTab('VIEW');
                     }}
                   />
                 </div>
