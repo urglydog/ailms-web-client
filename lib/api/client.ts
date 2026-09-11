@@ -96,7 +96,7 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
     ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
   });
 
-  if (response.status === 401 && typeof window !== 'undefined') {
+  if ((response.status === 401 || response.status === 403) && typeof window !== 'undefined') {
     const refreshToken = localStorage.getItem('refreshToken');
     if (refreshToken) {
       if (isRefreshing) {
