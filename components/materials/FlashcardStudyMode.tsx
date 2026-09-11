@@ -28,7 +28,7 @@ interface StudyModeProps {
  * - Edit button to update front/back text
  * - Font size +/- controls
  */
-export function FlashcardStudyMode({ deckName, cards, language, onFinish }: StudyModeProps) {
+export function FlashcardStudyMode({ deckName: _deckName, cards, language, onFinish }: StudyModeProps) {
   const { mutate: reviewCard } = useReviewFlashcard();
   const { mutate: updateCard, isPending: isUpdating } = useUpdateFlashcard();
 

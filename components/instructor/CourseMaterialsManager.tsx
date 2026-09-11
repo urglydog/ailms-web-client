@@ -224,7 +224,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
             </div>
 
             {expandedMindmapId === mat.id && mat.materialType === 'MINDMAP' && (
-              <InlineMindmapViewer generationId={mat.id} material={mat} />
+              <InlineMindmapViewer generationId={mat.id} />
             )}
           </div>
         ))}
@@ -262,16 +262,6 @@ function MaterialWorkspaceViewer({
 
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<'VIEW' | 'RAW_CODE' | 'QUESTIONS' | 'SETTINGS' | 'DRAG_DROP'>('VIEW');
-
-  const updateMermaidMutation = useMutation({
-    mutationFn: (variables: { id: number; mermaidCode: string }) => materialsApi.updateMaterial(variables.id, { mermaidCode: variables.mermaidCode }),
-    onSuccess: () => {
-      toast.success('Đã lưu sơ đồ Mindmap thành công!');
-      queryClient.invalidateQueries({ queryKey: ['instructor-materials'] });
-      queryClient.invalidateQueries({ queryKey: ['material-detail'] });
-    },
-    onError: () => toast.error('Có lỗi xảy ra khi lưu sơ đồ!'),
-  });
 
   // Cập nhật tab mặc định dựa trên loại học liệu
   useEffect(() => {
@@ -774,7 +764,7 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
   );
 }
 
-function InlineMindmapViewer({ generationId, material }: { generationId: number, material: InstructorMaterial }) {
+function InlineMindmapViewer({ generationId }: { generationId: number }) {
   const { data: detail, isLoading } = useQuery<MaterialDetailRes>({
     queryKey: ['material-detail', generationId],
     queryFn: () => materialsApi.getDetail(generationId),
