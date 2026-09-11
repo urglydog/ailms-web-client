@@ -190,6 +190,7 @@ function parseFlowToMermaid(nodes: Node[], edges: Edge[]) {
 export function MindmapEditor({ initialMermaidCode, onSave }: MindmapEditorProps) {
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
+  const [confirmStep, setConfirmStep] = useState<0 | 1 | 2>(0); // 0=none, 1=first confirm, 2=second confirm
 
   const initData = useCallback(() => {
     const { nodes: n, edges: e } = parseMermaidToFlow(initialMermaidCode);
@@ -212,7 +213,6 @@ export function MindmapEditor({ initialMermaidCode, onSave }: MindmapEditorProps
     setEditingNode({ id: node.id, label: (node.data.label as string) || '' });
   }, []);
 
-
   const onEdgesChange = useCallback(
     (changes: EdgeChange[]) => setEdges((eds) => applyEdgeChanges(changes, eds)),
     []
@@ -228,12 +228,71 @@ export function MindmapEditor({ initialMermaidCode, onSave }: MindmapEditorProps
     []
   );
 
-  const handleSave = () => {
+  // Delete selected nodes and edges
+  const handleDeleteSelected = useCallback(() => {
+    const selectedNodeIds = nodes.filter(n => n.selected).map(n => n.id);
+    const selectedEdgeIds = edges.filter(e => e.selected).map(e => e.id);
+
+    if (selectedNodeIds.length === 0 && selectedEdgeIds.length === 0) return;
+
+    // Remove edges connected to deleted nodes + selected edges
+    setEdges(eds => eds.filter(e => 
+      !selectedEdgeIds.includes(e.id) && 
+      !selectedNodeIds.includes(e.source) && 
+      !selectedNodeIds.includes(e.target)
+    ));
+    setNodes(nds => nds.filter(n => !selectedNodeIds.includes(n.id)));
+  }, [nodes, edges]);
+
+  // Add new node
+  const handleAddNode = useCallback(() => {
+    const newId = `node_${Date.now()}`;
+    const newNode: Node = {
+      id: newId,
+      position: { x: Math.random() * 300, y: Math.random() * 300 },
+      data: { label: 'Nhánh mới' },
+      style: {
+        background: '#F0F9FF',
+        border: '2px solid #0284C7',
+        borderRadius: '12px',
+        padding: '12px 20px',
+        fontWeight: 'bold',
+        color: '#0369A1',
+        minWidth: '200px',
+        boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+        textAlign: 'center' as const
+      }
+    };
+    setNodes(nds => [...nds, newNode]);
+  }, []);
+
+  // Keyboard Delete handler
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        // Don't delete if editing text
+        if (editingNode) return;
+        const target = e.target as HTMLElement;
+        if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
+        handleDeleteSelected();
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [handleDeleteSelected, editingNode]);
+
+  // 2-step save flow
+  const handleSaveClick = () => setConfirmStep(1);
+  const handleConfirmStep1 = () => setConfirmStep(2);
+  const handleConfirmStep2 = () => {
+    setConfirmStep(0);
     if (onSave) {
       const code = parseFlowToMermaid(nodes, edges);
       onSave(code);
     }
   };
+
+  const selectedCount = nodes.filter(n => n.selected).length + edges.filter(e => e.selected).length;
 
   return (
     <div style={{ height: '700px', width: '100%', border: '1px solid #E5E7EB', borderRadius: '12px', position: 'relative' }}>
@@ -244,24 +303,39 @@ export function MindmapEditor({ initialMermaidCode, onSave }: MindmapEditorProps
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         onNodeDoubleClick={onNodeDoubleClick}
+        deleteKeyCode={null}
         fitView
       >
         <Controls />
         <Background gap={16} size={1} />
         
-        <Panel position="top-right" className="flex gap-2">
+        <Panel position="top-right" className="flex gap-2 flex-wrap">
+          <button 
+            onClick={handleAddNode}
+            className="bg-green-50 border border-green-300 text-green-700 hover:bg-green-100 px-3 py-2 rounded-lg font-bold shadow-sm transition-colors text-sm"
+          >
+            ➕ Thêm nhánh
+          </button>
+          {selectedCount > 0 && (
+            <button 
+              onClick={handleDeleteSelected}
+              className="bg-red-50 border border-red-300 text-red-600 hover:bg-red-100 px-3 py-2 rounded-lg font-bold shadow-sm transition-colors text-sm"
+            >
+              🗑️ Xóa ({selectedCount})
+            </button>
+          )}
           <button 
             onClick={initData}
-            className="bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-lg font-bold shadow-sm transition-colors text-sm"
+            className="bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 px-3 py-2 rounded-lg font-bold shadow-sm transition-colors text-sm"
           >
             ↺ Xếp Lại Cây
           </button>
           {onSave && (
             <button 
-              onClick={handleSave}
+              onClick={handleSaveClick}
               className="bg-accent hover:bg-accent-dark text-white px-4 py-2 rounded-lg font-bold shadow-md transition-colors text-sm"
             >
-              💾 Áp dụng thay đổi
+              💾 Lưu thay đổi
             </button>
           )}
         </Panel>
@@ -301,6 +375,53 @@ export function MindmapEditor({ initialMermaidCode, onSave }: MindmapEditorProps
           </div>
         </div>
       )}
+
+      {/* 2-Step Verify Save Dialog */}
+      {confirmStep > 0 && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[2px] rounded-xl">
+          <div className="bg-white p-6 rounded-2xl shadow-2xl border border-gray-100 w-[420px] max-w-[90%]">
+            {confirmStep === 1 ? (
+              <>
+                <h3 className="text-base font-bold text-gray-900 mb-2 flex items-center gap-2">
+                  <span>⚠️</span> Xác nhận thay đổi?
+                </h3>
+                <p className="text-sm text-gray-600 mb-5">
+                  Bạn có chắc chắn muốn lưu các thay đổi trên sơ đồ Mindmap này không?
+                </p>
+                <div className="flex gap-2 justify-end">
+                  <button onClick={() => setConfirmStep(0)} className="px-4 py-2.5 bg-gray-50 text-gray-600 rounded-xl text-xs font-bold hover:bg-gray-100 border border-gray-200 transition-colors">
+                    Hủy
+                  </button>
+                  <button onClick={handleConfirmStep1} className="px-5 py-2.5 bg-amber-500 text-white rounded-xl text-xs font-bold hover:bg-amber-600 shadow-sm transition-colors">
+                    Tiếp tục xác nhận →
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <h3 className="text-base font-bold text-red-700 mb-2 flex items-center gap-2">
+                  <span>🔒</span> Xác nhận lần cuối
+                </h3>
+                <p className="text-sm text-gray-600 mb-2">
+                  Thay đổi sẽ được áp dụng cho <strong>tất cả sinh viên</strong> đang xem Mindmap này.
+                </p>
+                <p className="text-xs text-red-600 font-semibold bg-red-50 p-3 rounded-lg mb-5 border border-red-100">
+                  Hành động này không thể hoàn tác. Vui lòng kiểm tra kỹ trước khi xác nhận.
+                </p>
+                <div className="flex gap-2 justify-end">
+                  <button onClick={() => setConfirmStep(0)} className="px-4 py-2.5 bg-gray-50 text-gray-600 rounded-xl text-xs font-bold hover:bg-gray-100 border border-gray-200 transition-colors">
+                    Hủy bỏ
+                  </button>
+                  <button onClick={handleConfirmStep2} className="px-5 py-2.5 bg-red-600 text-white rounded-xl text-xs font-bold hover:bg-red-700 shadow-sm transition-colors">
+                    ✓ Xác nhận áp dụng
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+

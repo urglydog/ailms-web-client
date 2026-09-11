@@ -1,11 +1,13 @@
 'use client';
 
+import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useMaterialDetail } from '@/hooks/useMaterials';
 import { MermaidViewer } from '@/components/materials/MermaidViewer';
 import { QuizViewer } from '@/components/materials/QuizViewer';
 import { FlashcardViewer } from '@/components/materials/FlashcardViewer';
+import { FlashcardStudyMode } from '@/components/materials/FlashcardStudyMode';
 import { ApiError } from '@/lib/api/client';
 
 export default function MaterialDetailPage() {
@@ -18,6 +20,7 @@ export default function MaterialDetailPage() {
 
   // Chỉ fetch dữ liệu khi id hợp lệ (id > 0)
   const { data: material, isLoading, error } = useMaterialDetail(id);
+  const [flashcardMode, setFlashcardMode] = useState<'study' | 'browse'>('study');
 
   if (!id || isLoading) {
     return (
@@ -72,7 +75,7 @@ export default function MaterialDetailPage() {
               </Link>
             </div>
             <h1 className="font-display text-2xl font-bold text-ink">
-              {material.materialType === 'MINDMAP' ? 'Sơ đồ tư duy' : material.materialType} - Phiên bản {material.versionNo}
+              {material.materialType === 'MINDMAP' ? 'Sơ đồ tư duy' : material.materialType === 'FLASHCARD' ? 'Bộ thẻ Flashcard' : material.materialType} - Phiên bản {material.versionNo}
             </h1>
             <p className="text-sm text-ink-muted mt-1">
               Trạng thái: <span className="font-semibold text-green-600">{material.status}</span>
@@ -112,7 +115,47 @@ export default function MaterialDetailPage() {
         ) : material.materialType === 'FLASHCARD' ? (
           <div className="py-4">
             {material.flashcards && material.flashcards.length > 0 ? (
-          <FlashcardViewer flashcards={material.flashcards} language={material.language} />
+              <>
+                {/* Mode toggle */}
+                <div className="flex items-center gap-4 mb-6 border-b border-line pb-3">
+                  <button
+                    onClick={() => setFlashcardMode('study')}
+                    className={`pb-2 text-sm font-bold border-b-2 transition-colors ${
+                      flashcardMode === 'study' ? 'border-accent text-accent' : 'border-transparent text-ink-muted hover:text-ink'
+                    }`}
+                  >
+                    📖 Ôn tập (Study Mode)
+                  </button>
+                  <button
+                    onClick={() => setFlashcardMode('browse')}
+                    className={`pb-2 text-sm font-bold border-b-2 transition-colors ${
+                      flashcardMode === 'browse' ? 'border-accent text-accent' : 'border-transparent text-ink-muted hover:text-ink'
+                    }`}
+                  >
+                    📋 Duyệt tất cả (Browse)
+                  </button>
+                </div>
+
+                {flashcardMode === 'study' ? (
+                  <FlashcardStudyMode
+                    deckName={material.title || 'Bộ thẻ Flashcard'}
+                    cards={material.flashcards.map(c => ({
+                      id: c.id,
+                      frontText: c.frontText,
+                      backText: c.backText,
+                      nextReviewAt: c.nextReviewAt || null,
+                      intervalDays: c.intervalDays,
+                      repetitions: c.repetitions,
+                      easiness: c.easiness,
+                      isDue: c.isDue,
+                    }))}
+                    language={material.language}
+                    onFinish={() => router.back()}
+                  />
+                ) : (
+                  <FlashcardViewer flashcards={material.flashcards} language={material.language} />
+                )}
+              </>
             ) : (
               <div className="card p-6 text-center text-ink-muted">
                 {material.status === 'COMPLETED' ? 'Bộ flashcard này không có thẻ nào.' : 'Bộ flashcard đang được AI xử lý, vui lòng quay lại sau...'}

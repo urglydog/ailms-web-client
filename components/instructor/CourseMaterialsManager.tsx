@@ -28,6 +28,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
   };
   const [genMaterialType, setGenMaterialType] = useState<'QUIZ' | 'FLASHCARD' | 'MINDMAP' | null>(null);
   const [activeFilterTab, setActiveFilterTab] = useState<'ALL' | 'QUIZ' | 'FLASHCARD' | 'MINDMAP'>('ALL');
+  const [expandedMindmapId, setExpandedMindmapId] = useState<number | null>(null);
 
   const { data: materials, isLoading } = useQuery({
     queryKey: ['instructor-materials', courseId],
@@ -142,7 +143,8 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
       {/* Materials List */}
       <div className="flex flex-col gap-3">
         {filteredMaterials.map((mat) => (
-          <div key={mat.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:border-blue-200 transition-all">
+          <div key={mat.id} className="flex flex-col gap-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:border-blue-200 transition-all">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <span className={`inline-flex items-center rounded-md px-2.5 py-1 text-xs font-bold ring-1 ring-inset ${mat.materialType === 'MINDMAP' ? 'bg-blue-50 text-blue-700 ring-blue-600/20' :
                   mat.materialType === 'FLASHCARD' ? 'bg-purple-50 text-purple-700 ring-purple-600/20' :
@@ -176,12 +178,21 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
             {mat.status === 'COMPLETED' && (
               <div className="flex items-center gap-2 w-full sm:w-auto justify-end border-t sm:border-t-0 pt-2 sm:pt-0">
                 {/* Mở Workspace Xem / Chỉnh sửa */}
-                <button
-                  onClick={() => setInspectGenerationId(mat.id)}
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-50 border border-indigo-200 px-3.5 py-1.5 text-xs font-bold text-indigo-700 hover:bg-indigo-100 transition-all shadow-sm"
-                >
-                  🖥️ Quản Lý Nội Dung Workspace
-                </button>
+                {mat.materialType === 'MINDMAP' ? (
+                  <button
+                    onClick={() => setExpandedMindmapId(expandedMindmapId === mat.id ? null : mat.id)}
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-50 border border-indigo-200 px-3.5 py-1.5 text-xs font-bold text-indigo-700 hover:bg-indigo-100 transition-all shadow-sm"
+                  >
+                    {expandedMindmapId === mat.id ? 'Thu gọn' : '🖥️ Xem & Chỉnh sửa'}
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => setInspectGenerationId(mat.id)}
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-50 border border-indigo-200 px-3.5 py-1.5 text-xs font-bold text-indigo-700 hover:bg-indigo-100 transition-all shadow-sm"
+                  >
+                    🖥️ Quản Lý Nội Dung Workspace
+                  </button>
+                )}
 
                 {/* Đánh dấu Official */}
                 <button
@@ -209,6 +220,11 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
               <span className="text-xs text-amber-600 bg-amber-50 px-2.5 py-1 rounded-md font-medium">
                 ⏳ Trạng thái: {mat.status}
               </span>
+            )}
+            </div>
+
+            {expandedMindmapId === mat.id && mat.materialType === 'MINDMAP' && (
+              <InlineMindmapViewer generationId={mat.id} material={mat} />
             )}
           </div>
         ))}
@@ -261,7 +277,7 @@ function MaterialWorkspaceViewer({
   useEffect(() => {
     if (detail?.materialType === 'QUIZ') {
       setActiveTab('QUESTIONS');
-    } else if (detail?.materialType === 'MINDMAP') {
+    } else {
       setActiveTab('VIEW');
     }
   }, [detail?.materialType]);
@@ -400,50 +416,6 @@ function MaterialWorkspaceViewer({
 
               {activeTab === 'SETTINGS' && material && (
                 <QuizSettingsTab quiz={material} />
-              )}
-            </div>
-          )}
-
-          {/* Render Mindmap Workspace */}
-          {detail.materialType === 'MINDMAP' && detail.mermaidCode && (
-            <div className="space-y-4">
-              <div className="flex items-center gap-2 border-b pb-2">
-                <button
-                  onClick={() => setActiveTab('VIEW')}
-                  className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === 'VIEW' ? 'bg-blue-600 text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                    }`}
-                >
-                  Trực Quan (Tĩnh)
-                </button>
-                <button
-                  onClick={() => setActiveTab('DRAG_DROP')}
-                  className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === 'DRAG_DROP' ? 'bg-accent text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                    }`}
-                >
-                  Kéo Thả (React Flow)
-                </button>
-                <button
-                  onClick={() => setActiveTab('RAW_CODE')}
-                  className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === 'RAW_CODE' ? 'bg-slate-800 text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                    }`}
-                >
-                  Mã Mermaid
-                </button>
-              </div>
-
-              {activeTab === 'VIEW' ? (
-                <MermaidViewer chart={detail.mermaidCode} />
-              ) : activeTab === 'DRAG_DROP' ? (
-                <MindmapEditor 
-                  initialMermaidCode={detail.mermaidCode} 
-                  onSave={(code) => {
-                    updateMermaidMutation.mutate({ id: detail.id, mermaidCode: code });
-                  }}
-                />
-              ) : (
-                <pre className="p-5 rounded-2xl bg-slate-900 text-cyan-300 font-mono text-xs overflow-x-auto min-h-[400px] border border-slate-800">
-                  {detail.mermaidCode}
-                </pre>
               )}
             </div>
           )}
@@ -798,6 +770,69 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function InlineMindmapViewer({ generationId, material }: { generationId: number, material: InstructorMaterial }) {
+  const { data: detail, isLoading } = useQuery<MaterialDetailRes>({
+    queryKey: ['material-detail', generationId],
+    queryFn: () => materialsApi.getDetail(generationId),
+    enabled: !!generationId,
+  });
+  const queryClient = useQueryClient();
+  const [activeTab, setActiveTab] = useState<'VIEW' | 'RAW_CODE' | 'DRAG_DROP'>('VIEW');
+
+  const updateMermaidMutation = useMutation({
+    mutationFn: (variables: { id: number; mermaidCode: string }) => materialsApi.updateMaterial(variables.id, { mermaidCode: variables.mermaidCode }),
+    onSuccess: () => {
+      toast.success('Đã lưu sơ đồ Mindmap thành công!');
+      queryClient.invalidateQueries({ queryKey: ['instructor-materials'] });
+      queryClient.invalidateQueries({ queryKey: ['material-detail', generationId] });
+    },
+    onError: () => toast.error('Có lỗi xảy ra khi lưu sơ đồ!'),
+  });
+
+  if (isLoading) return <div className="p-4 text-sm text-gray-500 animate-pulse">Đang tải chi tiết Mindmap...</div>;
+  if (!detail || !detail.mermaidCode) return null;
+
+  return (
+    <div className="mt-2 border-t border-gray-100 pt-4 space-y-4 w-full">
+      <div className="flex items-center gap-2 border-b border-gray-100 pb-2">
+        <button
+          onClick={() => setActiveTab('VIEW')}
+          className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === 'VIEW' ? 'bg-blue-600 text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+        >
+          Trực Quan (Tĩnh)
+        </button>
+        <button
+          onClick={() => setActiveTab('DRAG_DROP')}
+          className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === 'DRAG_DROP' ? 'bg-accent text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+        >
+          ✏️ Chỉnh sửa (React Flow)
+        </button>
+        <button
+          onClick={() => setActiveTab('RAW_CODE')}
+          className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === 'RAW_CODE' ? 'bg-slate-800 text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+        >
+          Mã Mermaid
+        </button>
+      </div>
+
+      {activeTab === 'VIEW' ? (
+        <MermaidViewer chart={detail.mermaidCode} />
+      ) : activeTab === 'DRAG_DROP' ? (
+        <MindmapEditor 
+          initialMermaidCode={detail.mermaidCode} 
+          onSave={(code) => {
+            updateMermaidMutation.mutate({ id: detail.id, mermaidCode: code });
+          }}
+        />
+      ) : (
+        <pre className="p-5 rounded-2xl bg-slate-900 text-cyan-300 font-mono text-xs overflow-x-auto min-h-[400px] border border-slate-800">
+          {detail.mermaidCode}
+        </pre>
+      )}
     </div>
   );
 }
