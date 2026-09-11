@@ -103,9 +103,21 @@ function parseMermaidToFlow(code: string) {
   const edges: Edge[] = [];
   const nodeMap = new Map<string, Node>();
   
-  const lines = code.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('graph') && !l.startsWith('mindmap'));
+  let savedPositions: Record<string, {x: number, y: number}> | null = null;
+  
+  const lines = code.split('\n').map(l => l.trim());
 
   lines.forEach((line) => {
+    if (line.startsWith('%% POSITIONS: ')) {
+      try {
+        savedPositions = JSON.parse(line.replace('%% POSITIONS: ', ''));
+      } catch {
+        console.error("Failed to parse mindmap positions");
+      }
+      return;
+    }
+    
+    if (!line || line.startsWith('graph') || line.startsWith('mindmap')) return;
     const edgeParts = line.split(/\s*-->\s*/);
     
     const partIds = edgeParts.map((part) => {
@@ -169,21 +181,36 @@ function parseMermaidToFlow(code: string) {
     });
   }
 
-  // Áp dụng thuật toán Auto Layout
-  nodes = applyTreeLayout(nodes, edges);
+  if (savedPositions) {
+    nodes.forEach(n => {
+      const pos = savedPositions![n.id];
+      if (pos) {
+        n.position = pos;
+      }
+    });
+  } else {
+    // Áp dụng thuật toán Auto Layout
+    nodes = applyTreeLayout(nodes, edges);
+  }
 
   return { nodes, edges };
 }
 
 function parseFlowToMermaid(nodes: Node[], edges: Edge[]) {
   let mermaid = 'graph TD\n';
+  const positions: Record<string, {x: number, y: number}> = {};
+  
   nodes.forEach(n => {
     const label = (n.data.label as string) || n.id;
     mermaid += `    ${n.id}["${label}"]\n`;
+    positions[n.id] = n.position;
   });
+  
   edges.forEach(e => {
     mermaid += `    ${e.source} --> ${e.target}\n`;
   });
+  
+  mermaid += `\n%% POSITIONS: ${JSON.stringify(positions)}\n`;
   return mermaid;
 }
 

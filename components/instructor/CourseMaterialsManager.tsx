@@ -5,7 +5,6 @@ import { materialsApi, InstructorMaterial, MaterialDetailRes } from '@/lib/api/m
 import { toast } from 'sonner';
 import React, { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { MermaidViewer } from '@/components/materials/MermaidViewer';
 import { MindmapEditor } from '@/components/materials/MindmapEditor';
 
 interface CourseMaterialsManagerProps {
@@ -28,7 +27,6 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
   };
   const [genMaterialType, setGenMaterialType] = useState<'QUIZ' | 'FLASHCARD' | 'MINDMAP' | null>(null);
   const [activeFilterTab, setActiveFilterTab] = useState<'ALL' | 'QUIZ' | 'FLASHCARD' | 'MINDMAP'>('ALL');
-  const [expandedMindmapId, setExpandedMindmapId] = useState<number | null>(null);
 
   const { data: materials, isLoading } = useQuery({
     queryKey: ['instructor-materials', courseId],
@@ -145,87 +143,74 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
         {filteredMaterials.map((mat) => (
           <div key={mat.id} className="flex flex-col gap-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:border-blue-200 transition-all">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <span className={`inline-flex items-center rounded-md px-2.5 py-1 text-xs font-bold ring-1 ring-inset ${mat.materialType === 'MINDMAP' ? 'bg-blue-50 text-blue-700 ring-blue-600/20' :
+              <div className="flex items-center gap-3">
+                <span className={`inline-flex items-center rounded-md px-2.5 py-1 text-xs font-bold ring-1 ring-inset ${mat.materialType === 'MINDMAP' ? 'bg-blue-50 text-blue-700 ring-blue-600/20' :
                   mat.materialType === 'FLASHCARD' ? 'bg-purple-50 text-purple-700 ring-purple-600/20' :
                     'bg-orange-50 text-orange-700 ring-orange-600/20'
-                }`}>
-                {mat.materialType}
-              </span>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-bold text-gray-900">{mat.title || 'Học liệu không tên'}</span>
-                  {mat.isOfficial && (
-                    <span className="bg-emerald-100 text-emerald-800 text-[11px] font-extrabold px-2 py-0.5 rounded-full border border-emerald-200">
-                      ★ Official
-                    </span>
-                  )}
-                  {mat.isProctored && (
-                    <span className="bg-red-100 text-red-800 text-[11px] font-extrabold px-2 py-0.5 rounded-full border border-red-200 flex items-center gap-1">
-                      <span>🔴</span> Anti-Cheat
-                    </span>
-                  )}
-                </div>
-                <div className="text-xs text-gray-500 mt-0.5 flex items-center gap-3">
-                  <span>Tạo lúc: {new Date(mat.createdAt).toLocaleDateString('vi-VN')}</span>
-                  {mat.materialType === 'QUIZ' && mat.questionCount !== undefined && (
-                    <span className="font-semibold text-indigo-600">• Quy mô đề: {mat.randomPickCount ? mat.randomPickCount : mat.questionCount} câu hỏi</span>
-                  )}
+                  }`}>
+                  {mat.materialType}
+                </span>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-bold text-gray-900">{mat.title || 'Học liệu không tên'}</span>
+                    {mat.isOfficial && (
+                      <span className="bg-emerald-100 text-emerald-800 text-[11px] font-extrabold px-2 py-0.5 rounded-full border border-emerald-200">
+                        ★ Official
+                      </span>
+                    )}
+                    {mat.isProctored && (
+                      <span className="bg-red-100 text-red-800 text-[11px] font-extrabold px-2 py-0.5 rounded-full border border-red-200 flex items-center gap-1">
+                        <span>🔴</span> Anti-Cheat
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-xs text-gray-500 mt-0.5 flex items-center gap-3">
+                    <span>Tạo lúc: {new Date(mat.createdAt).toLocaleDateString('vi-VN')}</span>
+                    {mat.materialType === 'QUIZ' && mat.questionCount !== undefined && (
+                      <span className="font-semibold text-indigo-600">• Quy mô đề: {mat.randomPickCount ? mat.randomPickCount : mat.questionCount} câu hỏi</span>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {mat.status === 'COMPLETED' && (
-              <div className="flex items-center gap-2 w-full sm:w-auto justify-end border-t sm:border-t-0 pt-2 sm:pt-0">
-                {/* Mở Workspace Xem / Chỉnh sửa */}
-                {mat.materialType === 'MINDMAP' ? (
-                  <button
-                    onClick={() => setExpandedMindmapId(expandedMindmapId === mat.id ? null : mat.id)}
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-50 border border-indigo-200 px-3.5 py-1.5 text-xs font-bold text-indigo-700 hover:bg-indigo-100 transition-all shadow-sm"
-                  >
-                    {expandedMindmapId === mat.id ? 'Thu gọn' : '🖥️ Xem & Chỉnh sửa'}
-                  </button>
-                ) : (
+              {mat.status === 'COMPLETED' && (
+                <div className="flex items-center gap-2 w-full sm:w-auto justify-end border-t sm:border-t-0 pt-2 sm:pt-0">
+                  {/* Mở Workspace Xem / Chỉnh sửa */}
                   <button
                     onClick={() => setInspectGenerationId(mat.id)}
                     className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-50 border border-indigo-200 px-3.5 py-1.5 text-xs font-bold text-indigo-700 hover:bg-indigo-100 transition-all shadow-sm"
                   >
                     🖥️ Quản Lý Nội Dung Workspace
                   </button>
-                )}
 
-                {/* Đánh dấu Official */}
-                <button
-                  onClick={() => {
-                    if (mat.materialType === 'MINDMAP' && mat.materialId) {
-                      toggleMindmapMutation.mutate({ id: mat.materialId, isOfficial: !mat.isOfficial });
-                    } else if (mat.materialType === 'FLASHCARD' && mat.materialId) {
-                      toggleFlashcardMutation.mutate({ id: mat.materialId, isOfficial: !mat.isOfficial });
-                    } else if (mat.materialType === 'QUIZ' && mat.materialId) {
-                      setQuizOfficialMutation.mutate(mat.materialId);
-                    }
-                  }}
-                  className={`inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-semibold transition-all border ${mat.isOfficial
+                  {/* Đánh dấu Official */}
+                  <button
+                    onClick={() => {
+                      if (mat.materialType === 'MINDMAP' && mat.materialId) {
+                        toggleMindmapMutation.mutate({ id: mat.materialId, isOfficial: !mat.isOfficial });
+                      } else if (mat.materialType === 'FLASHCARD' && mat.materialId) {
+                        toggleFlashcardMutation.mutate({ id: mat.materialId, isOfficial: !mat.isOfficial });
+                      } else if (mat.materialType === 'QUIZ' && mat.materialId) {
+                        setQuizOfficialMutation.mutate(mat.materialId);
+                      }
+                    }}
+                    className={`inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-semibold transition-all border ${mat.isOfficial
                       ? 'bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100'
                       : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                    }`}
-                >
-                  {mat.isOfficial ? '★ Đang là Official' : '☆ Đánh dấu Official'}
-                </button>
+                      }`}
+                  >
+                    {mat.isOfficial ? '★ Đang là Official' : '☆ Đánh dấu Official'}
+                  </button>
 
 
-              </div>
-            )}
-            {mat.status !== 'COMPLETED' && (
-              <span className="text-xs text-amber-600 bg-amber-50 px-2.5 py-1 rounded-md font-medium">
-                ⏳ Trạng thái: {mat.status}
-              </span>
-            )}
+                </div>
+              )}
+              {mat.status !== 'COMPLETED' && (
+                <span className="text-xs text-amber-600 bg-amber-50 px-2.5 py-1 rounded-md font-medium">
+                  ⏳ Trạng thái: {mat.status}
+                </span>
+              )}
             </div>
-
-            {expandedMindmapId === mat.id && mat.materialType === 'MINDMAP' && (
-              <InlineMindmapViewer generationId={mat.id} />
-            )}
           </div>
         ))}
 
@@ -263,10 +248,22 @@ function MaterialWorkspaceViewer({
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<'VIEW' | 'RAW_CODE' | 'QUESTIONS' | 'SETTINGS' | 'DRAG_DROP'>('VIEW');
 
+  const updateMermaidMutation = useMutation({
+    mutationFn: (variables: { id: number; mermaidCode: string }) => materialsApi.updateMaterial(variables.id, { mermaidCode: variables.mermaidCode }),
+    onSuccess: () => {
+      toast.success('Đã lưu sơ đồ Mindmap thành công!');
+      queryClient.invalidateQueries({ queryKey: ['instructor-materials'] });
+      queryClient.invalidateQueries({ queryKey: ['material-detail'] });
+    },
+    onError: () => toast.error('Có lỗi xảy ra khi lưu sơ đồ!'),
+  });
+
   // Cập nhật tab mặc định dựa trên loại học liệu
   useEffect(() => {
     if (detail?.materialType === 'QUIZ') {
       setActiveTab('QUESTIONS');
+    } else if (detail?.materialType === 'MINDMAP') {
+      setActiveTab('DRAG_DROP');
     } else {
       setActiveTab('VIEW');
     }
@@ -326,8 +323,8 @@ function MaterialWorkspaceViewer({
           <button
             onClick={onToggleOfficial}
             className={`inline-flex items-center rounded-xl px-4 py-2 text-xs font-bold transition-all border ${material?.isOfficial
-                ? 'bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100'
-                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 shadow-sm'
+              ? 'bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100'
+              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 shadow-sm'
               }`}
           >
             {material?.isOfficial ? '★ Đang là Official' : '☆ Phát hành làm Official'}
@@ -386,8 +383,8 @@ function MaterialWorkspaceViewer({
                           <div
                             key={opt.id}
                             className={`p-3.5 rounded-xl text-sm font-medium border flex items-center justify-between transition-all ${opt.isCorrect
-                                ? 'bg-emerald-100/80 border-emerald-400 text-emerald-950 font-bold shadow-sm'
-                                : 'bg-white border-gray-200 text-gray-700'
+                              ? 'bg-emerald-100/80 border-emerald-400 text-emerald-950 font-bold shadow-sm'
+                              : 'bg-white border-gray-200 text-gray-700'
                               }`}
                           >
                             <span>{opt.content}</span>
@@ -406,6 +403,49 @@ function MaterialWorkspaceViewer({
 
               {activeTab === 'SETTINGS' && material && (
                 <QuizSettingsTab quiz={material} />
+              )}
+            </div>
+          )}
+
+          {/* Render Mindmap Workspace (Unified React Flow) */}
+          {detail.materialType === 'MINDMAP' && detail.mermaidCode && (
+            <div className="space-y-4">
+              <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <h3 className="font-bold text-sm text-blue-950">Bảng Vẽ Sơ Đồ Tư Duy (Mindmap)</h3>
+                  <p className="text-xs text-blue-700 mt-0.5">Sử dụng chuột để kéo thả vị trí, click đúp vào chữ để sửa tên nhánh.</p>
+                </div>
+                <div className="flex bg-white rounded-lg p-1 border border-blue-200">
+                  <button
+                    onClick={() => setActiveTab('DRAG_DROP')}
+                    className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all ${activeTab !== 'RAW_CODE' ? 'bg-blue-600 text-white shadow-sm' : 'text-blue-700 hover:bg-blue-50'}`}
+                  >
+                    Bảng Vẽ Trực Quan
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('RAW_CODE')}
+                    className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all ${activeTab === 'RAW_CODE' ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-50'}`}
+                  >
+                    Mã Nguồn Mermaid
+                  </button>
+                </div>
+              </div>
+
+              {activeTab === 'RAW_CODE' ? (
+                <div className="w-full relative">
+                  <pre className="p-6 rounded-2xl bg-slate-900 text-cyan-300 font-mono text-xs overflow-x-auto min-h-[500px] border border-slate-800 leading-relaxed shadow-inner">
+                    {detail.mermaidCode}
+                  </pre>
+                </div>
+              ) : (
+                <div className="w-full h-[700px] border border-gray-200 rounded-2xl overflow-hidden bg-gray-50 shadow-inner">
+                  <MindmapEditor
+                    initialMermaidCode={detail.mermaidCode}
+                    onSave={(code) => {
+                      updateMermaidMutation.mutate({ id: detail.id, mermaidCode: code });
+                    }}
+                  />
+                </div>
               )}
             </div>
           )}
@@ -431,8 +471,8 @@ function MaterialWorkspaceViewer({
                       key={card.id}
                       onClick={() => toggleCard(card.id)}
                       className={`cursor-pointer min-h-[160px] p-5 rounded-2xl border transition-all duration-300 flex flex-col justify-between shadow-sm hover:shadow-md ${isFlipped
-                          ? 'bg-gradient-to-br from-indigo-900 to-purple-950 text-white border-purple-800'
-                          : 'bg-purple-50/60 text-purple-950 border-purple-200 hover:border-purple-400'
+                        ? 'bg-gradient-to-br from-indigo-900 to-purple-950 text-white border-purple-800'
+                        : 'bg-purple-50/60 text-purple-950 border-purple-200 hover:border-purple-400'
                         }`}
                     >
                       <div className="flex justify-between items-center text-xs font-extrabold opacity-80 mb-2">
@@ -760,69 +800,6 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
           </div>
         </div>
       </div>
-    </div>
-  );
-}
-
-function InlineMindmapViewer({ generationId }: { generationId: number }) {
-  const { data: detail, isLoading } = useQuery<MaterialDetailRes>({
-    queryKey: ['material-detail', generationId],
-    queryFn: () => materialsApi.getDetail(generationId),
-    enabled: !!generationId,
-  });
-  const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState<'VIEW' | 'RAW_CODE' | 'DRAG_DROP'>('VIEW');
-
-  const updateMermaidMutation = useMutation({
-    mutationFn: (variables: { id: number; mermaidCode: string }) => materialsApi.updateMaterial(variables.id, { mermaidCode: variables.mermaidCode }),
-    onSuccess: () => {
-      toast.success('Đã lưu sơ đồ Mindmap thành công!');
-      queryClient.invalidateQueries({ queryKey: ['instructor-materials'] });
-      queryClient.invalidateQueries({ queryKey: ['material-detail', generationId] });
-    },
-    onError: () => toast.error('Có lỗi xảy ra khi lưu sơ đồ!'),
-  });
-
-  if (isLoading) return <div className="p-4 text-sm text-gray-500 animate-pulse">Đang tải chi tiết Mindmap...</div>;
-  if (!detail || !detail.mermaidCode) return null;
-
-  return (
-    <div className="mt-2 border-t border-gray-100 pt-4 space-y-4 w-full">
-      <div className="flex items-center gap-2 border-b border-gray-100 pb-2">
-        <button
-          onClick={() => setActiveTab('VIEW')}
-          className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === 'VIEW' ? 'bg-blue-600 text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
-        >
-          Trực Quan (Tĩnh)
-        </button>
-        <button
-          onClick={() => setActiveTab('DRAG_DROP')}
-          className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === 'DRAG_DROP' ? 'bg-accent text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
-        >
-          ✏️ Chỉnh sửa (React Flow)
-        </button>
-        <button
-          onClick={() => setActiveTab('RAW_CODE')}
-          className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === 'RAW_CODE' ? 'bg-slate-800 text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
-        >
-          Mã Mermaid
-        </button>
-      </div>
-
-      {activeTab === 'VIEW' ? (
-        <MermaidViewer chart={detail.mermaidCode} />
-      ) : activeTab === 'DRAG_DROP' ? (
-        <MindmapEditor 
-          initialMermaidCode={detail.mermaidCode} 
-          onSave={(code) => {
-            updateMermaidMutation.mutate({ id: detail.id, mermaidCode: code });
-          }}
-        />
-      ) : (
-        <pre className="p-5 rounded-2xl bg-slate-900 text-cyan-300 font-mono text-xs overflow-x-auto min-h-[400px] border border-slate-800">
-          {detail.mermaidCode}
-        </pre>
-      )}
     </div>
   );
 }
