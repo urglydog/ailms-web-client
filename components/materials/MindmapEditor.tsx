@@ -112,9 +112,12 @@ function getLayoutedElements(nodes: Node[], edges: Edge[], direction = 'LR') {
          }
      });
 
+     const validIds = new Set(nodes.map(n => n.id));
      edges.forEach(e => {
-         if (leftIds.includes(e.target)) dagreGraphL.setEdge(e.source, e.target);
-         else dagreGraphR.setEdge(e.source, e.target);
+         if (validIds.has(e.source) && validIds.has(e.target)) {
+             if (leftIds.includes(e.target)) dagreGraphL.setEdge(e.source, e.target);
+             else dagreGraphR.setEdge(e.source, e.target);
+         }
      });
 
      dagre.layout(dagreGraphL);
@@ -144,8 +147,11 @@ function getLayoutedElements(nodes: Node[], edges: Edge[], direction = 'LR') {
     dagreGraph.setNode(node.id, { width: nodeWidth, height: nodeHeight });
   });
 
+  const validIds = new Set(nodes.map(n => n.id));
   edges.forEach((edge) => {
-    dagreGraph.setEdge(edge.source, edge.target);
+    if (validIds.has(edge.source) && validIds.has(edge.target)) {
+        dagreGraph.setEdge(edge.source, edge.target);
+    }
   });
 
   dagre.layout(dagreGraph);
@@ -442,9 +448,21 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
 
   const onNodesChange = useCallback((changes: NodeChange[]) => {
       setNodes((nds) => {
-        const newNodes = applyNodeChanges(changes, nds);
-        if (changes.some(c => c.type === 'remove')) setTimeout(() => applyLayout(newNodes, edges), 0);
-        return newNodes;
+          const newNodes = applyNodeChanges(changes, nds);
+          const hasRemovals = changes.some(c => c.type === 'remove');
+          if (hasRemovals || changes.some(c => c.type === 'position')) {
+              if (hasRemovals) {
+                  setEdges(eds => {
+                      const validIds = new Set(newNodes.map(n => n.id));
+                      const validEdges = eds.filter(e => validIds.has(e.source) && validIds.has(e.target));
+                      setTimeout(() => applyLayout(newNodes, validEdges), 0);
+                      return validEdges;
+                  });
+              } else {
+                  setTimeout(() => applyLayout(newNodes, edges), 0);
+              }
+          }
+          return newNodes;
       });
   }, [edges, applyLayout]);
 
