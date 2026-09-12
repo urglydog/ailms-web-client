@@ -303,7 +303,7 @@ function parseFlowToMermaid(nodes: Node[], edges: Edge[], layout: string, theme:
     const label = (n.data.label as string) || n.id;
     mermaid += `    ${n.id}["${label}"]\n`;
     
-    let styleStr = [];
+    const styleStr = [];
     if (n.data.customBg) styleStr.push(`fill:${n.data.customBg}`);
     if (n.data.customColor) styleStr.push(`color:${n.data.customColor}`);
     
@@ -796,7 +796,7 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
                                         }} className="text-xs bg-gray-100 hover:bg-gray-200 px-3 rounded text-gray-600 font-bold">Xóa</button>
                                     </div>
                                 </div>
-                                <div className="text-xs text-gray-400 mt-2 text-center">Tùy chỉnh sẽ được đồng bộ khi bạn nhấn "Lưu & Áp dụng"</div>
+                                <div className="text-xs text-gray-400 mt-2 text-center">Tùy chỉnh sẽ được đồng bộ khi bạn nhấn &quot;Lưu &amp; Áp dụng&quot;</div>
                             </div>
                         ) : (
                             <div className="text-center text-gray-400 text-sm mt-10 p-4 border border-dashed rounded-xl border-gray-200">
