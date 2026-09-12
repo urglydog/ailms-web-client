@@ -143,6 +143,26 @@ function parseMermaidToFlow(code: string, theme: string) {
     if (line.startsWith('%% POSITIONS: ')) return;
     if (!line || line.startsWith('graph') || line.startsWith('mindmap')) return;
     
+    if (line.startsWith('style ')) {
+      const match = line.match(/^style\s+([^\s]+)\s+(.*)$/);
+      if (match) {
+        const id = match[1];
+        const styles = match[2];
+        const fillMatch = styles.match(/fill:([^,]+)/);
+        const colorMatch = styles.match(/color:([^,]+)/);
+        
+        if (!nodeMap.has(id)) {
+           const newNode: Node = { id, position: {x:0, y:0}, data: { label: id, level: 0 } };
+           nodes.push(newNode);
+           nodeMap.set(id, newNode);
+        }
+        const node = nodeMap.get(id)!;
+        if (fillMatch) node.data.customBg = fillMatch[1];
+        if (colorMatch) node.data.customColor = colorMatch[1];
+      }
+      return;
+    }
+    
     const edgeParts = line.split(/\s*-->\s*/);
     const partIds = edgeParts.map((part) => {
       const match = part.match(/^([^\[\]\(\)\s]+)(?:\["?(.*?)"?\]|\("?(.*?)"?\))?$/);
@@ -224,6 +244,9 @@ function parseMermaidToFlow(code: string, theme: string) {
       } else {
           n.style = { background: 'transparent', color: '#475569', border: 'none', borderBottom: `2px solid ${paletteColor}`, borderRadius: '0', padding: '6px 12px', fontWeight: '500', fontSize: '13px' };
       }
+      
+      if (n.data.customBg) n.style.background = n.data.customBg as string;
+      if (n.data.customColor) n.style.color = n.data.customColor as string;
   });
 
   edges.forEach(e => {
@@ -275,14 +298,23 @@ function parseFlowToMermaid(nodes: Node[], edges: Edge[], layout: string, theme:
   else direction = 'LR'; // Default for FISHBONE, LOGIC_CHART, etc.
 
   mermaid += `graph ${direction}\n`;
+  let styles = '';
   nodes.forEach(n => {
     const label = (n.data.label as string) || n.id;
     mermaid += `    ${n.id}["${label}"]\n`;
+    
+    let styleStr = [];
+    if (n.data.customBg) styleStr.push(`fill:${n.data.customBg}`);
+    if (n.data.customColor) styleStr.push(`color:${n.data.customColor}`);
+    
+    if (styleStr.length > 0) {
+       styles += `    style ${n.id} ${styleStr.join(',')}\n`;
+    }
   });
   edges.forEach(e => {
     mermaid += `    ${e.source} --> ${e.target}\n`;
   });
-  return mermaid;
+  return mermaid + styles;
 }
 
 export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOnly = false }: MindmapEditorProps) {
@@ -735,10 +767,43 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
                       </div>
                   )}
                   {activeTab === 'Style' && (
-                      <div className="text-center text-gray-400 text-sm mt-10 p-4 border border-dashed rounded-xl border-gray-200">
-                          <strong>Node Style</strong><br/><br/>
-                          Hãy click chọn một node cụ thể trên bản đồ để tuỳ chỉnh Shape, Border, Fill, Font cho riêng node đó.<br/><br/>
-                          <span className="text-[10px]">(Đang phát triển)</span>
+                      <div className="space-y-6">
+                        {nodes.filter(n => n.selected).length === 1 ? (
+                            <div className="space-y-4">
+                                <div className="border p-4 rounded-xl border-gray-200">
+                                    <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2 block">Màu Nền (Fill)</label>
+                                    <div className="flex gap-2">
+                                        <input type="color" className="w-10 h-10 rounded cursor-pointer border-0 p-0" onChange={(e) => {
+                                            const selectedId = nodes.find(n => n.selected)!.id;
+                                            setNodes(nds => nds.map(n => n.id === selectedId ? {...n, data: {...n.data, customBg: e.target.value}, style: {...n.style, background: e.target.value}} : n));
+                                        }} value={nodes.find(n => n.selected)?.data.customBg as string || '#ffffff'} />
+                                        <button onClick={() => {
+                                            const selectedId = nodes.find(n => n.selected)!.id;
+                                            setNodes(nds => nds.map(n => n.id === selectedId ? {...n, data: {...n.data, customBg: undefined}, style: {...n.style, background: undefined}} : n));
+                                        }} className="text-xs bg-gray-100 hover:bg-gray-200 px-3 rounded text-gray-600 font-bold">Xóa</button>
+                                    </div>
+                                </div>
+                                <div className="border p-4 rounded-xl border-gray-200">
+                                    <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2 block">Màu Chữ (Text)</label>
+                                    <div className="flex gap-2">
+                                        <input type="color" className="w-10 h-10 rounded cursor-pointer border-0 p-0" onChange={(e) => {
+                                            const selectedId = nodes.find(n => n.selected)!.id;
+                                            setNodes(nds => nds.map(n => n.id === selectedId ? {...n, data: {...n.data, customColor: e.target.value}, style: {...n.style, color: e.target.value}} : n));
+                                        }} value={nodes.find(n => n.selected)?.data.customColor as string || '#000000'} />
+                                        <button onClick={() => {
+                                            const selectedId = nodes.find(n => n.selected)!.id;
+                                            setNodes(nds => nds.map(n => n.id === selectedId ? {...n, data: {...n.data, customColor: undefined}, style: {...n.style, color: undefined}} : n));
+                                        }} className="text-xs bg-gray-100 hover:bg-gray-200 px-3 rounded text-gray-600 font-bold">Xóa</button>
+                                    </div>
+                                </div>
+                                <div className="text-xs text-gray-400 mt-2 text-center">Tùy chỉnh sẽ được đồng bộ khi bạn nhấn "Lưu & Áp dụng"</div>
+                            </div>
+                        ) : (
+                            <div className="text-center text-gray-400 text-sm mt-10 p-4 border border-dashed rounded-xl border-gray-200">
+                                <strong>Node Style</strong><br/><br/>
+                                Hãy click chọn một node cụ thể trên bản đồ để tuỳ chỉnh Màu nền và Màu chữ.
+                            </div>
+                        )}
                       </div>
                   )}
               </div>
