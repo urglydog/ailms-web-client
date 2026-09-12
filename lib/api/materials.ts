@@ -18,7 +18,7 @@ export interface MaterialGenerationReq {
   customLessonIds?: number[];
   quantityLevel?: string;
   difficultyLevel?: string;
-  extraConfig?: Record<string, any>;
+  extraConfig?: Record<string, unknown>;
 }
 
 export interface BaseMaterial {
