@@ -91,7 +91,6 @@ function getLayoutedElements(nodes: Node[], edges: Edge[], direction = 'LR') {
      
      const rootEdges = edges.filter(e => e.source === rootId);
      const leftRootEdges = rootEdges.filter((_, i) => i % 2 !== 0);
-     const rightRootEdges = rootEdges.filter((_, i) => i % 2 === 0);
 
      const getDescendants = (startIds: string[]) => {
          const desc = new Set<string>(startIds);
@@ -328,8 +327,11 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
             const config = JSON.parse(match[1]);
             if (config.layout) layout = config.layout;
             if (config.theme) theme = config.theme;
-        } catch(e) {}
+        } catch(_) {}
     }
+    if (layout === 'LOGIC_CHART' || layout === 'BRACE_MAP' || layout === 'TREE_TABLE' || layout === 'TIMELINE') layout = 'LR';
+    if (layout === 'ORG_CHART') layout = 'TB';
+
     return { layout, theme };
   }, [initialMermaidCode, initialTemplate]);
 
@@ -416,7 +418,7 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
         } catch (err) { console.error('Export failed', err); } 
         finally { flowEl.style.transform = oldTransform; }
     }
-  }, [nodes, edges, colorTheme]);
+  }, [nodes, edges, colorTheme, mapStyle]);
 
   const triggerAction = useCallback((action: 'TAB' | 'ENTER') => {
       const selectedNode = nodes.find(n => n.selected);
@@ -490,7 +492,7 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [editingNode, readOnly, nodes, edges, applyLayout]);
+  }, [editingNode, readOnly, nodes, edges, applyLayout, triggerAction]);
 
   const hasSelectedNode = nodes.some(n => n.selected);
 
