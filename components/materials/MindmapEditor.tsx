@@ -320,7 +320,7 @@ function parseFlowToMarkdownList(nodes: Node[], edges: Edge[]): string {
 
 function parseFlowToMermaid(nodes: Node[], edges: Edge[], layout: string, theme: string) {
   let mermaid = `%% CONFIG: {"layout":"${layout}","theme":"${theme}"}\n`;
-  mermaid += 'graph LR\n';
+  mermaid += `graph ${layout}\n`;
   nodes.forEach(n => {
     const label = (n.data.label as string) || n.id;
     mermaid += `    ${n.id}["${label}"]\n`;
@@ -407,6 +407,8 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
     const layouted = getLayoutedElements(n, ed, parsedConfig.layout);
     setNodes(layouted.nodes);
     setEdges(layouted.edges);
+    setHistory([{nodes: layouted.nodes, edges: layouted.edges}]);
+    setHistoryIndex(0);
     setTimeout(() => fitView(), 100);
   }, [initialMermaidCode, parsedConfig, fitView]);
 
@@ -577,7 +579,6 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
           if (onSave) {
               const newCode = parseFlowToMermaid(nodes, edges, mapStyle, colorTheme);
               onSave(newCode);
-              alert("Lưu sơ đồ thành công!");
           }
       }
       
@@ -650,7 +651,6 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
                     <button onClick={() => {
                         const newCode = parseFlowToMermaid(nodes, edges, mapStyle, colorTheme);
                         onSave(newCode);
-                        alert("Lưu sơ đồ thành công!");
                     }} className="flex flex-col items-center justify-center p-2 hover:bg-cyan-50 rounded-lg min-w-[80px] text-cyan-600 transition-colors border border-transparent hover:border-cyan-200">
                         <span className="text-lg">💾</span><span className="text-[10px] font-bold mt-1">Lưu & Áp dụng</span>
                     </button>

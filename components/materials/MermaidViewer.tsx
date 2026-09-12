@@ -114,34 +114,7 @@ export function MermaidViewer({ chart }: MermaidViewerProps) {
       {/* Thanh công cụ điều khiển sơ đồ */}
       <div className="flex flex-wrap items-center justify-between gap-4 bg-gray-50 p-2 rounded-xl border border-line">
         <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-line">
-          <button 
-            onClick={() => setLayout('TD')}
-            className={`flex items-center justify-center p-2 rounded-md transition-colors ${layout === 'TD' ? 'bg-accent text-white' : 'text-gray-500 hover:text-ink hover:bg-gray-100'}`}
-            title="Từ trên xuống dưới (Dọc)"
-          >
-            ↓
-          </button>
-          <button 
-            onClick={() => setLayout('LR')}
-            className={`flex items-center justify-center p-2 rounded-md transition-colors ${layout === 'LR' ? 'bg-accent text-white' : 'text-gray-500 hover:text-ink hover:bg-gray-100'}`}
-            title="Từ trái sang phải (Ngang)"
-          >
-            →
-          </button>
-          <button 
-            onClick={() => setLayout('BT')}
-            className={`flex items-center justify-center p-2 rounded-md transition-colors ${layout === 'BT' ? 'bg-accent text-white' : 'text-gray-500 hover:text-ink hover:bg-gray-100'}`}
-            title="Từ dưới lên trên (Dọc ngược)"
-          >
-            ↑
-          </button>
-          <button 
-            onClick={() => setLayout('RL')}
-            className={`flex items-center justify-center p-2 rounded-md transition-colors ${layout === 'RL' ? 'bg-accent text-white' : 'text-gray-500 hover:text-ink hover:bg-gray-100'}`}
-            title="Từ phải sang trái (Ngang ngược)"
-          >
-            ←
-          </button>
+          {/* Layout controls removed as they are synced with MindmapEditor */}
         </div>
 
         {svgContent && (
