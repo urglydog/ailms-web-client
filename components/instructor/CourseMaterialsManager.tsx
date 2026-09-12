@@ -465,6 +465,7 @@ function MaterialWorkspaceViewer({
                 <div className="w-full h-[700px] border border-gray-200 rounded-2xl overflow-hidden bg-gray-50 shadow-inner">
                   <MindmapEditor
                     initialMermaidCode={detail.mermaidCode}
+                    initialTemplate={(detail as unknown as { extraConfig?: { mapTemplate?: string } }).extraConfig?.mapTemplate}
                     onSave={(code) => {
                       updateMermaidMutation.mutate({ id: detail.id, mermaidCode: code });
                       setActiveTab('VIEW');
