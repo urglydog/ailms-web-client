@@ -327,7 +327,7 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
             const config = JSON.parse(match[1]);
             if (config.layout) layout = config.layout;
             if (config.theme) theme = config.theme;
-        } catch(_) {}
+        } catch {}
     }
     if (layout === 'LOGIC_CHART' || layout === 'BRACE_MAP' || layout === 'TREE_TABLE' || layout === 'TIMELINE') layout = 'LR';
     if (layout === 'ORG_CHART') layout = 'TB';
