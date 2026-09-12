@@ -74,68 +74,11 @@ const LAYOUTS = [
   { id: 'RL', name: 'Logic Chart (R-L)', icon: '⬅️' },
   { id: 'TB', name: 'Org Chart (T-B)', icon: '⬇️' },
   { id: 'BT', name: 'Org Chart (B-T)', icon: '⬆️' },
-  { id: 'MINDMAP', name: 'Mind Map (Radial)', icon: '🔀' },
 ];
 
 function getLayoutedElements(nodes: Node[], edges: Edge[], direction = 'LR') {
   if (nodes.length === 0) return { nodes, edges };
   
-  if (direction === 'MINDMAP') {
-     const dagreGraphL = new dagre.graphlib.Graph().setGraph({ rankdir: 'RL', nodesep: 50, ranksep: 100 });
-     const dagreGraphR = new dagre.graphlib.Graph().setGraph({ rankdir: 'LR', nodesep: 50, ranksep: 100 });
-     
-     const rootId = nodes.find(n => n.data.level === 0)?.id || nodes[0]!.id;
-     dagreGraphL.setNode(rootId, { width: nodeWidth, height: nodeHeight });
-     dagreGraphR.setNode(rootId, { width: nodeWidth, height: nodeHeight });
-     
-     const rootEdges = edges.filter(e => e.source === rootId);
-     const leftRootEdges = rootEdges.filter((_, i) => i % 2 !== 0);
-
-     const getDescendants = (startIds: string[]) => {
-         const desc = new Set<string>(startIds);
-         let changed = true;
-         while(changed) {
-             changed = false;
-             edges.forEach(e => {
-                 if (desc.has(e.source) && !desc.has(e.target)) { desc.add(e.target); changed = true; }
-             });
-         }
-         return Array.from(desc);
-     };
-
-     const leftIds = getDescendants(leftRootEdges.map(e => e.target));
-
-     nodes.forEach(n => {
-         if (n.id !== rootId) {
-             if (leftIds.includes(n.id)) dagreGraphL.setNode(n.id, { width: nodeWidth, height: nodeHeight });
-             else dagreGraphR.setNode(n.id, { width: nodeWidth, height: nodeHeight });
-         }
-     });
-
-     const validIds = new Set(nodes.map(n => n.id));
-     edges.forEach(e => {
-         if (validIds.has(e.source) && validIds.has(e.target)) {
-             if (leftIds.includes(e.target)) dagreGraphL.setEdge(e.source, e.target);
-             else dagreGraphR.setEdge(e.source, e.target);
-         }
-     });
-
-     dagre.layout(dagreGraphL);
-     dagre.layout(dagreGraphR);
-
-     const newNodes = nodes.map((node) => {
-         const isLeft = leftIds.includes(node.id);
-         const pos = isLeft ? dagreGraphL.node(node.id) : dagreGraphR.node(node.id);
-         return {
-             ...node,
-             targetPosition: isLeft ? Position.Right : Position.Left,
-             sourcePosition: isLeft ? Position.Left : Position.Right,
-             position: { x: pos.x - nodeWidth / 2, y: pos.y - nodeHeight / 2 }
-         };
-     });
-     return { nodes: newNodes, edges };
-  }
-
   // Default Dagre
   const dagreGraph = new dagre.graphlib.Graph();
   dagreGraph.setDefaultEdgeLabel(() => ({}));

@@ -1008,7 +1008,6 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
                   <label className="text-sm font-bold text-gray-700 block mb-3">Mẫu sơ đồ (Template)</label>
                   <div className="grid grid-cols-4 gap-2">
                     {[
-                      { id: 'MINDMAP', name: 'Mind Map', icon: '🔀' },
                       { id: 'LOGIC_CHART', name: 'Logic Chart', icon: '➡️' },
                       { id: 'ORG_CHART', name: 'Org Chart', icon: '🏢' },
                     ].map(tpl => (
