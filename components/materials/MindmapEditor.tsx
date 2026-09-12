@@ -246,7 +246,7 @@ function parseMermaidToFlow(code: string, theme: string) {
   nodes.forEach(n => {
       const level = n.data.level as number;
       const bIdx = (n.data.branchIndex as number) || 0;
-      const paletteColor = t.palette[bIdx % t.palette.length];
+      const paletteColor = t.palette[bIdx % t.palette.length] || '#000000';
 
       if (level === 0) {
           n.style = { background: t.rootBg, color: t.rootColor, border: 'none', borderRadius: '8px', padding: '14px 24px', fontWeight: 'bold', fontSize: '16px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' };
@@ -263,7 +263,7 @@ function parseMermaidToFlow(code: string, theme: string) {
   edges.forEach(e => {
       const targetNode = nodes.find(n => n.id === e.target);
       const bIdx = (targetNode?.data.branchIndex as number) || 0;
-      const paletteColor = t.palette[bIdx % t.palette.length];
+      const paletteColor = t.palette[bIdx % t.palette.length] || '#000000';
       e.style = { stroke: paletteColor, strokeWidth: targetNode?.data.level === 1 ? 3 : 2 };
       e.type = 'smoothstep';
       e.markerEnd = { type: MarkerType.ArrowClosed, color: paletteColor };
@@ -320,7 +320,7 @@ function parseFlowToMermaid(nodes: Node[], edges: Edge[], layout: string, theme:
     // Theme Styles
     const level = n.data.level as number;
     const bIdx = (n.data.branchIndex as number) || 0;
-    const paletteColor = t.palette[bIdx % t.palette.length];
+    const paletteColor = t.palette[bIdx % t.palette.length] || '#000000';
     
     let themeBg = 'none';
     let themeColor = '#475569';
@@ -351,7 +351,7 @@ function parseFlowToMermaid(nodes: Node[], edges: Edge[], layout: string, theme:
     mermaid += `    ${e.source} --> ${e.target}\n`;
     const targetNode = nodes.find(n => n.id === e.target);
     const bIdx = (targetNode?.data.branchIndex as number) || 0;
-    const paletteColor = t.palette[bIdx % t.palette.length];
+    const paletteColor = t.palette[bIdx % t.palette.length] || '#000000';
     const width = targetNode?.data.level === 1 ? '3px' : '2px';
     linkStyles += `    linkStyle ${idx} stroke:${paletteColor},stroke-width:${width}\n`;
   });
@@ -383,7 +383,7 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
       const newNodes = nds.map(n => {
           const level = n.data.level as number;
           const bIdx = (n.data.branchIndex as number) || 0;
-          const paletteColor = t.palette[bIdx % t.palette.length];
+          const paletteColor = t.palette[bIdx % t.palette.length] || '#000000';
           const newStyle: React.CSSProperties = { ...n.style };
           
           if (level === 0) {
@@ -403,7 +403,7 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
       const newEdges = eds.map(e => {
           const targetNode = nds.find(n => n.id === e.target);
           const bIdx = (targetNode?.data.branchIndex as number) || 0;
-          const paletteColor = t.palette[bIdx % t.palette.length];
+          const paletteColor = t.palette[bIdx % t.palette.length] || '#000000';
           return {
               ...e,
               style: { ...e.style, stroke: paletteColor, strokeWidth: targetNode?.data.level === 1 ? 3 : 2 },
