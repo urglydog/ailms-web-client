@@ -350,18 +350,22 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
   const handleUndo = useCallback(() => {
       if (historyIndex > 0) {
           const prevState = history[historyIndex - 1];
-          setNodes(prevState.nodes);
-          setEdges(prevState.edges);
-          setHistoryIndex(historyIndex - 1);
+          if (prevState) {
+              setNodes(prevState.nodes);
+              setEdges(prevState.edges);
+              setHistoryIndex(historyIndex - 1);
+          }
       }
   }, [history, historyIndex]);
 
   const handleRedo = useCallback(() => {
       if (historyIndex < history.length - 1) {
           const nextState = history[historyIndex + 1];
-          setNodes(nextState.nodes);
-          setEdges(nextState.edges);
-          setHistoryIndex(historyIndex + 1);
+          if (nextState) {
+              setNodes(nextState.nodes);
+              setEdges(nextState.edges);
+              setHistoryIndex(historyIndex + 1);
+          }
       }
   }, [history, historyIndex]);
 
@@ -487,7 +491,7 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
         } catch (err) { console.error('Export failed', err); } 
         finally { flowEl.style.transform = oldTransform; }
     }
-  }, [nodes, edges, colorTheme, mapStyle]);
+  }, [nodes, edges, colorTheme]);
 
   const triggerAction = useCallback((action: 'TAB' | 'ENTER') => {
       const selectedNode = nodes.find(n => n.selected);
