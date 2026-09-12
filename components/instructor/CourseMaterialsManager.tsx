@@ -1010,12 +1010,7 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
                     {[
                       { id: 'MINDMAP', name: 'Mind Map', icon: '🔀' },
                       { id: 'LOGIC_CHART', name: 'Logic Chart', icon: '➡️' },
-                      { id: 'BRACE_MAP', name: 'Brace Map', icon: '❴' },
                       { id: 'ORG_CHART', name: 'Org Chart', icon: '🏢' },
-                      { id: 'TREE_TABLE', name: 'Tree Table', icon: '🗂️' },
-                      { id: 'MATRIX', name: 'Matrix', icon: '▦' },
-                      { id: 'FISHBONE', name: 'Fishbone', icon: '🐟' },
-                      { id: 'TIMELINE', name: 'Timeline', icon: '⏳' },
                     ].map(tpl => (
                       <div 
                         key={tpl.id} 

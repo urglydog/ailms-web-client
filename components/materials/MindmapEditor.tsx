@@ -75,8 +75,6 @@ const LAYOUTS = [
   { id: 'TB', name: 'Org Chart (T-B)', icon: '⬇️' },
   { id: 'BT', name: 'Org Chart (B-T)', icon: '⬆️' },
   { id: 'MINDMAP', name: 'Mind Map (Radial)', icon: '🔀' },
-  { id: 'FISHBONE', name: 'Fishbone', icon: '🐟' },
-  { id: 'MATRIX', name: 'Matrix', icon: '▦' },
 ];
 
 function getLayoutedElements(nodes: Node[], edges: Edge[], direction = 'LR') {
@@ -320,7 +318,13 @@ function parseFlowToMarkdownList(nodes: Node[], edges: Edge[]): string {
 
 function parseFlowToMermaid(nodes: Node[], edges: Edge[], layout: string, theme: string) {
   let mermaid = `%% CONFIG: {"layout":"${layout}","theme":"${theme}"}\n`;
-  mermaid += `graph ${layout}\n`;
+  
+  let direction = layout;
+  if (layout === 'ORG_CHART' || layout === 'TB') direction = 'TB';
+  else if (layout === 'RL') direction = 'RL';
+  else direction = 'LR'; // Default for FISHBONE, LOGIC_CHART, etc.
+
+  mermaid += `graph ${direction}\n`;
   nodes.forEach(n => {
     const label = (n.data.label as string) || n.id;
     mermaid += `    ${n.id}["${label}"]\n`;
