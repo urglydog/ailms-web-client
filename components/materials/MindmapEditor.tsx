@@ -138,8 +138,19 @@ function parseMermaidToFlow(code: string, theme: string) {
   const t = THEME_PRESETS[theme] || THEME_PRESETS['Dawn']!;
   
   const lines = code.split('\n').map(l => l.trim());
+  let inThemeStyle = false;
 
   lines.forEach((line) => {
+    if (line.startsWith('%% THEME_STYLE_START')) {
+       inThemeStyle = true;
+       return;
+    }
+    if (line.startsWith('%% THEME_STYLE_END')) {
+       inThemeStyle = false;
+       return;
+    }
+    if (inThemeStyle) return;
+    
     if (line.startsWith('%% POSITIONS: ')) return;
     if (!line || line.startsWith('graph') || line.startsWith('mindmap')) return;
     
@@ -298,23 +309,57 @@ function parseFlowToMermaid(nodes: Node[], edges: Edge[], layout: string, theme:
   else direction = 'LR'; // Default for FISHBONE, LOGIC_CHART, etc.
 
   mermaid += `graph ${direction}\n`;
-  let styles = '';
+  const t = THEME_PRESETS[theme] || THEME_PRESETS['Dawn']!;
+  let customStyles = '';
+  let themeStyles = '%% THEME_STYLE_START\n';
+
   nodes.forEach(n => {
     const label = (n.data.label as string) || n.id;
     mermaid += `    ${n.id}["${label}"]\n`;
     
-    const styleStr = [];
+    // Theme Styles
+    const level = n.data.level as number;
+    const bIdx = (n.data.branchIndex as number) || 0;
+    const paletteColor = t.palette[bIdx % t.palette.length];
+    
+    let themeBg = 'none';
+    let themeColor = '#475569';
+    let themeStroke = 'none';
+    
+    if (level === 0) {
+        themeBg = t.rootBg;
+        themeColor = t.rootColor;
+    } else if (level === 1) {
+        themeBg = '#FFFFFF';
+        themeColor = paletteColor;
+        themeStroke = paletteColor;
+    }
+    themeStyles += `    style ${n.id} fill:${themeBg},color:${themeColor},stroke:${themeStroke},stroke-width:2px\n`;
+    
+    // Custom Styles
+    let styleStr = [];
     if (n.data.customBg) styleStr.push(`fill:${n.data.customBg}`);
     if (n.data.customColor) styleStr.push(`color:${n.data.customColor}`);
     
     if (styleStr.length > 0) {
-       styles += `    style ${n.id} ${styleStr.join(',')}\n`;
+       customStyles += `    style ${n.id} ${styleStr.join(',')}\n`;
     }
   });
-  edges.forEach(e => {
+  
+  let linkStyles = '%% THEME_STYLE_START\n';
+  edges.forEach((e, idx) => {
     mermaid += `    ${e.source} --> ${e.target}\n`;
+    const targetNode = nodes.find(n => n.id === e.target);
+    const bIdx = (targetNode?.data.branchIndex as number) || 0;
+    const paletteColor = t.palette[bIdx % t.palette.length];
+    const width = targetNode?.data.level === 1 ? '3px' : '2px';
+    linkStyles += `    linkStyle ${idx} stroke:${paletteColor},stroke-width:${width}\n`;
   });
-  return mermaid + styles;
+  
+  themeStyles += '%% THEME_STYLE_END\n';
+  linkStyles += '%% THEME_STYLE_END\n';
+
+  return mermaid + themeStyles + linkStyles + customStyles;
 }
 
 export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOnly = false }: MindmapEditorProps) {
@@ -332,6 +377,44 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
       });
       setHistoryIndex(prev => prev >= 19 ? 19 : prev + 1);
   }, [historyIndex]);
+
+  const applyTheme = useCallback((themeName: string, nds: Node[], eds: Edge[]) => {
+      const t = THEME_PRESETS[themeName] || THEME_PRESETS['Dawn']!;
+      const newNodes = nds.map(n => {
+          const level = n.data.level as number;
+          const bIdx = (n.data.branchIndex as number) || 0;
+          const paletteColor = t.palette[bIdx % t.palette.length];
+          const newStyle: any = { ...n.style };
+          
+          if (level === 0) {
+              Object.assign(newStyle, { background: t.rootBg, color: t.rootColor, border: 'none', borderRadius: '8px', padding: '14px 24px', fontWeight: 'bold', fontSize: '16px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' });
+          } else if (level === 1) {
+              Object.assign(newStyle, { background: '#FFFFFF', color: paletteColor, border: `2px solid ${paletteColor}`, borderRadius: '20px', padding: '10px 20px', fontWeight: 'bold', fontSize: '14px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' });
+          } else {
+              Object.assign(newStyle, { background: 'transparent', color: '#475569', border: 'none', borderBottom: `2px solid ${paletteColor}`, borderRadius: '0', padding: '6px 12px', fontWeight: '500', fontSize: '13px' });
+          }
+          
+          if (n.data.customBg) newStyle.background = n.data.customBg as string;
+          if (n.data.customColor) newStyle.color = n.data.customColor as string;
+          
+          return { ...n, style: newStyle };
+      });
+      
+      const newEdges = eds.map(e => {
+          const targetNode = nds.find(n => n.id === e.target);
+          const bIdx = (targetNode?.data.branchIndex as number) || 0;
+          const paletteColor = t.palette[bIdx % t.palette.length];
+          return {
+              ...e,
+              style: { ...e.style, stroke: paletteColor, strokeWidth: targetNode?.data.level === 1 ? 3 : 2 },
+              markerEnd: { type: MarkerType.ArrowClosed, color: paletteColor }
+          };
+      });
+      
+      setNodes(newNodes);
+      setEdges(newEdges);
+      setTimeout(() => pushHistory(newNodes, newEdges), 100);
+  }, [pushHistory]);
 
   const handleUndo = useCallback(() => {
       if (historyIndex > 0) {
@@ -755,7 +838,7 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
                               <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-3 block">Color Theme (Bảng màu)</label>
                               <div className="grid gap-2">
                                   {Object.keys(THEME_PRESETS).map(theme => (
-                                      <button key={theme} onClick={() => { setColorTheme(theme); applyLayout(nodes, edges); }} className={`p-3 rounded-xl border text-left transition-all flex flex-col gap-2 ${colorTheme === theme ? 'border-cyan-500 bg-cyan-50 shadow-sm' : 'border-gray-200 hover:border-gray-300'}`}>
+                                      <button key={theme} onClick={() => { setColorTheme(theme); applyTheme(theme, nodes, edges); }} className={`p-3 rounded-xl border text-left transition-all flex flex-col gap-2 ${colorTheme === theme ? 'border-cyan-500 bg-cyan-50 shadow-sm' : 'border-gray-200 hover:border-gray-300'}`}>
                                           <span className="text-xs font-bold text-gray-700">{theme}</span>
                                           <div className="flex gap-1 h-3 rounded-full overflow-hidden w-full">
                                               {THEME_PRESETS[theme]?.palette.map(c => <div key={c} className="flex-1" style={{backgroundColor: c}}></div>)}
