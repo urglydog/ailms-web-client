@@ -146,8 +146,8 @@ function parseMermaidToFlow(code: string, theme: string) {
     if (line.startsWith('style ')) {
       const match = line.match(/^style\s+([^\s]+)\s+(.*)$/);
       if (match) {
-        const id = match[1];
-        const styles = match[2];
+        const id = match[1] as string;
+        const styles = match[2] as string;
         const fillMatch = styles.match(/fill:([^,]+)/);
         const colorMatch = styles.match(/color:([^,]+)/);
         
