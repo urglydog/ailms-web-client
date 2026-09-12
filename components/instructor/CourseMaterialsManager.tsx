@@ -1002,26 +1002,38 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
             )}
 
             {materialType === 'MINDMAP' && (
-              <div className="grid grid-cols-2 gap-3">
-                <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
-                  Mẫu sơ đồ (Template)
-                  <select
-                    value={mapTemplate}
-                    onChange={(e) => setMapTemplate(e.target.value)}
-                    className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-cyan-500 focus:outline-none"
-                  >
-                    <option value="MINDMAP">Sơ đồ tư duy (Mind Map)</option>
-                    <option value="LOGIC_CHART">Sơ đồ logic (Logic Chart)</option>
-                    <option value="BRACE_MAP">Sơ đồ dấu ngoặc (Brace Map)</option>
-                    <option value="ORG_CHART">Sơ đồ tổ chức (Org Chart)</option>
-                  </select>
-                </label>
+              <div className="flex flex-col gap-4">
+                <div>
+                  <label className="text-sm font-bold text-gray-700 block mb-3">Mẫu sơ đồ (Template)</label>
+                  <div className="grid grid-cols-4 gap-2">
+                    {[
+                      { id: 'MINDMAP', name: 'Mind Map', icon: '🔀' },
+                      { id: 'LOGIC_CHART', name: 'Logic Chart', icon: '➡️' },
+                      { id: 'BRACE_MAP', name: 'Brace Map', icon: '❴' },
+                      { id: 'ORG_CHART', name: 'Org Chart', icon: '🏢' },
+                      { id: 'TREE_TABLE', name: 'Tree Table', icon: '🗂️' },
+                      { id: 'MATRIX', name: 'Matrix', icon: '▦' },
+                      { id: 'FISHBONE', name: 'Fishbone', icon: '🐟' },
+                      { id: 'TIMELINE', name: 'Timeline', icon: '⏳' },
+                    ].map(tpl => (
+                      <div 
+                        key={tpl.id} 
+                        onClick={() => setMapTemplate(tpl.id)}
+                        className={`cursor-pointer border rounded-xl p-3 flex flex-col items-center justify-center gap-2 transition-all ${mapTemplate === tpl.id ? 'border-cyan-500 bg-cyan-50 shadow-sm ring-1 ring-cyan-500' : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50 bg-white'}`}
+                      >
+                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-xl ${mapTemplate === tpl.id ? 'bg-cyan-100/50 opacity-100' : 'bg-gray-50 grayscale opacity-60'}`}>{tpl.icon}</div>
+                        <span className={`text-[11px] font-bold text-center ${mapTemplate === tpl.id ? 'text-cyan-700' : 'text-gray-500'}`}>{tpl.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
                 <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
                   Mức độ chi tiết nhánh
                   <select
                     value={quantityLevel}
                     onChange={(e) => setQuantityLevel(e.target.value as 'FEWER' | 'STANDARD' | 'MORE')}
-                    className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-cyan-500 focus:outline-none"
+                    className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/20"
                   >
                     <option value="FEWER">Cơ bản, nhánh chính</option>
                     <option value="STANDARD">Tiêu chuẩn, vừa phải</option>
