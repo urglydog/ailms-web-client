@@ -271,6 +271,7 @@ function parseFlowToMermaid(nodes: Node[], edges: Edge[], layout: string, theme:
   let direction = layout;
   if (layout === 'ORG_CHART' || layout === 'TB') direction = 'TB';
   else if (layout === 'RL') direction = 'RL';
+  else if (layout === 'BT') direction = 'BT';
   else direction = 'LR'; // Default for FISHBONE, LOGIC_CHART, etc.
 
   mermaid += `graph ${direction}\n`;
