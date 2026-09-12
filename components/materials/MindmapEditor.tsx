@@ -259,11 +259,11 @@ function parseMermaidToFlow(code: string, theme: string) {
       const paletteColor = t.palette[bIdx % t.palette.length] || '#000000';
 
       if (level === 0) {
-          Object.assign(n.style as object, { background: t.rootBg, color: t.rootColor, border: 'none', borderRadius: '8px', padding: '14px 24px', fontWeight: 'bold', fontSize: '16px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' });
+          n.style = { background: t.rootBg, color: t.rootColor, border: 'none', borderRadius: '8px', padding: '14px 24px', fontWeight: 'bold', fontSize: '16px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' };
       } else if (level === 1) {
-          Object.assign(n.style as object, { background: '#FFFFFF', color: paletteColor, border: `2px solid ${paletteColor}`, borderRadius: '20px', padding: '10px 20px', fontWeight: 'bold', fontSize: '14px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' });
+          n.style = { background: '#FFFFFF', color: paletteColor, border: `2px solid ${paletteColor}`, borderRadius: '20px', padding: '10px 20px', fontWeight: 'bold', fontSize: '14px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' };
       } else {
-          Object.assign(n.style as object, { background: 'transparent', color: '#475569', border: 'none', borderBottom: `2px solid ${paletteColor}`, borderRadius: '0', padding: '6px 12px', fontWeight: '500', fontSize: '13px' });
+          n.style = { background: 'transparent', color: '#475569', border: 'none', borderBottom: `2px solid ${paletteColor}`, borderRadius: '0', padding: '6px 12px', fontWeight: '500', fontSize: '13px' };
       }
       
       const shape = n.data.shape as string;
