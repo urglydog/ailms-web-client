@@ -13,7 +13,6 @@ import {
   NodeChange,
   EdgeChange,
   Connection,
-  Panel,
   MarkerType,
   useReactFlow,
   ReactFlowProvider,
@@ -68,7 +67,7 @@ function getLayoutedElements(nodes: Node[], edges: Edge[], direction = 'LR') {
 }
 
 function parseMermaidToFlow(code: string) {
-  let nodes: Node[] = [];
+  const nodes: Node[] = [];
   const edges: Edge[] = [];
   const nodeMap = new Map<string, Node>();
   
@@ -433,7 +432,7 @@ function FlowEditor({ initialMermaidCode, onSave, readOnly = false }: MindmapEdi
                   {['Style', 'Pitch', 'Map'].map(tab => (
                       <button 
                           key={tab}
-                          onClick={() => setActiveTab(tab as any)}
+                          onClick={() => setActiveTab(tab as 'Style' | 'Pitch' | 'Map')}
                           className={`flex-1 py-2 text-sm font-bold rounded-lg transition-colors ${activeTab === tab ? 'bg-gray-100 text-gray-800' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'}`}
                       >
                           {tab}
