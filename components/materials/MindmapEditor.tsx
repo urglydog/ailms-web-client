@@ -16,6 +16,7 @@ import {
   MarkerType,
   useReactFlow,
   ReactFlowProvider,
+  Position,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import dagre from 'dagre';
@@ -49,8 +50,8 @@ function getLayoutedElements(nodes: Node[], edges: Edge[], direction = 'LR') {
 
   const newNodes = nodes.map((node) => {
     const nodeWithPosition = dagreGraph.node(node.id);
-    const targetPosition = isHorizontal ? 'left' : 'top';
-    const sourcePosition = isHorizontal ? 'right' : 'bottom';
+    const targetPosition = isHorizontal ? Position.Left : Position.Top;
+    const sourcePosition = isHorizontal ? Position.Right : Position.Bottom;
 
     return {
       ...node,
