@@ -19,7 +19,8 @@ import {
   Position,
   MiniMap,
   Panel,
-  PanOnScrollMode
+  PanOnScrollMode,
+  getNodesBounds
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import dagre from 'dagre';
@@ -403,14 +404,22 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
     if (ref.current) {
         const flowEl = ref.current.querySelector('.react-flow__viewport') as HTMLElement;
         if (!flowEl) return;
+        
+        const nodesBounds = getNodesBounds(nodes);
+        const transformX = -nodesBounds.x + 50;
+        const transformY = -nodesBounds.y + 50;
+        const width = nodesBounds.width + 100;
+        const height = nodesBounds.height + 100;
+
         const oldTransform = flowEl.style.transform;
-        flowEl.style.transform = 'translate(0,0) scale(1)';
+        flowEl.style.transform = `translate(${transformX}px, ${transformY}px) scale(1)`;
+        
         const bg = THEME_PRESETS[colorTheme]?.background || '#FFFFFF';
         try {
             let dataUrl = '';
-            if (type === 'png') dataUrl = await toPng(flowEl, { backgroundColor: bg });
-            if (type === 'jpeg') dataUrl = await toJpeg(flowEl, { backgroundColor: bg, quality: 0.95 });
-            if (type === 'svg') dataUrl = await toSvg(flowEl, { backgroundColor: bg });
+            if (type === 'png') dataUrl = await toPng(flowEl, { backgroundColor: bg, width, height, style: { width: `${width}px`, height: `${height}px` } });
+            if (type === 'jpeg') dataUrl = await toJpeg(flowEl, { backgroundColor: bg, quality: 0.95, width, height, style: { width: `${width}px`, height: `${height}px` } });
+            if (type === 'svg') dataUrl = await toSvg(flowEl, { backgroundColor: bg, width, height, style: { width: `${width}px`, height: `${height}px` } });
             const a = document.createElement('a');
             a.href = dataUrl;
             a.download = `mindmap.${type}`;
@@ -487,12 +496,23 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
            return newNodes;
         });
       }
+      
+      // FIX 2: Shortcuts
+      if (e.key === 's' && (e.ctrlKey || e.metaKey)) {
+          e.preventDefault();
+          if (onSave) {
+              const newCode = parseFlowToMermaid(nodes, edges, mapStyle, colorTheme);
+              onSave(newCode);
+              alert("Lưu sơ đồ thành công!");
+          }
+      }
+      
       if (e.key === 'Tab') { e.preventDefault(); triggerAction('TAB'); }
       if (e.key === 'Enter') { e.preventDefault(); triggerAction('ENTER'); }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [editingNode, readOnly, nodes, edges, applyLayout, triggerAction]);
+  }, [editingNode, readOnly, nodes, edges, applyLayout, triggerAction, mapStyle, colorTheme, onSave]);
 
   const hasSelectedNode = nodes.some(n => n.selected);
 
@@ -597,9 +617,12 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
                 onKeyDown={(e) => {
                     if (e.key === 'Enter' && !e.shiftKey) {
                         e.preventDefault();
-                        setNodes((nds) => nds.map((n) => n.id === editingNode.id ? { ...n, data: { ...n.data, label: editingNode.label.trim() } } : n));
+                        setNodes((nds) => {
+                            const newNodes = nds.map((n) => n.id === editingNode.id ? { ...n, data: { ...n.data, label: editingNode.label.trim() } } : n);
+                            setTimeout(() => applyLayout(newNodes, edges), 0);
+                            return newNodes;
+                        });
                         setEditingNode(null);
-                        setTimeout(() => applyLayout(nodes, edges), 0);
                     }
                 }}
                 className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-accent/20 focus:border-accent resize-none h-28 text-gray-700 outline-none transition-all font-medium"
@@ -607,9 +630,12 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
               <div className="flex gap-2 justify-end mt-5">
                 <button onClick={() => setEditingNode(null)} className="px-4 py-2.5 bg-gray-50 text-gray-600 rounded-xl text-xs font-bold hover:bg-gray-100">Hủy</button>
                 <button onClick={() => {
-                    setNodes((nds) => nds.map((n) => n.id === editingNode.id ? { ...n, data: { ...n.data, label: editingNode.label.trim() } } : n));
+                    setNodes((nds) => {
+                        const newNodes = nds.map((n) => n.id === editingNode.id ? { ...n, data: { ...n.data, label: editingNode.label.trim() } } : n);
+                        setTimeout(() => applyLayout(newNodes, edges), 0);
+                        return newNodes;
+                    });
                     setEditingNode(null);
-                    setTimeout(() => applyLayout(nodes, edges), 0);
                   }}
                   className="px-5 py-2.5 bg-accent text-white rounded-xl text-xs font-bold hover:bg-accent/90 shadow-sm"
                 >Cập nhật</button>
