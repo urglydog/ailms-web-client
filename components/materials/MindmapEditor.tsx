@@ -176,22 +176,32 @@ function parseMermaidToFlow(code: string, theme: string) {
     
     const edgeParts = line.split(/\s*-->\s*/);
     const partIds = edgeParts.map((part) => {
-      const match = part.match(/^([^\[\]\(\)\s]+)(?:\["?(.*?)"?\]|\("?(.*?)"?\))?$/);
+      const match = part.match(/^([^\s\[\]\(\)\{\}]+)(?:\["?(.*?)"?\]|\(\("?(.*?)"?\)\)|\("?(.*?)"?\)|\{"?(.*?)"?\})?$/);
       if (match) {
-        const id = match[1] || '';
-        const label = match[2] || match[3];
+        const id = match[1] as string;
+        const rectLbl = match[2];
+        const circleLbl = match[3];
+        const roundedLbl = match[4];
+        const rhombusLbl = match[5];
+        const label = rectLbl || circleLbl || roundedLbl || rhombusLbl;
+        
+        let shape = 'rect';
+        if (circleLbl) shape = 'circle';
+        else if (roundedLbl) shape = 'rounded';
+        else if (rhombusLbl) shape = 'rhombus';
         
         if (!nodeMap.has(id)) {
            const newNode: Node = {
              id,
              position: { x: 0, y: 0 },
-             data: { label: label || id, level: 0 },
+             data: { label: label || id, level: 0, shape },
            };
            nodes.push(newNode);
            nodeMap.set(id, newNode);
         } else if (label) {
            const existing = nodeMap.get(id)!;
            existing.data.label = label;
+           existing.data.shape = shape;
         }
         return id;
       }
@@ -249,15 +259,22 @@ function parseMermaidToFlow(code: string, theme: string) {
       const paletteColor = t.palette[bIdx % t.palette.length] || '#000000';
 
       if (level === 0) {
-          n.style = { background: t.rootBg, color: t.rootColor, border: 'none', borderRadius: '8px', padding: '14px 24px', fontWeight: 'bold', fontSize: '16px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' };
+          Object.assign(n.style as object, { background: t.rootBg, color: t.rootColor, border: 'none', borderRadius: '8px', padding: '14px 24px', fontWeight: 'bold', fontSize: '16px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' });
       } else if (level === 1) {
-          n.style = { background: '#FFFFFF', color: paletteColor, border: `2px solid ${paletteColor}`, borderRadius: '20px', padding: '10px 20px', fontWeight: 'bold', fontSize: '14px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' };
+          Object.assign(n.style as object, { background: '#FFFFFF', color: paletteColor, border: `2px solid ${paletteColor}`, borderRadius: '20px', padding: '10px 20px', fontWeight: 'bold', fontSize: '14px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' });
       } else {
-          n.style = { background: 'transparent', color: '#475569', border: 'none', borderBottom: `2px solid ${paletteColor}`, borderRadius: '0', padding: '6px 12px', fontWeight: '500', fontSize: '13px' };
+          Object.assign(n.style as object, { background: 'transparent', color: '#475569', border: 'none', borderBottom: `2px solid ${paletteColor}`, borderRadius: '0', padding: '6px 12px', fontWeight: '500', fontSize: '13px' });
       }
       
-      if (n.data.customBg) n.style.background = n.data.customBg as string;
-      if (n.data.customColor) n.style.color = n.data.customColor as string;
+      const shape = n.data.shape as string;
+      if (shape === 'rounded') n.style!.borderRadius = '20px';
+      if (shape === 'circle') { n.style!.borderRadius = '50%'; n.style!.width = '80px'; n.style!.height = '80px'; n.style!.display = 'flex'; n.style!.alignItems = 'center'; n.style!.justifyContent = 'center'; n.style!.textAlign = 'center'; }
+      if (shape === 'rhombus') { n.style!.borderRadius = '0'; n.style!.transform = 'rotate(45deg)'; /* basic representation */ }
+      
+      if (n.data.customBg) n.style!.background = n.data.customBg as string;
+      if (n.data.customColor) n.style!.color = n.data.customColor as string;
+      if (n.data.isBold) n.style!.fontWeight = '900';
+      if (n.data.isItalic) n.style!.fontStyle = 'italic';
   });
 
   edges.forEach(e => {
@@ -315,7 +332,16 @@ function parseFlowToMermaid(nodes: Node[], edges: Edge[], layout: string, theme:
 
   nodes.forEach(n => {
     const label = (n.data.label as string) || n.id;
-    mermaid += `    ${n.id}["${label}"]\n`;
+    let mdLabel = label;
+    if (n.data.isBold && n.data.isItalic) mdLabel = `***${label}***`;
+    else if (n.data.isBold) mdLabel = `**${label}**`;
+    else if (n.data.isItalic) mdLabel = `*${label}*`;
+
+    const shape = n.data.shape || 'rect';
+    if (shape === 'rounded') mermaid += `    ${n.id}("${mdLabel}")\n`;
+    else if (shape === 'circle') mermaid += `    ${n.id}(("${mdLabel}"))\n`;
+    else if (shape === 'rhombus') mermaid += `    ${n.id}{"${mdLabel}"}\n`;
+    else mermaid += `    ${n.id}["${mdLabel}"]\n`;
     
     // Theme Styles
     const level = n.data.level as number;
@@ -394,8 +420,15 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
               Object.assign(newStyle, { background: 'transparent', color: '#475569', border: 'none', borderBottom: `2px solid ${paletteColor}`, borderRadius: '0', padding: '6px 12px', fontWeight: '500', fontSize: '13px' });
           }
           
+          const shape = n.data.shape as string;
+          if (shape === 'rounded') newStyle.borderRadius = '20px';
+          if (shape === 'circle') { newStyle.borderRadius = '50%'; newStyle.width = '80px'; newStyle.height = '80px'; newStyle.display = 'flex'; newStyle.alignItems = 'center'; newStyle.justifyContent = 'center'; newStyle.textAlign = 'center'; }
+          if (shape === 'rhombus') { newStyle.borderRadius = '0'; newStyle.transform = 'rotate(45deg)'; }
+          
           if (n.data.customBg) newStyle.background = n.data.customBg as string;
           if (n.data.customColor) newStyle.color = n.data.customColor as string;
+          if (n.data.isBold) newStyle.fontWeight = '900';
+          if (n.data.isItalic) newStyle.fontStyle = 'italic';
           
           return { ...n, style: newStyle };
       });
@@ -581,28 +614,44 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
       if (!selectedNode) return;
       
       const newId = `node_${Date.now()}`;
-      const newNode: Node = { id: newId, position: { x: 0, y: 0 }, data: { label: 'Nhánh mới' } };
+      const newNode: Node = { 
+          id: newId, 
+          position: { x: selectedNode.position.x + 100, y: selectedNode.position.y + 50 }, 
+          data: { 
+              label: 'Nhánh mới',
+              customBg: selectedNode.data.customBg,
+              customColor: selectedNode.data.customColor,
+              shape: selectedNode.data.shape,
+              isBold: selectedNode.data.isBold,
+              isItalic: selectedNode.data.isItalic
+          },
+          selected: true,
+          style: { ...selectedNode.style }
+      };
 
       if (action === 'TAB') {
-        setNodes(nds => [...nds, newNode]);
-        const newEdge: Edge = { id: `e-${selectedNode.id}-${newId}`, source: selectedNode.id, target: newId };
+        const nextNodes = [...nodes.map(n => ({...n, selected: false})), newNode];
+        const newEdge: Edge = { id: `e-${selectedNode.id}-${newId}`, source: selectedNode.id, target: newId, animated: true };
+        setNodes(nextNodes);
         setEdges(eds => {
             const nextEds = [...eds, newEdge];
-            setTimeout(() => applyLayout([...nodes, newNode], nextEds), 0);
+            setTimeout(() => applyLayout(nextNodes, nextEds), 0);
             return nextEds;
         });
       }
 
       if (action === 'ENTER') {
-        const parentEdge = edges.find(ed => ed.target === selectedNode.id);
         if (selectedNode.id === 'root') return; // root cannot have sibling
+        const parentEdge = edges.find(ed => ed.target === selectedNode.id);
         
-        setNodes(nds => [...nds, newNode]);
+        const nextNodes = [...nodes.map(n => ({...n, selected: false})), newNode];
+        setNodes(nextNodes);
+        
         if (parentEdge) {
-            const newEdge: Edge = { id: `e-${parentEdge.source}-${newId}`, source: parentEdge.source, target: newId };
+            const newEdge: Edge = { id: `e-${parentEdge.source}-${newId}`, source: parentEdge.source, target: newId, animated: true };
             setEdges(eds => {
                 const nextEds = [...eds, newEdge];
-                setTimeout(() => applyLayout([...nodes, newNode], nextEds), 0);
+                setTimeout(() => applyLayout(nextNodes, nextEds), 0);
                 return nextEds;
             });
         }
@@ -854,29 +903,75 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
                         {nodes.filter(n => n.selected).length === 1 ? (
                             <div className="space-y-4">
                                 <div className="border p-4 rounded-xl border-gray-200">
+                                    <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-3 block">Định dạng Khối (Shape)</label>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        {[
+                                            { id: 'rect', label: 'Vuông' },
+                                            { id: 'rounded', label: 'Bo Góc' },
+                                            { id: 'circle', label: 'Tròn' }
+                                        ].map(s => (
+                                            <button key={s.id} onClick={() => {
+                                                const selectedId = nodes.find(n => n.selected)!.id;
+                                                setNodes(nds => nds.map(n => n.id === selectedId ? {...n, data: {...n.data, shape: s.id}} : n));
+                                                setTimeout(() => applyTheme(colorTheme, nodes, edges), 0);
+                                            }} className={`py-1.5 text-xs font-bold rounded-lg border ${nodes.find(n => n.selected)?.data.shape === s.id || (s.id === 'rect' && !nodes.find(n => n.selected)?.data.shape) ? 'bg-cyan-50 border-cyan-500 text-cyan-700' : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'}`}>
+                                                {s.label}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div className="border p-4 rounded-xl border-gray-200">
                                     <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2 block">Màu Nền (Fill)</label>
                                     <div className="flex gap-2">
                                         <input type="color" className="w-10 h-10 rounded cursor-pointer border-0 p-0" onChange={(e) => {
                                             const selectedId = nodes.find(n => n.selected)!.id;
                                             setNodes(nds => nds.map(n => n.id === selectedId ? {...n, data: {...n.data, customBg: e.target.value}, style: {...n.style, background: e.target.value}} : n));
-                                        }} value={nodes.find(n => n.selected)?.data.customBg as string || '#ffffff'} />
+                                        }} value={(() => {
+                                            const sn = nodes.find(n => n.selected);
+                                            if (sn?.data.customBg) return sn.data.customBg as string;
+                                            const bg = sn?.style?.background as string;
+                                            if (bg && bg.startsWith('#') && bg.length === 7) return bg;
+                                            return '#ffffff';
+                                        })()} />
                                         <button onClick={() => {
                                             const selectedId = nodes.find(n => n.selected)!.id;
                                             setNodes(nds => nds.map(n => n.id === selectedId ? {...n, data: {...n.data, customBg: undefined}, style: {...n.style, background: undefined}} : n));
-                                        }} className="text-xs bg-gray-100 hover:bg-gray-200 px-3 rounded text-gray-600 font-bold">Xóa</button>
+                                            setTimeout(() => applyTheme(colorTheme, nodes, edges), 0);
+                                        }} className="text-xs bg-gray-100 hover:bg-gray-200 px-3 rounded text-gray-600 font-bold">Về mặc định</button>
                                     </div>
                                 </div>
                                 <div className="border p-4 rounded-xl border-gray-200">
-                                    <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2 block">Màu Chữ (Text)</label>
+                                    <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2 block">Văn Bản (Text)</label>
+                                    <div className="flex gap-2 mb-3">
+                                        <button onClick={() => {
+                                            const selectedId = nodes.find(n => n.selected)!.id;
+                                            const sn = nodes.find(n => n.selected)!;
+                                            setNodes(nds => nds.map(n => n.id === selectedId ? {...n, data: {...n.data, isBold: !sn.data.isBold}} : n));
+                                            setTimeout(() => applyTheme(colorTheme, nodes, edges), 0);
+                                        }} className={`flex-1 py-1.5 text-xs font-bold rounded-lg border ${nodes.find(n => n.selected)?.data.isBold ? 'bg-gray-800 text-white border-gray-800' : 'bg-gray-50 text-gray-600 border-gray-200'}`}>B</button>
+                                        <button onClick={() => {
+                                            const selectedId = nodes.find(n => n.selected)!.id;
+                                            const sn = nodes.find(n => n.selected)!;
+                                            setNodes(nds => nds.map(n => n.id === selectedId ? {...n, data: {...n.data, isItalic: !sn.data.isItalic}} : n));
+                                            setTimeout(() => applyTheme(colorTheme, nodes, edges), 0);
+                                        }} className={`flex-1 py-1.5 text-xs italic rounded-lg border ${nodes.find(n => n.selected)?.data.isItalic ? 'bg-gray-800 text-white border-gray-800' : 'bg-gray-50 text-gray-600 border-gray-200'}`}>I</button>
+                                    </div>
                                     <div className="flex gap-2">
                                         <input type="color" className="w-10 h-10 rounded cursor-pointer border-0 p-0" onChange={(e) => {
                                             const selectedId = nodes.find(n => n.selected)!.id;
                                             setNodes(nds => nds.map(n => n.id === selectedId ? {...n, data: {...n.data, customColor: e.target.value}, style: {...n.style, color: e.target.value}} : n));
-                                        }} value={nodes.find(n => n.selected)?.data.customColor as string || '#000000'} />
+                                        }} value={(() => {
+                                            const sn = nodes.find(n => n.selected);
+                                            if (sn?.data.customColor) return sn.data.customColor as string;
+                                            const c = sn?.style?.color as string;
+                                            if (c && c.startsWith('#') && c.length === 7) return c;
+                                            return '#000000';
+                                        })()} />
                                         <button onClick={() => {
                                             const selectedId = nodes.find(n => n.selected)!.id;
                                             setNodes(nds => nds.map(n => n.id === selectedId ? {...n, data: {...n.data, customColor: undefined}, style: {...n.style, color: undefined}} : n));
-                                        }} className="text-xs bg-gray-100 hover:bg-gray-200 px-3 rounded text-gray-600 font-bold">Xóa</button>
+                                            setTimeout(() => applyTheme(colorTheme, nodes, edges), 0);
+                                        }} className="text-xs bg-gray-100 hover:bg-gray-200 px-3 rounded text-gray-600 font-bold">Về mặc định</button>
                                     </div>
                                 </div>
                                 <div className="text-xs text-gray-400 mt-2 text-center">Tùy chỉnh sẽ được đồng bộ khi bạn nhấn &quot;Lưu &amp; Áp dụng&quot;</div>
@@ -884,7 +979,7 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
                         ) : (
                             <div className="text-center text-gray-400 text-sm mt-10 p-4 border border-dashed rounded-xl border-gray-200">
                                 <strong>Node Style</strong><br/><br/>
-                                Hãy click chọn một node cụ thể trên bản đồ để tuỳ chỉnh Màu nền và Màu chữ.
+                                Hãy click chọn một node cụ thể trên bản đồ để tuỳ chỉnh Shape, Font, Màu nền và Màu chữ.
                             </div>
                         )}
                       </div>
