@@ -291,6 +291,33 @@ function parseMermaidToFlow(code: string, theme: string) {
   return { nodes, edges };
 }
 
+function parseFlowToMarkdownList(nodes: Node[], edges: Edge[]): string {
+    if (nodes.length === 0) return '';
+    const rootNodes = nodes.filter(n => !edges.find(e => e.target === n.id));
+    const root = rootNodes[0] || nodes[0];
+    
+    let md = '';
+    
+    const dfs = (nodeId: string, level: number) => {
+        const node = nodes.find(n => n.id === nodeId);
+        if (!node) return;
+        const label = node.data.label as string;
+        if (level === 0) {
+            md += `# ${label}\n`;
+        } else {
+            md += `${'  '.repeat(level - 1)}- ${label}\n`;
+        }
+        
+        const children = edges.filter(e => e.source === nodeId).map(e => e.target);
+        for (const childId of children) {
+            dfs(childId, level + 1);
+        }
+    };
+    
+    if (root) dfs(root.id, 0);
+    return md;
+}
+
 function parseFlowToMermaid(nodes: Node[], edges: Edge[], layout: string, theme: string) {
   let mermaid = `%% CONFIG: {"layout":"${layout}","theme":"${theme}"}\n`;
   mermaid += 'graph LR\n';
@@ -307,6 +334,37 @@ function parseFlowToMermaid(nodes: Node[], edges: Edge[], layout: string, theme:
 export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOnly = false }: MindmapEditorProps) {
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
+  const [history, setHistory] = useState<{nodes: Node[], edges: Edge[]}[]>([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+
+  const pushHistory = useCallback((newNodes: Node[], newEdges: Edge[]) => {
+      setHistory(prev => {
+          const newHistory = prev.slice(0, historyIndex + 1);
+          newHistory.push({ nodes: newNodes, edges: newEdges });
+          if (newHistory.length > 20) newHistory.shift(); // Keep 20 steps
+          return newHistory;
+      });
+      setHistoryIndex(prev => prev >= 19 ? 19 : prev + 1);
+  }, [historyIndex]);
+
+  const handleUndo = useCallback(() => {
+      if (historyIndex > 0) {
+          const prevState = history[historyIndex - 1];
+          setNodes(prevState.nodes);
+          setEdges(prevState.edges);
+          setHistoryIndex(historyIndex - 1);
+      }
+  }, [history, historyIndex]);
+
+  const handleRedo = useCallback(() => {
+      if (historyIndex < history.length - 1) {
+          const nextState = history[historyIndex + 1];
+          setNodes(nextState.nodes);
+          setEdges(nextState.edges);
+          setHistoryIndex(historyIndex + 1);
+      }
+  }, [history, historyIndex]);
+
   const [editingNode, setEditingNode] = useState<{ id: string; label: string } | null>(null);
   const { fitView } = useReactFlow();
 
@@ -361,14 +419,16 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
   }, []);
 
   // FIX 5: Layout Re-render
-  const applyLayout = useCallback((nds: Node[], eds: Edge[]) => {
-    const tempMermaid = parseFlowToMermaid(nds, eds, mapStyle, colorTheme);
+  const applyLayout = useCallback((nds: Node[], eds: Edge[], layoutOverride?: string) => {
+    const layoutToUse = layoutOverride || mapStyle;
+    const tempMermaid = parseFlowToMermaid(nds, eds, layoutToUse, colorTheme);
     const { nodes: parsedNodes, edges: parsedEdges } = parseMermaidToFlow(tempMermaid, colorTheme);
-    const layouted = getLayoutedElements(parsedNodes, parsedEdges, mapStyle);
+    const layouted = getLayoutedElements(parsedNodes, parsedEdges, layoutToUse);
     setNodes(layouted.nodes);
     setEdges(layouted.edges);
+    pushHistory(layouted.nodes, layouted.edges);
     setTimeout(() => fitView({ duration: 300 }), 50);
-  }, [mapStyle, colorTheme, fitView]);
+  }, [mapStyle, colorTheme, fitView, pushHistory]);
 
   const onNodesChange = useCallback((changes: NodeChange[]) => {
       setNodes((nds) => {
@@ -393,7 +453,7 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
   const handleExport = useCallback(async (type: 'png' | 'jpeg' | 'svg' | 'md') => {
     setShowExport(false);
     if (type === 'md') {
-        const md = parseFlowToMermaid(nodes, edges, mapStyle, colorTheme);
+        const md = parseFlowToMarkdownList(nodes, edges);
         const blob = new Blob([md], { type: 'text/markdown' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
@@ -498,6 +558,16 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
       }
       
       // FIX 2: Shortcuts
+      if (e.key === 'z' && (e.ctrlKey || e.metaKey)) {
+          e.preventDefault();
+          if (e.shiftKey) handleRedo();
+          else handleUndo();
+      }
+      if (e.key === 'y' && (e.ctrlKey || e.metaKey)) {
+          e.preventDefault();
+          handleRedo();
+      }
+
       if (e.key === 's' && (e.ctrlKey || e.metaKey)) {
           e.preventDefault();
           if (onSave) {
@@ -512,7 +582,7 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [editingNode, readOnly, nodes, edges, applyLayout, triggerAction, mapStyle, colorTheme, onSave]);
+  }, [editingNode, readOnly, nodes, edges, applyLayout, triggerAction, mapStyle, colorTheme, onSave, handleUndo, handleRedo]);
 
   const hasSelectedNode = nodes.some(n => n.selected);
 
@@ -539,7 +609,7 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
                 {showLayouts && (
                     <div className="absolute top-full left-0 mt-2 w-64 bg-white border border-gray-200 rounded-xl shadow-2xl p-3 grid grid-cols-2 gap-2 z-50">
                         {LAYOUTS.map(l => (
-                            <button key={l.id} onClick={() => { setMapStyle(l.id); setShowLayouts(false); applyLayout(nodes, edges); }} className={`flex flex-col items-center justify-center p-3 rounded-lg border transition-all ${mapStyle === l.id ? 'border-cyan-500 bg-cyan-50' : 'border-gray-100 hover:border-gray-300 hover:bg-gray-50'}`}>
+                            <button key={l.id} onClick={() => { setMapStyle(l.id); setShowLayouts(false); applyLayout(nodes, edges, l.id); }} className={`flex flex-col items-center justify-center p-3 rounded-lg border transition-all ${mapStyle === l.id ? 'border-cyan-500 bg-cyan-50' : 'border-gray-100 hover:border-gray-300 hover:bg-gray-50'}`}>
                                 <span className="text-2xl mb-1">{l.icon}</span>
                                 <span className="text-[10px] font-bold text-center text-gray-600 leading-tight">{l.name}</span>
                             </button>
@@ -560,6 +630,28 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
                     </div>
                 )}
             </div>
+
+            <div className="w-[1px] h-8 bg-gray-200 mx-1"></div>
+            
+            <button onClick={handleUndo} disabled={historyIndex <= 0} className={`flex flex-col items-center justify-center p-2 rounded-lg min-w-[48px] transition-colors ${historyIndex > 0 ? 'hover:bg-gray-100 text-gray-600' : 'opacity-40 cursor-not-allowed text-gray-400'}`} title="Hoàn tác (Ctrl+Z)">
+                <span className="text-lg">↩️</span><span className="text-[10px] font-bold mt-1">Undo</span>
+            </button>
+            <button onClick={handleRedo} disabled={historyIndex >= history.length - 1} className={`flex flex-col items-center justify-center p-2 rounded-lg min-w-[48px] transition-colors ${historyIndex < history.length - 1 ? 'hover:bg-gray-100 text-gray-600' : 'opacity-40 cursor-not-allowed text-gray-400'}`} title="Làm lại (Ctrl+Y)">
+                <span className="text-lg">↪️</span><span className="text-[10px] font-bold mt-1">Redo</span>
+            </button>
+            
+            {onSave && (
+                <>
+                    <div className="w-[1px] h-8 bg-gray-200 mx-1"></div>
+                    <button onClick={() => {
+                        const newCode = parseFlowToMermaid(nodes, edges, mapStyle, colorTheme);
+                        onSave(newCode);
+                        alert("Lưu sơ đồ thành công!");
+                    }} className="flex flex-col items-center justify-center p-2 hover:bg-cyan-50 rounded-lg min-w-[80px] text-cyan-600 transition-colors border border-transparent hover:border-cyan-200">
+                        <span className="text-lg">💾</span><span className="text-[10px] font-bold mt-1">Lưu & Áp dụng</span>
+                    </button>
+                </>
+            )}
         </div>
       )}
 
@@ -681,18 +773,7 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
                   )}
               </div>
 
-              {/* FIX 2: Save Changes Button directly triggering without 2 steps, or keeping it but clearer */}
-              {onSave && (
-                  <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-100 bg-white/90 backdrop-blur">
-                      <button onClick={() => {
-                          const newCode = parseFlowToMermaid(nodes, edges, mapStyle, colorTheme);
-                          onSave(newCode);
-                          alert("Lưu sơ đồ thành công!");
-                      }} className="w-full bg-[#0284C7] hover:bg-[#0369A1] text-white py-3 rounded-xl font-bold shadow-md transition-all active:scale-95 flex items-center justify-center gap-2">
-                          💾 Lưu Thay Đổi
-                      </button>
-                  </div>
-              )}
+              {/* Removed old duplicate save button */}
           </div>
       )}
     </div>
