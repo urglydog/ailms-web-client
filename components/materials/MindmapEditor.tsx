@@ -19,8 +19,7 @@ import {
   Position,
   MiniMap,
   Panel,
-  PanOnScrollMode,
-  useStoreApi
+  PanOnScrollMode
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import dagre from 'dagre';
@@ -106,7 +105,6 @@ function getLayoutedElements(nodes: Node[], edges: Edge[], direction = 'LR') {
          return Array.from(desc);
      };
 
-     const rightIds = getDescendants(rightRootEdges.map(e => e.target));
      const leftIds = getDescendants(leftRootEdges.map(e => e.target));
 
      nodes.forEach(n => {
@@ -309,7 +307,6 @@ function parseFlowToMermaid(nodes: Node[], edges: Edge[], layout: string, theme:
 export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOnly = false }: MindmapEditorProps) {
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
-  const [confirmStep, setConfirmStep] = useState<0 | 1 | 2>(0);
   const [editingNode, setEditingNode] = useState<{ id: string; label: string } | null>(null);
   const { fitView } = useReactFlow();
 
@@ -341,8 +338,8 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
   const [isSidebarOpen, setIsSidebarOpen] = useState(!readOnly);
 
   const initData = useCallback(() => {
-    const { nodes: n, edges: e } = parseMermaidToFlow(initialMermaidCode, parsedConfig.theme);
-    const layouted = getLayoutedElements(n, e, parsedConfig.layout);
+    const { nodes: n, edges: ed } = parseMermaidToFlow(initialMermaidCode, parsedConfig.theme);
+    const layouted = getLayoutedElements(n, ed, parsedConfig.layout);
     setNodes(layouted.nodes);
     setEdges(layouted.edges);
     setTimeout(() => fitView(), 100);
@@ -421,7 +418,7 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
     }
   }, [nodes, edges, colorTheme]);
 
-  const triggerAction = (action: 'TAB' | 'ENTER') => {
+  const triggerAction = useCallback((action: 'TAB' | 'ENTER') => {
       const selectedNode = nodes.find(n => n.selected);
       if (!selectedNode) return;
       
@@ -452,7 +449,7 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
             });
         }
       }
-  };
+  }, [nodes, edges, applyLayout]);
 
   useEffect(() => {
     if (readOnly) return;
