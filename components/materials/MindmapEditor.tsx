@@ -906,16 +906,20 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
                                     <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-3 block">Định dạng Khối (Shape)</label>
                                     <div className="grid grid-cols-2 gap-2">
                                         {[
-                                            { id: 'rect', label: 'Vuông' },
-                                            { id: 'rounded', label: 'Bo Góc' },
-                                            { id: 'circle', label: 'Tròn' }
+                                            { id: 'rect', label: 'Vuông', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="6" width="18" height="12"></rect></svg> },
+                                            { id: 'rounded', label: 'Bo Góc', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="6" width="18" height="12" rx="6"></rect></svg> },
+                                            { id: 'circle', label: 'Tròn', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"></circle></svg> }
                                         ].map(s => (
                                             <button key={s.id} onClick={() => {
                                                 const selectedId = nodes.find(n => n.selected)!.id;
-                                                setNodes(nds => nds.map(n => n.id === selectedId ? {...n, data: {...n.data, shape: s.id}} : n));
-                                                setTimeout(() => applyTheme(colorTheme, nodes, edges), 0);
-                                            }} className={`py-1.5 text-xs font-bold rounded-lg border ${nodes.find(n => n.selected)?.data.shape === s.id || (s.id === 'rect' && !nodes.find(n => n.selected)?.data.shape) ? 'bg-cyan-50 border-cyan-500 text-cyan-700' : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'}`}>
-                                                {s.label}
+                                                setNodes(nds => {
+                                                    const nextNodes = nds.map(n => n.id === selectedId ? {...n, data: {...n.data, shape: s.id}} : n);
+                                                    setTimeout(() => applyTheme(colorTheme, nextNodes, edges), 0);
+                                                    return nextNodes;
+                                                });
+                                            }} className={`flex flex-col items-center gap-1 py-2 text-xs font-bold rounded-lg border transition-all ${nodes.find(n => n.selected)?.data.shape === s.id || (s.id === 'rect' && !nodes.find(n => n.selected)?.data.shape) ? 'bg-cyan-50 border-cyan-500 text-cyan-700' : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'}`}>
+                                                {s.icon}
+                                                <span>{s.label}</span>
                                             </button>
                                         ))}
                                     </div>
@@ -945,15 +949,21 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
                                     <div className="flex gap-2 mb-3">
                                         <button onClick={() => {
                                             const selectedId = nodes.find(n => n.selected)!.id;
-                                            const sn = nodes.find(n => n.selected)!;
-                                            setNodes(nds => nds.map(n => n.id === selectedId ? {...n, data: {...n.data, isBold: !sn.data.isBold}} : n));
-                                            setTimeout(() => applyTheme(colorTheme, nodes, edges), 0);
+                                            setNodes(nds => {
+                                                const sn = nds.find(n => n.id === selectedId)!;
+                                                const nextNodes = nds.map(n => n.id === selectedId ? {...n, data: {...n.data, isBold: !sn.data.isBold}} : n);
+                                                setTimeout(() => applyTheme(colorTheme, nextNodes, edges), 0);
+                                                return nextNodes;
+                                            });
                                         }} className={`flex-1 py-1.5 text-xs font-bold rounded-lg border ${nodes.find(n => n.selected)?.data.isBold ? 'bg-gray-800 text-white border-gray-800' : 'bg-gray-50 text-gray-600 border-gray-200'}`}>B</button>
                                         <button onClick={() => {
                                             const selectedId = nodes.find(n => n.selected)!.id;
-                                            const sn = nodes.find(n => n.selected)!;
-                                            setNodes(nds => nds.map(n => n.id === selectedId ? {...n, data: {...n.data, isItalic: !sn.data.isItalic}} : n));
-                                            setTimeout(() => applyTheme(colorTheme, nodes, edges), 0);
+                                            setNodes(nds => {
+                                                const sn = nds.find(n => n.id === selectedId)!;
+                                                const nextNodes = nds.map(n => n.id === selectedId ? {...n, data: {...n.data, isItalic: !sn.data.isItalic}} : n);
+                                                setTimeout(() => applyTheme(colorTheme, nextNodes, edges), 0);
+                                                return nextNodes;
+                                            });
                                         }} className={`flex-1 py-1.5 text-xs italic rounded-lg border ${nodes.find(n => n.selected)?.data.isItalic ? 'bg-gray-800 text-white border-gray-800' : 'bg-gray-50 text-gray-600 border-gray-200'}`}>I</button>
                                     </div>
                                     <div className="flex gap-2">
