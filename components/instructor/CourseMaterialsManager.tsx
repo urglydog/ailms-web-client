@@ -837,6 +837,7 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
   const [difficultyLevel, setDifficultyLevel] = useState<'EASY' | 'MEDIUM' | 'HARD'>('MEDIUM');
   const [quantityLevel, setQuantityLevel] = useState<'FEWER' | 'STANDARD' | 'MORE'>('STANDARD');
   const [language, setLanguage] = useState<string>('vi');
+  const [mapTemplate, setMapTemplate] = useState<string>('MINDMAP');
 
   const { data: languages } = useQuery({
     queryKey: ['available-languages', courseId],
@@ -874,6 +875,8 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
       difficultyLevel,
       quantityLevel,
       language,
+      // Pass the template to backend if needed (e.g. via metadata or extra param)
+      extraConfig: materialType === 'MINDMAP' ? { mapTemplate } : undefined,
     });
   };
 
@@ -996,6 +999,36 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
                   <option value="MORE">Nhiều (~30 thẻ)</option>
                 </select>
               </label>
+            )}
+
+            {materialType === 'MINDMAP' && (
+              <div className="grid grid-cols-2 gap-3">
+                <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
+                  Mẫu sơ đồ (Template)
+                  <select
+                    value={mapTemplate}
+                    onChange={(e) => setMapTemplate(e.target.value)}
+                    className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-cyan-500 focus:outline-none"
+                  >
+                    <option value="MINDMAP">Sơ đồ tư duy (Mind Map)</option>
+                    <option value="LOGIC_CHART">Sơ đồ logic (Logic Chart)</option>
+                    <option value="BRACE_MAP">Sơ đồ dấu ngoặc (Brace Map)</option>
+                    <option value="ORG_CHART">Sơ đồ tổ chức (Org Chart)</option>
+                  </select>
+                </label>
+                <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
+                  Mức độ chi tiết nhánh
+                  <select
+                    value={quantityLevel}
+                    onChange={(e) => setQuantityLevel(e.target.value as 'FEWER' | 'STANDARD' | 'MORE')}
+                    className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-cyan-500 focus:outline-none"
+                  >
+                    <option value="FEWER">Cơ bản, nhánh chính</option>
+                    <option value="STANDARD">Tiêu chuẩn, vừa phải</option>
+                    <option value="MORE">Chi tiết, chia nhiều nhánh nhỏ</option>
+                  </select>
+                </label>
+              </div>
             )}
 
             <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
