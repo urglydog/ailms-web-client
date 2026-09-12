@@ -12,16 +12,7 @@ export function MermaidViewer({ chart }: MermaidViewerProps) {
   const [svgContent, setSvgContent] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
-  // Trạng thái hướng của sơ đồ
-  const [layout, setLayout] = useState<'TD' | 'LR' | 'BT' | 'RL'>('TD');
 
-  useEffect(() => {
-    const match = chart.match(/^(graph|flowchart)\s+(TD|LR|BT|RL)/i);
-    if (match && match[2]) {
-      setLayout(match[2].toUpperCase() as 'TD' | 'LR' | 'BT' | 'RL');
-    }
-  }, [chart]);
 
   useEffect(() => {
     mermaid.initialize({
@@ -38,8 +29,9 @@ export function MermaidViewer({ chart }: MermaidViewerProps) {
         setLoading(true);
         setError(null);
         
-        // Thay đổi hướng sơ đồ dựa trên state `layout`
-        let modifiedChart = chart.replace(/^(graph|flowchart)\s+(TD|LR|BT|RL)/i, `$1 ${layout}`);
+        // Dọn dẹp các layout cũ không hợp lệ từ Database (VD: graph MINDMAP, graph FISHBONE)
+        let modifiedChart = chart.replace(/^(graph|flowchart)\s+(FISHBONE|MATRIX|MINDMAP|TREE_TABLE|BRACE_MAP|TIMELINE|LOGIC_CHART)/im, `$1 LR`);
+        modifiedChart = modifiedChart.replace(/^(graph|flowchart)\s+(ORG_CHART)/im, `$1 TB`);
         
         // Khắc phục lỗi "Unsupported markdown: list" bằng cách thay thế gạch đầu dòng thành ký tự bullet
         // Mermaid hiểu nhầm "1. " và "1) " là ordered list markdown. Thay thành "(1) "
@@ -59,7 +51,7 @@ export function MermaidViewer({ chart }: MermaidViewerProps) {
     };
 
     renderChart();
-  }, [chart, layout]);
+  }, [chart]);
 
   const handleDownloadSVG = () => {
     if (!svgContent) return;
@@ -102,7 +94,7 @@ export function MermaidViewer({ chart }: MermaidViewerProps) {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `mindmap_${layout}.svg`;
+    link.download = `mindmap.svg`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
