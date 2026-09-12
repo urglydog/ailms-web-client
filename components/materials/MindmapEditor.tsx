@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect, useState, useRef } from 'react';
+import React, { useCallback, useEffect, useState, useRef, useMemo } from 'react';
 import {
   ReactFlow,
   Controls,
@@ -18,7 +18,9 @@ import {
   ReactFlowProvider,
   Position,
   MiniMap,
-  Panel
+  Panel,
+  PanOnScrollMode,
+  useStoreApi
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import dagre from 'dagre';
@@ -26,6 +28,7 @@ import { toPng, toJpeg, toSvg } from 'html-to-image';
 
 interface MindmapEditorProps {
   initialMermaidCode: string;
+  initialTemplate?: string;
   onSave?: (newMermaidCode: string) => void;
   readOnly?: boolean;
 }
@@ -71,19 +74,74 @@ const LAYOUTS = [
   { id: 'RL', name: 'Logic Chart (R-L)', icon: '⬅️' },
   { id: 'TB', name: 'Org Chart (T-B)', icon: '⬇️' },
   { id: 'BT', name: 'Org Chart (B-T)', icon: '⬆️' },
-  { id: 'MINDMAP', name: 'Mind Map (Radial)', icon: '🔀' }, // Mock radial with LR/RL split
+  { id: 'MINDMAP', name: 'Mind Map (Radial)', icon: '🔀' },
   { id: 'FISHBONE', name: 'Fishbone', icon: '🐟' },
   { id: 'MATRIX', name: 'Matrix', icon: '▦' },
 ];
 
 function getLayoutedElements(nodes: Node[], edges: Edge[], direction = 'LR') {
+  if (nodes.length === 0) return { nodes, edges };
+  
+  if (direction === 'MINDMAP') {
+     const dagreGraphL = new dagre.graphlib.Graph().setGraph({ rankdir: 'RL', nodesep: 50, ranksep: 100 });
+     const dagreGraphR = new dagre.graphlib.Graph().setGraph({ rankdir: 'LR', nodesep: 50, ranksep: 100 });
+     
+     const rootId = nodes.find(n => n.data.level === 0)?.id || nodes[0]!.id;
+     dagreGraphL.setNode(rootId, { width: nodeWidth, height: nodeHeight });
+     dagreGraphR.setNode(rootId, { width: nodeWidth, height: nodeHeight });
+     
+     const rootEdges = edges.filter(e => e.source === rootId);
+     const leftRootEdges = rootEdges.filter((_, i) => i % 2 !== 0);
+     const rightRootEdges = rootEdges.filter((_, i) => i % 2 === 0);
+
+     const getDescendants = (startIds: string[]) => {
+         const desc = new Set<string>(startIds);
+         let changed = true;
+         while(changed) {
+             changed = false;
+             edges.forEach(e => {
+                 if (desc.has(e.source) && !desc.has(e.target)) { desc.add(e.target); changed = true; }
+             });
+         }
+         return Array.from(desc);
+     };
+
+     const rightIds = getDescendants(rightRootEdges.map(e => e.target));
+     const leftIds = getDescendants(leftRootEdges.map(e => e.target));
+
+     nodes.forEach(n => {
+         if (n.id !== rootId) {
+             if (leftIds.includes(n.id)) dagreGraphL.setNode(n.id, { width: nodeWidth, height: nodeHeight });
+             else dagreGraphR.setNode(n.id, { width: nodeWidth, height: nodeHeight });
+         }
+     });
+
+     edges.forEach(e => {
+         if (leftIds.includes(e.target)) dagreGraphL.setEdge(e.source, e.target);
+         else dagreGraphR.setEdge(e.source, e.target);
+     });
+
+     dagre.layout(dagreGraphL);
+     dagre.layout(dagreGraphR);
+
+     const newNodes = nodes.map((node) => {
+         const isLeft = leftIds.includes(node.id);
+         const pos = isLeft ? dagreGraphL.node(node.id) : dagreGraphR.node(node.id);
+         return {
+             ...node,
+             targetPosition: isLeft ? Position.Right : Position.Left,
+             sourcePosition: isLeft ? Position.Left : Position.Right,
+             position: { x: pos.x - nodeWidth / 2, y: pos.y - nodeHeight / 2 }
+         };
+     });
+     return { nodes: newNodes, edges };
+  }
+
+  // Default Dagre
   const dagreGraph = new dagre.graphlib.Graph();
   dagreGraph.setDefaultEdgeLabel(() => ({}));
-
-  // Simple layout fallback for special types
-  const actualDirection = (direction === 'MINDMAP' || direction === 'FISHBONE' || direction === 'MATRIX') ? 'LR' : direction;
+  const actualDirection = (direction === 'FISHBONE' || direction === 'MATRIX') ? 'LR' : direction;
   const isHorizontal = actualDirection === 'LR' || actualDirection === 'RL';
-  
   dagreGraph.setGraph({ rankdir: actualDirection, nodesep: 50, ranksep: 100 });
 
   nodes.forEach((node) => {
@@ -109,13 +167,18 @@ function getLayoutedElements(nodes: Node[], edges: Edge[], direction = 'LR') {
         sourcePosition = Position.Top;
     }
 
+    let yOffset = 0;
+    if (direction === 'FISHBONE' && node.data.level !== 0) {
+        yOffset = (node.data.branchIndex as number % 2 === 0) ? -80 : 80;
+    }
+
     return {
       ...node,
       targetPosition,
       sourcePosition,
       position: {
         x: nodeWithPosition.x - nodeWidth / 2,
-        y: nodeWithPosition.y - nodeHeight / 2,
+        y: (nodeWithPosition.y - nodeHeight / 2) + yOffset,
       },
     };
   });
@@ -171,7 +234,6 @@ function parseMermaidToFlow(code: string, theme: string) {
     }
   });
 
-  // Ensure root exists
   if (nodes.length === 0) {
     nodes.push({ id: 'root', position: { x: 100, y: 100 }, data: { label: 'Chủ đề chính', level: 0 } });
   }
@@ -181,7 +243,6 @@ function parseMermaidToFlow(code: string, theme: string) {
   rootNode.data.level = 0;
   const queue = [rootNode.id];
   const visited = new Set([rootNode.id]);
-  const parentMap = new Map<string, string>(); // child -> parent
 
   while(queue.length > 0) {
     const curr = queue.shift()!;
@@ -194,11 +255,10 @@ function parseMermaidToFlow(code: string, theme: string) {
         const childNode = nodes.find(n => n.id === e.target);
         if (childNode) {
             childNode.data.level = (currNode.data.level as number) + 1;
-            parentMap.set(childNode.id, currNode.id);
             if (childNode.data.level === 1) {
                 childNode.data.branchIndex = idx;
             } else {
-                childNode.data.branchIndex = currNode.data.branchIndex; // Inherit
+                childNode.data.branchIndex = currNode.data.branchIndex;
             }
             queue.push(childNode.id);
         }
@@ -230,11 +290,12 @@ function parseMermaidToFlow(code: string, theme: string) {
       e.markerEnd = { type: MarkerType.ArrowClosed, color: paletteColor };
   });
 
-  return getLayoutedElements(nodes, edges, 'LR');
+  return { nodes, edges };
 }
 
-function parseFlowToMermaid(nodes: Node[], edges: Edge[]) {
-  let mermaid = 'graph LR\n';
+function parseFlowToMermaid(nodes: Node[], edges: Edge[], layout: string, theme: string) {
+  let mermaid = `%% CONFIG: {"layout":"${layout}","theme":"${theme}"}\n`;
+  mermaid += 'graph LR\n';
   nodes.forEach(n => {
     const label = (n.data.label as string) || n.id;
     mermaid += `    ${n.id}["${label}"]\n`;
@@ -245,7 +306,7 @@ function parseFlowToMermaid(nodes: Node[], edges: Edge[]) {
   return mermaid;
 }
 
-function FlowEditor({ initialMermaidCode, onSave, readOnly = false }: MindmapEditorProps) {
+export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOnly = false }: MindmapEditorProps) {
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
   const [confirmStep, setConfirmStep] = useState<0 | 1 | 2>(0);
@@ -259,20 +320,37 @@ function FlowEditor({ initialMermaidCode, onSave, readOnly = false }: MindmapEdi
   const [showLayouts, setShowLayouts] = useState(false);
   
   const [activeTab, setActiveTab] = useState<'Map' | 'Style'>('Map');
-  const [mapStyle, setMapStyle] = useState('LR');
-  const [colorTheme, setColorTheme] = useState('Dawn');
+  
+  // Parse initial config from mermaid code or props
+  const parsedConfig = useMemo(() => {
+    let layout = initialTemplate || 'LR';
+    let theme = 'Dawn';
+    const match = initialMermaidCode.match(/%% CONFIG: (.+)/);
+    if (match && match[1]) {
+        try {
+            const config = JSON.parse(match[1]);
+            if (config.layout) layout = config.layout;
+            if (config.theme) theme = config.theme;
+        } catch(e) {}
+    }
+    return { layout, theme };
+  }, [initialMermaidCode, initialTemplate]);
+
+  const [mapStyle, setMapStyle] = useState(parsedConfig.layout);
+  const [colorTheme, setColorTheme] = useState(parsedConfig.theme);
   const [isSidebarOpen, setIsSidebarOpen] = useState(!readOnly);
 
   const initData = useCallback(() => {
-    const { nodes: n, edges: e } = parseMermaidToFlow(initialMermaidCode, colorTheme);
-    const layouted = getLayoutedElements(n, e, mapStyle);
+    const { nodes: n, edges: e } = parseMermaidToFlow(initialMermaidCode, parsedConfig.theme);
+    const layouted = getLayoutedElements(n, e, parsedConfig.layout);
     setNodes(layouted.nodes);
     setEdges(layouted.edges);
     setTimeout(() => fitView(), 100);
-  }, [initialMermaidCode, mapStyle, colorTheme, fitView]);
+  }, [initialMermaidCode, parsedConfig, fitView]);
 
   useEffect(() => { initData(); }, [initData]);
 
+  // FIX 8: Click outside to close popovers
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (exportRef.current && !exportRef.current.contains(event.target as globalThis.Node)) setShowExport(false);
@@ -282,10 +360,9 @@ function FlowEditor({ initialMermaidCode, onSave, readOnly = false }: MindmapEdi
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Handle auto layout on changes
+  // FIX 5: Layout Re-render
   const applyLayout = useCallback((nds: Node[], eds: Edge[]) => {
-    // Re-run color parsing to maintain theme hierarchy
-    const tempMermaid = parseFlowToMermaid(nds, eds);
+    const tempMermaid = parseFlowToMermaid(nds, eds, mapStyle, colorTheme);
     const { nodes: parsedNodes, edges: parsedEdges } = parseMermaidToFlow(tempMermaid, colorTheme);
     const layouted = getLayoutedElements(parsedNodes, parsedEdges, mapStyle);
     setNodes(layouted.nodes);
@@ -316,7 +393,7 @@ function FlowEditor({ initialMermaidCode, onSave, readOnly = false }: MindmapEdi
   const handleExport = useCallback(async (type: 'png' | 'jpeg' | 'svg' | 'md') => {
     setShowExport(false);
     if (type === 'md') {
-        const md = parseFlowToMermaid(nodes, edges);
+        const md = parseFlowToMermaid(nodes, edges, mapStyle, colorTheme);
         const blob = new Blob([md], { type: 'text/markdown' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
@@ -363,17 +440,11 @@ function FlowEditor({ initialMermaidCode, onSave, readOnly = false }: MindmapEdi
 
       if (action === 'ENTER') {
         const parentEdge = edges.find(ed => ed.target === selectedNode.id);
+        if (selectedNode.id === 'root') return; // root cannot have sibling
+        
         setNodes(nds => [...nds, newNode]);
         if (parentEdge) {
             const newEdge: Edge = { id: `e-${parentEdge.source}-${newId}`, source: parentEdge.source, target: newId };
-            setEdges(eds => {
-                const nextEds = [...eds, newEdge];
-                setTimeout(() => applyLayout([...nodes, newNode], nextEds), 0);
-                return nextEds;
-            });
-        } else {
-            // It's root, acts like Tab
-            const newEdge: Edge = { id: `e-${selectedNode.id}-${newId}`, source: selectedNode.id, target: newId };
             setEdges(eds => {
                 const nextEds = [...eds, newEdge];
                 setTimeout(() => applyLayout([...nodes, newNode], nextEds), 0);
@@ -386,17 +457,34 @@ function FlowEditor({ initialMermaidCode, onSave, readOnly = false }: MindmapEdi
   useEffect(() => {
     if (readOnly) return;
     const handler = (e: KeyboardEvent) => {
-      if (editingNode) return;
+      if (editingNode) return; // FIX 3: Ignore backspace if editing
       const target = e.target as HTMLElement;
       if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
       
       if (e.key === 'Delete' || e.key === 'Backspace') {
         const selectedNode = nodes.find(n => n.selected);
-        if (!selectedNode || selectedNode.id === 'root') return;
+        if (!selectedNode || selectedNode.id === 'root') return; // Cannot delete root
+        
+        // Cascade delete
+        const idsToDelete = new Set<string>([selectedNode.id]);
+        let changed = true;
+        while(changed) {
+            changed = false;
+            edges.forEach(ed => {
+                if (idsToDelete.has(ed.source) && !idsToDelete.has(ed.target)) {
+                    idsToDelete.add(ed.target);
+                    changed = true;
+                }
+            });
+        }
+
         setNodes(nds => {
-           const newNodes = nds.filter(n => n.id !== selectedNode.id);
-           setEdges(eds => eds.filter(ed => ed.source !== selectedNode.id && ed.target !== selectedNode.id));
-           setTimeout(() => applyLayout(newNodes, edges), 0);
+           const newNodes = nds.filter(n => !idsToDelete.has(n.id));
+           setEdges(eds => {
+               const newEdges = eds.filter(ed => !idsToDelete.has(ed.source) && !idsToDelete.has(ed.target));
+               setTimeout(() => applyLayout(newNodes, newEdges), 0);
+               return newEdges;
+           });
            return newNodes;
         });
       }
@@ -407,19 +495,24 @@ function FlowEditor({ initialMermaidCode, onSave, readOnly = false }: MindmapEdi
     return () => window.removeEventListener('keydown', handler);
   }, [editingNode, readOnly, nodes, edges, applyLayout]);
 
+  const hasSelectedNode = nodes.some(n => n.selected);
+
   return (
     <div className="flex h-[800px] w-full border border-gray-200 rounded-xl overflow-hidden bg-gray-50 relative" ref={ref} style={{ backgroundColor: THEME_PRESETS[colorTheme]?.background }}>
       
-      {/* Top Floating Toolbar (Xmind Style) */}
+      {/* Top Floating Toolbar */}
       {!readOnly && (
         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 bg-white shadow-xl rounded-xl border border-gray-200 px-2 py-1.5 flex gap-1 items-center animate-in slide-in-from-top-4">
-            <button onClick={() => triggerAction('TAB')} className="flex flex-col items-center justify-center p-2 hover:bg-gray-100 rounded-lg min-w-[64px] text-gray-600 transition-colors" title="Thêm nhánh con (Tab)">
+            {/* FIX 4: Disabled states */}
+            <button onClick={() => triggerAction('TAB')} disabled={!hasSelectedNode} className={`flex flex-col items-center justify-center p-2 rounded-lg min-w-[64px] transition-colors ${hasSelectedNode ? 'hover:bg-gray-100 text-gray-600' : 'opacity-40 cursor-not-allowed text-gray-400'}`} title="Thêm nhánh con (Tab)">
                 <span className="text-lg">🌿</span><span className="text-[10px] font-bold mt-1">Subtopic</span>
             </button>
-            <button onClick={() => triggerAction('ENTER')} className="flex flex-col items-center justify-center p-2 hover:bg-gray-100 rounded-lg min-w-[64px] text-gray-600 transition-colors" title="Thêm nhánh ngang hàng (Enter)">
+            <button onClick={() => triggerAction('ENTER')} disabled={!hasSelectedNode || nodes.find(n => n.selected)?.id === 'root'} className={`flex flex-col items-center justify-center p-2 rounded-lg min-w-[64px] transition-colors ${hasSelectedNode && nodes.find(n => n.selected)?.id !== 'root' ? 'hover:bg-gray-100 text-gray-600' : 'opacity-40 cursor-not-allowed text-gray-400'}`} title="Thêm nhánh ngang hàng (Enter)">
                 <span className="text-lg">↔️</span><span className="text-[10px] font-bold mt-1">Topic</span>
             </button>
+            
             <div className="w-[1px] h-8 bg-gray-200 mx-1"></div>
+            
             <div className="relative" ref={layoutRef}>
                 <button onClick={() => setShowLayouts(!showLayouts)} className="flex flex-col items-center justify-center p-2 hover:bg-gray-100 rounded-lg min-w-[64px] text-gray-600 transition-colors">
                     <span className="text-lg">✨</span><span className="text-[10px] font-bold mt-1">Layout</span>
@@ -427,7 +520,7 @@ function FlowEditor({ initialMermaidCode, onSave, readOnly = false }: MindmapEdi
                 {showLayouts && (
                     <div className="absolute top-full left-0 mt-2 w-64 bg-white border border-gray-200 rounded-xl shadow-2xl p-3 grid grid-cols-2 gap-2 z-50">
                         {LAYOUTS.map(l => (
-                            <button key={l.id} onClick={() => { setMapStyle(l.id); setShowLayouts(false); }} className={`flex flex-col items-center justify-center p-3 rounded-lg border transition-all ${mapStyle === l.id ? 'border-cyan-500 bg-cyan-50' : 'border-gray-100 hover:border-gray-300 hover:bg-gray-50'}`}>
+                            <button key={l.id} onClick={() => { setMapStyle(l.id); setShowLayouts(false); applyLayout(nodes, edges); }} className={`flex flex-col items-center justify-center p-3 rounded-lg border transition-all ${mapStyle === l.id ? 'border-cyan-500 bg-cyan-50' : 'border-gray-100 hover:border-gray-300 hover:bg-gray-50'}`}>
                                 <span className="text-2xl mb-1">{l.icon}</span>
                                 <span className="text-[10px] font-bold text-center text-gray-600 leading-tight">{l.name}</span>
                             </button>
@@ -452,12 +545,17 @@ function FlowEditor({ initialMermaidCode, onSave, readOnly = false }: MindmapEdi
       )}
 
       {/* Main Flow Canvas */}
-      <div className="flex-1 relative transition-all">
-        {/* Toggle Sidebar Button */}
+      <div className={`flex-1 relative transition-all duration-300 ${!isSidebarOpen ? 'mr-0' : 'mr-80'}`}>
+        
+        {/* FIX 1: Sidebar Toggle Arrow */}
         {!readOnly && (
-           <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="absolute top-4 right-4 z-20 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 p-2.5 rounded-lg font-bold shadow-sm transition-colors text-xs flex items-center gap-2">
-             {isSidebarOpen ? 'Đóng Panel ▶' : '◀ Panel'}
-           </button>
+            <button 
+                onClick={() => setIsSidebarOpen(!isSidebarOpen)} 
+                className={`absolute top-1/2 -translate-y-1/2 z-30 bg-white border border-gray-200 hover:bg-gray-50 text-gray-500 shadow-lg flex items-center justify-center transition-all ${isSidebarOpen ? 'right-0 rounded-l-lg border-r-0 w-6 h-12' : 'right-0 rounded-l-lg w-8 h-16'}`}
+                title="Toggle Sidebar"
+            >
+                {isSidebarOpen ? '▶' : '◀'}
+            </button>
         )}
 
         <ReactFlow
@@ -470,14 +568,17 @@ function FlowEditor({ initialMermaidCode, onSave, readOnly = false }: MindmapEdi
           nodesDraggable={!readOnly}
           nodesConnectable={!readOnly}
           elementsSelectable={!readOnly}
-          deleteKeyCode={null}
+          deleteKeyCode={null} // Prevent default deletion, handled custom
           fitView
           attributionPosition="bottom-left"
+          panOnScroll={true} // FIX 6: Viewport interactions
+          zoomOnPinch={true}
+          panOnScrollMode={PanOnScrollMode.Free}
         >
           {readOnly && (
               <Panel position="bottom-center" className="bg-white/90 backdrop-blur border border-gray-200 px-4 py-2 rounded-full shadow-lg mb-4 flex gap-4 text-xs font-bold text-gray-600">
-                  <span className="flex items-center gap-1">🖱️ Scroll to zoom</span>
-                  <span className="flex items-center gap-1">✋ Drag to pan</span>
+                  <span className="flex items-center gap-1">🖱️ Shift+Scroll to pan</span>
+                  <span className="flex items-center gap-1">✋ Drag/Pinch to zoom</span>
               </Panel>
           )}
           <Controls className="bg-white border-gray-200 shadow-md" />
@@ -494,6 +595,14 @@ function FlowEditor({ initialMermaidCode, onSave, readOnly = false }: MindmapEdi
                 autoFocus
                 value={editingNode.label}
                 onChange={(e) => setEditingNode({ ...editingNode, label: e.target.value })}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        setNodes((nds) => nds.map((n) => n.id === editingNode.id ? { ...n, data: { ...n.data, label: editingNode.label.trim() } } : n));
+                        setEditingNode(null);
+                        setTimeout(() => applyLayout(nodes, edges), 0);
+                    }
+                }}
                 className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-accent/20 focus:border-accent resize-none h-28 text-gray-700 outline-none transition-all font-medium"
               />
               <div className="flex gap-2 justify-end mt-5">
@@ -504,7 +613,7 @@ function FlowEditor({ initialMermaidCode, onSave, readOnly = false }: MindmapEdi
                     setTimeout(() => applyLayout(nodes, edges), 0);
                   }}
                   className="px-5 py-2.5 bg-accent text-white rounded-xl text-xs font-bold hover:bg-accent/90 shadow-sm"
-                >Lưu thay đổi</button>
+                >Cập nhật</button>
               </div>
             </div>
           </div>
@@ -512,8 +621,8 @@ function FlowEditor({ initialMermaidCode, onSave, readOnly = false }: MindmapEdi
       </div>
 
       {/* Right Inspector Panel */}
-      {!readOnly && isSidebarOpen && (
-          <div className="w-80 bg-white border-l border-gray-200 flex flex-col shadow-2xl z-20 absolute right-0 top-0 bottom-0 animate-in slide-in-from-right-8">
+      {!readOnly && (
+          <div className={`w-80 bg-white border-l border-gray-200 flex flex-col shadow-2xl z-20 absolute right-0 top-0 bottom-0 transition-transform duration-300 ${isSidebarOpen ? 'translate-x-0' : 'translate-x-full'}`}>
               <div className="flex border-b border-gray-100 p-2 gap-1 pt-16">
                   {['Map', 'Style'].map(tab => (
                       <button key={tab} onClick={() => setActiveTab(tab as 'Style' | 'Map')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-colors ${activeTab === tab ? 'bg-gray-100 text-gray-800' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'}`}>{tab}</button>
@@ -527,7 +636,7 @@ function FlowEditor({ initialMermaidCode, onSave, readOnly = false }: MindmapEdi
                               <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-3 block">Color Theme (Bảng màu)</label>
                               <div className="grid gap-2">
                                   {Object.keys(THEME_PRESETS).map(theme => (
-                                      <button key={theme} onClick={() => setColorTheme(theme)} className={`p-3 rounded-xl border text-left transition-all flex flex-col gap-2 ${colorTheme === theme ? 'border-cyan-500 bg-cyan-50 shadow-sm' : 'border-gray-200 hover:border-gray-300'}`}>
+                                      <button key={theme} onClick={() => { setColorTheme(theme); applyLayout(nodes, edges); }} className={`p-3 rounded-xl border text-left transition-all flex flex-col gap-2 ${colorTheme === theme ? 'border-cyan-500 bg-cyan-50 shadow-sm' : 'border-gray-200 hover:border-gray-300'}`}>
                                           <span className="text-xs font-bold text-gray-700">{theme}</span>
                                           <div className="flex gap-1 h-3 rounded-full overflow-hidden w-full">
                                               {THEME_PRESETS[theme]?.palette.map(c => <div key={c} className="flex-1" style={{backgroundColor: c}}></div>)}
@@ -547,41 +656,19 @@ function FlowEditor({ initialMermaidCode, onSave, readOnly = false }: MindmapEdi
                   )}
               </div>
 
+              {/* FIX 2: Save Changes Button directly triggering without 2 steps, or keeping it but clearer */}
               {onSave && (
                   <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-100 bg-white/90 backdrop-blur">
-                      <button onClick={() => setConfirmStep(1)} className="w-full bg-[#0284C7] hover:bg-[#0369A1] text-white py-3 rounded-xl font-bold shadow-md transition-all active:scale-95 flex items-center justify-center gap-2">
-                          💾 Xác Nhận Cập Nhật
+                      <button onClick={() => {
+                          const newCode = parseFlowToMermaid(nodes, edges, mapStyle, colorTheme);
+                          onSave(newCode);
+                          alert("Lưu sơ đồ thành công!");
+                      }} className="w-full bg-[#0284C7] hover:bg-[#0369A1] text-white py-3 rounded-xl font-bold shadow-md transition-all active:scale-95 flex items-center justify-center gap-2">
+                          💾 Lưu Thay Đổi
                       </button>
                   </div>
               )}
           </div>
-      )}
-
-      {/* Confirm Dialogs remain unchanged, but styled properly */}
-      {confirmStep > 0 && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[2px]">
-          <div className="bg-white p-6 rounded-2xl shadow-2xl border border-gray-100 w-[420px] max-w-[90%]">
-            {confirmStep === 1 ? (
-              <>
-                <h3 className="text-base font-bold text-gray-900 mb-2">⚠️ Xác nhận lưu?</h3>
-                <p className="text-sm text-gray-600 mb-5">Bạn có chắc chắn muốn lưu lại cấu trúc Mindmap này?</p>
-                <div className="flex gap-2 justify-end">
-                  <button onClick={() => setConfirmStep(0)} className="px-4 py-2.5 bg-gray-50 text-gray-600 rounded-xl text-xs font-bold hover:bg-gray-100 border border-gray-200">Hủy</button>
-                  <button onClick={() => setConfirmStep(2)} className="px-5 py-2.5 bg-amber-500 text-white rounded-xl text-xs font-bold hover:bg-amber-600">Tiếp tục →</button>
-                </div>
-              </>
-            ) : (
-              <>
-                <h3 className="text-base font-bold text-red-700 mb-2">🔒 Lần cuối</h3>
-                <p className="text-sm text-gray-600 mb-5">Xác nhận công bố bản đồ này cho học viên? Không thể hoàn tác.</p>
-                <div className="flex gap-2 justify-end">
-                  <button onClick={() => setConfirmStep(0)} className="px-4 py-2.5 bg-gray-50 text-gray-600 rounded-xl text-xs font-bold border border-gray-200">Hủy</button>
-                  <button onClick={() => { setConfirmStep(0); if(onSave) onSave(parseFlowToMermaid(nodes, edges)); }} className="px-5 py-2.5 bg-red-600 text-white rounded-xl text-xs font-bold">✓ Xác nhận</button>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
       )}
     </div>
   );
