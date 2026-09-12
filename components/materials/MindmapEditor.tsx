@@ -337,7 +337,7 @@ function parseFlowToMermaid(nodes: Node[], edges: Edge[], layout: string, theme:
     themeStyles += `    style ${n.id} fill:${themeBg},color:${themeColor},stroke:${themeStroke},stroke-width:2px\n`;
     
     // Custom Styles
-    let styleStr = [];
+    const styleStr = [];
     if (n.data.customBg) styleStr.push(`fill:${n.data.customBg}`);
     if (n.data.customColor) styleStr.push(`color:${n.data.customColor}`);
     
@@ -384,7 +384,7 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
           const level = n.data.level as number;
           const bIdx = (n.data.branchIndex as number) || 0;
           const paletteColor = t.palette[bIdx % t.palette.length];
-          const newStyle: any = { ...n.style };
+          const newStyle: React.CSSProperties = { ...n.style };
           
           if (level === 0) {
               Object.assign(newStyle, { background: t.rootBg, color: t.rootColor, border: 'none', borderRadius: '8px', padding: '14px 24px', fontWeight: 'bold', fontSize: '16px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' });
