@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useCourseMaterials, useRequestMaterial, useAvailableLanguages, useCourseChapters, useRenameMaterial, useDeleteMaterial } from '@/hooks/useMaterials';
 import { materialsApi, type MaterialType, type ScopeType, type InstructorMaterial } from '@/lib/api/materials';
+import { MaterialLanguagePicker } from '@/components/materials/MaterialLanguagePicker';
 import { toast } from 'sonner';
 import { ApiError } from '@/lib/api/client';
 import Link from 'next/link';
@@ -38,7 +39,7 @@ export function MaterialManager({ courseId }: { courseId: number }) {
 
   // Auto-select first language if available
   if (availableLanguages && availableLanguages.length > 0 && language === '') {
-    setLanguage(availableLanguages[0]!);
+    setLanguage(availableLanguages[0]!.code);
   }
 
   const handleRequest = () => {
@@ -76,19 +77,6 @@ export function MaterialManager({ courseId }: { courseId: number }) {
     setCustomLessonIds(prev => 
       prev.includes(id) ? prev.filter(l => l !== id) : [...prev, id]
     );
-  };
-
-  const getLanguageName = (code: string) => {
-    try {
-      const displayNames = new Intl.DisplayNames(['vi'], { type: 'language' });
-      const name = displayNames.of(code) || code;
-      return name.charAt(0).toUpperCase() + name.slice(1);
-    } catch {
-      if (code === 'vi-VN' || code === 'vi') return 'Tiếng Việt';
-      if (code === 'en-US' || code === 'en') return 'Tiếng Anh';
-      if (code.startsWith('zh-')) return 'Tiếng Trung';
-      return code;
-    }
   };
 
   const handleRenameSubmit = (id: number) => {
@@ -176,20 +164,11 @@ export function MaterialManager({ courseId }: { courseId: number }) {
           </div>
           <div>
             <label className="block text-sm font-semibold mb-1">Ngôn ngữ</label>
-            <select
-              className="w-full rounded-md border border-line p-2 text-sm"
+            <MaterialLanguagePicker
+              languages={availableLanguages ?? []}
               value={language}
-              onChange={(e) => setLanguage(e.target.value)}
-              disabled={!availableLanguages || availableLanguages.length === 0}
-            >
-              {availableLanguages && availableLanguages.length > 0 ? (
-                availableLanguages.map(lang => (
-                  <option key={lang} value={lang}>{getLanguageName(lang)}</option>
-                ))
-              ) : (
-                <option value="">Chưa có transcript</option>
-              )}
-            </select>
+              onChange={setLanguage}
+            />
           </div>
         </div>
       

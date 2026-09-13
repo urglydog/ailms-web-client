@@ -63,6 +63,15 @@ export interface MaterialGenerationRes {
   createdAt: string;
 }
 
+/** Cùng nguồn `voice_mappings.is_active` với dropdown lồng tiếng (BR-DUB-07) — `available` ở đây
+ * nghĩa là "đã có bản dịch sẵn" (dấu tích), KHÔNG phải "đã lồng tiếng xong"; chỉ là gợi ý hiển
+ * thị, không hạn chế lựa chọn (BR-MAT-01 cho chọn ngôn ngữ đầu ra tự do). */
+export interface LanguageAvailability {
+  code: string;
+  label: string;
+  available: boolean;
+}
+
 export interface MaterialDetailRes extends MaterialGenerationRes {
   mermaidCode?: string;
   flashcards?: {
@@ -98,7 +107,7 @@ export const materialsApi = {
     api.get<MaterialDetailRes>(`/api/v1/materials/${id}`, { token: authToken() }),
 
   getAvailableLanguages: (courseId: number) =>
-    api.get<string[]>(`/api/v1/materials/available-languages?courseId=${courseId}`, { token: authToken() }),
+    api.get<LanguageAvailability[]>(`/api/v1/materials/available-languages?courseId=${courseId}`, { token: authToken() }),
 
   getCourseChapters: (courseId: number) =>
     api.get<import('@/types/domain').Chapter[]>(`/api/v1/materials/course-chapters?courseId=${courseId}`, { token: authToken() }),
