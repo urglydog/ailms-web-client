@@ -228,19 +228,46 @@ function LearnPageContent() {
   // chế tua khác hẳn nhau (thẻ <video> cho UPLOAD, IFrame Player API cho YOUTUBE) sau 1
   // `seekTo()` chung qua `DualPlayerHandle` — trang này không cần biết đang phát nguồn nào.
   //
-  // UC30 mở rộng (06/09/2026) — Gia sư AI giờ có thể trả lời về 1 bài học KHÁC bài đang mở
-  // (học viên hỏi rõ, xem `TutorEmbedded`/`useTutorChat`) — mốc thời gian trích dẫn khi đó
-  // thuộc video bài học ĐÓ, không phải bài đang mở. `contextLessonId` khác `lessonId` hiện tại
-  // (hoặc null, từ `TranscriptPanel` — luôn cùng bài đang mở) thì điều hướng sang đúng bài đó
-  // thay vì tua nhầm video đang mở; TẠM chưa tự seek tiếp sau khi trang mới tải xong (đơn giản
-  // hoá phạm vi — học viên tự kéo tới đúng mốc [MM:SS] đã hiện sẵn trong nội dung trả lời).
+  // UC30 mở rộng (13/09/2026) — Gia sư AI giờ tìm kiếm xuyên suốt mọi bài trong khóa (không chỉ
+  // bài đang mở), nên mốc thời gian trích dẫn có thể thuộc 1 bài KHÁC hẳn — `contextLessonId`
+  // khác `lessonId` hiện tại thì điều hướng sang đúng bài đó, kèm `?seek=<giây>` trong URL để
+  // trang mới TỰ tua tới đúng chỗ sau khi tải xong (xem effect `?seek=` bên dưới) — không còn bắt
+  // học viên tự kéo tay tới mốc đã hiện sẵn trong câu trả lời như trước.
   const handleSeekToTimestamp = useCallback((sec: number, contextLessonId?: number | null) => {
     if (contextLessonId != null && contextLessonId !== lessonId) {
-      router.push(`/learn/${contextLessonId}`);
+      router.push(`/learn/${contextLessonId}?seek=${Math.round(sec)}`);
       return;
     }
     dualPlayerRef.current?.seekTo(sec);
   }, [lessonId, router]);
+
+  // UC30 mở rộng (13/09/2026) — xử lý `?seek=<giây>` do `handleSeekToTimestamp` ở TRANG NGUỒN gắn
+  // vào URL lúc điều hướng sang bài này. `DualPlayer` có thể chưa sẵn sàng ngay lúc mount (video
+  // chưa load xong metadata, hoặc IFrame YouTube chưa init) và `seekTo()` không báo lỗi khi gọi
+  // lúc chưa sẵn sàng — không có tín hiệu "thất bại" rõ ràng để chờ đúng 1 lần, nên thử lại vài
+  // lần trong ~2 giây thay vì gọi đúng 1 lần cho chắc.
+  useEffect(() => {
+    const seekParam = searchParams.get('seek');
+    const sec = seekParam ? Number(seekParam) : NaN;
+    if (isLoading || !lesson || !Number.isFinite(sec)) return;
+
+    let attempts = 0;
+    const intervalId = setInterval(() => {
+      attempts += 1;
+      dualPlayerRef.current?.seekTo(sec);
+      if (attempts >= 5) clearInterval(intervalId);
+    }, 400);
+
+    const newSearchParams = new URLSearchParams(searchParams.toString());
+    newSearchParams.delete('seek');
+    router.replace(`${pathname}${newSearchParams.toString() ? `?${newSearchParams.toString()}` : ''}`, { scroll: false });
+
+    return () => clearInterval(intervalId);
+    // Chỉ cần chạy lại khi ĐỔI BÀI hoặc lúc tải bài xong, không phải mỗi lần
+    // `searchParams`/`lesson`/`pathname`/`router` đổi tham chiếu (vd do `keepPreviousData` khi
+    // chuyển bài — sẽ tua lặp lại không cần thiết).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lessonId, isLoading]);
 
   // UC20 — chỉ mở kết nối STOMP khi thật sự đang chờ pipeline chạy.
   const { lastEvent } = useDubbingSocket(mode === 'processing' ? lessonId : null);
@@ -395,6 +422,9 @@ function LearnPageContent() {
     currentLessonIndex >= 0 && currentLessonIndex < flatLessons.length - 1
       ? (flatLessons[currentLessonIndex + 1]?.lessonId ?? null)
       : null;
+  // UC30 mở rộng (13/09/2026) — tên bài để hiện kèm trong nút mốc thời gian khi Gia sư AI trích
+  // dẫn 1 bài KHÁC bài đang mở (xem `MarkdownRenderer`/`TutorEmbedded`).
+  const lessonTitleById = Object.fromEntries(flatLessons.map((l) => [l.lessonId, l.lessonTitle]));
 
   const handleVideoEnded = () => {
     if (autoNextEnabled && nextLessonId) {
@@ -650,7 +680,12 @@ function LearnPageContent() {
                   </div>
                 )
               ) : lesson.enrolled ? (
-                <TutorEmbedded courseId={lesson.courseId} lessonId={lesson.lessonId} onSeek={handleSeekToTimestamp} />
+                <TutorEmbedded
+                  courseId={lesson.courseId}
+                  lessonId={lesson.lessonId}
+                  onSeek={handleSeekToTimestamp}
+                  lessonTitleById={lessonTitleById}
+                />
               ) : (
                 <div className="flex-1">
                   <LockedFeatureNotice feature="Gia sư AI" courseSlug={lesson.courseSlug} />

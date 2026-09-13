@@ -147,6 +147,9 @@ interface TutorEmbeddedProps {
    * thể khác nếu học viên hỏi rõ về 1 bài khác trong khóa) — trang cha quyết định tua video
    * đang mở hay điều hướng sang bài khác rồi mới tua, xem `learn/[lessonId]/page.tsx`. */
   onSeek: (seconds: number, contextLessonId: number | null) => void;
+  /** UC30 mở rộng (13/09/2026) — tên các bài trong khóa, CHỈ để hiện kèm trong nút mốc thời gian
+   * khi trích dẫn thuộc bài khác (vd "▶ 01:30 · Bài 1") — xem `MarkdownRenderer`. */
+  lessonTitleById?: Record<number, string>;
 }
 
 /**
@@ -164,7 +167,7 @@ interface TutorEmbeddedProps {
  * (`courseId`), không còn tách riêng theo từng bài (`lessonId` chỉ còn là "bài đang mở", truyền
  * làm ngữ cảnh MẶC ĐỊNH cho từng lượt hỏi — xem `useTutorChat`).
  */
-export function TutorEmbedded({ courseId, lessonId, onSeek }: TutorEmbeddedProps) {
+export function TutorEmbedded({ courseId, lessonId, onSeek, lessonTitleById }: TutorEmbeddedProps) {
   const {
     messages, sendQuestion, isSending, isRestoring,
     sessions, activeSessionId, switchSession, startNewChat,
@@ -375,7 +378,12 @@ export function TutorEmbedded({ courseId, lessonId, onSeek }: TutorEmbeddedProps
                       }`}
                     >
                       {msg.sender === 'AI' ? (
-                        <MarkdownRenderer content={msg.content} onSeek={(sec) => onSeek(sec, msg.contextLessonId)} />
+                        <MarkdownRenderer
+                          content={msg.content}
+                          onSeek={(sec, citedLessonId) => onSeek(sec, citedLessonId ?? msg.contextLessonId)}
+                          currentLessonId={lessonId}
+                          lessonTitleById={lessonTitleById}
+                        />
                       ) : (
                         msg.content
                       )}
