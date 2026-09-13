@@ -23,6 +23,7 @@ import { useLessonPlayer } from '@/hooks/usePublicCourses';
 import { useVoiceOptions } from '@/hooks/useVoiceOptions';
 import { ApiError } from '@/lib/api/client';
 import { LiveChatPanel } from '@/components/community/LiveChatPanel';
+import { useSetLearnTitle } from '@/components/layout/LearnTitleContext';
 import { decodeAccessToken, getAccessToken } from '@/lib/auth/token';
 import type { PipelineStep } from '@/types/domain';
 
@@ -130,6 +131,10 @@ function LearnPageContent() {
   const lesson = hasToken ? enrolled.data : preview.data;
   const isLoading = hasToken ? enrolled.isLoading : preview.isLoading;
   const error = hasToken ? enrolled.error : preview.error;
+  // Đang chuyển sang bài khác nhưng vẫn còn hiển thị dữ liệu bài CŨ (placeholder) — dùng để hiện
+  // 1 chỉ báo nhỏ trên khung video, không che mất cả trang như `isLoading`.
+  const isSwitchingLesson = (hasToken ? enrolled.isFetching : preview.isFetching) && !isLoading;
+  useSetLearnTitle(lesson?.courseTitle);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -178,6 +183,27 @@ function LearnPageContent() {
   // `showTranscript` đang bật (tránh re-render trang liên tục lúc panel ẩn, mặc định).
   const [showTranscript, setShowTranscript] = useState(false);
   const [playerCurrentSec, setPlayerCurrentSec] = useState(0);
+
+  // Chuyển bài học (`lessonId` đổi) giờ KHÔNG unmount lại component này nữa (nhờ
+  // `placeholderData: keepPreviousData` ở 2 hook trên — xem đó để biết lý do), nên các state
+  // RIÊNG CỦA TỪNG BÀI phải tự reset thủ công ở đây, nếu không sẽ bị "rò" từ bài cũ sang bài mới
+  // (vd đang xem tiếng Nhật ở bài A thì bài B tự nhảy vào `mode="processing"` do lẫn state cũ).
+  // Không reset `sidebarTab`/`autoNextEnabled` — đây là tuỳ chọn của học viên cho cả khoá học,
+  // không phải theo từng bài, nên phải giữ nguyên khi chuyển bài (giống Udemy).
+  useEffect(() => {
+    setMode('watching');
+    setActiveLang(null);
+    setSelectedVoiceName(null);
+    setSteps([PREPARE_STEP]);
+    setQuotaExceeded(false);
+    setActivateError(null);
+    setJobError(null);
+    setShowTranscript(false);
+    setShowOriginalSub(false);
+    setShowTranslatedSub(false);
+    setPlayerCurrentSec(0);
+  }, [lessonId]);
+
   // Tự động chuyển sang bài tiếp theo khi phát hết bài hiện tại — nhớ lựa chọn của học viên giữa
   // các bài (localStorage), mặc định BẬT giống hành vi gốc của Udemy (nguồn tham khảo giao diện).
   const [autoNextEnabled, setAutoNextEnabled] = useState(() => {
@@ -441,44 +467,47 @@ function LearnPageContent() {
           tràn gần hết chiều ngang trình duyệt thay vì bó trong khung nội dung thường, video vì
           vậy hiển thị to hơn hẳn thay vì còn dư 2 khoảng trống 2 bên. */}
       <div className="mx-auto w-full max-w-[1800px] px-4 py-8 md:px-8">
-        {/* Breadcrumb */}
-        <nav aria-label="Đường dẫn" className="mb-4 text-[13px] text-ink-faint">
-          <Link href="/my-courses" className="font-semibold no-underline">
-            Khóa học của tôi
-          </Link>
-          <span> / </span>
-          <span className="text-ink-muted">{lesson.courseTitle}</span>
-          <span> / </span>
-          <span className="text-ink-muted">{lesson.lessonTitle}</span>
-        </nav>
-
-        {/* Giao diện tham khảo Udemy — video lớn nhất, sidebar phải hẹp có tab, tab dưới video
+        {/* Giao diện tham khảo Udemy — tên khóa học đã chuyển lên thanh header dùng chung
+            (`app/(learn)/layout.tsx`), sidebar "Nội dung khóa học" bên dưới đã tự nêu rõ đang ở
+            bài nào (đánh dấu active) nên không cần lặp lại tên bài học ở đây nữa.
+            Video lớn nhất, sidebar phải hẹp có tab, tab dưới video
             thay cho các khối CTA/card rời trước đây. */}
         <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
           {/* ── Cột phát bài giảng ── */}
           <div className="flex min-w-0 flex-col gap-4">
-            {/* Video luôn hiển thị và phát được, bất kể mode — xem docblock đầu file */}
-            <DualPlayer
-              ref={dualPlayerRef}
-              videoSource={lesson.videoSource}
-              videoUrl={lesson.videoUrl}
-              youtubeId={lesson.youtubeId}
-              track={lesson.languages.find((l) => l.code === activeLang)?.track ?? null}
-              videoRef={videoRef}
-              audioRef={audioRef}
-              originalSubtitles={lesson.originalSubtitles}
-              translatedSubtitles={lesson.languages.find((l) => l.code === activeLang)?.subtitles ?? []}
-              showOriginalSub={showOriginalSub}
-              showTranslatedSub={showTranslatedSub}
-              onToggleShowOriginalSub={() => setShowOriginalSub((v) => !v)}
-              onToggleShowTranslatedSub={() => setShowTranslatedSub((v) => !v)}
-              onEnded={handleVideoEnded}
-              onTimeUpdate={setPlayerCurrentSec}
-              showTranscript={showTranscript}
-              onToggleTranscript={handleToggleTranscript}
-              autoNextEnabled={autoNextEnabled}
-              onToggleAutoNext={() => setAutoNextEnabled((v) => !v)}
-            />
+            {/* Video luôn hiển thị và phát được, bất kể mode — xem docblock đầu file.
+                Bọc thêm 1 lớp `relative` để hiện chỉ báo nhỏ "Đang chuyển bài học" đè lên góc
+                video trong lúc bài mới đang tải nền (`isSwitchingLesson`) — video/sidebar/tab
+                vẫn giữ nguyên bài CŨ trên màn hình, không biến mất như trước. */}
+            <div className="relative">
+              <DualPlayer
+                ref={dualPlayerRef}
+                videoSource={lesson.videoSource}
+                videoUrl={lesson.videoUrl}
+                youtubeId={lesson.youtubeId}
+                track={lesson.languages.find((l) => l.code === activeLang)?.track ?? null}
+                videoRef={videoRef}
+                audioRef={audioRef}
+                originalSubtitles={lesson.originalSubtitles}
+                translatedSubtitles={lesson.languages.find((l) => l.code === activeLang)?.subtitles ?? []}
+                showOriginalSub={showOriginalSub}
+                showTranslatedSub={showTranslatedSub}
+                onToggleShowOriginalSub={() => setShowOriginalSub((v) => !v)}
+                onToggleShowTranslatedSub={() => setShowTranslatedSub((v) => !v)}
+                onEnded={handleVideoEnded}
+                onTimeUpdate={setPlayerCurrentSec}
+                showTranscript={showTranscript}
+                onToggleTranscript={handleToggleTranscript}
+                autoNextEnabled={autoNextEnabled}
+                onToggleAutoNext={() => setAutoNextEnabled((v) => !v)}
+              />
+              {isSwitchingLesson && (
+                <div className="pointer-events-none absolute left-3 top-3 z-20 flex items-center gap-2 rounded-full bg-ink/70 px-3 py-1.5 text-[12px] font-medium text-white">
+                  <span className="h-3 w-3 animate-spin rounded-full border-2 border-white/40 border-t-white" aria-hidden />
+                  Đang chuyển bài học...
+                </div>
+              )}
+            </div>
 
             {lesson.languages.length > 0 && (
               <LanguageDropdown
@@ -584,7 +613,7 @@ function LearnPageContent() {
                       : 'border-transparent text-ink-muted hover:text-ink'
                   }`}
                 >
-                  {showTranscript ? '📝 Bản ghi lời thoại' : '📚 Nội dung khóa học'}
+                  {showTranscript ? 'Bản ghi lời thoại' : 'Nội dung khóa học'}
                 </button>
                 <button
                   type="button"
@@ -595,7 +624,7 @@ function LearnPageContent() {
                       : 'border-transparent text-ink-muted hover:text-ink'
                   }`}
                 >
-                  🤖 AI Gia sư
+                  AI Gia sư
                 </button>
               </div>
 

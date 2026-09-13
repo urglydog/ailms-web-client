@@ -410,16 +410,16 @@ export default function AntiCheatExamPage() {
                         onClick={() => handleExplain(detail.questionId, detail.selectedOptionId)}
                         className="text-accent text-sm font-semibold hover:underline flex items-center gap-1"
                       >
-                        🤖 Hỏi Gia sư AI tại sao sai?
+                        Hỏi Gia sư AI tại sao sai?
                       </button>
                     ) : (
-                      <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
-                        <div className="flex items-center gap-2 font-bold text-blue-900 mb-2">
-                          <span>🤖 Gia sư AI giải thích:</span>
-                          {explanations[detail.questionId]?.loading && <span className="animate-pulse text-blue-500">Đang suy nghĩ...</span>}
+                      <div className="bg-accent/5 p-4 rounded-lg border border-accent/15">
+                        <div className="flex items-center gap-2 font-bold text-accent-dark mb-2">
+                          <span>Gia sư AI giải thích:</span>
+                          {explanations[detail.questionId]?.loading && <span className="animate-pulse text-accent">Đang suy nghĩ...</span>}
                         </div>
                         {explanations[detail.questionId]?.text && (
-                          <div className="text-sm text-blue-800 leading-relaxed">
+                          <div className="text-sm text-ink leading-relaxed">
                             <MarkdownRenderer content={explanations[detail.questionId]!.text!} />
                           </div>
                         )}
@@ -723,7 +723,7 @@ export default function AntiCheatExamPage() {
             <button
               onClick={submitExam}
               disabled={isSubmitting}
-              className="bg-ink text-white font-bold py-3 rounded-xl hover:bg-gray-800 disabled:opacity-50"
+              className="bg-ink text-white font-bold py-3 rounded-xl hover:opacity-90 disabled:opacity-50"
             >
               {isSubmitting ? 'Đang nộp...' : 'Nộp bài thi'}
             </button>

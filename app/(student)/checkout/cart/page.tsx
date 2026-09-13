@@ -71,13 +71,13 @@ function CartCheckoutContent() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 py-12">
+    <main className="min-h-screen bg-surface py-12">
       <div className="mx-auto max-w-4xl px-4 md:px-8">
         <div className="mb-8 flex items-center justify-between">
-          <h1 className="font-display text-3xl font-bold text-gray-900">Thanh toán {items.length > 1 ? `${items.length} khóa học` : 'khóa học'}</h1>
+          <h1 className="font-display text-3xl font-bold text-ink">Thanh toán {items.length > 1 ? `${items.length} khóa học` : 'khóa học'}</h1>
           <button
-            onClick={() => router.push('/cart')}
-            className="flex items-center gap-2 rounded-full border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 hover:text-gray-900"
+            onClick={() => (window.history.length > 1 ? router.back() : router.push('/cart'))}
+            className="flex items-center gap-2 rounded-full border border-line bg-white px-4 py-2 text-sm font-medium text-ink-muted transition-colors hover:bg-surface-hover hover:text-ink"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
             Quay lại giỏ hàng
@@ -87,25 +87,25 @@ function CartCheckoutContent() {
         <div className="grid gap-8 md:grid-cols-3">
           {/* Cột trái: danh sách khóa học + thông tin bổ sung */}
           <div className="space-y-6 md:col-span-2">
-            <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-              <h2 className="mb-4 text-lg font-bold text-gray-900">
+            <div className="rounded-card border border-line bg-white p-6 shadow-card">
+              <h2 className="mb-4 text-lg font-bold text-ink">
                 {items.length > 1 ? `${items.length} khóa học đã chọn` : 'Khóa học'}
               </h2>
               <div className="flex flex-col gap-4">
                 {items.map((item) => (
-                  <div key={item.courseId} className="flex flex-col gap-4 border-b border-gray-100 pb-4 last:border-0 last:pb-0 sm:flex-row">
+                  <div key={item.courseId} className="flex flex-col gap-4 border-b border-line-soft pb-4 last:border-0 last:pb-0 sm:flex-row">
                     <div className="relative h-24 w-full shrink-0 overflow-hidden rounded-xl sm:w-36">
                       {item.thumbnailUrl ? (
                         <Image src={item.thumbnailUrl} alt={item.courseTitle} fill className="object-cover" />
                       ) : (
-                        <div className="h-full w-full bg-gradient-to-br from-cyan-100 to-blue-100" />
+                        <div className="h-full w-full bg-accent/10" />
                       )}
                     </div>
                     <div className="flex flex-1 flex-col justify-center">
-                      <h3 className="font-display text-base font-bold text-gray-900">{item.courseTitle}</h3>
-                      <p className="mt-1 text-sm text-gray-500">GV. {item.instructorName}</p>
+                      <h3 className="font-display text-base font-bold text-ink">{item.courseTitle}</h3>
+                      <p className="mt-1 text-sm text-ink-muted">GV. {item.instructorName}</p>
                     </div>
-                    <div className="flex shrink-0 items-center font-display text-base font-bold text-gray-900">
+                    <div className="flex shrink-0 items-center font-display text-base font-bold text-ink">
                       {formatPrice(item.price)}
                     </div>
                   </div>
@@ -113,47 +113,47 @@ function CartCheckoutContent() {
               </div>
             </div>
 
-            <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-              <h2 className="mb-4 text-lg font-bold text-gray-900">Thông tin bổ sung</h2>
+            <div className="rounded-card border border-line bg-white p-6 shadow-card">
+              <h2 className="mb-4 text-lg font-bold text-ink">Thông tin bổ sung</h2>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="mb-1.5 block text-sm font-semibold text-gray-700">Họ và tên</label>
+                  <label className="mb-1.5 block text-sm font-semibold text-ink-muted">Họ và tên</label>
                   <input
                     type="text"
                     placeholder="Tên của bạn"
-                    className="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+                    className="w-full rounded-xl border border-line px-4 py-2.5 text-sm outline-none focus:border-accent focus:ring-1 focus:ring-accent"
                     value={billingName}
                     onChange={(e) => setBillingName(e.target.value)}
                   />
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-sm font-semibold text-gray-700">Số điện thoại</label>
+                  <label className="mb-1.5 block text-sm font-semibold text-ink-muted">Số điện thoại</label>
                   <input
                     type="text"
                     placeholder="Số điện thoại liên hệ"
-                    className="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+                    className="w-full rounded-xl border border-line px-4 py-2.5 text-sm outline-none focus:border-accent focus:ring-1 focus:ring-accent"
                     value={billingPhone}
                     onChange={(e) => setBillingPhone(e.target.value)}
                   />
                 </div>
               </div>
-              <p className="mt-3 text-xs text-gray-500">* Thông tin trên chỉ dùng để liên hệ hỗ trợ khi cần thiết, không ảnh hưởng đến tài khoản thanh toán của bạn.</p>
+              <p className="mt-3 text-xs text-ink-muted">* Thông tin trên chỉ dùng để liên hệ hỗ trợ khi cần thiết, không ảnh hưởng đến tài khoản thanh toán của bạn.</p>
             </div>
           </div>
 
           {/* Cột phải: phương thức thanh toán */}
           <div className="space-y-6 md:col-span-1">
-            <div className="sticky top-24 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-              <h2 className="mb-4 text-lg font-bold text-gray-900">Tóm tắt đơn hàng</h2>
+            <div className="sticky top-24 rounded-card border border-line bg-white p-6 shadow-card">
+              <h2 className="mb-4 text-lg font-bold text-ink">Tóm tắt đơn hàng</h2>
 
-              <div className="flex justify-between border-b border-gray-100 pb-4">
-                <span className="text-gray-600">Tạm tính ({items.length} khóa học)</span>
-                <span className="font-semibold text-gray-900">{formatPrice(total)}</span>
+              <div className="flex justify-between border-b border-line-soft pb-4">
+                <span className="text-ink-muted">Tạm tính ({items.length} khóa học)</span>
+                <span className="font-semibold text-ink">{formatPrice(total)}</span>
               </div>
 
               <div className="flex justify-between py-4">
-                <span className="text-base font-bold text-gray-900">Tổng cộng</span>
-                <span className="text-xl font-bold text-cyan-600">{formatPrice(total)}</span>
+                <span className="text-base font-bold text-ink">Tổng cộng</span>
+                <span className="text-xl font-bold text-accent">{formatPrice(total)}</span>
               </div>
 
               <div className="mt-6 flex flex-col gap-3">
@@ -161,26 +161,26 @@ function CartCheckoutContent() {
                   onClick={() => handlePay('VNPAY')}
                   disabled={payingMethod !== null}
                   className={`flex w-full items-center justify-between rounded-xl border-2 px-4 py-3 transition-colors ${
-                    payingMethod === 'VNPAY' ? 'border-cyan-600 bg-cyan-50' : 'border-gray-200 bg-white hover:border-cyan-300'
+                    payingMethod === 'VNPAY' ? 'border-accent bg-accent/5' : 'border-line bg-white hover:border-accent/40'
                   }`}
                 >
                   <div className="flex items-center gap-3">
                     <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100 font-bold text-blue-700">V</div>
-                    <span className="font-semibold text-gray-900">VNPAY</span>
+                    <span className="font-semibold text-ink">VNPAY</span>
                   </div>
-                  {payingMethod === 'VNPAY' && <div className="h-4 w-4 animate-spin rounded-full border-2 border-cyan-600 border-t-transparent" />}
+                  {payingMethod === 'VNPAY' && <div className="h-4 w-4 animate-spin rounded-full border-2 border-accent border-t-transparent" />}
                 </button>
 
                 <button
                   onClick={() => handlePay('MOMO')}
                   disabled={payingMethod !== null}
                   className={`flex w-full items-center justify-between rounded-xl border-2 px-4 py-3 transition-colors ${
-                    payingMethod === 'MOMO' ? 'border-pink-600 bg-pink-50' : 'border-gray-200 bg-white hover:border-pink-300'
+                    payingMethod === 'MOMO' ? 'border-pink-600 bg-pink-50' : 'border-line bg-white hover:border-pink-300'
                   }`}
                 >
                   <div className="flex items-center gap-3">
                     <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-pink-100 font-bold text-pink-700">M</div>
-                    <span className="font-semibold text-gray-900">Ví MoMo</span>
+                    <span className="font-semibold text-ink">Ví MoMo</span>
                   </div>
                   {payingMethod === 'MOMO' && <div className="h-4 w-4 animate-spin rounded-full border-2 border-pink-600 border-t-transparent" />}
                 </button>
@@ -189,12 +189,12 @@ function CartCheckoutContent() {
                   onClick={() => handlePay('ZALOPAY')}
                   disabled={payingMethod !== null}
                   className={`flex w-full items-center justify-between rounded-xl border-2 px-4 py-3 transition-colors ${
-                    payingMethod === 'ZALOPAY' ? 'border-green-600 bg-green-50' : 'border-gray-200 bg-white hover:border-green-300'
+                    payingMethod === 'ZALOPAY' ? 'border-green-600 bg-green-50' : 'border-line bg-white hover:border-green-300'
                   }`}
                 >
                   <div className="flex items-center gap-3">
                     <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-100 font-bold text-green-700">Z</div>
-                    <span className="font-semibold text-gray-900">ZaloPay</span>
+                    <span className="font-semibold text-ink">ZaloPay</span>
                   </div>
                   {payingMethod === 'ZALOPAY' && <div className="h-4 w-4 animate-spin rounded-full border-2 border-green-600 border-t-transparent" />}
                 </button>
@@ -203,18 +203,18 @@ function CartCheckoutContent() {
                   onClick={() => handlePay('PAYOS')}
                   disabled={payingMethod !== null}
                   className={`flex w-full items-center justify-between rounded-xl border-2 px-4 py-3 transition-colors ${
-                    payingMethod === 'PAYOS' ? 'border-gray-900 bg-gray-50' : 'border-gray-200 bg-white hover:border-gray-900'
+                    payingMethod === 'PAYOS' ? 'border-ink bg-surface' : 'border-line bg-white hover:border-ink'
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-900 font-bold text-white">P</div>
-                    <span className="font-semibold text-gray-900">Chuyển khoản QR (PayOS)</span>
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-ink font-bold text-white">P</div>
+                    <span className="font-semibold text-ink">Chuyển khoản QR (PayOS)</span>
                   </div>
-                  {payingMethod === 'PAYOS' && <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-900 border-t-transparent" />}
+                  {payingMethod === 'PAYOS' && <div className="h-4 w-4 animate-spin rounded-full border-2 border-ink border-t-transparent" />}
                 </button>
               </div>
 
-              <p className="mt-4 text-center text-xs text-gray-500">
+              <p className="mt-4 text-center text-xs text-ink-muted">
                 Bằng việc thanh toán, bạn đồng ý với Điều khoản dịch vụ của LinguaLearn.
               </p>
             </div>

@@ -147,20 +147,20 @@ export function QuizViewer({ questions }: { questions: QuizQuestion[] }) {
         {isAnswered && !selectedIsCorrect && (
           <div className="mt-6 pt-6 border-t border-line">
             {!explanations[question.id] ? (
-              <button 
+              <button
                 onClick={() => handleExplain(question.id, selectedOption)}
                 className="text-accent text-sm font-semibold hover:underline flex items-center gap-1"
               >
-                🤖 Hỏi Gia sư AI tại sao sai?
+                Hỏi Gia sư AI tại sao sai?
               </button>
             ) : (
-              <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
-                <div className="flex items-center gap-2 font-bold text-blue-900 mb-2">
-                  <span>🤖 Gia sư AI giải thích:</span>
-                  {explanations[question.id]?.loading && <span className="animate-pulse text-blue-500">Đang suy nghĩ...</span>}
+              <div className="bg-accent/5 p-4 rounded-lg border border-accent/15">
+                <div className="flex items-center gap-2 font-bold text-accent-dark mb-2">
+                  <span>Gia sư AI giải thích:</span>
+                  {explanations[question.id]?.loading && <span className="animate-pulse text-accent">Đang suy nghĩ...</span>}
                 </div>
                 {explanations[question.id]?.text && (
-                  <div className="text-sm text-blue-800 leading-relaxed">
+                  <div className="text-sm text-ink leading-relaxed">
                     <MarkdownRenderer content={explanations[question.id]!.text!} />
                   </div>
                 )}

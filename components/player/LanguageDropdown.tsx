@@ -93,7 +93,7 @@ export function LanguageDropdown({ languages, activeCode, sourceLanguage, onSele
             )}
           </span>
         ) : (
-          <span className="text-ink-muted">🌐 Âm thanh gốc</span>
+          <span className="text-ink-muted">Âm thanh gốc</span>
         )}
         <svg
           width="10"

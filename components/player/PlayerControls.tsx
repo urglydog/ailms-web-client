@@ -14,6 +14,12 @@ import { useEffect, useRef, useState } from 'react';
  * `qualities = null` ẩn hẳn mục "Chất lượng video" trong Cài đặt — dùng cho nguồn UPLOAD, nơi hệ
  * thống chỉ lưu đúng 1 file/bài học (không có pipeline chuyển mã nhiều độ phân giải), khác nguồn
  * YouTube có thể dùng thẳng cơ chế chọn chất lượng có sẵn của IFrame Player API.
+ *
+ * BUG THẬT (11/09/2026): hover/bấm vào các nút (Cài đặt, Transcript, tốc độ đang chọn...) làm
+ * CHỮ/ICON BIẾN MẤT — nguyên nhân là token `accent-glow` (tailwind.config.ts) đã đổi thành
+ * `transparent` (bỏ hiệu ứng "glow" khi chuyển hướng thiết kế Enterprise/Academic) nhưng file này
+ * vẫn dùng `accent-glow` làm màu hover/active. Đổi hẳn sang `accent` (xanh dương đặc, luôn thấy
+ * rõ trên nền tối của thanh điều khiển) — không dùng lại `accent-glow` ở đây nữa.
  */
 
 export const SPEED_OPTIONS = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
@@ -49,6 +55,15 @@ export interface PlayerControlsProps {
   onToggleFullscreen: () => void;
   showTranscript: boolean;
   onToggleTranscript: () => void;
+  /** Bật/tắt phụ đề — đưa RA THẲNG thanh điều khiển (11/09/2026, trước đây chôn trong Cài đặt
+   * → Cài đặt phụ đề, học viên phản ánh khó bấm) — `*Available = false` disable nút khi bài học
+   * chưa có phụ đề loại đó. */
+  showOriginalSub: boolean;
+  onToggleShowOriginalSub: () => void;
+  originalSubtitleAvailable: boolean;
+  showTranslatedSub: boolean;
+  onToggleShowTranslatedSub: () => void;
+  translatedSubtitleAvailable: boolean;
   autoNextEnabled: boolean;
   onToggleAutoNext: () => void;
   onOpenShortcuts: () => void;
@@ -103,6 +118,12 @@ export function PlayerControls({
   onToggleFullscreen,
   showTranscript,
   onToggleTranscript,
+  showOriginalSub,
+  onToggleShowOriginalSub,
+  originalSubtitleAvailable,
+  showTranslatedSub,
+  onToggleShowTranslatedSub,
+  translatedSubtitleAvailable,
   autoNextEnabled,
   onToggleAutoNext,
   onOpenShortcuts,
@@ -170,7 +191,7 @@ export function PlayerControls({
       <div className="flex items-center justify-between gap-2 px-3">
         {/* ── Cụm trái: play/pause · lùi 5s · tốc độ · tua 5s · thời lượng ── */}
         <div className="flex items-center gap-3">
-          <button type="button" onClick={onTogglePlay} aria-label={isPlaying ? 'Tạm dừng' : 'Phát'} className="hover:text-accent-glow">
+          <button type="button" onClick={onTogglePlay} aria-label={isPlaying ? 'Tạm dừng' : 'Phát'} className="hover:text-accent">
             {isPlaying ? <PauseIcon /> : <PlayIcon />}
           </button>
           <button
@@ -178,7 +199,7 @@ export function PlayerControls({
             onClick={() => onSeek(Math.max(0, currentSec - 5))}
             aria-label="Lùi 5 giây"
             title="Lùi 5 giây"
-            className="hover:text-accent-glow"
+            className="hover:text-accent"
           >
             <Skip5Icon direction="back" />
           </button>
@@ -204,7 +225,7 @@ export function PlayerControls({
                       setSpeedOpen(false);
                     }}
                     className={`block w-full px-3 py-1.5 text-left hover:bg-white/10 ${
-                      s === playbackRate ? 'font-semibold text-accent-glow' : 'text-white'
+                      s === playbackRate ? 'font-semibold text-accent' : 'text-white'
                     }`}
                   >
                     {s}x
@@ -219,7 +240,7 @@ export function PlayerControls({
             onClick={() => onSeek(Math.min(duration, currentSec + 5))}
             aria-label="Tua tới 5 giây"
             title="Tua tới 5 giây"
-            className="hover:text-accent-glow"
+            className="hover:text-accent"
           >
             <Skip5Icon direction="forward" />
           </button>
@@ -229,8 +250,8 @@ export function PlayerControls({
           </span>
         </div>
 
-        {/* ── Cụm phải: âm lượng · transcript · cài đặt · toàn màn hình ── */}
-        <div className="flex items-center gap-3">
+        {/* ── Cụm phải: âm lượng · phụ đề gốc/dịch · transcript · cài đặt · toàn màn hình ── */}
+        <div className="flex items-center gap-2.5">
           {/* Mặc định CHỈ hiện icon loa — giữ chuột/focus vào loa mới lộ thanh kéo âm lượng.
               Bọc `<input>` trong 1 div `overflow-hidden` riêng (thay vì tự co width chính nó)
               vì con trượt (thumb) của `<input type="range">` không bị cắt theo width của
@@ -240,7 +261,7 @@ export function PlayerControls({
               type="button"
               onClick={onToggleMute}
               aria-label={muted || volume === 0 ? 'Bật tiếng' : 'Tắt tiếng'}
-              className="hover:text-accent-glow"
+              className="hover:text-accent"
             >
               {muted || volume === 0 ? <VolumeMuteIcon /> : <VolumeIcon />}
             </button>
@@ -257,18 +278,47 @@ export function PlayerControls({
             </div>
           </div>
 
+          {/* Bật/tắt phụ đề — nhãn CHỮ (Gốc/Dịch) thay vì icon mơ hồ, giống nút "CC" quen thuộc
+              của các trình phát video, dễ hiểu ngay không cần đoán icon. */}
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={onToggleShowOriginalSub}
+              disabled={!originalSubtitleAvailable}
+              aria-pressed={showOriginalSub}
+              title={originalSubtitleAvailable ? 'Phụ đề gốc' : 'Bài học chưa có phụ đề gốc'}
+              className={`rounded border px-1.5 py-0.5 text-[11px] font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-30 ${
+                showOriginalSub ? 'border-accent bg-accent text-white' : 'border-white/30 text-white/85 hover:border-white'
+              }`}
+            >
+              Gốc
+            </button>
+            <button
+              type="button"
+              onClick={onToggleShowTranslatedSub}
+              disabled={!translatedSubtitleAvailable}
+              aria-pressed={showTranslatedSub}
+              title={translatedSubtitleAvailable ? 'Phụ đề đã dịch' : 'Ngôn ngữ đang chọn chưa có phụ đề dịch'}
+              className={`rounded border px-1.5 py-0.5 text-[11px] font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-30 ${
+                showTranslatedSub ? 'border-accent bg-accent text-white' : 'border-white/30 text-white/85 hover:border-white'
+              }`}
+            >
+              Dịch
+            </button>
+          </div>
+
           <button
             type="button"
             onClick={onToggleTranscript}
             aria-pressed={showTranscript}
             title="Bản ghi lời thoại (Transcript)"
-            className={showTranscript ? 'text-accent-glow' : 'hover:text-accent-glow'}
+            className={showTranscript ? 'text-accent' : 'hover:text-accent'}
           >
             <TranscriptIcon />
           </button>
 
           <div ref={settingsRef} className="relative">
-            <button type="button" onClick={() => setSettingsOpen((v) => !v)} aria-label="Cài đặt" title="Cài đặt" className="hover:text-accent-glow">
+            <button type="button" onClick={() => setSettingsOpen((v) => !v)} aria-label="Cài đặt" title="Cài đặt" className="hover:text-accent">
               <GearIcon />
             </button>
             {settingsOpen && (
@@ -284,7 +334,7 @@ export function PlayerControls({
                         type="button"
                         onClick={() => onSetQuality(q)}
                         className={`flex w-full items-center justify-between rounded px-2 py-1.5 text-left hover:bg-white/10 ${
-                          q === quality ? 'text-accent-glow' : 'text-white'
+                          q === quality ? 'text-accent' : 'text-white'
                         }`}
                       >
                         {QUALITY_LABELS[q] ?? q}
@@ -303,10 +353,10 @@ export function PlayerControls({
                     onOpenSubtitleSettings();
                     setSettingsOpen(false);
                   }}
-                  className="flex w-full items-center gap-2 border-b border-white/10 p-3 text-left hover:bg-white/10"
+                  className="flex w-full items-center gap-2.5 border-b border-white/10 p-3 text-left hover:bg-white/10"
                 >
-                  <span aria-hidden>🔤</span>
-                  Cài đặt phụ đề
+                  <SubtitleStyleIcon />
+                  Kiểu hiển thị phụ đề
                 </button>
                 <button
                   type="button"
@@ -314,9 +364,9 @@ export function PlayerControls({
                     onOpenShortcuts();
                     setSettingsOpen(false);
                   }}
-                  className="flex w-full items-center gap-2 p-3 text-left hover:bg-white/10"
+                  className="flex w-full items-center gap-2.5 p-3 text-left hover:bg-white/10"
                 >
-                  <span aria-hidden>⌨️</span>
+                  <KeyboardIcon />
                   Phím tắt bàn phím
                 </button>
               </div>
@@ -328,7 +378,7 @@ export function PlayerControls({
             onClick={onToggleFullscreen}
             aria-label={isFullscreen ? 'Thoát toàn màn hình' : 'Toàn màn hình'}
             title={isFullscreen ? 'Thoát toàn màn hình' : 'Toàn màn hình'}
-            className="hover:text-accent-glow"
+            className="hover:text-accent"
           >
             {isFullscreen ? <CollapseIcon /> : <ExpandIcon />}
           </button>
@@ -429,6 +479,27 @@ function CollapseIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M9 3v4a1 1 0 0 1-1 1H4M20 8h-4a1 1 0 0 1-1-1V3M15 21v-4a1 1 0 0 1 1-1h4M4 16h4a1 1 0 0 1 1 1v4" />
+    </svg>
+  );
+}
+
+/** Ô chữ "Aa" trong khung — thay cho emoji 🔤, cùng quy ước với các nút chọn cỡ chữ trong
+ * bảng Kiểu hiển thị phụ đề. */
+function SubtitleStyleIcon() {
+  return (
+    <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded border border-current text-[8px] font-bold leading-none">
+      Aa
+    </span>
+  );
+}
+
+/** Phím bàn phím đơn giản — thay cho emoji ⌨️. */
+function KeyboardIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
+      <rect x="2" y="5" width="20" height="14" rx="2" />
+      <path d="M6 9h.01M10 9h.01M14 9h.01M18 9h.01M6 13h.01M18 13h.01" strokeWidth="2.4" />
+      <path d="M9 13h6" />
     </svg>
   );
 }

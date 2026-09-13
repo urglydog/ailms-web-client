@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { publicCoursesApi } from '@/lib/api/publicCourses';
 import type { CourseFilterState, CourseSortBy } from '@/types/domain';
 
@@ -22,5 +22,8 @@ export function useLessonPlayer(lessonId: number, options: { enabled?: boolean }
     queryFn: () => publicCoursesApi.getLessonPlayer(lessonId),
     retry: false,
     enabled: options.enabled ?? true,
+    // Giữ dữ liệu bài trước khi chuyển bài (xem `useEnrolledLessonPlayer`) — tránh cả trang chớp
+    // trắng lúc đổi bài.
+    placeholderData: keepPreviousData,
   });
 }

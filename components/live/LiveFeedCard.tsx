@@ -47,8 +47,8 @@ export function LiveFeedCard({ item }: { item: LiveFeedItem }) {
             className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-accent/15 to-accent/5 text-3xl">
-            🎬
+          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-accent/15 to-accent/5 text-accent/40">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="5" width="15" height="14" rx="2" /><path d="m22 8-5 4 5 4z" /></svg>
           </div>
         )}
 
@@ -59,7 +59,7 @@ export function LiveFeedCard({ item }: { item: LiveFeedItem }) {
             </span>
           ) : (
             <span className="rounded-full bg-black/60 px-2 py-0.5 text-[11px] font-semibold text-white shadow">
-              🗓️ {item.scheduledAt ? formatDateTime(item.scheduledAt) : 'Sắp diễn ra'}
+              {item.scheduledAt ? formatDateTime(item.scheduledAt) : 'Sắp diễn ra'}
             </span>
           )}
         </div>
@@ -71,7 +71,7 @@ export function LiveFeedCard({ item }: { item: LiveFeedItem }) {
         </p>
         <p className="m-0 truncate text-[12px] text-ink-muted">{item.instructorName}</p>
         <p className="m-0 truncate text-[11.5px] text-ink-faint">
-          {item.courseTitle} · 🌐 {languageDisplayName(item.sourceLanguage)}
+          {item.courseTitle} · {languageDisplayName(item.sourceLanguage)}
         </p>
       </div>
     </Link>

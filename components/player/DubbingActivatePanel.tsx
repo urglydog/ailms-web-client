@@ -63,7 +63,7 @@ export function DubbingActivatePanel({
         <div className="flex shrink-0 items-center gap-4">
           {!quotaExceeded && (
             <Button variant="ai" size="sm" onClick={onActivate} disabled={isSubmitting}>
-              {isSubmitting ? 'Đang gửi…' : '⚡ Kích hoạt lồng tiếng AI'}
+              {isSubmitting ? 'Đang gửi…' : 'Kích hoạt lồng tiếng AI'}
             </Button>
           )}
           <button

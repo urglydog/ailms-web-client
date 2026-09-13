@@ -152,7 +152,7 @@ function RequireLoginInline() {
         </Link>
         <Link
           href="/register"
-          className="rounded-full border border-line px-5 py-2.5 text-sm font-semibold text-ink no-underline hover:bg-gray-50"
+          className="rounded-full border border-line px-5 py-2.5 text-sm font-semibold text-ink no-underline hover:bg-surface-hover"
         >
           Đăng ký
         </Link>

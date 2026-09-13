@@ -12,25 +12,24 @@ import {
 } from '@/components/player/subtitleStyle';
 
 /**
- * Bảng cài đặt phụ đề — giao diện tham khảo tiện ích eJOY (06/09/2026), rút gọn cho đúng những
- * gì project này có: 2 loại phụ đề (gốc/đã dịch, KHÔNG có "Machine translation"/"Phonetic" như
- * eJOY vì không phải tính năng của hệ thống).
+ * Bảng "Kiểu hiển thị phụ đề" — giao diện tham khảo tiện ích eJOY (06/09/2026), rút gọn cho
+ * đúng những gì project này có: 2 loại phụ đề (gốc/đã dịch, KHÔNG có "Machine translation"/
+ * "Phonetic" như eJOY vì không phải tính năng của hệ thống).
  *
  * (06/09/2026 — sửa lần 2) Mỗi thuộc tính (màu chữ/màu nền/độ đậm nền/viền chữ) là 1 điều khiển
  * ĐỘC LẬP thay vì các "preset" loại trừ nhau như bản đầu — học viên yêu cầu rõ phải KẾT HỢP được
  * (vd nền đen + chữ vàng + có viền cùng lúc). `PRESET_TEMPLATES` giờ chỉ là nút "áp nhanh" 1
  * PHẦN cấu hình (patch), bấm nhiều mẫu liên tiếp sẽ CHỒNG lên nhau, không thay thế lẫn nhau.
+ *
+ * (11/09/2026 — sửa lần 3) Bỏ hẳn checkbox "Bật hiển thị" khỏi đây — 2 nút bật/tắt nhanh
+ * "Gốc"/"Dịch" đã chuyển RA THẲNG thanh điều khiển video (`PlayerControls.tsx`), tránh 2 nơi
+ * cùng điều khiển 1 trạng thái dễ gây nhầm lẫn. Bảng này giờ CHỈ còn lo phần KIỂU HIỂN THỊ
+ * (cỡ chữ/màu/vị trí), không còn quyết định bật/tắt.
  */
 
 interface SubtitleSettingsModalProps {
   settings: SubtitleSettings;
   onChange: (next: SubtitleSettings) => void;
-  showOriginal: boolean;
-  onToggleShowOriginal: () => void;
-  originalAvailable: boolean;
-  showTranslated: boolean;
-  onToggleShowTranslated: () => void;
-  translatedAvailable: boolean;
   onClose: () => void;
   onEditPosition: () => void;
 }
@@ -61,7 +60,7 @@ function ColorPickerRow({ label, value, onChange }: { label: string; value: stri
             onClick={() => onChange(c)}
             aria-label={c}
             className={`h-7 w-7 rounded-full border-2 ${
-              (normalizeHex(value) ?? '') === c ? 'border-accent-glow' : 'border-white/30 hover:border-white/60'
+              (normalizeHex(value) ?? '') === c ? 'border-accent' : 'border-white/30 hover:border-white/60'
             }`}
             style={{ backgroundColor: c }}
           />
@@ -89,24 +88,9 @@ function ColorPickerRow({ label, value, onChange }: { label: string; value: stri
   );
 }
 
-export function SubtitleSettingsModal({
-  settings,
-  onChange,
-  showOriginal,
-  onToggleShowOriginal,
-  originalAvailable,
-  showTranslated,
-  onToggleShowTranslated,
-  translatedAvailable,
-  onClose,
-  onEditPosition,
-}: SubtitleSettingsModalProps) {
-  // Mặc định mở đúng tab "Phụ đề gốc" (06/09/2026 — trước đó lỡ mặc định "Phụ đề đã dịch").
+export function SubtitleSettingsModal({ settings, onChange, onClose, onEditPosition }: SubtitleSettingsModalProps) {
   const [tab, setTab] = useState<Tab>('original');
   const current = settings[tab];
-  const isOn = tab === 'original' ? showOriginal : showTranslated;
-  const onToggleOn = tab === 'original' ? onToggleShowOriginal : onToggleShowTranslated;
-  const available = tab === 'original' ? originalAvailable : translatedAvailable;
 
   const updateCurrent = (patch: Partial<SubtitleTypeSettings>) => {
     onChange({ ...settings, [tab]: { ...current, ...patch } });
@@ -127,7 +111,7 @@ export function SubtitleSettingsModal({
         </svg>
       </button>
 
-      <h2 className="mb-4 text-center font-display text-lg font-bold">Cài đặt phụ đề</h2>
+      <h2 className="mb-4 text-center font-display text-lg font-bold">Kiểu hiển thị phụ đề</h2>
 
       <div className="mx-auto flex w-full max-w-lg flex-col gap-4">
         <div className="flex border-b border-white/15">
@@ -135,7 +119,7 @@ export function SubtitleSettingsModal({
             type="button"
             onClick={() => setTab('original')}
             className={`flex-1 border-b-2 px-3 py-2 text-sm font-semibold transition-colors ${
-              tab === 'original' ? 'border-accent text-accent-glow' : 'border-transparent text-white/60 hover:text-white'
+              tab === 'original' ? 'border-accent text-accent' : 'border-transparent text-white/60 hover:text-white'
             }`}
           >
             Phụ đề gốc
@@ -144,20 +128,12 @@ export function SubtitleSettingsModal({
             type="button"
             onClick={() => setTab('translated')}
             className={`flex-1 border-b-2 px-3 py-2 text-sm font-semibold transition-colors ${
-              tab === 'translated' ? 'border-accent text-accent-glow' : 'border-transparent text-white/60 hover:text-white'
+              tab === 'translated' ? 'border-accent text-accent' : 'border-transparent text-white/60 hover:text-white'
             }`}
           >
             Phụ đề đã dịch
           </button>
         </div>
-
-        <label className={`flex cursor-pointer items-center justify-between gap-3 ${!available ? 'cursor-not-allowed opacity-50' : ''}`}>
-          <span className="text-sm">
-            Bật hiển thị
-            {!available && <span className="ml-1.5 text-[12px] text-white/50">(chưa có phụ đề)</span>}
-          </span>
-          <input type="checkbox" checked={isOn} disabled={!available} onChange={onToggleOn} className="h-4 w-4 rounded accent-accent" />
-        </label>
 
         <div>
           <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-white/50">Cỡ chữ</p>
@@ -168,7 +144,7 @@ export function SubtitleSettingsModal({
                 type="button"
                 onClick={() => updateCurrent({ fontSize: opt.value })}
                 className={`flex h-10 flex-1 items-center justify-center rounded-md border ${
-                  current.fontSize === opt.value ? 'border-accent bg-accent/20 text-accent-glow' : 'border-white/20 hover:border-white/50'
+                  current.fontSize === opt.value ? 'border-accent bg-accent/20 text-accent' : 'border-white/20 hover:border-white/50'
                 }`}
               >
                 <span className={opt.textClass}>{opt.label}</span>
@@ -236,7 +212,14 @@ export function SubtitleSettingsModal({
           onClick={onEditPosition}
           className="mt-1 flex items-center justify-center gap-2 rounded-full border border-white/25 py-2.5 text-sm font-semibold hover:border-white"
         >
-          <span aria-hidden>🖱️</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="5 9 2 12 5 15" />
+            <polyline points="9 5 12 2 15 5" />
+            <polyline points="15 19 12 22 9 19" />
+            <polyline points="19 9 22 12 19 15" />
+            <line x1="2" y1="12" x2="22" y2="12" />
+            <line x1="12" y1="2" x2="12" y2="22" />
+          </svg>
           Tuỳ chỉnh vị trí phụ đề trên video
         </button>
       </div>

@@ -349,14 +349,14 @@ function LiveVideoStage({
   const showOriginalLine = showOriginalSub && originalText;
 
   return (
-    <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-gray-900">
+    <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-ink">
       {mainTrack ? (
         <VideoTrack
           trackRef={mainTrack}
           className={`h-full w-full ${mainTrack.source === Track.Source.ScreenShare ? 'object-contain' : 'object-cover'}`}
         />
       ) : (
-        <div className="flex h-full items-center justify-center text-sm text-gray-400">
+        <div className="flex h-full items-center justify-center text-sm text-white/40">
           Giảng viên chưa bật camera hoặc chia sẻ màn hình
         </div>
       )}
@@ -377,7 +377,7 @@ function LiveVideoStage({
             </span>
           )}
           {showOriginalLine && (
-            <span className="max-w-full rounded-md bg-black/50 px-2.5 py-1 text-[12.5px] leading-snug text-gray-200">
+            <span className="max-w-full rounded-md bg-black/50 px-2.5 py-1 text-[12.5px] leading-snug text-white/85">
               {originalText}
             </span>
           )}

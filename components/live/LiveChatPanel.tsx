@@ -76,25 +76,25 @@ export function LiveChatPanel({ isAuthenticated }: { isAuthenticated: boolean })
   };
 
   return (
-    <div className="flex h-full min-h-[360px] flex-col rounded-xl border border-gray-200 bg-white">
-      <div className="border-b border-gray-100 px-4 py-3">
-        <span className="text-[13px] font-bold text-gray-900">Chat trực tiếp</span>
+    <div className="flex h-full min-h-[360px] flex-col rounded-xl border border-line bg-white">
+      <div className="border-b border-line-soft px-4 py-3">
+        <span className="text-[13px] font-bold text-ink">Chat trực tiếp</span>
       </div>
 
       <div ref={listRef} className="flex-1 overflow-y-auto px-4 py-3">
         {visibleMessages.length === 0 && (
-          <p className="text-center text-[12.5px] text-gray-400">Chưa có tin nhắn nào.</p>
+          <p className="text-center text-[12.5px] text-ink-faint">Chưa có tin nhắn nào.</p>
         )}
         <div className="flex flex-col gap-2.5">
           {visibleMessages.map((m) => {
             const senderIsInstructor = m.from?.identity?.startsWith('instructor-') ?? false;
             return (
               <div key={m.id} className="group flex items-start justify-between gap-2 text-[13px]">
-                <p className="min-w-0 break-words text-gray-800">
-                  <span className={`font-semibold ${senderIsInstructor ? 'text-red-600' : 'text-gray-900'}`}>
+                <p className="min-w-0 break-words text-ink">
+                  <span className={`font-semibold ${senderIsInstructor ? 'text-red-600' : 'text-ink'}`}>
                     {senderIsInstructor ? 'Giảng viên' : (m.from?.name ?? 'Ẩn danh')}
                   </span>{' '}
-                  <span className="text-[10.5px] text-gray-400">{formatTime(m.timestamp)}</span>
+                  <span className="text-[10.5px] text-ink-faint">{formatTime(m.timestamp)}</span>
                   <br />
                   {m.message}
                 </p>
@@ -103,7 +103,7 @@ export function LiveChatPanel({ isAuthenticated }: { isAuthenticated: boolean })
                     type="button"
                     onClick={() => handleHide(m.id)}
                     title="Ẩn tin nhắn này"
-                    className="shrink-0 text-[11px] text-gray-300 opacity-0 hover:text-red-500 group-hover:opacity-100"
+                    className="shrink-0 text-[11px] text-ink-faint opacity-0 hover:text-red-500 group-hover:opacity-100"
                   >
                     Ẩn
                   </button>
@@ -114,7 +114,7 @@ export function LiveChatPanel({ isAuthenticated }: { isAuthenticated: boolean })
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="flex items-center gap-2 border-t border-gray-100 p-3">
+      <form onSubmit={handleSubmit} className="flex items-center gap-2 border-t border-line-soft p-3">
         <input
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
@@ -123,14 +123,14 @@ export function LiveChatPanel({ isAuthenticated }: { isAuthenticated: boolean })
             if (!isAuthenticated) setShowLoginModal(true);
           }}
           placeholder={isAuthenticated ? 'Nhập tin nhắn…' : 'Đăng nhập để chat'}
-          className="min-w-0 flex-1 rounded-full border border-gray-200 px-3.5 py-2 text-[13px]
-                     text-gray-800 outline-none placeholder:text-gray-400 focus:border-cyan-400"
+          className="min-w-0 flex-1 rounded-full border border-line px-3.5 py-2 text-[13px]
+                     text-ink outline-none placeholder:text-ink-faint focus:border-accent"
         />
         <button
           type="submit"
           disabled={isAuthenticated && (isSending || !draft.trim())}
-          className="shrink-0 rounded-full bg-cyan-600 px-4 py-2 text-[12.5px] font-bold text-white
-                     hover:bg-cyan-700 disabled:opacity-50"
+          className="shrink-0 rounded-full bg-accent px-4 py-2 text-[12.5px] font-bold text-white
+                     hover:bg-accent-dark disabled:opacity-50"
         >
           Gửi
         </button>

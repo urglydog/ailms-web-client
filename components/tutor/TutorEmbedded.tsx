@@ -24,7 +24,9 @@ function AttachmentThumb({ attachment }: { attachment: TutorAttachment }) {
   }
   return (
     <div className="flex max-w-[220px] items-center gap-1.5 rounded-lg border border-line bg-white px-2.5 py-1.5 text-xs text-ink-muted shadow-sm">
-      <span aria-hidden>📄</span>
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden className="shrink-0">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6" />
+      </svg>
       <span className="truncate">{attachment.fileName}</span>
     </div>
   );
@@ -86,8 +88,8 @@ function SessionRow({
           isActive ? 'bg-accent/10' : ''
         }`}
       >
-        <span className="flex w-full items-center gap-1 truncate text-sm text-ink">
-          {session.isPinned && <span aria-hidden title="Đã ghim">📌</span>}
+        <span className="flex w-full items-center gap-1.5 truncate text-sm text-ink">
+          {session.isPinned && <span aria-hidden title="Đã ghim" className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />}
           <span className="truncate">{session.title}</span>
         </span>
         <span className="text-xs text-ink-faint">
@@ -116,21 +118,21 @@ function SessionRow({
             onClick={onTogglePin}
             className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-ink hover:bg-surface"
           >
-            {session.isPinned ? '📌 Bỏ ghim' : '📌 Ghim'}
+            {session.isPinned ? 'Bỏ ghim' : 'Ghim'}
           </button>
           <button
             type="button"
             onClick={onStartRename}
             className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-ink hover:bg-surface"
           >
-            ✏️ Đổi tên
+            Đổi tên
           </button>
           <button
             type="button"
             onClick={onDelete}
             className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50"
           >
-            🗑️ Xoá
+            Xoá
           </button>
         </div>
       )}
@@ -257,9 +259,9 @@ export function TutorEmbedded({ courseId, lessonId, onSeek }: TutorEmbeddedProps
             }}
             title="Cuộc trò chuyện mới"
             aria-label="Bắt đầu cuộc trò chuyện mới"
-            className="flex h-8 w-8 items-center justify-center rounded-full text-lg transition-colors hover:bg-white/20"
+            className="flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-white/20"
           >
-            ✚
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
           </button>
           <button
             type="button"
@@ -270,9 +272,9 @@ export function TutorEmbedded({ courseId, lessonId, onSeek }: TutorEmbeddedProps
             title="Lịch sử trò chuyện"
             aria-label="Xem lịch sử trò chuyện"
             aria-expanded={showHistory}
-            className={`flex h-8 w-8 items-center justify-center rounded-full text-lg transition-colors hover:bg-white/20 ${showHistory ? 'bg-white/20' : ''}`}
+            className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-white/20 ${showHistory ? 'bg-white/20' : ''}`}
           >
-            🕘
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3.5 2" /></svg>
           </button>
         </div>
       </div>
@@ -351,7 +353,7 @@ export function TutorEmbedded({ courseId, lessonId, onSeek }: TutorEmbeddedProps
             {!isRestoring && messages.length === 0 && (
               <p className="mt-4 text-center text-sm text-ink-muted">
                 Chào bạn! Hỏi mình bất cứ điều gì về bài học này (hoặc bài học khác trong khóa) nhé
-                — mình sẽ gợi ý để bạn tự tìm ra câu trả lời, chứ không đưa đáp án trực tiếp đâu 😉
+                — mình sẽ gợi ý để bạn tự tìm ra câu trả lời, chứ không đưa đáp án trực tiếp đâu
               </p>
             )}
             <div className="flex flex-col gap-3">
@@ -408,7 +410,13 @@ export function TutorEmbedded({ courseId, lessonId, onSeek }: TutorEmbeddedProps
                     key={`${file.name}-${i}`}
                     className="flex items-center gap-1.5 rounded-lg border border-line bg-surface px-2 py-1 text-xs text-ink-muted"
                   >
-                    <span aria-hidden>{file.type.startsWith('image/') ? '🖼️' : '📄'}</span>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden className="shrink-0">
+                      {file.type.startsWith('image/') ? (
+                        <><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="9" cy="9" r="1.5" /><path d="m21 15-5-5L5 21" /></>
+                      ) : (
+                        <><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6" /></>
+                      )}
+                    </svg>
                     <span className="max-w-[140px] truncate">{file.name}</span>
                     <button
                       type="button"

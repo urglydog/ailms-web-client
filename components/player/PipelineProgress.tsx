@@ -30,7 +30,7 @@ export function PipelineProgress({ steps, percent, onWatchOriginal, onCancel, is
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="h-2 w-2 animate-ai-pulse rounded-full bg-accent-glow" aria-hidden />
+          <span className="h-2 w-2 animate-ai-pulse rounded-full bg-accent" aria-hidden />
           <span className="font-mono text-[11px] font-semibold tracking-widest text-accent">
             ĐANG XỬ LÝ LỒNG TIẾNG AI
           </span>
