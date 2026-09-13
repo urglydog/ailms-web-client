@@ -3,12 +3,29 @@ import remarkGfm from 'remark-gfm';
 
 import type { Components } from 'react-markdown';
 
-const TIMESTAMP_RE = /\[(\d{1,3}):([0-5]?\d)\]/g;
+/**
+ * UC30 mở rộng (13/09/2026) — Gia sư AI giờ tìm kiếm xuyên suốt mọi bài trong khóa, nên 1 câu
+ * trả lời có thể trích dẫn TỪ NHIỀU bài khác nhau cùng lúc. Định dạng mới `[lessonId|MM:SS]`
+ * (nhóm 1 = lessonId) mang theo đúng bài học của mốc đó; định dạng cũ `[MM:SS]` (không có
+ * lessonId, nhóm 1 rỗng) vẫn được hỗ trợ — luồng giải thích câu hỏi trắc nghiệm
+ * (`answer_single_lesson` ở ai-worker) không đổi, luôn ngầm hiểu là bài đang mở.
+ */
+const TIMESTAMP_RE = /\[(?:(\d+)\|)?(\d{1,3}):([0-5]?\d)\]/g;
 
-function injectTimestampLinks(content: string): string {
-  return content.replace(TIMESTAMP_RE, (_match, m: string, s: string) => {
+/** Nhãn nút bấm hiện thêm "· Tên bài" khi mốc thời gian thuộc 1 bài KHÁC bài đang mở, để học
+ * viên biết TRƯỚC khi bấm là sẽ nhảy sang bài nào, không chỉ thấy mỗi giờ:phút:giây. */
+function injectTimestampLinks(
+  content: string, currentLessonId?: number, lessonTitleById?: Record<number, string>,
+): string {
+  return content.replace(TIMESTAMP_RE, (_match, lessonIdStr: string | undefined, m: string, s: string) => {
     const sec = Number(m) * 60 + Number(s);
-    return `[▶ ${m.padStart(2, '0')}:${s.padStart(2, '0')}](tutor-seek:${sec})`;
+    const lessonId = lessonIdStr ? Number(lessonIdStr) : undefined;
+    const target = lessonId !== undefined ? `${sec}@${lessonId}` : `${sec}`;
+    const timeLabel = `${m.padStart(2, '0')}:${s.padStart(2, '0')}`;
+    const isOtherLesson = lessonId !== undefined && currentLessonId !== undefined && lessonId !== currentLessonId;
+    const lessonLabel = isOtherLesson ? lessonTitleById?.[lessonId] ?? `bài #${lessonId}` : null;
+    const linkText = lessonLabel ? `▶ ${timeLabel} · ${lessonLabel}` : `▶ ${timeLabel}`;
+    return `[${linkText}](tutor-seek:${target})`;
   });
 }
 
@@ -28,18 +45,32 @@ function urlTransform(url: string): string {
   return url.startsWith('tutor-seek:') ? url : defaultUrlTransform(url);
 }
 
-export function MarkdownRenderer({ content, onSeek }: { content: string; onSeek?: (sec: number) => void }) {
-  const processedContent = onSeek ? injectTimestampLinks(content) : content;
+export function MarkdownRenderer({
+  content, onSeek, currentLessonId, lessonTitleById,
+}: {
+  content: string;
+  /** `lessonId` là `null` khi mốc thời gian không kèm bài học riêng (định dạng cũ `[MM:SS]`,
+   * luôn hiểu là bài đang mở) — xem `TIMESTAMP_RE`. */
+  onSeek?: (sec: number, lessonId: number | null) => void;
+  /** Bài đang mở + tên các bài trong khóa — chỉ dùng để HIỂN THỊ tên bài ngay trong nút bấm khi
+   * mốc trích dẫn thuộc bài khác (xem `injectTimestampLinks`), không ảnh hưởng logic tua/điều
+   * hướng (`onSeek` vẫn tự đủ thông tin qua `lessonId`). */
+  currentLessonId?: number;
+  lessonTitleById?: Record<number, string>;
+}) {
+  const processedContent = onSeek ? injectTimestampLinks(content, currentLessonId, lessonTitleById) : content;
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
   const components: Components = {
     a: ({ href, children, ...props }: any) => {
       if (href?.startsWith('tutor-seek:')) {
-        const sec = Number(href.slice('tutor-seek:'.length));
+        const [secPart, lessonIdPart] = href.slice('tutor-seek:'.length).split('@');
+        const sec = Number(secPart);
+        const lessonId = lessonIdPart ? Number(lessonIdPart) : null;
         return (
           <button
             type="button"
-            onClick={() => onSeek?.(sec)}
+            onClick={() => onSeek?.(sec, lessonId)}
             className="mx-0.5 inline rounded-full bg-accent/10 px-2 py-0.5 text-xs font-semibold text-accent hover:bg-accent/20"
             {...props}
           >
