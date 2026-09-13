@@ -7,6 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { MindmapEditor } from '@/components/materials/MindmapEditor';
 import { MermaidViewer } from '@/components/materials/MermaidViewer';
+import { MaterialLanguagePicker } from '@/components/materials/MaterialLanguagePicker';
 
 interface CourseMaterialsManagerProps {
   courseId: number;
@@ -1039,29 +1040,12 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
             )}
 
             <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
-              Ngôn ngữ lồng tiếng & Bài giảng
-              <select
+              Ngôn ngữ học liệu
+              <MaterialLanguagePicker
+                languages={languages ?? []}
                 value={language}
-                onChange={(e) => setLanguage(e.target.value)}
-                className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-cyan-500 focus:outline-none font-medium bg-white"
-              >
-                {languages && languages.length > 0 ? (
-                  languages.map((lang) => (
-                    <option key={lang} value={lang}>
-                      {lang.startsWith('vi') ? '🇻🇳 Tiếng Việt (Việt Nam) ✓ (Đã lồng tiếng)' :
-                        lang.startsWith('en') ? '🇺🇸 Tiếng Anh (Hoa Kỳ) ✓ (Đã lồng tiếng)' :
-                          lang.startsWith('ja') ? '🇯🇵 Tiếng Nhật (Nhật Bản) ✓ (Đã lồng tiếng)' :
-                            lang.startsWith('zh') ? '🇨🇳 Tiếng Trung (Trung Quốc) ✓ (Đã lồng tiếng)' :
-                              lang + ' ✓ (Đã lồng tiếng)'}
-                    </option>
-                  ))
-                ) : (
-                  <>
-                    <option value="vi">🇻🇳 Tiếng Việt (Việt Nam) ✓ (Ngôn ngữ gốc)</option>
-                    <option value="en">🇺🇸 Tiếng Anh (Hoa Kỳ)</option>
-                  </>
-                )}
-              </select>
+                onChange={setLanguage}
+              />
             </label>
 
             <div className="mt-6 flex justify-end gap-3 border-t pt-5">
