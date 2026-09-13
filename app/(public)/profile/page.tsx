@@ -90,13 +90,13 @@ export default function ProfilePage() {
 
   return (
     <div className="mx-auto max-w-4xl p-6 md:p-10">
-      <h1 className="mb-6 font-display text-3xl font-bold text-gray-900">Hồ sơ cá nhân</h1>
-      
+      <h1 className="mb-6 font-display text-3xl font-bold text-ink">Hồ sơ cá nhân</h1>
+
       <div className="grid gap-8 md:grid-cols-2">
         {/* Cột 1: Thông tin cá nhân */}
-        <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+        <div className="rounded-card border border-line bg-white p-6 shadow-card">
           <div className="mb-6 flex items-center gap-4">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-cyan-100 font-display text-2xl font-bold text-cyan-700">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-accent/10 font-display text-2xl font-bold text-accent-dark">
               {user.avatarUrl ? (
                 <img src={user.avatarUrl} alt={user.fullName} className="h-16 w-16 rounded-full object-cover" />
               ) : (
@@ -104,27 +104,27 @@ export default function ProfilePage() {
               )}
             </div>
             <div>
-              <h2 className="font-display text-xl font-bold text-gray-900">{user.fullName}</h2>
-              <span className="inline-block rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-600">
+              <h2 className="font-display text-xl font-bold text-ink">{user.fullName}</h2>
+              <span className="inline-block rounded-full bg-surface-hover px-3 py-1 text-xs font-semibold text-ink-muted">
                 Vai trò: {user.role}
               </span>
             </div>
           </div>
-          
+
           <div className="flex flex-col gap-4">
             <div>
-              <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Email</label>
-              <div className="mt-1 font-medium text-gray-900">{user.email}</div>
+              <label className="text-xs font-bold text-ink-muted uppercase tracking-wider">Email</label>
+              <div className="mt-1 font-medium text-ink">{user.email}</div>
             </div>
             <div>
-              <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Ngôn ngữ ưa thích</label>
-              <div className="mt-1 font-medium text-gray-900">
+              <label className="text-xs font-bold text-ink-muted uppercase tracking-wider">Ngôn ngữ ưa thích</label>
+              <div className="mt-1 font-medium text-ink">
                 {user.preferredLanguage === 'en' ? 'English' : user.preferredLanguage === 'ja' ? '日本語' : 'Tiếng Việt'}
               </div>
             </div>
             <div>
-              <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Ngày tham gia</label>
-              <div className="mt-1 font-medium text-gray-900">
+              <label className="text-xs font-bold text-ink-muted uppercase tracking-wider">Ngày tham gia</label>
+              <div className="mt-1 font-medium text-ink">
                 {new Date(user.createdAt).toLocaleDateString('vi-VN')}
               </div>
             </div>
@@ -134,14 +134,14 @@ export default function ProfilePage() {
             <div className="flex gap-2">
               <button
                 onClick={() => setShowEditModal(true)}
-                className="flex-1 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition-colors"
+                className="flex-1 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-dark transition-colors"
               >
                 Chỉnh sửa hồ sơ
               </button>
               {user.authProvider !== 'GOOGLE' && (
                 <button
                   onClick={() => setShowPasswordModal(true)}
-                  className="flex-1 rounded-lg bg-gray-600 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-700 transition-colors"
+                  className="flex-1 rounded-lg bg-ink-muted px-4 py-2 text-sm font-semibold text-white hover:bg-ink transition-colors"
                 >
                   Đổi mật khẩu
                 </button>
@@ -152,9 +152,9 @@ export default function ProfilePage() {
 
         {/* Cột 2: Đăng ký làm giảng viên */}
         {user.role === 'STUDENT' && (
-          <div className="rounded-2xl border border-cyan-200 bg-cyan-50/30 p-6 shadow-sm">
-            <h2 className="mb-2 font-display text-lg font-bold text-gray-900">Trở thành Giảng viên</h2>
-            <p className="mb-6 text-sm text-gray-600">
+          <div className="rounded-card border border-accent/20 bg-accent/5 p-6 shadow-card">
+            <h2 className="mb-2 font-display text-lg font-bold text-ink">Trở thành Giảng viên</h2>
+            <p className="mb-6 text-sm text-ink-muted">
               Chia sẻ kiến thức của bạn và tạo thêm thu nhập. Gửi yêu cầu để được xét duyệt.
             </p>
 
@@ -165,40 +165,40 @@ export default function ProfilePage() {
             ) : (
               <form onSubmit={handleSubmitRequest} className="flex flex-col gap-4">
                 <div>
-                  <label className="mb-1.5 block text-sm font-semibold text-gray-900">
+                  <label className="mb-1.5 block text-sm font-semibold text-ink">
                     Lý do muốn làm giảng viên <span className="text-red-500">*</span>
                   </label>
                   <textarea
                     required
                     rows={3}
-                    className="w-full rounded-lg border border-gray-300 p-3 text-sm focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500"
+                    className="w-full rounded-lg border border-line p-3 text-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                     placeholder="Giới thiệu kinh nghiệm giảng dạy của bạn..."
                     value={motivation}
                     onChange={(e) => setMotivation(e.target.value)}
                   />
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-sm font-semibold text-gray-900">
+                  <label className="mb-1.5 block text-sm font-semibold text-ink">
                     Link chứng chỉ / Portfolio
                   </label>
                   <input
                     type="url"
-                    className="w-full rounded-lg border border-gray-300 p-3 text-sm focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500"
+                    className="w-full rounded-lg border border-line p-3 text-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                     placeholder="https://..."
                     value={credentialUrl}
                     onChange={(e) => setCredentialUrl(e.target.value)}
                   />
                 </div>
-                
+
                 {message && (
                   <div className={`text-sm font-medium ${message.includes('thành công') ? 'text-green-600' : 'text-red-600'}`}>
                     {message}
                   </div>
                 )}
-                
+
                 <button
                   type="submit"
-                  className="mt-2 w-full rounded-lg bg-cyan-600 py-3 text-sm font-bold text-white hover:bg-cyan-700 transition-colors"
+                  className="mt-2 w-full rounded-lg bg-accent py-3 text-sm font-bold text-white hover:bg-accent-dark transition-colors"
                 >
                   Gửi Yêu Cầu Nâng Cấp
                 </button>

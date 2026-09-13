@@ -96,7 +96,9 @@ export function FlashcardStudyMode({ deckName: _deckName, cards, language, onFin
   if (isFinished) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[500px] text-center">
-        <div className="text-6xl mb-6">🎉</div>
+        <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-success/10 text-success">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
+        </div>
         <h2 className="font-display text-2xl font-bold text-ink mb-3">
           Congratulations! You have finished this deck for now.
         </h2>
@@ -122,7 +124,7 @@ export function FlashcardStudyMode({ deckName: _deckName, cards, language, onFin
         {/* Header */}
         <div className="w-full flex items-center justify-between mb-6">
           <h3 className="font-display text-lg font-bold text-ink flex items-center gap-2">
-            <span className="text-accent">✏️</span> Chỉnh sửa Flashcard
+            Chỉnh sửa Flashcard
           </h3>
           <button
             onClick={() => setEditMode(null)}
@@ -164,7 +166,7 @@ export function FlashcardStudyMode({ deckName: _deckName, cards, language, onFin
               disabled={isUpdating}
               className="px-6 py-2.5 bg-accent text-white rounded-xl text-sm font-bold hover:bg-accent-dark shadow-sm transition-colors disabled:opacity-50"
             >
-              {isUpdating ? 'Đang lưu...' : '💾 Lưu thay đổi'}
+              {isUpdating ? 'Đang lưu...' : 'Lưu thay đổi'}
             </button>
           </div>
         </div>
@@ -206,7 +208,7 @@ export function FlashcardStudyMode({ deckName: _deckName, cards, language, onFin
 
         {/* Counter: New + Learning + Review */}
         <div className="flex items-center gap-0 text-sm font-bold select-none">
-          <span className="text-blue-600">{newCards.length}</span>
+          <span className="text-accent">{newCards.length}</span>
           <span className="text-ink-muted mx-1">+</span>
           <span className="text-red-500">{learningCards.length}</span>
           <span className="text-ink-muted mx-1">+</span>

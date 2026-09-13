@@ -46,8 +46,8 @@ export function CourseOverviewTab({ courseSlug }: { courseSlug: string }) {
       <p className="whitespace-pre-line text-[14.5px] leading-relaxed text-ink-muted">{course.description}</p>
 
       <div className="flex flex-wrap gap-x-6 gap-y-2 border-t border-line-soft pt-4 text-sm text-ink-muted">
-        <span>📚 {course.chapters.length} chương · {totalLessons} bài giảng</span>
-        <span>🌐 Có thể lồng tiếng sang {course.langs.length} ngôn ngữ</span>
+        <span>{course.chapters.length} chương · {totalLessons} bài giảng</span>
+        <span>Có thể lồng tiếng sang {course.langs.length} ngôn ngữ</span>
       </div>
 
       <div className="flex items-center gap-3 border-t border-line-soft pt-4">

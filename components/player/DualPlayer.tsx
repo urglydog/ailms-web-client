@@ -455,7 +455,7 @@ export const DualPlayer = forwardRef<DualPlayerHandle, DualPlayerProps>(function
           className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-ink/70
                      px-2.5 py-1 text-[11px] font-semibold text-white"
         >
-          <span className="h-1.5 w-1.5 animate-ai-pulse rounded-full bg-accent-glow" aria-hidden />
+          <span className="h-1.5 w-1.5 animate-ai-pulse rounded-full bg-accent" aria-hidden />
           Đang xử lý phần còn lại
         </span>
       )}
@@ -512,6 +512,12 @@ export const DualPlayer = forwardRef<DualPlayerHandle, DualPlayerProps>(function
         onToggleFullscreen={toggleFullscreen}
         showTranscript={showTranscript}
         onToggleTranscript={onToggleTranscript}
+        showOriginalSub={showOriginalSub}
+        onToggleShowOriginalSub={onToggleShowOriginalSub}
+        originalSubtitleAvailable={originalSubtitles.length > 0}
+        showTranslatedSub={showTranslatedSub}
+        onToggleShowTranslatedSub={onToggleShowTranslatedSub}
+        translatedSubtitleAvailable={translatedSubtitles.length > 0}
         autoNextEnabled={autoNextEnabled}
         onToggleAutoNext={onToggleAutoNext}
         onOpenShortcuts={() => setShowShortcuts(true)}
@@ -524,12 +530,6 @@ export const DualPlayer = forwardRef<DualPlayerHandle, DualPlayerProps>(function
         <SubtitleSettingsModal
           settings={subtitleSettings}
           onChange={setSubtitleSettings}
-          showOriginal={showOriginalSub}
-          onToggleShowOriginal={onToggleShowOriginalSub}
-          originalAvailable={originalSubtitles.length > 0}
-          showTranslated={showTranslatedSub}
-          onToggleShowTranslated={onToggleShowTranslatedSub}
-          translatedAvailable={translatedSubtitles.length > 0}
           onClose={() => setShowSubtitleSettings(false)}
           onEditPosition={handleEditPosition}
         />

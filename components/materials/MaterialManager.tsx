@@ -261,7 +261,7 @@ export function MaterialManager({ courseId }: { courseId: number }) {
           disabled={requestMutation.isPending || (!language && availableLanguages?.length === 0) || (scopeType === 'CUSTOM_LESSONS' && customLessonIds.length === 0)}
           className="rounded-full bg-accent px-6 py-2 text-sm font-semibold text-white hover:bg-accent-dark disabled:opacity-50"
         >
-          {requestMutation.isPending ? 'Đang gửi...' : '✨ Tạo học liệu'}
+          {requestMutation.isPending ? 'Đang gửi...' : 'Tạo học liệu'}
         </button>
       </div>
 
@@ -324,7 +324,7 @@ export function MaterialManager({ courseId }: { courseId: number }) {
                       >
                         {m.title || 'Học liệu không tên'}
                       </h3>
-                      <span className="text-[10px] text-ink-muted bg-surface-hover px-2 py-0.5 rounded opacity-0 group-hover/title:opacity-100 transition-opacity">✏️ Đổi tên</span>
+                      <span className="text-[10px] text-ink-muted bg-surface-hover px-2 py-0.5 rounded opacity-0 group-hover/title:opacity-100 transition-opacity">Đổi tên</span>
                     </div>
                   )}
                   
@@ -364,7 +364,7 @@ export function MaterialManager({ courseId }: { courseId: number }) {
                     className="p-2 text-ink-muted hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
                     title="Xóa học liệu"
                   >
-                    🗑️
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18" /><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6" /><path d="M10 11v6M14 11v6" /></svg>
                   </button>
                 </div>
               </div>
@@ -399,17 +399,17 @@ export function MaterialManager({ courseId }: { courseId: number }) {
       <Link 
         key={item.id} 
         href={href}
-        className="block flex flex-col sm:flex-row items-start sm:items-center justify-between p-5 mb-3 bg-white border border-gray-200 rounded-xl hover:border-accent hover:shadow-sm transition-all cursor-pointer group"
+        className="block flex flex-col sm:flex-row items-start sm:items-center justify-between p-5 mb-3 bg-white border border-line rounded-xl hover:border-accent hover:shadow-sm transition-all cursor-pointer group"
       >
         <div className="flex-1 w-full">
           <div className="flex items-center gap-2 mb-2">
-            <h3 className="font-bold text-gray-900 text-lg group-hover:text-accent transition-colors">{item.title || 'Học liệu khóa học'}</h3>
+            <h3 className="font-bold text-ink text-lg group-hover:text-accent transition-colors">{item.title || 'Học liệu khóa học'}</h3>
             {item.materialType === 'QUIZ' ? (
               <span className="text-[10px] uppercase font-bold text-accent-dark bg-accent/10 border border-accent/20 px-2 py-0.5 rounded-md shadow-sm">
                 THI CHÍNH THỨC
               </span>
             ) : (
-              <span className="text-[10px] uppercase font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded-md">
+              <span className="text-[10px] uppercase font-bold text-ink-muted bg-surface-hover px-2 py-0.5 rounded-md">
                 {item.materialType === 'FLASHCARD' ? 'Flashcard' : 'Mindmap'}
               </span>
             )}
@@ -424,35 +424,35 @@ export function MaterialManager({ courseId }: { courseId: number }) {
                <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md ml-auto sm:ml-2">Chưa mở</span>
             )}
             {item.materialType === 'QUIZ' && isAfterEnd && (
-               <span className="text-[10px] font-bold text-gray-600 bg-gray-100 px-2 py-0.5 rounded-md ml-auto sm:ml-2">Đã đóng</span>
+               <span className="text-[10px] font-bold text-ink-muted bg-surface-hover px-2 py-0.5 rounded-md ml-auto sm:ml-2">Đã đóng</span>
             )}
             {item.materialType === 'QUIZ' && outOfAttempts && !isAfterEnd && (
-               <span className="text-[10px] font-bold text-gray-600 bg-gray-100 px-2 py-0.5 rounded-md ml-auto sm:ml-2">Hết lượt</span>
+               <span className="text-[10px] font-bold text-ink-muted bg-surface-hover px-2 py-0.5 rounded-md ml-auto sm:ml-2">Hết lượt</span>
             )}
           </div>
           
-          <div className="text-sm text-gray-600 flex flex-wrap gap-x-6 gap-y-2 mt-2">
+          <div className="text-sm text-ink-muted flex flex-wrap gap-x-6 gap-y-2 mt-2">
             {item.materialType === 'QUIZ' && (
               <>
                 <div className="flex items-center gap-1">
-                  <span className="text-gray-400">Thời gian:</span>
-                  <span className="font-medium text-gray-900">{item.durationMinutes ? `${item.durationMinutes} phút` : 'Không giới hạn'}</span>
+                  <span className="text-ink-faint">Thời gian:</span>
+                  <span className="font-medium text-ink">{item.durationMinutes ? `${item.durationMinutes} phút` : 'Không giới hạn'}</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <span className="text-gray-400">Số câu:</span>
-                  <span className="font-medium text-gray-900">{item.randomPickCount || item.questionCount}</span>
+                  <span className="text-ink-faint">Số câu:</span>
+                  <span className="font-medium text-ink">{item.randomPickCount || item.questionCount}</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <span className="text-gray-400">Lượt thi:</span>
-                  <span className="font-medium text-gray-900">
+                  <span className="text-ink-faint">Lượt thi:</span>
+                  <span className="font-medium text-ink">
                     {item.attemptCount !== undefined ? `${item.attemptCount} / ` : ''}
                     {item.maxAttempts || '∞'}
                   </span>
                 </div>
                 {startTime && (
                   <div className="flex items-center gap-1 w-full sm:w-auto mt-1 sm:mt-0">
-                    <span className="text-gray-400">Mở lúc:</span>
-                    <span className="font-medium text-gray-900">{startTime.toLocaleString('vi-VN')}</span>
+                    <span className="text-ink-faint">Mở lúc:</span>
+                    <span className="font-medium text-ink">{startTime.toLocaleString('vi-VN')}</span>
                   </div>
                 )}
               </>
@@ -487,8 +487,8 @@ export function MaterialManager({ courseId }: { courseId: number }) {
 
       {activeTab === 'OFFICIAL' ? (
         <div className="space-y-6">
-          <div className="flex items-center justify-between border-b border-gray-100 pb-3">
-            <h2 className="text-xl font-bold text-gray-900">
+          <div className="flex items-center justify-between border-b border-line-soft pb-3">
+            <h2 className="text-xl font-bold text-ink">
               Danh Sách Học Liệu & Bài Thi
             </h2>
           </div>
@@ -498,7 +498,7 @@ export function MaterialManager({ courseId }: { courseId: number }) {
               {filteredOfficial.map(item => renderOfficialItem(item))}
             </div>
           ) : (
-            <p className="text-gray-500 italic text-center py-10 bg-gray-50 rounded border border-gray-100 text-sm">
+            <p className="text-ink-muted italic text-center py-10 bg-surface rounded border border-line-soft text-sm">
               Chưa có học liệu chính thức nào từ Giảng viên.
             </p>
           )}

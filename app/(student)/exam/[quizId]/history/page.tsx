@@ -40,7 +40,7 @@ export default function AttemptHistoryPage() {
         ) : isLoadingHistory ? (
           <div className="text-center text-ink-muted py-8">Đang tải lịch sử...</div>
         ) : !history || history.length === 0 ? (
-          <div className="text-center text-ink-muted py-8 bg-white border border-gray-200 rounded-md shadow-sm">
+          <div className="text-center text-ink-muted py-8 bg-white border border-line rounded-md shadow-sm">
             Bạn chưa có lượt làm bài nào cho bài thi này.
           </div>
         ) : (
@@ -53,8 +53,8 @@ export default function AttemptHistoryPage() {
                   onClick={() => setSelectedAttemptId(h.id)}
                   className={`p-4 rounded-lg border cursor-pointer transition-colors ${
                     selectedAttemptId === h.id 
-                      ? 'bg-blue-50 border-blue-200 shadow-sm ring-1 ring-blue-500' 
-                      : 'bg-white border-gray-200 hover:bg-gray-50'
+                      ? 'bg-accent/5 border-accent/20 shadow-sm ring-1 ring-accent' 
+                      : 'bg-white border-line hover:bg-surface-hover'
                   }`}
                 >
                   <div className="flex justify-between items-center mb-2">
@@ -69,7 +69,7 @@ export default function AttemptHistoryPage() {
                       })()}
                     </span>
                   </div>
-                  <div className="text-xl font-bold text-blue-600">
+                  <div className="text-xl font-bold text-accent">
                     {h.score.toFixed(1)} / 10
                   </div>
                   <div className="text-xs text-ink-muted mt-1">
@@ -82,21 +82,21 @@ export default function AttemptHistoryPage() {
             <div className="md:col-span-2">
               {selectedAttemptId ? (
                 isLoadingDetail ? (
-                  <div className="bg-white border border-gray-200 rounded-lg p-8 text-center shadow-sm">
+                  <div className="bg-white border border-line rounded-lg p-8 text-center shadow-sm">
                     Đang tải chi tiết bài làm...
                   </div>
                 ) : attemptDetail ? (
-                  <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-                    <div className="bg-gray-50 border-b border-gray-200 p-4">
+                  <div className="bg-white border border-line rounded-lg shadow-sm overflow-hidden">
+                    <div className="bg-surface border-b border-line p-4">
                       <h2 className="font-bold text-lg">Chi tiết bài làm</h2>
-                      <p className="text-sm text-ink-muted">Điểm số: <strong className="text-blue-600">{Number(attemptDetail.score).toFixed(2).replace(/\.?0+$/, '')}</strong></p>
+                      <p className="text-sm text-ink-muted">Điểm số: <strong className="text-accent">{Number(attemptDetail.score).toFixed(2).replace(/\.?0+$/, '')}</strong></p>
                     </div>
                     
                     <div className="p-6 space-y-8">
                       {attemptDetail.details.map((q, qIdx) => (
                         <div key={q.questionId} className="space-y-3">
                           <h3 className="font-bold text-sm flex gap-2">
-                            <span className="w-6 h-6 flex-shrink-0 bg-gray-100 rounded-full flex items-center justify-center text-xs">
+                            <span className="w-6 h-6 flex-shrink-0 bg-line-soft rounded-full flex items-center justify-center text-xs">
                               {qIdx + 1}
                             </span>
                             {q.content}
@@ -109,8 +109,8 @@ export default function AttemptHistoryPage() {
                               // Chế độ cho phép xem lại: correctOptionId != null
                               const showCorrectness = q.correctOptionId !== null;
                               
-                              let bgClass = "bg-white border-gray-200";
-                              let textClass = "text-gray-700";
+                              let bgClass = "bg-white border-line";
+                              let textClass = "text-ink-muted";
                               let icon = null;
 
                               if (showCorrectness) {
@@ -129,8 +129,8 @@ export default function AttemptHistoryPage() {
                                 }
                               } else {
                                 if (isSelected) {
-                                  bgClass = "bg-blue-50 border-blue-200";
-                                  textClass = "text-blue-800 font-medium";
+                                  bgClass = "bg-accent/5 border-accent/20";
+                                  textClass = "text-accent-dark font-medium";
                                   icon = "(Bạn chọn)";
                                 }
                               }
@@ -148,12 +148,12 @@ export default function AttemptHistoryPage() {
                     </div>
                   </div>
                 ) : (
-                  <div className="bg-white border border-gray-200 rounded-lg p-8 text-center text-red-500 shadow-sm">
+                  <div className="bg-white border border-line rounded-lg p-8 text-center text-red-500 shadow-sm">
                     Không tải được chi tiết
                   </div>
                 )
               ) : (
-                <div className="bg-gray-50 border border-gray-200 border-dashed rounded-lg p-12 text-center text-ink-muted flex flex-col items-center justify-center h-full min-h-[300px]">
+                <div className="bg-surface border border-line border-dashed rounded-lg p-12 text-center text-ink-muted flex flex-col items-center justify-center h-full min-h-[300px]">
                   <p>Chọn một lần làm bài ở cột bên trái để xem chi tiết</p>
                 </div>
               )}

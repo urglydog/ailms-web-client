@@ -40,24 +40,24 @@ function PayosReturnContent() {
       )}
       
       {status === 'success' && (
-        <div className="card max-w-md p-8 flex flex-col items-center border-t-4 border-t-gray-900 shadow-xl">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-success/10 text-3xl mb-4">
-            ✅
+        <div className="card max-w-md p-8 flex flex-col items-center border-t-4 border-t-success shadow-xl">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-success/10 text-success mb-4">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
           </div>
           <h1 className="font-display text-2xl font-bold text-ink mb-2">Thanh toán thành công</h1>
           <p className="text-sm text-ink-muted mb-6">
             Lưu ý: Khoá học sẽ tự động được mở khóa ngay sau khi hệ thống ghi nhận thành công từ ngân hàng (thường mất 1-2 phút).
           </p>
           <div className="flex w-full flex-col gap-3">
-            <Link 
-              href="/payments" 
-              className="w-full rounded-full bg-gray-900 px-6 py-3 font-semibold text-white no-underline hover:bg-black transition-colors"
+            <Link
+              href="/payments"
+              className="w-full rounded-full bg-accent px-6 py-3 font-semibold text-white no-underline hover:bg-accent-dark transition-colors"
             >
               Xem lịch sử giao dịch
             </Link>
-            <Link 
-              href="/courses" 
-              className="text-sm font-semibold text-gray-900 no-underline hover:underline mt-2"
+            <Link
+              href="/courses"
+              className="text-sm font-semibold text-ink no-underline hover:underline mt-2"
             >
               Quay lại kho khóa học
             </Link>
@@ -67,8 +67,8 @@ function PayosReturnContent() {
 
       {status === 'error' && (
         <div className="card max-w-md p-8 flex flex-col items-center border-t-4 border-t-danger shadow-xl">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-danger/10 text-3xl mb-4">
-            ❌
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-danger/10 text-danger mb-4">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
           </div>
           <h1 className="font-display text-2xl font-bold text-ink mb-2">Giao dịch không thành công</h1>
           <p className="text-sm text-ink-muted mb-6">

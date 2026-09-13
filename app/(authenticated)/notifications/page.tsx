@@ -80,7 +80,7 @@ export default function NotificationsPage() {
     return (
       <div className="max-w-2xl mx-auto p-6">
         <div className="text-center py-10">
-          <p className="text-gray-600">Đang tải...</p>
+          <p className="text-ink-muted">Đang tải...</p>
         </div>
       </div>
     );
@@ -102,7 +102,7 @@ export default function NotificationsPage() {
 
       {notifications.length === 0 ? (
         <div className="text-center py-10">
-          <p className="text-gray-600">Không có thông báo nào</p>
+          <p className="text-ink-muted">Không có thông báo nào</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -111,8 +111,8 @@ export default function NotificationsPage() {
               key={notif.id}
               className={`p-4 rounded-lg border-l-4 border ${
                 notif.isRead
-                  ? 'bg-gray-50 border-gray-300'
-                  : 'bg-white border-l-blue-500 shadow-sm'
+                  ? 'bg-surface border-line'
+                  : 'bg-white border-l-accent shadow-sm'
               }`}
             >
               <div className="flex justify-between items-start gap-4">
@@ -126,11 +126,11 @@ export default function NotificationsPage() {
                       {getTypeLabel(notif.type)}
                     </span>
                     {!notif.isRead && (
-                      <span className="inline-block w-2 h-2 bg-blue-600 rounded-full"></span>
+                      <span className="inline-block w-2 h-2 bg-accent rounded-full"></span>
                     )}
                   </div>
-                  <p className="text-gray-800 text-sm">{notif.message}</p>
-                  <p className="text-xs text-gray-500 mt-2">
+                  <p className="text-ink text-sm">{notif.message}</p>
+                  <p className="text-xs text-ink-muted mt-2">
                     {formatDate(notif.createdAt)}
                   </p>
                 </div>

@@ -32,12 +32,12 @@ export function VoicePicker({ voices, selected, onSelect }: VoicePickerProps) {
   const female = voices.filter((v) => v.gender === 'FEMALE');
   const male = voices.filter((v) => v.gender === 'MALE');
 
-  const renderGroup = (label: string, icon: string, group: VoiceOption[]) => {
+  const renderGroup = (label: string, group: VoiceOption[]) => {
     if (group.length === 0) return null;
     return (
       <div className="flex flex-col gap-1.5">
         <span className="text-[11px] font-semibold uppercase tracking-wide text-ink-faint">
-          {icon} {label}
+          {label}
         </span>
         <div className="flex flex-wrap gap-2">
           {group.map((voice) => {
@@ -72,8 +72,8 @@ export function VoicePicker({ voices, selected, onSelect }: VoicePickerProps) {
     <div className="flex flex-col gap-3">
       <span className="text-[13px] font-medium text-ink">Chọn giọng đọc</span>
       <div className="flex flex-col gap-3 sm:flex-row sm:gap-6">
-        {renderGroup('Nữ', '👩', female)}
-        {renderGroup('Nam', '👨', male)}
+        {renderGroup('Nữ', female)}
+        {renderGroup('Nam', male)}
       </div>
     </div>
   );

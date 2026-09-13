@@ -360,7 +360,7 @@ export function MindmapEditor({ initialMermaidCode, onSave, readOnly = false }: 
           )}
           <button 
             onClick={initData}
-            className="bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 px-3 py-2 rounded-lg font-bold shadow-sm transition-colors text-sm"
+            className="bg-white border border-line text-ink-muted hover:bg-surface-hover px-3 py-2 rounded-lg font-bold shadow-sm transition-colors text-sm"
           >
             ↺ Xếp Lại Cây
           </button>
@@ -379,21 +379,21 @@ export function MindmapEditor({ initialMermaidCode, onSave, readOnly = false }: 
       {/* Custom Edit Modal */}
       {editingNode && (
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[2px] rounded-xl">
-          <div className="bg-white p-6 rounded-2xl shadow-2xl border border-gray-100 w-96 max-w-[90%] transform transition-all">
-            <h3 className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
+          <div className="bg-white p-6 rounded-2xl shadow-2xl border border-line-soft w-96 max-w-[90%] transform transition-all">
+            <h3 className="text-sm font-bold text-ink mb-3 flex items-center gap-2">
               <span className="text-accent">✏️</span> Đổi tên nhánh sơ đồ
             </h3>
             <textarea
               autoFocus
               value={editingNode.label}
               onChange={(e) => setEditingNode({ ...editingNode, label: e.target.value })}
-              className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-accent/20 focus:border-accent resize-none h-28 text-gray-700 outline-none transition-all font-medium"
+              className="w-full border border-line rounded-xl p-3 text-sm focus:ring-2 focus:ring-accent/20 focus:border-accent resize-none h-28 text-ink-muted outline-none transition-all font-medium"
               placeholder="Nhập nội dung mới..."
             />
             <div className="flex gap-2 justify-end mt-5">
               <button 
                 onClick={() => setEditingNode(null)} 
-                className="px-4 py-2.5 bg-gray-50 text-gray-600 rounded-xl text-xs font-bold hover:bg-gray-100 border border-gray-200 transition-colors"
+                className="px-4 py-2.5 bg-surface text-ink-muted rounded-xl text-xs font-bold hover:bg-surface-hover border border-line transition-colors"
               >
                 Hủy bỏ
               </button>
@@ -414,17 +414,17 @@ export function MindmapEditor({ initialMermaidCode, onSave, readOnly = false }: 
       {/* 2-Step Verify Save Dialog */}
       {confirmStep > 0 && (
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[2px] rounded-xl">
-          <div className="bg-white p-6 rounded-2xl shadow-2xl border border-gray-100 w-[420px] max-w-[90%]">
+          <div className="bg-white p-6 rounded-2xl shadow-2xl border border-line-soft w-[420px] max-w-[90%]">
             {confirmStep === 1 ? (
               <>
-                <h3 className="text-base font-bold text-gray-900 mb-2 flex items-center gap-2">
+                <h3 className="text-base font-bold text-ink mb-2 flex items-center gap-2">
                   <span>⚠️</span> Xác nhận thay đổi?
                 </h3>
-                <p className="text-sm text-gray-600 mb-5">
+                <p className="text-sm text-ink-muted mb-5">
                   Bạn có chắc chắn muốn lưu các thay đổi trên sơ đồ Mindmap này không?
                 </p>
                 <div className="flex gap-2 justify-end">
-                  <button onClick={() => setConfirmStep(0)} className="px-4 py-2.5 bg-gray-50 text-gray-600 rounded-xl text-xs font-bold hover:bg-gray-100 border border-gray-200 transition-colors">
+                  <button onClick={() => setConfirmStep(0)} className="px-4 py-2.5 bg-surface text-ink-muted rounded-xl text-xs font-bold hover:bg-surface-hover border border-line transition-colors">
                     Hủy
                   </button>
                   <button onClick={handleConfirmStep1} className="px-5 py-2.5 bg-amber-500 text-white rounded-xl text-xs font-bold hover:bg-amber-600 shadow-sm transition-colors">
@@ -437,14 +437,14 @@ export function MindmapEditor({ initialMermaidCode, onSave, readOnly = false }: 
                 <h3 className="text-base font-bold text-red-700 mb-2 flex items-center gap-2">
                   <span>🔒</span> Xác nhận lần cuối
                 </h3>
-                <p className="text-sm text-gray-600 mb-2">
+                <p className="text-sm text-ink-muted mb-2">
                   Thay đổi sẽ được áp dụng cho <strong>tất cả sinh viên</strong> đang xem Mindmap này.
                 </p>
                 <p className="text-xs text-red-600 font-semibold bg-red-50 p-3 rounded-lg mb-5 border border-red-100">
                   Hành động này không thể hoàn tác. Vui lòng kiểm tra kỹ trước khi xác nhận.
                 </p>
                 <div className="flex gap-2 justify-end">
-                  <button onClick={() => setConfirmStep(0)} className="px-4 py-2.5 bg-gray-50 text-gray-600 rounded-xl text-xs font-bold hover:bg-gray-100 border border-gray-200 transition-colors">
+                  <button onClick={() => setConfirmStep(0)} className="px-4 py-2.5 bg-surface text-ink-muted rounded-xl text-xs font-bold hover:bg-surface-hover border border-line transition-colors">
                     Hủy bỏ
                   </button>
                   <button onClick={handleConfirmStep2} className="px-5 py-2.5 bg-red-600 text-white rounded-xl text-xs font-bold hover:bg-red-700 shadow-sm transition-colors">

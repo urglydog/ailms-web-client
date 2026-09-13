@@ -45,8 +45,8 @@ function VnpayReturnContent() {
       
       {status === 'success' && (
         <div className="card max-w-md p-8 flex flex-col items-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-success/10 text-3xl mb-4">
-            ✅
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-success/10 text-success mb-4">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
           </div>
           <h1 className="font-display text-2xl font-bold text-ink mb-2">Thanh toán thành công</h1>
           <p className="text-sm text-ink-muted mb-6">
@@ -71,8 +71,8 @@ function VnpayReturnContent() {
 
       {status === 'error' && (
         <div className="card max-w-md p-8 flex flex-col items-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-danger/10 text-3xl mb-4">
-            ❌
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-danger/10 text-danger mb-4">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
           </div>
           <h1 className="font-display text-2xl font-bold text-ink mb-2">Giao dịch không thành công</h1>
           <p className="text-sm text-ink-muted mb-6">

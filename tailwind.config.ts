@@ -41,6 +41,9 @@ const config: Config = {
           hover: '#F1F5F9',
         },
         success: '#16A34A',
+        danger: '#DC2626', // Nhiều file đã dùng `bg-danger`/`border-danger` nhưng token này
+                            // chưa từng được khai báo — các class đó trước đây không sinh CSS gì
+                            // (giống lỗi `accent-glow` cũ), phần tử liên quan mất màu/viền.
         star: '#F59E0B',
       },
       fontFamily: {

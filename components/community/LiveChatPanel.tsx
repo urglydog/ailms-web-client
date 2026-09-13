@@ -82,7 +82,7 @@ export function LiveChatPanel({ lessonId, userName }: LiveChatPanelProps) {
           Trả lời
         </button>
       </div>
-      <p className="text-sm text-ink leading-snug bg-gray-50 border border-line-soft rounded-lg rounded-tl-none p-2 w-fit">
+      <p className="text-sm text-ink leading-snug bg-surface border border-line-soft rounded-lg rounded-tl-none p-2 w-fit">
         {msg.content}
       </p>
     </div>
@@ -139,7 +139,7 @@ export function LiveChatPanel({ lessonId, userName }: LiveChatPanelProps) {
 
       <div className="bg-surface-hover border-t border-line flex flex-col">
         {replyingTo && (
-          <div className="px-3 py-2 bg-gray-100 text-xs text-ink-muted flex justify-between items-center border-b border-line">
+          <div className="px-3 py-2 bg-line-soft text-xs text-ink-muted flex justify-between items-center border-b border-line">
             <span>Đang trả lời <strong>{replyingTo.senderName}</strong></span>
             <button 
               onClick={() => {
