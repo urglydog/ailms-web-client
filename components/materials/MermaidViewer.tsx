@@ -12,16 +12,7 @@ export function MermaidViewer({ chart }: MermaidViewerProps) {
   const [svgContent, setSvgContent] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
-  // Trạng thái hướng của sơ đồ
-  const [layout, setLayout] = useState<'TD' | 'LR' | 'BT' | 'RL'>('TD');
 
-  useEffect(() => {
-    const match = chart.match(/^(graph|flowchart)\s+(TD|LR|BT|RL)/i);
-    if (match && match[2]) {
-      setLayout(match[2].toUpperCase() as 'TD' | 'LR' | 'BT' | 'RL');
-    }
-  }, [chart]);
 
   useEffect(() => {
     mermaid.initialize({
@@ -38,8 +29,9 @@ export function MermaidViewer({ chart }: MermaidViewerProps) {
         setLoading(true);
         setError(null);
         
-        // Thay đổi hướng sơ đồ dựa trên state `layout`
-        let modifiedChart = chart.replace(/^(graph|flowchart)\s+(TD|LR|BT|RL)/i, `$1 ${layout}`);
+        // Dọn dẹp các layout cũ không hợp lệ từ Database (VD: graph MINDMAP, graph FISHBONE)
+        let modifiedChart = chart.replace(/^(graph|flowchart)\s+(FISHBONE|MATRIX|MINDMAP|TREE_TABLE|BRACE_MAP|TIMELINE|LOGIC_CHART)/im, `$1 LR`);
+        modifiedChart = modifiedChart.replace(/^(graph|flowchart)\s+(ORG_CHART)/im, `$1 TB`);
         
         // Khắc phục lỗi "Unsupported markdown: list" bằng cách thay thế gạch đầu dòng thành ký tự bullet
         // Mermaid hiểu nhầm "1. " và "1) " là ordered list markdown. Thay thành "(1) "
@@ -59,7 +51,7 @@ export function MermaidViewer({ chart }: MermaidViewerProps) {
     };
 
     renderChart();
-  }, [chart, layout]);
+  }, [chart]);
 
   const handleDownloadSVG = () => {
     if (!svgContent) return;
@@ -102,7 +94,7 @@ export function MermaidViewer({ chart }: MermaidViewerProps) {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `mindmap_${layout}.svg`;
+    link.download = `mindmap.svg`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -112,42 +104,15 @@ export function MermaidViewer({ chart }: MermaidViewerProps) {
   return (
     <div className="flex flex-col gap-4">
       {/* Thanh công cụ điều khiển sơ đồ */}
-      <div className="flex flex-wrap items-center justify-between gap-4 bg-surface p-2 rounded-xl border border-line">
+      <div className="flex flex-wrap items-center justify-between gap-4 bg-gray-50 p-2 rounded-xl border border-line">
         <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-line">
-          <button 
-            onClick={() => setLayout('TD')}
-            className={`flex items-center justify-center p-2 rounded-md transition-colors ${layout === 'TD' ? 'bg-accent text-white' : 'text-ink-muted hover:text-ink hover:bg-surface-hover'}`}
-            title="Từ trên xuống dưới (Dọc)"
-          >
-            ↓
-          </button>
-          <button 
-            onClick={() => setLayout('LR')}
-            className={`flex items-center justify-center p-2 rounded-md transition-colors ${layout === 'LR' ? 'bg-accent text-white' : 'text-ink-muted hover:text-ink hover:bg-surface-hover'}`}
-            title="Từ trái sang phải (Ngang)"
-          >
-            →
-          </button>
-          <button 
-            onClick={() => setLayout('BT')}
-            className={`flex items-center justify-center p-2 rounded-md transition-colors ${layout === 'BT' ? 'bg-accent text-white' : 'text-ink-muted hover:text-ink hover:bg-surface-hover'}`}
-            title="Từ dưới lên trên (Dọc ngược)"
-          >
-            ↑
-          </button>
-          <button 
-            onClick={() => setLayout('RL')}
-            className={`flex items-center justify-center p-2 rounded-md transition-colors ${layout === 'RL' ? 'bg-accent text-white' : 'text-ink-muted hover:text-ink hover:bg-surface-hover'}`}
-            title="Từ phải sang trái (Ngang ngược)"
-          >
-            ←
-          </button>
+          {/* Layout controls removed as they are synced with MindmapEditor */}
         </div>
 
         {svgContent && (
           <button 
             onClick={handleDownloadSVG}
-            className="flex items-center gap-2 px-4 py-2 bg-surface-hover hover:bg-accent text-ink hover:text-white rounded-lg text-sm font-medium transition-all border border-line"
+            className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-accent text-ink hover:text-white rounded-lg text-sm font-medium transition-all border border-line"
             title="Tải sơ đồ dưới dạng ảnh SVG"
           >
             Tải ảnh (SVG)
@@ -165,7 +130,7 @@ export function MermaidViewer({ chart }: MermaidViewerProps) {
         {error ? (
           <div className="flex flex-col items-center justify-center w-full h-full bg-red-50/50 rounded-2xl border border-red-200 text-red-600 p-8 text-center">
             <p className="mb-4 text-sm font-medium">{error}</p>
-            <pre className="text-xs text-left w-full overflow-auto p-4 bg-surface rounded-xl border border-line">{chart}</pre>
+            <pre className="text-xs text-left w-full overflow-auto p-4 bg-gray-50 rounded-xl border border-gray-200">{chart}</pre>
           </div>
         ) : (
           <div 

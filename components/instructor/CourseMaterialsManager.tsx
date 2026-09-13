@@ -465,6 +465,7 @@ function MaterialWorkspaceViewer({
                 <div className="w-full h-[700px] border border-gray-200 rounded-2xl overflow-hidden bg-gray-50 shadow-inner">
                   <MindmapEditor
                     initialMermaidCode={detail.mermaidCode}
+                    initialTemplate={(detail as unknown as { extraConfig?: { mapTemplate?: string } }).extraConfig?.mapTemplate}
                     onSave={(code) => {
                       updateMermaidMutation.mutate({ id: detail.id, mermaidCode: code });
                       setActiveTab('VIEW');
@@ -837,6 +838,7 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
   const [difficultyLevel, setDifficultyLevel] = useState<'EASY' | 'MEDIUM' | 'HARD'>('MEDIUM');
   const [quantityLevel, setQuantityLevel] = useState<'FEWER' | 'STANDARD' | 'MORE'>('STANDARD');
   const [language, setLanguage] = useState<string>('vi');
+  const [mapTemplate, setMapTemplate] = useState<string>('MINDMAP');
 
   const { data: languages } = useQuery({
     queryKey: ['available-languages', courseId],
@@ -874,6 +876,8 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
       difficultyLevel,
       quantityLevel,
       language,
+      // Pass the template to backend if needed (e.g. via metadata or extra param)
+      extraConfig: materialType === 'MINDMAP' ? { mapTemplate } : undefined,
     });
   };
 
@@ -996,6 +1000,42 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
                   <option value="MORE">Nhiều (~30 thẻ)</option>
                 </select>
               </label>
+            )}
+
+            {materialType === 'MINDMAP' && (
+              <div className="flex flex-col gap-4">
+                <div>
+                  <label className="text-sm font-bold text-gray-700 block mb-3">Mẫu sơ đồ (Template)</label>
+                  <div className="grid grid-cols-4 gap-2">
+                    {[
+                      { id: 'LOGIC_CHART', name: 'Logic Chart', icon: '➡️' },
+                      { id: 'ORG_CHART', name: 'Org Chart', icon: '🏢' },
+                    ].map(tpl => (
+                      <div 
+                        key={tpl.id} 
+                        onClick={() => setMapTemplate(tpl.id)}
+                        className={`cursor-pointer border rounded-xl p-3 flex flex-col items-center justify-center gap-2 transition-all ${mapTemplate === tpl.id ? 'border-cyan-500 bg-cyan-50 shadow-sm ring-1 ring-cyan-500' : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50 bg-white'}`}
+                      >
+                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-xl ${mapTemplate === tpl.id ? 'bg-cyan-100/50 opacity-100' : 'bg-gray-50 grayscale opacity-60'}`}>{tpl.icon}</div>
+                        <span className={`text-[11px] font-bold text-center ${mapTemplate === tpl.id ? 'text-cyan-700' : 'text-gray-500'}`}>{tpl.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
+                  Mức độ chi tiết nhánh
+                  <select
+                    value={quantityLevel}
+                    onChange={(e) => setQuantityLevel(e.target.value as 'FEWER' | 'STANDARD' | 'MORE')}
+                    className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/20"
+                  >
+                    <option value="FEWER">Cơ bản, nhánh chính</option>
+                    <option value="STANDARD">Tiêu chuẩn, vừa phải</option>
+                    <option value="MORE">Chi tiết, chia nhiều nhánh nhỏ</option>
+                  </select>
+                </label>
+              </div>
             )}
 
             <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">

@@ -49,6 +49,12 @@ export default function InstructorLayout({ children }: { children: React.ReactNo
               <Link
                 key={item.id}
                 href={item.href}
+                onClick={(e) => {
+                  if (pathname === item.href) {
+                     e.preventDefault();
+                     router.push(item.href); // force remove query params
+                  }
+                }}
                 className={`block rounded-lg px-3.5 py-2.5 text-[13.5px] font-semibold no-underline ${
                   isActive ? 'bg-accent/10 text-accent font-semibold' : 'text-slate-300 hover:bg-slate-800'
                 }`}
