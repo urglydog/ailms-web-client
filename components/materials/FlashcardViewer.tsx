@@ -32,7 +32,7 @@ interface Flashcard {
 }
 
 /** `language` khớp với trường `language` của MaterialGeneration (ví dụ: 'vi', 'en', 'ja'). */
-export function FlashcardViewer({ flashcards, language, deckId }: { flashcards: Flashcard[]; language?: string; deckId?: number }) {
+export function FlashcardViewer({ flashcards, language, deckId, readOnly = false }: { flashcards: Flashcard[]; language?: string; deckId?: number; readOnly?: boolean }) {
   const [currentIdx, setCurrentIdx] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const { mutate: updateCard } = useUpdateFlashcard();
@@ -84,14 +84,14 @@ export function FlashcardViewer({ flashcards, language, deckId }: { flashcards: 
   const handleNext = () => {
     if (currentIdx < flashcards.length - 1) {
       setIsFlipped(false);
-      setTimeout(() => setCurrentIdx(i => Math.min(i + 1, flashcards.length - 1)), 150);
+      setCurrentIdx(i => Math.min(i + 1, flashcards.length - 1));
     }
   };
 
   const handlePrev = () => {
     if (currentIdx > 0) {
       setIsFlipped(false);
-      setTimeout(() => setCurrentIdx(i => Math.max(i - 1, 0)), 150);
+      setCurrentIdx(i => Math.max(i - 1, 0));
     }
   };
 
@@ -215,7 +215,7 @@ export function FlashcardViewer({ flashcards, language, deckId }: { flashcards: 
       <div className="w-full flex justify-between text-ink-muted mb-6 text-sm font-semibold">
         <div className="flex gap-4 items-center">
           <span>Flashcard {safeIdx + 1} / {flashcards.length}</span>
-          {deckId && (
+          {!readOnly && deckId && (
             <>
               <button
                 onClick={() => setEditMode({ id: card.id, front: card.frontText, back: card.backText })}
@@ -310,7 +310,7 @@ export function FlashcardViewer({ flashcards, language, deckId }: { flashcards: 
               className={`h-2.5 rounded-full transition-all ${i === safeIdx ? 'w-8 bg-accent' : 'w-2.5 bg-line hover:bg-line-soft cursor-pointer'}`}
               onClick={() => {
                 setIsFlipped(false);
-                setTimeout(() => setCurrentIdx(i), 150);
+                setCurrentIdx(i);
               }}
             />
           ))}

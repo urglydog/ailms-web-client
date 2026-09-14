@@ -6,9 +6,10 @@ import { toast } from 'sonner';
 
 interface MermaidViewerProps {
   chart: string;
+  readOnly?: boolean;
 }
 
-export function MermaidViewer({ chart }: MermaidViewerProps) {
+export function MermaidViewer({ chart, readOnly = false }: MermaidViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [svgContent, setSvgContent] = useState<string>('');
   const [loading, setLoading] = useState(true);
@@ -133,25 +134,27 @@ export function MermaidViewer({ chart }: MermaidViewerProps) {
     <div className="flex flex-col gap-4">
       {/* Thanh công cụ điều khiển sơ đồ */}
       <div className="flex flex-wrap items-center justify-between gap-4 bg-gray-50 p-2 rounded-xl border border-line">
-        <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-line">
-          {[
-            { id: 'TB', label: '⬇️' },
-            { id: 'LR', label: '➡️' },
-            { id: 'BT', label: '⬆️' },
-            { id: 'RL', label: '⬅️' }
-          ].map(dir => (
-            <button
-              key={dir.id}
-              onClick={() => setLayoutDirection(dir.id as 'TB' | 'LR' | 'BT' | 'RL')}
-              className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                layoutDirection === dir.id ? 'bg-accent text-white shadow-sm' : 'text-ink-muted hover:bg-surface-hover hover:text-ink'
-              }`}
-              title={`Xoay sơ đồ hướng ${dir.label}`}
-            >
-              {dir.label}
-            </button>
-          ))}
-        </div>
+        {!readOnly ? (
+          <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-line">
+            {[
+              { id: 'TB', label: '⬇️' },
+              { id: 'LR', label: '➡️' },
+              { id: 'BT', label: '⬆️' },
+              { id: 'RL', label: '⬅️' }
+            ].map(dir => (
+              <button
+                key={dir.id}
+                onClick={() => setLayoutDirection(dir.id as 'TB' | 'LR' | 'BT' | 'RL')}
+                className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                  layoutDirection === dir.id ? 'bg-accent text-white shadow-sm' : 'text-ink-muted hover:bg-surface-hover hover:text-ink'
+                }`}
+                title={`Xoay sơ đồ hướng ${dir.label}`}
+              >
+                {dir.label}
+              </button>
+            ))}
+          </div>
+        ) : <div />}
 
         {svgContent && (
           <div className="flex items-center gap-2">

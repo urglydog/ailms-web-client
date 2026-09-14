@@ -385,7 +385,7 @@ export function MaterialManager({ courseId }: { courseId: number }) {
     const currentUrl = `${pathname}?${searchParams.toString()}`;
     const href = item.materialType === 'QUIZ' && item.materialId
       ? `/exam/${item.materialId}?title=${encodeURIComponent(item.title || '')}&duration=${item.durationMinutes || ''}&attempts=${item.maxAttempts || ''}&count=${item.randomPickCount || item.questionCount || ''}&start=${item.startTime || ''}&end=${item.endTime || ''}&attemptCount=${item.attemptCount || 0}&proctored=${item.isProctored || false}&returnUrl=${encodeURIComponent(currentUrl)}`
-      : `/materials/${item.id}`;
+      : `/materials/${item.id}?isOfficial=true`;
 
     return (
       <Link 
