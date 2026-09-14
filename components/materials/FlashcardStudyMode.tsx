@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import { useReviewFlashcard, useUpdateFlashcard } from '@/hooks/useFlashcards';
+import { useReviewFlashcard } from '@/hooks/useFlashcards';
 import { toast } from 'sonner';
 import type { FlashcardCardWithReview } from '@/lib/api/flashcards';
 
@@ -30,7 +30,6 @@ interface StudyModeProps {
  */
 export function FlashcardStudyMode({ deckName: _deckName, cards, language, onFinish }: StudyModeProps) {
   const { mutate: reviewCard } = useReviewFlashcard();
-  const { mutate: updateCard, isPending: isUpdating } = useUpdateFlashcard();
 
   // Filter due cards: isDue=true (includes new cards with no review)
   const [completedIds, setCompletedIds] = useState<Set<number>>(new Set());
