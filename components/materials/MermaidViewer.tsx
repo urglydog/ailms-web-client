@@ -12,6 +12,7 @@ export function MermaidViewer({ chart }: MermaidViewerProps) {
   const [svgContent, setSvgContent] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [layoutDirection, setLayoutDirection] = useState<'TB' | 'LR' | 'BT' | 'RL' | null>(null);
 
 
   useEffect(() => {
@@ -34,10 +35,24 @@ export function MermaidViewer({ chart }: MermaidViewerProps) {
         modifiedChart = modifiedChart.replace(/^(graph|flowchart)\s+(ORG_CHART)/im, `$1 TB`);
         
         // Khắc phục lỗi "Unsupported markdown: list" bằng cách thay thế gạch đầu dòng thành ký tự bullet
-        // Mermaid hiểu nhầm "1. " và "1) " là ordered list markdown. Thay thành "(1) "
         modifiedChart = modifiedChart.replace(/<br\s*\/?>\s*[-*]\s/g, '<br/>• ')
                                      .replace(/\n\s*[-*]\s/g, '<br/>• ')
                                      .replace(/\["(\d+)[\.)]\s/g, '["($1) ');
+
+        // Đổi hướng sơ đồ nếu user chọn
+        if (layoutDirection) {
+            // Thay thế tất cả các dạng định hướng hiện tại
+            modifiedChart = modifiedChart.replace(/^(graph|flowchart)\s+(TB|TD|BT|RL|LR)/im, `$1 ${layoutDirection}`);
+            // Nếu chưa có hướng nào (chỉ có graph/flowchart), thêm vào
+            if (!modifiedChart.match(/^(graph|flowchart)\s+(TB|TD|BT|RL|LR)/im)) {
+                modifiedChart = modifiedChart.replace(/^(graph|flowchart)/im, `$1 ${layoutDirection}`);
+            }
+        }
+
+        // Nếu sơ đồ chưa có styling đồng bộ từ Editor, thêm styling mặc định cho đẹp (xanh nước biển/chàm)
+        if (!modifiedChart.includes('style ') && !modifiedChart.includes('classDef ')) {
+            modifiedChart += `\n    classDef default fill:#e0e7ff,stroke:#6366f1,stroke-width:2px,color:#3730a3,rx:8,ry:8;`;
+        }
         
         const id = `mermaid-${Math.random().toString(36).substring(2, 9)}`;
         const { svg } = await mermaid.render(id, modifiedChart);
@@ -51,7 +66,7 @@ export function MermaidViewer({ chart }: MermaidViewerProps) {
     };
 
     renderChart();
-  }, [chart]);
+  }, [chart, layoutDirection]);
 
   const handleDownloadSVG = () => {
     if (!svgContent) return;
@@ -106,7 +121,23 @@ export function MermaidViewer({ chart }: MermaidViewerProps) {
       {/* Thanh công cụ điều khiển sơ đồ */}
       <div className="flex flex-wrap items-center justify-between gap-4 bg-gray-50 p-2 rounded-xl border border-line">
         <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-line">
-          {/* Layout controls removed as they are synced with MindmapEditor */}
+          {[
+            { id: 'TB', label: '⬇️ Dọc' },
+            { id: 'LR', label: '➡️ Ngang' },
+            { id: 'BT', label: '⬆️ Ngược' },
+            { id: 'RL', label: '⬅️ Trái' }
+          ].map(dir => (
+            <button
+              key={dir.id}
+              onClick={() => setLayoutDirection(dir.id as 'TB' | 'LR' | 'BT' | 'RL')}
+              className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                layoutDirection === dir.id ? 'bg-accent text-white shadow-sm' : 'text-ink-muted hover:bg-surface-hover hover:text-ink'
+              }`}
+              title={`Xoay sơ đồ hướng ${dir.label}`}
+            >
+              {dir.label}
+            </button>
+          ))}
         </div>
 
         {svgContent && (

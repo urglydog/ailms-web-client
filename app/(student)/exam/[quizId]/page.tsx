@@ -161,7 +161,7 @@ export default function AntiCheatExamPage() {
       }
       return newCount;
     });
-  }, [isSubmitting, result, submitExam]);
+  }, [isSubmitting, result, submitExam, attemptData?.maxViolations]);
 
   // 1. Chống chuyển tab & Rời chuột khỏi màn hình
   useEffect(() => {
@@ -375,24 +375,12 @@ export default function AntiCheatExamPage() {
                   if (returnUrl) {
                     router.push(returnUrl);
                   } else {
-                    router.push(`/materials`);
+                    router.push('/my-courses');
                   }
                 }}
-                className="bg-surface-hover text-ink border border-line px-8 py-3 rounded-full font-bold shadow-sm hover:bg-line transition-all"
-              >
-                Quay lại học liệu
-              </button>
-              <Link
-                href={`/exam/${quizId}/history`}
                 className="bg-accent text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-accent-hover transition-all"
               >
-                Xem lại đáp án
-              </Link>
-              <button
-                onClick={() => router.push('/my-courses')}
-                className="bg-surface-hover text-ink border border-line px-8 py-3 rounded-full font-bold shadow-sm hover:bg-line transition-all"
-              >
-                Về khóa học
+                Quay lại khóa học
               </button>
             </div>
           </div>
@@ -613,7 +601,7 @@ export default function AntiCheatExamPage() {
                             <div className="text-xs font-semibold text-accent mt-1">{Number(h.score).toFixed(2).replace(/\.?0+$/, '')} điểm</div>
                           </td>
                           <td className="px-6 py-4 text-center">
-                            <Link href={`/exam/${quizId}/history`} className="text-accent font-semibold hover:underline">
+                            <Link href={`/exam/${quizId}/history?attemptId=${h.id}`} className="text-accent font-semibold hover:underline">
                               Xem chi tiết
                             </Link>
                           </td>

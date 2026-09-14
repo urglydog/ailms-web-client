@@ -1,16 +1,18 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
 import { useQuizHistory, useAttemptDetail } from '@/hooks/useQuizzes';
 import { ApiError } from '@/lib/api/client';
 
-export default function AttemptHistoryPage() {
+function AttemptHistoryContent() {
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
   const quizId = typeof params?.quizId === 'string' ? Number(params.quizId) : 0;
+  const initialAttemptId = searchParams.get('attemptId') ? Number(searchParams.get('attemptId')) : null;
 
-  const [selectedAttemptId, setSelectedAttemptId] = useState<number | null>(null);
+  const [selectedAttemptId, setSelectedAttemptId] = useState<number | null>(initialAttemptId);
 
   const { data: history, isLoading: isLoadingHistory, error: historyError } = useQuizHistory(quizId);
   const { data: attemptDetail, isLoading: isLoadingDetail } = useAttemptDetail(selectedAttemptId || 0);
@@ -162,5 +164,13 @@ export default function AttemptHistoryPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function AttemptHistoryPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-center">Đang tải...</div>}>
+      <AttemptHistoryContent />
+    </Suspense>
   );
 }
