@@ -219,10 +219,14 @@ export default function AntiCheatExamPage() {
             setFaceStatus('NO_FACE');
             handleViolation('Phát hiện có nhiều hơn 1 người trong khung hình');
           } else {
-            const landmarks = detections[0].landmarks;
+            const detection = detections[0];
+            if (!detection) return;
+            const landmarks = detection.landmarks;
             const noseTip = landmarks.getNose()[3];
             const leftJaw = landmarks.getJawOutline()[0];
             const rightJaw = landmarks.getJawOutline()[16];
+
+            if (!noseTip || !leftJaw || !rightJaw) return;
 
             const leftDist = Math.abs(noseTip.x - leftJaw.x);
             const rightDist = Math.abs(noseTip.x - rightJaw.x);
