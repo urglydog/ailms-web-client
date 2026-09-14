@@ -161,7 +161,7 @@ export default function AntiCheatExamPage() {
       }
       return newCount;
     });
-  }, [isSubmitting, result, submitExam]);
+  }, [isSubmitting, result, submitExam, attemptData?.maxViolations]);
 
   // 1. Chống chuyển tab & Rời chuột khỏi màn hình
   useEffect(() => {

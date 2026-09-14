@@ -66,7 +66,7 @@ export function MermaidViewer({ chart }: MermaidViewerProps) {
     };
 
     renderChart();
-  }, [chart]);
+  }, [chart, layoutDirection]);
 
   const handleDownloadSVG = () => {
     if (!svgContent) return;
@@ -129,7 +129,7 @@ export function MermaidViewer({ chart }: MermaidViewerProps) {
           ].map(dir => (
             <button
               key={dir.id}
-              onClick={() => setLayoutDirection(dir.id as any)}
+              onClick={() => setLayoutDirection(dir.id as 'TB' | 'LR' | 'BT' | 'RL')}
               className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
                 layoutDirection === dir.id ? 'bg-accent text-white shadow-sm' : 'text-ink-muted hover:bg-surface-hover hover:text-ink'
               }`}
