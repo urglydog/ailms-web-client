@@ -54,8 +54,8 @@ export default function AntiCheatExamPage() {
   const [elapsedSeconds, setElapsedSeconds] = useState<number>(0);
   const startTimeRef = useRef<Date | null>(null);
 
-  // State for AI Explanations
   const [explanations, setExplanations] = useState<Record<number, { loading: boolean; text?: string }>>({});
+  const [flagged, setFlagged] = useState<Record<number, boolean>>({});
 
   const [currentPage, setCurrentPage] = useState(1);
   const questionsPerPage = 5;
@@ -95,37 +95,19 @@ export default function AntiCheatExamPage() {
     loadModels();
   }, [isProctored]);
 
-  // Anti-Cheat: Track tab switching
-  useEffect(() => {
-    if (!isStarted || isSubmitting || !!result) return;
-
-    const handleVisibilityChange = () => {
-      if (document.hidden) {
-        setViolationCount(prev => {
-          const newCount = prev + 1;
-          const maxViolations = attemptData?.maxViolations || 3;
-          if (newCount >= maxViolations) {
-            toast.error(`Phát hiện gian lận chuyển Tab quá ${maxViolations} lần. Hệ thống tự động nộp bài!`);
-            // Delay slightly to allow toast to render
-            setTimeout(() => submitExam(), 500);
-          } else {
-            toast.warning(`Cảnh báo gian lận (${newCount}/${maxViolations}): Bạn đã chuyển Tab. Hệ thống sẽ tự động nộp bài nếu vi phạm ${maxViolations} lần!`);
-          }
-          return newCount;
-        });
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isStarted, isSubmitting, result]); // Omitting submitExam to avoid infinite re-renders if not memoized properly
-
   // Hàm nộp bài
-  const submitExam = useCallback(() => {
+  const submitExam = useCallback((isAuto = false) => {
     if (!attemptData || isSubmitting) return;
+    
+    // Nếu nộp thủ công, bắt buộc làm hết
+    if (!isAuto) {
+      const isAllAnswered = attemptData.questions.every(q => answers[q.id] !== undefined);
+      if (!isAllAnswered) {
+        toast.error('Bạn phải hoàn thành tất cả các câu hỏi trước khi nộp bài!');
+        return;
+      }
+    }
+
     setIsSubmitting(true);
     // Dừng timer khi nộp bài
     if (timerRef.current) clearInterval(timerRef.current);
@@ -146,6 +128,34 @@ export default function AntiCheatExamPage() {
     });
   }, [attemptData, answers, isSubmitting, submitQuiz, mediaStream]);
 
+  // Anti-Cheat: Track tab switching
+  useEffect(() => {
+    if (!isStarted || isSubmitting || !!result) return;
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        setViolationCount(prev => {
+          const newCount = prev + 1;
+          const maxViolations = attemptData?.maxViolations || 3;
+          if (newCount >= maxViolations) {
+            toast.error(`Phát hiện gian lận chuyển Tab quá ${maxViolations} lần. Hệ thống tự động nộp bài!`);
+            // Delay slightly to allow toast to render
+            setTimeout(() => submitExam(true), 500);
+          } else {
+            toast.warning(`Cảnh báo gian lận (${newCount}/${maxViolations}): Bạn đã chuyển Tab. Hệ thống sẽ tự động nộp bài nếu vi phạm ${maxViolations} lần!`);
+          }
+          return newCount;
+        });
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [isStarted, isSubmitting, result, submitExam, attemptData?.maxViolations]);
+
+
   // Hàm xử lý vi phạm với debounce (tránh trigger liên tục)
   const handleViolation = useCallback((reason: string) => {
     if (isSubmitting || result) return;
@@ -158,7 +168,7 @@ export default function AntiCheatExamPage() {
       const maxViolations = attemptData?.maxViolations || 3;
       if (newCount >= maxViolations) {
         toast.error(`Bạn đã vi phạm quá ${maxViolations} lần. Hệ thống tự động nộp bài!`);
-        submitExam();
+        submitExam(true);
       } else {
         toast.warning(`Cảnh báo vi phạm (${newCount}/${maxViolations}): ${reason}`);
       }
@@ -290,7 +300,7 @@ export default function AntiCheatExamPage() {
         if (timerRef.current) clearInterval(timerRef.current);
         setTimeLeft(0);
         toast.warning('⏱ Hết giờ! Bài thi đã được tự động nộp.');
-        setTimeout(() => submitExam(), 300);
+        setTimeout(() => submitExam(true), 300);
       } else {
         setTimeLeft(Math.floor(remainingMs / 1000));
       }
@@ -674,16 +684,6 @@ export default function AntiCheatExamPage() {
             <p className="text-sm text-ink-muted mt-1">Mã đề thi: {quizId}</p>
           </div>
           <div className="flex items-center gap-6">
-            {/* Đồng hồ đếm ngược */}
-            {isStarted && timeLeft !== null && (
-              <div className={`flex items-center gap-2 font-mono text-xl font-bold px-4 py-2 rounded-xl border-2 ${timeLeft <= 60 ? 'border-red-500 text-red-600 bg-red-50 animate-pulse' :
-                timeLeft <= 180 ? 'border-amber-400 text-amber-600 bg-amber-50' :
-                  'border-line text-ink bg-surface-hover'
-                }`}>
-                <span>⏱</span>
-                <span>{formatTime(timeLeft)}</span>
-              </div>
-            )}
             {isProctored && (
               <div className="text-right">
                 <div className="text-sm font-semibold text-ink-muted">Cảnh báo vi phạm</div>
@@ -699,8 +699,17 @@ export default function AntiCheatExamPage() {
             {attemptData?.questions
               .slice((currentPage - 1) * questionsPerPage, currentPage * questionsPerPage)
               .map((q, idx) => (
-              <div key={q.id} className="card p-6">
-                <h3 className="font-bold text-lg mb-4">Câu hỏi {(currentPage - 1) * questionsPerPage + idx + 1}</h3>
+              <div key={q.id} id={`question-${q.id}`} className="card p-6">
+                <div className="flex justify-between items-start mb-4">
+                  <h3 className="font-bold text-lg">Câu hỏi {(currentPage - 1) * questionsPerPage + idx + 1}</h3>
+                  <button 
+                    onClick={() => setFlagged(prev => ({ ...prev, [q.id]: !prev[q.id] }))}
+                    className={`text-xl ${flagged[q.id] ? 'text-red-500' : 'text-line-soft hover:text-red-200'}`}
+                    title="Đánh dấu xem lại"
+                  >
+                    🚩
+                  </button>
+                </div>
                 <p className="text-sm mb-6">{q.content}</p>
 
                 <div className="space-y-3">
@@ -745,19 +754,34 @@ export default function AntiCheatExamPage() {
           </div>
 
           <div className="col-span-1 flex flex-col gap-4 sticky top-8 self-start">
+            {/* Đồng hồ đếm ngược */}
+            {isStarted && timeLeft !== null && (
+              <div className={`flex items-center justify-center gap-2 font-mono text-2xl font-bold px-4 py-3 rounded-xl border-2 shadow-sm ${timeLeft <= 60 ? 'border-red-500 text-red-600 bg-red-50 animate-pulse' :
+                timeLeft <= 180 ? 'border-amber-400 text-amber-600 bg-amber-50' :
+                  'border-line text-ink bg-surface'
+                }`}>
+                <span>⏱</span>
+                <span>{formatTime(timeLeft)}</span>
+              </div>
+            )}
+
             <div className="card p-4">
-              <h3 className="font-bold text-sm mb-3">Điều hướng câu hỏi</h3>
               <div className="grid grid-cols-5 gap-2">
                 {attemptData?.questions.map((q, idx) => {
                   const isAnswered = answers[q.id] !== undefined;
+                  const isFlagged = flagged[q.id];
                   const pageOfQuestion = Math.ceil((idx + 1) / questionsPerPage);
                   return (
                     <button
                       key={q.id}
-                      onClick={() => setCurrentPage(pageOfQuestion)}
-                      className={`h-8 w-8 rounded text-xs font-bold border transition-colors ${isAnswered ? 'bg-accent text-white border-accent' : 'bg-surface hover:bg-surface-hover border-line text-ink'} ${currentPage === pageOfQuestion && !isAnswered ? 'ring-2 ring-accent/50' : ''}`}
+                      onClick={() => {
+                        setCurrentPage(pageOfQuestion);
+                        setTimeout(() => document.getElementById(`question-${q.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+                      }}
+                      className={`h-8 w-8 rounded text-xs font-bold border transition-colors relative ${isAnswered ? 'bg-accent text-white border-accent' : 'bg-surface hover:bg-surface-hover border-line text-ink'} ${currentPage === pageOfQuestion && !isAnswered ? 'ring-2 ring-accent/50' : ''}`}
                     >
                       {idx + 1}
+                      {isFlagged && <span className="absolute -top-1 -right-1 text-[10px]">🚩</span>}
                     </button>
                   );
                 })}
@@ -784,9 +808,9 @@ export default function AntiCheatExamPage() {
             )}
 
             <button
-              onClick={submitExam}
+              onClick={() => submitExam(false)}
               disabled={isSubmitting}
-              className="bg-ink text-white font-bold py-3 rounded-xl hover:opacity-90 disabled:opacity-50 mt-4"
+              className="bg-ink text-white font-bold py-3 rounded-xl hover:opacity-90 disabled:opacity-50 mt-4 shadow-lg"
             >
               {isSubmitting ? 'Đang nộp...' : 'Nộp bài thi'}
             </button>

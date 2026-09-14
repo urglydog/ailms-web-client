@@ -26,7 +26,7 @@ export const useUpdateFlashcard = () => {
       flashcardsApi.updateFlashcard(flashcardId, data),
     onSuccess: () => {
       toast.success('Đã cập nhật nội dung flashcard!');
-      queryClient.invalidateQueries({ queryKey: ['material-detail'] });
+      queryClient.invalidateQueries({ queryKey: ['materials', 'detail'] });
       queryClient.invalidateQueries({ queryKey: ['deck-study-cards'] });
     },
     onError: (error: Error) => {
@@ -51,7 +51,7 @@ export const useAddFlashcard = () => {
       flashcardsApi.addFlashcard(deckId, data),
     onSuccess: () => {
       toast.success('Đã thêm flashcard mới!');
-      queryClient.invalidateQueries({ queryKey: ['material-detail'] });
+      queryClient.invalidateQueries({ queryKey: ['materials', 'detail'] });
       queryClient.invalidateQueries({ queryKey: ['deck-study-cards'] });
     },
     onError: (error: Error) => {
