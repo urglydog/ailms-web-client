@@ -57,6 +57,9 @@ export default function AntiCheatExamPage() {
   // State for AI Explanations
   const [explanations, setExplanations] = useState<Record<number, { loading: boolean; text?: string }>>({});
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const questionsPerPage = 5;
+
   const handleExplain = (questionId: number, selectedOptionId: number | null) => {
     setExplanations(prev => ({ ...prev, [questionId]: { loading: true } }));
     explainWrongAnswer({ questionId, selectedOptionId }, {
@@ -163,7 +166,7 @@ export default function AntiCheatExamPage() {
     });
   }, [isSubmitting, result, submitExam, attemptData?.maxViolations]);
 
-  // 1. Chống chuyển tab & Rời chuột khỏi màn hình
+  // 1. Chống chuyển tab
   useEffect(() => {
     if (!isStarted || result || !isProctored) return;
 
@@ -173,16 +176,10 @@ export default function AntiCheatExamPage() {
       }
     };
 
-    const handleWindowBlur = () => {
-      handleViolation('Mất tiêu điểm cửa sổ thi');
-    };
-
     document.addEventListener('visibilitychange', handleVisibilityChange);
-    window.addEventListener('blur', handleWindowBlur);
 
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('blur', handleWindowBlur);
     };
   }, [isStarted, result, isProctored, handleViolation]);
 
@@ -381,6 +378,16 @@ export default function AntiCheatExamPage() {
                 className="bg-accent text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-accent-hover transition-all"
               >
                 Quay lại khóa học
+              </button>
+              <button
+                onClick={() => {
+                  setResult(null);
+                  setIsStarted(false);
+                  setAttemptData(null);
+                }}
+                className="bg-surface-hover text-ink px-8 py-3 rounded-full font-bold shadow-sm border border-line hover:bg-line transition-all"
+              >
+                Trở về lịch sử bài thi
               </button>
             </div>
           </div>
@@ -680,8 +687,8 @@ export default function AntiCheatExamPage() {
             {isProctored && (
               <div className="text-right">
                 <div className="text-sm font-semibold text-ink-muted">Cảnh báo vi phạm</div>
-                <div className={`text-xl font-bold ${violationCount >= 2 ? 'text-red-600' : 'text-amber-600'}`}>
-                  {violationCount} / 3
+                <div className={`text-xl font-bold ${violationCount >= (attemptData?.maxViolations || 3) - 1 ? 'text-red-600' : 'text-amber-600'}`}>
+                  {violationCount} / {attemptData?.maxViolations || 3}
                 </div>
               </div>
             )}
@@ -689,9 +696,11 @@ export default function AntiCheatExamPage() {
         </div>
         <div className="grid grid-cols-3 gap-8">
           <div className="col-span-2 flex flex-col gap-6">
-            {attemptData?.questions.map((q, idx) => (
+            {attemptData?.questions
+              .slice((currentPage - 1) * questionsPerPage, currentPage * questionsPerPage)
+              .map((q, idx) => (
               <div key={q.id} className="card p-6">
-                <h3 className="font-bold text-lg mb-4">Câu hỏi {idx + 1}</h3>
+                <h3 className="font-bold text-lg mb-4">Câu hỏi {(currentPage - 1) * questionsPerPage + idx + 1}</h3>
                 <p className="text-sm mb-6">{q.content}</p>
 
                 <div className="space-y-3">
@@ -711,9 +720,50 @@ export default function AntiCheatExamPage() {
                 </div>
               </div>
             ))}
+            
+            {attemptData?.questions && attemptData.questions.length > questionsPerPage && (
+              <div className="flex justify-between items-center mt-4">
+                <button
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage(p => p - 1)}
+                  className="px-4 py-2 border border-line rounded-lg text-sm font-semibold disabled:opacity-50"
+                >
+                  Trang trước
+                </button>
+                <span className="text-sm font-medium text-ink-muted">
+                  Trang {currentPage} / {Math.ceil(attemptData.questions.length / questionsPerPage)}
+                </span>
+                <button
+                  disabled={currentPage === Math.ceil(attemptData.questions.length / questionsPerPage)}
+                  onClick={() => setCurrentPage(p => p + 1)}
+                  className="px-4 py-2 border border-line rounded-lg text-sm font-semibold disabled:opacity-50"
+                >
+                  Trang sau
+                </button>
+              </div>
+            )}
           </div>
 
           <div className="col-span-1 flex flex-col gap-4 sticky top-8 self-start">
+            <div className="card p-4">
+              <h3 className="font-bold text-sm mb-3">Điều hướng câu hỏi</h3>
+              <div className="grid grid-cols-5 gap-2">
+                {attemptData?.questions.map((q, idx) => {
+                  const isAnswered = answers[q.id] !== undefined;
+                  const pageOfQuestion = Math.ceil((idx + 1) / questionsPerPage);
+                  return (
+                    <button
+                      key={q.id}
+                      onClick={() => setCurrentPage(pageOfQuestion)}
+                      className={`h-8 w-8 rounded text-xs font-bold border transition-colors ${isAnswered ? 'bg-accent text-white border-accent' : 'bg-surface hover:bg-surface-hover border-line text-ink'} ${currentPage === pageOfQuestion && !isAnswered ? 'ring-2 ring-accent/50' : ''}`}
+                    >
+                      {idx + 1}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
             {isProctored && (
               <div className="card overflow-hidden">
                 <div className={`text-white text-xs font-bold p-2 text-center transition-colors ${faceStatus === 'DETECTING' ? 'bg-amber-500' :
@@ -736,7 +786,7 @@ export default function AntiCheatExamPage() {
             <button
               onClick={submitExam}
               disabled={isSubmitting}
-              className="bg-ink text-white font-bold py-3 rounded-xl hover:opacity-90 disabled:opacity-50"
+              className="bg-ink text-white font-bold py-3 rounded-xl hover:opacity-90 disabled:opacity-50 mt-4"
             >
               {isSubmitting ? 'Đang nộp...' : 'Nộp bài thi'}
             </button>
