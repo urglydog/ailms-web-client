@@ -1,6 +1,10 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
+import { Client } from '@stomp/stompjs';
+import SockJS from 'sockjs-client';
+import { getAccessToken, decodeAccessToken } from '@/lib/auth/token';
+import { toast } from 'sonner';
 
 type Notification = {
   id: number;
@@ -35,23 +39,58 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     ]);
   }, []);
 
+  const clientRef = useRef<Client | null>(null);
+
   useEffect(() => {
-    // TODO: Phase 1 Backend hasn't implemented WebSocket Config (STOMP/SockJS) yet.
-    // When BE is ready, we will connect like this:
-    /*
-    const token = localStorage.getItem('accessToken');
+    const token = getAccessToken();
     if (!token) return;
+    
+    const user = decodeAccessToken();
+    const email = user?.sub;
+    if (!email) return;
 
-    const wsUrl = `${process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8080/ws'}?token=${token}`;
-    const ws = new WebSocket(wsUrl);
+    const client = new Client({
+      webSocketFactory: () => new SockJS(`${process.env.NEXT_PUBLIC_WS_URL ?? 'http://localhost:8080'}/ws`),
+      connectHeaders: {
+        Authorization: `Bearer ${token}`,
+      },
+      reconnectDelay: 3000,
+    });
 
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      setNotifications(prev => [data, ...prev]);
+    client.onConnect = () => {
+      client.subscribe(`/topic/notifications/${email}`, (message) => {
+        try {
+          const data = JSON.parse(message.body);
+          
+          setNotifications(prev => [{
+            id: Date.now(),
+            title: data.type === 'SRS_REMINDER' ? '📚 Ôn tập Flashcard' : 'Thông báo mới',
+            message: data.message,
+            isRead: false,
+            createdAt: new Date().toISOString()
+          }, ...prev]);
+
+          if (data.type === 'SRS_REMINDER' && data.message) {
+            toast.info(data.message, {
+              duration: 10000,
+              icon: '📚'
+            });
+          } else if (data.message) {
+            toast.info(data.message);
+          }
+        } catch {
+          // Ignore invalid message
+        }
+      });
     };
 
-    return () => ws.close();
-    */
+    client.activate();
+    clientRef.current = client;
+
+    return () => {
+      client.deactivate();
+      clientRef.current = null;
+    };
   }, []);
 
   const unreadCount = notifications.filter(n => !n.isRead).length;

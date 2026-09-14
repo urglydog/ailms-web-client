@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useReviewFlashcard } from '@/hooks/useFlashcards';
 import { toast } from 'sonner';
 
@@ -37,6 +37,14 @@ export function FlashcardViewer({ flashcards, language }: { flashcards: Flashcar
   const [isFlipped, setIsFlipped] = useState(false);
   const { mutate: reviewCard } = useReviewFlashcard();
   const [localStats, setLocalStats] = useState<Record<number, { isDue?: boolean; easiness?: number; intervalDays?: number; nextReviewAt?: string }>>({});
+
+  useEffect(() => {
+    return () => {
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, []);
 
   if (!flashcards || flashcards.length === 0) {
     return <div className="text-center text-ink-muted">Chưa có flashcard nào.</div>;
@@ -113,7 +121,12 @@ export function FlashcardViewer({ flashcards, language }: { flashcards: Flashcar
 
       <div 
         className="relative w-full max-w-2xl h-96 perspective-1000 cursor-pointer group"
-        onClick={() => setIsFlipped(!isFlipped)}
+        onClick={() => {
+          if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+          }
+          setIsFlipped(!isFlipped);
+        }}
       >
         <div className={`w-full h-full transition-transform duration-500 transform-style-3d ${isFlipped ? 'rotate-y-180' : ''}`}>
           
