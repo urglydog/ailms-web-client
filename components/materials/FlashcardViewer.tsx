@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useReviewFlashcard } from '@/hooks/useFlashcards';
+import { useReviewFlashcard, useUpdateFlashcard, useAddFlashcard } from '@/hooks/useFlashcards';
 import { toast } from 'sonner';
 
 /** Map mã ngôn ngữ backend → BCP-47 tag cho Web Speech API */
@@ -32,11 +32,32 @@ interface Flashcard {
 }
 
 /** `language` khớp với trường `language` của MaterialGeneration (ví dụ: 'vi', 'en', 'ja'). */
-export function FlashcardViewer({ flashcards, language }: { flashcards: Flashcard[]; language?: string }) {
+export function FlashcardViewer({ flashcards, language, deckId }: { flashcards: Flashcard[]; language?: string; deckId?: number }) {
   const [currentIdx, setCurrentIdx] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const { mutate: reviewCard } = useReviewFlashcard();
   const [localStats, setLocalStats] = useState<Record<number, { isDue?: boolean; easiness?: number; intervalDays?: number; nextReviewAt?: string }>>({});
+  const { mutate: updateCard } = useUpdateFlashcard();
+  const { mutate: addCard } = useAddFlashcard();
+  const [editMode, setEditMode] = useState<{ id: number; front: string; back: string } | null>(null);
+  const [addMode, setAddMode] = useState<{ front: string; back: string } | null>(null);
+
+  const handleEditSave = () => {
+    if (!editMode) return;
+    updateCard({ flashcardId: editMode.id, data: { frontText: editMode.front, backText: editMode.back } }, {
+      onSuccess: () => setEditMode(null)
+    });
+  };
+
+  const handleAddSave = () => {
+    if (!addMode || !deckId) return;
+    addCard({ deckId, data: { frontText: addMode.front, backText: addMode.back } }, {
+      onSuccess: () => {
+        setAddMode(null);
+        setCurrentIdx(flashcards.length); // will move to the new card once data updates
+      }
+    });
+  };
 
   useEffect(() => {
     return () => {
@@ -47,7 +68,19 @@ export function FlashcardViewer({ flashcards, language }: { flashcards: Flashcar
   }, []);
 
   if (!flashcards || flashcards.length === 0) {
-    return <div className="text-center text-ink-muted">Chưa có flashcard nào.</div>;
+    if (addMode) {
+      return renderAddModal();
+    }
+    return (
+      <div className="text-center text-ink-muted flex flex-col items-center">
+        Chưa có flashcard nào.
+        {deckId && (
+          <button onClick={() => setAddMode({ front: '', back: '' })} className="mt-4 bg-accent text-white px-4 py-2 rounded-full font-bold">
+            + Thêm thẻ mới
+          </button>
+        )}
+      </div>
+    );
   }
 
   const handleNext = () => {
@@ -112,10 +145,113 @@ export function FlashcardViewer({ flashcards, language }: { flashcards: Flashcar
     nextReviewAt: card.nextReviewAt
   };
 
+  function renderAddModal() {
+    return (
+      <div className="flex flex-col items-center max-w-2xl mx-auto">
+        <div className="w-full flex items-center justify-between mb-6">
+          <h3 className="font-display text-lg font-bold text-ink flex items-center gap-2">
+            Thêm Flashcard mới
+          </h3>
+          <button onClick={() => setAddMode(null)} className="text-ink-muted hover:text-ink text-sm font-semibold px-3 py-1 rounded-lg hover:bg-surface-hover transition-colors">
+            Hủy
+          </button>
+        </div>
+        <div className="w-full space-y-4">
+          <div>
+            <label className="block text-sm font-semibold text-ink-muted mb-1">Mặt trước (Front)</label>
+            <textarea
+              className="w-full p-3 rounded-xl border border-line bg-surface focus:ring-2 focus:ring-accent outline-none text-ink text-lg font-medium resize-none h-24"
+              value={addMode?.front || ''}
+              onChange={e => setAddMode(prev => prev ? { ...prev, front: e.target.value } : null)}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-ink-muted mb-1">Mặt sau (Back)</label>
+            <textarea
+              className="w-full p-3 rounded-xl border border-line bg-surface focus:ring-2 focus:ring-accent outline-none text-ink text-lg font-medium resize-none h-24"
+              value={addMode?.back || ''}
+              onChange={e => setAddMode(prev => prev ? { ...prev, back: e.target.value } : null)}
+            />
+          </div>
+          <div className="pt-4 flex justify-end">
+            <button
+              onClick={handleAddSave}
+              className="bg-accent hover:bg-accent-dark text-white font-bold px-6 py-2 rounded-full shadow-md transition-all"
+            >
+              Thêm Thẻ
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  function renderEditModal() {
+    return (
+      <div className="flex flex-col items-center max-w-2xl mx-auto">
+        <div className="w-full flex items-center justify-between mb-6">
+          <h3 className="font-display text-lg font-bold text-ink flex items-center gap-2">
+            Chỉnh sửa Flashcard
+          </h3>
+          <button onClick={() => setEditMode(null)} className="text-ink-muted hover:text-ink text-sm font-semibold px-3 py-1 rounded-lg hover:bg-surface-hover transition-colors">
+            Hủy
+          </button>
+        </div>
+        <div className="w-full space-y-4">
+          <div>
+            <label className="block text-sm font-semibold text-ink-muted mb-1">Mặt trước (Front)</label>
+            <textarea
+              className="w-full p-3 rounded-xl border border-line bg-surface focus:ring-2 focus:ring-accent outline-none text-ink text-lg font-medium resize-none h-24"
+              value={editMode?.front || ''}
+              onChange={e => setEditMode(prev => prev ? { ...prev, front: e.target.value } : null)}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-ink-muted mb-1">Mặt sau (Back)</label>
+            <textarea
+              className="w-full p-3 rounded-xl border border-line bg-surface focus:ring-2 focus:ring-accent outline-none text-ink text-lg font-medium resize-none h-24"
+              value={editMode?.back || ''}
+              onChange={e => setEditMode(prev => prev ? { ...prev, back: e.target.value } : null)}
+            />
+          </div>
+          <div className="pt-4 flex justify-end">
+            <button
+              onClick={handleEditSave}
+              className="bg-accent hover:bg-accent-dark text-white font-bold px-6 py-2 rounded-full shadow-md transition-all"
+            >
+              Lưu thay đổi
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (addMode) return renderAddModal();
+  if (editMode) return renderEditModal();
+
   return (
     <div className="flex flex-col items-center">
       <div className="w-full flex justify-between text-ink-muted mb-6 text-sm font-semibold">
-        <span>Flashcard {currentIdx + 1} / {flashcards.length}</span>
+        <div className="flex gap-4 items-center">
+          <span>Flashcard {currentIdx + 1} / {flashcards.length}</span>
+          {deckId && (
+            <>
+              <button
+                onClick={() => setEditMode({ id: card.id, front: card.frontText, back: card.backText })}
+                className="text-accent hover:underline flex items-center gap-1"
+              >
+                ✏️ Sửa thẻ này
+              </button>
+              <button
+                onClick={() => setAddMode({ front: '', back: '' })}
+                className="text-green-600 hover:underline flex items-center gap-1"
+              >
+                ➕ Thêm thẻ mới
+              </button>
+            </>
+          )}
+        </div>
         <span className="bg-surface-hover px-3 py-1 rounded-full border border-line">Click vào thẻ để lật</span>
       </div>
 

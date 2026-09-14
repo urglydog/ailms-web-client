@@ -165,7 +165,7 @@ export default function MaterialDetailPage() {
                     onFinish={() => router.back()}
                   />
                 ) : (
-                  <FlashcardViewer flashcards={material.flashcards} language={material.language} />
+                  <FlashcardViewer flashcards={material.flashcards} language={material.language} deckId={material.id} />
                 )}
               </>
             ) : (

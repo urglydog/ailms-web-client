@@ -39,9 +39,9 @@ export function FlashcardStudyMode({ deckName: _deckName, cards, language, onFin
   const [editMode, setEditMode] = useState<{ id: number; front: string; back: string } | null>(null);
 
   // Separate cards into categories for counter
-  const newCards = cards.filter(c => c.nextReviewAt === null && !completedIds.has(c.id));
-  const learningCards = cards.filter(c => c.nextReviewAt !== null && c.isDue && c.repetitions > 0 && c.repetitions < 3 && !completedIds.has(c.id));
-  const reviewCards = cards.filter(c => c.nextReviewAt !== null && c.isDue && c.repetitions >= 3 && !completedIds.has(c.id));
+  const newCards = cards.filter(c => c.isDue && c.repetitions === 0 && !completedIds.has(c.id));
+  const learningCards = cards.filter(c => c.isDue && c.repetitions > 0 && c.repetitions < 3 && !completedIds.has(c.id));
+  const reviewCards = cards.filter(c => c.isDue && c.repetitions >= 3 && !completedIds.has(c.id));
 
   // All due cards (in study order: new first, then learning, then review)
   const dueCards = [...newCards, ...learningCards, ...reviewCards];
