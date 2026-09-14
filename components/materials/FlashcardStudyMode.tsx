@@ -36,7 +36,6 @@ export function FlashcardStudyMode({ deckName: _deckName, cards, language, onFin
   const [completedIds, setCompletedIds] = useState<Set<number>>(new Set());
   const [isFlipped, setIsFlipped] = useState(false);
   const [fontSize, setFontSize] = useState(28); // px
-  const [editMode, setEditMode] = useState<{ id: number; front: string; back: string } | null>(null);
 
   // Separate cards into categories for counter
   const newCards = cards.filter(c => c.isDue && c.repetitions === 0 && !completedIds.has(c.id));
@@ -50,13 +49,11 @@ export function FlashcardStudyMode({ deckName: _deckName, cards, language, onFin
   const isFinished = dueCards.length === 0;
 
   const handleFlip = useCallback(() => {
-    if (!editMode) {
-      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-      }
-      setIsFlipped(prev => !prev);
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
     }
-  }, [editMode]);
+    setIsFlipped(prev => !prev);
+  }, []);
 
   const handleRate = useCallback((quality: number) => {
     if (!currentCard) return;
@@ -69,14 +66,6 @@ export function FlashcardStudyMode({ deckName: _deckName, cards, language, onFin
     });
   }, [currentCard, reviewCard]);
 
-  const handleEditSave = useCallback(() => {
-    if (!editMode) return;
-    updateCard({ flashcardId: editMode.id, data: { frontText: editMode.front, backText: editMode.back } }, {
-      onSuccess: () => {
-        setEditMode(null);
-      }
-    });
-  }, [editMode, updateCard]);
 
   const handleSpeak = useCallback((text: string) => {
     if (!('speechSynthesis' in window)) {
@@ -127,62 +116,6 @@ export function FlashcardStudyMode({ deckName: _deckName, cards, language, onFin
     );
   }
 
-  // ─── EDIT MODAL ───
-  if (editMode) {
-    return (
-      <div className="flex flex-col items-center max-w-2xl mx-auto">
-        {/* Header */}
-        <div className="w-full flex items-center justify-between mb-6">
-          <h3 className="font-display text-lg font-bold text-ink flex items-center gap-2">
-            Chỉnh sửa Flashcard
-          </h3>
-          <button
-            onClick={() => setEditMode(null)}
-            className="text-ink-muted hover:text-ink text-sm font-semibold px-3 py-1 rounded-lg hover:bg-surface-hover transition-colors"
-          >
-            Hủy
-          </button>
-        </div>
-
-        <div className="w-full space-y-4">
-          <div>
-            <label className="block text-sm font-semibold text-ink-muted mb-1">Mặt trước (Front)</label>
-            <textarea
-              autoFocus
-              value={editMode.front}
-              onChange={(e) => setEditMode({ ...editMode, front: e.target.value })}
-              className="w-full border border-line rounded-xl p-4 text-base focus:ring-2 focus:ring-accent/20 focus:border-accent resize-none h-32 text-ink outline-none transition-all font-medium"
-              placeholder="Nhập nội dung mặt trước..."
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-ink-muted mb-1">Mặt sau (Back)</label>
-            <textarea
-              value={editMode.back}
-              onChange={(e) => setEditMode({ ...editMode, back: e.target.value })}
-              className="w-full border border-line rounded-xl p-4 text-base focus:ring-2 focus:ring-accent/20 focus:border-accent resize-none h-32 text-ink outline-none transition-all font-medium"
-              placeholder="Nhập nội dung mặt sau..."
-            />
-          </div>
-          <div className="flex justify-end gap-3 pt-2">
-            <button
-              onClick={() => setEditMode(null)}
-              className="px-5 py-2.5 bg-surface-hover text-ink rounded-xl text-sm font-bold hover:bg-line border border-line transition-colors"
-            >
-              Hủy bỏ
-            </button>
-            <button
-              onClick={handleEditSave}
-              disabled={isUpdating}
-              className="px-6 py-2.5 bg-accent text-white rounded-xl text-sm font-bold hover:bg-accent-dark shadow-sm transition-colors disabled:opacity-50"
-            >
-              {isUpdating ? 'Đang lưu...' : 'Lưu thay đổi'}
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   // ─── STUDY SCREEN ───
   return (
@@ -190,15 +123,6 @@ export function FlashcardStudyMode({ deckName: _deckName, cards, language, onFin
       {/* Top Bar: Deck name + Controls + Counter */}
       <div className="w-full flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          {/* Edit button */}
-          {currentCard && (
-            <button
-              onClick={() => setEditMode({ id: currentCard.id, front: currentCard.frontText, back: currentCard.backText })}
-              className="px-3 py-1.5 bg-surface-hover text-ink-muted border border-line rounded-lg text-xs font-bold hover:bg-line hover:text-ink transition-colors"
-            >
-              Edit
-            </button>
-          )}
           {/* Font size controls */}
           <button
             onClick={() => setFontSize(s => Math.max(16, s - 4))}

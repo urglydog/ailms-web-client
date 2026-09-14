@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import mermaid from 'mermaid';
+import { toast } from 'sonner';
 
 interface MermaidViewerProps {
   chart: string;
@@ -13,6 +14,7 @@ export function MermaidViewer({ chart }: MermaidViewerProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [layoutDirection, setLayoutDirection] = useState<'TB' | 'LR' | 'BT' | 'RL' | null>(null);
+  const [styledChart, setStyledChart] = useState<string>('');
 
 
   useEffect(() => {
@@ -53,6 +55,8 @@ export function MermaidViewer({ chart }: MermaidViewerProps) {
         if (!modifiedChart.includes('style ') && !modifiedChart.includes('classDef ')) {
             modifiedChart += `\n    classDef default fill:#e0e7ff,stroke:#6366f1,stroke-width:2px,color:#3730a3,rx:8,ry:8;`;
         }
+        
+        setStyledChart(modifiedChart);
         
         const id = `mermaid-${Math.random().toString(36).substring(2, 9)}`;
         const { svg } = await mermaid.render(id, modifiedChart);
@@ -116,16 +120,25 @@ export function MermaidViewer({ chart }: MermaidViewerProps) {
     URL.revokeObjectURL(url);
   };
 
+  const handleCopyCode = async () => {
+    try {
+      await navigator.clipboard.writeText(styledChart || chart);
+      toast.success('Đã sao chép mã Mermaid!');
+    } catch {
+      toast.error('Lỗi khi sao chép mã.');
+    }
+  };
+
   return (
     <div className="flex flex-col gap-4">
       {/* Thanh công cụ điều khiển sơ đồ */}
       <div className="flex flex-wrap items-center justify-between gap-4 bg-gray-50 p-2 rounded-xl border border-line">
         <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-line">
           {[
-            { id: 'TB', label: '⬇️ Dọc' },
-            { id: 'LR', label: '➡️ Ngang' },
-            { id: 'BT', label: '⬆️ Ngược' },
-            { id: 'RL', label: '⬅️ Trái' }
+            { id: 'TB', label: '⬇️' },
+            { id: 'LR', label: '➡️' },
+            { id: 'BT', label: '⬆️' },
+            { id: 'RL', label: '⬅️' }
           ].map(dir => (
             <button
               key={dir.id}
@@ -141,13 +154,22 @@ export function MermaidViewer({ chart }: MermaidViewerProps) {
         </div>
 
         {svgContent && (
-          <button 
-            onClick={handleDownloadSVG}
-            className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-accent text-ink hover:text-white rounded-lg text-sm font-medium transition-all border border-line"
-            title="Tải sơ đồ dưới dạng ảnh SVG"
-          >
-            Tải ảnh (SVG)
-          </button>
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={handleCopyCode}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-accent text-ink hover:text-white rounded-lg text-sm font-medium transition-all border border-line"
+              title="Sao chép mã Mermaid"
+            >
+              Copy Code
+            </button>
+            <button 
+              onClick={handleDownloadSVG}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-accent text-ink hover:text-white rounded-lg text-sm font-medium transition-all border border-line"
+              title="Tải sơ đồ dưới dạng ảnh SVG"
+            >
+              Tải ảnh (SVG)
+            </button>
+          </div>
         )}
       </div>
 

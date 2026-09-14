@@ -47,8 +47,8 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     if (!token) return;
     
     const user = decodeAccessToken();
-    const email = user?.sub;
-    if (!email) return;
+    const userId = user?.id;
+    if (!userId) return;
 
     const client = new Client({
       webSocketFactory: () => new SockJS(`${process.env.NEXT_PUBLIC_WS_URL ?? 'http://localhost:8080'}/ws`),
@@ -59,7 +59,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     });
 
     client.onConnect = () => {
-      client.subscribe(`/topic/notifications/${email}`, (message) => {
+      client.subscribe(`/topic/notifications/${userId}`, (message) => {
         try {
           const data = JSON.parse(message.body);
           

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useReviewFlashcard, useUpdateFlashcard, useAddFlashcard } from '@/hooks/useFlashcards';
+import { useUpdateFlashcard, useAddFlashcard } from '@/hooks/useFlashcards';
 import { toast } from 'sonner';
 
 /** Map mã ngôn ngữ backend → BCP-47 tag cho Web Speech API */
@@ -35,8 +35,6 @@ interface Flashcard {
 export function FlashcardViewer({ flashcards, language, deckId }: { flashcards: Flashcard[]; language?: string; deckId?: number }) {
   const [currentIdx, setCurrentIdx] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
-  const { mutate: reviewCard } = useReviewFlashcard();
-  const [localStats, setLocalStats] = useState<Record<number, { isDue?: boolean; easiness?: number; intervalDays?: number; nextReviewAt?: string }>>({});
   const { mutate: updateCard } = useUpdateFlashcard();
   const { mutate: addCard } = useAddFlashcard();
   const [editMode, setEditMode] = useState<{ id: number; front: string; back: string } | null>(null);
@@ -54,7 +52,7 @@ export function FlashcardViewer({ flashcards, language, deckId }: { flashcards: 
     addCard({ deckId, data: { frontText: addMode.front, backText: addMode.back } }, {
       onSuccess: () => {
         setAddMode(null);
-        setCurrentIdx(flashcards.length); // will move to the new card once data updates
+        // Ngay sau khi lưu, data có thể chưa update ngay. Invalidate cache sẽ fetch lại flashcards.
       }
     });
   };
@@ -86,21 +84,22 @@ export function FlashcardViewer({ flashcards, language, deckId }: { flashcards: 
   const handleNext = () => {
     if (currentIdx < flashcards.length - 1) {
       setIsFlipped(false);
-      setTimeout(() => setCurrentIdx(i => i + 1), 150);
+      setTimeout(() => setCurrentIdx(i => Math.min(i + 1, flashcards.length - 1)), 150);
     }
   };
 
   const handlePrev = () => {
     if (currentIdx > 0) {
       setIsFlipped(false);
-      setTimeout(() => setCurrentIdx(i => i - 1), 150);
+      setTimeout(() => setCurrentIdx(i => Math.max(i - 1, 0)), 150);
     }
   };
 
-  const card = flashcards[currentIdx];
+  const safeIdx = Math.min(Math.max(currentIdx, 0), Math.max(flashcards.length - 1, 0));
+  const card = flashcards[safeIdx];
 
   if (!card) {
-    return <div className="text-center text-ink-muted">Lỗi hiển thị thẻ.</div>;
+    return <div className="text-center text-ink-muted">Đang tải thẻ...</div>;
   }
 
   const handleSpeak = (text: string, e: React.MouseEvent) => {
@@ -109,41 +108,22 @@ export function FlashcardViewer({ flashcards, language, deckId }: { flashcards: 
       toast.error('Trình duyệt không hỗ trợ phát âm thanh.');
       return;
     }
-    // Chuyển mã ngôn ngữ backend sang BCP-47; nếu không xác định thì dùng ngôn ngữ mặc định trình duyệt
     const langCode = language?.toLowerCase().split('-')[0] ?? '';
     const bcp47 = LANGUAGE_MAP[langCode] ?? '';
     if (!bcp47) {
-      // Ngôn ngữ không xác định — ẩn tính năng, không nên phát sai
       toast.info('Ngôn ngữ của bộ thẻ chưa được hỗ trợ phát âm.');
       return;
     }
-    window.speechSynthesis.cancel(); // Dừng bất kỳ phát âm đang chạy
+    window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = bcp47;
     window.speechSynthesis.speak(utterance);
   };
 
-  /** Ẩn nút phát âm nếu ngôn ngữ không xác định hoặc không được hỗ trợ */
   const langCode = language?.toLowerCase().split('-')[0] ?? '';
   const isSpeakSupported = !!LANGUAGE_MAP[langCode] && 'speechSynthesis' in (typeof window !== 'undefined' ? window : {});
 
-  const handleRate = (quality: number, e: React.MouseEvent) => {
-    e.stopPropagation();
-    reviewCard({ flashcardId: card.id, data: { quality } }, {
-      onSuccess: (data) => {
-        setLocalStats(prev => ({ ...prev, [card.id]: data }));
-        toast.success(`Đã lưu tiến độ! Lần tới: ${new Date(data.nextReviewAt).toLocaleDateString()}`);
-        handleNext();
-      }
-    });
-  };
 
-  const currentStats = localStats[card.id] || {
-    isDue: card.isDue,
-    easiness: card.easiness,
-    intervalDays: card.intervalDays,
-    nextReviewAt: card.nextReviewAt
-  };
 
   function renderAddModal() {
     return (
@@ -234,7 +214,7 @@ export function FlashcardViewer({ flashcards, language, deckId }: { flashcards: 
     <div className="flex flex-col items-center">
       <div className="w-full flex justify-between text-ink-muted mb-6 text-sm font-semibold">
         <div className="flex gap-4 items-center">
-          <span>Flashcard {currentIdx + 1} / {flashcards.length}</span>
+          <span>Flashcard {safeIdx + 1} / {flashcards.length}</span>
           {deckId && (
             <>
               <button
@@ -281,9 +261,9 @@ export function FlashcardViewer({ flashcards, language, deckId }: { flashcards: 
               {card.frontText}
             </h3>
             
-            {currentStats.nextReviewAt && (
-              <div className={`absolute top-4 left-4 px-3 py-1 rounded-full text-xs font-semibold ${currentStats.isDue ? 'bg-red-100 text-red-700 border border-red-200' : 'bg-green-100 text-green-700 border border-green-200'}`}>
-                {currentStats.isDue ? 'Tới hạn ôn tập' : `Ôn tập: ${new Date(currentStats.nextReviewAt).toLocaleDateString()}`}
+            {card.nextReviewAt && (
+              <div className={`absolute top-4 left-4 px-3 py-1 rounded-full text-xs font-semibold ${card.isDue ? 'bg-red-100 text-red-700 border border-red-200' : 'bg-green-100 text-green-700 border border-green-200'}`}>
+                {card.isDue ? 'Tới hạn ôn tập' : `Ôn tập: ${new Date(card.nextReviewAt).toLocaleDateString()}`}
               </div>
             )}
             
@@ -308,16 +288,7 @@ export function FlashcardViewer({ flashcards, language, deckId }: { flashcards: 
               {card.backText}
             </h3>
             
-            {/* SM2 Rating Controls */}
-            <div className="absolute bottom-6 w-full px-8" onClick={e => e.stopPropagation()}>
-              <p className="text-center text-sm text-white/80 mb-3 font-medium">Mức độ ghi nhớ của bạn?</p>
-              <div className="flex justify-center gap-2">
-                <button onClick={(e) => handleRate(0, e)} className="flex-1 py-2 bg-red-500/20 hover:bg-red-500/50 border border-red-400/50 rounded-lg text-xs font-bold transition-colors">Quên sạch</button>
-                <button onClick={(e) => handleRate(2, e)} className="flex-1 py-2 bg-orange-500/20 hover:bg-orange-500/50 border border-orange-400/50 rounded-lg text-xs font-bold transition-colors">Khó nhớ</button>
-                <button onClick={(e) => handleRate(4, e)} className="flex-1 py-2 bg-green-500/20 hover:bg-green-500/50 border border-green-400/50 rounded-lg text-xs font-bold transition-colors">Dễ nhớ</button>
-                <button onClick={(e) => handleRate(5, e)} className="flex-1 py-2 bg-blue-500/20 hover:bg-blue-500/50 border border-blue-400/50 rounded-lg text-xs font-bold transition-colors">Hoàn hảo</button>
-              </div>
-            </div>
+
           </div>
 
         </div>
@@ -326,8 +297,8 @@ export function FlashcardViewer({ flashcards, language, deckId }: { flashcards: 
       <div className="flex items-center space-x-6 mt-10">
         <button
           onClick={handlePrev}
-          disabled={currentIdx === 0}
-          className={`w-14 h-14 rounded-full flex items-center justify-center transition-all ${currentIdx === 0 ? 'bg-surface border border-line text-ink-muted opacity-50 cursor-not-allowed' : 'bg-white border border-line shadow-sm hover:border-accent hover:text-accent transform hover:-translate-x-1'}`}
+          disabled={safeIdx === 0}
+          className={`w-14 h-14 rounded-full flex items-center justify-center transition-all ${safeIdx === 0 ? 'bg-surface border border-line text-ink-muted opacity-50 cursor-not-allowed' : 'bg-white border border-line shadow-sm hover:border-accent hover:text-accent transform hover:-translate-x-1'}`}
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
         </button>
@@ -336,7 +307,7 @@ export function FlashcardViewer({ flashcards, language, deckId }: { flashcards: 
           {flashcards.map((_, i) => (
             <div 
               key={i} 
-              className={`h-2.5 rounded-full transition-all ${i === currentIdx ? 'w-8 bg-accent' : 'w-2.5 bg-line hover:bg-line-soft cursor-pointer'}`}
+              className={`h-2.5 rounded-full transition-all ${i === safeIdx ? 'w-8 bg-accent' : 'w-2.5 bg-line hover:bg-line-soft cursor-pointer'}`}
               onClick={() => {
                 setIsFlipped(false);
                 setTimeout(() => setCurrentIdx(i), 150);
@@ -347,8 +318,8 @@ export function FlashcardViewer({ flashcards, language, deckId }: { flashcards: 
 
         <button
           onClick={handleNext}
-          disabled={currentIdx === flashcards.length - 1}
-          className={`w-14 h-14 rounded-full flex items-center justify-center transition-all ${currentIdx === flashcards.length - 1 ? 'bg-surface border border-line text-ink-muted opacity-50 cursor-not-allowed' : 'bg-white border border-line shadow-sm hover:border-accent hover:text-accent transform hover:translate-x-1'}`}
+          disabled={safeIdx === flashcards.length - 1}
+          className={`w-14 h-14 rounded-full flex items-center justify-center transition-all ${safeIdx === flashcards.length - 1 ? 'bg-surface border border-line text-ink-muted opacity-50 cursor-not-allowed' : 'bg-white border border-line shadow-sm hover:border-accent hover:text-accent transform hover:translate-x-1'}`}
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
         </button>
