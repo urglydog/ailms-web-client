@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { flashcardsApi, FlashcardReviewReq, FlashcardUpdateReq } from '@/lib/api/flashcards';
+import { flashcardsApi, FlashcardReviewReq, FlashcardUpdateReq, FlashcardAddReq } from '@/lib/api/flashcards';
 import { toast } from 'sonner';
 
 export const useReviewFlashcard = () => {
@@ -40,5 +40,22 @@ export const useDeckStudyCards = (deckId: number | undefined) => {
     queryKey: ['deck-study-cards', deckId],
     queryFn: () => flashcardsApi.getDeckStudyCards(deckId!),
     enabled: !!deckId,
+  });
+};
+
+export const useAddFlashcard = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ deckId, data }: { deckId: number; data: FlashcardAddReq }) =>
+      flashcardsApi.addFlashcard(deckId, data),
+    onSuccess: () => {
+      toast.success('Đã thêm flashcard mới!');
+      queryClient.invalidateQueries({ queryKey: ['material-detail'] });
+      queryClient.invalidateQueries({ queryKey: ['deck-study-cards'] });
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Lỗi khi thêm flashcard');
+    },
   });
 };

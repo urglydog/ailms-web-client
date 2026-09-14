@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { ApiError } from '@/lib/api/client';
 import Link from 'next/link';
 import { usePathname, useSearchParams, useRouter } from 'next/navigation';
+import { useNotification } from '@/components/providers/NotificationProvider';
 
 export function MaterialManager({ courseId }: { courseId: number }) {
   const pathname = usePathname();
@@ -20,6 +21,10 @@ export function MaterialManager({ courseId }: { courseId: number }) {
   const requestMutation = useRequestMaterial();
   const renameMutation = useRenameMaterial(courseId);
   const deleteMutation = useDeleteMaterial(courseId);
+
+  const { notifications } = useNotification();
+  const officialUnreadCount = notifications.filter(n => !n.isRead && n.type === 'NEW_OFFICIAL_MATERIAL').length;
+  const personalUnreadCount = notifications.filter(n => !n.isRead && n.type === 'NEW_PERSONAL_MATERIAL').length;
 
   const { data: officialMaterials } = useQuery<InstructorMaterial[]>({
     queryKey: ['official-materials', courseId],
@@ -456,19 +461,29 @@ export function MaterialManager({ courseId }: { courseId: number }) {
       <div className="flex border-b border-line gap-6">
         <button
           onClick={() => setActiveTab('OFFICIAL')}
-          className={`pb-3 text-sm font-bold border-b-2 transition-colors ${
+          className={`pb-3 text-sm font-bold border-b-2 transition-colors relative ${
             activeTab === 'OFFICIAL' ? 'border-accent text-accent' : 'border-transparent text-ink-muted hover:text-ink'
           }`}
         >
           Kho Học Liệu Official
+          {officialUnreadCount > 0 && (
+            <span className="absolute -top-2 -right-3 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+              {officialUnreadCount}
+            </span>
+          )}
         </button>
         <button
           onClick={() => setActiveTab('PERSONAL')}
-          className={`pb-3 text-sm font-bold border-b-2 transition-colors ${
+          className={`pb-3 text-sm font-bold border-b-2 transition-colors relative ${
             activeTab === 'PERSONAL' ? 'border-accent text-accent' : 'border-transparent text-ink-muted hover:text-ink'
           }`}
         >
-          Tạo Học Liệu Cá Nhân
+          Kho Học Liệu Cá Nhân
+          {personalUnreadCount > 0 && (
+            <span className="absolute -top-2 -right-3 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+              {personalUnreadCount}
+            </span>
+          )}
         </button>
       </div>
 

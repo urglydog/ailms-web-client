@@ -12,6 +12,7 @@ type Notification = {
   message: string;
   isRead: boolean;
   createdAt: string;
+  type?: string;
 };
 
 type NotificationContextType = {
@@ -67,7 +68,8 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
             title: data.type === 'SRS_REMINDER' ? '📚 Ôn tập Flashcard' : 'Thông báo mới',
             message: data.message,
             isRead: false,
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
+            type: data.type
           }, ...prev]);
 
           if (data.type === 'SRS_REMINDER' && data.message) {

@@ -100,12 +100,13 @@ export default function AntiCheatExamPage() {
       if (document.hidden) {
         setViolationCount(prev => {
           const newCount = prev + 1;
-          if (newCount >= 3) {
-            toast.error('Phát hiện gian lận chuyển Tab quá 3 lần. Hệ thống tự động nộp bài!');
+          const maxViolations = attemptData?.maxViolations || 3;
+          if (newCount >= maxViolations) {
+            toast.error(`Phát hiện gian lận chuyển Tab quá ${maxViolations} lần. Hệ thống tự động nộp bài!`);
             // Delay slightly to allow toast to render
             setTimeout(() => submitExam(), 500);
           } else {
-            toast.warning(`Cảnh báo gian lận (${newCount}/3): Bạn đã chuyển Tab. Hệ thống sẽ tự động nộp bài nếu vi phạm 3 lần!`);
+            toast.warning(`Cảnh báo gian lận (${newCount}/${maxViolations}): Bạn đã chuyển Tab. Hệ thống sẽ tự động nộp bài nếu vi phạm ${maxViolations} lần!`);
           }
           return newCount;
         });
@@ -151,11 +152,12 @@ export default function AntiCheatExamPage() {
 
     setViolationCount((prev) => {
       const newCount = prev + 1;
-      if (newCount >= 3) {
-        toast.error('Bạn đã vi phạm quá 3 lần. Hệ thống tự động nộp bài!');
+      const maxViolations = attemptData?.maxViolations || 3;
+      if (newCount >= maxViolations) {
+        toast.error(`Bạn đã vi phạm quá ${maxViolations} lần. Hệ thống tự động nộp bài!`);
         submitExam();
       } else {
-        toast.warning(`Cảnh báo vi phạm (${newCount}/3): ${reason}`);
+        toast.warning(`Cảnh báo vi phạm (${newCount}/${maxViolations}): ${reason}`);
       }
       return newCount;
     });
@@ -175,21 +177,12 @@ export default function AntiCheatExamPage() {
       handleViolation('Mất tiêu điểm cửa sổ thi');
     };
 
-    const handleMouseLeave = (e: MouseEvent) => {
-      // Chỉ tính vi phạm nếu chuột rời khỏi cửa sổ browser đi sang màn hình khác / mép trên màn hình
-      if (e.clientY <= 5) {
-        handleViolation('Chuột rời khỏi khung hình thi (Nghi ngờ xem tài liệu)');
-      }
-    };
-
     document.addEventListener('visibilitychange', handleVisibilityChange);
     window.addEventListener('blur', handleWindowBlur);
-    document.addEventListener('mouseleave', handleMouseLeave);
 
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('blur', handleWindowBlur);
-      document.removeEventListener('mouseleave', handleMouseLeave);
     };
   }, [isStarted, result, isProctored, handleViolation]);
 
@@ -376,7 +369,19 @@ export default function AntiCheatExamPage() {
                 📅 Nộp lúc: {submitTime.toLocaleString('vi-VN')}
               </p>
             )}
-            <div className="flex justify-center gap-4 mt-8">
+            <div className="flex justify-center gap-4 mt-8 flex-wrap">
+              <button
+                onClick={() => {
+                  if (returnUrl) {
+                    router.push(returnUrl);
+                  } else {
+                    router.push(`/materials`);
+                  }
+                }}
+                className="bg-surface-hover text-ink border border-line px-8 py-3 rounded-full font-bold shadow-sm hover:bg-line transition-all"
+              >
+                Quay lại học liệu
+              </button>
               <Link
                 href={`/exam/${quizId}/history`}
                 className="bg-accent text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-accent-hover transition-all"

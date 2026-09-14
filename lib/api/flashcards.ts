@@ -22,6 +22,11 @@ export interface FlashcardUpdateReq {
   backText?: string;
 }
 
+export interface FlashcardAddReq {
+  frontText: string;
+  backText: string;
+}
+
 export interface FlashcardCardWithReview {
   id: number;
   frontText: string;
@@ -42,4 +47,7 @@ export const flashcardsApi = {
 
   getDeckStudyCards: (deckId: number) =>
     api.get<FlashcardCardWithReview[]>(`/api/v1/flashcards/deck/${deckId}/study`, { token: authToken() }),
+
+  addFlashcard: (deckId: number, data: FlashcardAddReq) =>
+    api.post<FlashcardCardWithReview>(`/api/v1/flashcards/deck/${deckId}`, data, { token: authToken() }),
 };
