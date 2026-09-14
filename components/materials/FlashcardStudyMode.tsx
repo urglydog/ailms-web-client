@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useReviewFlashcard, useUpdateFlashcard } from '@/hooks/useFlashcards';
 import { toast } from 'sonner';
 import type { FlashcardCardWithReview } from '@/lib/api/flashcards';
@@ -51,6 +51,9 @@ export function FlashcardStudyMode({ deckName: _deckName, cards, language, onFin
 
   const handleFlip = useCallback(() => {
     if (!editMode) {
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
       setIsFlipped(prev => !prev);
     }
   }, [editMode]);
@@ -92,7 +95,14 @@ export function FlashcardStudyMode({ deckName: _deckName, cards, language, onFin
   const langCode = language?.toLowerCase().split('-')[0] ?? '';
   const isSpeakSupported = !!LANGUAGE_MAP[langCode] && typeof window !== 'undefined' && 'speechSynthesis' in window;
 
-  // ─── FINISHED SCREEN ───
+  // Stop speech on unmount
+  useEffect(() => {
+    return () => {
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, []);
   if (isFinished) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[500px] text-center">

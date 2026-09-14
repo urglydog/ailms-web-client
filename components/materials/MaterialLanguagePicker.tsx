@@ -25,14 +25,20 @@ export function MaterialLanguagePicker({ languages, value, onChange, disabled }:
   const [query, setQuery] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const active = languages.find((l) => l.code === value) ?? null;
+  const active = (typeof languages?.[0] === 'string' ? languages as unknown as string[] : languages).find(
+    (l) => typeof l === 'string' ? l === value : l.code === value
+  ) ? (typeof languages?.[0] === 'string' ? { code: value, label: value, available: false } : languages.find(l => (l as LanguageAvailability).code === value) as LanguageAvailability) : null;
+
+  const normalizedLanguages = typeof languages?.[0] === 'string'
+    ? (languages as unknown as string[]).map(l => ({ code: l, label: l, available: false }))
+    : languages;
 
   const normalizedQuery = query.trim().toLowerCase();
   const filteredLanguages = normalizedQuery
-    ? languages.filter(
-        (l) => l.label.toLowerCase().includes(normalizedQuery) || l.code.toLowerCase().includes(normalizedQuery),
+    ? normalizedLanguages.filter(
+        (l) => l.label?.toLowerCase().includes(normalizedQuery) || l.code?.toLowerCase().includes(normalizedQuery),
       )
-    : languages;
+    : normalizedLanguages;
 
   useEffect(() => {
     if (!open) return;

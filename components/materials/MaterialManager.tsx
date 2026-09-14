@@ -8,11 +8,12 @@ import { MaterialLanguagePicker } from '@/components/materials/MaterialLanguageP
 import { toast } from 'sonner';
 import { ApiError } from '@/lib/api/client';
 import Link from 'next/link';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams, useRouter } from 'next/navigation';
 
 export function MaterialManager({ courseId }: { courseId: number }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const router = useRouter();
   const { data: materials, isLoading, refetch } = useCourseMaterials(courseId);
   const { data: availableLanguages } = useAvailableLanguages(courseId);
   const { data: chapters } = useCourseChapters(courseId);
@@ -103,7 +104,14 @@ export function MaterialManager({ courseId }: { courseId: number }) {
   };
 
   const filteredOfficial = officialMaterials?.filter(m => m.isOfficial);
-  const [activeTab, setActiveTab] = useState<'OFFICIAL' | 'PERSONAL'>('OFFICIAL');
+  const activeTabParam = searchParams.get('subtab') as 'OFFICIAL' | 'PERSONAL' | null;
+  const activeTab = activeTabParam === 'PERSONAL' ? 'PERSONAL' : 'OFFICIAL';
+
+  const setActiveTab = (tab: 'OFFICIAL' | 'PERSONAL') => {
+    const newParams = new URLSearchParams(searchParams.toString());
+    newParams.set('subtab', tab);
+    router.replace(`${pathname}?${newParams.toString()}`, { scroll: false });
+  };
 
   const getFilteredAndSortedMaterials = () => {
     if (!materials) return [];

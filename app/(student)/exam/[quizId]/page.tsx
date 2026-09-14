@@ -81,6 +81,7 @@ export default function AntiCheatExamPage() {
         const faceapi = await import('@vladmandic/face-api');
         const MODEL_URL = '/models';
         await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
+        await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
         setIsModelLoaded(true);
       } catch (err) {
         console.error("Failed to load face-api models", err);
@@ -209,7 +210,7 @@ export default function AntiCheatExamPage() {
           const detections = await faceapi.detectAllFaces(
             video,
             new faceapi.TinyFaceDetectorOptions({ inputSize: 160, scoreThreshold: 0.3 })
-          );
+          ).withFaceLandmarks();
 
           if (detections.length === 0) {
             setFaceStatus('NO_FACE');
@@ -218,7 +219,22 @@ export default function AntiCheatExamPage() {
             setFaceStatus('NO_FACE');
             handleViolation('Phát hiện có nhiều hơn 1 người trong khung hình');
           } else {
-            setFaceStatus('FACE_FOUND');
+            const landmarks = detections[0].landmarks;
+            const noseTip = landmarks.getNose()[3];
+            const leftJaw = landmarks.getJawOutline()[0];
+            const rightJaw = landmarks.getJawOutline()[16];
+
+            const leftDist = Math.abs(noseTip.x - leftJaw.x);
+            const rightDist = Math.abs(noseTip.x - rightJaw.x);
+            
+            // Nếu tỷ lệ lệch quá lớn, chứng tỏ đang quay mặt hẳn sang 1 bên
+            const ratio = leftDist / rightDist;
+            if (ratio > 2.5 || ratio < 0.4) {
+              setFaceStatus('NO_FACE');
+              handleViolation('Phát hiện đầu quay sang một bên quá lâu (Nghi ngờ xem tài liệu)');
+            } else {
+              setFaceStatus('FACE_FOUND');
+            }
           }
         } catch {
           // ignore detection error
