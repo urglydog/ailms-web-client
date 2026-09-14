@@ -1,11 +1,11 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ChapterAccordion } from '@/components/course/ChapterAccordion';
+import { CoursePreview } from '@/components/course/CoursePreview';
 import { EnrollButton } from '@/components/course/EnrollButton';
 import { ReviewsSection } from '@/components/course/ReviewsSection';
 import { CourseLiveBanner } from '@/components/live/CourseLiveBanner';
 import { Badge } from '@/components/ui/Badge';
-import { StarRating } from '@/components/ui/StarRating';
 import { ApiError } from '@/lib/api/client';
 import { publicCoursesApi } from '@/lib/api/publicCourses';
 
@@ -13,8 +13,16 @@ import { publicCoursesApi } from '@/lib/api/publicCourses';
  * Chi tiết khoá học — dịch từ nhánh `isDetail` của design. UC10.
  *
  * Server Component: gọi thẳng API công khai (`publicCoursesApi.getBySlug`) phía
- * server, tốt cho SEO trang công khai. `ReviewsSection` là Client Component nhúng
- * riêng vì cần state tương tác (form viết đánh giá) + token của người dùng.
+ * server, tốt cho SEO trang công khai. `ReviewsSection`/`CoursePreview` là Client
+ * Component nhúng riêng vì cần state tương tác.
+ *
+ * Vùng "hero" nền đen (14/09/2026, thiết kế lại kiểu Udemy) — trước đây trang này không
+ * tách hero riêng, chạy thẳng layout 2 cột nền trắng từ đầu. Giờ tách riêng 1 khối
+ * `bg-ink` full-bleed (nằm NGOÀI `.shell` để chiếm hết chiều ngang, có `.shell` riêng bên
+ * trong để căn nội dung) chứa tiêu đề/mô tả/tác giả/ngày cập nhật/ngôn ngữ gốc/ngôn ngữ đã
+ * lồng tiếng/rating/số học viên — đúng các mục yêu cầu, không dùng `StarRating`/token
+ * `ink`/`ink-muted` ở đây vì 2 token đó là màu CHỮ TỐI dành cho nền sáng, đặt trên nền đen
+ * sẽ chìm mất chữ (đen trên đen).
  *
  * Giai đoạn 3 sẽ thay khối "Ghi danh" bằng luồng thật: khoá miễn phí ghi danh ngay
  * (UC12), khoá trả phí chuyển sang checkout (UC13 → UC14).
@@ -47,121 +55,145 @@ export default async function CourseDetailPage({ params }: PageProps) {
 
   const totalLessons = course.chapters.reduce((sum, ch) => sum + ch.lessons.length, 0);
   const allLessons = course.chapters.flatMap((ch) => ch.lessons);
-  const previewLesson = allLessons.find((lesson) => lesson.isPreview);
+  // Toàn bộ bài Preview theo đúng thứ tự chương-bài (không chỉ 1 bài đầu tiên như trước) —
+  // dùng cho modal "Xem trước khóa học" (CoursePreview.tsx).
+  const previewLessons = allLessons.filter((lesson) => lesson.isPreview);
   const firstLesson = allLessons[0] ?? null;
+  const lastUpdatedLabel = new Date(course.updatedAt).toLocaleDateString('vi-VN', {
+    month: 'numeric',
+    year: 'numeric',
+  });
 
   return (
-    <div className="shell py-10">
-      {/* Breadcrumb */}
-      <nav aria-label="Đường dẫn" className="mb-6 text-[13px] text-ink-faint">
-        <Link href="/courses" className="font-semibold no-underline">
-          Kho khoá học
-        </Link>
-        <span> / </span>
-        <span className="text-ink-muted">{course.title}</span>
-      </nav>
+    <div>
+      {/* ── Vùng hero nền đen ── */}
+      <div className="bg-ink text-white">
+        <div className="shell flex flex-col gap-4 py-10">
+          <nav aria-label="Đường dẫn" className="text-[13px] text-white/60">
+            <Link href="/courses" className="font-semibold text-white/80 no-underline hover:text-white">
+              Kho khoá học
+            </Link>
+            <span> / </span>
+            <span>{course.title}</span>
+          </nav>
 
-      <div className="grid gap-10 lg:grid-cols-[1fr_340px]">
-        {/* ── Cột nội dung ── */}
-        <div className="flex min-w-0 flex-col gap-8">
-          <CourseLiveBanner courseId={course.id} />
+          <h1 className="max-w-3xl font-display text-3xl font-extrabold leading-tight">{course.title}</h1>
+          <p className="max-w-2xl text-[15px] leading-relaxed text-white/70">{course.description}</p>
 
-          <header className="flex flex-col gap-4">
-            <h1 className="font-display text-3xl font-extrabold leading-tight text-ink">
-              {course.title}
-            </h1>
-
-            <div className="flex flex-wrap items-center gap-4">
-              <span className="text-sm text-ink-muted">GV. {course.instructorName}</span>
-              <StarRating
-                rating={course.avgRating}
-                reviewCount={course.reviewCount}
-                levelLabel={LEVEL_LABEL[course.level]}
-              />
-            </div>
-
-            <p className="max-w-2xl text-[15px] leading-relaxed text-ink-muted">{course.description}</p>
-
-            {/* Ngôn ngữ lồng tiếng đã có (BR-DUB-07) — chưa có dữ liệu thật (Giai đoạn 5) */}
-            {course.langs.length > 0 && (
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="text-sm font-medium text-ink">Lồng tiếng sẵn có:</span>
-                {course.langs.map((lang) => (
-                  <span
-                    key={lang.code}
-                    className="inline-flex items-center gap-1.5 rounded-full border border-line
-                               bg-surface-raised px-2.5 py-1 text-[13px] text-ink-muted"
-                  >
-                    <span aria-hidden>{lang.flag}</span>
-                    {lang.label}
-                  </span>
-                ))}
-              </div>
-            )}
-          </header>
-
-          {/* Nội dung khoá học */}
-          <section>
-            <h2 className="mb-4 font-display text-xl font-bold text-ink">
-              Nội dung khoá học
-              <span className="ml-2 text-sm font-normal text-ink-muted">
-                {course.chapters.length} chương · {totalLessons} bài
-              </span>
-            </h2>
-            <ChapterAccordion chapters={course.chapters} enrolled={course.enrolled} />
-          </section>
-
-          {/* Đánh giá (UC23) */}
-          <section>
-            <h2 className="mb-4 font-display text-xl font-bold text-ink">Đánh giá từ học viên</h2>
-            <ReviewsSection courseId={course.id} />
-          </section>
-        </div>
-
-        {/* ── Cột ghi danh (sticky) ── */}
-        <aside className="lg:sticky lg:top-24 lg:self-start">
-          <div className="card flex flex-col gap-4 p-6">
-            {course.isFree ? (
-              <div className="flex items-baseline gap-2">
-                <span className="font-display text-3xl font-extrabold text-success">Miễn phí</span>
-                <Badge tone="success">Sở hữu vĩnh viễn</Badge>
-              </div>
-            ) : (
-              <div className="flex items-baseline gap-2">
-                <span className="font-display text-3xl font-extrabold text-ink">
-                  {course.price.toLocaleString('vi-VN')}đ
-                </span>
-                <Badge tone="neutral">Sở hữu vĩnh viễn</Badge>
-              </div>
-            )}
-
-            <EnrollButton
-              courseId={course.id}
-              courseSlug={course.slug}
-              isFree={course.isFree}
-              enrolled={course.enrolled}
-              firstLessonId={firstLesson?.id ?? null}
-            />
-
-            {previewLesson && (
-              <Link
-                href={`/learn/${previewLesson.id}`}
-                className="w-full rounded-full border border-line px-6 py-3 text-center font-display
-                           text-base font-semibold text-ink no-underline hover:border-accent
-                           hover:text-accent hover:no-underline"
-              >
-                Học thử miễn phí
-              </Link>
-            )}
-
-            <ul className="mt-2 flex flex-col gap-2 text-sm text-ink-muted">
-              <li>✓ {totalLessons} bài giảng có lồng tiếng AI</li>
-              <li>✓ Trợ lý Socratic AI Tutor</li>
-              <li>✓ Sơ đồ tư duy, Thẻ ghi nhớ, Quiz tự sinh</li>
-              <li>✓ Truy cập vĩnh viễn sau khi sở hữu</li>
-            </ul>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+            <span className="flex items-center gap-1.5 font-semibold text-star">
+              {course.avgRating.toFixed(1)}
+              <span aria-hidden>★</span>
+              <span className="font-normal text-white/60">({course.reviewCount.toLocaleString('vi-VN')})</span>
+            </span>
+            <span className="text-white/60">
+              {course.learnerCount.toLocaleString('vi-VN')} học viên
+            </span>
+            <span className="text-white/60">{LEVEL_LABEL[course.level]}</span>
           </div>
-        </aside>
+
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[13px] text-white/60">
+            <span>
+              Giảng viên: <span className="text-white/85">{course.instructorName}</span>
+            </span>
+            <span aria-hidden>·</span>
+            <span>Cập nhật {lastUpdatedLabel}</span>
+            {course.sourceLanguage && (
+              <>
+                <span aria-hidden>·</span>
+                <span className="flex items-center gap-1">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20Z" />
+                  </svg>
+                  {course.sourceLanguage}
+                </span>
+              </>
+            )}
+          </div>
+
+          {course.dubbedLanguages.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-[13px] font-medium text-white/70">Đã lồng tiếng:</span>
+              {course.dubbedLanguages.map((lang) => (
+                <span
+                  key={lang}
+                  className="rounded-full border border-white/25 bg-white/10 px-2.5 py-1 text-[12.5px] text-white/85"
+                >
+                  {lang}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="shell py-10">
+        <div className="grid gap-10 lg:grid-cols-[1fr_340px]">
+          {/* ── Cột nội dung ── */}
+          <div className="flex min-w-0 flex-col gap-8">
+            <CourseLiveBanner courseId={course.id} />
+
+            {/* Nội dung khoá học */}
+            <section>
+              <h2 className="mb-4 font-display text-xl font-bold text-ink">
+                Nội dung khoá học
+                <span className="ml-2 text-sm font-normal text-ink-muted">
+                  {course.chapters.length} chương · {totalLessons} bài
+                </span>
+              </h2>
+              <ChapterAccordion chapters={course.chapters} enrolled={course.enrolled} />
+            </section>
+
+            {/* Đánh giá (UC23) */}
+            <section>
+              <h2 className="mb-4 font-display text-xl font-bold text-ink">Đánh giá từ học viên</h2>
+              <ReviewsSection courseId={course.id} />
+            </section>
+          </div>
+
+          {/* ── Cột ghi danh (sticky) ── */}
+          <aside className="lg:sticky lg:top-24 lg:self-start">
+            <div className="card overflow-hidden">
+              <CoursePreview
+                thumbnailUrl={course.thumbnailUrl}
+                courseTitle={course.title}
+                previewLessons={previewLessons}
+              />
+
+              <div className="flex flex-col gap-4 p-6">
+                {course.isFree ? (
+                  <div className="flex items-baseline gap-2">
+                    <span className="font-display text-3xl font-extrabold text-success">Miễn phí</span>
+                    <Badge tone="success">Sở hữu vĩnh viễn</Badge>
+                  </div>
+                ) : (
+                  <div className="flex items-baseline gap-2">
+                    <span className="font-display text-3xl font-extrabold text-ink">
+                      {course.price.toLocaleString('vi-VN')}đ
+                    </span>
+                    <Badge tone="neutral">Sở hữu vĩnh viễn</Badge>
+                  </div>
+                )}
+
+                <EnrollButton
+                  courseId={course.id}
+                  courseSlug={course.slug}
+                  isFree={course.isFree}
+                  enrolled={course.enrolled}
+                  firstLessonId={firstLesson?.id ?? null}
+                />
+
+                <ul className="mt-2 flex flex-col gap-2 text-sm text-ink-muted">
+                  <li>✓ {totalLessons} bài giảng có lồng tiếng AI</li>
+                  <li>✓ Trợ lý Socratic AI Tutor</li>
+                  <li>✓ Sơ đồ tư duy, Thẻ ghi nhớ, Quiz tự sinh</li>
+                  <li>✓ Truy cập vĩnh viễn sau khi sở hữu</li>
+                </ul>
+              </div>
+            </div>
+          </aside>
+        </div>
       </div>
     </div>
   );

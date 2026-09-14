@@ -28,5 +28,18 @@ export const authApi = {
   },
   verifyOtp: async (data: Record<string, unknown>) => {
     return fetchApi('/api/v1/auth/register/verify', data);
-  }
+  },
+  /**
+   * (14/09/2026) — BE có sẵn từ đầu để thu hồi refresh token (BR-AUTH-04) nhưng FE trước đây
+   * đăng xuất thuần bằng cách xoá localStorage, không hề gọi endpoint này — refresh token cũ
+   * vẫn còn hiệu lực phía server sau khi "đăng xuất". Best-effort: lỗi (mất mạng, token đã
+   * hết hạn) không nên chặn việc đăng xuất phía client.
+   */
+  logout: async (refreshToken: string) => {
+    try {
+      await fetchApi('/api/v1/auth/logout', { refreshToken });
+    } catch {
+      // best-effort — xem docblock
+    }
+  },
 };
