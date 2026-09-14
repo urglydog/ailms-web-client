@@ -31,7 +31,41 @@ export interface User {
   fullName: string;
   avatarUrl: string | null;
   role: Role;
+  authProvider: string;
   preferredLanguage: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  /** "View public profile" (14/09/2026, mở rộng) — 2 công tắc tách riêng, mặc định công khai. */
+  coursesPublic: boolean;
+  wishlistPublic: boolean;
+}
+
+/** 1 khóa trên "View public profile" — đủ dữ liệu render thẻ card kiểu Udemy. */
+export interface PublicCourseSummary {
+  courseId: number;
+  title: string;
+  slug: string;
+  thumbnailUrl: string | null;
+  price: number;
+  isFree: boolean;
+  avgRating: number;
+  reviewCount: number;
+}
+
+/**
+ * "View public profile" (14/09/2026, mở rộng ngoài đặc tả gốc) — `courses`/`wishlist` là
+ * `null` (KHÔNG PHẢI mảng rỗng) khi chủ tài khoản đã ẩn mục đó — phân biệt "ẩn" với "công
+ * khai nhưng chưa có gì".
+ */
+export interface PublicProfile {
+  id: number;
+  fullName: string;
+  avatarUrl: string | null;
+  role: Role;
+  memberSince: string;
+  courses: PublicCourseSummary[] | null;
+  wishlist: PublicCourseSummary[] | null;
 }
 
 // ── Khoá học ────────────────────────────────────────────────────
@@ -75,6 +109,8 @@ export interface CourseSummary {
   avgRating: number;
   reviewCount: number;
   totalLessons: number;
+  /** UC09 mở rộng (14/09/2026) — tổng giây video, dùng cho bộ lọc "Thời lượng video" kiểu Udemy. */
+  totalDurationSec: number;
   categorySlug: string;
   langs: DubLanguage[];
   /** Dùng cho ảnh bìa gradient khi chưa có thumbnail thật */
@@ -88,6 +124,13 @@ export interface CourseDetail extends CourseSummary {
   chapters: Chapter[];
   /** true khi người dùng hiện tại đã sở hữu khoá học (BR-ENROLL-01) */
   enrolled: boolean;
+  /** UC10 mở rộng (14/09/2026) — vùng "hero" nền đen kiểu Udemy ở trang chi tiết khóa. */
+  updatedAt: string;
+  /** Nhãn hiển thị (vd "Tiếng Anh"), null nếu chưa bài nào có transcript. */
+  sourceLanguage: string | null;
+  /** Ngôn ngữ đã lồng tiếng XONG (ít nhất 1 bài) — rỗng nếu chưa có. */
+  dubbedLanguages: string[];
+  learnerCount: number;
 }
 
 export interface Chapter {
@@ -128,6 +171,10 @@ export interface CourseFilterState {
   level: string | null;
   priceType: 'all' | 'free' | 'paid';
   keyword: string;
+  /** UC09 mở rộng (14/09/2026) — bộ lọc "Ratings" kiểu Udemy: sao trung bình >= giá trị này. */
+  minRating: number | null;
+  /** UC09 mở rộng (14/09/2026) — bộ lọc "Video Duration": "0-1" | "1-3" | "3-6" | "6-17" | "17+". */
+  durationBucket: string | null;
 }
 
 /** Không có từ khóa thì "relevance" cư xử giống hệt "newest" (không có gì để so khớp). */
@@ -498,6 +545,14 @@ export interface EnrolledCourse {
   quizScore: number | null;
   /** "Học ngay" — bấm vào thẳng bài học này thay vì trang chi tiết khoá. null nếu khoá chưa có bài. */
   firstLessonId: number | null;
+  /** Trang "Khóa học của tôi" (giao diện kiểu Udemy) — tên giảng viên hiển thị trên thẻ card. */
+  instructorName: string;
+  /** Số sao (1-5) học viên TỰ chấm cho khóa; null nếu chưa đánh giá (khác `alreadyReviewed` — field này mang giá trị thật). */
+  myRating: number | null;
+  /** Ngày ghi danh — dùng cho sort "Recently Enrolled". */
+  enrolledAt: string;
+  /** Lần gần nhất xem 1 bài bất kỳ trong khóa — dùng cho sort "Recently Accessed"; null nếu chưa xem bài nào. */
+  lastAccessedAt: string | null;
 }
 
 // ── F6.2: Tiến độ học tập (UC21, UC22) ───────────────────────────
@@ -618,6 +673,27 @@ export interface CartItem {
   thumbnailUrl: string | null;
   instructorName: string;
   price: number;
+  addedAt: string;
+  /** (14/09/2026, mở rộng) — đủ thông tin hiển thị trên mỗi dòng giỏ hàng kiểu Udemy. */
+  avgRating: number;
+  reviewCount: number;
+  totalDurationSec: number;
+  totalLessons: number;
+  level: CourseLevel;
+}
+
+/** Danh sách yêu thích (14/09/2026) — TÍNH NĂNG MỞ RỘNG, không nằm trong 49 use case đặc tả
+ * gốc, cùng tinh thần {@link CartItem}. Khác giỏ hàng: khóa MIỄN PHÍ vẫn thêm được (`isFree`). */
+export interface WishlistItem {
+  courseId: number;
+  courseTitle: string;
+  courseSlug: string;
+  thumbnailUrl: string | null;
+  instructorName: string;
+  price: number;
+  isFree: boolean;
+  avgRating: number;
+  reviewCount: number;
   addedAt: string;
 }
 

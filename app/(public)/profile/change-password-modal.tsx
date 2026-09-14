@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { ApiError } from '@/lib/api/client';
+import { usersApi } from '@/lib/api/users';
 
 interface ChangePasswordModalProps {
   onClose: () => void;
@@ -33,28 +35,11 @@ export default function ChangePasswordModal({ onClose, onSuccess }: ChangePasswo
     setLoading(true);
 
     try {
-      const token = localStorage.getItem('accessToken');
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/api/v1/users/me/password`,
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({ currentPassword, newPassword })
-        }
-      );
-
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.detail || 'Có lỗi xảy ra');
-      }
-
+      await usersApi.changePassword({ currentPassword, newPassword });
       setSuccess('Đổi mật khẩu thành công!');
       setTimeout(() => onSuccess(), 1500);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Có lỗi xảy ra');
+      setError(err instanceof ApiError ? err.message : 'Có lỗi xảy ra');
     } finally {
       setLoading(false);
     }
