@@ -2,12 +2,14 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import type { MouseEvent } from 'react';
 import { Badge } from '@/components/ui/Badge';
 import { StarRating } from '@/components/ui/StarRating';
 import type { CourseSummary } from '@/types/domain';
 import { useMyEnrollments } from '@/hooks/useEnrollments';
 import { useAddToCart, useCart } from '@/hooks/useCart';
+import { useAddToWishlist, useRemoveFromWishlist, useWishlist } from '@/hooks/useWishlist';
 
 /**
  * Thẻ khoá học — dịch từ `CourseCard.dc.html` của Claude Design.
@@ -31,6 +33,7 @@ function formatPrice(price: number): string {
 }
 
 export function CourseCard({ course }: { course: CourseSummary }) {
+  const router = useRouter();
   const { data: enrollments } = useMyEnrollments();
   const enrollment = enrollments?.find((e) => e.courseId === course.id);
   const isOwned = !!enrollment;
@@ -43,12 +46,33 @@ export function CourseCard({ course }: { course: CourseSummary }) {
   const canAddToCart = !isOwned && !course.isFree;
 
   const handleAddToCart = (e: MouseEvent) => {
-    // Cả thẻ là 1 <Link> — chặn điều hướng khi bấm đúng nút này (BR-CART-02: bấm lại khi đã
-    // có trong giỏ chỉ là no-op, không gọi lại API cho đỡ tốn request).
+    // Cả thẻ là 1 <Link> — chặn điều hướng mặc định (vào trang chi tiết) khi bấm đúng nút này.
     e.preventDefault();
     e.stopPropagation();
-    if (inCart || addToCart.isPending) return;
+    // Đã có trong giỏ — kiểu Udemy: đổi hẳn thành lối tắt "Đi đến giỏ hàng" thay vì no-op
+    // (BR-CART-02 vẫn đúng: bấm lại không tạo dòng giỏ hàng trùng, chỉ đổi ý nghĩa nút bấm).
+    if (inCart) {
+      router.push('/cart');
+      return;
+    }
+    if (addToCart.isPending) return;
     addToCart.mutate(course.id);
+  };
+
+  // Danh sách yêu thích (14/09/2026, mở rộng ngoài đặc tả gốc) — không có lý do wishlist 1
+  // khóa đã sở hữu rồi, ẩn hẳn nút cho gọn thay vì disable.
+  const { data: wishlistItems } = useWishlist();
+  const inWishlist = wishlistItems?.some((item) => item.courseId === course.id) ?? false;
+  const addToWishlist = useAddToWishlist();
+  const removeFromWishlist = useRemoveFromWishlist();
+  const wishlistPending = addToWishlist.isPending || removeFromWishlist.isPending;
+
+  const handleToggleWishlist = (e: MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (wishlistPending) return;
+    if (inWishlist) removeFromWishlist.mutate(course.id);
+    else addToWishlist.mutate(course.id);
   };
 
   const targetHref = isOwned && enrollment.firstLessonId
@@ -85,8 +109,25 @@ export function CourseCard({ course }: { course: CourseSummary }) {
           </span>
         )}
 
-        {/* Cờ các ngôn ngữ đã có bản lồng tiếng */}
+        {/* Cờ các ngôn ngữ đã có bản lồng tiếng + nút yêu thích (14/09/2026, mở rộng) */}
         <div className="absolute right-2.5 top-2.5 flex gap-1">
+          {!isOwned && (
+            <button
+              type="button"
+              onClick={handleToggleWishlist}
+              disabled={wishlistPending}
+              aria-label={inWishlist ? 'Bỏ khỏi danh sách yêu thích' : 'Thêm vào danh sách yêu thích'}
+              aria-pressed={inWishlist}
+              className={`flex h-9 w-9 items-center justify-center rounded-full shadow-sm transition-colors ${
+                inWishlist ? 'bg-white text-red-500' : 'bg-white/90 text-ink-faint hover:text-red-500'
+              }`}
+            >
+              {/* SVG duy nhất cho cả 2 trạng thái, chỉ đổi fill — tránh lệch hình dạng như 2 ký tự Unicode ♥/♡ cũ. */}
+              <svg width="18" height="18" viewBox="0 0 24 24" fill={inWishlist ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+              </svg>
+            </button>
+          )}
           {course.langs.map((lang) => (
             <span
               key={lang.code}
@@ -136,14 +177,14 @@ export function CourseCard({ course }: { course: CourseSummary }) {
             <button
               type="button"
               onClick={handleAddToCart}
-              disabled={inCart || addToCart.isPending}
+              disabled={addToCart.isPending}
               className={`shrink-0 rounded-full px-3.5 py-2 text-[13px] font-semibold transition-colors ${
                 inCart
-                  ? 'bg-success/10 text-success'
+                  ? 'bg-success/10 text-success hover:bg-success/20'
                   : 'bg-accent text-white hover:bg-accent-dark'
               } disabled:cursor-not-allowed`}
             >
-              {inCart ? '✓ Đã có trong giỏ' : addToCart.isPending ? 'Đang thêm...' : 'Thêm vào giỏ hàng'}
+              {inCart ? 'Đi đến giỏ hàng' : addToCart.isPending ? 'Đang thêm...' : 'Thêm vào giỏ hàng'}
             </button>
           )}
         </div>

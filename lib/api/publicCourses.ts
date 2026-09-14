@@ -14,6 +14,8 @@ export const EMPTY_FILTERS: CourseFilterState = {
   level: null,
   priceType: 'all',
   keyword: '',
+  minRating: null,
+  durationBucket: null,
 };
 
 /** Cùng bảng màu placeholder ảnh bìa đã dùng ở `lib/mock/courses.ts` — giữ nhất quán hình ảnh. */
@@ -42,6 +44,7 @@ interface RawSummary {
   avgRating: number;
   reviewCount: number;
   totalLessons: number;
+  totalDurationSec: number;
   categorySlug: string;
   categoryName: string;
 }
@@ -64,6 +67,10 @@ interface RawChapter {
 interface RawDetail extends RawSummary {
   description: string | null;
   chapters: RawChapter[];
+  updatedAt: string;
+  sourceLanguage: string | null;
+  dubbedLanguages: string[];
+  learnerCount: number;
 }
 
 /**
@@ -85,6 +92,7 @@ function toSummary(raw: RawSummary): CourseSummary {
     avgRating: raw.avgRating,
     reviewCount: raw.reviewCount,
     totalLessons: raw.totalLessons,
+    totalDurationSec: raw.totalDurationSec,
     categorySlug: raw.categorySlug,
     langs: [],
     coverColorA,
@@ -119,6 +127,10 @@ function toDetail(raw: RawDetail): CourseDetail {
     chapters: toChapters(raw.chapters),
     // Chưa có luồng ghi danh/mua khóa thật (Giai đoạn 3) nên luôn coi là chưa sở hữu.
     enrolled: false,
+    updatedAt: raw.updatedAt,
+    sourceLanguage: raw.sourceLanguage,
+    dubbedLanguages: raw.dubbedLanguages,
+    learnerCount: raw.learnerCount,
   };
 }
 
@@ -177,6 +189,8 @@ export const publicCoursesApi = {
       categorySlug: filters.category ?? undefined,
       level: filters.level ?? undefined,
       priceType: filters.priceType === 'all' ? undefined : filters.priceType,
+      minRating: filters.minRating ?? undefined,
+      durationBucket: filters.durationBucket ?? undefined,
       sortBy: sortBy === 'newest' ? undefined : sortBy,
       size,
     });

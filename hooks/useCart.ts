@@ -20,7 +20,6 @@ export function useAddToCart() {
   return useMutation({
     mutationFn: (courseId: number) => cartApi.add(courseId),
     onSuccess: () => {
-      toast.success('Đã thêm vào giỏ hàng');
       void queryClient.invalidateQueries({ queryKey: CART_QUERY_KEY });
     },
     onError: (err) => {
