@@ -15,6 +15,7 @@ interface QuizQuestion {
   id: number;
   content: string;
   displayOrder: number;
+  isMultipleChoice?: boolean;
   options: QuizOption[];
 }
 
@@ -32,7 +33,7 @@ export function QuizPersonalEditor({ questions, quizId }: { questions: QuizQuest
       questionId: q.id,
       data: {
         content: q.content,
-        isMultipleChoice: q.options.filter(o => o.isCorrect).length > 1,
+        isMultipleChoice: q.isMultipleChoice,
         options: q.options.map(o => ({ content: o.content, isCorrect: o.isCorrect }))
       }
     }, {
@@ -40,6 +41,9 @@ export function QuizPersonalEditor({ questions, quizId }: { questions: QuizQuest
         toast.success('Cập nhật câu hỏi thành công');
         queryClient.invalidateQueries({ queryKey: ['material-detail'] });
         setEditingQuestion(null);
+      },
+      onError: (err: any) => {
+        toast.error(err.message || 'Cập nhật thất bại');
       }
     });
   };
@@ -49,7 +53,7 @@ export function QuizPersonalEditor({ questions, quizId }: { questions: QuizQuest
       quizId,
       data: {
         content: q.content,
-        isMultipleChoice: q.options.filter(o => o.isCorrect).length > 1,
+        isMultipleChoice: q.isMultipleChoice,
         options: q.options.map(o => ({ content: o.content, isCorrect: o.isCorrect }))
       }
     }, {
@@ -57,6 +61,9 @@ export function QuizPersonalEditor({ questions, quizId }: { questions: QuizQuest
         toast.success('Thêm câu hỏi thành công');
         queryClient.invalidateQueries({ queryKey: ['material-detail'] });
         setIsAddingQuestion(false);
+      },
+      onError: (err: any) => {
+        toast.error(err.message || 'Thêm thất bại');
       }
     });
   };
@@ -92,6 +99,7 @@ export function QuizPersonalEditor({ questions, quizId }: { questions: QuizQuest
                 id: 0,
                 content: '',
                 displayOrder: 0,
+                isMultipleChoice: false,
                 options: [
                   { id: 1, content: '', isCorrect: true },
                   { id: 2, content: '', isCorrect: false },
@@ -174,22 +182,50 @@ function QuestionForm({ initialData, onSave, onCancel }: { initialData: QuizQues
           rows={3}
         />
       </div>
+      <div className="flex items-center gap-2 mb-2">
+        <input
+          type="checkbox"
+          checked={q.isMultipleChoice}
+          onChange={e => {
+            const isMulti = e.target.checked;
+            let newOpts = [...q.options];
+            if (!isMulti) {
+              // Reset to only one correct if switching back to single choice
+              let foundCorrect = false;
+              newOpts = newOpts.map(o => {
+                if (o.isCorrect && !foundCorrect) {
+                  foundCorrect = true;
+                  return o;
+                }
+                return { ...o, isCorrect: false };
+              });
+            }
+            setQ({ ...q, isMultipleChoice: isMulti, options: newOpts });
+          }}
+          className="w-4 h-4 text-accent rounded"
+        />
+        <label className="text-sm font-semibold text-ink">Câu hỏi có nhiều đáp án đúng (Multi-answer)</label>
+      </div>
+
       <div>
         <label className="block text-sm font-semibold mb-2">Đáp án (Check vào ô xanh để đánh dấu đáp án đúng)</label>
         <div className="space-y-2">
           {q.options.map((opt, idx) => (
             <div key={idx} className="flex gap-2 items-center">
               <input
-                type="checkbox"
+                type={q.isMultipleChoice ? "checkbox" : "radio"}
+                name={`correct_option_${q.id}`}
                 checked={opt.isCorrect}
                 onChange={e => {
-                  const newOpts = [...q.options];
-                  if (newOpts[idx]) {
-                    newOpts[idx].isCorrect = e.target.checked;
-                    setQ({ ...q, options: newOpts });
+                  let newOpts = [...q.options];
+                  if (!q.isMultipleChoice) {
+                    newOpts = newOpts.map((o, i) => ({ ...o, isCorrect: i === idx }));
+                  } else if (newOpts[idx]) {
+                    newOpts[idx] = { ...newOpts[idx], isCorrect: e.target.checked };
                   }
+                  setQ({ ...q, options: newOpts });
                 }}
-                className="w-5 h-5 text-accent rounded focus:ring-accent"
+                className="w-5 h-5 text-accent focus:ring-accent"
               />
               <input
                 type="text"
@@ -197,7 +233,7 @@ function QuestionForm({ initialData, onSave, onCancel }: { initialData: QuizQues
                 onChange={e => {
                   const newOpts = [...q.options];
                   if (newOpts[idx]) {
-                    newOpts[idx].content = e.target.value;
+                    newOpts[idx] = { ...newOpts[idx], content: e.target.value };
                     setQ({ ...q, options: newOpts });
                   }
                 }}
