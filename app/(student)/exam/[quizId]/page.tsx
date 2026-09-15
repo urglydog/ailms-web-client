@@ -827,42 +827,21 @@ export default function AntiCheatExamPage() {
               </div>
             )}
 
-            <div className="card p-4">
-              <div className="grid grid-cols-5 gap-2">
-                {attemptData?.questions.map((q, idx) => {
-                  const isAnswered = answers[q.id] !== undefined;
-                  const isFlagged = flagged[q.id];
-                  const pageOfQuestion = Math.ceil((idx + 1) / questionsPerPage);
-                  return (
-                    <button
-                      key={q.id}
-                      onClick={() => {
-                        setCurrentPage(pageOfQuestion);
-                        setTimeout(() => document.getElementById(`question-${q.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
-                      }}
-                      className={`flex flex-col h-9 w-8 rounded overflow-hidden text-[10px] font-bold border transition-colors relative ${currentPage === pageOfQuestion && !isAnswered ? 'ring-2 ring-accent/50' : 'border-line'} hover:opacity-80`}
-                    >
-                      <div className="h-[70%] w-full flex items-center justify-center bg-surface text-ink border-b border-line/50">
-                        {idx + 1}
-                      </div>
-                      <div className={`h-[30%] w-full ${isAnswered ? 'bg-green-500' : 'bg-red-500'}`}>
-                      </div>
-                      {isFlagged && <span className="absolute -top-1 -right-1 text-[10px] z-10">🚩</span>}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-
-
-            <button
-              onClick={() => handleFirstSubmitClick}
+<button
+              onClick={() => handleFirstSubmitClick()}
               disabled={isSubmitting}
               className="bg-ink text-white font-bold py-3 rounded-xl hover:opacity-90 disabled:opacity-50 mt-4 shadow-lg"
             >
               {isSubmitting ? 'Đang nộp...' : 'Nộp bài thi'}
             </button>
+
+
+
+            
+
+
+
+            
           </div>
         </div>
         )}
