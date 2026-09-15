@@ -59,6 +59,7 @@ export default function AntiCheatExamPage() {
   const [flagged, setFlagged] = useState<Record<number, boolean>>({});
 
   const [currentPage, setCurrentPage] = useState(1);
+  const [resultPage, setResultPage] = useState(1);
   const questionsPerPage = 5;
 
   const handleExplain = (questionId: number, selectedOptionId: number | null) => {
@@ -339,15 +340,15 @@ export default function AntiCheatExamPage() {
       <div className="min-h-dvh bg-surface p-8">
         <div className="max-w-4xl mx-auto">
           {/* Kết quả chính */}
-          <div className={`card p-10 text-center mb-8 border-t-4 ${isPassed ? 'border-green-500' : 'border-red-500'}`}>
-            <div className={`text-5xl mb-4 ${isPassed ? '' : ''}`}>{isPassed ? '🎉' : '📝'}</div>
-            <h2 className={`font-display text-2xl font-bold mb-2 ${isPassed ? 'text-green-600' : 'text-red-600'}`}>
+          <div className={`card p-6 text-center mb-8 border-t-4 ${isPassed ? 'border-green-500' : 'border-red-500'}`}>
+            <div className={`text-4xl mb-2 ${isPassed ? '' : ''}`}>{isPassed ? '🎉' : '📝'}</div>
+            <h2 className={`text-xl font-bold mb-1 ${isPassed ? 'text-green-600' : 'text-red-600'}`}>
               {isPassed ? 'Xuất sắc! Bài thi hoàn thành' : 'Bài thi đã nộp'}
             </h2>
-            <div className={`text-5xl font-extrabold my-4 ${isPassed ? 'text-green-600' : 'text-red-500'}`}>
+            <div className={`text-3xl font-extrabold my-2 ${isPassed ? 'text-green-600' : 'text-red-500'}`}>
               {Number(result.score).toFixed(2).replace(/\.?0+$/, '')}/10
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 text-sm">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4 text-xs">
               <div className="bg-surface-hover rounded-xl p-3">
                 <div className="text-ink-muted text-xs font-semibold uppercase mb-1">Câu đúng</div>
                 <div className="text-2xl font-bold text-green-600">{result.correctCount}</div>
@@ -379,7 +380,7 @@ export default function AntiCheatExamPage() {
                     router.push('/my-courses');
                   }
                 }}
-                className="bg-accent text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-accent-hover transition-all"
+                className="bg-accent text-white px-6 py-2 rounded-lg font-semibold text-sm shadow-lg hover:bg-accent-hover transition-all"
               >
                 Quay lại khóa học
               </button>
@@ -389,28 +390,35 @@ export default function AntiCheatExamPage() {
                   setIsStarted(false);
                   setAttemptData(null);
                 }}
-                className="bg-surface-hover text-ink px-8 py-3 rounded-full font-bold shadow-sm border border-line hover:bg-line transition-all"
+                className="bg-surface-hover text-ink px-6 py-2 rounded-lg font-semibold text-sm shadow-sm border border-line hover:bg-line transition-all"
               >
                 Trở về lịch sử bài thi
               </button>
             </div>
           </div>
 
-          <div className="space-y-6">
-            <h3 className="font-display text-xl font-bold mb-4">Chi tiết bài làm (Socratic Tutor)</h3>
-            {result.details?.map((detail, idx) => (
-              <div key={detail.questionId} className={`card p-6 border-l-4 ${detail.isCorrect ? 'border-green-500' : 'border-red-500'}`}>
-                <div className="flex justify-between items-start mb-4">
-                  <h4 className="font-bold text-lg">Câu {idx + 1}</h4>
+          <div className="space-y-4">
+            <h3 className="text-lg font-bold mb-2">Chi tiết bài làm (Socratic Tutor)</h3>
+            {(() => {
+              const resPerPage = 5;
+              const totalResPages = Math.ceil((result.details?.length || 0) / resPerPage);
+              const rStart = (resultPage - 1) * resPerPage;
+              const rEnd = resultPage * resPerPage;
+              return (
+                <>
+                {result.details?.slice(rStart, rEnd).map((detail, idx) => (
+              <div key={detail.questionId} className={`card p-4 border-l-4 ${detail.isCorrect ? 'border-green-500' : 'border-red-500'}`}>
+                <div className="flex justify-between items-start mb-2">
+                  <h4 className="font-bold text-sm">Câu {rStart + idx + 1}</h4>
                   {detail.isCorrect ? (
-                    <span className="text-green-600 font-bold bg-green-50 px-3 py-1 rounded-full text-sm">Đúng ✓</span>
+                    <span className="text-green-600 font-bold bg-green-50 px-2 py-0.5 rounded text-xs">Đúng ✓</span>
                   ) : (
-                    <span className="text-red-600 font-bold bg-red-50 px-3 py-1 rounded-full text-sm">Sai ✕</span>
+                    <span className="text-red-600 font-bold bg-red-50 px-2 py-0.5 rounded text-xs">Sai ✕</span>
                   )}
                 </div>
-                <p className="mb-4">{detail.content}</p>
+                <p className="mb-3 text-sm">{detail.content}</p>
 
-                <div className="space-y-2 mb-6">
+                <div className="space-y-1.5 mb-4">
                   {detail.options.map(opt => {
                     const isSelected = detail.selectedOptionIds?.includes(opt.id);
                     const isCorrect = detail.correctOptionIds?.includes(opt.id);
@@ -453,6 +461,16 @@ export default function AntiCheatExamPage() {
                 )}
               </div>
             ))}
+                {totalResPages > 1 && (
+                  <div className="flex justify-between items-center mt-4">
+                    <button disabled={resultPage === 1} onClick={() => setResultPage(p => p - 1)} className="px-4 py-1.5 border border-line rounded-lg text-sm font-semibold disabled:opacity-50">Trang trước</button>
+                    <span className="text-sm font-medium text-ink-muted">Trang {resultPage}/{totalResPages}</span>
+                    <button disabled={resultPage === totalResPages} onClick={() => setResultPage(p => p + 1)} className="px-4 py-1.5 border border-line rounded-lg text-sm font-semibold disabled:opacity-50">Trang sau</button>
+                  </div>
+                )}
+                </>
+              );
+            })()}
           </div>
         </div>
       </div>
