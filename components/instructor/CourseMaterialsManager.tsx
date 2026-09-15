@@ -917,7 +917,7 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
   const [scopeRefId, setScopeRefId] = useState<number | undefined>(undefined);
   const [difficultyLevel, setDifficultyLevel] = useState<'EASY' | 'MEDIUM' | 'HARD'>('MEDIUM');
   const [quantityLevel, setQuantityLevel] = useState<'FEWER' | 'STANDARD' | 'MORE'>('STANDARD');
-  const [language, setLanguage] = useState<string>('vi');
+  const [language, setLanguage] = useState<string>('');
   const [mapTemplate, setMapTemplate] = useState<string>('MINDMAP');
 
   const { data: languages } = useQuery({
@@ -1159,6 +1159,7 @@ interface QuizQuestionEditorProps {
   question: {
     id: number;
     content: string;
+    isMultipleChoice?: boolean;
     displayOrder: number;
     options: { id: number; content: string; isCorrect: boolean }[];
   };
@@ -1168,12 +1169,13 @@ interface QuizQuestionEditorProps {
 
 function QuizQuestionEditorModal({ question, onClose, onSuccess }: QuizQuestionEditorProps) {
   const [content, setContent] = useState(question.content);
+  const [isMultipleChoice, setIsMultipleChoice] = useState(question.isMultipleChoice || false);
   const [options, setOptions] = useState<{ id: number; content: string; isCorrect: boolean }[]>(
     JSON.parse(JSON.stringify(question.options))
   );
 
   const updateMutation = useMutation({
-    mutationFn: () => materialsApi.updateQuizQuestion(question.id, { content, options }),
+    mutationFn: () => materialsApi.updateQuizQuestion(question.id, { content, isMultipleChoice, options }),
     onSuccess: () => {
       toast.success('Đã lưu thay đổi câu hỏi');
       onSuccess();
@@ -1184,7 +1186,11 @@ function QuizQuestionEditorModal({ question, onClose, onSuccess }: QuizQuestionE
   });
 
   const handleToggleCorrect = (idx: number) => {
-    setOptions(options.map((o, i) => ({ ...o, isCorrect: i === idx })));
+    if (isMultipleChoice) {
+      setOptions(options.map((o, i) => i === idx ? { ...o, isCorrect: !o.isCorrect } : o));
+    } else {
+      setOptions(options.map((o, i) => ({ ...o, isCorrect: i === idx })));
+    }
   };
 
   return (
@@ -1200,12 +1206,24 @@ function QuizQuestionEditorModal({ question, onClose, onSuccess }: QuizQuestionE
           rows={3}
         />
 
-        <label className="block text-sm font-semibold text-gray-700 mb-2">Các đáp án (Chọn 1 đáp án đúng)</label>
+        <label className="block text-sm font-semibold text-gray-700 mb-1">Loại câu hỏi</label>
+        <div className="flex gap-4 mb-4">
+          <label className="flex items-center gap-2 text-sm cursor-pointer">
+            <input type="radio" checked={!isMultipleChoice} onChange={() => setIsMultipleChoice(false)} className="w-4 h-4 text-indigo-600 focus:ring-indigo-500" />
+            Single Choice (1 đáp án đúng)
+          </label>
+          <label className="flex items-center gap-2 text-sm cursor-pointer">
+            <input type="radio" checked={isMultipleChoice} onChange={() => setIsMultipleChoice(true)} className="w-4 h-4 text-indigo-600 focus:ring-indigo-500" />
+            Multiple Choice (Nhiều đáp án đúng)
+          </label>
+        </div>
+
+        <label className="block text-sm font-semibold text-gray-700 mb-2">Các đáp án</label>
         <div className="space-y-3">
           {options.map((opt, idx) => (
             <div key={idx} className={`flex gap-3 items-center p-3 rounded-xl border ${opt.isCorrect ? 'bg-emerald-50 border-emerald-300' : 'bg-gray-50 border-gray-200'}`}>
               <input
-                type="radio"
+                type={isMultipleChoice ? "checkbox" : "radio"}
                 checked={opt.isCorrect}
                 onChange={() => handleToggleCorrect(idx)}
                 className="w-5 h-5 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
@@ -1239,6 +1257,7 @@ function QuizQuestionEditorModal({ question, onClose, onSuccess }: QuizQuestionE
 
 function NewQuizQuestionEditorModal({ quizId, onClose, onSuccess }: { quizId: number; onClose: () => void; onSuccess: () => void; }) {
   const [content, setContent] = useState('');
+  const [isMultipleChoice, setIsMultipleChoice] = useState(false);
   const [options, setOptions] = useState<{ id: number; content: string; isCorrect: boolean }[]>([
     { id: -1, content: 'Đáp án A', isCorrect: true },
     { id: -2, content: 'Đáp án B', isCorrect: false },
@@ -1247,7 +1266,7 @@ function NewQuizQuestionEditorModal({ quizId, onClose, onSuccess }: { quizId: nu
   ]);
 
   const addMutation = useMutation({
-    mutationFn: () => materialsApi.addQuizQuestion(quizId, { content, options }),
+    mutationFn: () => materialsApi.addQuizQuestion(quizId, { content, isMultipleChoice, options }),
     onSuccess: () => {
       toast.success('Đã thêm câu hỏi mới');
       onSuccess();
@@ -1258,7 +1277,11 @@ function NewQuizQuestionEditorModal({ quizId, onClose, onSuccess }: { quizId: nu
   });
 
   const handleToggleCorrect = (idx: number) => {
-    setOptions(options.map((o, i) => ({ ...o, isCorrect: i === idx })));
+    if (isMultipleChoice) {
+      setOptions(options.map((o, i) => i === idx ? { ...o, isCorrect: !o.isCorrect } : o));
+    } else {
+      setOptions(options.map((o, i) => ({ ...o, isCorrect: i === idx })));
+    }
   };
 
   return (
@@ -1275,12 +1298,24 @@ function NewQuizQuestionEditorModal({ quizId, onClose, onSuccess }: { quizId: nu
           rows={3}
         />
 
-        <label className="block text-sm font-semibold text-gray-700 mb-2">Các đáp án (Chọn 1 đáp án đúng)</label>
+        <label className="block text-sm font-semibold text-gray-700 mb-1">Loại câu hỏi</label>
+        <div className="flex gap-4 mb-4">
+          <label className="flex items-center gap-2 text-sm cursor-pointer">
+            <input type="radio" checked={!isMultipleChoice} onChange={() => setIsMultipleChoice(false)} className="w-4 h-4 text-indigo-600 focus:ring-indigo-500" />
+            Single Choice (1 đáp án đúng)
+          </label>
+          <label className="flex items-center gap-2 text-sm cursor-pointer">
+            <input type="radio" checked={isMultipleChoice} onChange={() => setIsMultipleChoice(true)} className="w-4 h-4 text-indigo-600 focus:ring-indigo-500" />
+            Multiple Choice (Nhiều đáp án đúng)
+          </label>
+        </div>
+
+        <label className="block text-sm font-semibold text-gray-700 mb-2">Các đáp án</label>
         <div className="space-y-3">
           {options.map((opt, idx) => (
             <div key={idx} className={`flex gap-3 items-center p-3 rounded-xl border ${opt.isCorrect ? 'bg-emerald-50 border-emerald-300' : 'bg-gray-50 border-gray-200'}`}>
               <input
-                type="radio"
+                type={isMultipleChoice ? "checkbox" : "radio"}
                 checked={opt.isCorrect}
                 onChange={() => handleToggleCorrect(idx)}
                 className="w-5 h-5 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
@@ -1379,7 +1414,7 @@ function NewFlashcardEditorModal({ generationId, onClose, onSuccess }: { generat
 function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess }: { courseId: number; initialType: 'QUIZ' | 'FLASHCARD' | 'MINDMAP'; onClose: () => void; onSuccess: (id: number) => void }) {
   const [materialType, setMaterialType] = useState<'QUIZ' | 'FLASHCARD' | 'MINDMAP'>(initialType);
   const [title, setTitle] = useState('');
-  const [language, setLanguage] = useState<string>('vi');
+  const [language, setLanguage] = useState<string>('');
 
   const { data: languages } = useQuery({
     queryKey: ['available-languages', courseId],
