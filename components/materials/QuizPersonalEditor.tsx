@@ -169,7 +169,10 @@ export function QuizPersonalEditor({ questions, quizId }: { questions: QuizQuest
 }
 
 function QuestionForm({ initialData, onSave, onCancel }: { initialData: QuizQuestion, onSave: (q: QuizQuestion) => void, onCancel: () => void }) {
-  const [q, setQ] = useState(initialData);
+  const [q, setQ] = useState(() => ({
+    ...initialData,
+    options: initialData.options.map(o => ({ ...o }))
+  }));
 
   return (
     <div className="space-y-4">
@@ -210,8 +213,10 @@ function QuestionForm({ initialData, onSave, onCancel }: { initialData: QuizQues
       <div>
         <label className="block text-sm font-semibold mb-2">Đáp án (Check vào ô xanh để đánh dấu đáp án đúng)</label>
         <div className="space-y-2">
-          {q.options.map((opt, idx) => (
-            <div key={idx} className="flex gap-2 items-center">
+          {q.options.map((opt, idx) => {
+            const optKey = opt.id ? `opt_${opt.id}` : `opt_new_${idx}`;
+            return (
+            <div key={optKey} className="flex gap-2 items-center">
               <input
                 type={q.isMultipleChoice ? "checkbox" : "radio"}
                 name={`correct_option_${q.id}`}
@@ -251,7 +256,8 @@ function QuestionForm({ initialData, onSave, onCancel }: { initialData: QuizQues
                 ✕
               </button>
             </div>
-          ))}
+            );
+          })}
         </div>
         <button
           type="button"
@@ -270,7 +276,7 @@ function QuestionForm({ initialData, onSave, onCancel }: { initialData: QuizQues
         </button>
         <button 
           onClick={() => onSave(q)} 
-          className="px-6 py-2 bg-accent text-white font-bold rounded-xl hover:bg-accent-hover shadow-sm"
+          className="px-6 py-2 bg-accent text-white font-bold rounded-xl hover:bg-accent-hover shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={!q.content.trim() || q.options.length < 2 || !q.options.some(o => o.isCorrect)}
         >
           Lưu Câu Hỏi
