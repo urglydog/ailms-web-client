@@ -1175,7 +1175,10 @@ function QuizQuestionEditorModal({ question, onClose, onSuccess }: QuizQuestionE
   );
 
   const updateMutation = useMutation({
-    mutationFn: () => materialsApi.updateQuizQuestion(question.id, { content, isMultipleChoice, options }),
+    mutationFn: () => {
+      const validOptions = options.filter(o => o.content.trim() !== '');
+      return materialsApi.updateQuizQuestion(question.id, { content, isMultipleChoice, options: validOptions });
+    },
     onSuccess: () => {
       toast.success('Đã lưu thay đổi câu hỏi');
       onSuccess();
@@ -1234,10 +1237,55 @@ function QuizQuestionEditorModal({ question, onClose, onSuccess }: QuizQuestionE
                 onChange={e => {
                   setOptions(options.map((o, i) => i === idx ? { ...o, content: e.target.value } : o));
                 }}
-                className={`flex-1 p-2 bg-transparent border-b ${opt.isCorrect ? 'border-emerald-200 focus:border-emerald-500' : 'border-gray-300 focus:border-indigo-500'} focus:outline-none text-sm font-medium`}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const newOptions = [...options];
+                    newOptions.splice(idx + 1, 0, { id: -Date.now(), content: '', isCorrect: false });
+                    setOptions(newOptions);
+                    setTimeout(() => {
+                      const inputs = document.querySelectorAll('.option-input');
+                      if (inputs[idx + 1]) (inputs[idx + 1] as HTMLElement).focus();
+                    }, 50);
+                  }
+                }}
+                className={`option-input flex-1 p-2 bg-transparent border-b ${opt.isCorrect ? 'border-emerald-200 focus:border-emerald-500' : 'border-gray-300 focus:border-indigo-500'} focus:outline-none text-sm font-medium`}
               />
+              {options.length > 2 && (
+                <button
+                  type="button"
+                  onClick={() => setOptions(options.filter((_, i) => i !== idx))}
+                  className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                  title="Xóa đáp án"
+                >
+                  ✕
+                </button>
+              )}
             </div>
           ))}
+          {isMultipleChoice && (
+            <div className="flex gap-3 items-center p-3 rounded-xl border border-dashed border-gray-300 opacity-60 hover:opacity-100 transition-opacity">
+              <input type="checkbox" disabled className="w-5 h-5 cursor-not-allowed" />
+              <input
+                type="text"
+                placeholder="Nhập đáp án mới và nhấn Enter..."
+                value=""
+                onChange={() => {}}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const newOptions = [...options, { id: -Date.now(), content: (e.target as HTMLInputElement).value || 'Đáp án mới', isCorrect: false }];
+                    setOptions(newOptions);
+                    setTimeout(() => {
+                      const inputs = document.querySelectorAll('.option-input');
+                      if (inputs.length > 0) (inputs[inputs.length - 1] as HTMLElement).focus();
+                    }, 50);
+                  }
+                }}
+                className={`flex-1 p-2 bg-transparent border-b border-gray-300 focus:outline-none text-sm font-medium`}
+              />
+            </div>
+          )}
         </div>
 
         <div className="mt-6 flex justify-end gap-3 border-t pt-4">
@@ -1266,7 +1314,10 @@ function NewQuizQuestionEditorModal({ quizId, onClose, onSuccess }: { quizId: nu
   ]);
 
   const addMutation = useMutation({
-    mutationFn: () => materialsApi.addQuizQuestion(quizId, { content, isMultipleChoice, options }),
+    mutationFn: () => {
+      const validOptions = options.filter(o => o.content.trim() !== '');
+      return materialsApi.addQuizQuestion(quizId, { content, isMultipleChoice, options: validOptions });
+    },
     onSuccess: () => {
       toast.success('Đã thêm câu hỏi mới');
       onSuccess();
@@ -1326,10 +1377,55 @@ function NewQuizQuestionEditorModal({ quizId, onClose, onSuccess }: { quizId: nu
                 onChange={e => {
                   setOptions(options.map((o, i) => i === idx ? { ...o, content: e.target.value } : o));
                 }}
-                className={`flex-1 p-2 bg-transparent border-b ${opt.isCorrect ? 'border-emerald-200 focus:border-emerald-500' : 'border-gray-300 focus:border-indigo-500'} focus:outline-none text-sm font-medium`}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const newOptions = [...options];
+                    newOptions.splice(idx + 1, 0, { id: -Date.now(), content: '', isCorrect: false });
+                    setOptions(newOptions);
+                    setTimeout(() => {
+                      const inputs = document.querySelectorAll('.option-input');
+                      if (inputs[idx + 1]) (inputs[idx + 1] as HTMLElement).focus();
+                    }, 50);
+                  }
+                }}
+                className={`option-input flex-1 p-2 bg-transparent border-b ${opt.isCorrect ? 'border-emerald-200 focus:border-emerald-500' : 'border-gray-300 focus:border-indigo-500'} focus:outline-none text-sm font-medium`}
               />
+              {options.length > 2 && (
+                <button
+                  type="button"
+                  onClick={() => setOptions(options.filter((_, i) => i !== idx))}
+                  className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                  title="Xóa đáp án"
+                >
+                  ✕
+                </button>
+              )}
             </div>
           ))}
+          {isMultipleChoice && (
+            <div className="flex gap-3 items-center p-3 rounded-xl border border-dashed border-gray-300 opacity-60 hover:opacity-100 transition-opacity">
+              <input type="checkbox" disabled className="w-5 h-5 cursor-not-allowed" />
+              <input
+                type="text"
+                placeholder="Nhập đáp án mới và nhấn Enter..."
+                value=""
+                onChange={() => {}}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const newOptions = [...options, { id: -Date.now(), content: (e.target as HTMLInputElement).value || 'Đáp án mới', isCorrect: false }];
+                    setOptions(newOptions);
+                    setTimeout(() => {
+                      const inputs = document.querySelectorAll('.option-input');
+                      if (inputs.length > 0) (inputs[inputs.length - 1] as HTMLElement).focus();
+                    }, 50);
+                  }
+                }}
+                className={`flex-1 p-2 bg-transparent border-b border-gray-300 focus:outline-none text-sm font-medium`}
+              />
+            </div>
+          )}
         </div>
 
         <div className="mt-6 flex justify-end gap-3 border-t pt-4">
