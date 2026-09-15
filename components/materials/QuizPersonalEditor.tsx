@@ -42,7 +42,7 @@ export function QuizPersonalEditor({ questions, quizId }: { questions: QuizQuest
         queryClient.invalidateQueries({ queryKey: ['material-detail'] });
         setEditingQuestion(null);
       },
-      onError: (err: any) => {
+      onError: (err: Error) => {
         toast.error(err.message || 'Cập nhật thất bại');
       }
     });
@@ -62,7 +62,7 @@ export function QuizPersonalEditor({ questions, quizId }: { questions: QuizQuest
         queryClient.invalidateQueries({ queryKey: ['material-detail'] });
         setIsAddingQuestion(false);
       },
-      onError: (err: any) => {
+      onError: (err: Error) => {
         toast.error(err.message || 'Thêm thất bại');
       }
     });
