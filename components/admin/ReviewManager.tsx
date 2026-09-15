@@ -20,7 +20,7 @@ export function ReviewManager() {
 
   const reviews = data?.content ?? [];
 
-  const handleHide = (id: number, courseTitle: string) => {
+  const handleHide = (id: number) => {
     setErrorMessage(null);
     hideReview.mutate(id, {
       onError: (err) => setErrorMessage(err instanceof ApiError ? err.message : 'Không ẩn được đánh giá này.'),
@@ -98,7 +98,7 @@ export function ReviewManager() {
                     </button>
                   ) : (
                     <button
-                      onClick={() => handleHide(review.id, review.courseTitle)}
+                      onClick={() => handleHide(review.id)}
                       className="text-xs font-bold text-red-500 hover:text-red-700"
                     >
                       Ẩn
