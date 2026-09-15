@@ -7,7 +7,9 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { StarRating } from '@/components/ui/StarRating';
 import { useCart, useRemoveFromCart } from '@/hooks/useCart';
-import type { CourseLevel } from '@/types/domain';
+import { couponsApi } from '@/lib/api/coupons';
+import { ApiError } from '@/lib/api/client';
+import type { CouponPriceRes, CourseLevel } from '@/types/domain';
 
 const LEVEL_LABEL: Record<CourseLevel, string> = {
   BEGINNER: 'Cơ bản',
@@ -40,6 +42,9 @@ export default function CartPage() {
   const removeFromCart = useRemoveFromCart();
   const [uncheckedIds, setUncheckedIds] = useState<Set<number>>(new Set());
   const [couponCode, setCouponCode] = useState('');
+  const [appliedCode, setAppliedCode] = useState<string | null>(null);
+  const [priceMap, setPriceMap] = useState<Map<number, CouponPriceRes>>(new Map());
+  const [applying, setApplying] = useState(false);
 
   const items = cartItems ?? [];
   const isChecked = (courseId: number) => !uncheckedIds.has(courseId);
@@ -55,12 +60,18 @@ export default function CartPage() {
   const toggleAll = () => setUncheckedIds(allChecked ? new Set(items.map((i) => i.courseId)) : new Set());
 
   const selectedItems = items.filter((item) => isChecked(item.courseId));
-  const total = selectedItems.reduce((sum, item) => sum + item.price, 0);
+  // Mã giảm giá (15/09/2026, mở rộng) — mỗi khóa tự resolve coupon TỐT NHẤT của riêng nó
+  // (BR-COUPON-05): dùng giá đã preview theo mã học viên nhập nếu có, không thì rơi về giá
+  // hiển thị mặc định của giỏ hàng (đã tính coupon autoApply, xem `CartService.toRes`).
+  const finalPriceFor = (item: (typeof items)[number]) => priceMap.get(item.courseId)?.finalPrice ?? item.finalPrice;
+  const total = selectedItems.reduce((sum, item) => sum + finalPriceFor(item), 0);
+  const totalOriginal = selectedItems.reduce((sum, item) => sum + item.price, 0);
 
   const handleCheckout = () => {
     if (selectedItems.length === 0) return;
     const courseIds = selectedItems.map((item) => item.courseId).join(',');
-    router.push(`/checkout/cart?courseIds=${courseIds}`);
+    const couponParam = appliedCode ? `&coupon=${encodeURIComponent(appliedCode)}` : '';
+    router.push(`/checkout/cart?courseIds=${courseIds}${couponParam}`);
   };
 
   // Xoá nhiều (14/09/2026, mở rộng) — xoá thẳng các khóa đang tick chọn, không cần vào từng
@@ -69,9 +80,31 @@ export default function CartPage() {
     selectedItems.forEach((item) => removeFromCart.mutate(item.courseId));
   };
 
-  const handleApplyCoupon = () => {
-    if (!couponCode.trim()) return;
-    toast.info('Tính năng mã giảm giá đang được phát triển, chưa áp dụng được vào đơn hàng.');
+  const handleApplyCoupon = async () => {
+    const code = couponCode.trim();
+    if (!code) return;
+    if (selectedItems.length === 0) {
+      toast.error('Chọn ít nhất 1 khóa học để áp dụng mã giảm giá.');
+      return;
+    }
+    setApplying(true);
+    try {
+      const results = await couponsApi.previewMany(selectedItems.map((item) => item.courseId), code);
+      // `enteredCodeValid=false` chỉ khi mã KHÔNG áp dụng được cho khóa đó — vẫn true dù coupon
+      // autoApply khác lời hơn thắng (BR-COUPON-01), giá cuối vẫn đúng đã là mức tốt nhất.
+      const anyValid = [...results.values()].some((r) => r.enteredCodeValid);
+      if (!anyValid) {
+        toast.error('Mã giảm giá không áp dụng được cho các khóa đã chọn.');
+        return;
+      }
+      setPriceMap(results);
+      setAppliedCode(code);
+      toast.success('Đã áp dụng mã giảm giá.');
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : 'Không áp dụng được mã giảm giá, thử lại sau.');
+    } finally {
+      setApplying(false);
+    }
   };
 
   return (
@@ -134,7 +167,19 @@ export default function CartPage() {
                   </p>
                 </div>
                 <div className="flex shrink-0 flex-col items-end gap-2">
-                  <span className="font-display text-[15px] font-bold text-ink">{formatPrice(item.price)}</span>
+                  {(() => {
+                    const applied = priceMap.get(item.courseId);
+                    const finalPrice = applied?.finalPrice ?? item.finalPrice;
+                    const discountPercent = applied?.discountPercent ?? item.discountPercent;
+                    return discountPercent ? (
+                      <div className="flex flex-col items-end">
+                        <span className="font-display text-[15px] font-bold text-ink">{formatPrice(finalPrice)}</span>
+                        <span className="text-xs text-ink-faint line-through">{formatPrice(item.price)}</span>
+                      </div>
+                    ) : (
+                      <span className="font-display text-[15px] font-bold text-ink">{formatPrice(item.price)}</span>
+                    );
+                  })()}
                   <button
                     type="button"
                     onClick={() => removeFromCart.mutate(item.courseId)}
@@ -153,6 +198,12 @@ export default function CartPage() {
               <span>Đã chọn</span>
               <span>{selectedItems.length} / {items.length} khóa học</span>
             </div>
+            {total < totalOriginal && (
+              <div className="flex items-center justify-between text-sm text-ink-muted">
+                <span>Đã giảm</span>
+                <span className="font-semibold text-danger">-{formatPrice(totalOriginal - total)}</span>
+              </div>
+            )}
             <div className="flex items-center justify-between py-3">
               <span className="font-display text-base font-bold text-ink">Tổng cộng</span>
               <span className="font-display text-xl font-bold text-accent">{formatPrice(total)}</span>
@@ -166,28 +217,41 @@ export default function CartPage() {
               Tiến hành thanh toán
             </button>
 
-            {/* Mã giảm giá (14/09/2026, mở rộng) — CHỈ giao diện, chưa có logic giảm giá thật
-                (chưa có khái niệm khuyến mãi/coupon trong hệ thống) — bấm "Áp dụng" báo rõ
-                đang phát triển thay vì giả vờ trừ tiền, giữ đúng tinh thần trung thực với
-                người dùng như đã làm ở LanguageModal.tsx. */}
+            {/* Mã giảm giá (15/09/2026, mở rộng) — mỗi khóa ĐANG CHỌN tự resolve coupon tốt
+                nhất của riêng nó với cùng mã nhập (BR-COUPON-05), xem `couponsApi.previewMany`. */}
             <div className="mt-4 border-t border-line-soft pt-4">
               <p className="mb-2 text-sm font-semibold text-ink">Mã giảm giá</p>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={couponCode}
-                  onChange={(e) => setCouponCode(e.target.value)}
-                  placeholder="Nhập mã giảm giá"
-                  className="w-full min-w-0 rounded-lg border border-line px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:border-accent focus:outline-none"
-                />
-                <button
-                  type="button"
-                  onClick={handleApplyCoupon}
-                  className="shrink-0 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-dark"
-                >
-                  Áp dụng
-                </button>
-              </div>
+              {appliedCode ? (
+                <div className="flex items-center justify-between rounded-lg bg-success/5 border border-success/20 px-3 py-2 text-sm">
+                  <span className="font-mono font-bold text-success">{appliedCode.toUpperCase()}</span>
+                  <button
+                    type="button"
+                    onClick={() => { setAppliedCode(null); setPriceMap(new Map()); setCouponCode(''); }}
+                    className="text-xs font-semibold text-ink-muted hover:text-ink"
+                  >
+                    Bỏ mã
+                  </button>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={couponCode}
+                    onChange={(e) => setCouponCode(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); void handleApplyCoupon(); } }}
+                    placeholder="Nhập mã giảm giá"
+                    className="w-full min-w-0 rounded-lg border border-line px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:border-accent focus:outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => void handleApplyCoupon()}
+                    disabled={applying}
+                    className="shrink-0 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-dark disabled:opacity-60"
+                  >
+                    {applying ? 'Đang kiểm tra...' : 'Áp dụng'}
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>

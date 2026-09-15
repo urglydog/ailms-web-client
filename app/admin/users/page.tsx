@@ -12,21 +12,11 @@ interface User {
   createdAt: string;
 }
 
-interface InstructorRequest {
-  id: number;
-  userId: number;
-  motivation: string;
-  credentialUrl?: string;
-  createdAt: string;
-}
-
 type SortField = 'id' | 'fullName' | 'email' | 'role' | 'createdAt';
 type SortOrder = 'asc' | 'desc';
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
-  const [requests, setRequests] = useState<InstructorRequest[]>([]);
-  const [activeTab, setActiveTab] = useState<'users' | 'requests'>('users');
   const [loading, setLoading] = useState(true);
 
   // Filters & Search
@@ -53,20 +43,8 @@ export default function AdminUsersPage() {
     }
   };
 
-  const fetchRequests = async () => {
-    try {
-      const token = localStorage.getItem('accessToken');
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/api/v1/instructor-requests?status=PENDING`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (res.ok) setRequests(await res.json());
-    } catch {
-      toast.error('Lỗi khi tải danh sách yêu cầu giảng viên');
-    }
-  };
-
   useEffect(() => {
-    Promise.all([fetchUsers(), fetchRequests()]).finally(() => setLoading(false));
+    fetchUsers().finally(() => setLoading(false));
   }, []);
 
   const handleToggleBlock = async (userId: number, currentStatus: boolean) => {
@@ -94,33 +72,6 @@ export default function AdminUsersPage() {
       }
     } catch {
       toast.error('Có lỗi kết nối');
-    }
-  };
-
-  const handleApproveRequest = async (id: number, status: 'APPROVED' | 'REJECTED') => {
-    const reason = status === 'REJECTED' ? window.prompt('Nhập lý do từ chối:') : '';
-    if (status === 'REJECTED' && !reason) return;
-
-    try {
-      const token = localStorage.getItem('accessToken');
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/api/v1/instructor-requests/${id}/status`, {
-        method: 'PUT',
-        headers: { 
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ status, adminNotes: reason })
-      });
-      if (res.ok) {
-        toast.success(`Đã ${status === 'APPROVED' ? 'duyệt' : 'từ chối'} yêu cầu`);
-        fetchRequests();
-        fetchUsers(); // Cập nhật lại danh sách user vì role có thể đã thay đổi
-      } else {
-        const error = await res.json();
-        toast.error(error.detail || 'Có lỗi xảy ra');
-      }
-    } catch {
-      toast.error('Lỗi kết nối');
     }
   };
 
@@ -193,37 +144,15 @@ export default function AdminUsersPage() {
         <div>
           <h1 className="font-display text-2xl font-bold text-ink">Quản lý Người dùng</h1>
           <p className="mt-1 text-sm text-ink-muted">
-            Quản lý tài khoản, vai trò và phê duyệt giảng viên mới.
+            Quản lý tài khoản và vai trò người dùng.
           </p>
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-6 border-b border-line">
-        <button
-          onClick={() => setActiveTab('users')}
-          className={`pb-3 text-[14px] font-semibold transition-colors ${
-            activeTab === 'users' ? 'border-b-2 border-cyan-600 text-cyan-600' : 'text-ink-muted hover:text-ink'
-          }`}
-        >
-          Tất cả người dùng ({users.length})
-        </button>
-        <button
-          onClick={() => setActiveTab('requests')}
-          className={`pb-3 text-[14px] font-semibold transition-colors ${
-            activeTab === 'requests' ? 'border-b-2 border-cyan-600 text-cyan-600' : 'text-ink-muted hover:text-ink'
-          }`}
-        >
-          Yêu cầu duyệt Giảng viên ({requests.length})
-        </button>
-      </div>
-
       {/* Content */}
       <div className="flex flex-col gap-4">
-        {activeTab === 'users' ? (
-          <>
-            {/* Bộ lọc Users */}
-            <div className="card p-4 flex flex-wrap gap-4 items-center border border-line bg-surface">
+        {/* Bộ lọc Users */}
+        <div className="card p-4 flex flex-wrap gap-4 items-center border border-line bg-surface">
               <div className="flex flex-col gap-1.5 w-full sm:w-64">
                 <label className="text-xs font-semibold text-ink-muted uppercase">Tìm kiếm</label>
                 <input 
@@ -349,56 +278,6 @@ export default function AdminUsersPage() {
                 </div>
               </div>
             )}
-          </>
-        ) : (
-          <div className="overflow-x-auto card border border-line rounded-xl">
-            {requests.length === 0 ? (
-              <div className="p-10 text-center text-sm text-ink-muted">Không có yêu cầu nào đang chờ duyệt.</div>
-            ) : (
-              <table className="w-full text-left text-sm text-ink-muted">
-                <thead className="bg-surface-raised text-xs uppercase text-ink border-b border-line">
-                  <tr>
-                    <th className="px-6 py-4">User ID</th>
-                    <th className="px-6 py-4">Lý do</th>
-                    <th className="px-6 py-4">Link CV / Portfolio</th>
-                    <th className="px-6 py-4">Ngày gửi</th>
-                    <th className="px-6 py-4 text-right">Hành động</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-line">
-                  {requests.map(r => (
-                    <tr key={r.id} className="hover:bg-surface-raised transition-colors">
-                      <td className="px-6 py-4 font-semibold text-ink">#{r.userId}</td>
-                      <td className="px-6 py-4 text-ink max-w-xs truncate" title={r.motivation}>{r.motivation}</td>
-                      <td className="px-6 py-4">
-                        {r.credentialUrl ? (
-                          <a href={r.credentialUrl} target="_blank" rel="noreferrer" className="text-cyan-600 hover:underline">Xem Link</a>
-                        ) : (
-                          <span className="text-ink-muted">Không có</span>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 text-ink-muted">{new Date(r.createdAt).toLocaleDateString('vi-VN')}</td>
-                      <td className="px-6 py-4 text-right flex gap-2 justify-end">
-                        <button 
-                          onClick={() => handleApproveRequest(r.id, 'APPROVED')}
-                          className="text-xs font-bold text-success bg-success/10 border border-success/20 px-3 py-1.5 rounded hover:bg-success/20"
-                        >
-                          Duyệt
-                        </button>
-                        <button 
-                          onClick={() => handleApproveRequest(r.id, 'REJECTED')}
-                          className="text-xs font-bold text-danger bg-danger/10 border border-danger/20 px-3 py-1.5 rounded hover:bg-danger/20"
-                        >
-                          Từ chối
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
-        )}
       </div>
     </div>
   );

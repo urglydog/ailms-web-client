@@ -167,6 +167,22 @@ export default async function CourseDetailPage({ params }: PageProps) {
                     <span className="font-display text-3xl font-extrabold text-success">Miễn phí</span>
                     <Badge tone="success">Sở hữu vĩnh viễn</Badge>
                   </div>
+                ) : course.discountPercent ? (
+                  // Mã giảm giá (15/09/2026, mở rộng) — chỉ coupon `autoApply=true` hiện trực
+                  // tiếp ở đây, không cần nhập mã (BR-COUPON-04).
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-baseline gap-2">
+                      <span className="font-display text-3xl font-extrabold text-ink">
+                        {course.finalPrice.toLocaleString('vi-VN')}đ
+                      </span>
+                      <span className="rounded bg-danger/10 px-2 py-0.5 text-sm font-bold text-danger">
+                        -{course.discountPercent}%
+                      </span>
+                    </div>
+                    <span className="text-sm text-ink-faint line-through">
+                      {course.price.toLocaleString('vi-VN')}đ
+                    </span>
+                  </div>
                 ) : (
                   <div className="flex items-baseline gap-2">
                     <span className="font-display text-3xl font-extrabold text-ink">

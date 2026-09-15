@@ -7,10 +7,18 @@ import { LogoutSidebarButton } from '@/components/auth/LogoutSidebarButton';
 import { UploadTray } from '@/components/instructor/UploadTray';
 import { InstructorChat } from '@/components/chat/InstructorChat';
 import { getCurrentRole } from '@/lib/auth/token';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 
 export default function InstructorLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
+  // (15/09/2026) — sidebar trước đây gắn cứng "Trần Thanh Hà"/"TH", không đổi theo tài khoản
+  // đang đăng nhập thật (lộ rõ khi 1 học viên vừa "Trở thành Giảng viên" vào đây vẫn thấy tên
+  // giảng viên khác). Đọc từ `useCurrentUser()` — cùng nguồn dữ liệu Header đang dùng.
+  const { data: currentUser } = useCurrentUser();
+  const initials = currentUser?.fullName
+    ? currentUser.fullName.split(' ').filter(Boolean).slice(-2).map((w) => w.charAt(0).toUpperCase()).join('')
+    : 'GV';
 
   useEffect(() => {
     const role = getCurrentRole();
@@ -26,6 +34,7 @@ export default function InstructorLayout({ children }: { children: React.ReactNo
     { id: 'live', label: 'Live', href: '/instructor/live' },
     { id: 'revenue', label: 'Thống kê doanh thu', href: '/instructor/revenue' },
     { id: 'students', label: 'Học viên', href: '/instructor/students' },
+    { id: 'coupons', label: 'Mã giảm giá', href: '/instructor/coupons' },
   ];
 
   return (
@@ -71,11 +80,16 @@ export default function InstructorLayout({ children }: { children: React.ReactNo
         
         <div className="mt-auto border-t border-white/10 pt-3">
           <div className="flex items-center gap-2.5 px-2">
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-600 font-display text-[12.5px] font-bold text-white">
-              TH
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-cyan-600 font-display text-[12.5px] font-bold text-white uppercase">
+              {currentUser?.avatarUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={currentUser.avatarUrl} alt={currentUser.fullName} className="h-full w-full object-cover" />
+              ) : (
+                initials
+              )}
             </span>
             <div className="flex min-w-0 flex-col">
-              <span className="truncate text-[12.5px] font-semibold text-white">Trần Thanh Hà</span>
+              <span className="truncate text-[12.5px] font-semibold text-white">{currentUser?.fullName || 'Đang tải...'}</span>
               <span className="text-[11px] text-slate-400">Giảng viên</span>
             </div>
           </div>

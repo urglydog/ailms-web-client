@@ -18,6 +18,10 @@ export interface AdminPayment {
   gatewayTxnNo: string | null;
   billingName?: string;
   billingPhone?: string;
+  /** Mã giảm giá (15/09/2026, mở rộng) — null nếu giao dịch không dùng coupon nào. */
+  originalAmount: number | null;
+  discountAmount: number;
+  couponCode: string | null;
 }
 
 type SortField = 'txnRef' | 'userEmail' | 'amount' | 'paidAt';
@@ -363,6 +367,19 @@ export default function AdminPaymentsPage() {
                     {selectedPayment.instructorEarning ? selectedPayment.instructorEarning.toLocaleString('vi-VN') + 'đ' : '-'}
                   </p>
                 </div>
+
+                {selectedPayment.couponCode && (
+                  <div className="col-span-2 rounded-lg bg-accent/5 border border-accent/20 p-3">
+                    <p className="text-sm font-medium text-ink-muted mb-1">Mã giảm giá đã dùng</p>
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono font-bold text-accent-dark">{selectedPayment.couponCode}</span>
+                      <span className="text-sm text-ink-muted">
+                        Giá gốc {selectedPayment.originalAmount?.toLocaleString('vi-VN')}đ − Giảm{' '}
+                        {selectedPayment.discountAmount.toLocaleString('vi-VN')}đ
+                      </span>
+                    </div>
+                  </div>
+                )}
 
                 <div>
                   <p className="text-sm font-medium text-ink-muted mb-1">Phương thức TT</p>

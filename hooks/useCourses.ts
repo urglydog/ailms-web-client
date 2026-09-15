@@ -16,11 +16,17 @@ import type {
   UpdateLessonInput,
 } from '@/types/domain';
 
-export function useMyCourses(params: { status?: CourseStatus; page?: number; size?: number } = {}) {
+export function useMyCourses(
+  params: { status?: CourseStatus; page?: number; size?: number } = {},
+  options: { enabled?: boolean } = {},
+) {
   return useQuery({
     queryKey: ['courses', 'mine', params],
     queryFn: () => coursesApi.listMine(params),
-    enabled: !!getAccessToken(),
+    // `/api/v1/courses/mine` chỉ dành cho INSTRUCTOR (403 với ADMIN) — `enabled` cho phép nơi
+    // gọi (VD: `CoursePicker` dùng chung cho cả Admin lẫn Instructor ở trang coupon) tắt hẳn
+    // request này khi đang ở vai trò không phù hợp, thay vì để nó tự bắn 403 vô ích.
+    enabled: (options.enabled ?? true) && !!getAccessToken(),
   });
 }
 

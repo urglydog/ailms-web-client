@@ -164,6 +164,18 @@ export function CourseCard({ course }: { course: CourseSummary }) {
             <span className="font-display text-[15px] font-bold text-accent">Đã sở hữu</span>
           ) : course.isFree ? (
             <span className="font-display text-[15px] font-bold text-success">Miễn phí</span>
+          ) : course.discountPercent ? (
+            // Mã giảm giá (15/09/2026, mở rộng) — chỉ coupon `autoApply=true` hiện trực tiếp ở
+            // thẻ khóa học, không cần nhập mã (BR-COUPON-04).
+            <div className="flex items-baseline gap-1.5">
+              <span className="font-display text-[15px] font-bold text-ink">
+                {formatPrice(course.finalPrice)}
+              </span>
+              <span className="text-xs text-ink-faint line-through">{formatPrice(course.price)}</span>
+              <span className="rounded bg-danger/10 px-1.5 py-0.5 text-[11px] font-bold text-danger">
+                -{course.discountPercent}%
+              </span>
+            </div>
           ) : (
             <span className="font-display text-[15px] font-bold text-ink">
               {formatPrice(course.price)}

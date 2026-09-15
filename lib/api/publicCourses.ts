@@ -47,6 +47,9 @@ interface RawSummary {
   totalDurationSec: number;
   categorySlug: string;
   categoryName: string;
+  /** Mã giảm giá (15/09/2026, mở rộng) — xem `CourseSummary.finalPrice`. */
+  finalPrice: number;
+  discountPercent: number | null;
 }
 
 interface RawLesson {
@@ -97,6 +100,8 @@ function toSummary(raw: RawSummary): CourseSummary {
     langs: [],
     coverColorA,
     coverColorB,
+    finalPrice: raw.finalPrice,
+    discountPercent: raw.discountPercent,
   };
 }
 

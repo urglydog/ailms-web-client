@@ -4,9 +4,9 @@
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
-import { ApiError, api } from '@/lib/api/client';
 import { getAccessToken } from '@/lib/auth/token';
 import { useCurrentUser, useUpdatePrivacy } from '@/hooks/useCurrentUser';
+import { useBecomeInstructor, useInstructorVerificationStatus, useSubmitInstructorVerification } from '@/hooks/useInstructor';
 import EditProfileModal from './edit-modal';
 import ChangePasswordModal from './change-password-modal';
 
@@ -33,11 +33,8 @@ function ProfilePageContent() {
   const searchParams = useSearchParams();
   const { data: user, isLoading } = useCurrentUser();
   const updatePrivacy = useUpdatePrivacy();
+  const becomeInstructor = useBecomeInstructor();
 
-  const [motivation, setMotivation] = useState('');
-  const [credentialUrl, setCredentialUrl] = useState('');
-  const [requestStatus, setRequestStatus] = useState<string | null>(null);
-  const [message, setMessage] = useState('');
   const [showEditModal, setShowEditModal] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
 
@@ -50,18 +47,6 @@ function ProfilePageContent() {
   useEffect(() => {
     if (searchParams.get('edit') === '1') setShowEditModal(true);
   }, [searchParams]);
-
-  const handleSubmitRequest = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setMessage('');
-    try {
-      await api.post('/api/v1/instructor-requests', { motivation, credentialUrl }, { token: getAccessToken() ?? undefined });
-      setMessage('Đã gửi yêu cầu thành công! Vui lòng chờ Admin duyệt.');
-      setRequestStatus('PENDING');
-    } catch (err) {
-      setMessage(err instanceof ApiError ? err.message : 'Có lỗi xảy ra, vui lòng thử lại.');
-    }
-  };
 
   if (isLoading) return <div className="p-10 text-center">Đang tải...</div>;
   if (!user) return <div className="p-10 text-center">Không thể tải thông tin.</div>;
@@ -166,57 +151,21 @@ function ProfilePageContent() {
             <div className="rounded-card border border-accent/20 bg-accent/5 p-6 shadow-card">
               <h2 className="mb-2 font-display text-lg font-bold text-ink">Trở thành Giảng viên</h2>
               <p className="mb-6 text-sm text-ink-muted">
-                Chia sẻ kiến thức của bạn và tạo thêm thu nhập. Gửi yêu cầu để được xét duyệt.
+                Chia sẻ kiến thức của bạn và tạo thêm thu nhập — nâng cấp tài khoản ngay, không
+                cần chờ xét duyệt. Bạn sẽ cần xác minh thông tin định danh trước khi gửi khóa học
+                đầu tiên đi duyệt.
               </p>
-
-              {requestStatus === 'PENDING' ? (
-                <div className="rounded-lg bg-amber-50 p-4 text-sm font-medium text-amber-800 border border-amber-200">
-                  Yêu cầu của bạn đang được duyệt. Vui lòng chờ phản hồi từ Admin.
-                </div>
-              ) : (
-                <form onSubmit={handleSubmitRequest} className="flex flex-col gap-4">
-                  <div>
-                    <label className="mb-1.5 block text-sm font-semibold text-ink">
-                      Lý do muốn làm giảng viên <span className="text-red-500">*</span>
-                    </label>
-                    <textarea
-                      required
-                      rows={3}
-                      className="w-full rounded-lg border border-line p-3 text-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
-                      placeholder="Giới thiệu kinh nghiệm giảng dạy của bạn..."
-                      value={motivation}
-                      onChange={(e) => setMotivation(e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <label className="mb-1.5 block text-sm font-semibold text-ink">
-                      Link chứng chỉ / Portfolio
-                    </label>
-                    <input
-                      type="url"
-                      className="w-full rounded-lg border border-line p-3 text-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
-                      placeholder="https://..."
-                      value={credentialUrl}
-                      onChange={(e) => setCredentialUrl(e.target.value)}
-                    />
-                  </div>
-
-                  {message && (
-                    <div className={`text-sm font-medium ${message.includes('thành công') ? 'text-green-600' : 'text-red-600'}`}>
-                      {message}
-                    </div>
-                  )}
-
-                  <button
-                    type="submit"
-                    className="mt-2 w-full rounded-lg bg-accent py-3 text-sm font-bold text-white hover:bg-accent-dark transition-colors"
-                  >
-                    Gửi Yêu Cầu Nâng Cấp
-                  </button>
-                </form>
-              )}
+              <button
+                onClick={() => becomeInstructor.mutate()}
+                disabled={becomeInstructor.isPending}
+                className="w-full rounded-lg bg-accent py-3 text-sm font-bold text-white hover:bg-accent-dark transition-colors disabled:opacity-60"
+              >
+                {becomeInstructor.isPending ? 'Đang xử lý...' : 'Trở thành Giảng viên'}
+              </button>
             </div>
           )}
+
+          {user.role === 'INSTRUCTOR' && <InstructorVerificationPanel />}
         </div>
       </div>
 
@@ -264,5 +213,122 @@ function PrivacyToggle({
         />
       </button>
     </label>
+  );
+}
+
+/**
+ * Xác minh định danh (BR-VERIFY-01, 15/09/2026) — bắt buộc 1 LẦN DUY NHẤT/tài khoản trước khi
+ * gửi khóa học ĐẦU TIÊN đi duyệt (không lặp lại cho các khóa sau). Chỉ thu thập thông tin,
+ * KHÔNG gọi eKYC/API định danh thật nào (ngoài phạm vi đồ án) — xem docblock
+ * `InstructorVerification.java`. Ảnh CCCD lưu trên bucket B2 công khai chung, chỉ chặn lộ ở
+ * tầng ứng dụng (endpoint `GET /verification/me` chỉ trả cho chính chủ) — không dựng hạ tầng
+ * presigned-URL/bucket riêng, theo lựa chọn đã chốt cho phạm vi đồ án.
+ */
+function InstructorVerificationPanel() {
+  const { data: status, isLoading } = useInstructorVerificationStatus(true);
+  const submitVerification = useSubmitInstructorVerification();
+
+  const [idNumber, setIdNumber] = useState('');
+  const [addressText, setAddressText] = useState('');
+  const [confirmed, setConfirmed] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
+
+  if (isLoading) {
+    return (
+      <div className="rounded-card border border-line bg-white p-6 shadow-card text-sm text-ink-muted">
+        Đang tải trạng thái xác minh...
+      </div>
+    );
+  }
+
+  if (status?.verified) {
+    return (
+      <div className="rounded-card border border-success/20 bg-success/5 p-6 shadow-card">
+        <h2 className="mb-2 font-display text-lg font-bold text-ink">Xác minh định danh</h2>
+        <div className="mb-4 flex items-center gap-2 text-sm font-medium text-success">
+          <span>✓</span>
+          <span>Tài khoản đã xác minh — bạn có thể gửi khóa học đi duyệt.</span>
+        </div>
+        {/* Điều hướng sang khu vực quản lý khóa học/upload video (15/09/2026) — sau khi vừa
+            "Trở thành Giảng viên"/xác minh xong, học viên cần lối vào rõ ràng tới
+            `app/instructor/**` thay vì tự mò menu tài khoản ở Header. */}
+        <Link
+          href="/instructor"
+          className="inline-flex w-full items-center justify-center rounded-lg bg-accent py-2.5 text-sm font-bold text-white hover:bg-accent-dark transition-colors no-underline"
+        >
+          Đến Kênh Giảng viên →
+        </Link>
+      </div>
+    );
+  }
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!file) return;
+    submitVerification.mutate({ idNumber, addressText, contentOwnershipConfirmed: confirmed, file });
+  };
+
+  return (
+    <div className="rounded-card border border-accent/20 bg-accent/5 p-6 shadow-card">
+      <h2 className="mb-2 font-display text-lg font-bold text-ink">Xác minh định danh</h2>
+      <p className="mb-6 text-sm text-ink-muted">
+        Cần hoàn tất 1 lần trước khi gửi khóa học đầu tiên đi duyệt (không lặp lại cho các khóa sau).
+      </p>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <div>
+          <label className="mb-1.5 block text-sm font-semibold text-ink">
+            Số CCCD/CMND <span className="text-red-500">*</span>
+          </label>
+          <input
+            required
+            type="text"
+            className="w-full rounded-lg border border-line p-3 text-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+            value={idNumber}
+            onChange={(e) => setIdNumber(e.target.value)}
+          />
+        </div>
+        <div>
+          <label className="mb-1.5 block text-sm font-semibold text-ink">
+            Địa chỉ thường trú <span className="text-red-500">*</span>
+          </label>
+          <input
+            required
+            type="text"
+            className="w-full rounded-lg border border-line p-3 text-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+            value={addressText}
+            onChange={(e) => setAddressText(e.target.value)}
+          />
+        </div>
+        <div>
+          <label className="mb-1.5 block text-sm font-semibold text-ink">
+            Ảnh CCCD/CMND <span className="text-red-500">*</span>
+          </label>
+          <input
+            required
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            className="w-full rounded-lg border border-line p-2.5 text-sm"
+            onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+          />
+        </div>
+        <label className="flex items-start gap-2 text-sm text-ink">
+          <input
+            required
+            type="checkbox"
+            className="mt-0.5"
+            checked={confirmed}
+            onChange={(e) => setConfirmed(e.target.checked)}
+          />
+          <span>Tôi xác nhận đây là thông tin của chính mình và tôi sở hữu/có quyền chia sẻ nội dung khóa học sẽ đăng tải.</span>
+        </label>
+        <button
+          type="submit"
+          disabled={submitVerification.isPending || !file || !confirmed}
+          className="mt-2 w-full rounded-lg bg-accent py-3 text-sm font-bold text-white hover:bg-accent-dark transition-colors disabled:opacity-60"
+        >
+          {submitVerification.isPending ? 'Đang gửi...' : 'Gửi xác minh'}
+        </button>
+      </form>
+    </div>
   );
 }
