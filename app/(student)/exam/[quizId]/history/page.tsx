@@ -96,7 +96,7 @@ function AttemptHistoryContent() {
                     
                     <div className="p-6 space-y-8">
                       {attemptDetail.details.map((q, qIdx) => (
-                        <div key={q.questionId} className="space-y-3">
+                        <div key={q.questionId} id={`question-${q.questionId}`} className="space-y-3 pt-4">
                           <h3 className="font-bold text-sm flex gap-2">
                             <span className="w-6 h-6 flex-shrink-0 bg-line-soft rounded-full flex items-center justify-center text-xs">
                               {qIdx + 1}
@@ -106,10 +106,10 @@ function AttemptHistoryContent() {
                           
                           <div className="ml-8 space-y-2">
                             {q.options.map(opt => {
-                              const isSelected = q.selectedOptionId === opt.id;
-                              const isCorrectAnswer = q.correctOptionId === opt.id;
+                              const isSelected = q.selectedOptionIds?.includes(opt.id);
+                              const isCorrectAnswer = q.correctOptionIds?.includes(opt.id);
                               // Chế độ cho phép xem lại: correctOptionId != null
-                              const showCorrectness = q.correctOptionId !== null;
+                              const showCorrectness = q.correctOptionIds && q.correctOptionIds.length > 0;
                               
                               let bgClass = "bg-white border-line";
                               let textClass = "text-ink-muted";
@@ -147,7 +147,31 @@ function AttemptHistoryContent() {
                           </div>
                         </div>
                       ))}
-                    </div>
+                    
+                      <div className="fixed bottom-8 right-8 z-50 bg-white p-4 rounded-xl shadow-2xl border border-line hidden md:block max-w-[280px]">
+                        <h4 className="text-sm font-bold mb-3 text-center">Đến câu hỏi</h4>
+                        <div className="flex flex-wrap gap-2 justify-center max-h-[40vh] overflow-y-auto p-1">
+                          {attemptDetail.details.map((q, idx) => {
+                            const isCorrect = q.isCorrect;
+                            return (
+                              <button
+                                key={q.questionId}
+                                onClick={() => {
+                                  document.getElementById(`question-${q.questionId}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                }}
+                                className="flex flex-col h-9 w-8 rounded overflow-hidden text-[10px] font-bold border transition-colors border-line hover:opacity-80 shadow-sm"
+                              >
+                                <div className="h-[70%] w-full flex items-center justify-center bg-surface text-ink border-b border-line/50">
+                                  {idx + 1}
+                                </div>
+                                <div className={`h-[30%] w-full ${isCorrect ? 'bg-green-500' : 'bg-red-500'}`}>
+                                </div>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+</div>
                   </div>
                 ) : (
                   <div className="bg-white border border-line rounded-lg p-8 text-center text-red-500 shadow-sm">

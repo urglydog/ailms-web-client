@@ -48,7 +48,8 @@ export default function AntiCheatExamPage() {
   const { mutate: submitQuiz } = useSubmitQuiz();
   const { mutate: explainWrongAnswer } = useExplainWrongAnswer();
   const [attemptData, setAttemptData] = useState<StartRes | null>(null);
-  const [answers, setAnswers] = useState<Record<number, number>>({});
+  const [answers, setAnswers] = useState<Record<number, number[]>>({});
+  const [showReviewConfirm, setShowReviewConfirm] = useState(false);
   const [result, setResult] = useState<SubmitRes | null>(null);
   const [submitTime, setSubmitTime] = useState<Date | null>(null);
   const [elapsedSeconds, setElapsedSeconds] = useState<number>(0);
@@ -99,14 +100,7 @@ export default function AntiCheatExamPage() {
   const submitExam = useCallback((isAuto = false) => {
     if (!attemptData || isSubmitting) return;
     
-    // Nếu nộp thủ công, bắt buộc làm hết
-    if (!isAuto) {
-      const isAllAnswered = attemptData.questions.every(q => answers[q.id] !== undefined);
-      if (!isAllAnswered) {
-        toast.error('Bạn phải hoàn thành tất cả các câu hỏi trước khi nộp bài!');
-        return;
-      }
-    }
+
 
     setIsSubmitting(true);
     // Dừng timer khi nộp bài
@@ -418,8 +412,8 @@ export default function AntiCheatExamPage() {
 
                 <div className="space-y-2 mb-6">
                   {detail.options.map(opt => {
-                    const isSelected = detail.selectedOptionId === opt.id;
-                    const isCorrect = detail.correctOptionId === opt.id;
+                    const isSelected = detail.selectedOptionIds?.includes(opt.id);
+                    const isCorrect = detail.correctOptionIds?.includes(opt.id);
                     let style = "p-3 border rounded-lg text-sm ";
                     if (isCorrect) style += "border-green-500 bg-green-50 text-green-900 font-medium";
                     else if (isSelected) style += "border-red-500 bg-red-50 text-red-900";
@@ -437,7 +431,7 @@ export default function AntiCheatExamPage() {
                   <div className="mt-4 pt-4 border-t border-line">
                     {!explanations[detail.questionId] ? (
                       <button
-                        onClick={() => handleExplain(detail.questionId, detail.selectedOptionId)}
+                        onClick={() => handleExplain(detail.questionId, detail.selectedOptionIds?.[0] || null)}
                         className="text-accent text-sm font-semibold hover:underline flex items-center gap-1"
                       >
                         Hỏi Gia sư AI tại sao sai?
@@ -673,6 +667,16 @@ export default function AntiCheatExamPage() {
     );
   }
 
+
+  const handleFirstSubmitClick = () => {
+    if (!attemptData) return;
+    const answeredCount = Object.keys(answers).filter(k => answers[Number(k)] && (answers[Number(k)]?.length || 0) > 0).length;
+    if (answeredCount < attemptData.questions.length) {
+      toast.warning('Vui lòng hoàn thành toàn bộ câu hỏi trước khi nộp');
+    }
+    setShowReviewConfirm(true);
+  };
+
   return (
     <div className="min-h-dvh bg-surface p-8">
       <div className="shell max-w-4xl mx-auto">
@@ -694,7 +698,33 @@ export default function AntiCheatExamPage() {
             )}
           </div>
         </div>
-        <div className="grid grid-cols-3 gap-8">
+        
+        {showReviewConfirm ? (
+          <div className="card p-8 col-span-3 max-w-2xl mx-auto w-full">
+            <h2 className="text-2xl font-bold mb-6 text-center">Xác nhận nộp bài</h2>
+            <div className="space-y-4 mb-8">
+              {attemptData?.questions.map((q, idx) => {
+                const isAnswered = answers[q.id] && (answers[q.id]?.length || 0) > 0;
+                return (
+                  <div key={q.id} className={`p-4 border rounded-lg flex items-center justify-between ${isAnswered ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
+                    <span className="font-bold">Câu {idx + 1}</span>
+                    <span className="font-semibold">{isAnswered ? '✅ Đã ghi nhận câu trả lời' : '❌ Chưa ghi nhận câu trả lời'}</span>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="flex flex-col gap-4 sticky bottom-0 bg-white pt-4 border-t border-line">
+              <button onClick={() => submitExam(false)} disabled={isSubmitting} className="w-full bg-accent text-white font-bold py-3 rounded-full hover:bg-accent-hover transition-colors shadow-lg">
+                {isSubmitting ? 'Đang nộp...' : 'Xác nhận nộp bài'}
+              </button>
+              <button onClick={() => setShowReviewConfirm(false)} className="w-full text-ink-muted font-bold hover:text-ink pb-4">
+                Quay lại bài thi
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+    
           <div className="col-span-2 flex flex-col gap-6">
             {attemptData?.questions
               .slice((currentPage - 1) * questionsPerPage, currentPage * questionsPerPage)
@@ -712,20 +742,33 @@ export default function AntiCheatExamPage() {
                 </div>
                 <p className="text-sm mb-6">{q.content}</p>
 
+                {q.isMultipleChoice && <div className="text-sm text-ink-muted italic mb-4">(Chọn nhiều đáp án)</div>}
                 <div className="space-y-3">
-                  {q.options.map((opt) => (
+                  {q.options.map((opt) => {
+                    const isSelected = answers[q.id]?.includes(opt.id);
+                    return (
                     <label key={opt.id} className="flex items-center gap-3 p-3 border border-line rounded-lg hover:bg-surface-hover cursor-pointer">
                       <input
-                        type="radio"
+                        type={q.isMultipleChoice ? "checkbox" : "radio"}
                         name={`question_${q.id}`}
                         value={opt.id}
-                        checked={answers[q.id] === opt.id}
-                        onChange={() => setAnswers(prev => ({ ...prev, [q.id]: opt.id }))}
+                        checked={isSelected || false}
+                        onChange={() => {
+                          if (q.isMultipleChoice) {
+                            setAnswers(prev => {
+                              const curr = prev[q.id] || [];
+                              if (curr.includes(opt.id)) return { ...prev, [q.id]: curr.filter(id => id !== opt.id) };
+                              return { ...prev, [q.id]: [...curr, opt.id] };
+                            });
+                          } else {
+                            setAnswers(prev => ({ ...prev, [q.id]: [opt.id] }));
+                          }
+                        }}
                         className="w-4 h-4 text-accent"
                       />
                       <span className="text-sm">{opt.content}</span>
                     </label>
-                  ))}
+                  )})}
                 </div>
               </div>
             ))}
@@ -753,7 +796,7 @@ export default function AntiCheatExamPage() {
             )}
           </div>
 
-          <div className="col-span-1 flex flex-col gap-4 sticky top-8 self-start">
+          <div className="col-span-1 flex flex-col gap-4 sticky top-4 self-start" style={{ maxHeight: "calc(100vh - 2rem)", overflowY: "auto" }}>
             {isProctored && (
               <div className="card overflow-hidden">
                 <div className={`text-white text-xs font-bold p-2 text-center transition-colors ${faceStatus === 'DETECTING' ? 'bg-amber-500' :
@@ -797,10 +840,14 @@ export default function AntiCheatExamPage() {
                         setCurrentPage(pageOfQuestion);
                         setTimeout(() => document.getElementById(`question-${q.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
                       }}
-                      className={`h-8 w-8 rounded text-xs font-bold border transition-colors relative ${isAnswered ? 'bg-accent text-white border-accent' : 'bg-surface hover:bg-surface-hover border-line text-ink'} ${currentPage === pageOfQuestion && !isAnswered ? 'ring-2 ring-accent/50' : ''}`}
+                      className={`flex flex-col h-9 w-8 rounded overflow-hidden text-[10px] font-bold border transition-colors relative ${currentPage === pageOfQuestion && !isAnswered ? 'ring-2 ring-accent/50' : 'border-line'} hover:opacity-80`}
                     >
-                      {idx + 1}
-                      {isFlagged && <span className="absolute -top-1 -right-1 text-[10px]">🚩</span>}
+                      <div className="h-[70%] w-full flex items-center justify-center bg-surface text-ink border-b border-line/50">
+                        {idx + 1}
+                      </div>
+                      <div className={`h-[30%] w-full ${isAnswered ? 'bg-green-500' : 'bg-red-500'}`}>
+                      </div>
+                      {isFlagged && <span className="absolute -top-1 -right-1 text-[10px] z-10">🚩</span>}
                     </button>
                   );
                 })}
@@ -810,7 +857,7 @@ export default function AntiCheatExamPage() {
 
 
             <button
-              onClick={() => submitExam(false)}
+              onClick={() => handleFirstSubmitClick}
               disabled={isSubmitting}
               className="bg-ink text-white font-bold py-3 rounded-xl hover:opacity-90 disabled:opacity-50 mt-4 shadow-lg"
             >
@@ -818,6 +865,7 @@ export default function AntiCheatExamPage() {
             </button>
           </div>
         </div>
+        )}
       </div>
     </div>
   );
