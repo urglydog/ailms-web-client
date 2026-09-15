@@ -41,3 +41,21 @@ export const useExplainWrongAnswer = () => {
     mutationFn: (data: import('@/lib/api/quizzes').ExplainReq) => quizApi.explainWrongAnswer(data),
   });
 };
+
+export const useUpdatePersonalQuestion = () => {
+  return useMutation({
+    mutationFn: ({ questionId, data }: { questionId: number; data: any }) => quizApi.updateQuestion(questionId, data),
+  });
+};
+
+export const useAddPersonalQuestion = () => {
+  return useMutation({
+    mutationFn: ({ quizId, data }: { quizId: number; data: any }) => quizApi.addQuestion(quizId, data),
+  });
+};
+
+export const useDeletePersonalQuestion = () => {
+  return useMutation({
+    mutationFn: (questionId: number) => quizApi.deleteQuestion(questionId),
+  });
+};

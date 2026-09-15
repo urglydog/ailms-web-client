@@ -93,4 +93,16 @@ export const quizApi = {
   explainWrongAnswer: (data: ExplainReq) => {
     return api.post<ExplainRes>(`/api/v1/quizzes/tutor/explain`, data, { token: authToken() });
   },
+
+  updateQuestion: (questionId: number, data: any) => {
+    return api.put(`/api/v1/quizzes/questions/${questionId}`, data, { token: authToken() });
+  },
+
+  addQuestion: (quizId: number, data: any) => {
+    return api.post(`/api/v1/quizzes/${quizId}/questions`, data, { token: authToken() });
+  },
+
+  deleteQuestion: (questionId: number) => {
+    return api.delete(`/api/v1/quizzes/questions/${questionId}`, { token: authToken() });
+  },
 };
