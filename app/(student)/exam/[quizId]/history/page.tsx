@@ -148,7 +148,7 @@ function AttemptHistoryContent() {
                         </div>
                       ))}
                     
-                      <div className="fixed bottom-8 right-8 z-50 bg-white p-4 rounded-xl shadow-2xl border border-line hidden md:block max-w-[280px]">
+                      <div className="fixed bottom-24 right-8 z-50 bg-white p-4 rounded-xl shadow-2xl border border-line hidden md:block max-w-[280px]">
                         <h4 className="text-sm font-bold mb-3 text-center">Đến câu hỏi</h4>
                         <div className="flex flex-wrap gap-2 justify-center max-h-[40vh] overflow-y-auto p-1">
                           {attemptDetail.details.map((q, idx) => {
