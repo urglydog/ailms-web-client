@@ -13,6 +13,8 @@ function AttemptHistoryContent() {
   const initialAttemptId = searchParams.get('attemptId') ? Number(searchParams.get('attemptId')) : null;
 
   const [selectedAttemptId, setSelectedAttemptId] = useState<number | null>(initialAttemptId);
+  const [historyPage, setHistoryPage] = useState(1);
+  const historyPerPage = 5;
 
   const { data: history, isLoading: isLoadingHistory, error: historyError } = useQuizHistory(quizId);
   const { data: attemptDetail, isLoading: isLoadingDetail } = useAttemptDetail(selectedAttemptId || 0);
@@ -89,9 +91,13 @@ function AttemptHistoryContent() {
                   <div className="bg-white border border-line rounded-lg p-8 text-center shadow-sm text-sm">
                     Đang tải chi tiết bài làm...
                   </div>
-                ) : attemptDetail ? (
+                ) : attemptDetail ? (() => {
+                  const totalHistPages = Math.ceil(attemptDetail.details.length / historyPerPage);
+                  const hStart = (historyPage - 1) * historyPerPage;
+                  const hEnd = historyPage * historyPerPage;
+                  return (
                   <div className="space-y-3">
-                    {attemptDetail.details.map((q, qIdx) => {
+                    {attemptDetail.details.slice(hStart, hEnd).map((q, qIdx) => {
                       const hasAnswer = q.selectedOptionIds && q.selectedOptionIds.length > 0;
                       const showCorrectness = q.correctOptionIds && q.correctOptionIds.length > 0;
                       // Border: green if correct, red if wrong or unanswered
@@ -101,7 +107,7 @@ function AttemptHistoryContent() {
                         <div key={q.questionId} id={`question-${q.questionId}`} className={`border-2 rounded-lg p-4 ${cardBorder}`}>
                           <h3 className="font-bold text-xs flex items-center gap-2 mb-2">
                             <span className={`w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center text-[10px] text-white font-bold ${q.isCorrect ? 'bg-green-500' : 'bg-red-500'}`}>
-                              {qIdx + 1}
+                              {hStart + qIdx + 1}
                             </span>
                             <span className="text-ink">{q.content}</span>
                             {q.isCorrect
@@ -152,8 +158,16 @@ function AttemptHistoryContent() {
                         </div>
                       );
                     })}
+                    {totalHistPages > 1 && (
+                      <div className="flex justify-between items-center mt-3 pt-3 border-t border-line">
+                        <button disabled={historyPage === 1} onClick={() => setHistoryPage(p => p - 1)} className="px-3 py-1 border border-line rounded text-xs font-semibold disabled:opacity-50">Trang trước</button>
+                        <span className="text-xs text-ink-muted">Trang {historyPage}/{totalHistPages}</span>
+                        <button disabled={historyPage === totalHistPages} onClick={() => setHistoryPage(p => p + 1)} className="px-3 py-1 border border-line rounded text-xs font-semibold disabled:opacity-50">Trang sau</button>
+                      </div>
+                    )}
                   </div>
-                ) : (
+                  );
+                })() : (
                   <div className="bg-white border border-line rounded-lg p-8 text-center text-red-500 shadow-sm text-sm">
                     Không tải được chi tiết
                   </div>

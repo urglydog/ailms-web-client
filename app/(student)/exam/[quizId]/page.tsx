@@ -699,30 +699,46 @@ export default function AntiCheatExamPage() {
           </div>
         </div>
         
-        {showReviewConfirm ? (
-          <div className="card p-8 col-span-3 max-w-2xl mx-auto w-full">
-            <h2 className="text-2xl font-bold mb-6 text-center">Xác nhận nộp bài</h2>
-            <div className="space-y-4 mb-8">
-              {attemptData?.questions.map((q, idx) => {
+        {showReviewConfirm ? (() => {
+          const reviewPerPage = 10;
+          const totalQ = attemptData?.questions.length || 0;
+          const totalReviewPages = Math.ceil(totalQ / reviewPerPage);
+          const reviewStart = (currentPage - 1) * reviewPerPage;
+          const reviewEnd = currentPage * reviewPerPage;
+          const answeredTotal = attemptData?.questions.filter(q => answers[q.id] && (answers[q.id]?.length || 0) > 0).length || 0;
+          return (
+          <div className="card p-5 max-w-2xl mx-auto w-full">
+            <h2 className="text-base font-bold mb-1 text-center">Xác nhận nộp bài</h2>
+            <p className="text-xs text-ink-muted text-center mb-3">Đã trả lời: <strong className={answeredTotal < totalQ ? 'text-red-600' : 'text-green-600'}>{answeredTotal}/{totalQ}</strong> câu</p>
+            <div className="space-y-1.5 mb-4">
+              {attemptData?.questions.slice(reviewStart, reviewEnd).map((q, idx) => {
                 const isAnswered = answers[q.id] && (answers[q.id]?.length || 0) > 0;
                 return (
-                  <div key={q.id} className={`p-4 border rounded-lg flex items-center justify-between ${isAnswered ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
-                    <span className="font-bold">Câu {idx + 1}</span>
-                    <span className="font-semibold">{isAnswered ? '✅ Đã ghi nhận câu trả lời' : '❌ Chưa ghi nhận câu trả lời'}</span>
+                  <div key={q.id} className={`py-2 px-3 border rounded flex items-center justify-between text-xs ${isAnswered ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
+                    <span className="font-bold">Câu {reviewStart + idx + 1}</span>
+                    <span className="font-semibold">{isAnswered ? '✅ Đã trả lời' : '❌ Chưa trả lời'}</span>
                   </div>
                 );
               })}
             </div>
-            <div className="flex flex-col gap-4 sticky bottom-0 bg-white pt-4 border-t border-line">
-              <button onClick={() => submitExam(false)} disabled={isSubmitting} className="w-full bg-accent text-white font-bold py-3 rounded-full hover:bg-accent-hover transition-colors shadow-lg">
+            {totalReviewPages > 1 && (
+              <div className="flex justify-between items-center mb-4">
+                <button disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)} className="px-3 py-1 border border-line rounded text-xs font-semibold disabled:opacity-50">Trước</button>
+                <span className="text-xs text-ink-muted">Trang {currentPage}/{totalReviewPages}</span>
+                <button disabled={currentPage === totalReviewPages} onClick={() => setCurrentPage(p => p + 1)} className="px-3 py-1 border border-line rounded text-xs font-semibold disabled:opacity-50">Sau</button>
+              </div>
+            )}
+            <div className="flex flex-col gap-2 pt-3 border-t border-line">
+              <button onClick={() => submitExam(false)} disabled={isSubmitting} className="w-full bg-accent text-white font-bold py-2.5 rounded-full hover:bg-accent-hover transition-colors shadow-lg text-sm">
                 {isSubmitting ? 'Đang nộp...' : 'Xác nhận nộp bài'}
               </button>
-              <button onClick={() => setShowReviewConfirm(false)} className="w-full text-ink-muted font-bold hover:text-ink pb-4">
+              <button onClick={() => setShowReviewConfirm(false)} className="w-full text-ink-muted font-semibold hover:text-ink text-xs py-1">
                 Quay lại bài thi
               </button>
             </div>
           </div>
-        ) : (
+          );
+        })() : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
     
           <div className="col-span-2 flex flex-col gap-6">
