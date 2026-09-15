@@ -64,6 +64,16 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
     },
   });
 
+  const deleteMaterialMutation = useMutation({
+    mutationFn: (id: number) => materialsApi.deleteMaterial(id),
+    onSuccess: () => {
+      toast.success('Đã xóa bộ học liệu thành công');
+      queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] });
+      setInspectGenerationId(null);
+    },
+    onError: (err: Error) => toast.error(err.message || 'Lỗi khi xóa học liệu'),
+  });
+
 
   if (isLoading) return <div className="p-6 text-center text-sm text-gray-500 animate-pulse">Đang tải danh sách học liệu Giảng viên...</div>;
 
@@ -83,6 +93,11 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
             toggleFlashcardMutation.mutate({ id: activeMat.materialId, isOfficial: !activeMat.isOfficial });
           } else if (activeMat.materialType === 'QUIZ') {
             setQuizOfficialMutation.mutate(activeMat.materialId);
+          }
+        }}
+        onDelete={() => {
+          if (confirm('Bạn chắc chắn muốn xóa TOÀN BỘ học liệu này? Mọi câu hỏi, thẻ học và dữ liệu làm bài liên quan sẽ bị xóa vĩnh viễn!')) {
+            deleteMaterialMutation.mutate(inspectGenerationId);
           }
         }}
       />
@@ -226,7 +241,18 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                     {mat.isOfficial ? '★ Đang là Official' : '☆ Đánh dấu Official'}
                   </button>
 
-
+                  {/* Xóa Bộ Học Liệu */}
+                  <button
+                    onClick={() => {
+                      if (confirm('Bạn chắc chắn muốn xóa TOÀN BỘ học liệu này?')) {
+                        deleteMaterialMutation.mutate(mat.id);
+                      }
+                    }}
+                    className="inline-flex items-center rounded-lg bg-red-50 border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-100 transition-all shadow-sm ml-1"
+                    title="Xóa Học Liệu"
+                  >
+                    Xóa
+                  </button>
                 </div>
               )}
               {mat.status !== 'COMPLETED' && (
@@ -256,12 +282,14 @@ function MaterialWorkspaceViewer({
   generationId,
   material,
   onBack,
-  onToggleOfficial
+  onToggleOfficial,
+  onDelete
 }: {
   generationId: number;
   material?: InstructorMaterial;
   onBack: () => void;
   onToggleOfficial: () => void;
+  onDelete?: () => void;
 }) {
   const { data: detail, isLoading } = useQuery<MaterialDetailRes>({
     queryKey: ['material-detail', generationId],
@@ -364,6 +392,15 @@ function MaterialWorkspaceViewer({
           >
             {material?.isOfficial ? '★ Đang là Official' : '☆ Phát hành làm Official'}
           </button>
+          {onDelete && (
+            <button
+              onClick={onDelete}
+              className="inline-flex items-center rounded-xl px-4 py-2 text-xs font-bold bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 transition-all ml-1 shadow-sm"
+              title="Xóa toàn bộ học liệu này"
+            >
+              Xóa Bộ Học Liệu
+            </button>
+          )}
           <button
             onClick={onBack}
             className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors ml-2"
