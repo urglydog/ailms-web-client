@@ -8,6 +8,7 @@ import { MermaidViewer } from '@/components/materials/MermaidViewer';
 import { QuizViewer } from '@/components/materials/QuizViewer';
 import { FlashcardViewer } from '@/components/materials/FlashcardViewer';
 import { FlashcardStudyMode } from '@/components/materials/FlashcardStudyMode';
+import { QuizPersonalEditor } from '@/components/materials/QuizPersonalEditor';
 import { ApiError } from '@/lib/api/client';
 
 export default function MaterialDetailPage() {
@@ -24,6 +25,7 @@ export default function MaterialDetailPage() {
   // Chỉ fetch dữ liệu khi id hợp lệ (id > 0)
   const { data: material, isLoading, error } = useMaterialDetail(id);
   const [flashcardMode, setFlashcardMode] = useState<'study' | 'browse'>('study');
+  const [quizMode, setQuizMode] = useState<'study' | 'browse'>('study');
 
   if (!id || isLoading) {
     return (
@@ -100,8 +102,31 @@ export default function MaterialDetailPage() {
           </div>
         ) : material.materialType === 'QUIZ' ? (
           <div className="py-4">
+            {!isOfficial && material.quizQuestions && material.quizQuestions.length > 0 && (
+              <div className="flex items-center gap-4 mb-6 border-b border-line pb-3">
+                <button
+                  onClick={() => setQuizMode('study')}
+                  className={`pb-2 text-sm font-bold border-b-2 transition-colors ${quizMode === 'study' ? 'border-accent text-accent' : 'border-transparent text-ink-muted hover:text-ink'
+                    }`}
+                >
+                  📖 Làm Bài (Study Mode)
+                </button>
+                <button
+                  onClick={() => setQuizMode('browse')}
+                  className={`pb-2 text-sm font-bold border-b-2 transition-colors ${quizMode === 'browse' ? 'border-accent text-accent' : 'border-transparent text-ink-muted hover:text-ink'
+                    }`}
+                >
+                  📋 Chỉnh Sửa Câu Hỏi (Edit Mode)
+                </button>
+              </div>
+            )}
+            
             {material.quizQuestions && material.quizQuestions.length > 0 ? (
-              <QuizViewer questions={material.quizQuestions} />
+              quizMode === 'study' || isOfficial ? (
+                <QuizViewer questions={material.quizQuestions} />
+              ) : (
+                <QuizPersonalEditor questions={material.quizQuestions} quizId={material.id} />
+              )
             ) : (
               <div className="card p-6 text-center text-ink-muted">
                 {material.status === 'COMPLETED' ? 'Bài trắc nghiệm này không có câu hỏi nào.' : 'Bài trắc nghiệm đang được AI xử lý, vui lòng quay lại sau...'}
