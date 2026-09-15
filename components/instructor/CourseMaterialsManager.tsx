@@ -30,6 +30,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
   const [genMaterialType, setGenMaterialType] = useState<'QUIZ' | 'FLASHCARD' | 'MINDMAP' | null>(null);
   const [manualMaterialType, setManualMaterialType] = useState<'QUIZ' | 'FLASHCARD' | 'MINDMAP' | null>(null);
   const [activeFilterTab, setActiveFilterTab] = useState<'ALL' | 'QUIZ' | 'FLASHCARD' | 'MINDMAP'>('ALL');
+  const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
 
   const { data: materials, isLoading } = useQuery({
     queryKey: ['instructor-materials', courseId],
@@ -70,6 +71,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
       toast.success('Đã xóa bộ học liệu thành công');
       queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] });
       setInspectGenerationId(null);
+      setConfirmDeleteId(null);
     },
     onError: (err: Error) => toast.error(err.message || 'Lỗi khi xóa học liệu'),
   });
@@ -96,9 +98,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
           }
         }}
         onDelete={() => {
-          if (confirm('Bạn chắc chắn muốn xóa TOÀN BỘ học liệu này? Mọi câu hỏi, thẻ học và dữ liệu làm bài liên quan sẽ bị xóa vĩnh viễn!')) {
-            deleteMaterialMutation.mutate(inspectGenerationId);
-          }
+          setConfirmDeleteId(inspectGenerationId);
         }}
       />
     );
@@ -244,9 +244,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                   {/* Xóa Bộ Học Liệu */}
                   <button
                     onClick={() => {
-                      if (confirm('Bạn chắc chắn muốn xóa TOÀN BỘ học liệu này?')) {
-                        deleteMaterialMutation.mutate(mat.id);
-                      }
+                      setConfirmDeleteId(mat.id);
                     }}
                     className="inline-flex items-center rounded-lg bg-red-50 border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-100 transition-all shadow-sm ml-1"
                     title="Xóa Học Liệu"
@@ -272,6 +270,47 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
         )}
 
       </div>
+
+      </div>
+
+      {/* Modal Xác Nhận Xóa */}
+      {confirmDeleteId && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in">
+          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden border border-red-100">
+            <div className="bg-red-50 p-6 border-b border-red-100 flex items-center gap-4">
+              <div className="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center flex-shrink-0 text-2xl">
+                ⚠️
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-red-950">Xóa Học Liệu</h3>
+                <p className="text-sm text-red-700 mt-1">Hành động này không thể hoàn tác.</p>
+              </div>
+            </div>
+            <div className="p-6">
+              <p className="text-gray-600 text-sm mb-6 leading-relaxed">
+                Bạn có chắc chắn muốn xóa TOÀN BỘ bộ học liệu này không? Mọi dữ liệu (câu hỏi, thẻ học, sơ đồ) và kết quả làm bài liên quan sẽ bị xóa vĩnh viễn.
+              </p>
+              <div className="flex items-center justify-end gap-3">
+                <button
+                  onClick={() => setConfirmDeleteId(null)}
+                  className="px-4 py-2 text-sm font-bold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors"
+                >
+                  Hủy bỏ
+                </button>
+                <button
+                  onClick={() => {
+                    deleteMaterialMutation.mutate(confirmDeleteId);
+                  }}
+                  disabled={deleteMaterialMutation.isPending}
+                  className="px-4 py-2 text-sm font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-md shadow-red-200 transition-all disabled:opacity-50"
+                >
+                  {deleteMaterialMutation.isPending ? 'Đang xóa...' : 'Xác nhận xóa'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

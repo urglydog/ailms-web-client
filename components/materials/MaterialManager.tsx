@@ -108,7 +108,7 @@ export function MaterialManager({ courseId }: { courseId: number }) {
     }
   };
 
-  const filteredOfficial = officialMaterials?.filter(m => m.isOfficial);
+  const filteredOfficial = officialMaterials || [];
   const activeTabParam = searchParams.get('subtab') as 'OFFICIAL' | 'PERSONAL' | null;
   const activeTab = activeTabParam === 'PERSONAL' ? 'PERSONAL' : 'OFFICIAL';
 
