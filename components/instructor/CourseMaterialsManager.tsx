@@ -927,7 +927,7 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
 
   useEffect(() => {
     if (languages && languages.length > 0 && !language) {
-      setLanguage(languages![0].code);
+      setLanguage(languages?.[0]?.code ?? '');
     }
   }, [languages, language]);
 
@@ -1388,7 +1388,7 @@ function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess 
 
   useEffect(() => {
     if (languages && languages.length > 0 && !language) {
-      setLanguage(languages![0].code);
+      setLanguage(languages?.[0]?.code ?? '');
     }
   }, [languages, language]);
 
