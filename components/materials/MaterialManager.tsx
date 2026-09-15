@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useCourseMaterials, useRequestMaterial, useAvailableLanguages, useCourseChapters, useRenameMaterial, useDeleteMaterial } from '@/hooks/useMaterials';
 import { materialsApi, type MaterialType, type ScopeType, type InstructorMaterial } from '@/lib/api/materials';
@@ -44,9 +44,11 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
   const [editTitle, setEditTitle] = useState('');
 
   // Auto-select first language if available
-  if (availableLanguages && availableLanguages.length > 0 && language === '') {
-    setLanguage(availableLanguages[0]!.code);
-  }
+  useEffect(() => {
+    if (availableLanguages && availableLanguages.length > 0 && language === '') {
+      setLanguage(availableLanguages[0]!.code);
+    }
+  }, [availableLanguages, language]);
 
   const handleRequest = () => {
     if (!language) {
@@ -106,7 +108,6 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
     });
   };
 
-  const filteredOfficial = officialMaterials || [];
   const activeTabParam = searchParams.get('subtab') as 'OFFICIAL' | 'PERSONAL' | null;
   const activeTab = activeTabParam === 'PERSONAL' ? 'PERSONAL' : 'OFFICIAL';
 
