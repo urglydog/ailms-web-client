@@ -271,8 +271,6 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
 
       </div>
 
-      </div>
-
       {/* Modal Xác Nhận Xóa */}
       {confirmDeleteId && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in">
