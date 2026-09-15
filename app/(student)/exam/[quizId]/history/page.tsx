@@ -150,7 +150,7 @@ function AttemptHistoryContent() {
                     
                       <div className="fixed bottom-24 right-8 z-50 bg-white p-4 rounded-xl shadow-2xl border border-line hidden md:block max-w-[280px]">
                         <h4 className="text-sm font-bold mb-3 text-center">Đến câu hỏi</h4>
-                        <div className="flex flex-wrap gap-2 justify-center max-h-[40vh] overflow-y-auto p-1">
+                        <div className="grid grid-cols-5 gap-2 max-h-[40vh] overflow-y-auto p-1">
                           {attemptDetail.details.map((q, idx) => {
                             const isCorrect = q.isCorrect;
                             return (

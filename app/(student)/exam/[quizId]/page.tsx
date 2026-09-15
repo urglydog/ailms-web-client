@@ -796,7 +796,8 @@ export default function AntiCheatExamPage() {
             )}
           </div>
 
-          <div className="col-span-1 flex flex-col gap-4 sticky top-4 self-start" style={{ maxHeight: "calc(100vh - 2rem)", overflowY: "auto" }}>
+          <div className="col-span-1">
+            <div className="fixed top-24 right-8 w-[280px] flex flex-col gap-3" style={{ maxHeight: "calc(100vh - 7rem)", overflowY: "auto" }}>
             {isProctored && (
               <div className="card overflow-hidden">
                 <div className={`text-white text-xs font-bold p-2 text-center transition-colors ${faceStatus === 'DETECTING' ? 'bg-amber-500' :
@@ -827,21 +828,41 @@ export default function AntiCheatExamPage() {
               </div>
             )}
 
-<button
+            <button
               onClick={() => handleFirstSubmitClick()}
               disabled={isSubmitting}
-              className="bg-ink text-white font-bold py-3 rounded-xl hover:opacity-90 disabled:opacity-50 mt-4 shadow-lg"
+              className="bg-ink text-white font-bold py-3 rounded-xl hover:opacity-90 disabled:opacity-50 shadow-lg w-full"
             >
               {isSubmitting ? 'Đang nộp...' : 'Nộp bài thi'}
             </button>
 
-
-
-            
-
-
-
-            
+            <div className="card p-3">
+              <div className="grid grid-cols-5 gap-2">
+                {attemptData?.questions.map((q, idx) => {
+                  const isAnswered = answers[q.id] && (answers[q.id]?.length || 0) > 0;
+                  const isFlagged = flagged[q.id];
+                  const pageOfQuestion = Math.ceil((idx + 1) / questionsPerPage);
+                  return (
+                    <button
+                      key={q.id}
+                      onClick={() => {
+                        setCurrentPage(pageOfQuestion);
+                        setTimeout(() => document.getElementById(`question-${q.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+                      }}
+                      className={`flex flex-col h-9 w-full rounded overflow-hidden text-[10px] font-bold border transition-colors relative ${currentPage === pageOfQuestion && !isAnswered ? 'ring-2 ring-accent/50' : 'border-line'} hover:opacity-80`}
+                    >
+                      <div className="h-[70%] w-full flex items-center justify-center bg-surface text-ink border-b border-line/50">
+                        {idx + 1}
+                      </div>
+                      <div className={`h-[30%] w-full ${isAnswered ? 'bg-green-500' : 'bg-red-500'}`}>
+                      </div>
+                      {isFlagged && <span className="absolute -top-1 -right-1 text-[10px] z-10">🚩</span>}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+            </div>
           </div>
         </div>
         )}
