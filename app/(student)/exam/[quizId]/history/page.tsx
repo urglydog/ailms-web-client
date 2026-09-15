@@ -192,9 +192,11 @@ function AttemptHistoryContent() {
                           <button
                             key={q.questionId}
                             onClick={() => {
-                              document.getElementById(`question-${q.questionId}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                              const pageOfQuestion = Math.ceil((idx + 1) / historyPerPage);
+                              setHistoryPage(pageOfQuestion);
+                              setTimeout(() => document.getElementById(`question-${q.questionId}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
                             }}
-                            className="flex flex-col h-9 w-full rounded overflow-hidden text-[10px] font-bold border transition-colors border-line hover:opacity-80"
+                            className={`flex flex-col h-9 w-full rounded overflow-hidden text-[10px] font-bold border transition-colors ${historyPage === Math.ceil((idx + 1) / historyPerPage) ? 'ring-2 ring-accent/50' : 'border-line'} hover:opacity-80`}
                           >
                             <div className="h-[70%] w-full flex items-center justify-center bg-surface text-ink border-b border-line/50">
                               {idx + 1}
