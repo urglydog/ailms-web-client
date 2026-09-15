@@ -49,6 +49,8 @@ export interface InstructorMaterial {
   attemptCount?: number;
   isProctored?: boolean;
   maxViolations?: number | null;
+  lessonId?: number;
+  quizType?: 'LECTURE_QUIZ' | 'OFFICIAL_EXAM';
 }
 
 
@@ -137,6 +139,9 @@ export const materialsApi = {
     
   setQuizOfficial: (id: number) =>
     api.put(`/api/v1/instructor/quizzes/${id}/set-official`, undefined, { token: authToken() }),
+    
+  attachMaterialToLesson: (id: number, lessonId: number | null) =>
+    api.put(`/api/v1/instructor/materials/${id}/attach-lesson`, { lessonId }, { token: authToken() }),
     
   updateQuizSettings: (id: number, req: Record<string, unknown>) =>
     api.put(`/api/v1/instructor/quizzes/${id}/settings`, req, { token: authToken() }),

@@ -2,6 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { materialsApi, InstructorMaterial, MaterialDetailRes } from '@/lib/api/materials';
+import { useCourseChapters } from '@/hooks/useMaterials';
 import { toast } from 'sonner';
 import React, { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -38,6 +39,10 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
     enabled: !!courseId,
   });
 
+  const { data: chapters } = useCourseChapters(courseId);
+
+  const flatLessons = chapters?.flatMap(c => c.lessons) || [];
+
 
   const toggleMindmapMutation = useMutation({
     mutationFn: (variables: { id: number; isOfficial: boolean }) =>
@@ -63,6 +68,16 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
       toast.success('Đã phát hành bài Quiz thành Official');
       queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] });
     },
+  });
+
+  const attachLessonMutation = useMutation({
+    mutationFn: (variables: { id: number; lessonId: number | null }) => 
+      materialsApi.attachMaterialToLesson(variables.id, variables.lessonId),
+    onSuccess: () => {
+      toast.success('Đã cập nhật bài học đính kèm');
+      queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] });
+    },
+    onError: (err: Error) => toast.error(err.message || 'Lỗi cập nhật bài học đính kèm')
   });
 
   const deleteMaterialMutation = useMutation({
@@ -240,6 +255,27 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                   >
                     {mat.isOfficial ? '★ Đang là Official' : '☆ Đánh dấu Official'}
                   </button>
+
+                  {/* Đính kèm vào bài học (chỉ hiện khi đã Official) */}
+                  {mat.isOfficial && flatLessons.length > 0 && (
+                    <select
+                      className="ml-2 rounded-lg border border-gray-300 px-2 py-1.5 text-xs font-semibold text-gray-700 bg-white focus:border-indigo-500 focus:outline-none"
+                      value={mat.lessonId || ''}
+                      onChange={(e) => {
+                        attachLessonMutation.mutate({
+                          id: mat.id,
+                          lessonId: e.target.value ? Number(e.target.value) : null
+                        });
+                      }}
+                    >
+                      <option value="">[Cấp Khóa học] Không đính kèm</option>
+                      {flatLessons.map(l => (
+                        <option key={l.id} value={l.id}>
+                          Bài học: {l.title}
+                        </option>
+                      ))}
+                    </select>
+                  )}
 
                   {/* Xóa Bộ Học Liệu */}
                   <button
@@ -1585,6 +1621,7 @@ function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess 
   const [materialType, setMaterialType] = useState<'QUIZ' | 'FLASHCARD' | 'MINDMAP'>(initialType);
   const [title, setTitle] = useState('');
   const [language, setLanguage] = useState<string>('');
+  const [quizType, setQuizType] = useState<'OFFICIAL_EXAM' | 'LECTURE_QUIZ'>('OFFICIAL_EXAM');
 
   const { data: languages } = useQuery({
     queryKey: ['available-languages', courseId],
@@ -1598,7 +1635,7 @@ function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess 
   }, [languages, language]);
 
   const generateManualMutation = useMutation({
-    mutationFn: (input: { materialType: string; language: string; title: string }) => materialsApi.createManualMaterial(courseId, input),
+    mutationFn: (input: { materialType: string; language: string; title: string; quizType?: string }) => materialsApi.createManualMaterial(courseId, input),
     onSuccess: (data) => {
       toast.success('Đã khởi tạo học liệu trống thành công!');
       onSuccess(data.id);
@@ -1622,6 +1659,7 @@ function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess 
       materialType,
       language,
       title: title.trim(),
+      ...(materialType === 'QUIZ' ? { quizType } : {})
     });
   };
 
@@ -1685,6 +1723,28 @@ function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess 
               onChange={setLanguage}
             />
           </label>
+
+          {materialType === 'QUIZ' && (
+            <div className="flex flex-col gap-2 pt-2">
+              <span className="text-sm font-semibold text-gray-700">Loại bài thi</span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <label className={`cursor-pointer flex items-start gap-3 p-3 rounded-xl border-2 transition-all ${quizType === 'LECTURE_QUIZ' ? 'border-emerald-500 bg-emerald-50' : 'border-gray-200 bg-white hover:border-emerald-200'}`}>
+                  <input type="radio" name="quizType" value="LECTURE_QUIZ" checked={quizType === 'LECTURE_QUIZ'} onChange={() => setQuizType('LECTURE_QUIZ')} className="mt-1" />
+                  <div className="flex flex-col">
+                    <span className="font-bold text-gray-900 text-sm">Kiểm tra nhanh (Quick Check)</span>
+                    <span className="text-xs text-gray-500">Đính kèm vào bài học. Làm nhanh lấy kết quả ngay, không giám sát, không tính điểm.</span>
+                  </div>
+                </label>
+                <label className={`cursor-pointer flex items-start gap-3 p-3 rounded-xl border-2 transition-all ${quizType === 'OFFICIAL_EXAM' ? 'border-emerald-500 bg-emerald-50' : 'border-gray-200 bg-white hover:border-emerald-200'}`}>
+                  <input type="radio" name="quizType" value="OFFICIAL_EXAM" checked={quizType === 'OFFICIAL_EXAM'} onChange={() => setQuizType('OFFICIAL_EXAM')} className="mt-1" />
+                  <div className="flex flex-col">
+                    <span className="font-bold text-gray-900 text-sm">Thi chính thức (Official Exam)</span>
+                    <span className="text-xs text-gray-500">Dành cho kỳ thi. Bật camera giám sát, tính giờ, tính điểm vào hồ sơ.</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+          )}
           
           <div className="mt-4 flex justify-end gap-3 border-t pt-5">
             <button type="button" onClick={onClose} className="rounded-xl px-5 py-2.5 text-sm font-bold text-gray-600 hover:bg-gray-200 transition-colors">
