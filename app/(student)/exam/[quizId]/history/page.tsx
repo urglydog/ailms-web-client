@@ -179,10 +179,10 @@ function AttemptHistoryContent() {
               )}
             </div>
 
-            {/* Matrix column - fixed sidebar, takes 1/3 */}
+            {/* Matrix column - sticky sidebar, takes 1/3 */}
             <div className="md:col-span-1">
               {attemptDetail && (
-                <div className="fixed top-24 right-8 w-[280px] flex flex-col gap-3" style={{ maxHeight: "calc(100vh - 7rem)", overflowY: "auto" }}>
+                <div className="sticky top-24 w-full flex flex-col gap-3" style={{ maxHeight: "calc(100vh - 7rem)", overflowY: "auto" }}>
                   <div className="card p-3 shadow-lg border border-line">
                     <h4 className="text-xs font-bold mb-2 text-center text-ink-muted">Ma trận kết quả</h4>
                     <div className="grid grid-cols-5 gap-2">
