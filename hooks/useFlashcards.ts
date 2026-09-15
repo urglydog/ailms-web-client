@@ -59,3 +59,19 @@ export const useAddFlashcard = () => {
     },
   });
 };
+
+export const useDeleteFlashcard = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (flashcardId: number) => flashcardsApi.deleteFlashcard(flashcardId),
+    onSuccess: () => {
+      toast.success('Đã xóa flashcard!');
+      queryClient.invalidateQueries({ queryKey: ['materials', 'detail'] });
+      queryClient.invalidateQueries({ queryKey: ['deck-study-cards'] });
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Lỗi khi xóa flashcard');
+    },
+  });
+};

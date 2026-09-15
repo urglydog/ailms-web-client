@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useUpdateFlashcard, useAddFlashcard } from '@/hooks/useFlashcards';
+import { useUpdateFlashcard, useAddFlashcard, useDeleteFlashcard } from '@/hooks/useFlashcards';
 import { toast } from 'sonner';
 
 /** Map mã ngôn ngữ backend → BCP-47 tag cho Web Speech API */
@@ -37,8 +37,21 @@ export function FlashcardViewer({ flashcards, language, deckId, readOnly = false
   const [isFlipped, setIsFlipped] = useState(false);
   const { mutate: updateCard } = useUpdateFlashcard();
   const { mutate: addCard } = useAddFlashcard();
+  const { mutate: deleteCard } = useDeleteFlashcard();
   const [editMode, setEditMode] = useState<{ id: number; front: string; back: string } | null>(null);
   const [addMode, setAddMode] = useState<{ front: string; back: string } | null>(null);
+
+  const handleDelete = (id: number) => {
+    if (window.confirm('Bạn có chắc chắn muốn xóa thẻ này?')) {
+      deleteCard(id, {
+        onSuccess: () => {
+          if (currentIdx >= flashcards.length - 1) {
+            setCurrentIdx(Math.max(0, currentIdx - 1));
+          }
+        }
+      });
+    }
+  };
 
   const handleEditSave = () => {
     if (!editMode) return;
@@ -228,6 +241,12 @@ export function FlashcardViewer({ flashcards, language, deckId, readOnly = false
                 className="text-green-600 hover:underline flex items-center gap-1"
               >
                 ➕ Thêm thẻ mới
+              </button>
+              <button
+                onClick={() => handleDelete(card.id)}
+                className="text-red-500 hover:underline flex items-center gap-1"
+              >
+                🗑️ Xóa thẻ này
               </button>
             </>
           )}

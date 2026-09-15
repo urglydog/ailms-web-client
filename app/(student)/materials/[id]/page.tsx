@@ -111,12 +111,10 @@ export default function MaterialDetailPage() {
         ) : material.materialType === 'FLASHCARD' ? (
           <div className="py-4">
             {material.flashcards && material.flashcards.length > 0 ? (
-              isOfficial ? (
-                <FlashcardViewer flashcards={material.flashcards} language={material.language} deckId={material.id} readOnly={true} />
-              ) : (
-                <>
-                  {/* Mode toggle */}
-                  <div className="flex items-center gap-4 mb-6 border-b border-line pb-3">
+              <>
+                {/* Mode toggle & Export */}
+                <div className="flex items-center justify-between mb-6 border-b border-line pb-3">
+                  <div className="flex items-center gap-4">
                     <button
                       onClick={() => setFlashcardMode('study')}
                       className={`pb-2 text-sm font-bold border-b-2 transition-colors ${flashcardMode === 'study' ? 'border-accent text-accent' : 'border-transparent text-ink-muted hover:text-ink'
@@ -132,28 +130,44 @@ export default function MaterialDetailPage() {
                       📋 Duyệt tất cả (Browse)
                     </button>
                   </div>
+                  <button
+                    onClick={() => {
+                      if (!material?.flashcards) return;
+                      const content = material.flashcards.map(c => `${c.frontText.replace(/\t/g, ' ')}\t${c.backText.replace(/\n/g, ' ')}`).join('\n');
+                      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = `flashcards_${material.id}.txt`;
+                      a.click();
+                      URL.revokeObjectURL(url);
+                    }}
+                    className="text-sm font-semibold text-accent hover:underline flex items-center gap-1"
+                  >
+                    📥 Xuất ra file Anki/Quizlet
+                  </button>
+                </div>
 
-                  {flashcardMode === 'study' ? (
-                    <FlashcardStudyMode
-                      deckName={material.title || 'Bộ thẻ Flashcard'}
-                      cards={material.flashcards.map(c => ({
-                        id: c.id,
-                        frontText: c.frontText,
-                        backText: c.backText,
-                        nextReviewAt: c.nextReviewAt || null,
-                        intervalDays: c.intervalDays,
-                        repetitions: c.repetitions,
-                        easiness: c.easiness,
-                        isDue: c.isDue,
-                      }))}
-                      language={material.language}
-                      onFinish={() => router.back()}
-                    />
-                  ) : (
-                    <FlashcardViewer flashcards={material.flashcards} language={material.language} deckId={material.id} readOnly={false} />
-                  )}
-                </>
-              )
+                {flashcardMode === 'study' ? (
+                  <FlashcardStudyMode
+                    deckName={material.title || 'Bộ thẻ Flashcard'}
+                    cards={material.flashcards.map(c => ({
+                      id: c.id,
+                      frontText: c.frontText,
+                      backText: c.backText,
+                      nextReviewAt: c.nextReviewAt || null,
+                      intervalDays: c.intervalDays,
+                      repetitions: c.repetitions,
+                      easiness: c.easiness,
+                      isDue: c.isDue,
+                    }))}
+                    language={material.language}
+                    onFinish={() => router.back()}
+                  />
+                ) : (
+                  <FlashcardViewer flashcards={material.flashcards} language={material.language} deckId={material.id} readOnly={isOfficial} />
+                )}
+              </>
             ) : (
               <div className="card p-6 text-center text-ink-muted">
                 {material.status === 'COMPLETED' ? 'Bộ flashcard này không có thẻ nào.' : 'Bộ flashcard đang được AI xử lý, vui lòng quay lại sau...'}
