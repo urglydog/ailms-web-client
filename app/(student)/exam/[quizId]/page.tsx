@@ -831,7 +831,7 @@ export default function AntiCheatExamPage() {
           </div>
 
           <div className="col-span-1">
-            <div className="fixed top-24 right-8 w-[280px] flex flex-col gap-3" style={{ maxHeight: "calc(100vh - 7rem)", overflowY: "auto" }}>
+            <div className="sticky top-24 w-full flex flex-col gap-3" style={{ maxHeight: "calc(100vh - 7rem)", overflowY: "auto" }}>
             {isProctored && (
               <div className="card overflow-hidden">
                 <div className={`text-white text-xs font-bold p-2 text-center transition-colors ${faceStatus === 'DETECTING' ? 'bg-amber-500' :
