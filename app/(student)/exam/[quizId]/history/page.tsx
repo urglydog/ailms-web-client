@@ -25,162 +25,174 @@ function AttemptHistoryContent() {
 
   if (!quizId) return <div className="p-8 text-center">Mã bài thi không hợp lệ</div>;
 
+  const formatDate = (d: string | number[]) => {
+    if (Array.isArray(d)) {
+      return new Date(d[0] || 0, (d[1] || 1) - 1, d[2] || 1, d[3] || 0, d[4] || 0, d[5] || 0).toLocaleDateString('vi-VN');
+    }
+    return new Date(d).toLocaleDateString('vi-VN');
+  };
+
+  // Find current attempt info from history
+  const currentAttempt = history?.find(h => h.id === selectedAttemptId);
+  const currentAttemptIndex = history ? history.length - (history.findIndex(h => h.id === selectedAttemptId)) : 0;
+
   return (
-    <div className="min-h-dvh bg-surface p-8">
-      <div className="max-w-4xl mx-auto space-y-6">
-        <div className="flex items-center justify-between border-b border-line pb-4 mb-6">
-          <h1 className="text-2xl font-bold">Lịch sử làm bài thi</h1>
-          <button onClick={() => router.back()} className="text-sm font-semibold text-accent hover:underline">
-            ← Quay lại
-          </button>
+    <div className="min-h-dvh bg-surface p-4 md:p-6">
+      <div className="max-w-5xl mx-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-line pb-3 mb-4">
+          <div>
+            <h1 className="text-lg font-bold">Lịch sử làm bài thi</h1>
+            {currentAttempt && (
+              <p className="text-xs text-ink-muted mt-0.5">
+                Lần {currentAttemptIndex} · {formatDate(currentAttempt.submittedAt)} · Điểm: <strong className="text-accent">{Number(currentAttempt.score).toFixed(2).replace(/\.?0+$/, '')}/10</strong> · Đúng: {currentAttempt.correctCount}/{currentAttempt.totalQuestions} câu
+              </p>
+            )}
+          </div>
+          <div className="flex items-center gap-3">
+            {/* Attempt selector dropdown */}
+            {history && history.length > 1 && (
+              <select
+                value={selectedAttemptId || ''}
+                onChange={e => setSelectedAttemptId(Number(e.target.value))}
+                className="text-xs border border-line rounded-lg px-3 py-1.5 bg-white font-semibold focus:outline-none focus:ring-2 focus:ring-accent/30"
+              >
+                {history.map((h, idx) => (
+                  <option key={h.id} value={h.id}>
+                    Lần {history.length - idx} — {Number(h.score).toFixed(1)}/10 ({h.correctCount}/{h.totalQuestions} câu)
+                  </option>
+                ))}
+              </select>
+            )}
+            <button onClick={() => router.back()} className="text-xs font-semibold text-accent hover:underline whitespace-nowrap">
+              ← Quay lại
+            </button>
+          </div>
         </div>
 
         {historyError ? (
-          <div className="bg-red-50 text-red-600 p-4 rounded-md">
+          <div className="bg-red-50 text-red-600 p-4 rounded-md text-sm">
             {historyError instanceof ApiError ? historyError.message : 'Có lỗi xảy ra khi tải lịch sử'}
           </div>
         ) : isLoadingHistory ? (
-          <div className="text-center text-ink-muted py-8">Đang tải lịch sử...</div>
+          <div className="text-center text-ink-muted py-8 text-sm">Đang tải lịch sử...</div>
         ) : !history || history.length === 0 ? (
-          <div className="text-center text-ink-muted py-8 bg-white border border-line rounded-md shadow-sm">
+          <div className="text-center text-ink-muted py-8 bg-white border border-line rounded-md shadow-sm text-sm">
             Bạn chưa có lượt làm bài nào cho bài thi này.
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="md:col-span-1 space-y-4">
-              <h2 className="font-bold text-lg">Các lần thử</h2>
-              {history.map((h, idx) => (
-                <div 
-                  key={h.id} 
-                  onClick={() => setSelectedAttemptId(h.id)}
-                  className={`p-4 rounded-lg border cursor-pointer transition-colors ${
-                    selectedAttemptId === h.id 
-                      ? 'bg-accent/5 border-accent/20 shadow-sm ring-1 ring-accent' 
-                      : 'bg-white border-line hover:bg-surface-hover'
-                  }`}
-                >
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="font-bold text-sm">Lần {history.length - idx}</span>
-                    <span className="text-xs text-ink-muted">
-                      {(() => {
-                        const d = h.submittedAt;
-                        if (Array.isArray(d)) {
-                          return new Date(d[0] || 0, (d[1] || 1) - 1, d[2] || 1, d[3] || 0, d[4] || 0, d[5] || 0).toLocaleDateString('vi-VN');
-                        }
-                        return new Date(d).toLocaleDateString('vi-VN');
-                      })()}
-                    </span>
-                  </div>
-                  <div className="text-xl font-bold text-accent">
-                    {h.score.toFixed(1)} / 10
-                  </div>
-                  <div className="text-xs text-ink-muted mt-1">
-                    Đúng: {h.correctCount}/{h.totalQuestions} câu
-                  </div>
-                </div>
-              ))}
-            </div>
-
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Questions column - takes 2/3 */}
             <div className="md:col-span-2">
               {selectedAttemptId ? (
                 isLoadingDetail ? (
-                  <div className="bg-white border border-line rounded-lg p-8 text-center shadow-sm">
+                  <div className="bg-white border border-line rounded-lg p-8 text-center shadow-sm text-sm">
                     Đang tải chi tiết bài làm...
                   </div>
                 ) : attemptDetail ? (
-                  <div className="bg-white border border-line rounded-lg shadow-sm overflow-hidden">
-                    <div className="bg-surface border-b border-line p-4">
-                      <h2 className="font-bold text-lg">Chi tiết bài làm</h2>
-                      <p className="text-sm text-ink-muted">Điểm số: <strong className="text-accent">{Number(attemptDetail.score).toFixed(2).replace(/\.?0+$/, '')}</strong></p>
-                    </div>
-                    
-                    <div className="p-6 space-y-8">
-                      {attemptDetail.details.map((q, qIdx) => (
-                        <div key={q.questionId} id={`question-${q.questionId}`} className="space-y-3 pt-4">
-                          <h3 className="font-bold text-sm flex gap-2">
-                            <span className="w-6 h-6 flex-shrink-0 bg-line-soft rounded-full flex items-center justify-center text-xs">
+                  <div className="space-y-3">
+                    {attemptDetail.details.map((q, qIdx) => {
+                      const hasAnswer = q.selectedOptionIds && q.selectedOptionIds.length > 0;
+                      const showCorrectness = q.correctOptionIds && q.correctOptionIds.length > 0;
+                      // Border: green if correct, red if wrong or unanswered
+                      const cardBorder = q.isCorrect ? 'border-green-400 bg-green-50/30' : 'border-red-400 bg-red-50/30';
+
+                      return (
+                        <div key={q.questionId} id={`question-${q.questionId}`} className={`border-2 rounded-lg p-4 ${cardBorder}`}>
+                          <h3 className="font-bold text-xs flex items-center gap-2 mb-2">
+                            <span className={`w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center text-[10px] text-white font-bold ${q.isCorrect ? 'bg-green-500' : 'bg-red-500'}`}>
                               {qIdx + 1}
                             </span>
-                            {q.content}
+                            <span className="text-ink">{q.content}</span>
+                            {q.isCorrect
+                              ? <span className="ml-auto text-green-600 text-[10px] font-bold whitespace-nowrap">✓ Đúng</span>
+                              : hasAnswer
+                                ? <span className="ml-auto text-red-600 text-[10px] font-bold whitespace-nowrap">✗ Sai</span>
+                                : <span className="ml-auto text-red-600 text-[10px] font-bold whitespace-nowrap">— Bỏ trống</span>
+                            }
                           </h3>
-                          
-                          <div className="ml-8 space-y-2">
+
+                          <div className="ml-7 space-y-1.5">
                             {q.options.map(opt => {
                               const isSelected = q.selectedOptionIds?.includes(opt.id);
-                              const isCorrectAnswer = q.correctOptionIds?.includes(opt.id);
-                              // Chế độ cho phép xem lại: correctOptionId != null
-                              const showCorrectness = q.correctOptionIds && q.correctOptionIds.length > 0;
-                              
-                              let bgClass = "bg-white border-line";
-                              let textClass = "text-ink-muted";
-                              let icon = null;
+                              const isCorrectAnswer = showCorrectness && q.correctOptionIds?.includes(opt.id);
+
+                              let optClass = "bg-white border-line text-ink-muted";
+                              let icon: string | null = null;
 
                               if (showCorrectness) {
                                 if (isCorrectAnswer && isSelected) {
-                                  bgClass = "bg-green-50 border-green-200";
-                                  textClass = "text-green-800 font-medium";
+                                  // Picked correct
+                                  optClass = "bg-green-50 border-green-300 text-green-800 font-medium";
                                   icon = "✓";
                                 } else if (isCorrectAnswer) {
-                                  bgClass = "bg-green-50 border-green-200 border-dashed";
-                                  textClass = "text-green-700";
-                                  icon = "✓ (Đáp án đúng)";
+                                  // Correct but not picked
+                                  optClass = "bg-green-50 border-green-300 border-dashed text-green-700";
+                                  icon = "✓";
                                 } else if (isSelected) {
-                                  bgClass = "bg-red-50 border-red-200";
-                                  textClass = "text-red-800 font-medium";
-                                  icon = "✗ (Bạn chọn)";
+                                  // Picked wrong
+                                  optClass = "bg-red-50 border-red-300 text-red-800 font-medium";
+                                  icon = "✗";
                                 }
                               } else {
                                 if (isSelected) {
-                                  bgClass = "bg-accent/5 border-accent/20";
-                                  textClass = "text-accent-dark font-medium";
-                                  icon = "(Bạn chọn)";
+                                  optClass = "bg-accent/5 border-accent/20 text-accent-dark font-medium";
+                                  icon = "—";
                                 }
                               }
 
                               return (
-                                <div key={opt.id} className={`p-3 text-sm border rounded-md flex justify-between items-center ${bgClass} ${textClass}`}>
+                                <div key={opt.id} className={`py-2 px-3 text-xs border rounded flex justify-between items-center ${optClass}`}>
                                   <span>{opt.content}</span>
-                                  {icon && <span className="text-xs font-bold">{icon}</span>}
+                                  {icon && <span className="text-[10px] font-bold ml-2">{icon}</span>}
                                 </div>
                               );
                             })}
                           </div>
                         </div>
-                      ))}
-                    
-                      <div className="fixed bottom-24 right-8 z-50 bg-white p-4 rounded-xl shadow-2xl border border-line hidden md:block max-w-[280px]">
-                        <h4 className="text-sm font-bold mb-3 text-center">Đến câu hỏi</h4>
-                        <div className="grid grid-cols-5 gap-2 max-h-[40vh] overflow-y-auto p-1">
-                          {attemptDetail.details.map((q, idx) => {
-                            const isCorrect = q.isCorrect;
-                            return (
-                              <button
-                                key={q.questionId}
-                                onClick={() => {
-                                  document.getElementById(`question-${q.questionId}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                }}
-                                className="flex flex-col h-9 w-8 rounded overflow-hidden text-[10px] font-bold border transition-colors border-line hover:opacity-80 shadow-sm"
-                              >
-                                <div className="h-[70%] w-full flex items-center justify-center bg-surface text-ink border-b border-line/50">
-                                  {idx + 1}
-                                </div>
-                                <div className={`h-[30%] w-full ${isCorrect ? 'bg-green-500' : 'bg-red-500'}`}>
-                                </div>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-</div>
+                      );
+                    })}
                   </div>
                 ) : (
-                  <div className="bg-white border border-line rounded-lg p-8 text-center text-red-500 shadow-sm">
+                  <div className="bg-white border border-line rounded-lg p-8 text-center text-red-500 shadow-sm text-sm">
                     Không tải được chi tiết
                   </div>
                 )
               ) : (
-                <div className="bg-surface border border-line border-dashed rounded-lg p-12 text-center text-ink-muted flex flex-col items-center justify-center h-full min-h-[300px]">
-                  <p>Chọn một lần làm bài ở cột bên trái để xem chi tiết</p>
+                <div className="bg-surface border border-line border-dashed rounded-lg p-12 text-center text-ink-muted flex flex-col items-center justify-center h-full min-h-[300px] text-sm">
+                  <p>Chọn một lần làm bài để xem chi tiết</p>
+                </div>
+              )}
+            </div>
+
+            {/* Matrix column - fixed sidebar, takes 1/3 */}
+            <div className="md:col-span-1">
+              {attemptDetail && (
+                <div className="fixed top-24 right-8 w-[280px] flex flex-col gap-3" style={{ maxHeight: "calc(100vh - 7rem)", overflowY: "auto" }}>
+                  <div className="card p-3 shadow-lg border border-line">
+                    <h4 className="text-xs font-bold mb-2 text-center text-ink-muted">Ma trận kết quả</h4>
+                    <div className="grid grid-cols-5 gap-2">
+                      {attemptDetail.details.map((q, idx) => {
+                        const isCorrect = q.isCorrect;
+                        return (
+                          <button
+                            key={q.questionId}
+                            onClick={() => {
+                              document.getElementById(`question-${q.questionId}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            }}
+                            className="flex flex-col h-9 w-full rounded overflow-hidden text-[10px] font-bold border transition-colors border-line hover:opacity-80"
+                          >
+                            <div className="h-[70%] w-full flex items-center justify-center bg-surface text-ink border-b border-line/50">
+                              {idx + 1}
+                            </div>
+                            <div className={`h-[30%] w-full flex items-center justify-center text-white text-[8px] ${isCorrect ? 'bg-green-500' : 'bg-red-500'}`}>
+                              {isCorrect ? '✓' : '✗'}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
