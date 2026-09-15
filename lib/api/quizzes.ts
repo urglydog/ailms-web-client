@@ -19,6 +19,20 @@ export interface QuestionDto {
   options: OptionDto[];
 }
 
+export interface UpdateQuestionReq {
+  content?: string;
+  displayOrder?: number;
+  isMultipleChoice?: boolean;
+  options?: Omit<OptionDto, 'id'>[];
+}
+
+export interface AddQuestionReq {
+  content: string;
+  displayOrder: number;
+  isMultipleChoice?: boolean;
+  options: Omit<OptionDto, 'id'>[];
+}
+
 export interface StartRes {
   attemptId: number;
   quizId: number;
@@ -94,11 +108,11 @@ export const quizApi = {
     return api.post<ExplainRes>(`/api/v1/quizzes/tutor/explain`, data, { token: authToken() });
   },
 
-  updateQuestion: (questionId: number, data: any) => {
+  updateQuestion: (questionId: number, data: UpdateQuestionReq) => {
     return api.put(`/api/v1/quizzes/questions/${questionId}`, data, { token: authToken() });
   },
 
-  addQuestion: (quizId: number, data: any) => {
+  addQuestion: (quizId: number, data: AddQuestionReq) => {
     return api.post(`/api/v1/quizzes/${quizId}/questions`, data, { token: authToken() });
   },
 
