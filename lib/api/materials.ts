@@ -87,6 +87,7 @@ export interface MaterialDetailRes extends MaterialGenerationRes {
   quizQuestions?: {
     id: number;
     content: string;
+    isMultipleChoice?: boolean;
     displayOrder: number;
     options: {
       id: number;

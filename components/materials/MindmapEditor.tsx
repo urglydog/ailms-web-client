@@ -625,12 +625,12 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
               isBold: selectedNode.data.isBold,
               isItalic: selectedNode.data.isItalic
           },
-          selected: true,
+          selected: false,
           style: { ...selectedNode.style }
       };
 
       if (action === 'TAB') {
-        const nextNodes = [...nodes.map(n => ({...n, selected: false})), newNode];
+        const nextNodes = [...nodes, newNode];
         const newEdge: Edge = { id: `e-${selectedNode.id}-${newId}`, source: selectedNode.id, target: newId, animated: true };
         setNodes(nextNodes);
         setEdges(eds => {
@@ -644,7 +644,7 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
         if (selectedNode.id === 'root') return; // root cannot have sibling
         const parentEdge = edges.find(ed => ed.target === selectedNode.id);
         
-        const nextNodes = [...nodes.map(n => ({...n, selected: false})), newNode];
+        const nextNodes = [...nodes, newNode];
         setNodes(nextNodes);
         
         if (parentEdge) {
