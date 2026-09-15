@@ -15,6 +15,7 @@ export interface QuestionDto {
   id: number;
   content: string;
   displayOrder: number;
+  isMultipleChoice?: boolean;
   options: OptionDto[];
 }
 
@@ -29,14 +30,14 @@ export interface StartRes {
 }
 
 export interface SubmitReq {
-  answers: Record<number, number>;
+  answers: Record<number, number[]>;
 }
 
 export interface AnswerDetailDto {
   questionId: number;
   content: string;
-  selectedOptionId: number | null;
-  correctOptionId: number | null;
+  selectedOptionIds: number[];
+  correctOptionIds: number[];
   isCorrect: boolean;
   options: OptionDto[];
 }
