@@ -42,15 +42,13 @@ export function FlashcardViewer({ flashcards, language, deckId, readOnly = false
   const [addMode, setAddMode] = useState<{ front: string; back: string } | null>(null);
 
   const handleDelete = (id: number) => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa thẻ này?')) {
-      deleteCard(id, {
-        onSuccess: () => {
-          if (currentIdx >= flashcards.length - 1) {
-            setCurrentIdx(Math.max(0, currentIdx - 1));
-          }
+    deleteCard(id, {
+      onSuccess: () => {
+        if (currentIdx >= flashcards.length - 1) {
+          setCurrentIdx(Math.max(0, currentIdx - 1));
         }
-      });
-    }
+      }
+    });
   };
 
   const handleEditSave = () => {
@@ -65,18 +63,32 @@ export function FlashcardViewer({ flashcards, language, deckId, readOnly = false
     addCard({ deckId, data: { frontText: addMode.front, backText: addMode.back } }, {
       onSuccess: () => {
         setAddMode(null);
-        // Ngay sau khi lưu, data có thể chưa update ngay. Invalidate cache sẽ fetch lại flashcards.
       }
     });
   };
 
   useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      if (e.code === 'Space') {
+        e.preventDefault();
+        setIsFlipped(prevFlipped => {
+          if (!prevFlipped) return true;
+          setCurrentIdx(prevIdx => Math.min(prevIdx + 1, flashcards?.length ? flashcards.length - 1 : 0));
+          return false;
+        });
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+
     return () => {
+      window.removeEventListener('keydown', handleKeyDown);
       if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
         window.speechSynthesis.cancel();
       }
     };
-  }, []);
+  }, [flashcards?.length]);
+
 
   if (!flashcards || flashcards.length === 0) {
     if (addMode) {

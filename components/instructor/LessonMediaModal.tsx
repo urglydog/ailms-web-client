@@ -66,9 +66,7 @@ export function LessonMediaModal({ courseId, lesson, onClose }: LessonMediaModal
   };
 
   const handleDeleteVideo = () => {
-    if (window.confirm('Xóa video hiện tại? Bạn sẽ cần nạp video mới cho bài học này.')) {
-      deleteVideo.mutate(lesson.id);
-    }
+    deleteVideo.mutate(lesson.id);
   };
 
   return (

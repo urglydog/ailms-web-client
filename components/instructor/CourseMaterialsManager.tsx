@@ -488,7 +488,7 @@ function MaterialWorkspaceViewer({
                         </div>
                         <div className="flex gap-2 shrink-0">
                           <button onClick={() => setEditingQuestion(q)} className="text-xs font-semibold bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg hover:bg-gray-200 border border-gray-200">Sửa</button>
-                          <button onClick={() => { if (confirm('Bạn chắc chắn muốn xóa câu hỏi này?')) deleteQuestionMutation.mutate(q.id); }} className="text-xs font-semibold bg-red-50 text-red-600 px-3 py-1.5 rounded-lg hover:bg-red-100 border border-red-200">Xóa</button>
+                          <button onClick={() => deleteQuestionMutation.mutate(q.id)} className="text-xs font-semibold bg-red-50 text-red-600 px-3 py-1.5 rounded-lg hover:bg-red-100 border border-red-200">Xóa</button>
                         </div>
                       </div>
 
@@ -634,7 +634,7 @@ function MaterialWorkspaceViewer({
                         </div>
                         <div className="flex gap-2">
                           <button onClick={(e) => { e.stopPropagation(); setEditingFlashcard(card); }} className="text-[11px] font-bold bg-white/50 hover:bg-white text-purple-700 px-2.5 py-1 rounded-md border border-purple-200">Sửa</button>
-                          <button onClick={(e) => { e.stopPropagation(); if(confirm('Bạn chắc chắn muốn xóa thẻ này?')) deleteFlashcardMutation.mutate(card.id); }} className="text-[11px] font-bold bg-red-50 hover:bg-red-100 text-red-600 px-2.5 py-1 rounded-md border border-red-200">Xóa</button>
+                          <button onClick={(e) => { e.stopPropagation(); deleteFlashcardMutation.mutate(card.id); }} className="text-[11px] font-bold bg-red-50 hover:bg-red-100 text-red-600 px-2.5 py-1 rounded-md border border-red-200">Xóa</button>
                         </div>
                       </div>
                     </div>

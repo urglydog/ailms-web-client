@@ -238,7 +238,7 @@ export function TutorEmbedded({ courseId, lessonId, onSeek, lessonTitleById }: T
 
   const handleDelete = async (session: TutorSession) => {
     setOpenMenuId(null);
-    if (!window.confirm(`Xoá cuộc trò chuyện "${session.title}"? Không thể hoàn tác.`)) return;
+    setOpenMenuId(null);
     try {
       await removeSession(session.id);
     } catch (err) {

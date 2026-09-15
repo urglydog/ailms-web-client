@@ -123,13 +123,7 @@ export function ChapterEditorList({ courseId, chapters }: ChapterEditorListProps
               <button
                 type="button"
                 onClick={() => {
-                  if (
-                    window.confirm(
-                      `Xóa chương "${chapter.title}"? Toàn bộ bài học, video và tài liệu đính kèm bên trong sẽ bị xóa vĩnh viễn.`,
-                    )
-                  ) {
-                    deleteChapter.mutate(chapter.id);
-                  }
+                  deleteChapter.mutate(chapter.id);
                 }}
                 className="shrink-0 text-[12px] font-bold text-red-500 hover:text-red-700"
               >
@@ -168,13 +162,7 @@ export function ChapterEditorList({ courseId, chapters }: ChapterEditorListProps
                       updateLesson.mutate({ id: lesson.id, input: { title: lesson.title, isPreview } })
                     }
                     onDelete={() => {
-                      if (
-                        window.confirm(
-                          `Xóa bài học "${lesson.title}"? Video và tài liệu đính kèm của bài học này (nếu có) sẽ bị xóa vĩnh viễn.`,
-                        )
-                      ) {
-                        deleteLesson.mutate(lesson.id);
-                      }
+                      deleteLesson.mutate(lesson.id);
                     }}
                     onManageVideo={() => setManageVideoLessonId(lesson.id)}
                   />
