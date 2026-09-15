@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useCourseMaterials, useRequestMaterial, useAvailableLanguages, useCourseChapters, useRenameMaterial, useDeleteMaterial } from '@/hooks/useMaterials';
 import { materialsApi, type MaterialType, type ScopeType, type InstructorMaterial } from '@/lib/api/materials';
@@ -11,7 +11,7 @@ import Link from 'next/link';
 import { usePathname, useSearchParams, useRouter } from 'next/navigation';
 import { useNotification } from '@/components/providers/NotificationProvider';
 
-export function MaterialManager({ courseId }: { courseId: number }) {
+export function MaterialManager({ courseId, lessonId }: { courseId: number, lessonId?: number }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -44,9 +44,11 @@ export function MaterialManager({ courseId }: { courseId: number }) {
   const [editTitle, setEditTitle] = useState('');
 
   // Auto-select first language if available
-  if (availableLanguages && availableLanguages.length > 0 && language === '') {
-    setLanguage(availableLanguages[0]!.code);
-  }
+  useEffect(() => {
+    if (availableLanguages && availableLanguages.length > 0 && language === '') {
+      setLanguage(availableLanguages[0]!.code);
+    }
+  }, [availableLanguages, language]);
 
   const handleRequest = () => {
     if (!language) {
@@ -106,7 +108,6 @@ export function MaterialManager({ courseId }: { courseId: number }) {
     });
   };
 
-  const filteredOfficial = officialMaterials || [];
   const activeTabParam = searchParams.get('subtab') as 'OFFICIAL' | 'PERSONAL' | null;
   const activeTab = activeTabParam === 'PERSONAL' ? 'PERSONAL' : 'OFFICIAL';
 
@@ -371,6 +372,8 @@ export function MaterialManager({ courseId }: { courseId: number }) {
     </>
   );
 
+  const filteredOfficialMaterials = officialMaterials?.filter(m => lessonId ? m.lessonId === lessonId : !m.lessonId) || [];
+
   const renderOfficialItem = (item: InstructorMaterial) => {
     const now = new Date();
     const startTime = item.startTime ? new Date(item.startTime) : null;
@@ -381,7 +384,7 @@ export function MaterialManager({ courseId }: { courseId: number }) {
     const outOfAttempts = (item.maxAttempts && item.attemptCount !== undefined) ? item.attemptCount >= item.maxAttempts : false;
 
     const currentUrl = `${pathname}?${searchParams.toString()}`;
-    const href = item.materialType === 'QUIZ' && item.materialId
+    const href = item.materialType === 'QUIZ' && item.materialId && item.quizType !== 'LECTURE_QUIZ'
       ? `/exam/${item.materialId}?title=${encodeURIComponent(item.title || '')}&duration=${item.durationMinutes || ''}&attempts=${item.maxAttempts || ''}&count=${item.randomPickCount || item.questionCount || ''}&start=${item.startTime || ''}&end=${item.endTime || ''}&attemptCount=${item.attemptCount || 0}&proctored=${item.isProctored || false}&returnUrl=${encodeURIComponent(currentUrl)}`
       : `/materials/${item.id}?isOfficial=true`;
 
@@ -395,8 +398,8 @@ export function MaterialManager({ courseId }: { courseId: number }) {
           <div className="flex items-center gap-2 mb-2">
             <h3 className="font-bold text-ink text-lg group-hover:text-accent transition-colors">{item.title || 'Học liệu khóa học'}</h3>
             {item.materialType === 'QUIZ' ? (
-              <span className="text-[10px] uppercase font-bold text-accent-dark bg-accent/10 border border-accent/20 px-2 py-0.5 rounded-md shadow-sm">
-                THI CHÍNH THỨC
+              <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-md shadow-sm ${item.quizType === 'LECTURE_QUIZ' ? 'text-teal-700 bg-teal-50 border border-teal-200' : 'text-accent-dark bg-accent/10 border border-accent/20'}`}>
+                {item.quizType === 'LECTURE_QUIZ' ? 'QUICK CHECK' : 'THI CHÍNH THỨC'}
               </span>
             ) : (
               <span className="text-[10px] uppercase font-bold text-ink-muted bg-surface-hover px-2 py-0.5 rounded-md">
@@ -493,14 +496,18 @@ export function MaterialManager({ courseId }: { courseId: number }) {
             </h2>
           </div>
 
-          {filteredOfficial && filteredOfficial.length > 0 ? (
+          {filteredOfficialMaterials.length > 0 ? (
             <div className="flex flex-col">
-              {filteredOfficial.map(item => renderOfficialItem(item))}
+              {filteredOfficialMaterials.map(renderOfficialItem)}
             </div>
           ) : (
-            <p className="text-ink-muted italic text-center py-10 bg-surface rounded border border-line-soft text-sm">
-              Chưa có học liệu chính thức nào từ Giảng viên.
-            </p>
+            <div className="text-center py-10 bg-surface rounded-xl border border-line">
+              <div className="text-4xl mb-3">📚</div>
+              <h3 className="text-ink font-semibold mb-1">Chưa có học liệu chính thức</h3>
+              <p className="text-sm text-ink-muted max-w-sm mx-auto">
+                {lessonId ? 'Bài học này chưa có học liệu đính kèm.' : 'Giảng viên chưa công bố học liệu nào cho khóa học này.'}
+              </p>
+            </div>
           )}
         </div>
       ) : personalTabContent}
