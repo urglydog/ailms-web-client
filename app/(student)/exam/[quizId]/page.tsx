@@ -97,7 +97,7 @@ export default function AntiCheatExamPage() {
   }, [isProctored]);
 
   // Hàm nộp bài
-  const submitExam = useCallback((isAuto = false) => {
+  const submitExam = useCallback((_isAuto = false) => {
     if (!attemptData || isSubmitting) return;
     
 
