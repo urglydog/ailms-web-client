@@ -50,4 +50,7 @@ export const flashcardsApi = {
 
   addFlashcard: (deckId: number, data: FlashcardAddReq) =>
     api.post<FlashcardCardWithReview>(`/api/v1/flashcards/deck/${deckId}`, data, { token: authToken() }),
+
+  deleteFlashcard: (flashcardId: number) =>
+    api.delete<void>(`/api/v1/flashcards/${flashcardId}`, { token: authToken() }),
 };
