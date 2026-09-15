@@ -100,12 +100,10 @@ export function MaterialManager({ courseId }: { courseId: number }) {
   };
 
   const handleDelete = (id: number) => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa học liệu này không?')) {
-      deleteMutation.mutate(id, {
-        onSuccess: () => toast.success('Đã xóa học liệu'),
-        onError: () => toast.error('Có lỗi xảy ra khi xóa học liệu')
-      });
-    }
+    deleteMutation.mutate(id, {
+      onSuccess: () => toast.success('Đã xóa học liệu'),
+      onError: () => toast.error('Có lỗi xảy ra khi xóa học liệu')
+    });
   };
 
   const filteredOfficial = officialMaterials || [];

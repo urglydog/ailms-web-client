@@ -21,7 +21,6 @@ export function ReviewManager() {
   const reviews = data?.content ?? [];
 
   const handleHide = (id: number, courseTitle: string) => {
-    if (!window.confirm(`Ẩn đánh giá này khỏi trang "${courseTitle}"?`)) return;
     setErrorMessage(null);
     hideReview.mutate(id, {
       onError: (err) => setErrorMessage(err instanceof ApiError ? err.message : 'Không ẩn được đánh giá này.'),

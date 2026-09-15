@@ -25,7 +25,6 @@ export function AiJobQueueManager() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleRetry = (id: number) => {
-    if (!window.confirm(`Thử lại job lồng tiếng #${id}?`)) return;
     setErrorMessage(null);
     retryJob.mutate(id, {
       onError: (err) =>

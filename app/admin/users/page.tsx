@@ -70,7 +70,6 @@ export default function AdminUsersPage() {
   }, []);
 
   const handleToggleBlock = async (userId: number, currentStatus: boolean) => {
-    if (!window.confirm(`Bạn có chắc muốn ${currentStatus ? 'khóa' : 'mở khóa'} người dùng này?`)) return;
     try {
       const token = localStorage.getItem('accessToken');
       const userToUpdate = users.find(u => u.id === userId);

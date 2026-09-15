@@ -28,7 +28,6 @@ export function CategoryManager() {
   };
 
   const handleDelete = (category: Category) => {
-    if (!window.confirm(`Xóa danh mục "${category.name}"?`)) return;
     setErrorMessage(null);
     deleteCategory.mutate(category.id, {
       onError: (err) =>

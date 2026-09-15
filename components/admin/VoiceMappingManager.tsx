@@ -46,7 +46,6 @@ export function VoiceMappingManager() {
   };
 
   const handleDelete = (voice: VoiceMapping) => {
-    if (!window.confirm(`Xóa giọng đọc "${voice.voiceName}" (${voice.language})?`)) return;
     setErrorMessage(null);
     deleteVoice.mutate(voice.id, {
       onError: (err) =>
