@@ -754,6 +754,25 @@ export default function AntiCheatExamPage() {
           </div>
 
           <div className="col-span-1 flex flex-col gap-4 sticky top-8 self-start">
+            {isProctored && (
+              <div className="card overflow-hidden">
+                <div className={`text-white text-xs font-bold p-2 text-center transition-colors ${faceStatus === 'DETECTING' ? 'bg-amber-500' :
+                  faceStatus === 'FACE_FOUND' ? 'bg-green-600' : 'bg-red-600 animate-pulse'
+                  }`}>
+                  {faceStatus === 'DETECTING' && 'Đang quét khuôn mặt...'}
+                  {faceStatus === 'FACE_FOUND' && 'Camera Giám Sát AI (Bình thường)'}
+                  {faceStatus === 'NO_FACE' && 'CẢNH BÁO: KHÔNG THẤY KHUÔN MẶT'}
+                </div>
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  playsInline
+                  muted
+                  className="w-full aspect-video object-cover bg-black"
+                />
+              </div>
+            )}
+
             {/* Đồng hồ đếm ngược */}
             {isStarted && timeLeft !== null && (
               <div className={`flex items-center justify-center gap-2 font-mono text-2xl font-bold px-4 py-3 rounded-xl border-2 shadow-sm ${timeLeft <= 60 ? 'border-red-500 text-red-600 bg-red-50 animate-pulse' :
@@ -788,24 +807,7 @@ export default function AntiCheatExamPage() {
               </div>
             </div>
 
-            {isProctored && (
-              <div className="card overflow-hidden">
-                <div className={`text-white text-xs font-bold p-2 text-center transition-colors ${faceStatus === 'DETECTING' ? 'bg-amber-500' :
-                  faceStatus === 'FACE_FOUND' ? 'bg-green-600' : 'bg-red-600 animate-pulse'
-                  }`}>
-                  {faceStatus === 'DETECTING' && 'Đang quét khuôn mặt...'}
-                  {faceStatus === 'FACE_FOUND' && 'Camera Giám Sát AI (Bình thường)'}
-                  {faceStatus === 'NO_FACE' && 'CẢNH BÁO: KHÔNG THẤY KHUÔN MẶT'}
-                </div>
-                <video
-                  ref={videoRef}
-                  autoPlay
-                  playsInline
-                  muted
-                  className="w-full aspect-video object-cover bg-black"
-                />
-              </div>
-            )}
+
 
             <button
               onClick={() => submitExam(false)}

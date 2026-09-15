@@ -28,6 +28,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
     }
   };
   const [genMaterialType, setGenMaterialType] = useState<'QUIZ' | 'FLASHCARD' | 'MINDMAP' | null>(null);
+  const [manualMaterialType, setManualMaterialType] = useState<'QUIZ' | 'FLASHCARD' | 'MINDMAP' | null>(null);
   const [activeFilterTab, setActiveFilterTab] = useState<'ALL' | 'QUIZ' | 'FLASHCARD' | 'MINDMAP'>('ALL');
 
   const { data: materials, isLoading } = useQuery({
@@ -102,6 +103,21 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
     );
   }
 
+  if (manualMaterialType) {
+    return (
+      <GenerateManualOfficialView
+        courseId={courseId}
+        initialType={manualMaterialType}
+        onClose={() => setManualMaterialType(null)}
+        onSuccess={(id) => {
+          setManualMaterialType(null);
+          queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] });
+          setInspectGenerationId(id);
+        }}
+      />
+    );
+  }
+
   const filteredMaterials = materials?.filter(mat => activeFilterTab === 'ALL' || mat.materialType === activeFilterTab) || [];
 
   return (
@@ -123,6 +139,12 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
             className="rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-bold text-white shadow hover:bg-blue-700 transition-all flex items-center gap-2"
           >
             <span>🤖</span> Tạo Học Liệu AI
+          </button>
+          <button
+            onClick={() => setManualMaterialType('QUIZ')}
+            className="rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white shadow hover:bg-emerald-700 transition-all flex items-center gap-2"
+          >
+            <span>✍️</span> Tạo Thủ Công
           </button>
           <button
             onClick={() => router.push(`/instructor/courses/${courseId}/gradebook`)}
@@ -278,11 +300,22 @@ function MaterialWorkspaceViewer({
     displayOrder: number;
     options: { id: number; content: string; isCorrect: boolean }[];
   } | null>(null);
+  const [isAddingQuestion, setIsAddingQuestion] = useState(false);
+  const [editingFlashcard, setEditingFlashcard] = useState<{ id: number; frontText: string; backText: string } | null>(null);
+  const [isAddingFlashcard, setIsAddingFlashcard] = useState(false);
 
   const deleteQuestionMutation = useMutation({
     mutationFn: (id: number) => materialsApi.deleteQuizQuestion(id),
     onSuccess: () => {
       toast.success('Đã xóa câu hỏi');
+      queryClient.invalidateQueries({ queryKey: ['material-detail', generationId] });
+    }
+  });
+
+  const deleteFlashcardMutation = useMutation({
+    mutationFn: (id: number) => materialsApi.deleteFlashcard(id),
+    onSuccess: () => {
+      toast.success('Đã xóa Flashcard');
       queryClient.invalidateQueries({ queryKey: ['material-detail', generationId] });
     }
   });
@@ -368,6 +401,11 @@ function MaterialWorkspaceViewer({
 
               {activeTab === 'QUESTIONS' && (
                 <div className="grid grid-cols-1 gap-4">
+                  <div className="flex justify-end mb-2">
+                    <button onClick={() => setIsAddingQuestion(true)} className="px-4 py-2 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded-xl font-bold text-sm border border-indigo-200 transition-colors">
+                      + Thêm Câu Hỏi Mới
+                    </button>
+                  </div>
                   {detail.quizQuestions.map((q, idx) => (
                     <div key={q.id} className="p-5 rounded-2xl border border-gray-200 bg-gray-50/70 space-y-3 shadow-sm hover:border-blue-300 transition-all">
                       <div className="flex items-start justify-between gap-3">
@@ -480,14 +518,19 @@ function MaterialWorkspaceViewer({
           {/* Render Flashcards Workspace */}
           {detail.materialType === 'FLASHCARD' && detail.flashcards && (
             <div className="space-y-6">
-              <div className="bg-purple-50 border border-purple-100 rounded-2xl p-4 flex items-center justify-between">
+              <div className="bg-purple-50 border border-purple-100 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
                   <h3 className="font-bold text-sm text-purple-950">Bộ Thẻ Học Flashcards 2 Mặt Trực Quan</h3>
-                  <p className="text-xs text-purple-700 mt-0.5">Bấm vào bất kỳ thẻ nào bên dưới để xem lật mặt sau.</p>
+                  <p className="text-xs text-purple-700 mt-0.5">Bấm vào thẻ để lật, hoặc Sửa/Xóa bên dưới thẻ.</p>
                 </div>
-                <span className="bg-purple-600 text-white font-extrabold text-xs px-3 py-1 rounded-full">
-                  {detail.flashcards.length} Thẻ ôn tập
-                </span>
+                <div className="flex items-center gap-3">
+                  <span className="bg-purple-600 text-white font-extrabold text-xs px-3 py-1 rounded-full">
+                    {detail.flashcards.length} Thẻ ôn tập
+                  </span>
+                  <button onClick={() => setIsAddingFlashcard(true)} className="px-3 py-1.5 bg-purple-100 hover:bg-purple-200 text-purple-800 rounded-lg text-xs font-bold border border-purple-200 transition-colors">
+                    + Thêm Thẻ Mới
+                  </button>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -511,8 +554,14 @@ function MaterialWorkspaceViewer({
                         {isFlipped ? card.backText : card.frontText}
                       </div>
 
-                      <div className="text-[11px] opacity-70 mt-3 text-right">
-                        {isFlipped ? 'Nhấn để lật lại mặt trước' : 'Nhấn để xem giải nghĩa khái niệm'}
+                      <div className="flex items-center justify-between mt-3 border-t border-purple-100 pt-3">
+                        <div className="text-[11px] opacity-70">
+                          {isFlipped ? 'Nhấn để lật lại' : 'Nhấn để xem giải nghĩa'}
+                        </div>
+                        <div className="flex gap-2">
+                          <button onClick={(e) => { e.stopPropagation(); setEditingFlashcard(card); }} className="text-[11px] font-bold bg-white/50 hover:bg-white text-purple-700 px-2.5 py-1 rounded-md border border-purple-200">Sửa</button>
+                          <button onClick={(e) => { e.stopPropagation(); if(confirm('Bạn chắc chắn muốn xóa thẻ này?')) deleteFlashcardMutation.mutate(card.id); }} className="text-[11px] font-bold bg-red-50 hover:bg-red-100 text-red-600 px-2.5 py-1 rounded-md border border-red-200">Xóa</button>
+                        </div>
                       </div>
                     </div>
                   );
@@ -530,6 +579,36 @@ function MaterialWorkspaceViewer({
           onClose={() => setEditingQuestion(null)}
           onSuccess={() => {
             setEditingQuestion(null);
+            queryClient.invalidateQueries({ queryKey: ['material-detail', generationId] });
+          }}
+        />
+      )}
+      {isAddingQuestion && detail?.quizQuestions && (
+        <NewQuizQuestionEditorModal
+          quizId={material!.materialId!}
+          onClose={() => setIsAddingQuestion(false)}
+          onSuccess={() => {
+            setIsAddingQuestion(false);
+            queryClient.invalidateQueries({ queryKey: ['material-detail', generationId] });
+          }}
+        />
+      )}
+      {editingFlashcard && (
+        <FlashcardEditorModal
+          flashcard={editingFlashcard}
+          onClose={() => setEditingFlashcard(null)}
+          onSuccess={() => {
+            setEditingFlashcard(null);
+            queryClient.invalidateQueries({ queryKey: ['material-detail', generationId] });
+          }}
+        />
+      )}
+      {isAddingFlashcard && detail && (
+        <NewFlashcardEditorModal
+          generationId={detail.id}
+          onClose={() => setIsAddingFlashcard(false)}
+          onSuccess={() => {
+            setIsAddingFlashcard(false);
             queryClient.invalidateQueries({ queryKey: ['material-detail', generationId] });
           }}
         />
@@ -846,6 +925,12 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
     queryFn: () => materialsApi.getAvailableLanguages(courseId),
   });
 
+  useEffect(() => {
+    if (languages && languages.length > 0 && !language) {
+      setLanguage(languages?.[0]?.code ?? '');
+    }
+  }, [languages, language]);
+
   const { data: chapters } = useQuery({
     queryKey: ['course-chapters', courseId],
     queryFn: () => materialsApi.getCourseChapters(courseId),
@@ -883,10 +968,13 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
   };
 
   return (
-    <div className="w-full rounded-3xl bg-white p-8 shadow-sm border border-gray-200">
-      <div className="border-b pb-4 mb-6">
-        <h3 className="text-2xl font-black text-gray-900">Tạo Học Liệu AI Tự Động</h3>
-        <p className="text-sm text-gray-500 mt-1">Lựa chọn loại học liệu bạn muốn AI tự động tổng hợp từ nội dung bài giảng.</p>
+    <div className="w-full rounded-3xl bg-white p-8 shadow-sm border border-gray-200 relative">
+      <div className="border-b pb-4 mb-6 flex justify-between items-start">
+        <div>
+          <h3 className="text-2xl font-black text-gray-900">Tạo Học Liệu AI Tự Động</h3>
+          <p className="text-sm text-gray-500 mt-1">Lựa chọn loại học liệu bạn muốn AI tự động tổng hợp từ nội dung bài giảng.</p>
+        </div>
+        <button type="button" onClick={onClose} className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors" title="Đóng">✕</button>
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-6">
@@ -1148,3 +1236,266 @@ function QuizQuestionEditorModal({ question, onClose, onSuccess }: QuizQuestionE
     </div>
   );
 }
+
+function NewQuizQuestionEditorModal({ quizId, onClose, onSuccess }: { quizId: number; onClose: () => void; onSuccess: () => void; }) {
+  const [content, setContent] = useState('');
+  const [options, setOptions] = useState<{ id: number; content: string; isCorrect: boolean }[]>([
+    { id: -1, content: 'Đáp án A', isCorrect: true },
+    { id: -2, content: 'Đáp án B', isCorrect: false },
+    { id: -3, content: 'Đáp án C', isCorrect: false },
+    { id: -4, content: 'Đáp án D', isCorrect: false },
+  ]);
+
+  const addMutation = useMutation({
+    mutationFn: () => materialsApi.addQuizQuestion(quizId, { content, options }),
+    onSuccess: () => {
+      toast.success('Đã thêm câu hỏi mới');
+      onSuccess();
+    },
+    onError: (err: Error) => {
+      toast.error(err.message || 'Không thể thêm câu hỏi');
+    }
+  });
+
+  const handleToggleCorrect = (idx: number) => {
+    setOptions(options.map((o, i) => ({ ...o, isCorrect: i === idx })));
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+      <div className="bg-white p-6 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
+        <h3 className="font-bold text-lg mb-4 text-gray-900">Thêm Câu Hỏi Mới</h3>
+
+        <label className="block text-sm font-semibold text-gray-700 mb-1">Nội dung câu hỏi</label>
+        <textarea
+          value={content}
+          onChange={e => setContent(e.target.value)}
+          placeholder="Nhập nội dung câu hỏi..."
+          className="w-full border border-gray-300 p-3 rounded-xl mb-5 focus:border-indigo-500 focus:outline-none"
+          rows={3}
+        />
+
+        <label className="block text-sm font-semibold text-gray-700 mb-2">Các đáp án (Chọn 1 đáp án đúng)</label>
+        <div className="space-y-3">
+          {options.map((opt, idx) => (
+            <div key={idx} className={`flex gap-3 items-center p-3 rounded-xl border ${opt.isCorrect ? 'bg-emerald-50 border-emerald-300' : 'bg-gray-50 border-gray-200'}`}>
+              <input
+                type="radio"
+                checked={opt.isCorrect}
+                onChange={() => handleToggleCorrect(idx)}
+                className="w-5 h-5 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+              />
+              <input
+                type="text"
+                value={opt.content}
+                onChange={e => {
+                  setOptions(options.map((o, i) => i === idx ? { ...o, content: e.target.value } : o));
+                }}
+                className={`flex-1 p-2 bg-transparent border-b ${opt.isCorrect ? 'border-emerald-200 focus:border-emerald-500' : 'border-gray-300 focus:border-indigo-500'} focus:outline-none text-sm font-medium`}
+              />
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-6 flex justify-end gap-3 border-t pt-4">
+          <button onClick={onClose} className="px-5 py-2 bg-gray-100 font-semibold text-gray-700 rounded-lg hover:bg-gray-200">Hủy</button>
+          <button
+            onClick={() => {
+              if (!content.trim()) return toast.error('Vui lòng nhập nội dung câu hỏi');
+              addMutation.mutate();
+            }}
+            disabled={addMutation.isPending}
+            className="px-5 py-2 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 shadow disabled:opacity-50"
+          >
+            {addMutation.isPending ? 'Đang thêm...' : 'Thêm Câu Hỏi'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function FlashcardEditorModal({ flashcard, onClose, onSuccess }: { flashcard: { id: number, frontText: string, backText: string }, onClose: () => void, onSuccess: () => void }) {
+  const [frontText, setFrontText] = useState(flashcard.frontText);
+  const [backText, setBackText] = useState(flashcard.backText);
+
+  const updateMutation = useMutation({
+    mutationFn: () => materialsApi.updateFlashcard(flashcard.id, { frontText, backText }),
+    onSuccess: () => {
+      toast.success('Đã cập nhật Flashcard');
+      onSuccess();
+    }
+  });
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+      <div className="bg-white p-6 rounded-2xl w-full max-w-lg shadow-2xl">
+        <h3 className="font-bold text-lg mb-4 text-gray-900">Chỉnh sửa Flashcard</h3>
+        <label className="block text-sm font-semibold text-gray-700 mb-1">Mặt Trước (Thuật ngữ)</label>
+        <textarea value={frontText} onChange={e => setFrontText(e.target.value)} className="w-full border border-gray-300 p-3 rounded-xl mb-4 focus:border-purple-500 focus:outline-none" rows={3} />
+        <label className="block text-sm font-semibold text-gray-700 mb-1">Mặt Sau (Khái niệm)</label>
+        <textarea value={backText} onChange={e => setBackText(e.target.value)} className="w-full border border-gray-300 p-3 rounded-xl mb-5 focus:border-purple-500 focus:outline-none" rows={3} />
+        
+        <div className="flex justify-end gap-3 border-t pt-4">
+          <button onClick={onClose} className="px-5 py-2 bg-gray-100 font-semibold text-gray-700 rounded-lg hover:bg-gray-200">Hủy</button>
+          <button onClick={() => updateMutation.mutate()} disabled={updateMutation.isPending} className="px-5 py-2 bg-purple-600 text-white font-bold rounded-lg hover:bg-purple-700 shadow disabled:opacity-50">Lưu Thay Đổi</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function NewFlashcardEditorModal({ generationId, onClose, onSuccess }: { generationId: number, onClose: () => void, onSuccess: () => void }) {
+  const [frontText, setFrontText] = useState('');
+  const [backText, setBackText] = useState('');
+
+  const addMutation = useMutation({
+    mutationFn: () => materialsApi.addFlashcard(generationId, { frontText, backText }),
+    onSuccess: () => {
+      toast.success('Đã thêm Flashcard mới');
+      onSuccess();
+    }
+  });
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+      <div className="bg-white p-6 rounded-2xl w-full max-w-lg shadow-2xl">
+        <h3 className="font-bold text-lg mb-4 text-gray-900">Thêm Flashcard Mới</h3>
+        <label className="block text-sm font-semibold text-gray-700 mb-1">Mặt Trước (Thuật ngữ)</label>
+        <textarea value={frontText} onChange={e => setFrontText(e.target.value)} className="w-full border border-gray-300 p-3 rounded-xl mb-4 focus:border-purple-500 focus:outline-none" rows={3} />
+        <label className="block text-sm font-semibold text-gray-700 mb-1">Mặt Sau (Khái niệm)</label>
+        <textarea value={backText} onChange={e => setBackText(e.target.value)} className="w-full border border-gray-300 p-3 rounded-xl mb-5 focus:border-purple-500 focus:outline-none" rows={3} />
+        
+        <div className="flex justify-end gap-3 border-t pt-4">
+          <button onClick={onClose} className="px-5 py-2 bg-gray-100 font-semibold text-gray-700 rounded-lg hover:bg-gray-200">Hủy</button>
+          <button onClick={() => addMutation.mutate()} disabled={addMutation.isPending || !frontText.trim() || !backText.trim()} className="px-5 py-2 bg-purple-600 text-white font-bold rounded-lg hover:bg-purple-700 shadow disabled:opacity-50">Thêm Thẻ</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** Giao diện Sinh Thủ Công Cho Giảng Viên */
+function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess }: { courseId: number; initialType: 'QUIZ' | 'FLASHCARD' | 'MINDMAP'; onClose: () => void; onSuccess: (id: number) => void }) {
+  const [materialType, setMaterialType] = useState<'QUIZ' | 'FLASHCARD' | 'MINDMAP'>(initialType);
+  const [title, setTitle] = useState('');
+  const [language, setLanguage] = useState<string>('vi');
+
+  const { data: languages } = useQuery({
+    queryKey: ['available-languages', courseId],
+    queryFn: () => materialsApi.getAvailableLanguages(courseId),
+  });
+
+  useEffect(() => {
+    if (languages && languages.length > 0 && !language) {
+      setLanguage(languages?.[0]?.code ?? '');
+    }
+  }, [languages, language]);
+
+  const generateManualMutation = useMutation({
+    mutationFn: (input: { materialType: string; language: string; title: string }) => materialsApi.createManualMaterial(courseId, input),
+    onSuccess: (data) => {
+      toast.success('Đã khởi tạo học liệu trống thành công!');
+      onSuccess(data.id);
+    },
+    onError: (err: Error) => {
+      toast.error(err.message || 'Không thể khởi tạo học liệu');
+    }
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!materialType) {
+      toast.error("Vui lòng chọn loại học liệu");
+      return;
+    }
+    if (!title.trim()) {
+      toast.error("Vui lòng nhập tên học liệu");
+      return;
+    }
+    generateManualMutation.mutate({
+      materialType,
+      language,
+      title: title.trim(),
+    });
+  };
+
+  return (
+    <div className="w-full rounded-3xl bg-white p-8 shadow-sm border border-emerald-200 relative">
+      <div className="border-b pb-4 mb-6 flex justify-between items-start">
+        <div>
+          <h3 className="text-2xl font-black text-gray-900 flex items-center gap-2">
+            <span>✍️</span> Tạo Học Liệu Thủ Công
+          </h3>
+          <p className="text-sm text-gray-500 mt-1">Khởi tạo một bản ghi rỗng để bạn tự tay nhập nội dung 100%.</p>
+        </div>
+        <button type="button" onClick={onClose} className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors" title="Đóng">✕</button>
+      </div>
+
+      <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div
+            onClick={() => setMaterialType('QUIZ')}
+            className={`cursor-pointer rounded-2xl p-4 border-2 transition-all flex flex-col items-center text-center gap-2 ${materialType === 'QUIZ' ? 'border-emerald-500 bg-emerald-50 shadow-md scale-[1.02]' : 'border-gray-200 hover:border-emerald-300 bg-white'}`}
+          >
+            <div className="text-4xl">📝</div>
+            <div className="font-bold text-gray-900">Bài Thi (Quiz)</div>
+            <div className="text-[10px] font-bold text-emerald-600 uppercase bg-emerald-100 px-2 py-0.5 rounded">Khởi tạo trống</div>
+          </div>
+          <div
+            onClick={() => setMaterialType('FLASHCARD')}
+            className={`cursor-pointer rounded-2xl p-4 border-2 transition-all flex flex-col items-center text-center gap-2 ${materialType === 'FLASHCARD' ? 'border-emerald-500 bg-emerald-50 shadow-md scale-[1.02]' : 'border-gray-200 hover:border-emerald-300 bg-white'}`}
+          >
+            <div className="text-4xl">🃏</div>
+            <div className="font-bold text-gray-900">Flashcard</div>
+            <div className="text-[10px] font-bold text-emerald-600 uppercase bg-emerald-100 px-2 py-0.5 rounded">Khởi tạo trống</div>
+          </div>
+          <div
+            onClick={() => setMaterialType('MINDMAP')}
+            className={`cursor-pointer rounded-2xl p-4 border-2 transition-all flex flex-col items-center text-center gap-2 ${materialType === 'MINDMAP' ? 'border-emerald-500 bg-emerald-50 shadow-md scale-[1.02]' : 'border-gray-200 hover:border-emerald-300 bg-white'}`}
+          >
+            <div className="text-4xl">🧠</div>
+            <div className="font-bold text-gray-900">Mindmap</div>
+            <div className="text-[10px] font-bold text-emerald-600 uppercase bg-emerald-100 px-2 py-0.5 rounded">Khởi tạo trống</div>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-4 bg-gray-50 p-5 rounded-2xl border border-gray-200">
+          <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
+            Tên học liệu
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="VD: Bài thi giữa kỳ, Khái niệm cơ bản..."
+              className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:border-emerald-500 outline-none bg-white"
+              required
+            />
+          </label>
+          <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
+            Ngôn ngữ học liệu
+            <MaterialLanguagePicker
+              languages={languages ?? []}
+              value={language}
+              onChange={setLanguage}
+            />
+          </label>
+          
+          <div className="mt-4 flex justify-end gap-3 border-t pt-5">
+            <button type="button" onClick={onClose} className="rounded-xl px-5 py-2.5 text-sm font-bold text-gray-600 hover:bg-gray-200 transition-colors">
+              Hủy
+            </button>
+            <button
+              type="submit"
+              disabled={generateManualMutation.isPending || !materialType || !title.trim()}
+              className="rounded-xl bg-emerald-600 px-6 py-2.5 text-sm font-bold text-white hover:bg-emerald-700 disabled:opacity-50 shadow-md"
+            >
+              {generateManualMutation.isPending ? 'Đang tạo...' : '✨ Tạo Bản Ghi Trống'}
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  );
+}
+

@@ -122,7 +122,9 @@ export const materialsApi = {
     api.delete(`/api/v1/materials/${id}`, { token: authToken() }),
     
   // Instructor APIs
-  // Instructor APIs
+  createManualMaterial: (courseId: number, input: { materialType: string; language: string; title: string }) =>
+    api.post<InstructorMaterial>(`/api/v1/instructor/materials/courses/${courseId}/manual`, input, { token: authToken() }),
+
   getInstructorMaterials: (courseId: number) =>
     api.get<InstructorMaterial[]>(`/api/v1/instructor/materials/courses/${courseId}`, { token: authToken() }),
     
@@ -141,6 +143,18 @@ export const materialsApi = {
   updateQuizQuestion: (questionId: number, req: Record<string, unknown>) =>
     api.put(`/api/v1/instructor/quizzes/questions/${questionId}`, req, { token: authToken() }),
 
+  addQuizQuestion: (quizId: number, req: Record<string, unknown>) =>
+    api.post(`/api/v1/instructor/quizzes/${quizId}/questions`, req, { token: authToken() }),
+
   deleteQuizQuestion: (questionId: number) =>
-    api.delete(`/api/v1/instructor/quizzes/questions/${questionId}`, { token: authToken() })
+    api.delete(`/api/v1/instructor/quizzes/questions/${questionId}`, { token: authToken() }),
+
+  addFlashcard: (generationId: number, req: Record<string, unknown>) =>
+    api.post(`/api/v1/flashcards/deck/${generationId}`, req, { token: authToken() }),
+
+  updateFlashcard: (id: number, req: Record<string, unknown>) =>
+    api.patch(`/api/v1/flashcards/${id}`, req, { token: authToken() }),
+
+  deleteFlashcard: (id: number) =>
+    api.delete(`/api/v1/flashcards/${id}`, { token: authToken() })
 };
