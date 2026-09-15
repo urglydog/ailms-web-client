@@ -854,7 +854,8 @@ export default function AntiCheatExamPage() {
                       <div className="h-[70%] w-full flex items-center justify-center bg-surface text-ink border-b border-line/50">
                         {idx + 1}
                       </div>
-                      <div className={`h-[30%] w-full ${isAnswered ? 'bg-green-500' : 'bg-red-500'}`}>
+                      <div className={`h-[30%] w-full flex items-center justify-center text-white text-[8px] ${isAnswered ? 'bg-green-500' : 'bg-red-500'}`}>
+                        {isAnswered ? '✓' : '✗'}
                       </div>
                       {isFlagged && <span className="absolute -top-1 -right-1 text-[10px] z-10">🚩</span>}
                     </button>
