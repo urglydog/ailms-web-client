@@ -621,7 +621,7 @@ function LearnPageContent() {
 
                 {mainTab === 'materials' && (
                   lesson.enrolled ? (
-                    <MaterialManager courseId={lesson.courseId} />
+                    <MaterialManager courseId={lesson.courseId} lessonId={lesson.lessonId} />
                   ) : (
                     <LockedFeatureNotice feature="Học liệu AI" courseSlug={lesson.courseSlug} />
                   )
