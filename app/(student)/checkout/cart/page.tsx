@@ -1,11 +1,14 @@
 'use client';
 
-import { Suspense, useMemo, useState } from 'react';
+import { Suspense, useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useCart } from '@/hooks/useCart';
 import { paymentsApi } from '@/lib/api/payments';
+import { couponsApi } from '@/lib/api/coupons';
+import { ApiError } from '@/lib/api/client';
+import type { CouponPriceRes } from '@/types/domain';
 import { toast } from 'sonner';
 
 /**
@@ -33,7 +36,46 @@ function CartCheckoutContent() {
   }, [searchParams]);
 
   const items = (cartItems ?? []).filter((item) => courseIds.includes(item.courseId));
-  const total = items.reduce((sum, item) => sum + item.price, 0);
+
+  // Mã giảm giá (15/09/2026, mở rộng) — mã có thể đã được áp ở trang giỏ hàng (truyền qua
+  // query `coupon`) hoặc nhập lại ở đây; mỗi khóa tự resolve coupon TỐT NHẤT (BR-COUPON-05).
+  const [couponCode, setCouponCode] = useState(searchParams.get('coupon') ?? '');
+  const [appliedCode, setAppliedCode] = useState<string | null>(null);
+  const [priceMap, setPriceMap] = useState<Map<number, CouponPriceRes>>(new Map());
+  const [applying, setApplying] = useState(false);
+
+  useEffect(() => {
+    const preset = searchParams.get('coupon');
+    if (preset && items.length > 0 && !appliedCode) {
+      void applyCoupon(preset);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [items.length]);
+
+  const applyCoupon = async (code: string) => {
+    const trimmed = code.trim();
+    if (!trimmed || items.length === 0) return;
+    setApplying(true);
+    try {
+      const results = await couponsApi.previewMany(items.map((item) => item.courseId), trimmed);
+      const anyValid = [...results.values()].some((r) => r.enteredCodeValid);
+      if (!anyValid) {
+        toast.error('Mã giảm giá không áp dụng được cho các khóa này.');
+        return;
+      }
+      setPriceMap(results);
+      setAppliedCode(trimmed);
+      toast.success('Đã áp dụng mã giảm giá.');
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : 'Không áp dụng được mã giảm giá, thử lại sau.');
+    } finally {
+      setApplying(false);
+    }
+  };
+
+  const finalPriceFor = (item: (typeof items)[number]) => priceMap.get(item.courseId)?.finalPrice ?? item.finalPrice;
+  const total = items.reduce((sum, item) => sum + finalPriceFor(item), 0);
+  const totalOriginal = items.reduce((sum, item) => sum + item.price, 0);
 
   const handlePay = async (method: string) => {
     if (items.length === 0) return;
@@ -44,6 +86,7 @@ function CartCheckoutContent() {
         paymentMethod: method,
         billingName,
         billingPhone,
+        couponCode: appliedCode ?? undefined,
       });
       window.location.href = res.paymentUrl;
     } catch (err: unknown) {
@@ -105,8 +148,11 @@ function CartCheckoutContent() {
                       <h3 className="font-display text-base font-bold text-ink">{item.courseTitle}</h3>
                       <p className="mt-1 text-sm text-ink-muted">GV. {item.instructorName}</p>
                     </div>
-                    <div className="flex shrink-0 items-center font-display text-base font-bold text-ink">
-                      {formatPrice(item.price)}
+                    <div className="flex shrink-0 flex-col items-end justify-center font-display text-base font-bold text-ink">
+                      <span>{formatPrice(finalPriceFor(item))}</span>
+                      {finalPriceFor(item) < item.price && (
+                        <span className="text-xs font-normal text-ink-faint line-through">{formatPrice(item.price)}</span>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -148,7 +194,48 @@ function CartCheckoutContent() {
 
               <div className="flex justify-between border-b border-line-soft pb-4">
                 <span className="text-ink-muted">Tạm tính ({items.length} khóa học)</span>
-                <span className="font-semibold text-ink">{formatPrice(total)}</span>
+                <span className="font-semibold text-ink">{formatPrice(totalOriginal)}</span>
+              </div>
+
+              {total < totalOriginal && (
+                <div className="flex justify-between pt-4 text-sm text-ink-muted">
+                  <span>Đã giảm</span>
+                  <span className="font-semibold text-danger">-{formatPrice(totalOriginal - total)}</span>
+                </div>
+              )}
+
+              <div className="mb-4 border-b border-line-soft pb-4 pt-2">
+                {appliedCode ? (
+                  <div className="flex items-center justify-between rounded-lg bg-success/5 border border-success/20 px-3 py-2 text-sm">
+                    <span className="font-mono font-bold text-success">{appliedCode.toUpperCase()}</span>
+                    <button
+                      type="button"
+                      onClick={() => { setAppliedCode(null); setPriceMap(new Map()); }}
+                      className="text-xs font-semibold text-ink-muted hover:text-ink"
+                    >
+                      Bỏ mã
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={couponCode}
+                      onChange={(e) => setCouponCode(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); void applyCoupon(couponCode); } }}
+                      placeholder="Mã giảm giá"
+                      className="w-full min-w-0 rounded-lg border border-line px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:border-accent focus:outline-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => void applyCoupon(couponCode)}
+                      disabled={applying}
+                      className="shrink-0 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-dark disabled:opacity-60"
+                    >
+                      {applying ? '...' : 'Áp dụng'}
+                    </button>
+                  </div>
+                )}
               </div>
 
               <div className="flex justify-between py-4">

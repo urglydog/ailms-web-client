@@ -184,9 +184,17 @@ function WishlistCard({ item }: { item: WishlistItem }) {
         <StarRating rating={item.avgRating} reviewCount={item.reviewCount} />
 
         <div className="mt-auto flex items-center justify-between gap-2 border-t border-line-soft pt-3">
-          <span className="font-display text-[15px] font-bold text-ink">
-            {item.isFree ? 'Miễn phí' : formatPrice(item.price)}
-          </span>
+          {item.isFree ? (
+            <span className="font-display text-[15px] font-bold text-ink">Miễn phí</span>
+          ) : item.discountPercent ? (
+            // Mã giảm giá (15/09/2026, mở rộng) — chỉ coupon `autoApply=true` (BR-COUPON-04).
+            <div className="flex items-baseline gap-1.5">
+              <span className="font-display text-[15px] font-bold text-ink">{formatPrice(item.finalPrice)}</span>
+              <span className="text-xs text-ink-faint line-through">{formatPrice(item.price)}</span>
+            </div>
+          ) : (
+            <span className="font-display text-[15px] font-bold text-ink">{formatPrice(item.price)}</span>
+          )}
 
           {item.isFree ? (
             <button

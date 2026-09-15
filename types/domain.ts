@@ -20,8 +20,10 @@ export type ScopeType = 'WHOLE_COURSE' | 'CHAPTER' | 'COMPLETED_LESSONS';
 export type GenStatus = 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
 export type QuantityLevel = 'FEWER' | 'STANDARD' | 'MORE';
 export type DifficultyLevel = 'EASY' | 'MEDIUM' | 'HARD';
-export type RequestStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 export type CourseLevel = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
+/** Mã giảm giá (15/09/2026, mở rộng ngoài đặc tả gốc — UC55/UC56/UC57). */
+export type DiscountType = 'PERCENTAGE' | 'FIXED_AMOUNT';
+export type CouponScopeType = 'ALL_COURSES' | 'SPECIFIC_COURSES' | 'SINGLE_COURSE';
 export type LessonStatus = 'DRAFT' | 'READY' | 'UNAVAILABLE';
 
 // ── Người dùng ──────────────────────────────────────────────────
@@ -116,6 +118,11 @@ export interface CourseSummary {
   /** Dùng cho ảnh bìa gradient khi chưa có thumbnail thật */
   coverColorA: string;
   coverColorB: string;
+  /** Mã giảm giá (15/09/2026, mở rộng) — chỉ xét coupon `autoApply=true` (BR-COUPON-04), luôn
+   * bằng `price` nếu không có coupon nào áp dụng hoặc khóa MIỄN PHÍ. */
+  finalPrice: number;
+  /** null nếu không có coupon nào áp dụng. */
+  discountPercent: number | null;
 }
 
 export interface CourseDetail extends CourseSummary {
@@ -637,6 +644,9 @@ export interface CreatePaymentReq {
   paymentMethod: string; // 'VNPAY' | 'MOMO'
   billingName?: string;
   billingPhone?: string;
+  /** Mã giảm giá học viên tự nhập (15/09/2026, mở rộng) — bỏ trống nếu không dùng mã (coupon
+   * autoApply vẫn được xét dù không nhập gì, xem BR-COUPON-01/04). */
+  couponCode?: string;
 }
 
 export interface PaymentUrlRes {
@@ -653,6 +663,10 @@ export interface PaymentRes {
   gatewayTxnNo: string | null;
   billingName?: string;
   billingPhone?: string;
+  /** Mã giảm giá (15/09/2026, mở rộng) — null nếu giao dịch không dùng coupon nào. */
+  originalAmount: number | null;
+  discountAmount: number;
+  couponCode: string | null;
 }
 
 /** Giỏ hàng (06/09/2026) — TÍNH NĂNG MỞ RỘNG, không nằm trong 49 use case đặc tả gốc. Gộp
@@ -662,6 +676,11 @@ export interface CreateBatchPaymentReq {
   paymentMethod: string;
   billingName?: string;
   billingPhone?: string;
+  /** BR-COUPON-05 — mỗi khóa trong giỏ tự chọn mã RIÊNG, đây chỉ là 1 mã áp dụng chung nếu
+   * học viên nhập ở khung "Mã giảm giá" của trang giỏ hàng (áp mã ĐÓ cho MỌI khóa đang thanh
+   * toán, mỗi khóa vẫn tự tính coupon tốt nhất — có thể một khóa lại có coupon autoApply lời
+   * hơn coupon nhập tay, xem `CouponService.resolveBestPrice`). */
+  couponCode?: string;
 }
 
 /** 1 dòng trong giỏ hàng — đủ dữ liệu để hiển thị trực tiếp, không cần gọi thêm API chi tiết
@@ -680,6 +699,10 @@ export interface CartItem {
   totalDurationSec: number;
   totalLessons: number;
   level: CourseLevel;
+  /** Mã giảm giá (15/09/2026, mở rộng) — giỏ hàng không có khóa MIỄN PHÍ (BR-CART-01) nên luôn
+   * xét coupon, không cần nhánh riêng như wishlist. */
+  finalPrice: number;
+  discountPercent: number | null;
 }
 
 /** Danh sách yêu thích (14/09/2026) — TÍNH NĂNG MỞ RỘNG, không nằm trong 49 use case đặc tả
@@ -695,6 +718,67 @@ export interface WishlistItem {
   avgRating: number;
   reviewCount: number;
   addedAt: string;
+  /** Mã giảm giá (15/09/2026, mở rộng) — bằng `price` cho khóa MIỄN PHÍ (không xét coupon). */
+  finalPrice: number;
+  discountPercent: number | null;
+}
+
+// ── Mã giảm giá (15/09/2026, mở rộng — UC55/UC56/UC57) ───────────
+
+export interface CouponCourseRef {
+  courseId: number;
+  courseTitle: string;
+}
+
+export interface Coupon {
+  id: number;
+  /** null khi `autoApply=true` (BR-COUPON-04) — coupon tự động không cần mã. */
+  code: string | null;
+  autoApply: boolean;
+  discountType: DiscountType;
+  discountValue: number;
+  scopeType: CouponScopeType;
+  /** Rỗng khi `scopeType=ALL_COURSES`. */
+  courses: CouponCourseRef[];
+  createdByName: string;
+  startAt: string;
+  endAt: string;
+  maxUsageCount: number | null;
+  maxUsagePerUser: number | null;
+  isActive: boolean;
+  usageCount: number;
+}
+
+export interface CreateCouponReq {
+  code?: string;
+  autoApply: boolean;
+  discountType: DiscountType;
+  discountValue: number;
+  scopeType: CouponScopeType;
+  courseIds?: number[];
+  startAt: string;
+  endAt: string;
+  maxUsageCount?: number | null;
+  maxUsagePerUser?: number | null;
+}
+
+export interface UpdateCouponReq extends CreateCouponReq {
+  isActive: boolean;
+}
+
+/** Xem trước giá sau khi nhập mã ở giỏ hàng/thanh toán — không tạo giao dịch nào. */
+export interface CouponPreviewReq {
+  courseId: number;
+  code?: string;
+}
+
+export interface CouponPriceRes {
+  originalPrice: number;
+  finalPrice: number;
+  discountPercent: number | null;
+  appliedCouponCode: string | null;
+  /** false khi có nhập mã nhưng mã đó KHÔNG áp dụng được cho khóa này — luôn true nếu bỏ trống mã. */
+  enteredCodeValid: boolean;
 }
 
 // ── F11.1: Live Classroom — vòng đời phiên (UC50) ────────────────

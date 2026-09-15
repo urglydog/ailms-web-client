@@ -56,6 +56,12 @@ export default function PaymentDetailModal({ payment, onClose }: PaymentDetailMo
               <p className="text-3xl font-display font-bold text-accent">
                 {payment.amount.toLocaleString('vi-VN')}đ
               </p>
+              {payment.couponCode && payment.originalAmount != null && (
+                <p className="mt-1 text-sm text-ink-muted">
+                  <span className="line-through">{payment.originalAmount.toLocaleString('vi-VN')}đ</span>
+                  {' '}— đã giảm {payment.discountAmount.toLocaleString('vi-VN')}đ
+                </p>
+              )}
             </div>
             <div className="text-right">
               <p className="text-sm font-medium text-ink-muted uppercase tracking-wider mb-1">Trạng thái</p>
@@ -64,6 +70,13 @@ export default function PaymentDetailModal({ payment, onClose }: PaymentDetailMo
               </span>
             </div>
           </div>
+
+          {payment.couponCode && (
+            <div className="flex items-center justify-between rounded-lg bg-accent/5 border border-accent/20 px-4 py-2.5">
+              <span className="text-sm font-medium text-ink-muted">Mã giảm giá đã dùng</span>
+              <span className="font-mono font-bold text-accent-dark">{payment.couponCode}</span>
+            </div>
+          )}
 
           <div className="grid grid-cols-2 gap-y-4 gap-x-6 border-t border-line pt-6">
             <div className="col-span-2">

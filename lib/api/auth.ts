@@ -42,4 +42,20 @@ export const authApi = {
       // best-effort — xem docblock
     }
   },
+  /**
+   * (15/09/2026) — `JwtTokenProvider` nhồi `roles` vào access token NGAY LÚC KÝ, không đọc lại
+   * DB mỗi request; chỉ `refresh` mới đọc `Role` mới nhất từ DB. Nên sau khi
+   * `instructorApi.become()` nâng role STUDENT → INSTRUCTOR ở DB, access token cũ trên máy
+   * học viên VẪN mang role STUDENT cho tới khi chủ động gọi hàm này — bắt buộc gọi ngay sau
+   * `become()` thành công (xem `app/(public)/profile/page.tsx`), không đợi request nào đó
+   * tình cờ nhận 401 mới refresh.
+   */
+  refresh: async (): Promise<{ accessToken: string; refreshToken: string }> => {
+    const refreshToken = localStorage.getItem('refreshToken');
+    if (!refreshToken) throw new Error('Không có refresh token');
+    const data = await fetchApi('/api/v1/auth/refresh', { refreshToken });
+    localStorage.setItem('accessToken', data.accessToken as string);
+    localStorage.setItem('refreshToken', data.refreshToken as string);
+    return data as { accessToken: string; refreshToken: string };
+  },
 };

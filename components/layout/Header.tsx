@@ -41,7 +41,7 @@ export function Header() {
   // cứng cũ (icon giỏ hàng vốn để sẵn từ trước nhưng chưa từng nối API/route thật).
   const { data: cartItems } = useCart();
   const cartCount = cartItems?.length ?? 0;
-  const cartTotal = cartItems?.reduce((sum, item) => sum + item.price, 0) ?? 0;
+  const cartTotal = cartItems?.reduce((sum, item) => sum + item.finalPrice, 0) ?? 0;
   // Danh sách yêu thích (14/09/2026) — không hiện số đếm ở icon (theo yêu cầu trước), nhưng
   // vẫn cần dữ liệu để đổ vào dropdown xem nhanh khi hover.
   const { data: wishlistItems } = useWishlist();
@@ -353,13 +353,6 @@ export function Header() {
                       </Link>
                     )}
 
-                    {/* Instructor links */}
-                    {currentUser?.role === 'INSTRUCTOR' && (
-                      <Link href="/instructor" className="rounded-lg px-3 py-2.5 text-[13.5px] font-semibold text-accent-dark bg-accent/10 hover:bg-accent/20 mb-1">
-                        Kênh Giảng viên
-                      </Link>
-                    )}
-
                     {/* Default student links */}
                     <Link href="/my-courses" className="rounded-lg px-3 py-2.5 text-[13.5px] text-ink hover:bg-surface">
                       Khóa học của tôi
@@ -385,6 +378,12 @@ export function Header() {
                     <Link href="/profile" className="rounded-lg px-3 py-2.5 text-[13.5px] text-ink hover:bg-surface">
                       Hồ sơ cá nhân
                     </Link>
+                    {/* Instructor links */}
+                    {currentUser?.role === 'INSTRUCTOR' && (
+                      <Link href="/instructor" className="rounded-lg px-3 py-2.5 text-[13.5px] text-ink hover:bg-surface">
+                        Kênh Giảng viên
+                      </Link>
+                    )}
                     {/* Ngôn ngữ giao diện (14/09/2026, mở rộng) — CHỈ hiển thị danh sách kiểu
                         Udemy, chưa có logic đổi ngôn ngữ UI thật (xem LanguageModal.tsx). */}
                     <button
@@ -500,7 +499,7 @@ function HeaderWishlistRow({ item }: { item: WishlistItem }) {
           {item.courseTitle}
         </Link>
         <p className="truncate text-[11.5px] text-ink-muted">{item.instructorName}</p>
-        <p className="mt-0.5 text-[12.5px] font-bold text-ink">{item.isFree ? 'Miễn phí' : formatPrice(item.price)}</p>
+        <p className="mt-0.5 text-[12.5px] font-bold text-ink">{item.isFree ? 'Miễn phí' : formatPrice(item.finalPrice)}</p>
         {item.isFree ? (
           <button
             type="button"
@@ -542,7 +541,7 @@ function HeaderCartRow({ item }: { item: CartItem }) {
       <div className="min-w-0 flex-1">
         <p className="line-clamp-1 text-[13px] font-semibold text-ink">{item.courseTitle}</p>
         <p className="truncate text-[11.5px] text-ink-muted">{item.instructorName}</p>
-        <p className="mt-0.5 text-[12.5px] font-bold text-ink">{formatPrice(item.price)}</p>
+        <p className="mt-0.5 text-[12.5px] font-bold text-ink">{formatPrice(item.finalPrice)}</p>
       </div>
     </Link>
   );

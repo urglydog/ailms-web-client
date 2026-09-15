@@ -1,24 +1,34 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { publicCoursesApi } from '@/lib/api/publicCourses';
+import { couponsApi } from '@/lib/api/coupons';
+import { ApiError } from '@/lib/api/client';
 import type { CourseDetail } from '@/types/domain';
 import { paymentsApi } from '@/lib/api/payments';
 import { toast } from 'sonner';
 
-export default function CheckoutPage() {
+function CheckoutPageContent() {
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
   const courseSlug = decodeURIComponent(params.slug as string);
-  
+
   const [course, setCourse] = useState<CourseDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [payingMethod, setPayingMethod] = useState<string | null>(null);
-  
+
   const [billingName, setBillingName] = useState('');
   const [billingPhone, setBillingPhone] = useState('');
+
+  // Mã giảm giá (15/09/2026, mở rộng) — UC57. `finalPrice`/`discountPercent` mặc định đến từ
+  // coupon autoApply (BR-COUPON-04); nhập mã ở đây có thể thay bằng mức tốt hơn (BR-COUPON-01).
+  const [couponCode, setCouponCode] = useState(searchParams.get('coupon') ?? '');
+  const [appliedCode, setAppliedCode] = useState<string | null>(null);
+  const [preview, setPreview] = useState<{ finalPrice: number; discountPercent: number | null } | null>(null);
+  const [applying, setApplying] = useState(false);
 
   useEffect(() => {
     if (!courseSlug) return;
@@ -33,6 +43,36 @@ export default function CheckoutPage() {
       .finally(() => setLoading(false));
   }, [courseSlug, router]);
 
+  useEffect(() => {
+    const preset = searchParams.get('coupon');
+    if (preset && course && !appliedCode) {
+      void applyCoupon(preset);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [course]);
+
+  const applyCoupon = async (code: string) => {
+    const trimmed = code.trim();
+    if (!trimmed || !course) return;
+    setApplying(true);
+    try {
+      const result = await couponsApi.preview({ courseId: course.id, code: trimmed });
+      if (!result.enteredCodeValid) {
+        toast.error('Mã giảm giá không áp dụng được cho khóa học này.');
+        return;
+      }
+      setPreview({ finalPrice: result.finalPrice, discountPercent: result.discountPercent });
+      setAppliedCode(trimmed);
+      toast.success('Đã áp dụng mã giảm giá.');
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : 'Không áp dụng được mã giảm giá, thử lại sau.');
+    } finally {
+      setApplying(false);
+    }
+  };
+
+  const finalPrice = preview?.finalPrice ?? course?.finalPrice ?? course?.price ?? 0;
+
   const handlePay = async (method: string) => {
     if (!course) return;
     try {
@@ -41,7 +81,8 @@ export default function CheckoutPage() {
         courseId: course.id,
         paymentMethod: method,
         billingName,
-        billingPhone
+        billingPhone,
+        couponCode: appliedCode ?? undefined,
       });
       window.location.href = res.paymentUrl;
     } catch (err: unknown) {
@@ -141,10 +182,51 @@ export default function CheckoutPage() {
                 <span className="text-ink-muted">Tạm tính</span>
                 <span className="font-semibold text-ink">{course.price.toLocaleString('vi-VN')} đ</span>
               </div>
-              
+
+              {finalPrice < course.price && (
+                <div className="flex justify-between pt-4 text-sm text-ink-muted">
+                  <span>Đã giảm</span>
+                  <span className="font-semibold text-danger">-{(course.price - finalPrice).toLocaleString('vi-VN')} đ</span>
+                </div>
+              )}
+
+              <div className="mb-4 border-b border-line-soft pb-4 pt-2">
+                {appliedCode ? (
+                  <div className="flex items-center justify-between rounded-lg bg-success/5 border border-success/20 px-3 py-2 text-sm">
+                    <span className="font-mono font-bold text-success">{appliedCode.toUpperCase()}</span>
+                    <button
+                      type="button"
+                      onClick={() => { setAppliedCode(null); setPreview(null); }}
+                      className="text-xs font-semibold text-ink-muted hover:text-ink"
+                    >
+                      Bỏ mã
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={couponCode}
+                      onChange={(e) => setCouponCode(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); void applyCoupon(couponCode); } }}
+                      placeholder="Mã giảm giá"
+                      className="w-full min-w-0 rounded-lg border border-line px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:border-accent focus:outline-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => void applyCoupon(couponCode)}
+                      disabled={applying}
+                      className="shrink-0 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-dark disabled:opacity-60"
+                    >
+                      {applying ? '...' : 'Áp dụng'}
+                    </button>
+                  </div>
+                )}
+              </div>
+
               <div className="flex justify-between py-4">
                 <span className="text-base font-bold text-ink">Tổng cộng</span>
-                <span className="text-xl font-bold text-accent">{course.price.toLocaleString('vi-VN')} đ</span>
+                <span className="text-xl font-bold text-accent">{finalPrice.toLocaleString('vi-VN')} đ</span>
               </div>
 
               <div className="mt-6 flex flex-col gap-3">
@@ -213,5 +295,19 @@ export default function CheckoutPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function CheckoutPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex h-[60vh] items-center justify-center">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-accent border-t-transparent" />
+        </div>
+      }
+    >
+      <CheckoutPageContent />
+    </Suspense>
   );
 }
