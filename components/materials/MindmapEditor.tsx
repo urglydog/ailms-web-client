@@ -532,7 +532,11 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
     const tempMermaid = parseFlowToMermaid(nds, eds, layoutToUse, colorTheme);
     const { nodes: parsedNodes, edges: parsedEdges } = parseMermaidToFlow(tempMermaid, colorTheme);
     const layouted = getLayoutedElements(parsedNodes, parsedEdges, layoutToUse);
-    setNodes(layouted.nodes);
+    const finalNodes = layouted.nodes.map(n => {
+        const orig = nds.find(o => o.id === n.id);
+        return orig ? { ...n, selected: orig.selected } : n;
+    });
+    setNodes(finalNodes);
     setEdges(layouted.edges);
     pushHistory(layouted.nodes, layouted.edges);
     setTimeout(() => fitView({ duration: 300 }), 50);
