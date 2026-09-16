@@ -7,9 +7,12 @@ import { useStartQuiz, useSubmitQuiz, useExplainWrongAnswer, useQuizHistory } fr
 import { StartRes, SubmitRes } from '@/lib/api/quizzes';
 import Link from 'next/link';
 import { MarkdownRenderer } from '@/components/ui/MarkdownRenderer';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 
 export default function AntiCheatExamPage() {
   const router = useRouter();
+  const { data: user } = useCurrentUser();
+  const userId = user?.id;
   const params = useParams();
   const searchParams = useSearchParams();
   const quizId = params.quizId;
@@ -54,6 +57,9 @@ export default function AntiCheatExamPage() {
   const [submitTime, setSubmitTime] = useState<Date | null>(null);
   const [elapsedSeconds, setElapsedSeconds] = useState<number>(0);
   const startTimeRef = useRef<Date | null>(null);
+  
+  const [archivedError, setArchivedError] = useState<{show: boolean, message: string}>({show: false, message: ''});
+  const [isHydrated, setIsHydrated] = useState(false);
 
   const [explanations, setExplanations] = useState<Record<number, { loading: boolean; text?: string }>>({});
   const [flagged, setFlagged] = useState<Record<number, boolean>>({});
@@ -61,6 +67,35 @@ export default function AntiCheatExamPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [resultPage, setResultPage] = useState(1);
   const questionsPerPage = 5;
+
+  useEffect(() => {
+    if (userId && quizId) {
+      const draftKey = `exam_draft_${userId}_${quizId}`;
+      try {
+        const savedDraft = localStorage.getItem(draftKey);
+        if (savedDraft) {
+          const parsed = JSON.parse(savedDraft);
+          if (parsed && typeof parsed === 'object') {
+            setAnswers(parsed);
+          }
+        }
+      } catch (e) {
+        console.error("Failed to parse exam draft", e);
+      }
+    }
+    setIsHydrated(true);
+  }, [userId, quizId]);
+
+  useEffect(() => {
+    if (isHydrated && userId && quizId && isStarted && !result) {
+      const draftKey = `exam_draft_${userId}_${quizId}`;
+      try {
+        localStorage.setItem(draftKey, JSON.stringify(answers));
+      } catch (e) {
+        console.error("Failed to save exam draft", e);
+      }
+    }
+  }, [answers, isHydrated, userId, quizId, isStarted, result]);
 
   const handleExplain = (questionId: number, selectedOptionId: number | null) => {
     setExplanations(prev => ({ ...prev, [questionId]: { loading: true } }));
@@ -113,14 +148,18 @@ export default function AntiCheatExamPage() {
       onSuccess: (data) => {
         setResult(data);
         setSubmitTime(new Date());
+        if (userId && quizId) {
+          localStorage.removeItem(`exam_draft_${userId}_${quizId}`);
+        }
         // Dừng stream
         if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
       },
       onError: (err: unknown) => {
-        const error = err as { response?: { status?: number } };
-        if (error.response?.status === 404 || error.response?.status === 500) {
-          toast.error('Bài tập này đã được giảng viên gỡ bỏ hoặc cập nhật. Phiên làm bài kết thúc.', { duration: 5000 });
-          setTimeout(() => router.push('/my-courses'), 2000);
+        const error = err as { response?: { status?: number, data?: { code?: string, message?: string } } };
+        if (error.response?.status === 410) {
+          setArchivedError({ show: true, message: error.response?.data?.message || 'Bài tập này đã được giảng viên thu hồi.' });
+        } else if (error.response?.status === 404 || error.response?.status === 500) {
+          setArchivedError({ show: true, message: 'Bài tập này đã được giảng viên gỡ bỏ hoặc cập nhật. Phiên làm bài kết thúc.' });
         } else {
           toast.error('Có lỗi khi nộp bài. Vui lòng thử lại.');
         }
@@ -912,6 +951,26 @@ export default function AntiCheatExamPage() {
         </div>
         )}
       </div>
+
+      {archivedError.show && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="p-6">
+              <h3 className="text-xl font-bold mb-2">Bài thi không còn khả dụng</h3>
+              <p className="text-ink-muted">{archivedError.message}</p>
+              <div className="mt-6 flex justify-end">
+                <button
+                  onClick={() => router.push(returnUrl ? returnUrl : '/my-courses')}
+                  className="bg-accent text-white px-5 py-2.5 rounded-lg font-semibold shadow-lg hover:bg-accent-hover transition-colors"
+                >
+                  Quay lại khóa học
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

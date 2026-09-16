@@ -6,6 +6,8 @@ import { useParams, useRouter, useSearchParams, usePathname } from 'next/navigat
 import { useCallback, useEffect, useRef, useState, Suspense } from 'react';
 import { toast } from 'sonner';
 import { CourseOverviewTab } from '@/components/course/CourseOverviewTab';
+import { CourseGradebookTab } from '@/components/course/CourseGradebookTab';
+import { CourseResourcesTab } from '@/components/course/CourseResourcesTab';
 import { ReviewsSection } from '@/components/course/ReviewsSection';
 import { MaterialManager } from '@/components/materials/MaterialManager';
 import { DualPlayer, type DualPlayerHandle } from '@/components/player/DualPlayer';
@@ -29,14 +31,16 @@ import { useSetLearnTitle } from '@/components/layout/LearnTitleContext';
 import { decodeAccessToken, getAccessToken } from '@/lib/auth/token';
 import type { PipelineStep } from '@/types/domain';
 
-type MainTab = 'overview' | 'qna' | 'reviews' | 'materials';
+type MainTab = 'overview' | 'qna' | 'reviews' | 'materials' | 'gradebook' | 'resources';
 type SidebarTab = 'content' | 'tutor';
 
 const MAIN_TABS: Array<{ key: MainTab; label: string }> = [
   { key: 'overview', label: 'Tổng quan' },
   { key: 'qna', label: 'Hỏi đáp' },
+  { key: 'materials', label: 'Học liệu AI' },
+  { key: 'gradebook', label: 'Bảng điểm' },
+  { key: 'resources', label: 'Tài nguyên' },
   { key: 'reviews', label: 'Đánh giá' },
-  { key: 'materials', label: 'Học liệu' },
 ];
 
 /** Thông báo khoá thống nhất cho 3 mục cần sở hữu khoá học (Hỏi đáp/Học liệu/Gia sư AI) — thay
@@ -682,7 +686,8 @@ function LearnPageContent() {
                 )}
 
                 {mainTab === 'reviews' && <ReviewsSection courseId={lesson.courseId} />}
-
+                {mainTab === 'gradebook' && <CourseGradebookTab courseId={lesson.courseId} />}
+                {mainTab === 'resources' && <CourseResourcesTab courseId={lesson.courseId} />}
                 {mainTab === 'materials' && (
                   lesson.enrolled ? (
                     <MaterialManager courseId={lesson.courseId} lessonId={lesson.lessonId} />
