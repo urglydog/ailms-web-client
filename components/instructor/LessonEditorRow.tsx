@@ -9,6 +9,7 @@ interface LessonEditorRowProps {
   onTogglePreview: (isPreview: boolean) => void;
   onDelete: () => void;
   onManageVideo: () => void;
+  onAttachMaterial: () => void;
   onDragStart: () => void;
   onDragEnd: () => void;
   isDropTarget: boolean;
@@ -26,6 +27,7 @@ export function LessonEditorRow({
   onTogglePreview,
   onDelete,
   onManageVideo,
+  onAttachMaterial,
   onDragStart,
   onDragEnd,
   isDropTarget,
@@ -87,15 +89,24 @@ export function LessonEditorRow({
       <button
         type="button"
         onClick={onManageVideo}
-        className="shrink-0 whitespace-nowrap rounded-full border border-cyan-200 px-2.5 py-1 text-[11px] font-bold text-cyan-700 hover:bg-cyan-50"
+        className="shrink-0 whitespace-nowrap rounded-full border border-cyan-200 px-2.5 py-1 text-[11px] font-bold text-cyan-700 hover:bg-cyan-50 transition-colors"
       >
         Quản lý video
       </button>
 
       <button
         type="button"
+        onClick={onAttachMaterial}
+        className="shrink-0 whitespace-nowrap rounded-full border border-purple-200 px-2.5 py-1 text-[11px] font-bold text-purple-700 hover:bg-purple-50 transition-colors"
+        title="Đính kèm bài thi/học liệu từ kho"
+      >
+        📎 Đính kèm
+      </button>
+
+      <button
+        type="button"
         onClick={onDelete}
-        className="shrink-0 text-[12px] font-bold text-red-500 hover:text-red-700"
+        className="shrink-0 text-[12px] font-bold text-red-500 hover:text-red-700 ml-1"
       >
         Xóa
       </button>
