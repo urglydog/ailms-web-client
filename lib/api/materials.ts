@@ -65,6 +65,7 @@ export interface MaterialGenerationRes {
   versionNo: number;
   status: GenStatus;
   createdAt: string;
+  usageCount?: number;
 }
 
 /** Cùng nguồn `voice_mappings.is_active` với dropdown lồng tiếng (BR-DUB-07) — `available` ở đây

@@ -100,6 +100,56 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
     onError: (err: Error) => toast.error(err.message || 'Lỗi khi xóa học liệu'),
   });
 
+  const renderDeleteModal = () => {
+    if (!confirmDeleteId) return null;
+    const mat = materials?.find(m => m.id === confirmDeleteId);
+    const hasUsage = (mat?.usageCount ?? 0) > 0;
+    
+    return (
+      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in">
+        <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden border border-red-100">
+          <div className="bg-red-50 p-6 border-b border-red-100 flex items-center gap-4">
+            <div className="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center flex-shrink-0 text-2xl">
+              ⚠️
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-red-950">Xóa Học Liệu</h3>
+              <p className="text-sm text-red-700 mt-1">Hành động này không thể hoàn tác.</p>
+            </div>
+          </div>
+          <div className="p-6">
+            {hasUsage ? (
+              <p className="text-red-700 font-medium text-sm mb-6 leading-relaxed bg-red-50 p-3 rounded-lg border border-red-100">
+                ⚠️ Học liệu đã có dữ liệu tương tác! Hiện có {mat?.usageCount} lượt tương tác. Việc xóa sẽ ẩn học liệu nhưng lịch sử điểm số vẫn được lưu trữ.
+              </p>
+            ) : (
+              <p className="text-gray-600 text-sm mb-6 leading-relaxed">
+                Bạn có chắc chắn muốn xóa TOÀN BỘ bộ học liệu này không? Mọi dữ liệu (câu hỏi, thẻ học, sơ đồ) và kết quả làm bài liên quan sẽ bị xóa vĩnh viễn.
+              </p>
+            )}
+            <div className="flex items-center justify-end gap-3">
+              <button
+                onClick={() => setConfirmDeleteId(null)}
+                className="px-4 py-2 text-sm font-bold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors"
+              >
+                Hủy bỏ
+              </button>
+              <button
+                onClick={() => {
+                  deleteMaterialMutation.mutate(confirmDeleteId);
+                }}
+                disabled={deleteMaterialMutation.isPending}
+                className="px-4 py-2 text-sm font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-md shadow-red-200 transition-all disabled:opacity-50"
+              >
+                {deleteMaterialMutation.isPending ? 'Đang xóa...' : (hasUsage ? 'Xác nhận Xóa và Ẩn' : 'Xác nhận xóa')}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
 
   if (isLoading) return <div className="p-6 text-center text-sm text-gray-500 animate-pulse">Đang tải danh sách học liệu Giảng viên...</div>;
 
@@ -107,24 +157,31 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
   if (inspectGenerationId) {
     const activeMat = materials?.find(m => m.id === inspectGenerationId);
     return (
-      <MaterialWorkspaceViewer
-        generationId={inspectGenerationId}
-        material={activeMat}
-        onBack={() => setInspectGenerationId(null)}
-        onToggleOfficial={() => {
-          if (!activeMat || !activeMat.materialId) return;
-          if (activeMat.materialType === 'MINDMAP') {
-            toggleMindmapMutation.mutate({ id: activeMat.materialId, isOfficial: !activeMat.isOfficial });
-          } else if (activeMat.materialType === 'FLASHCARD') {
-            toggleFlashcardMutation.mutate({ id: activeMat.materialId, isOfficial: !activeMat.isOfficial });
-          } else if (activeMat.materialType === 'QUIZ') {
-            setQuizOfficialMutation.mutate(activeMat.materialId);
-          }
-        }}
-        onDelete={() => {
-          setConfirmDeleteId(inspectGenerationId);
-        }}
-      />
+      <>
+        <MaterialWorkspaceViewer
+          generationId={inspectGenerationId}
+          material={activeMat}
+          onBack={() => setInspectGenerationId(null)}
+          onToggleOfficial={() => {
+            if (!activeMat || !activeMat.materialId) return;
+            
+            const confirmUnpublish = !activeMat.isOfficial || window.confirm("Học liệu sẽ chuyển về bản nháp (Draft), học viên sẽ mất quyền truy cập vào tài nguyên này. Bạn có chắc chắn?");
+            if (!confirmUnpublish) return;
+
+            if (activeMat.materialType === 'MINDMAP') {
+              toggleMindmapMutation.mutate({ id: activeMat.materialId, isOfficial: !activeMat.isOfficial });
+            } else if (activeMat.materialType === 'FLASHCARD') {
+              toggleFlashcardMutation.mutate({ id: activeMat.materialId, isOfficial: !activeMat.isOfficial });
+            } else if (activeMat.materialType === 'QUIZ') {
+              setQuizOfficialMutation.mutate(activeMat.materialId);
+            }
+          }}
+          onDelete={() => {
+            setConfirmDeleteId(inspectGenerationId);
+          }}
+        />
+        {renderDeleteModal()}
+      </>
     );
   }
 
@@ -355,43 +412,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
       </div>
 
       {/* Modal Xác Nhận Xóa */}
-      {confirmDeleteId && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in">
-          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden border border-red-100">
-            <div className="bg-red-50 p-6 border-b border-red-100 flex items-center gap-4">
-              <div className="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center flex-shrink-0 text-2xl">
-                ⚠️
-              </div>
-              <div>
-                <h3 className="text-lg font-bold text-red-950">Xóa Học Liệu</h3>
-                <p className="text-sm text-red-700 mt-1">Hành động này không thể hoàn tác.</p>
-              </div>
-            </div>
-            <div className="p-6">
-              <p className="text-gray-600 text-sm mb-6 leading-relaxed">
-                Bạn có chắc chắn muốn xóa TOÀN BỘ bộ học liệu này không? Mọi dữ liệu (câu hỏi, thẻ học, sơ đồ) và kết quả làm bài liên quan sẽ bị xóa vĩnh viễn.
-              </p>
-              <div className="flex items-center justify-end gap-3">
-                <button
-                  onClick={() => setConfirmDeleteId(null)}
-                  className="px-4 py-2 text-sm font-bold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors"
-                >
-                  Hủy bỏ
-                </button>
-                <button
-                  onClick={() => {
-                    deleteMaterialMutation.mutate(confirmDeleteId);
-                  }}
-                  disabled={deleteMaterialMutation.isPending}
-                  className="px-4 py-2 text-sm font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-md shadow-red-200 transition-all disabled:opacity-50"
-                >
-                  {deleteMaterialMutation.isPending ? 'Đang xóa...' : 'Xác nhận xóa'}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {renderDeleteModal()}
 
       {/* Static Files List */}
       {activeFilterTab === 'STATIC_FILE' && (
@@ -471,8 +492,11 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                         name="distribute_lesson" 
                         checked={currentLessonId === null}
                         onChange={() => {
-                          attachLessonMutation.mutate({ id: distributeMaterialId, lessonId: null });
-                          // setDistributeMaterialId(null);
+                          if (currentLessonId === null) return;
+                          
+                          if (window.confirm("Học liệu sẽ chuyển về trạng thái Chưa phân phối, học viên sẽ không còn nhìn thấy ở bài học này. Bạn có chắc chắn?")) {
+                            attachLessonMutation.mutate({ id: distributeMaterialId, lessonId: null });
+                          }
                         }}
                         className="w-4 h-4 text-blue-600 focus:ring-blue-500"
                       />
@@ -492,8 +516,16 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                                 name="distribute_lesson" 
                                 checked={currentLessonId === lesson.id}
                                 onChange={() => {
-                                  attachLessonMutation.mutate({ id: distributeMaterialId, lessonId: lesson.id });
-                                  // setDistributeMaterialId(null);
+                                  if (currentLessonId === lesson.id) return;
+                                  
+                                  let confirmMsg = "Học liệu này sẽ được đính kèm vào bài học mới.";
+                                  if (currentLessonId) {
+                                    confirmMsg = "Học liệu sẽ được di chuyển sang bài học mới. Học viên ở bài học cũ sẽ không còn nhìn thấy tài nguyên này. Bạn có chắc chắn?";
+                                  }
+                                  
+                                  if (window.confirm(confirmMsg)) {
+                                    attachLessonMutation.mutate({ id: distributeMaterialId, lessonId: lesson.id });
+                                  }
                                 }}
                                 className="w-4 h-4 text-blue-600 focus:ring-blue-500 ml-2"
                               />
@@ -866,7 +898,7 @@ function MaterialWorkspaceViewer({
 
       {editingQuestion && (
         <QuizQuestionEditorModal
-          question={editingQuestion}
+          question={{...editingQuestion, usageCount: detail.usageCount}}
           onClose={() => setEditingQuestion(null)}
           onSuccess={() => {
             setEditingQuestion(null);
@@ -886,7 +918,7 @@ function MaterialWorkspaceViewer({
       )}
       {editingFlashcard && (
         <FlashcardEditorModal
-          flashcard={editingFlashcard}
+          flashcard={{...editingFlashcard, usageCount: detail.usageCount}}
           onClose={() => setEditingFlashcard(null)}
           onSuccess={() => {
             setEditingFlashcard(null);
@@ -1033,7 +1065,14 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
     <div className="bg-white p-2">
       <div className="flex justify-between items-center pb-4 mb-6 border-b">
         <div>
-          <h3 className="text-xl font-bold text-gray-900">Cấu Hình Bài Thi</h3>
+          <div className="flex items-center gap-3">
+            <h3 className="text-xl font-bold text-gray-900">Cấu Hình Bài Thi</h3>
+            {quiz.quizType === 'LECTURE_QUIZ' ? (
+              <span className="px-2.5 py-1 text-xs font-extrabold bg-emerald-100 text-emerald-700 rounded-md uppercase tracking-wider">Quick Check</span>
+            ) : (
+              <span className="px-2.5 py-1 text-xs font-extrabold bg-purple-100 text-purple-700 rounded-md uppercase tracking-wider">Official Exam</span>
+            )}
+          </div>
           <p className="text-sm text-gray-500 mt-1">Quản lý thời gian, số lượt làm bài, sinh đề ngẫu nhiên và tính năng giám sát</p>
         </div>
         <button
@@ -1351,7 +1390,8 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
               Tiêu đề học liệu
               <input
                 type="text"
-                value={title}
+                key={`ai-title-${materialType}-${scopeType}-${scopeRefId || ''}-${lessonId || ''}`}
+                defaultValue={title}
                 onChange={(e) => {
                   setTitle(e.target.value);
                   setIsTitleEdited(true);
@@ -1538,6 +1578,7 @@ interface QuizQuestionEditorProps {
     isMultipleChoice?: boolean;
     displayOrder: number;
     options: { id: number; content: string; isCorrect: boolean }[];
+    usageCount?: number;
   };
   onClose: () => void;
   onSuccess: () => void;
@@ -1576,6 +1617,12 @@ function QuizQuestionEditorModal({ question, onClose, onSuccess }: QuizQuestionE
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
       <div className="bg-white p-6 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
         <h3 className="font-bold text-lg mb-4 text-gray-900">Chỉnh sửa Nội Dung Câu Hỏi</h3>
+        
+        {question.usageCount && question.usageCount > 0 ? (
+          <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-sm font-medium">
+            ⚠️ Lưu ý: Học liệu này đã có lượt làm bài. Sửa đáp án câu hỏi sẽ ảnh hưởng đến kết quả chấm điểm của các bài thi đã nộp trước đó.
+          </div>
+        ) : null}
 
         <label className="block text-sm font-semibold text-gray-700 mb-1">Nội dung câu hỏi</label>
         <textarea
@@ -2016,7 +2063,8 @@ function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess 
             Tên học liệu
             <input
               type="text"
-              value={title}
+              key={`manual-title-${materialType}-${scope}-${quizType}-${scopeRefId || ''}`}
+              defaultValue={title}
               onChange={(e) => {
                 setTitle(e.target.value);
                 setIsTitleEdited(true);
