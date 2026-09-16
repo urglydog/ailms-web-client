@@ -1,6 +1,6 @@
 'use client';
 
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient, useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState, Suspense } from 'react';
@@ -12,6 +12,7 @@ import { DualPlayer, type DualPlayerHandle } from '@/components/player/DualPlaye
 import { DubbingActivatePanel } from '@/components/player/DubbingActivatePanel';
 import { LanguageDropdown } from '@/components/player/LanguageDropdown';
 import { LessonSidebar } from '@/components/player/LessonSidebar';
+import { materialsApi } from '@/lib/api/materials';
 import { PipelineProgress } from '@/components/player/PipelineProgress';
 import { TranscriptPanel } from '@/components/player/TranscriptPanel';
 import { TutorEmbedded } from '@/components/tutor/TutorEmbedded';
@@ -140,6 +141,15 @@ function LearnPageContent() {
   const audioRef = useRef<HTMLAudioElement>(null);
   const dualPlayerRef = useRef<DualPlayerHandle>(null);
   const queryClient = useQueryClient();
+
+  // P2: Fetch materials để hiện Badge và ghim ở sidebar
+  const { data: officialMaterials } = useQuery({
+    queryKey: ['official-materials', lesson?.courseId],
+    queryFn: () => materialsApi.getInstructorMaterials(lesson!.courseId),
+    enabled: !!lesson?.courseId,
+  });
+  const currentLessonMaterialCount = officialMaterials?.filter(m => m.lessonId === lessonId).length || 0;
+
   // `languages[].track` chỉ mới sau khi gọi lại API — cần refetch mỗi khi có track mới sẵn sàng
   // (BR-DUB-04 trả AVAILABLE ngay, hoặc job vừa COMPLETED), nếu không `available`/`track` trong
   // cache vẫn cũ dù backend đã có audio.
@@ -599,6 +609,11 @@ function LearnPageContent() {
                     }`}
                   >
                     {tab.label}
+                    {tab.key === 'materials' && currentLessonMaterialCount > 0 && (
+                      <span className="ml-2 inline-flex items-center justify-center rounded-full bg-accent px-1.5 py-0.5 text-[10px] font-bold text-white">
+                        {currentLessonMaterialCount}
+                      </span>
+                    )}
                   </button>
                 ))}
               </div>
@@ -671,7 +686,7 @@ function LearnPageContent() {
                 ) : (
                   <div className="flex-1 overflow-y-auto p-4">
                     {lesson.chapters.length > 0 ? (
-                      <LessonSidebar chapters={lesson.chapters} currentLessonId={lesson.lessonId} />
+                      <LessonSidebar chapters={lesson.chapters} currentLessonId={lesson.lessonId} officialMaterials={officialMaterials || []} />
                     ) : (
                       <p className="text-sm text-ink-muted">
                         Đăng nhập để xem toàn bộ chương trình học và theo dõi tiến độ của khoá này.

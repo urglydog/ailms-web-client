@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { formatDuration } from '@/lib/format';
 import type { ChapterNav } from '@/types/domain';
+import type { InstructorMaterial } from '@/lib/api/materials';
 
 /**
  * "Trong khoá học này" — UC21/22. Chỉ hiển thị khi đã đăng nhập (đã ghi danh, hoặc bài Preview
@@ -15,9 +16,10 @@ import type { ChapterNav } from '@/types/domain';
 interface LessonSidebarProps {
   chapters: ChapterNav[];
   currentLessonId: number;
+  officialMaterials?: InstructorMaterial[];
 }
 
-export function LessonSidebar({ chapters, currentLessonId }: LessonSidebarProps) {
+export function LessonSidebar({ chapters, currentLessonId, officialMaterials = [] }: LessonSidebarProps) {
   return (
     <div className="flex flex-col gap-4">
       {chapters.map((chapter) => (
@@ -46,7 +48,12 @@ export function LessonSidebar({ chapters, currentLessonId }: LessonSidebarProps)
                     >
                       {lesson.isCompleted ? '✓' : ''}
                     </span>
-                    <span className="min-w-0 flex-1 truncate">{lesson.lessonTitle}</span>
+                    <span className="min-w-0 flex-1 truncate flex items-center gap-1.5">
+                      {lesson.lessonTitle}
+                      {officialMaterials.some(m => m.lessonId === lesson.lessonId) && (
+                        <span title="Có bài tập/học liệu đính kèm" className="text-[10px] text-ink-muted">📎</span>
+                      )}
+                    </span>
                     <span className="shrink-0 font-mono text-xs text-ink-faint">
                       {formatDuration(lesson.durationSec)}
                     </span>

@@ -32,6 +32,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
   const [manualMaterialType, setManualMaterialType] = useState<'QUIZ' | 'FLASHCARD' | 'MINDMAP' | null>(null);
   const [activeFilterTab, setActiveFilterTab] = useState<'ALL' | 'QUIZ' | 'FLASHCARD' | 'MINDMAP'>('ALL');
   const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
+  const [distributeMaterialId, setDistributeMaterialId] = useState<number | null>(null);
 
   const { data: materials, isLoading } = useQuery({
     queryKey: ['instructor-materials', courseId],
@@ -41,7 +42,6 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
 
   const { data: chapters } = useCourseChapters(courseId);
 
-  const flatLessons = chapters?.flatMap(c => c.lessons) || [];
 
 
   const toggleMindmapMutation = useMutation({
@@ -257,24 +257,18 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                   </button>
 
                   {/* Đính kèm vào bài học (chỉ hiện khi đã Official) */}
-                  {mat.isOfficial && flatLessons.length > 0 && (
-                    <select
-                      className="ml-2 rounded-lg border border-gray-300 px-2 py-1.5 text-xs font-semibold text-gray-700 bg-white focus:border-indigo-500 focus:outline-none"
-                      value={mat.lessonId || ''}
-                      onChange={(e) => {
-                        attachLessonMutation.mutate({
-                          id: mat.id,
-                          lessonId: e.target.value ? Number(e.target.value) : null
-                        });
-                      }}
+                  {mat.isOfficial && chapters && chapters.length > 0 && (
+                    <button
+                      onClick={() => setDistributeMaterialId(mat.id)}
+                      className={`ml-2 inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-semibold transition-all shadow-sm border ${
+                        mat.lessonId 
+                          ? 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100' 
+                          : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                      }`}
+                      title="Phân phối học liệu này vào các Bài học"
                     >
-                      <option value="">[Cấp Khóa học] Không đính kèm</option>
-                      {flatLessons.map(l => (
-                        <option key={l.id} value={l.id}>
-                          Bài học: {l.title}
-                        </option>
-                      ))}
-                    </select>
+                      {mat.lessonId ? '📎 Đã đính kèm bài học' : 'Phân phối Bài học'}
+                    </button>
                   )}
 
                   {/* Xóa Bộ Học Liệu */}
@@ -341,6 +335,88 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                   {deleteMaterialMutation.isPending ? 'Đang xóa...' : 'Xác nhận xóa'}
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Phân Phối Học Liệu Tree-View */}
+      {distributeMaterialId && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in">
+          <div className="bg-white rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden border border-gray-100">
+            <div className="bg-blue-50 p-5 border-b border-blue-100 flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-bold text-blue-950 flex items-center gap-2">
+                  <span>📎</span> Phân phối Học liệu
+                </h3>
+                <p className="text-xs text-blue-700 mt-1">Chọn bài học mà bạn muốn đính kèm tài nguyên này.</p>
+              </div>
+              <button onClick={() => setDistributeMaterialId(null)} className="text-gray-400 hover:text-gray-600 transition-colors">✕</button>
+            </div>
+            <div className="p-5 max-h-[60vh] overflow-y-auto">
+              {(() => {
+                const matToDistribute = materials?.find(m => m.id === distributeMaterialId);
+                const currentLessonId = matToDistribute?.lessonId || null;
+                
+                return (
+                  <div className="flex flex-col gap-3">
+                    <label className="flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all hover:bg-gray-50 bg-white border-gray-200">
+                      <input 
+                        type="radio" 
+                        name="distribute_lesson" 
+                        checked={currentLessonId === null}
+                        onChange={() => {
+                          attachLessonMutation.mutate({ id: distributeMaterialId, lessonId: null });
+                          setDistributeMaterialId(null);
+                        }}
+                        className="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                      />
+                      <span className="text-sm font-semibold text-gray-800">[Cấp Khóa học] Không đính kèm cụ thể</span>
+                    </label>
+                    
+                    {chapters?.map((chapter, cIdx) => (
+                      <div key={chapter.id} className="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm">
+                        <div className="bg-gray-50 px-4 py-2.5 border-b border-gray-200 font-bold text-sm text-gray-800">
+                          Chương {cIdx + 1}: {chapter.title}
+                        </div>
+                        <div className="flex flex-col">
+                          {chapter.lessons.map((lesson, lIdx) => (
+                            <label key={lesson.id} className="flex items-center gap-3 p-3 border-b last:border-0 border-gray-100 cursor-pointer transition-colors hover:bg-blue-50/50">
+                              <input 
+                                type="radio" 
+                                name="distribute_lesson" 
+                                checked={currentLessonId === lesson.id}
+                                onChange={() => {
+                                  attachLessonMutation.mutate({ id: distributeMaterialId, lessonId: lesson.id });
+                                  setDistributeMaterialId(null);
+                                }}
+                                className="w-4 h-4 text-blue-600 focus:ring-blue-500 ml-2"
+                              />
+                              <div className="flex flex-col">
+                                <span className="text-sm font-medium text-gray-800">Bài {lIdx + 1}: {lesson.title}</span>
+                                {currentLessonId === lesson.id && (
+                                  <span className="text-[10px] text-blue-600 font-bold uppercase mt-0.5">Đang đính kèm</span>
+                                )}
+                              </div>
+                            </label>
+                          ))}
+                          {chapter.lessons.length === 0 && (
+                            <div className="p-3 text-xs text-gray-400 italic text-center">Chưa có bài học nào trong chương này</div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
+            </div>
+            <div className="p-4 border-t border-gray-100 bg-gray-50 flex justify-end">
+               <button
+                onClick={() => setDistributeMaterialId(null)}
+                className="px-5 py-2 text-sm font-bold text-gray-700 bg-white border border-gray-200 hover:bg-gray-100 rounded-xl transition-colors shadow-sm"
+              >
+                Đóng
+              </button>
             </div>
           </div>
         </div>
