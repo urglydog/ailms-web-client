@@ -33,7 +33,6 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
   const [genMaterialType, setGenMaterialType] = useState<'QUIZ' | 'FLASHCARD' | 'MINDMAP' | null>(null);
   const [manualMaterialType, setManualMaterialType] = useState<'QUIZ' | 'FLASHCARD' | 'MINDMAP' | null>(null);
   const [activeFilterTab, setActiveFilterTab] = useState<'ALL' | 'QUIZ' | 'FLASHCARD' | 'MINDMAP' | 'STATIC_FILE'>('ALL');
-  const [distributeMaterial, setDistributeMaterial] = useState<InstructorMaterial | null>(null);
   const [showUploadStatic, setShowUploadStatic] = useState(false);
   const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
   const [distributeMaterialId, setDistributeMaterialId] = useState<number | null>(null);
@@ -1913,7 +1912,7 @@ function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess 
   // Auto-generate title for manual
   useEffect(() => {
     if (isTitleEdited) return;
-    let typeName = materialType === 'QUIZ' ? (quizType === 'LECTURE_QUIZ' ? 'Quick Check' : 'Đề thi Tổng kết') : (materialType === 'MINDMAP' ? 'Mindmap' : 'Flashcard');
+    const typeName = materialType === 'QUIZ' ? (quizType === 'LECTURE_QUIZ' ? 'Quick Check' : 'Đề thi Tổng kết') : (materialType === 'MINDMAP' ? 'Mindmap' : 'Flashcard');
 
     let newTitle = '';
     if (scope === 'LESSON' && scopeRefId && structure) {
@@ -2089,7 +2088,7 @@ function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess 
                 className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:border-emerald-500 outline-none bg-white mt-1"
               >
                 <option value="">-- Chọn chương --</option>
-                {structure?.map((ch: any) => (
+                {structure?.map((ch: { id: number; title: string; lessons: Array<{ id: number; title: string }> }) => (
                   <option key={ch.id} value={ch.id}>{ch.title}</option>
                 ))}
               </select>
@@ -2105,7 +2104,7 @@ function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess 
                 className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:border-emerald-500 outline-none bg-white mt-1"
               >
                 <option value="">-- Chọn bài học --</option>
-                {structure?.flatMap((ch: any) => ch.lessons || []).map((les: any) => (
+                {structure?.flatMap((ch: { lessons?: Array<{ id: number; title: string }> }) => ch.lessons || []).map((les: { id: number; title: string }) => (
                   <option key={les.id} value={les.id}>{les.title}</option>
                 ))}
               </select>
@@ -2114,7 +2113,7 @@ function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess 
             {scope === 'CUSTOM' && (
               <div className="flex flex-col gap-2 mt-1 max-h-40 overflow-y-auto p-3 border rounded-xl bg-white">
                 <span className="text-xs text-gray-500 font-medium">Chọn các bài học muốn đưa vào học liệu:</span>
-                {structure?.flatMap((ch: any) => ch.lessons || []).map((les: any) => (
+                {structure?.flatMap((ch: { lessons?: Array<{ id: number; title: string }> }) => ch.lessons || []).map((les: { id: number; title: string }) => (
                   <label key={les.id} className="flex items-center gap-2 text-xs text-gray-700 cursor-pointer">
                     <input
                       type="checkbox"

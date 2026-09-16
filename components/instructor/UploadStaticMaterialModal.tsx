@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { courseResourcesApi } from '@/lib/api/courseResourcesApi';
 import { toast } from 'sonner';
@@ -29,7 +29,7 @@ export function UploadStaticMaterialModal({ courseId, onClose }: Props) {
       queryClient.invalidateQueries({ queryKey: ['course-resources', courseId] });
       onClose();
     },
-    onError: (err: any) => {
+    onError: (err: Error) => {
       toast.error(err.message || 'Lỗi khi tải lên file');
     }
   });
