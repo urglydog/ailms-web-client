@@ -444,7 +444,7 @@ function LearnPageContent() {
       await lessonPlayerApi.sendHeartbeat(lessonId, sessionIdRef.current, navigator.userAgent, true);
       setStreamConflict(false);
       dualPlayerRef.current?.play();
-    } catch (err) {
+    } catch {
       toast.error('Không thể giành lại quyền phát.');
     }
   };
