@@ -898,7 +898,7 @@ function MaterialWorkspaceViewer({
 
       {editingQuestion && (
         <QuizQuestionEditorModal
-          question={{...editingQuestion, usageCount: detail.usageCount}}
+          question={{...editingQuestion, usageCount: detail?.usageCount}}
           onClose={() => setEditingQuestion(null)}
           onSuccess={() => {
             setEditingQuestion(null);
@@ -918,7 +918,7 @@ function MaterialWorkspaceViewer({
       )}
       {editingFlashcard && (
         <FlashcardEditorModal
-          flashcard={{...editingFlashcard, usageCount: detail.usageCount}}
+          flashcard={{...editingFlashcard, usageCount: detail?.usageCount}}
           onClose={() => setEditingFlashcard(null)}
           onSuccess={() => {
             setEditingFlashcard(null);
