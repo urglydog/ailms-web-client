@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useExplainWrongAnswer } from '@/hooks/useQuizzes';
 import { toast } from 'sonner';
 import { MarkdownRenderer } from '@/components/ui/MarkdownRenderer';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 
 interface QuizOption {
   id: number;
@@ -18,11 +19,53 @@ interface QuizQuestion {
   options: QuizOption[];
 }
 
-export function QuizViewer({ questions }: { questions: QuizQuestion[] }) {
+export function QuizViewer({ questions, quizId }: { questions: QuizQuestion[], quizId?: number }) {
+  const { data: user } = useCurrentUser();
+  const userId = user?.id;
+  
   const [currentIdx, setCurrentIdx] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [score, setScore] = useState(0);
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  // Load state from localStorage on mount
+  useEffect(() => {
+    if (userId && quizId) {
+      const draftKey = `quiz_draft_${userId}_${quizId}`;
+      try {
+        const savedDraft = localStorage.getItem(draftKey);
+        if (savedDraft) {
+          const parsed = JSON.parse(savedDraft);
+          if (parsed && typeof parsed === 'object') {
+             if (typeof parsed.currentIdx === 'number' && parsed.currentIdx < questions.length) {
+               setCurrentIdx(parsed.currentIdx);
+             }
+             if (typeof parsed.selectedOption === 'number') {
+               setSelectedOption(parsed.selectedOption);
+             }
+          }
+        }
+      } catch (e) {
+        console.error("Failed to parse quiz draft", e);
+      }
+    }
+    setIsHydrated(true);
+  }, [userId, quizId, questions.length]);
+
+  // Save state to localStorage whenever it changes
+  useEffect(() => {
+    if (isHydrated && userId && quizId && !showResult) {
+      const draftKey = `quiz_draft_${userId}_${quizId}`;
+      try {
+        localStorage.setItem(draftKey, JSON.stringify({ currentIdx, selectedOption }));
+      } catch (e) {
+        console.error("Failed to save quiz draft", e);
+      }
+    }
+  }, [currentIdx, selectedOption, isHydrated, userId, quizId, showResult]);
+
+
 
   // AI Tutor State
   const { mutate: explainWrongAnswer } = useExplainWrongAnswer();
@@ -89,6 +132,9 @@ export function QuizViewer({ questions }: { questions: QuizQuestion[] }) {
       setSelectedOption(null);
     } else {
       setShowResult(true);
+      if (userId && quizId) {
+        localStorage.removeItem(`quiz_draft_${userId}_${quizId}`);
+      }
     }
   };
 

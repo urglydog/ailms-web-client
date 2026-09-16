@@ -137,7 +137,7 @@ export default function MaterialDetailPage() {
             
             {material.quizQuestions && material.quizQuestions.length > 0 ? (
               quizMode === 'study' || isOfficial ? (
-                <QuizViewer questions={material.quizQuestions} />
+                <QuizViewer questions={material.quizQuestions} quizId={material.id} />
               ) : (
                 <QuizPersonalEditor questions={material.quizQuestions} quizId={material.id} />
               )
