@@ -13,6 +13,7 @@ export interface MaterialGenerationReq {
   courseId: number;
   materialType: MaterialType;
   language: string;
+  title?: string;
   scopeType: ScopeType;
   scopeRefId?: number;
   customLessonIds?: number[];
@@ -49,7 +50,8 @@ export interface InstructorMaterial {
   attemptCount?: number;
   isProctored?: boolean;
   maxViolations?: number | null;
-  lessonId?: number;
+  chapterId?: number | '';
+  lessonId?: number | '';
   quizType?: 'LECTURE_QUIZ' | 'OFFICIAL_EXAM';
 }
 
@@ -140,8 +142,9 @@ export const materialsApi = {
   setQuizOfficial: (id: number) =>
     api.put(`/api/v1/instructor/quizzes/${id}/set-official`, undefined, { token: authToken() }),
     
-  attachMaterialToLesson: (id: number, lessonId: number | null) =>
-    api.put(`/api/v1/instructor/materials/${id}/attach-lesson`, { lessonId }, { token: authToken() }),
+  // Đính kèm vào bài học cụ thể hoặc chương
+  attachMaterial: (id: number, target: { lessonId?: number | null; chapterId?: number | null }) =>
+    api.put(`/api/v1/instructor/materials/${id}/attach-lesson`, target, { token: authToken() }),
     
   updateQuizSettings: (id: number, req: Record<string, unknown>) =>
     api.put(`/api/v1/instructor/quizzes/${id}/settings`, req, { token: authToken() }),

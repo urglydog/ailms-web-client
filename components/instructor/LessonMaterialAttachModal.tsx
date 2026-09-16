@@ -25,7 +25,7 @@ export function LessonMaterialAttachModal({ courseId, lesson, onClose }: LessonM
 
   const attachLessonMutation = useMutation({
     mutationFn: (variables: { id: number; lessonId: number | null }) => 
-      materialsApi.attachMaterialToLesson(variables.id, variables.lessonId),
+      materialsApi.attachMaterial(variables.id, { lessonId: variables.lessonId, chapterId: null }),
     onSuccess: () => {
       toast.success('Đã cập nhật đính kèm học liệu!');
       queryClient.invalidateQueries({ queryKey: ['official-materials', courseId] });
