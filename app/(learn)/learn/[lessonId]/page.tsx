@@ -1,6 +1,6 @@
 'use client';
 
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient, useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState, Suspense } from 'react';
