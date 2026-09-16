@@ -59,7 +59,7 @@ export function LessonMaterialAttachModal({ courseId, lesson, onClose }: LessonM
             <div className="text-center py-10">
               <div className="text-3xl mb-3">📚</div>
               <p className="text-sm font-bold text-gray-700">Chưa có học liệu Official nào</p>
-              <p className="text-xs text-gray-500 mt-1">Hãy vào "Quản lý Học liệu Official" để tạo và phát hành học liệu trước.</p>
+              <p className="text-xs text-gray-500 mt-1">Hãy vào &quot;Quản lý Học liệu Official&quot; để tạo và phát hành học liệu trước.</p>
             </div>
           ) : (
             <div className="flex flex-col gap-3">

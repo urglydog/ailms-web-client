@@ -42,7 +42,6 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
 
   const { data: chapters } = useCourseChapters(courseId);
 
-  const flatLessons = chapters?.flatMap(c => c.lessons) || [];
 
 
   const toggleMindmapMutation = useMutation({
