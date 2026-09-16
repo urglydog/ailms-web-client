@@ -367,7 +367,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                         checked={currentLessonId === null}
                         onChange={() => {
                           attachLessonMutation.mutate({ id: distributeMaterialId, lessonId: null });
-                          setDistributeMaterialId(null);
+                          // setDistributeMaterialId(null);
                         }}
                         className="w-4 h-4 text-blue-600 focus:ring-blue-500"
                       />
@@ -388,7 +388,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                                 checked={currentLessonId === lesson.id}
                                 onChange={() => {
                                   attachLessonMutation.mutate({ id: distributeMaterialId, lessonId: lesson.id });
-                                  setDistributeMaterialId(null);
+                                  // setDistributeMaterialId(null);
                                 }}
                                 className="w-4 h-4 text-blue-600 focus:ring-blue-500 ml-2"
                               />
