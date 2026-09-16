@@ -9,6 +9,7 @@ import { useCurrentUser, useUpdatePrivacy } from '@/hooks/useCurrentUser';
 import { useBecomeInstructor, useInstructorVerificationStatus, useSubmitInstructorVerification } from '@/hooks/useInstructor';
 import EditProfileModal from './edit-modal';
 import ChangePasswordModal from './change-password-modal';
+import { toast } from 'sonner';
 
 /**
  * Hồ sơ cá nhân (14/09/2026, hợp nhất) — trước đây tự `fetch()` thô + tự đọc token, không
@@ -145,6 +146,30 @@ function ProfilePageContent() {
                 onChange={(checked) => updatePrivacy.mutate({ coursesPublic: user.coursesPublic, wishlistPublic: checked })}
               />
             </div>
+          </div>
+
+          {/* Task 10: Quản lý thiết bị & Bảo mật */}
+          <div className="rounded-card border border-line bg-white p-6 shadow-card">
+            <h2 className="mb-2 font-display text-lg font-bold text-ink">Bảo mật & Thiết bị</h2>
+            <p className="mb-4 text-sm text-ink-muted">
+              Đăng xuất khỏi tất cả các thiết bị khác đang sử dụng tài khoản này.
+            </p>
+            <button
+              onClick={async () => {
+                try {
+                  await fetch('/api/v1/users/me/logout-all', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${getAccessToken()}` }
+                  });
+                  toast.success('Đã đăng xuất khỏi tất cả các thiết bị khác.');
+                } catch {
+                  toast.error('Có lỗi xảy ra, vui lòng thử lại.');
+                }
+              }}
+              className="w-full rounded-lg border border-line bg-white py-2.5 text-sm font-bold text-ink hover:bg-surface-hover transition-colors"
+            >
+              Đăng xuất khỏi tất cả các thiết bị khác
+            </button>
           </div>
 
           {user.role === 'STUDENT' && (

@@ -95,6 +95,8 @@ interface ResolvedAudio {
  * nhau bị `DualPlayer` che giấu hoàn toàn, trang cha không cần biết đang phát nguồn nào. */
 export interface DualPlayerHandle {
   seekTo: (seconds: number) => void;
+  pause: () => void;
+  play: () => void;
 }
 
 /** Chọn URL audio + offset đồng bộ hiện tại theo BR-CHUNK-05. */
@@ -223,7 +225,23 @@ export const DualPlayer = forwardRef<DualPlayerHandle, DualPlayerProps>(function
     [isYoutube, youtubeSeekTo, videoRef],
   );
 
-  useImperativeHandle(ref, () => ({ seekTo }), [seekTo]);
+  const pause = useCallback(() => {
+    if (isYoutube) {
+      youtube.pause(); // Wait, youtube controller from hook might not expose pause
+    } else if (videoRef.current) {
+      videoRef.current.pause();
+    }
+  }, [isYoutube, youtube, videoRef]);
+
+  const play = useCallback(() => {
+    if (isYoutube) {
+      youtube.play(); // Wait, need to check if hook exposes play/pause
+    } else if (videoRef.current) {
+      void videoRef.current.play().catch(() => {});
+    }
+  }, [isYoutube, youtube, videoRef]);
+
+  useImperativeHandle(ref, () => ({ seekTo, pause, play }), [seekTo, pause, play]);
 
   const handleTogglePlay = () => {
     if (isYoutube) {

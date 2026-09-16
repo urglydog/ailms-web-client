@@ -36,22 +36,36 @@ export default function MaterialDetailPage() {
   }
 
   if (error || !material) {
+    const isNotFound = error instanceof ApiError && error.status === 404;
+    const errorMessage = isNotFound 
+      ? 'Bài tập này đã được giảng viên gỡ bỏ hoặc cập nhật. Phiên làm việc kết thúc.' 
+      : (error instanceof ApiError ? error.message : 'Không tìm thấy học liệu này hoặc bạn không có quyền xem.');
+
     return (
-      <div className="min-h-dvh bg-surface p-8">
-        <div className="shell text-center py-20">
-          <p className="text-sm text-ink-muted mb-4">
-            {error instanceof ApiError ? error.message : 'Không tìm thấy học liệu này hoặc bạn không có quyền xem.'}
+      <div className="min-h-dvh bg-surface p-8 flex items-center justify-center">
+        <div className="shell max-w-md text-center py-12 px-6 bg-white rounded-2xl shadow-sm border border-line">
+          <div className="w-16 h-16 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+            {isNotFound ? '📦' : '⚠️'}
+          </div>
+          <h2 className="text-lg font-bold text-ink mb-2">
+            {isNotFound ? 'Học liệu không còn khả dụng' : 'Không thể tải dữ liệu'}
+          </h2>
+          <p className="text-sm text-ink-muted mb-8 leading-relaxed">
+            {errorMessage}
           </p>
           <div className="flex justify-center space-x-4">
             <button
               type="button"
               onClick={() => router.back()}
-              className="text-sm font-semibold text-accent hover:underline"
+              className="px-5 py-2 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors"
             >
               ← Quay lại
             </button>
-            <Link href="/courses" className="text-sm font-semibold text-ink-muted hover:text-ink hover:underline">
-              Về danh sách khóa học
+            <Link 
+              href="/courses" 
+              className="px-5 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-sm transition-colors"
+            >
+              Về trang chủ
             </Link>
           </div>
         </div>

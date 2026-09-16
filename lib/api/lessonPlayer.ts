@@ -178,4 +178,10 @@ export const lessonPlayerApi = {
     });
     return toPlayerLesson(raw);
   },
+  
+  sendHeartbeat: async (lessonId: number, sessionId: string, deviceName: string, force: boolean): Promise<void> => {
+    await api.post<void>(`/api/v1/lessons/${lessonId}/heartbeat`, { sessionId, deviceName, force }, {
+      token: getAccessToken() ?? undefined,
+    });
+  }
 };

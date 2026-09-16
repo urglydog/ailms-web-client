@@ -31,6 +31,7 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
     queryKey: ['official-materials', courseId],
     queryFn: () => materialsApi.getInstructorMaterials(courseId),
     enabled: !!courseId,
+    staleTime: 0,
   });
 
   const { data: courseResources } = useQuery<CourseResource[]>({

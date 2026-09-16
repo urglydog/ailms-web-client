@@ -116,12 +116,18 @@ export default function AntiCheatExamPage() {
         // Dừng stream
         if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
       },
-      onError: () => {
-        toast.error('Có lỗi khi nộp bài. Vui lòng thử lại.');
+      onError: (err: unknown) => {
+        const error = err as { response?: { status?: number } };
+        if (error.response?.status === 404 || error.response?.status === 500) {
+          toast.error('Bài tập này đã được giảng viên gỡ bỏ hoặc cập nhật. Phiên làm bài kết thúc.', { duration: 5000 });
+          setTimeout(() => router.push('/my-courses'), 2000);
+        } else {
+          toast.error('Có lỗi khi nộp bài. Vui lòng thử lại.');
+        }
         setIsSubmitting(false);
       }
     });
-  }, [attemptData, answers, isSubmitting, submitQuiz, mediaStream]);
+  }, [attemptData, answers, isSubmitting, submitQuiz, mediaStream, router]);
 
   // Anti-Cheat: Track tab switching
   useEffect(() => {
@@ -271,8 +277,12 @@ export default function AntiCheatExamPage() {
         }
       },
       onError: (err: unknown) => {
-        const error = err as { message?: string; response?: { data?: { message?: string; detail?: string } } };
-        toast.error(error.message || error.response?.data?.message || error.response?.data?.detail || 'Không thể tải bài thi.');
+        const error = err as { message?: string; response?: { data?: { message?: string; detail?: string }, status?: number } };
+        if (error.response?.status === 404 || error.response?.status === 500) {
+          toast.error('Bài tập này đã được giảng viên gỡ bỏ hoặc cập nhật.');
+        } else {
+          toast.error(error.message || error.response?.data?.message || error.response?.data?.detail || 'Không thể tải bài thi.');
+        }
         if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
       }
     });
