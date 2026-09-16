@@ -1389,7 +1389,7 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
     if (newTitle && newTitle !== title) {
       setTitle(newTitle);
     }
-  }, [materialType, scopeType, scopeRefId, lessonId, chapters, isTitleEdited]);
+  }, [materialType, scopeType, scopeRefId, lessonId, chapters, isTitleEdited, title]);
 
   const generateMutation = useMutation({
     mutationFn: materialsApi.requestGeneration,
@@ -2075,7 +2075,7 @@ function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess 
     if (newTitle && newTitle !== title) {
       setTitle(newTitle);
     }
-  }, [materialType, quizType, scope, scopeRefId, structure, isTitleEdited]);
+  }, [materialType, quizType, scope, scopeRefId, structure, isTitleEdited, title]);
 
   const generateManualMutation = useMutation({
     mutationFn: (input: { materialType: string; language: string; title: string; quizType?: string; scope: string; scopeRefId?: string; customLessonIds?: string }) => materialsApi.createManualMaterial(courseId, input),
