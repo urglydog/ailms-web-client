@@ -2,7 +2,9 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { materialsApi, InstructorMaterial, MaterialDetailRes } from '@/lib/api/materials';
+import { courseResourcesApi } from '@/lib/api/courseResourcesApi';
 import { useCourseChapters } from '@/hooks/useMaterials';
+import { UploadStaticMaterialModal } from './UploadStaticMaterialModal';
 import { toast } from 'sonner';
 import React, { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -30,7 +32,8 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
   };
   const [genMaterialType, setGenMaterialType] = useState<'QUIZ' | 'FLASHCARD' | 'MINDMAP' | null>(null);
   const [manualMaterialType, setManualMaterialType] = useState<'QUIZ' | 'FLASHCARD' | 'MINDMAP' | null>(null);
-  const [activeFilterTab, setActiveFilterTab] = useState<'ALL' | 'QUIZ' | 'FLASHCARD' | 'MINDMAP'>('ALL');
+  const [activeFilterTab, setActiveFilterTab] = useState<'ALL' | 'QUIZ' | 'FLASHCARD' | 'MINDMAP' | 'STATIC_FILE'>('ALL');
+  const [showUploadStatic, setShowUploadStatic] = useState(false);
   const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
   const [distributeMaterialId, setDistributeMaterialId] = useState<number | null>(null);
 
@@ -41,6 +44,12 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
   });
 
   const { data: chapters } = useCourseChapters(courseId);
+
+  const { data: courseResources } = useQuery({
+    queryKey: ['course-resources', courseId],
+    queryFn: () => courseResourcesApi.getCourseResources(courseId),
+    enabled: !!courseId,
+  });
 
 
 
@@ -72,7 +81,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
 
   const attachLessonMutation = useMutation({
     mutationFn: (variables: { id: number; lessonId: number | null }) => 
-      materialsApi.attachMaterialToLesson(variables.id, variables.lessonId),
+      materialsApi.attachMaterial(variables.id, { lessonId: variables.lessonId, chapterId: null }),
     onSuccess: () => {
       toast.success('Đã cập nhật bài học đính kèm');
       queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] });
@@ -177,6 +186,12 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
             <span>✍️</span> Tạo Thủ Công
           </button>
           <button
+            onClick={() => setShowUploadStatic(true)}
+            className="rounded-xl bg-orange-600 px-4 py-2.5 text-sm font-bold text-white shadow hover:bg-orange-700 transition-all flex items-center gap-2"
+          >
+            <span>📁</span> Tải Lên File Tĩnh
+          </button>
+          <button
             onClick={() => router.push(`/instructor/courses/${courseId}/gradebook`)}
             className="rounded-xl bg-white px-4 py-2.5 text-sm font-bold text-blue-950 shadow hover:bg-blue-50 transition-all flex items-center gap-2 ml-1"
           >
@@ -185,11 +200,19 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
         </div>
       </div>
 
-      <div className="flex border-b border-gray-200 mt-2">
-        <button onClick={() => setActiveFilterTab('ALL')} className={`px-4 py-2 text-sm font-bold border-b-2 ${activeFilterTab === 'ALL' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>Tất cả</button>
+      {showUploadStatic && (
+        <UploadStaticMaterialModal 
+          courseId={courseId} 
+          onClose={() => setShowUploadStatic(false)} 
+        />
+      )}
+
+      <div className="flex items-center border-b gap-2 overflow-x-auto">
+        <button onClick={() => setActiveFilterTab('ALL')} className={`px-4 py-2 text-sm font-bold border-b-2 ${activeFilterTab === 'ALL' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>Tất cả AI</button>
         <button onClick={() => setActiveFilterTab('QUIZ')} className={`px-4 py-2 text-sm font-bold border-b-2 ${activeFilterTab === 'QUIZ' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>Bài Thi Trắc Nghiệm</button>
         <button onClick={() => setActiveFilterTab('FLASHCARD')} className={`px-4 py-2 text-sm font-bold border-b-2 ${activeFilterTab === 'FLASHCARD' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>Thẻ Flashcard</button>
         <button onClick={() => setActiveFilterTab('MINDMAP')} className={`px-4 py-2 text-sm font-bold border-b-2 ${activeFilterTab === 'MINDMAP' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>Sơ Đồ Tư Duy</button>
+        <button onClick={() => setActiveFilterTab('STATIC_FILE')} className={`px-4 py-2 text-sm font-bold border-b-2 ${activeFilterTab === 'STATIC_FILE' ? 'border-orange-600 text-orange-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>Tài Liệu Tĩnh (PDF, Slide)</button>
       </div>
 
       {/* Materials List */}
@@ -218,11 +241,37 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                       </span>
                     )}
                   </div>
-                  <div className="text-xs text-gray-500 mt-0.5 flex items-center gap-3">
-                    <span>Tạo lúc: {new Date(mat.createdAt).toLocaleDateString('vi-VN')}</span>
-                    {mat.materialType === 'QUIZ' && mat.questionCount !== undefined && (
-                      <span className="font-semibold text-indigo-600">• Quy mô đề: {mat.randomPickCount ? mat.randomPickCount : mat.questionCount} câu hỏi</span>
-                    )}
+                  <div className="text-xs text-gray-500 mt-1 flex flex-col gap-1">
+                    {/* Breadcrumb Context */}
+                    <div className="flex items-center gap-1.5 text-gray-600 bg-gray-50 px-2 py-1 rounded-md w-fit border border-gray-100">
+                      {mat.lessonId && chapters ? (
+                        <>
+                          <span>📂</span>
+                          <span>{chapters.find(c => c.lessons.some(l => l.id === mat.lessonId))?.title}</span>
+                          <span>&gt;</span>
+                          <span>📄</span>
+                          <span className="font-semibold text-gray-800">{chapters.flatMap(c => c.lessons).find(l => l.id === mat.lessonId)?.title}</span>
+                        </>
+                      ) : mat.chapterId && chapters ? (
+                        <>
+                          <span>📂</span>
+                          <span>Cấp Chương:</span>
+                          <span className="font-semibold text-gray-800">{chapters.find(c => c.id === mat.chapterId)?.title}</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>🌐</span>
+                          <span className="font-semibold text-gray-800">Cấp Khóa học</span>
+                        </>
+                      )}
+                    </div>
+                    {/* Other info */}
+                    <div className="flex items-center gap-3">
+                      <span>Tạo lúc: {new Date(mat.createdAt).toLocaleDateString('vi-VN')}</span>
+                      {mat.materialType === 'QUIZ' && mat.questionCount !== undefined && (
+                        <span className="font-semibold text-indigo-600">• Quy mô đề: {mat.randomPickCount ? mat.randomPickCount : mat.questionCount} câu hỏi</span>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -263,11 +312,15 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                       className={`ml-2 inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-semibold transition-all shadow-sm border ${
                         mat.lessonId 
                           ? 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100' 
-                          : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                          : mat.chapterId 
+                            ? 'bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100'
+                            : 'bg-orange-50 text-orange-700 border-orange-300 hover:bg-orange-100'
                       }`}
-                      title="Phân phối học liệu này vào các Bài học"
+                      title={mat.lessonId || mat.chapterId ? 'Nhấn để thay đổi vị trí phân phối' : 'Nhấn để phân phối học liệu này'}
                     >
-                      {mat.lessonId ? '📎 Đã đính kèm bài học' : 'Phân phối Bài học'}
+                      {mat.lessonId ? `📎 Đang gắn: ${chapters.flatMap(c => c.lessons).find(l => l.id === mat.lessonId)?.title || 'Bài học'}` 
+                        : mat.chapterId ? `📎 Đang gắn: ${chapters.find(c => c.id === mat.chapterId)?.title || 'Chương'}`
+                        : '⚠️ Chưa phân phối'}
                     </button>
                   )}
 
@@ -337,6 +390,58 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Static Files List */}
+      {activeFilterTab === 'STATIC_FILE' && (
+        <div className="flex flex-col gap-3">
+          {(!courseResources || courseResources.length === 0) && (
+            <div className="text-center py-10 bg-gray-50 rounded-xl border border-dashed border-gray-300">
+              <span className="text-4xl block mb-2">📄</span>
+              <p className="text-gray-500 font-medium text-sm">Chưa có tài liệu tĩnh nào trong khóa học.</p>
+            </div>
+          )}
+          {courseResources?.map(res => (
+            <div key={res.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:border-orange-200 transition-all">
+              <div className="flex items-center gap-3">
+                <span className="inline-flex items-center rounded-md px-2.5 py-1 text-xs font-bold ring-1 ring-inset bg-orange-50 text-orange-700 ring-orange-600/20">
+                  STATIC_FILE
+                </span>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-bold text-gray-900">{res.title}</span>
+                  </div>
+                  <div className="text-xs text-gray-500 mt-0.5 flex items-center gap-3">
+                    <span>Tạo lúc: {new Date(res.createdAt).toLocaleDateString('vi-VN')}</span>
+                    {(res.chapterId || res.lessonId) ? (
+                      <span className="text-emerald-600 font-bold">
+                        Đã đính kèm (Chương: {res.chapterId || 'Không'}, Bài: {res.lessonId || 'Không'})
+                      </span>
+                    ) : (
+                      <span className="text-gray-400">Chung toàn khóa</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <a
+                  href={res.fileUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-50 border border-indigo-200 px-3.5 py-1.5 text-xs font-bold text-indigo-700 hover:bg-indigo-100 transition-all shadow-sm"
+                >
+                  👁 Xem File
+                </a>
+                <button
+                  onClick={() => courseResourcesApi.deleteResource(res.id).then(() => { toast.success('Đã xóa'); queryClient.invalidateQueries({ queryKey: ['course-resources', courseId] })})}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-red-50 border border-red-200 px-3.5 py-1.5 text-xs font-bold text-red-700 hover:bg-red-100 transition-all shadow-sm"
+                >
+                  Xóa
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
       )}
 
@@ -1099,8 +1204,11 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
 /** Giao diện Sinh AI Official Mới Cho Giảng Viên */
 function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: { courseId: number; initialType: 'QUIZ' | 'FLASHCARD' | 'MINDMAP'; onClose: () => void; onSuccess: () => void }) {
   const [materialType, setMaterialType] = useState<'QUIZ' | 'FLASHCARD' | 'MINDMAP'>(initialType);
-  const [scopeType, setScopeType] = useState<'WHOLE_COURSE' | 'CHAPTER' | 'CUSTOM_LESSONS'>('WHOLE_COURSE');
+  const [scopeType, setScopeType] = useState<'WHOLE_COURSE' | 'CHAPTER' | 'LESSON'>('WHOLE_COURSE');
   const [scopeRefId, setScopeRefId] = useState<number | undefined>(undefined);
+  const [lessonId, setLessonId] = useState<number | undefined>(undefined);
+  const [title, setTitle] = useState('');
+  const [isTitleEdited, setIsTitleEdited] = useState(false);
   const [difficultyLevel, setDifficultyLevel] = useState<'EASY' | 'MEDIUM' | 'HARD'>('MEDIUM');
   const [quantityLevel, setQuantityLevel] = useState<'FEWER' | 'STANDARD' | 'MORE'>('STANDARD');
   const [language, setLanguage] = useState<string>('');
@@ -1120,8 +1228,29 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
   const { data: chapters } = useQuery({
     queryKey: ['course-chapters', courseId],
     queryFn: () => materialsApi.getCourseChapters(courseId),
-    enabled: scopeType === 'CHAPTER',
   });
+
+  // Auto-generate title
+  useEffect(() => {
+    if (isTitleEdited) return;
+    let typeName = materialType === 'QUIZ' ? 'Quick Check' : materialType === 'MINDMAP' ? 'Mindmap' : 'Flashcard';
+    if (materialType === 'QUIZ' && scopeType === 'WHOLE_COURSE') typeName = 'Đề thi Tổng kết';
+
+    let newTitle = '';
+    if (scopeType === 'LESSON' && lessonId && chapters) {
+      const lesson = chapters.flatMap(c => c.lessons).find(l => l.id === lessonId);
+      if (lesson) newTitle = `${typeName} - ${lesson.title}`;
+    } else if (scopeType === 'CHAPTER' && scopeRefId && chapters) {
+      const chapter = chapters.find(c => c.id === scopeRefId);
+      if (chapter) newTitle = `${typeName} Ôn tập - ${chapter.title}`;
+    } else if (scopeType === 'WHOLE_COURSE') {
+      newTitle = `${typeName} - Khóa học`;
+    }
+
+    if (newTitle && newTitle !== title) {
+      setTitle(newTitle);
+    }
+  }, [materialType, scopeType, scopeRefId, lessonId, chapters, isTitleEdited]);
 
   const generateMutation = useMutation({
     mutationFn: materialsApi.requestGeneration,
@@ -1140,11 +1269,17 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
       toast.error("Vui lòng chọn loại học liệu bạn muốn tạo");
       return;
     }
+    if (!title.trim()) {
+      toast.error("Vui lòng nhập tiêu đề");
+      return;
+    }
     generateMutation.mutate({
       courseId,
       materialType,
-      scopeType,
+      title: title.trim(),
+      scopeType: scopeType === 'LESSON' ? 'CUSTOM_LESSONS' : scopeType,
       scopeRefId: scopeType === 'CHAPTER' ? scopeRefId : undefined,
+      customLessonIds: scopeType === 'LESSON' && lessonId ? [lessonId] : undefined,
       difficultyLevel,
       quantityLevel,
       language,
@@ -1168,7 +1303,10 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
         {/* Bước 1: Chọn Loại Học Liệu (Card Layout) */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div
-            onClick={() => setMaterialType('QUIZ')}
+            onClick={() => {
+              setMaterialType('QUIZ');
+              setScopeType('WHOLE_COURSE');
+            }}
             className={`cursor-pointer rounded-2xl p-4 border-2 transition-all flex flex-col items-center text-center gap-2 ${materialType === 'QUIZ' ? 'border-cyan-500 bg-cyan-50/50 shadow-md scale-[1.02]' : 'border-gray-200 hover:border-cyan-300 bg-white'
               }`}
           >
@@ -1178,7 +1316,10 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
           </div>
 
           <div
-            onClick={() => setMaterialType('FLASHCARD')}
+            onClick={() => {
+              setMaterialType('FLASHCARD');
+              setScopeType('CHAPTER');
+            }}
             className={`cursor-pointer rounded-2xl p-4 border-2 transition-all flex flex-col items-center text-center gap-2 ${materialType === 'FLASHCARD' ? 'border-purple-500 bg-purple-50/50 shadow-md scale-[1.02]' : 'border-gray-200 hover:border-purple-300 bg-white'
               }`}
           >
@@ -1188,7 +1329,10 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
           </div>
 
           <div
-            onClick={() => setMaterialType('MINDMAP')}
+            onClick={() => {
+              setMaterialType('MINDMAP');
+              setScopeType('CHAPTER');
+            }}
             className={`cursor-pointer rounded-2xl p-4 border-2 transition-all flex flex-col items-center text-center gap-2 ${materialType === 'MINDMAP' ? 'border-blue-500 bg-blue-50/50 shadow-md scale-[1.02]' : 'border-gray-200 hover:border-blue-300 bg-white'
               }`}
           >
@@ -1204,14 +1348,37 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
             <h4 className="font-bold text-gray-800 border-b pb-2">Cấu Hình Chi Tiết</h4>
 
             <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
+              Tiêu đề học liệu
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => {
+                  setTitle(e.target.value);
+                  setIsTitleEdited(true);
+                }}
+                className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:border-cyan-500 outline-none bg-white"
+                required
+              />
+            </label>
+
+            <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
               Phạm vi tạo học liệu
               <select
                 value={scopeType}
-                onChange={(e) => setScopeType(e.target.value as 'WHOLE_COURSE' | 'CHAPTER')}
+                onChange={(e) => {
+                  setScopeType(e.target.value as 'WHOLE_COURSE' | 'CHAPTER' | 'LESSON');
+                  setIsTitleEdited(false); // Reset to allow auto-fill on change
+                }}
                 className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:border-cyan-500 outline-none bg-white"
               >
-                <option value="WHOLE_COURSE">Toàn bộ khóa học</option>
-                <option value="CHAPTER">Theo chương cụ thể</option>
+                {materialType === 'QUIZ' && <option value="WHOLE_COURSE">Toàn bộ khóa học (Official Exam)</option>}
+                {materialType === 'QUIZ' && <option value="LESSON">Bài học cụ thể (Quick Check)</option>}
+                
+                {materialType === 'FLASHCARD' && <option value="CHAPTER">Theo chương cụ thể</option>}
+                {materialType === 'FLASHCARD' && <option value="LESSON">Bài học cụ thể</option>}
+                
+                {materialType === 'MINDMAP' && <option value="CHAPTER">Theo chương cụ thể</option>}
+                {materialType === 'MINDMAP' && <option value="LESSON">Bài học cụ thể</option>}
               </select>
             </label>
 
@@ -1219,14 +1386,37 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
               <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
                 Chọn chương
                 <select
-                  value={scopeRefId}
-                  onChange={(e) => setScopeRefId(Number(e.target.value))}
+                  value={scopeRefId ?? ''}
+                  onChange={(e) => {
+                    setScopeRefId(Number(e.target.value));
+                    setIsTitleEdited(false);
+                  }}
                   required
                   className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-cyan-500 focus:outline-none"
                 >
                   <option value="">-- Chọn chương --</option>
                   {chapters?.map((ch) => (
                     <option key={ch.id} value={ch.id}>{ch.title}</option>
+                  ))}
+                </select>
+              </label>
+            )}
+
+            {scopeType === 'LESSON' && (
+              <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
+                Chọn bài học
+                <select
+                  value={lessonId ?? ''}
+                  onChange={(e) => {
+                    setLessonId(Number(e.target.value));
+                    setIsTitleEdited(false);
+                  }}
+                  required
+                  className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-cyan-500 focus:outline-none"
+                >
+                  <option value="">-- Chọn bài học --</option>
+                  {chapters?.flatMap(ch => ch.lessons).map((lesson) => (
+                    <option key={lesson.id} value={lesson.id}>{lesson.title}</option>
                   ))}
                 </select>
               </label>
@@ -1695,7 +1885,11 @@ function NewFlashcardEditorModal({ generationId, onClose, onSuccess }: { generat
 /** Giao diện Sinh Thủ Công Cho Giảng Viên */
 function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess }: { courseId: number; initialType: 'QUIZ' | 'FLASHCARD' | 'MINDMAP'; onClose: () => void; onSuccess: (id: number) => void }) {
   const [materialType, setMaterialType] = useState<'QUIZ' | 'FLASHCARD' | 'MINDMAP'>(initialType);
+  const [scope, setScope] = useState<'COURSE' | 'CHAPTER' | 'LESSON' | 'CUSTOM'>('COURSE');
+  const [scopeRefId, setScopeRefId] = useState<number | null>(null);
+  const [customLessonIds, setCustomLessonIds] = useState<number[]>([]);
   const [title, setTitle] = useState('');
+  const [isTitleEdited, setIsTitleEdited] = useState(false);
   const [language, setLanguage] = useState<string>('');
   const [quizType, setQuizType] = useState<'OFFICIAL_EXAM' | 'LECTURE_QUIZ'>('OFFICIAL_EXAM');
 
@@ -1704,14 +1898,40 @@ function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess 
     queryFn: () => materialsApi.getAvailableLanguages(courseId),
   });
 
+  const { data: structure } = useQuery({
+    queryKey: ['course-chapters', courseId],
+    queryFn: () => materialsApi.getCourseChapters(courseId),
+  });
+
   useEffect(() => {
     if (languages && languages.length > 0 && !language) {
       setLanguage(languages?.[0]?.code ?? '');
     }
   }, [languages, language]);
 
+  // Auto-generate title for manual
+  useEffect(() => {
+    if (isTitleEdited) return;
+    const typeName = materialType === 'QUIZ' ? (quizType === 'LECTURE_QUIZ' ? 'Quick Check' : 'Đề thi Tổng kết') : (materialType === 'MINDMAP' ? 'Mindmap' : 'Flashcard');
+
+    let newTitle = '';
+    if (scope === 'LESSON' && scopeRefId && structure) {
+      const lesson = structure.flatMap(c => c.lessons).find(l => l.id === scopeRefId);
+      if (lesson) newTitle = `${typeName} - ${lesson.title}`;
+    } else if (scope === 'CHAPTER' && scopeRefId && structure) {
+      const chapter = structure.find(c => c.id === scopeRefId);
+      if (chapter) newTitle = `${typeName} Ôn tập - ${chapter.title}`;
+    } else if (scope === 'COURSE') {
+      newTitle = `${typeName} - Khóa học`;
+    }
+
+    if (newTitle && newTitle !== title) {
+      setTitle(newTitle);
+    }
+  }, [materialType, quizType, scope, scopeRefId, structure, isTitleEdited]);
+
   const generateManualMutation = useMutation({
-    mutationFn: (input: { materialType: string; language: string; title: string; quizType?: string }) => materialsApi.createManualMaterial(courseId, input),
+    mutationFn: (input: { materialType: string; language: string; title: string; quizType?: string; scope: string; scopeRefId?: string; customLessonIds?: string }) => materialsApi.createManualMaterial(courseId, input),
     onSuccess: (data) => {
       toast.success('Đã khởi tạo học liệu trống thành công!');
       onSuccess(data.id);
@@ -1735,7 +1955,10 @@ function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess 
       materialType,
       language,
       title: title.trim(),
-      ...(materialType === 'QUIZ' ? { quizType } : {})
+      ...(materialType === 'QUIZ' ? { quizType } : {}),
+      scope,
+      scopeRefId: scopeRefId ? String(scopeRefId) : undefined,
+      customLessonIds: customLessonIds.length > 0 ? JSON.stringify(customLessonIds) : undefined,
     });
   };
 
@@ -1754,7 +1977,10 @@ function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess 
       <form onSubmit={handleSubmit} className="flex flex-col gap-6">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div
-            onClick={() => setMaterialType('QUIZ')}
+            onClick={() => {
+              setMaterialType('QUIZ');
+              setScope(quizType === 'LECTURE_QUIZ' ? 'LESSON' : 'COURSE');
+            }}
             className={`cursor-pointer rounded-2xl p-4 border-2 transition-all flex flex-col items-center text-center gap-2 ${materialType === 'QUIZ' ? 'border-emerald-500 bg-emerald-50 shadow-md scale-[1.02]' : 'border-gray-200 hover:border-emerald-300 bg-white'}`}
           >
             <div className="text-4xl">📝</div>
@@ -1762,7 +1988,10 @@ function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess 
             <div className="text-[10px] font-bold text-emerald-600 uppercase bg-emerald-100 px-2 py-0.5 rounded">Khởi tạo trống</div>
           </div>
           <div
-            onClick={() => setMaterialType('FLASHCARD')}
+            onClick={() => {
+              setMaterialType('FLASHCARD');
+              setScope('CHAPTER');
+            }}
             className={`cursor-pointer rounded-2xl p-4 border-2 transition-all flex flex-col items-center text-center gap-2 ${materialType === 'FLASHCARD' ? 'border-emerald-500 bg-emerald-50 shadow-md scale-[1.02]' : 'border-gray-200 hover:border-emerald-300 bg-white'}`}
           >
             <div className="text-4xl">🃏</div>
@@ -1770,7 +1999,10 @@ function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess 
             <div className="text-[10px] font-bold text-emerald-600 uppercase bg-emerald-100 px-2 py-0.5 rounded">Khởi tạo trống</div>
           </div>
           <div
-            onClick={() => setMaterialType('MINDMAP')}
+            onClick={() => {
+              setMaterialType('MINDMAP');
+              setScope('CHAPTER');
+            }}
             className={`cursor-pointer rounded-2xl p-4 border-2 transition-all flex flex-col items-center text-center gap-2 ${materialType === 'MINDMAP' ? 'border-emerald-500 bg-emerald-50 shadow-md scale-[1.02]' : 'border-gray-200 hover:border-emerald-300 bg-white'}`}
           >
             <div className="text-4xl">🧠</div>
@@ -1785,7 +2017,10 @@ function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess 
             <input
               type="text"
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={(e) => {
+                setTitle(e.target.value);
+                setIsTitleEdited(true);
+              }}
               placeholder="VD: Bài thi giữa kỳ, Khái niệm cơ bản..."
               className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:border-emerald-500 outline-none bg-white"
               required
@@ -1800,19 +2035,124 @@ function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess 
             />
           </label>
 
+          <div className="flex flex-col gap-2 pt-2">
+            <span className="text-sm font-semibold text-gray-700">Phạm vi học liệu (Scope)</span>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              {((materialType === 'QUIZ' && quizType === 'OFFICIAL_EXAM') || materialType === 'FLASHCARD') && (
+                <button
+                  type="button"
+                  onClick={() => { setScope('COURSE'); setScopeRefId(null); setCustomLessonIds([]); setIsTitleEdited(false); }}
+                  className={`p-2.5 rounded-xl border text-xs font-bold transition-all ${scope === 'COURSE' ? 'bg-emerald-600 text-white border-emerald-600 shadow' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-100'}`}
+                >
+                  Toàn khóa học
+                </button>
+              )}
+              
+              {(materialType === 'MINDMAP' || materialType === 'FLASHCARD') && (
+                <button
+                  type="button"
+                  onClick={() => { setScope('CHAPTER'); setScopeRefId(null); setCustomLessonIds([]); setIsTitleEdited(false); }}
+                  className={`p-2.5 rounded-xl border text-xs font-bold transition-all ${scope === 'CHAPTER' ? 'bg-emerald-600 text-white border-emerald-600 shadow' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-100'}`}
+                >
+                  Theo Chương
+                </button>
+              )}
+              
+              {((materialType === 'QUIZ' && quizType === 'LECTURE_QUIZ') || materialType === 'MINDMAP' || materialType === 'FLASHCARD') && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => { setScope('LESSON'); setScopeRefId(null); setCustomLessonIds([]); setIsTitleEdited(false); }}
+                    className={`p-2.5 rounded-xl border text-xs font-bold transition-all ${scope === 'LESSON' ? 'bg-emerald-600 text-white border-emerald-600 shadow' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-100'}`}
+                  >
+                    Theo Bài học
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setScope('CUSTOM'); setScopeRefId(null); setCustomLessonIds([]); setIsTitleEdited(false); }}
+                    className={`p-2.5 rounded-xl border text-xs font-bold transition-all ${scope === 'CUSTOM' ? 'bg-emerald-600 text-white border-emerald-600 shadow' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-100'}`}
+                  >
+                    Tùy chỉnh
+                  </button>
+                </>
+              )}
+            </div>
+
+            {scope === 'CHAPTER' && (
+              <select
+                value={scopeRefId ?? ''}
+                onChange={(e) => {
+                  setScopeRefId(e.target.value ? Number(e.target.value) : null);
+                  setIsTitleEdited(false);
+                }}
+                className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:border-emerald-500 outline-none bg-white mt-1"
+              >
+                <option value="">-- Chọn chương --</option>
+                {structure?.map((ch: { id: number; title: string; lessons: Array<{ id: number; title: string }> }) => (
+                  <option key={ch.id} value={ch.id}>{ch.title}</option>
+                ))}
+              </select>
+            )}
+
+            {scope === 'LESSON' && (
+              <select
+                value={scopeRefId ?? ''}
+                onChange={(e) => {
+                  setScopeRefId(e.target.value ? Number(e.target.value) : null);
+                  setIsTitleEdited(false);
+                }}
+                className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:border-emerald-500 outline-none bg-white mt-1"
+              >
+                <option value="">-- Chọn bài học --</option>
+                {structure?.flatMap((ch: { lessons?: Array<{ id: number; title: string }> }) => ch.lessons || []).map((les: { id: number; title: string }) => (
+                  <option key={les.id} value={les.id}>{les.title}</option>
+                ))}
+              </select>
+            )}
+
+            {scope === 'CUSTOM' && (
+              <div className="flex flex-col gap-2 mt-1 max-h-40 overflow-y-auto p-3 border rounded-xl bg-white">
+                <span className="text-xs text-gray-500 font-medium">Chọn các bài học muốn đưa vào học liệu:</span>
+                {structure?.flatMap((ch: { lessons?: Array<{ id: number; title: string }> }) => ch.lessons || []).map((les: { id: number; title: string }) => (
+                  <label key={les.id} className="flex items-center gap-2 text-xs text-gray-700 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={customLessonIds.includes(les.id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setCustomLessonIds([...customLessonIds, les.id]);
+                        } else {
+                          setCustomLessonIds(customLessonIds.filter(id => id !== les.id));
+                        }
+                      }}
+                      className="rounded text-emerald-600 focus:ring-emerald-500"
+                    />
+                    {les.title}
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>
+
           {materialType === 'QUIZ' && (
             <div className="flex flex-col gap-2 pt-2">
               <span className="text-sm font-semibold text-gray-700">Loại bài thi</span>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <label className={`cursor-pointer flex items-start gap-3 p-3 rounded-xl border-2 transition-all ${quizType === 'LECTURE_QUIZ' ? 'border-emerald-500 bg-emerald-50' : 'border-gray-200 bg-white hover:border-emerald-200'}`}>
-                  <input type="radio" name="quizType" value="LECTURE_QUIZ" checked={quizType === 'LECTURE_QUIZ'} onChange={() => setQuizType('LECTURE_QUIZ')} className="mt-1" />
+                  <input type="radio" name="quizType" value="LECTURE_QUIZ" checked={quizType === 'LECTURE_QUIZ'} onChange={() => {
+                    setQuizType('LECTURE_QUIZ');
+                    setScope('LESSON');
+                  }} className="mt-1" />
                   <div className="flex flex-col">
                     <span className="font-bold text-gray-900 text-sm">Kiểm tra nhanh (Quick Check)</span>
                     <span className="text-xs text-gray-500">Đính kèm vào bài học. Làm nhanh lấy kết quả ngay, không giám sát, không tính điểm.</span>
                   </div>
                 </label>
                 <label className={`cursor-pointer flex items-start gap-3 p-3 rounded-xl border-2 transition-all ${quizType === 'OFFICIAL_EXAM' ? 'border-emerald-500 bg-emerald-50' : 'border-gray-200 bg-white hover:border-emerald-200'}`}>
-                  <input type="radio" name="quizType" value="OFFICIAL_EXAM" checked={quizType === 'OFFICIAL_EXAM'} onChange={() => setQuizType('OFFICIAL_EXAM')} className="mt-1" />
+                  <input type="radio" name="quizType" value="OFFICIAL_EXAM" checked={quizType === 'OFFICIAL_EXAM'} onChange={() => {
+                    setQuizType('OFFICIAL_EXAM');
+                    setScope('COURSE');
+                  }} className="mt-1" />
                   <div className="flex flex-col">
                     <span className="font-bold text-gray-900 text-sm">Thi chính thức (Official Exam)</span>
                     <span className="text-xs text-gray-500">Dành cho kỳ thi. Bật camera giám sát, tính giờ, tính điểm vào hồ sơ.</span>

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useCourseMaterials, useRequestMaterial, useAvailableLanguages, useCourseChapters, useRenameMaterial, useDeleteMaterial } from '@/hooks/useMaterials';
 import { materialsApi, type MaterialType, type ScopeType, type InstructorMaterial } from '@/lib/api/materials';
+import { courseResourcesApi, type CourseResource } from '@/lib/api/courseResourcesApi';
 import { MaterialLanguagePicker } from '@/components/materials/MaterialLanguagePicker';
 import { toast } from 'sonner';
 import { ApiError } from '@/lib/api/client';
@@ -29,6 +30,12 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
   const { data: officialMaterials } = useQuery<InstructorMaterial[]>({
     queryKey: ['official-materials', courseId],
     queryFn: () => materialsApi.getInstructorMaterials(courseId),
+    enabled: !!courseId,
+  });
+
+  const { data: courseResources } = useQuery<CourseResource[]>({
+    queryKey: ['course-resources', courseId],
+    queryFn: () => courseResourcesApi.getCourseResources(courseId),
     enabled: !!courseId,
   });
 
@@ -372,7 +379,39 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
     </>
   );
 
-  const filteredOfficialMaterials = officialMaterials?.filter(m => lessonId ? m.lessonId === lessonId : !m.lessonId) || [];
+  const filteredOfficialMaterials = officialMaterials?.filter(m => {
+    if (!lessonId) {
+      // Course level
+      return !m.chapterId && !m.lessonId;
+    } else {
+      // Lesson level: check if material is attached specifically to this lesson
+      if (m.lessonId === lessonId) return true;
+      
+      // Or check if material is attached to the chapter containing this lesson
+      if (m.chapterId && chapters) {
+        const chapter = chapters.find(c => c.id === m.chapterId);
+        if (chapter && chapter.lessons.some(l => l.id === lessonId)) {
+          return true;
+        }
+      }
+      return false;
+    }
+  }) || [];
+
+  const filteredCourseResources = courseResources?.filter(r => {
+    if (!lessonId) {
+      return !r.chapterId && !r.lessonId;
+    } else {
+      if (r.lessonId === lessonId) return true;
+      if (r.chapterId && chapters) {
+        const chapter = chapters.find(c => c.id === r.chapterId);
+        if (chapter && chapter.lessons.some(l => l.id === lessonId)) {
+          return true;
+        }
+      }
+      return false;
+    }
+  }) || [];
 
   const renderOfficialItem = (item: InstructorMaterial) => {
     const now = new Date();
@@ -496,8 +535,29 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
             </h2>
           </div>
 
-          {filteredOfficialMaterials.length > 0 ? (
-            <div className="flex flex-col">
+          {(filteredOfficialMaterials.length > 0 || filteredCourseResources.length > 0) ? (
+            <div className="space-y-4">
+              {filteredCourseResources.map(res => (
+                <a 
+                  key={res.id} 
+                  href={res.fileUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="block flex flex-col sm:flex-row items-start sm:items-center justify-between p-5 mb-3 bg-white border border-line rounded-xl hover:border-orange-200 hover:shadow-sm transition-all cursor-pointer group"
+                >
+                  <div className="flex-1 w-full">
+                    <div className="flex items-center gap-2 mb-2">
+                      <h3 className="font-bold text-ink text-lg group-hover:text-orange-600 transition-colors">{res.title}</h3>
+                      <span className="text-[10px] uppercase font-bold text-orange-700 bg-orange-50 border border-orange-200 px-2 py-0.5 rounded-md shadow-sm">
+                        Tài liệu tham khảo
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-4 text-xs text-ink-muted">
+                      <span>Tải lên lúc: {new Date(res.createdAt).toLocaleDateString('vi-VN')}</span>
+                    </div>
+                  </div>
+                </a>
+              ))}
               {filteredOfficialMaterials.map(renderOfficialItem)}
             </div>
           ) : (
