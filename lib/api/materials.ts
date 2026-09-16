@@ -48,6 +48,7 @@ export interface InstructorMaterial {
   durationMinutes?: number | null;
   maxAttempts?: number | null;
   attemptCount?: number;
+  usageCount?: number;
   isProctored?: boolean;
   maxViolations?: number | null;
   chapterId?: number | '';
