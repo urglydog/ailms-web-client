@@ -1869,7 +1869,7 @@ function NewQuizQuestionEditorModal({ quizId, onClose, onSuccess }: { quizId: nu
   );
 }
 
-function FlashcardEditorModal({ flashcard, onClose, onSuccess }: { flashcard: { id: number, frontText: string, backText: string }, onClose: () => void, onSuccess: () => void }) {
+function FlashcardEditorModal({ flashcard, onClose, onSuccess }: { flashcard: { id: number, frontText: string, backText: string, usageCount?: number }, onClose: () => void, onSuccess: () => void }) {
   const [frontText, setFrontText] = useState(flashcard.frontText);
   const [backText, setBackText] = useState(flashcard.backText);
 
