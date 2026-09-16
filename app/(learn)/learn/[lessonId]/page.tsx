@@ -610,7 +610,7 @@ function LearnPageContent() {
                   >
                     {tab.label}
                     {tab.key === 'materials' && currentLessonMaterialCount > 0 && (
-                      <span className="ml-2 inline-flex items-center justify-center rounded-full bg-accent px-1.5 py-0.5 text-[10px] font-bold text-white">
+                      <span className="ml-2 inline-flex items-center justify-center rounded-full bg-red-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
                         {currentLessonMaterialCount}
                       </span>
                     )}
