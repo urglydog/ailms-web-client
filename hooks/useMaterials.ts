@@ -6,6 +6,7 @@ export function useCourseMaterials(courseId: number) {
     queryKey: ['materials', 'course', courseId],
     queryFn: () => materialsApi.listForCourse(courseId),
     enabled: !!courseId,
+    staleTime: 0,
     refetchInterval: (query) => {
       const data = query.state.data;
       if (data && data.some(m => m.status === 'PENDING')) {

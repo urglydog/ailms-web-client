@@ -236,6 +236,8 @@ export interface YouTubePlayerController {
   quality: string;
   seekTo: (seconds: number) => void;
   togglePlay: () => void;
+  play: () => void;
+  pause: () => void;
   setPlaybackRateLevel: (rate: number) => void;
   setVolumeLevel: (volume: number) => void;
   toggleMute: () => void;
@@ -424,6 +426,14 @@ export function useYouTubeDualPlayerSync(
     else p.playVideo();
   }, []);
 
+  const play = useCallback(() => {
+    playerRef.current?.playVideo();
+  }, []);
+
+  const pause = useCallback(() => {
+    playerRef.current?.pauseVideo();
+  }, []);
+
   const setPlaybackRateLevel = useCallback(
     (rate: number) => {
       playerRef.current?.setPlaybackRate(rate);
@@ -482,6 +492,8 @@ export function useYouTubeDualPlayerSync(
     quality,
     seekTo,
     togglePlay,
+    play,
+    pause,
     setPlaybackRateLevel,
     setVolumeLevel,
     toggleMute,

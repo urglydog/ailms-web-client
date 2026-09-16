@@ -36,6 +36,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
   const [showUploadStatic, setShowUploadStatic] = useState(false);
   const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
   const [distributeMaterialId, setDistributeMaterialId] = useState<number | null>(null);
+  const [confirmAction, setConfirmAction] = useState<{title: string, message: string, onConfirm: () => void} | null>(null);
 
   const { data: materials, isLoading } = useQuery({
     queryKey: ['instructor-materials', courseId],
@@ -120,11 +121,11 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
           <div className="p-6">
             {hasUsage ? (
               <p className="text-red-700 font-medium text-sm mb-6 leading-relaxed bg-red-50 p-3 rounded-lg border border-red-100">
-                ⚠️ Học liệu đã có dữ liệu tương tác! Hiện có {mat?.usageCount} lượt tương tác. Việc xóa sẽ ẩn học liệu nhưng lịch sử điểm số vẫn được lưu trữ.
+                ⚠️ Học liệu đã có dữ liệu tương tác ({mat?.usageCount} lượt)! Việc xóa bài tập sẽ ẩn nội dung này khỏi bài học. Lịch sử làm bài và điểm số của học viên đã hoàn thành trước đó vẫn được bảo lưu.
               </p>
             ) : (
               <p className="text-gray-600 text-sm mb-6 leading-relaxed">
-                Bạn có chắc chắn muốn xóa TOÀN BỘ bộ học liệu này không? Mọi dữ liệu (câu hỏi, thẻ học, sơ đồ) và kết quả làm bài liên quan sẽ bị xóa vĩnh viễn.
+                Việc xóa bài tập sẽ ẩn nội dung này khỏi bài học. Lịch sử làm bài và điểm số của học viên đã hoàn thành trước đó vẫn được bảo lưu. Bạn có chắc chắn muốn xóa không?
               </p>
             )}
             <div className="flex items-center justify-end gap-3">
@@ -165,15 +166,25 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
           onToggleOfficial={() => {
             if (!activeMat || !activeMat.materialId) return;
             
-            const confirmUnpublish = !activeMat.isOfficial || window.confirm("Học liệu sẽ chuyển về bản nháp (Draft), học viên sẽ mất quyền truy cập vào tài nguyên này. Bạn có chắc chắn?");
-            if (!confirmUnpublish) return;
+            const handleToggle = () => {
+              const materialId = activeMat.materialId as number;
+              if (activeMat.materialType === 'MINDMAP') {
+                toggleMindmapMutation.mutate({ id: materialId, isOfficial: !activeMat.isOfficial });
+              } else if (activeMat.materialType === 'FLASHCARD') {
+                toggleFlashcardMutation.mutate({ id: materialId, isOfficial: !activeMat.isOfficial });
+              } else if (activeMat.materialType === 'QUIZ') {
+                setQuizOfficialMutation.mutate(materialId);
+              }
+            };
 
-            if (activeMat.materialType === 'MINDMAP') {
-              toggleMindmapMutation.mutate({ id: activeMat.materialId, isOfficial: !activeMat.isOfficial });
-            } else if (activeMat.materialType === 'FLASHCARD') {
-              toggleFlashcardMutation.mutate({ id: activeMat.materialId, isOfficial: !activeMat.isOfficial });
-            } else if (activeMat.materialType === 'QUIZ') {
-              setQuizOfficialMutation.mutate(activeMat.materialId);
+            if (activeMat.isOfficial) {
+              setConfirmAction({
+                title: "Chuyển về bản nháp",
+                message: "Học liệu sẽ chuyển về bản nháp (Draft), học viên sẽ mất quyền truy cập vào tài nguyên này. Bạn có chắc chắn?",
+                onConfirm: handleToggle
+              });
+            } else {
+              handleToggle();
             }
           }}
           onDelete={() => {
@@ -181,6 +192,33 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
           }}
         />
         {renderDeleteModal()}
+        {confirmAction && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-sm animate-in fade-in duration-200">
+            <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl animate-in zoom-in-95 duration-200 border border-gray-200">
+              <h3 className="text-lg font-bold text-gray-900 mb-2">{confirmAction.title}</h3>
+              <p className="text-sm text-gray-600 mb-6">
+                {confirmAction.message}
+              </p>
+              <div className="flex gap-3 justify-end">
+                <button
+                  onClick={() => setConfirmAction(null)}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
+                >
+                  Hủy bỏ
+                </button>
+                <button
+                  onClick={() => {
+                    confirmAction.onConfirm();
+                    setConfirmAction(null);
+                  }}
+                  className="px-4 py-2 text-sm font-bold text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-colors shadow-sm hover:shadow"
+                >
+                  Xác nhận
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </>
     );
   }
@@ -494,9 +532,11 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                         onChange={() => {
                           if (currentLessonId === null) return;
                           
-                          if (window.confirm("Học liệu sẽ chuyển về trạng thái Chưa phân phối, học viên sẽ không còn nhìn thấy ở bài học này. Bạn có chắc chắn?")) {
-                            attachLessonMutation.mutate({ id: distributeMaterialId, lessonId: null });
-                          }
+                          setConfirmAction({
+                            title: "Hủy phân phối học liệu",
+                            message: "Học liệu sẽ chuyển về trạng thái Chưa phân phối, học viên sẽ không còn nhìn thấy ở bài học này. Bạn có chắc chắn?",
+                            onConfirm: () => attachLessonMutation.mutate({ id: distributeMaterialId, lessonId: null })
+                          });
                         }}
                         className="w-4 h-4 text-blue-600 focus:ring-blue-500"
                       />
@@ -523,9 +563,11 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                                     confirmMsg = "Học liệu sẽ được di chuyển sang bài học mới. Học viên ở bài học cũ sẽ không còn nhìn thấy tài nguyên này. Bạn có chắc chắn?";
                                   }
                                   
-                                  if (window.confirm(confirmMsg)) {
-                                    attachLessonMutation.mutate({ id: distributeMaterialId, lessonId: lesson.id });
-                                  }
+                                  setConfirmAction({
+                                    title: "Đính kèm học liệu",
+                                    message: confirmMsg,
+                                    onConfirm: () => attachLessonMutation.mutate({ id: distributeMaterialId, lessonId: lesson.id })
+                                  });
                                 }}
                                 className="w-4 h-4 text-blue-600 focus:ring-blue-500 ml-2"
                               />
@@ -553,6 +595,64 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                 className="px-5 py-2 text-sm font-bold text-gray-700 bg-white border border-gray-200 hover:bg-gray-100 rounded-xl transition-colors shadow-sm"
               >
                 Đóng
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Xác nhận Action chung */}
+      {confirmAction && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl animate-in zoom-in-95 duration-200">
+            <h3 className="text-lg font-bold text-gray-900 mb-2">{confirmAction.title}</h3>
+            <p className="text-sm text-gray-600 mb-6">
+              {confirmAction.message}
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setConfirmAction(null)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
+              >
+                Hủy bỏ
+              </button>
+              <button
+                onClick={() => {
+                  confirmAction.onConfirm();
+                  setConfirmAction(null);
+                }}
+                className="px-4 py-2 text-sm font-bold text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-colors"
+              >
+                Xác nhận
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Xác nhận Action chung */}
+      {confirmAction && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl animate-in zoom-in-95 duration-200 border border-gray-200">
+            <h3 className="text-lg font-bold text-gray-900 mb-2">{confirmAction.title}</h3>
+            <p className="text-sm text-gray-600 mb-6">
+              {confirmAction.message}
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setConfirmAction(null)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
+              >
+                Hủy bỏ
+              </button>
+              <button
+                onClick={() => {
+                  confirmAction.onConfirm();
+                  setConfirmAction(null);
+                }}
+                className="px-4 py-2 text-sm font-bold text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-colors shadow-sm hover:shadow"
+              >
+                Xác nhận
               </button>
             </div>
           </div>

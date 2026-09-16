@@ -23,6 +23,7 @@ import { useLessonProgress } from '@/hooks/useLessonProgress';
 import { useLessonPlayer } from '@/hooks/usePublicCourses';
 import { useVoiceOptions } from '@/hooks/useVoiceOptions';
 import { ApiError } from '@/lib/api/client';
+import { lessonPlayerApi } from '@/lib/api/lessonPlayer';
 import { LiveChatPanel } from '@/components/community/LiveChatPanel';
 import { useSetLearnTitle } from '@/components/layout/LearnTitleContext';
 import { decodeAccessToken, getAccessToken } from '@/lib/auth/token';
@@ -141,12 +142,22 @@ function LearnPageContent() {
   const audioRef = useRef<HTMLAudioElement>(null);
   const dualPlayerRef = useRef<DualPlayerHandle>(null);
   const queryClient = useQueryClient();
+  const sessionIdRef = useRef<string | null>(null);
+  const [streamConflict, setStreamConflict] = useState(false);
+
+  useEffect(() => {
+    // Chỉ tạo sessionId duy nhất cho mỗi phiên mount trang (hoặc mỗi bài học mới)
+    if (!sessionIdRef.current) {
+      sessionIdRef.current = crypto.randomUUID();
+    }
+  }, [lessonId]);
 
   // P2: Fetch materials để hiện Badge và ghim ở sidebar
   const { data: officialMaterials } = useQuery({
     queryKey: ['official-materials', lesson?.courseId],
     queryFn: () => materialsApi.getInstructorMaterials(lesson!.courseId),
     enabled: !!lesson?.courseId,
+    staleTime: 0, // Cập nhật ngay khi tab mount (Test 2.1)
   });
   const currentLessonMaterialCount = officialMaterials?.filter(m => m.lessonId === lessonId).length || 0;
 
@@ -212,6 +223,7 @@ function LearnPageContent() {
     setShowOriginalSub(false);
     setShowTranslatedSub(false);
     setPlayerCurrentSec(0);
+    setStreamConflict(false);
   }, [lessonId]);
 
   // Tự động chuyển sang bài tiếp theo khi phát hết bài hiện tại — nhớ lựa chọn của học viên giữa
@@ -399,6 +411,43 @@ function LearnPageContent() {
     initialPositionSec: lesson?.lastPositionSec ?? 0,
     enabled: hasToken && lesson?.videoSource === 'UPLOAD',
   });
+
+  // Gửi heartbeat kiểm tra conflict (Task 10)
+  useEffect(() => {
+    if (!hasToken || !lessonId || streamConflict) return;
+    
+    // Gửi lần đầu khi vào bài
+    const sendPing = async (force: boolean) => {
+      if (!sessionIdRef.current) return;
+      try {
+        await lessonPlayerApi.sendHeartbeat(lessonId, sessionIdRef.current, navigator.userAgent, force);
+      } catch (err) {
+        if (err instanceof ApiError && err.status === 409) {
+          setStreamConflict(true);
+          dualPlayerRef.current?.pause();
+        }
+      }
+    };
+
+    void sendPing(true);
+
+    const intervalId = setInterval(() => {
+      void sendPing(false);
+    }, 20000);
+
+    return () => clearInterval(intervalId);
+  }, [hasToken, lessonId, streamConflict]);
+
+  const handleResumeStream = async () => {
+    if (!sessionIdRef.current) return;
+    try {
+      await lessonPlayerApi.sendHeartbeat(lessonId, sessionIdRef.current, navigator.userAgent, true);
+      setStreamConflict(false);
+      dualPlayerRef.current?.play();
+    } catch (err) {
+      toast.error('Không thể giành lại quyền phát.');
+    }
+  };
 
   if (isLoading) {
     return <div className="p-16 text-center text-sm text-ink-muted">Đang tải bài học...</div>;
@@ -710,6 +759,24 @@ function LearnPageContent() {
           </aside>
         </div>
       </div>
+
+      {streamConflict && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="mx-4 w-full max-w-sm rounded-card bg-white p-6 shadow-card text-center animate-in zoom-in-95">
+            <div className="mb-4 text-4xl">⚠️</div>
+            <h2 className="mb-2 font-display text-lg font-bold text-ink">Đã phát hiện thiết bị khác</h2>
+            <p className="mb-6 text-sm text-ink-muted">
+              Video đã tạm dừng vì tài khoản của bạn đang phát video trên một thiết bị khác.
+            </p>
+            <button
+              onClick={handleResumeStream}
+              className="w-full rounded-lg bg-accent px-4 py-2.5 text-sm font-bold text-white hover:bg-accent-dark transition-colors"
+            >
+              Tiếp tục phát tại đây
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
