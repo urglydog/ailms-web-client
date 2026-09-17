@@ -156,7 +156,6 @@ function LearnPageContent() {
     }
   }, [lessonId]);
 
-  // P2: Fetch materials để hiện Badge và ghim ở sidebar
   const { data: officialMaterials } = useQuery({
     queryKey: ['official-materials', lesson?.courseId],
     queryFn: () => materialsApi.getInstructorMaterials(lesson!.courseId),
@@ -164,6 +163,28 @@ function LearnPageContent() {
     staleTime: 0, // Cập nhật ngay khi tab mount (Test 2.1)
   });
   const currentLessonMaterialCount = officialMaterials?.filter(m => m.lessonId === lessonId).length || 0;
+
+  // Dọn dẹp Draft rác của các Quiz đã bị xóa mềm (Graceful In-flight cleanup)
+  useEffect(() => {
+    if (lesson?.courseId && userId) {
+      materialsApi.getStudentGradebook(lesson.courseId).then(gradebook => {
+        const deletedQuizIds = new Set(gradebook.quizzes.filter(q => q.isDeleted).map(q => q.quizId.toString()));
+        const keysToRemove: string[] = [];
+        try {
+          for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && (key.startsWith(`exam_draft_${userId}_`) || key.startsWith(`quiz_draft_${userId}_`))) {
+              const qId = key.split('_').pop();
+              if (qId && deletedQuizIds.has(qId)) {
+                keysToRemove.push(key);
+              }
+            }
+          }
+          keysToRemove.forEach(k => localStorage.removeItem(k));
+        } catch(e) {}
+      }).catch(() => {});
+    }
+  }, [lesson?.courseId, userId]);
 
   // `languages[].track` chỉ mới sau khi gọi lại API — cần refetch mỗi khi có track mới sẵn sàng
   // (BR-DUB-04 trả AVAILABLE ngay, hoặc job vừa COMPLETED), nếu không `available`/`track` trong

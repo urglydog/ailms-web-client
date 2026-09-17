@@ -133,7 +133,9 @@ export function QuizViewer({ questions, quizId }: { questions: QuizQuestion[], q
     } else {
       setShowResult(true);
       if (userId && quizId) {
-        localStorage.removeItem(`quiz_draft_${userId}_${quizId}`);
+        try {
+          localStorage.removeItem(`quiz_draft_${userId}_${quizId}`);
+        } catch(e){}
       }
     }
   };

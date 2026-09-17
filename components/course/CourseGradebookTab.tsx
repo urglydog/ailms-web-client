@@ -75,8 +75,13 @@ export function CourseGradebookTab({ courseId }: { courseId: number }) {
               return (
                 <tr key={quiz.quizId} className="hover:bg-surface-hover transition-colors">
                   <td className="py-4 px-4">
-                    <div className="font-medium text-ink flex items-center gap-2">
-                      {quiz.quizTitle || 'Bài kiểm tra'}
+                    <div className="font-medium text-ink flex flex-col gap-1">
+                      <div className="flex items-center gap-2">{quiz.quizTitle || 'Bài kiểm tra'}</div>
+                      {quiz.isDeleted && (
+                        <div className="p-2 mt-1 bg-amber-50 border border-amber-200 rounded text-amber-800 text-xs flex items-center gap-1 w-fit">
+                          ⚠️ Bài tập/bài thi này đã được giảng viên lưu trữ.
+                        </div>
+                      )}
                     </div>
                   </td>
                   <td className="py-4 px-4 text-sm">
