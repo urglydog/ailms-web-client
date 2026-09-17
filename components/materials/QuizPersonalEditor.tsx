@@ -172,7 +172,7 @@ export function QuizPersonalEditor({ questions, quizId }: { questions: QuizQuest
 function QuestionForm({ initialData, onSave, onCancel }: { initialData: QuizQuestion, onSave: (q: QuizQuestion) => void, onCancel: () => void }) {
   const [q, setQ] = useState(() => ({
     ...initialData,
-    options: initialData.options.map(o => ({ ...o }))
+    options: initialData.options.map(o => ({ ...o, _tempId: o.id || Math.random() }))
   }));
 
   return (
@@ -214,8 +214,8 @@ function QuestionForm({ initialData, onSave, onCancel }: { initialData: QuizQues
       <div>
         <label className="block text-sm font-semibold mb-2">Đáp án (Check vào ô xanh để đánh dấu đáp án đúng)</label>
         <div className="space-y-2">
-          {q.options.map((opt, idx) => {
-            const optKey = opt.id ? `opt_${opt.id}` : `opt_new_${idx}`;
+          {q.options.map((opt: QuizOption & { _tempId?: number }, idx: number) => {
+            const optKey = opt._tempId || opt.id || `opt_new_${idx}`;
             return (
             <div key={optKey} className="flex gap-2 items-center">
               <input
@@ -236,6 +236,9 @@ function QuestionForm({ initialData, onSave, onCancel }: { initialData: QuizQues
               <input
                 type="text"
                 value={opt.content}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') e.preventDefault();
+                }}
                 onChange={e => {
                   const newOpts = [...q.options];
                   if (newOpts[idx]) {
@@ -263,7 +266,7 @@ function QuestionForm({ initialData, onSave, onCancel }: { initialData: QuizQues
         <button
           type="button"
           onClick={() => {
-            setQ({ ...q, options: [...q.options, { id: 0, content: '', isCorrect: false }] });
+            setQ({ ...q, options: [...q.options, { id: 0, _tempId: Math.random(), content: '', isCorrect: false }] });
           }}
           className="mt-2 text-sm font-semibold text-accent hover:underline"
         >

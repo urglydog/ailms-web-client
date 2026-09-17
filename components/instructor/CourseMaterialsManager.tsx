@@ -2034,9 +2034,6 @@ function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess 
   const [isTitleEdited, setIsTitleEdited] = useState(false);
   const [language, setLanguage] = useState<string>('');
   const [quizType, setQuizType] = useState<'OFFICIAL_EXAM' | 'LECTURE_QUIZ'>('OFFICIAL_EXAM');
-  const [allowReview, setAllowReview] = useState(true);
-  const [maxAttempts, setMaxAttempts] = useState<number | ''>('');
-  const [durationMinutes, setDurationMinutes] = useState<number | ''>('');
 
   const { data: languages } = useQuery({
     queryKey: ['available-languages', courseId],
@@ -2076,7 +2073,7 @@ function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess 
   }, [materialType, quizType, scope, scopeRefId, structure, isTitleEdited, title]);
 
   const generateManualMutation = useMutation({
-    mutationFn: (input: { materialType: string; language: string; title: string; quizType?: string; scope: string; scopeRefId?: string; customLessonIds?: string; allowReview?: boolean; maxAttempts?: number; durationMinutes?: number }) => materialsApi.createManualMaterial(courseId, input),
+    mutationFn: (input: { materialType: string; language: string; title: string; quizType?: string; scope: string; scopeRefId?: string; customLessonIds?: string }) => materialsApi.createManualMaterial(courseId, input),
     onSuccess: (data) => {
       toast.success('Đã khởi tạo học liệu trống thành công!');
       onSuccess(data.id);
@@ -2103,10 +2100,7 @@ function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess 
       ...(materialType === 'QUIZ' ? { quizType } : {}),
       scope,
       scopeRefId: scopeRefId ? String(scopeRefId) : undefined,
-      customLessonIds: customLessonIds.length > 0 ? JSON.stringify(customLessonIds) : undefined,
-      allowReview,
-      maxAttempts: maxAttempts !== '' ? maxAttempts : undefined,
-      durationMinutes: durationMinutes !== '' ? durationMinutes : undefined,
+      customLessonIds: customLessonIds.length > 0 ? JSON.stringify(customLessonIds) : undefined
     });
   };
 
@@ -2247,7 +2241,7 @@ function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess 
                   Theo Bài học
                 </button>
               )}
-              {((materialType === 'QUIZ' && quizType === 'OFFICIAL_EXAM') || materialType === 'MINDMAP' || materialType === 'FLASHCARD') && (
+              {(materialType === 'MINDMAP' || materialType === 'FLASHCARD') && (
                 <button
                   type="button"
                   onClick={() => { setScope('CUSTOM'); setScopeRefId(null); setCustomLessonIds([]); setIsTitleEdited(false); }}
@@ -2314,44 +2308,7 @@ function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess 
             )}
           </div>
 
-          {materialType === 'QUIZ' && quizType === 'OFFICIAL_EXAM' && (
-            <div className="flex flex-col gap-4 pt-2">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t pt-4">
-                <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
-                  Thời lượng (Phút)
-                  <input
-                    type="number"
-                    min="1"
-                    placeholder="Bỏ trống = Không giới hạn"
-                    value={durationMinutes}
-                    onChange={(e) => setDurationMinutes(e.target.value ? Number(e.target.value) : '')}
-                    className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:border-emerald-500 outline-none bg-white font-normal"
-                  />
-                </label>
-                <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
-                  Số lần làm tối đa
-                  <input
-                    type="number"
-                    min="1"
-                    placeholder="Bỏ trống = Không giới hạn"
-                    value={maxAttempts}
-                    onChange={(e) => setMaxAttempts(e.target.value ? Number(e.target.value) : '')}
-                    className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:border-emerald-500 outline-none bg-white font-normal"
-                  />
-                </label>
-              </div>
 
-              <label className="flex items-center gap-2 cursor-pointer mt-2 bg-gray-50 p-3 rounded-xl border border-gray-200 w-max">
-                <input
-                  type="checkbox"
-                  checked={allowReview}
-                  onChange={(e) => setAllowReview(e.target.checked)}
-                  className="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4"
-                />
-                <span className="text-sm font-semibold text-gray-700">Cho phép xem lại đáp án sau khi nộp</span>
-              </label>
-            </div>
-          )}
           
           <div className="mt-4 flex justify-end gap-3 border-t pt-5">
             <button type="button" onClick={onClose} className="rounded-xl px-5 py-2.5 text-sm font-bold text-gray-600 hover:bg-gray-200 transition-colors">

@@ -375,10 +375,12 @@ export default function AntiCheatExamPage() {
     startQuiz(Number(quizId), {
       onSuccess: (data) => {
         setAttemptData(data);
-        if (isProctored) {
-          toast.success('Bắt đầu làm bài. Vui lòng không chuyển tab!');
-        } else {
-          toast.success('Bắt đầu làm bài!');
+        if (!isTakingMode) {
+          if (isProctored) {
+            toast.success('Bắt đầu làm bài. Vui lòng không chuyển tab!');
+          } else {
+            toast.success('Bắt đầu làm bài!');
+          }
         }
         let url = `/exam/${quizId}?mode=taking`;
         if (proctoredParam) url += `&proctored=${proctoredParam}`;
@@ -395,7 +397,7 @@ export default function AntiCheatExamPage() {
         if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
       }
     });
-  }, [isProctored, quizId, startQuiz, mediaStream, proctoredParam, returnUrl, router]);
+  }, [isProctored, quizId, startQuiz, mediaStream, proctoredParam, returnUrl, router, isTakingMode]);
 
   // Cập nhật isStarted dựa trên mode=taking và attemptData
   useEffect(() => {
@@ -415,7 +417,7 @@ export default function AntiCheatExamPage() {
 
   // Đồng hồ đếm ngược tuyệt đối dựa vào startedAt
   useEffect(() => {
-    const examDurationMinutes = duration ? Number(duration) : null;
+    const examDurationMinutes = duration ? Number(duration) : attemptData?.durationMinutes;
     if (!isStarted || !examDurationMinutes || result || !attemptData?.startedAt) return;
 
     const startedAtTimestamp = Array.isArray(attemptData.startedAt)
