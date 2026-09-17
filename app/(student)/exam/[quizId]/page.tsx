@@ -156,8 +156,8 @@ export default function AntiCheatExamPage() {
     const elapsed = startTimeRef.current ? Math.floor((Date.now() - startTimeRef.current.getTime()) / 1000) : 0;
     setElapsedSeconds(elapsed);
     submitQuiz({ attemptId: attemptData.attemptId, data: { answers } }, {
-      onSuccess: (data) => {
-        setResult(data as any);
+      onSuccess: (data: SubmitRes) => {
+        setResult(data);
         setSubmitTime(new Date());
         if (userId && quizId) {
           try {

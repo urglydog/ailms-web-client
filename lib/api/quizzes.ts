@@ -62,6 +62,7 @@ export interface SubmitRes {
   correctCount: number;
   totalQuestions: number;
   details: AnswerDetailDto[];
+  isArchived?: boolean;
 }
 
 export interface ExplainReq {
