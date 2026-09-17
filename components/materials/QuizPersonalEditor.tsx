@@ -214,7 +214,7 @@ function QuestionForm({ initialData, onSave, onCancel }: { initialData: QuizQues
       <div>
         <label className="block text-sm font-semibold mb-2">Đáp án (Check vào ô xanh để đánh dấu đáp án đúng)</label>
         <div className="space-y-2">
-          {q.options.map((opt: any, idx: number) => {
+          {q.options.map((opt: QuizOption & { _tempId?: number }, idx: number) => {
             const optKey = opt._tempId || opt.id || `opt_new_${idx}`;
             return (
             <div key={optKey} className="flex gap-2 items-center">

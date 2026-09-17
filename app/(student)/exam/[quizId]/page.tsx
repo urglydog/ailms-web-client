@@ -397,7 +397,7 @@ export default function AntiCheatExamPage() {
         if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
       }
     });
-  }, [isProctored, quizId, startQuiz, mediaStream, proctoredParam, returnUrl, router]);
+  }, [isProctored, quizId, startQuiz, mediaStream, proctoredParam, returnUrl, router, isTakingMode]);
 
   // Cập nhật isStarted dựa trên mode=taking và attemptData
   useEffect(() => {
