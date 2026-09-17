@@ -7,7 +7,6 @@ import { useCategories } from '@/hooks/useCategories';
 import { useCreateCourse } from '@/hooks/useCourses';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { ApiError } from '@/lib/api/client';
-import { ApiError } from '@/lib/api/client';
 
 /**
  * Bước khởi tạo tối thiểu — chỉ hỏi 2 field bắt buộc ở tầng DB (title, categoryId) rồi
