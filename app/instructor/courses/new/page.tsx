@@ -2,10 +2,9 @@
 
 import { useRouter } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
-import { useUpdateMyProfile } from '@/hooks/useAuth';
 import { useCategories } from '@/hooks/useCategories';
 import { useCreateCourse } from '@/hooks/useCourses';
-import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useCurrentUser, useUpdateProfile } from '@/hooks/useCurrentUser';
 import { ApiError } from '@/lib/api/client';
 
 /**
@@ -17,7 +16,7 @@ export default function NewCoursePage() {
   const router = useRouter();
   const { data: categories } = useCategories();
   const createCourse = useCreateCourse();
-  const updateProfile = useUpdateMyProfile();
+  const updateProfile = useUpdateProfile();
   const { data: currentUser } = useCurrentUser();
 
   const [title, setTitle] = useState('');
