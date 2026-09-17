@@ -506,7 +506,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
 
       {/* Modal Phân Phối Học Liệu Tree-View */}
       {distributeMaterialId && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in">
           <div className="bg-white rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden border border-gray-100">
             <div className="bg-blue-50 p-5 border-b border-blue-100 flex items-center justify-between">
               <div>

@@ -5,6 +5,7 @@ import { useExplainWrongAnswer } from '@/hooks/useQuizzes';
 import { toast } from 'sonner';
 import { MarkdownRenderer } from '@/components/ui/MarkdownRenderer';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useParams } from 'next/navigation';
 
 interface QuizOption {
   id: number;
@@ -22,22 +23,28 @@ interface QuizQuestion {
 export function QuizViewer({ questions, quizId }: { questions: QuizQuestion[], quizId?: number }) {
   const { data: user } = useCurrentUser();
   const userId = user?.id;
+  const params = useParams();
+  const lessonId = params?.lessonId || 'general';
   
   const [currentIdx, setCurrentIdx] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [score, setScore] = useState(0);
   const [isHydrated, setIsHydrated] = useState(false);
+  const [isDoing, setIsDoing] = useState(false);
 
   // Load state from localStorage on mount
   useEffect(() => {
     if (userId && quizId) {
-      const draftKey = `quiz_draft_${userId}_${quizId}`;
+      const draftKey = `quickcheck_state_${lessonId}_${quizId}`;
       try {
         const savedDraft = localStorage.getItem(draftKey);
         if (savedDraft) {
           const parsed = JSON.parse(savedDraft);
           if (parsed && typeof parsed === 'object') {
+             if (typeof parsed.isDoing === 'boolean') {
+               setIsDoing(parsed.isDoing);
+             }
              if (typeof parsed.currentIdx === 'number' && parsed.currentIdx < questions.length) {
                setCurrentIdx(parsed.currentIdx);
              }
@@ -60,14 +67,14 @@ export function QuizViewer({ questions, quizId }: { questions: QuizQuestion[], q
   // Save state to localStorage whenever it changes
   useEffect(() => {
     if (isHydrated && userId && quizId) {
-      const draftKey = `quiz_draft_${userId}_${quizId}`;
+      const draftKey = `quickcheck_state_${lessonId}_${quizId}`;
       try {
-        localStorage.setItem(draftKey, JSON.stringify({ currentIdx, selectedOption, showResult }));
+        localStorage.setItem(draftKey, JSON.stringify({ isDoing, currentIdx, selectedOption, showResult }));
       } catch (e) {
         console.error("Failed to save quiz draft", e);
       }
     }
-  }, [currentIdx, selectedOption, isHydrated, userId, quizId, showResult]);
+  }, [isDoing, currentIdx, selectedOption, isHydrated, userId, quizId, lessonId, showResult]);
 
 
 
@@ -92,6 +99,24 @@ export function QuizViewer({ questions, quizId }: { questions: QuizQuestion[], q
     return <div className="text-center text-ink-muted">Chưa có câu hỏi trắc nghiệm nào.</div>;
   }
 
+  if (!isDoing) {
+    return (
+      <div className="card p-10 text-center bg-surface-hover border border-line-soft">
+        <div className="text-4xl mb-4">🧩</div>
+        <h2 className="text-2xl font-bold font-display text-ink mb-4">Quick Check: Ôn tập nhanh</h2>
+        <p className="text-ink-muted mb-8">
+          Bài tập này có {questions.length} câu hỏi giúp bạn củng cố kiến thức vừa học.
+        </p>
+        <button
+          onClick={() => setIsDoing(true)}
+          className="btn-primary"
+        >
+          {currentIdx > 0 || selectedOption !== null ? 'Tiếp tục làm bài' : 'Bắt đầu làm bài'}
+        </button>
+      </div>
+    );
+  }
+
   if (showResult) {
     return (
       <div className="card p-10 text-center bg-surface-hover border border-line-soft">
@@ -108,7 +133,13 @@ export function QuizViewer({ questions, quizId }: { questions: QuizQuestion[], q
             setScore(0);
             setSelectedOption(null);
             setShowResult(false);
+            setIsDoing(false);
             setExplanations({});
+            if (userId && quizId) {
+              try {
+                localStorage.removeItem(`quickcheck_state_${lessonId}_${quizId}`);
+              } catch {}
+            }
           }}
           className="btn-primary"
         >
@@ -138,7 +169,7 @@ export function QuizViewer({ questions, quizId }: { questions: QuizQuestion[], q
       setShowResult(true);
       if (userId && quizId) {
         try {
-          localStorage.removeItem(`quiz_draft_${userId}_${quizId}`);
+          localStorage.removeItem(`quickcheck_state_${lessonId}_${quizId}`);
         } catch {}
       }
     }
