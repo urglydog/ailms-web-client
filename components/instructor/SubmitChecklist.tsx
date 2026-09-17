@@ -16,11 +16,15 @@ export function SubmitChecklist({ missingConditions, canSubmit }: SubmitChecklis
       ) : (
         <ul className="flex flex-col gap-1.5">
           {missingConditions.map((condition) => (
-            <li key={condition} className="flex items-center gap-2 text-[12.5px] text-amber-700">
-              <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-amber-100 text-[10px]">✗</span>
+            <li key={condition} className="flex items-center gap-2 text-[12.5px] text-red-700">
+              <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-red-100 text-[10px]">✗</span>
               <span>{condition}</span>
             </li>
           ))}
+          <li className="flex items-center gap-2 text-[12.5px] text-green-700">
+            <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-green-100 text-[10px]">✓</span>
+            <span>Khuyến nghị: Thêm Bài tập (Quiz/Flashcard/Mindmap) (Không bắt buộc)</span>
+          </li>
         </ul>
       )}
     </div>

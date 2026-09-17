@@ -32,6 +32,8 @@ export interface User {
   email: string;
   fullName: string;
   avatarUrl: string | null;
+  headline: string | null;
+  bio: string | null;
   role: Role;
   authProvider: string;
   preferredLanguage: string;
@@ -64,6 +66,8 @@ export interface PublicProfile {
   id: number;
   fullName: string;
   avatarUrl: string | null;
+  headline: string | null;
+  bio: string | null;
   role: Role;
   memberSince: string;
   courses: PublicCourseSummary[] | null;
