@@ -62,7 +62,7 @@ export function QuizViewer({ questions, quizId }: { questions: QuizQuestion[], q
       }
     }
     setIsHydrated(true);
-  }, [userId, quizId, questions.length]);
+  }, [userId, quizId, lessonId, questions.length]);
 
   // Save state to localStorage whenever it changes
   useEffect(() => {

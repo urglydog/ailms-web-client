@@ -163,7 +163,7 @@ export default function AntiCheatExamPage() {
             localStorage.removeItem(key);
           }
         }
-      } catch (e) {}
+      } catch {}
     }
   }, [history, userId, quizId]);
 
@@ -228,7 +228,7 @@ export default function AntiCheatExamPage() {
         setIsSubmitting(false);
       }
     });
-  }, [attemptData, answers, isSubmitting, submitQuiz, mediaStream, userId, quizId, router]);
+  }, [attemptData, answers, isSubmitting, submitQuiz, mediaStream, userId, quizId, router, returnUrl]);
 
   // Anti-Cheat: Track tab switching
   useEffect(() => {
