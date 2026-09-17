@@ -2,8 +2,11 @@
 
 import { useRouter } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
+import { useUpdateMyProfile } from '@/hooks/useAuth';
 import { useCategories } from '@/hooks/useCategories';
 import { useCreateCourse } from '@/hooks/useCourses';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { ApiError } from '@/lib/api/client';
 import { ApiError } from '@/lib/api/client';
 
 /**
@@ -15,16 +18,58 @@ export default function NewCoursePage() {
   const router = useRouter();
   const { data: categories } = useCategories();
   const createCourse = useCreateCourse();
+  const updateProfile = useUpdateMyProfile();
+  const { data: currentUser } = useCurrentUser();
 
   const [title, setTitle] = useState('');
   const [categoryId, setCategoryId] = useState<number | ''>('');
+  
+  // Profile Onboarding State
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [headline, setHeadline] = useState('');
+  const [bio, setBio] = useState('');
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
+  const checkProfileAndSubmit = (e?: FormEvent) => {
+    if (e) e.preventDefault();
     if (!title.trim() || !categoryId) return;
+    
+    // Check local state first to save an API call if obviously incomplete
+    const isProfileIncomplete = !currentUser?.headline?.trim() || (currentUser?.bio?.trim()?.length ?? 0) < 20;
+    
+    if (isProfileIncomplete) {
+      setHeadline(currentUser?.headline || '');
+      setBio(currentUser?.bio || '');
+      setShowProfileModal(true);
+      return;
+    }
+    
+    submitCourse();
+  };
+  
+  const submitCourse = () => {
     createCourse.mutate(
       { title: title.trim(), categoryId: Number(categoryId), price: 0 },
-      { onSuccess: (created) => router.replace(`/instructor/courses/${created.id}/edit`) },
+      { 
+        onSuccess: (created) => router.replace(`/instructor/courses/${created.id}/edit`),
+        onError: (err) => {
+          if (err instanceof ApiError && err.code === 'PROFILE_INCOMPLETE') {
+            setShowProfileModal(true);
+          }
+        }
+      },
+    );
+  };
+  
+  const handleSaveProfile = () => {
+    if (!headline.trim() || bio.trim().length < 20) return;
+    updateProfile.mutate(
+      { headline: headline.trim(), bio: bio.trim() } as any, // DTO updated
+      {
+        onSuccess: () => {
+          setShowProfileModal(false);
+          submitCourse();
+        }
+      }
     );
   };
 
@@ -36,7 +81,7 @@ export default function NewCoursePage() {
         ngay ở trang soạn thảo tiếp theo.
       </p>
       <form
-        onSubmit={handleSubmit}
+        onSubmit={checkProfileAndSubmit}
         className="flex flex-col gap-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm"
       >
         <label className="flex flex-col gap-1.5">
@@ -80,6 +125,54 @@ export default function NewCoursePage() {
           {createCourse.isPending ? 'Đang tạo...' : 'Tạo & bắt đầu soạn thảo →'}
         </button>
       </form>
+      
+      {showProfileModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="flex w-full max-w-md flex-col gap-4 rounded-xl bg-white p-6 shadow-xl">
+            <h2 className="m-0 text-lg font-bold text-gray-900">Hoàn thiện hồ sơ Giảng viên</h2>
+            <p className="text-sm text-gray-600">
+              Bạn cần cập nhật chức danh nghề nghiệp và tiểu sử trước khi tạo khóa học đầu tiên.
+            </p>
+            
+            <label className="flex flex-col gap-1.5">
+              <span className="text-[12.5px] font-semibold text-gray-600">Chức danh nghề nghiệp</span>
+              <input
+                value={headline}
+                onChange={(e) => setHeadline(e.target.value)}
+                placeholder="VD: Kỹ sư phần mềm / Giảng viên tiếng Anh"
+                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-cyan-400 focus:outline-none"
+              />
+            </label>
+            
+            <label className="flex flex-col gap-1.5">
+              <span className="text-[12.5px] font-semibold text-gray-600">Tiểu sử ngắn (tối thiểu 20 ký tự)</span>
+              <textarea
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
+                rows={4}
+                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-cyan-400 focus:outline-none"
+              />
+              <span className="text-xs text-gray-400 text-right">{bio.length}/20</span>
+            </label>
+            
+            <div className="mt-2 flex justify-end gap-3">
+              <button
+                onClick={() => setShowProfileModal(false)}
+                className="rounded-full px-4 py-2 text-[13px] font-bold text-gray-600 hover:bg-gray-100"
+              >
+                Hủy bỏ
+              </button>
+              <button
+                onClick={handleSaveProfile}
+                disabled={!headline.trim() || bio.trim().length < 20 || updateProfile.isPending}
+                className="rounded-full bg-cyan-600 px-5 py-2 text-[13px] font-bold text-white hover:bg-cyan-700 disabled:opacity-50"
+              >
+                {updateProfile.isPending ? 'Đang lưu...' : 'Lưu & Tiếp tục'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

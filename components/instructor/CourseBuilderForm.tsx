@@ -138,6 +138,12 @@ export function CourseBuilderForm({ courseId }: CourseBuilderFormProps) {
         </div>
       )}
 
+      {course.status === 'PENDING' && (
+        <div className="rounded-xl border border-blue-200 bg-blue-50 p-4 text-[13px] text-blue-800">
+          Khóa học đang được phê duyệt. Bạn không thể chỉnh sửa nội dung trong thời gian này.
+        </div>
+      )}
+
       {errors.length > 0 && (
         <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-[13px] text-red-700">
           {errors.map((e) => e.message).join(' · ')}
@@ -177,8 +183,11 @@ export function CourseBuilderForm({ courseId }: CourseBuilderFormProps) {
             <form
               id="course-metadata-form"
               onSubmit={handleSave}
-              className="flex flex-col gap-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm"
+              className={`flex flex-col gap-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm ${
+                course.status === 'PENDING' ? 'pointer-events-none opacity-70' : ''
+              }`}
             >
+              <fieldset disabled={course.status === 'PENDING'} className="flex flex-col gap-4 border-0 p-0 m-0">
               <Field label="Tiêu đề khóa học">
                 <input
                   value={title}
@@ -257,6 +266,7 @@ export function CourseBuilderForm({ courseId }: CourseBuilderFormProps) {
                   className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-cyan-400 focus:outline-none"
                 />
               </Field>
+              </fieldset>
             </form>
 
             <div className="flex flex-col gap-4">
@@ -266,17 +276,21 @@ export function CourseBuilderForm({ courseId }: CourseBuilderFormProps) {
 
           <div className="flex flex-col gap-3">
             <h2 className="m-0 font-display text-[16px] font-bold text-gray-900">Chương &amp; bài học</h2>
-            <ChapterEditorList courseId={course.id} chapters={course.chapters} />
+            <div className={course.status === 'PENDING' ? 'pointer-events-none opacity-70' : ''}>
+              <ChapterEditorList courseId={course.id} chapters={course.chapters} />
+            </div>
           </div>
 
-          <button
-            type="submit"
-            form="course-metadata-form"
-            disabled={updateCourse.isPending}
-            className="self-start rounded-full bg-gray-900 px-6 py-3 text-[13.5px] font-bold text-white hover:bg-gray-700 disabled:opacity-50"
-          >
-            {updateCourse.isPending ? 'Đang lưu...' : 'Lưu thay đổi'}
-          </button>
+          {course.status !== 'PENDING' && (
+            <button
+              type="submit"
+              form="course-metadata-form"
+              disabled={updateCourse.isPending}
+              className="self-start rounded-full bg-gray-900 px-6 py-3 text-[13.5px] font-bold text-white hover:bg-gray-700 disabled:opacity-50"
+            >
+              {updateCourse.isPending ? 'Đang lưu...' : 'Lưu thay đổi'}
+            </button>
+          )}
         </div>
       )}
 
