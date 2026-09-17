@@ -170,7 +170,7 @@ function LearnPageContent() {
   // Dọn dẹp Draft rác của các Quiz đã bị xóa mềm (Graceful In-flight cleanup)
   useEffect(() => {
     if (lesson?.courseId && userId) {
-      api.get<{quizzes: {quizId: number, isDeleted: boolean}[]}>(`/api/v1/gradebook/courses/${lesson.courseId}`, { token: getAccessToken() ?? undefined }).then(gradebook => {
+      api.get<{quizzes: {quizId: number, isDeleted: boolean}[]}>(`/api/v1/student/courses/${lesson.courseId}/gradebook`, { token: getAccessToken() ?? undefined }).then(gradebook => {
         const deletedQuizIds = new Set(gradebook.quizzes.filter(q => q.isDeleted).map(q => q.quizId.toString()));
         const keysToRemove: string[] = [];
         try {

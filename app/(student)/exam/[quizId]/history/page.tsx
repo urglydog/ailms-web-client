@@ -99,9 +99,9 @@ function AttemptHistoryContent() {
                   <div className="space-y-3">
                     {attemptDetail.details.slice(hStart, hEnd).map((q, qIdx) => {
                       const hasAnswer = q.selectedOptionIds && q.selectedOptionIds.length > 0;
-                      const showCorrectness = q.correctOptionIds && q.correctOptionIds.length > 0;
-                      // Border: green if correct, red if wrong or unanswered
-                      const cardBorder = q.isCorrect ? 'border-green-400 bg-green-50/30' : 'border-red-400 bg-red-50/30';
+                      const showCorrectness = q.isCorrect !== null && q.correctOptionIds && q.correctOptionIds.length > 0;
+                      // Border: green if correct, red if wrong or unanswered, neutral if allowReview is false
+                      const cardBorder = q.isCorrect === null ? 'border-line bg-white' : (q.isCorrect ? 'border-green-400 bg-green-50/30' : 'border-red-400 bg-red-50/30');
 
                       return (
                         <div key={q.questionId} id={`question-${q.questionId}`} className={`border-2 rounded-lg p-4 ${cardBorder}`}>
@@ -110,11 +110,13 @@ function AttemptHistoryContent() {
                               {hStart + qIdx + 1}
                             </span>
                             <span className="text-ink">{q.content}</span>
-                            {q.isCorrect
+                            {q.isCorrect === true
                               ? <span className="ml-auto text-green-600 text-[10px] font-bold whitespace-nowrap">✓ Đúng</span>
-                              : hasAnswer
+                              : q.isCorrect === false && hasAnswer
                                 ? <span className="ml-auto text-red-600 text-[10px] font-bold whitespace-nowrap">✗ Sai</span>
-                                : <span className="ml-auto text-red-600 text-[10px] font-bold whitespace-nowrap">— Bỏ trống</span>
+                                : q.isCorrect === false && !hasAnswer
+                                  ? <span className="ml-auto text-red-600 text-[10px] font-bold whitespace-nowrap">— Bỏ trống</span>
+                                  : <span className="ml-auto text-ink-muted text-[10px] font-bold whitespace-nowrap">{hasAnswer ? 'Đã trả lời' : 'Bỏ trống'}</span>
                             }
                           </h3>
 
@@ -201,8 +203,8 @@ function AttemptHistoryContent() {
                             <div className="h-[70%] w-full flex items-center justify-center bg-surface text-ink border-b border-line/50">
                               {idx + 1}
                             </div>
-                            <div className={`h-[30%] w-full flex items-center justify-center text-white text-[8px] ${isCorrect ? 'bg-green-500' : 'bg-red-500'}`}>
-                              {isCorrect ? '✓' : '✗'}
+                            <div className={`h-[30%] w-full flex items-center justify-center text-white text-[8px] ${isCorrect === null ? (q.selectedOptionIds?.length ? 'bg-accent/80' : 'bg-surface text-ink-muted') : (isCorrect ? 'bg-green-500' : 'bg-red-500')}`}>
+                              {isCorrect === null ? (q.selectedOptionIds?.length ? '✓' : '—') : (isCorrect ? '✓' : '✗')}
                             </div>
                           </button>
                         );

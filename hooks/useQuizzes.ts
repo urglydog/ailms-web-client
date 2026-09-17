@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { quizApi } from '@/lib/api/quizzes';
-import { StartRes, SubmitReq, SubmitRes, HistoryRes } from '@/lib/api/quizzes';
+import { SubmitReq } from '@/lib/api/quizzes';
 
 export const useStartQuiz = () => {
   return useMutation({
@@ -13,7 +13,7 @@ export const useSubmitQuiz = () => {
   return useMutation({
     mutationFn: ({ attemptId, data }: { attemptId: number; data: SubmitReq }) =>
       quizApi.submitAttempt(attemptId, data),
-    onSuccess: (_, variables) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['quizHistory'] });
       queryClient.invalidateQueries({ queryKey: ['course-materials'] });
     }
@@ -44,13 +44,13 @@ export const useExplainWrongAnswer = () => {
 
 export const useUpdatePersonalQuestion = () => {
   return useMutation({
-    mutationFn: ({ questionId, data }: { questionId: number; data: any }) => quizApi.updateQuestion(questionId, data),
+    mutationFn: ({ questionId, data }: { questionId: number; data: import('@/lib/api/quizzes').UpdateQuestionReq }) => quizApi.updateQuestion(questionId, data),
   });
 };
 
 export const useAddPersonalQuestion = () => {
   return useMutation({
-    mutationFn: ({ quizId, data }: { quizId: number; data: any }) => quizApi.addQuestion(quizId, data),
+    mutationFn: ({ quizId, data }: { quizId: number; data: import('@/lib/api/quizzes').AddQuestionReq }) => quizApi.addQuestion(quizId, data),
   });
 };
 

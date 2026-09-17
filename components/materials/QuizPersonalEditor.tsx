@@ -34,7 +34,7 @@ export function QuizPersonalEditor({ questions, quizId }: { questions: QuizQuest
       data: {
         content: q.content,
         isMultipleChoice: q.isMultipleChoice,
-        options: q.options.map(o => ({ content: o.content, isCorrect: o.isCorrect }))
+        options: q.options.map((o, i) => ({ content: o.content, isCorrect: o.isCorrect, displayOrder: i }))
       }
     }, {
       onSuccess: () => {
@@ -53,8 +53,9 @@ export function QuizPersonalEditor({ questions, quizId }: { questions: QuizQuest
       quizId,
       data: {
         content: q.content,
+        displayOrder: q.displayOrder || 0,
         isMultipleChoice: q.isMultipleChoice,
-        options: q.options.map(o => ({ content: o.content, isCorrect: o.isCorrect }))
+        options: q.options.map((o, i) => ({ content: o.content, isCorrect: o.isCorrect, displayOrder: i }))
       }
     }, {
       onSuccess: () => {
