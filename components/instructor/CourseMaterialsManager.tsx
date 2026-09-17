@@ -1304,6 +1304,7 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
 /** Giao diện Sinh AI Official Mới Cho Giảng Viên */
 function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: { courseId: number; initialType: 'QUIZ' | 'FLASHCARD' | 'MINDMAP'; onClose: () => void; onSuccess: () => void }) {
   const [materialType, setMaterialType] = useState<'QUIZ' | 'FLASHCARD' | 'MINDMAP'>(initialType);
+  const [quizType, setQuizType] = useState<'LECTURE_QUIZ' | 'OFFICIAL_EXAM'>('OFFICIAL_EXAM');
   const [scopeType, setScopeType] = useState<'WHOLE_COURSE' | 'CHAPTER' | 'LESSON'>('WHOLE_COURSE');
   const [scopeRefId, setScopeRefId] = useState<number | undefined>(undefined);
   const [lessonId, setLessonId] = useState<number | undefined>(undefined);
@@ -1405,7 +1406,7 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
           <div
             onClick={() => {
               setMaterialType('QUIZ');
-              setScopeType('WHOLE_COURSE');
+              setScopeType(quizType === 'LECTURE_QUIZ' ? 'LESSON' : 'WHOLE_COURSE');
             }}
             className={`cursor-pointer rounded-2xl p-4 border-2 transition-all flex flex-col items-center text-center gap-2 ${materialType === 'QUIZ' ? 'border-cyan-500 bg-cyan-50/50 shadow-md scale-[1.02]' : 'border-gray-200 hover:border-cyan-300 bg-white'
               }`}
@@ -1447,6 +1448,38 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-300 flex flex-col gap-4 bg-gray-50 p-5 rounded-2xl border border-gray-200">
             <h4 className="font-bold text-gray-800 border-b pb-2">Cấu Hình Chi Tiết</h4>
 
+            {materialType === 'QUIZ' && (
+              <div className="flex flex-col gap-2 pt-2 pb-2">
+                <span className="text-sm font-semibold text-gray-700">Phân loại Trắc nghiệm</span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <label className={`cursor-pointer flex items-start gap-3 p-3 rounded-xl border-2 transition-all ${quizType === 'LECTURE_QUIZ' ? 'border-cyan-500 bg-cyan-50' : 'border-gray-200 bg-white hover:border-cyan-200'}`}>
+                    <input type="radio" name="aiQuizType" value="LECTURE_QUIZ" checked={quizType === 'LECTURE_QUIZ'} onChange={() => {
+                      setQuizType('LECTURE_QUIZ');
+                      setScopeType('LESSON');
+                      setScopeRefId(undefined);
+                      setLessonId(undefined);
+                    }} className="mt-1" />
+                    <div className="flex flex-col">
+                      <span className="font-bold text-gray-900 text-sm">Kiểm tra nhanh (Quick Check)</span>
+                      <span className="text-xs text-gray-500">Gắn vào 1 Bài học. Luôn hiện giải thích, làm vô hạn lần, không tính giờ.</span>
+                    </div>
+                  </label>
+                  <label className={`cursor-pointer flex items-start gap-3 p-3 rounded-xl border-2 transition-all ${quizType === 'OFFICIAL_EXAM' ? 'border-cyan-500 bg-cyan-50' : 'border-gray-200 bg-white hover:border-cyan-200'}`}>
+                    <input type="radio" name="aiQuizType" value="OFFICIAL_EXAM" checked={quizType === 'OFFICIAL_EXAM'} onChange={() => {
+                      setQuizType('OFFICIAL_EXAM');
+                      setScopeType('WHOLE_COURSE');
+                      setScopeRefId(undefined);
+                      setLessonId(undefined);
+                    }} className="mt-1" />
+                    <div className="flex flex-col">
+                      <span className="font-bold text-gray-900 text-sm">Thi chính thức (Official Exam)</span>
+                      <span className="text-xs text-gray-500">Thi theo Chương/Khóa học. Có tính giờ, ghi Bảng điểm, tùy chỉnh lượt làm.</span>
+                    </div>
+                  </label>
+                </div>
+              </div>
+            )}
+
             <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
               Tiêu đề học liệu
               <input
@@ -1472,9 +1505,9 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
                 }}
                 className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:border-cyan-500 outline-none bg-white"
               >
-                {materialType === 'QUIZ' && <option value="WHOLE_COURSE">Toàn bộ khóa học</option>}
-                {materialType === 'QUIZ' && <option value="CHAPTER">Theo chương cụ thể</option>}
-                {materialType === 'QUIZ' && <option value="LESSON">Bài học cụ thể</option>}
+                {materialType === 'QUIZ' && quizType === 'OFFICIAL_EXAM' && <option value="WHOLE_COURSE">Toàn bộ khóa học</option>}
+                {materialType === 'QUIZ' && quizType === 'OFFICIAL_EXAM' && <option value="CHAPTER">Theo chương cụ thể</option>}
+                {materialType === 'QUIZ' && quizType === 'LECTURE_QUIZ' && <option value="LESSON">Bài học cụ thể</option>}
                 
                 {materialType === 'FLASHCARD' && <option value="CHAPTER">Theo chương cụ thể</option>}
                 {materialType === 'FLASHCARD' && <option value="LESSON">Bài học cụ thể</option>}
@@ -2151,10 +2184,41 @@ function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess 
             />
           </label>
 
+          {materialType === 'QUIZ' && (
+            <div className="flex flex-col gap-2 pt-2">
+              <span className="text-sm font-semibold text-gray-700">Phân loại Trắc nghiệm</span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <label className={`cursor-pointer flex items-start gap-3 p-3 rounded-xl border-2 transition-all ${quizType === 'LECTURE_QUIZ' ? 'border-emerald-500 bg-emerald-50' : 'border-gray-200 bg-white hover:border-emerald-200'}`}>
+                  <input type="radio" name="quizTypeTop" value="LECTURE_QUIZ" checked={quizType === 'LECTURE_QUIZ'} onChange={() => {
+                    setQuizType('LECTURE_QUIZ');
+                    setScope('LESSON');
+                    setScopeRefId(null);
+                  }} className="mt-1" />
+                  <div className="flex flex-col">
+                    <span className="font-bold text-gray-900 text-sm">Kiểm tra nhanh (Quick Check)</span>
+                    <span className="text-xs text-gray-500">Gắn vào 1 Bài học. Luôn hiện giải thích, làm vô hạn lần, không tính giờ.</span>
+                  </div>
+                </label>
+                <label className={`cursor-pointer flex items-start gap-3 p-3 rounded-xl border-2 transition-all ${quizType === 'OFFICIAL_EXAM' ? 'border-emerald-500 bg-emerald-50' : 'border-gray-200 bg-white hover:border-emerald-200'}`}>
+                  <input type="radio" name="quizTypeTop" value="OFFICIAL_EXAM" checked={quizType === 'OFFICIAL_EXAM'} onChange={() => {
+                    setQuizType('OFFICIAL_EXAM');
+                    setScope('COURSE');
+                    setScopeRefId(null);
+                  }} className="mt-1" />
+                  <div className="flex flex-col">
+                    <span className="font-bold text-gray-900 text-sm">Thi chính thức (Official Exam)</span>
+                    <span className="text-xs text-gray-500">Thi theo Chương/Khóa học. Có tính giờ, ghi Bảng điểm, tùy chỉnh lượt làm.</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+          )}
+
+
           <div className="flex flex-col gap-2 pt-2">
             <span className="text-sm font-semibold text-gray-700">Phạm vi học liệu (Scope)</span>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              {((materialType === 'QUIZ') || materialType === 'FLASHCARD') && (
+              {((materialType === 'QUIZ' && quizType === 'OFFICIAL_EXAM') || materialType === 'FLASHCARD') && (
                 <button
                   type="button"
                   onClick={() => { setScope('COURSE'); setScopeRefId(null); setCustomLessonIds([]); setIsTitleEdited(false); }}
@@ -2164,7 +2228,7 @@ function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess 
                 </button>
               )}
               
-              {(materialType === 'QUIZ' || materialType === 'MINDMAP' || materialType === 'FLASHCARD') && (
+              {((materialType === 'QUIZ' && quizType === 'OFFICIAL_EXAM') || materialType === 'MINDMAP' || materialType === 'FLASHCARD') && (
                 <button
                   type="button"
                   onClick={() => { setScope('CHAPTER'); setScopeRefId(null); setCustomLessonIds([]); setIsTitleEdited(false); }}
@@ -2174,23 +2238,23 @@ function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess 
                 </button>
               )}
               
-              {(materialType === 'QUIZ' || materialType === 'MINDMAP' || materialType === 'FLASHCARD') && (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => { setScope('LESSON'); setScopeRefId(null); setCustomLessonIds([]); setIsTitleEdited(false); }}
-                    className={`p-2.5 rounded-xl border text-xs font-bold transition-all ${scope === 'LESSON' ? 'bg-emerald-600 text-white border-emerald-600 shadow' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-100'}`}
-                  >
-                    Theo Bài học
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => { setScope('CUSTOM'); setScopeRefId(null); setCustomLessonIds([]); setIsTitleEdited(false); }}
-                    className={`p-2.5 rounded-xl border text-xs font-bold transition-all ${scope === 'CUSTOM' ? 'bg-emerald-600 text-white border-emerald-600 shadow' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-100'}`}
-                  >
-                    Tùy chỉnh
-                  </button>
-                </>
+              {((materialType === 'QUIZ' && quizType === 'LECTURE_QUIZ') || materialType === 'MINDMAP' || materialType === 'FLASHCARD') && (
+                <button
+                  type="button"
+                  onClick={() => { setScope('LESSON'); setScopeRefId(null); setCustomLessonIds([]); setIsTitleEdited(false); }}
+                  className={`p-2.5 rounded-xl border text-xs font-bold transition-all ${scope === 'LESSON' ? 'bg-emerald-600 text-white border-emerald-600 shadow' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-100'}`}
+                >
+                  Theo Bài học
+                </button>
+              )}
+              {((materialType === 'QUIZ' && quizType === 'OFFICIAL_EXAM') || materialType === 'MINDMAP' || materialType === 'FLASHCARD') && (
+                <button
+                  type="button"
+                  onClick={() => { setScope('CUSTOM'); setScopeRefId(null); setCustomLessonIds([]); setIsTitleEdited(false); }}
+                  className={`p-2.5 rounded-xl border text-xs font-bold transition-all ${scope === 'CUSTOM' ? 'bg-emerald-600 text-white border-emerald-600 shadow' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-100'}`}
+                >
+                  Tùy chỉnh
+                </button>
               )}
             </div>
 
@@ -2250,34 +2314,8 @@ function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess 
             )}
           </div>
 
-          {materialType === 'QUIZ' && (
+          {materialType === 'QUIZ' && quizType === 'OFFICIAL_EXAM' && (
             <div className="flex flex-col gap-4 pt-2">
-              <div className="flex flex-col gap-2">
-                <span className="text-sm font-semibold text-gray-700">Loại bài thi</span>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <label className={`cursor-pointer flex items-start gap-3 p-3 rounded-xl border-2 transition-all ${quizType === 'LECTURE_QUIZ' ? 'border-emerald-500 bg-emerald-50' : 'border-gray-200 bg-white hover:border-emerald-200'}`}>
-                    <input type="radio" name="quizType" value="LECTURE_QUIZ" checked={quizType === 'LECTURE_QUIZ'} onChange={() => {
-                      setQuizType('LECTURE_QUIZ');
-                      setScope('LESSON');
-                    }} className="mt-1" />
-                    <div className="flex flex-col">
-                      <span className="font-bold text-gray-900 text-sm">Kiểm tra nhanh (Quick Check)</span>
-                      <span className="text-xs text-gray-500">Đính kèm vào bài học. Làm nhanh lấy kết quả ngay, không giám sát, không tính điểm.</span>
-                    </div>
-                  </label>
-                  <label className={`cursor-pointer flex items-start gap-3 p-3 rounded-xl border-2 transition-all ${quizType === 'OFFICIAL_EXAM' ? 'border-emerald-500 bg-emerald-50' : 'border-gray-200 bg-white hover:border-emerald-200'}`}>
-                    <input type="radio" name="quizType" value="OFFICIAL_EXAM" checked={quizType === 'OFFICIAL_EXAM'} onChange={() => {
-                      setQuizType('OFFICIAL_EXAM');
-                      setScope('COURSE');
-                    }} className="mt-1" />
-                    <div className="flex flex-col">
-                      <span className="font-bold text-gray-900 text-sm">Thi chính thức (Official Exam)</span>
-                      <span className="text-xs text-gray-500">Dành cho kỳ thi. Bật camera giám sát, tính giờ, tính điểm vào hồ sơ.</span>
-                    </div>
-                  </label>
-                </div>
-              </div>
-
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t pt-4">
                 <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
                   Thời lượng (Phút)

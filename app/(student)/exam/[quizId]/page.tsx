@@ -418,29 +418,31 @@ export default function AntiCheatExamPage() {
     const examDurationMinutes = duration ? Number(duration) : null;
     if (!isStarted || !examDurationMinutes || result || !attemptData?.startedAt) return;
 
-    const parseDate = (d: string | number[] | undefined) => {
-      if (!d) return 0;
-      if (Array.isArray(d)) {
-        return new Date(d[0] || 0, (d[1] || 1) - 1, d[2] || 1, d[3] || 0, d[4] || 0, d[5] || 0).getTime();
-      }
-      return new Date(d).getTime();
-    };
-
-    const startTimeMs = parseDate(attemptData.startedAt);
-    const durationMs = examDurationMinutes * 60 * 1000;
-    const expireTimeMs = startTimeMs + durationMs;
-
-    startTimeRef.current = new Date(startTimeMs);
+    const startedAtTimestamp = Array.isArray(attemptData.startedAt)
+      ? new Date(
+          attemptData.startedAt[0],
+          (attemptData.startedAt[1] || 1) - 1,
+          attemptData.startedAt[2] || 1,
+          attemptData.startedAt[3] || 0,
+          attemptData.startedAt[4] || 0,
+          attemptData.startedAt[5] || 0
+        ).getTime()
+      : new Date(attemptData.startedAt).getTime();
+    
+    startTimeRef.current = new Date(startedAtTimestamp);
+    const totalDurationSeconds = examDurationMinutes * 60;
 
     const updateTimer = () => {
-      const remainingMs = expireTimeMs - Date.now();
-      if (remainingMs <= 1000) {
+      const elapsedSeconds = Math.floor((Date.now() - startedAtTimestamp) / 1000);
+      const remainingSeconds = Math.max(0, totalDurationSeconds - elapsedSeconds);
+
+      if (remainingSeconds <= 0) {
         if (timerRef.current) clearInterval(timerRef.current);
         setTimeLeft(0);
         toast.warning('⏱ Hết giờ! Bài thi đã được tự động nộp.');
         setTimeout(() => submitExam(true), 300);
       } else {
-        setTimeLeft(Math.floor(remainingMs / 1000));
+        setTimeLeft(remainingSeconds);
       }
     };
 
