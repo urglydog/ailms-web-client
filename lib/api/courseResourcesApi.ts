@@ -21,8 +21,8 @@ export const courseResourcesApi = {
     return api.get<CourseResource[]>(`/api/v1/instructor/resources/courses/${courseId}`, { token: authToken() });
   },
 
-  uploadResource: async (courseId: number, formData: FormData): Promise<CourseResource> => {
-    return api.post<CourseResource>(`/api/v1/instructor/resources/courses/${courseId}/upload`, formData, { 
+  uploadResource: async (courseId: number, formData: FormData): Promise<{successes: CourseResource[], failures: {file: string, reason: string}[]}> => {
+    return api.post<{successes: CourseResource[], failures: {file: string, reason: string}[]}>(`/api/v1/instructor/resources/courses/${courseId}/upload`, formData, { 
       token: authToken(),
       headers: {} // Let browser set Content-Type with boundary for multipart/form-data
     });

@@ -10,22 +10,24 @@ interface Props {
 
 export function UploadStaticMaterialModal({ courseId, onClose }: Props) {
   const queryClient = useQueryClient();
-  const [title, setTitle] = useState('');
-  const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
   
   const uploadMutation = useMutation({
     mutationFn: async () => {
-      if (!file) throw new Error('Vui lòng chọn file');
-      if (!title.trim()) throw new Error('Vui lòng nhập tiêu đề');
+      if (files.length === 0) throw new Error('Vui lòng chọn ít nhất 1 file');
       
       const formData = new FormData();
-      formData.append('file', file);
-      formData.append('title', title);
+      files.forEach(f => formData.append('files', f));
       
       return courseResourcesApi.uploadResource(courseId, formData);
     },
-    onSuccess: () => {
-      toast.success('Đã tải lên học liệu tĩnh thành công');
+    onSuccess: (data) => {
+      if (data.failures && data.failures.length > 0) {
+        toast.warning(`Đã tải lên ${data.successes.length} file. ${data.failures.length} file bị lỗi.`);
+        data.failures.forEach(f => console.error("Lỗi:", f.file, f.reason));
+      } else {
+        toast.success(`Đã tải lên ${data.successes.length} học liệu tĩnh thành công`);
+      }
       queryClient.invalidateQueries({ queryKey: ['course-resources', courseId] });
       onClose();
     },
@@ -49,27 +51,22 @@ export function UploadStaticMaterialModal({ courseId, onClose }: Props) {
           <p className="text-sm text-gray-500 mt-1">Hỗ trợ file PDF, Word, PowerPoint, ZIP.</p>
         </div>
 
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Tiêu đề học liệu</label>
-            <input 
-              type="text" 
-              value={title} 
-              onChange={e => setTitle(e.target.value)}
-              placeholder="VD: Slide Bài giảng Chương 1" 
-              className="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">File đính kèm</label>
+          <div className="space-y-4">
+            <label className="block text-sm font-semibold text-gray-700 mb-1">Chọn các file đính kèm</label>
             <input 
               type="file" 
-              onChange={e => setFile(e.target.files?.[0] || null)}
+              multiple
+              onChange={e => setFiles(Array.from(e.target.files || []))}
               className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 border border-gray-300 rounded-lg p-1.5"
             />
+            {files.length > 0 && (
+              <div className="text-xs text-gray-500 mt-2 max-h-32 overflow-y-auto">
+                {files.map((f, i) => (
+                  <div key={i} className="truncate">• {f.name} ({(f.size / 1024 / 1024).toFixed(2)} MB)</div>
+                ))}
+              </div>
+            )}
           </div>
-        </div>
 
         <div className="mt-8 flex justify-end gap-3">
           <button 
@@ -80,7 +77,7 @@ export function UploadStaticMaterialModal({ courseId, onClose }: Props) {
           </button>
           <button 
             onClick={() => uploadMutation.mutate()}
-            disabled={uploadMutation.isPending || !file || !title.trim()}
+            disabled={uploadMutation.isPending || files.length === 0}
             className="px-4 py-2 text-sm font-bold text-white bg-blue-600 rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
             {uploadMutation.isPending ? 'Đang tải lên...' : 'Tải Lên Ngay'}

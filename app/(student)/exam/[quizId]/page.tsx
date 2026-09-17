@@ -91,6 +91,7 @@ export default function AntiCheatExamPage() {
         }
       } catch (e) {
         console.error("Failed to parse exam draft", e);
+        localStorage.removeItem(draftKey);
       }
     }
     setIsHydrated(true);
@@ -323,7 +324,7 @@ export default function AntiCheatExamPage() {
   }, [isStarted, isProctored, isModelLoaded, result, handleViolation]);
 
   // Yêu cầu bật Camera (nếu proctored)
-  const startExam = async () => {
+  const startExam = useCallback(async () => {
     if (isProctored) {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
@@ -354,7 +355,17 @@ export default function AntiCheatExamPage() {
         if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
       }
     });
-  };
+  }, [isProctored, quizId, startQuiz, mediaStream]);
+
+  // B. Giữ Viewport Khi F5
+  useEffect(() => {
+    if (history && history.length > 0 && !isStarted && !result && !isStarting && !attemptData) {
+      const inProgress = history.find(h => h.status === 'IN_PROGRESS');
+      if (inProgress) {
+        startExam();
+      }
+    }
+  }, [history, isStarted, result, isStarting, attemptData, startExam]);
 
   // Đồng hồ đếm ngược tuyệt đối dựa vào startedAt
   useEffect(() => {
@@ -485,13 +496,15 @@ export default function AntiCheatExamPage() {
               return (
                 <>
                 {result.details?.slice(rStart, rEnd).map((detail, idx) => (
-              <div key={detail.questionId} className={`card p-4 border-l-4 ${detail.isCorrect ? 'border-green-500' : 'border-red-500'}`}>
+              <div key={detail.questionId} className={`card p-4 border-l-4 ${detail.isCorrect === null ? 'border-line bg-surface' : (detail.isCorrect ? 'border-green-500' : 'border-red-500')}`}>
                 <div className="flex justify-between items-start mb-2">
                   <h4 className="font-bold text-sm">Câu {rStart + idx + 1}</h4>
-                  {detail.isCorrect ? (
+                  {detail.isCorrect === true ? (
                     <span className="text-green-600 font-bold bg-green-50 px-2 py-0.5 rounded text-xs">Đúng ✓</span>
-                  ) : (
+                  ) : detail.isCorrect === false ? (
                     <span className="text-red-600 font-bold bg-red-50 px-2 py-0.5 rounded text-xs">Sai ✕</span>
+                  ) : (
+                    <span className="text-ink-muted font-bold bg-surface-hover px-2 py-0.5 rounded border border-line text-xs">{detail.selectedOptionIds?.length ? 'Đã ghi nhận' : 'Bỏ trống'}</span>
                   )}
                 </div>
                 <p className="mb-3 text-sm">{detail.content}</p>
@@ -499,10 +512,10 @@ export default function AntiCheatExamPage() {
                 <div className="space-y-1.5 mb-4">
                   {detail.options.map(opt => {
                     const isSelected = detail.selectedOptionIds?.includes(opt.id);
-                    const isCorrect = detail.correctOptionIds?.includes(opt.id);
+                    const isCorrect = detail.isCorrect !== null && detail.correctOptionIds?.includes(opt.id);
                     let style = "p-3 border rounded-lg text-sm ";
                     if (isCorrect) style += "border-green-500 bg-green-50 text-green-900 font-medium";
-                    else if (isSelected) style += "border-red-500 bg-red-50 text-red-900";
+                    else if (isSelected) style += detail.isCorrect === null ? "border-accent bg-accent/5 text-accent-dark font-medium" : "border-red-500 bg-red-50 text-red-900";
                     else style += "border-line text-ink-muted opacity-70";
 
                     return (
@@ -513,7 +526,7 @@ export default function AntiCheatExamPage() {
                   })}
                 </div>
 
-                {!detail.isCorrect && (
+                {detail.isCorrect === false && (
                   <div className="mt-4 pt-4 border-t border-line">
                     {!explanations[detail.questionId] ? (
                       <button
@@ -580,6 +593,7 @@ export default function AntiCheatExamPage() {
     const isNotOpenYet = startTime ? new Date() < new Date(startTime) : false;
     const maxAtt = parseInt(maxAttempts || '0');
     const canStartNewAttempt = !maxAttempts || maxAtt <= 0 || completedCount < maxAtt;
+    const isArchivedQuiz = history?.some(h => h.isArchived) || false;
 
     return (
       <div className="min-h-dvh bg-surface p-4 sm:p-8">
@@ -737,6 +751,11 @@ export default function AntiCheatExamPage() {
             ) : isClosed ? (
               <div className="text-red-500 font-bold p-4 bg-red-50 rounded-lg">
                 Bài thi đã đóng. Bạn không thể làm bài nữa.
+              </div>
+            ) : isArchivedQuiz ? (
+              <div className="text-red-500 font-bold p-4 bg-red-50 rounded-lg border border-red-200 shadow-sm text-center">
+                Bài thi này đã bị giảng viên thu hồi hoặc xóa.<br/>
+                <span className="text-sm font-normal">Bạn chỉ có thể xem lại lịch sử làm bài.</span>
               </div>
             ) : !canStartNewAttempt ? (
               <div className="text-ink-muted font-semibold p-4 bg-surface-hover rounded-lg border border-line">

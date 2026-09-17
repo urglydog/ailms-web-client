@@ -51,8 +51,8 @@ export interface AnswerDetailDto {
   questionId: number;
   content: string;
   selectedOptionIds: number[];
-  correctOptionIds: number[];
-  isCorrect: boolean;
+  correctOptionIds: number[] | null;
+  isCorrect: boolean | null;
   options: OptionDto[];
 }
 
@@ -82,6 +82,7 @@ export interface HistoryRes {
   submittedAt: string | number[];
   quizId: number;
   status: string;
+  isArchived?: boolean;
 }
 
 export const quizApi = {

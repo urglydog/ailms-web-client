@@ -44,10 +44,14 @@ export function QuizViewer({ questions, quizId }: { questions: QuizQuestion[], q
              if (typeof parsed.selectedOption === 'number') {
                setSelectedOption(parsed.selectedOption);
              }
+             if (typeof parsed.showResult === 'boolean') {
+               setShowResult(parsed.showResult);
+             }
           }
         }
       } catch (e) {
         console.error("Failed to parse quiz draft", e);
+        localStorage.removeItem(draftKey);
       }
     }
     setIsHydrated(true);
@@ -55,10 +59,10 @@ export function QuizViewer({ questions, quizId }: { questions: QuizQuestion[], q
 
   // Save state to localStorage whenever it changes
   useEffect(() => {
-    if (isHydrated && userId && quizId && !showResult) {
+    if (isHydrated && userId && quizId) {
       const draftKey = `quiz_draft_${userId}_${quizId}`;
       try {
-        localStorage.setItem(draftKey, JSON.stringify({ currentIdx, selectedOption }));
+        localStorage.setItem(draftKey, JSON.stringify({ currentIdx, selectedOption, showResult }));
       } catch (e) {
         console.error("Failed to save quiz draft", e);
       }
