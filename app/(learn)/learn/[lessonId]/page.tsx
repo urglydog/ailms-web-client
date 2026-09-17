@@ -22,9 +22,10 @@ import { useActivateDubbing, useCancelDubbing } from '@/hooks/useDubbing';
 import { useDubbingSocket } from '@/hooks/useDubbingSocket';
 import { useEnrolledLessonPlayer } from '@/hooks/useEnrolledLessonPlayer';
 import { useLessonProgress } from '@/hooks/useLessonProgress';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useLessonPlayer } from '@/hooks/usePublicCourses';
 import { useVoiceOptions } from '@/hooks/useVoiceOptions';
-import { ApiError } from '@/lib/api/client';
+import { api, ApiError } from '@/lib/api/client';
 import { lessonPlayerApi } from '@/lib/api/lessonPlayer';
 import { LiveChatPanel } from '@/components/community/LiveChatPanel';
 import { useSetLearnTitle } from '@/components/layout/LearnTitleContext';
@@ -131,6 +132,8 @@ function LearnPageContent() {
   const pathname = usePathname();
   const lessonId = Number(params.lessonId);
   const hasToken = !!getAccessToken();
+  const { data: currentUser } = useCurrentUser();
+  const userId = currentUser?.id;
 
   const enrolled = useEnrolledLessonPlayer(lessonId);
   const preview = useLessonPlayer(lessonId, { enabled: !hasToken });
@@ -156,7 +159,6 @@ function LearnPageContent() {
     }
   }, [lessonId]);
 
-  // P2: Fetch materials để hiện Badge và ghim ở sidebar
   const { data: officialMaterials } = useQuery({
     queryKey: ['official-materials', lesson?.courseId],
     queryFn: () => materialsApi.getInstructorMaterials(lesson!.courseId),
@@ -164,6 +166,28 @@ function LearnPageContent() {
     staleTime: 0, // Cập nhật ngay khi tab mount (Test 2.1)
   });
   const currentLessonMaterialCount = officialMaterials?.filter(m => m.lessonId === lessonId).length || 0;
+
+  // Dọn dẹp Draft rác của các Quiz đã bị xóa mềm (Graceful In-flight cleanup)
+  useEffect(() => {
+    if (lesson?.courseId && userId) {
+      api.get<{quizzes: {quizId: number, isDeleted: boolean}[]}>(`/api/v1/gradebook/courses/${lesson.courseId}`, { token: getAccessToken() ?? undefined }).then(gradebook => {
+        const deletedQuizIds = new Set(gradebook.quizzes.filter(q => q.isDeleted).map(q => q.quizId.toString()));
+        const keysToRemove: string[] = [];
+        try {
+          for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && (key.startsWith(`exam_draft_${userId}_`) || key.startsWith(`quiz_draft_${userId}_`))) {
+              const qId = key.split('_').pop();
+              if (qId && deletedQuizIds.has(qId)) {
+                keysToRemove.push(key);
+              }
+            }
+          }
+          keysToRemove.forEach(k => localStorage.removeItem(k));
+        } catch {}
+      }).catch(() => {});
+    }
+  }, [lesson?.courseId, userId]);
 
   // `languages[].track` chỉ mới sau khi gọi lại API — cần refetch mỗi khi có track mới sẵn sàng
   // (BR-DUB-04 trả AVAILABLE ngay, hoặc job vừa COMPLETED), nếu không `available`/`track` trong

@@ -32,9 +32,19 @@ export default function AntiCheatExamPage() {
 
   const [violationCount, setViolationCount] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const hasAutoSubmittedRef = useRef(false);
 
   const [isStarted, setIsStarted] = useState(false);
   const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
+
+  useEffect(() => {
+    if (userId && quizId) {
+      try {
+        const saved = localStorage.getItem(`exam_violations_${userId}_${quizId}`);
+        if (saved) setViolationCount(parseInt(saved, 10) || 0);
+      } catch {}
+    }
+  }, [userId, quizId]);
 
   // Trạng thái AI
   const [isModelLoaded, setIsModelLoaded] = useState(false);
@@ -134,7 +144,8 @@ export default function AntiCheatExamPage() {
 
   // Hàm nộp bài
   const submitExam = useCallback((_isAuto = false) => {
-    if (!attemptData || isSubmitting) return;
+    if (!attemptData || isSubmitting || hasAutoSubmittedRef.current) return;
+    if (_isAuto) hasAutoSubmittedRef.current = true;
     
 
 
@@ -145,19 +156,32 @@ export default function AntiCheatExamPage() {
     const elapsed = startTimeRef.current ? Math.floor((Date.now() - startTimeRef.current.getTime()) / 1000) : 0;
     setElapsedSeconds(elapsed);
     submitQuiz({ attemptId: attemptData.attemptId, data: { answers } }, {
-      onSuccess: (data) => {
+      onSuccess: (data: SubmitRes) => {
         setResult(data);
         setSubmitTime(new Date());
         if (userId && quizId) {
-          localStorage.removeItem(`exam_draft_${userId}_${quizId}`);
+          try {
+            localStorage.removeItem(`exam_draft_${userId}_${quizId}`);
+            localStorage.removeItem(`exam_violations_${userId}_${quizId}`);
+          } catch {}
         }
         // Dừng stream
         if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
+        
+        if (data && data.isArchived) {
+          setArchivedError({ show: true, message: 'Bài nộp đã được lưu vào Bảng điểm. Bài thi này hiện đã được giảng viên lưu trữ.' });
+        }
       },
       onError: (err: unknown) => {
         const error = err as { response?: { status?: number, data?: { code?: string, message?: string } } };
-        if (error.response?.status === 410) {
+        if (error.response?.status === 410 || error.response?.data?.code === 'QUIZ_ARCHIVED') {
           setArchivedError({ show: true, message: error.response?.data?.message || 'Bài tập này đã được giảng viên thu hồi.' });
+          if (userId && quizId) {
+            try {
+              localStorage.removeItem(`exam_draft_${userId}_${quizId}`);
+              localStorage.removeItem(`exam_violations_${userId}_${quizId}`);
+            } catch {}
+          }
         } else if (error.response?.status === 404 || error.response?.status === 500) {
           setArchivedError({ show: true, message: 'Bài tập này đã được giảng viên gỡ bỏ hoặc cập nhật. Phiên làm bài kết thúc.' });
         } else {
@@ -166,20 +190,22 @@ export default function AntiCheatExamPage() {
         setIsSubmitting(false);
       }
     });
-  }, [attemptData, answers, isSubmitting, submitQuiz, mediaStream, router, userId, quizId]);
+  }, [attemptData, answers, isSubmitting, submitQuiz, mediaStream, userId, quizId]);
 
   // Anti-Cheat: Track tab switching
   useEffect(() => {
-    if (!isStarted || isSubmitting || !!result) return;
+    if (!isStarted || isSubmitting || !!result || hasAutoSubmittedRef.current) return;
 
     const handleVisibilityChange = () => {
       if (document.hidden) {
         setViolationCount(prev => {
           const newCount = prev + 1;
           const maxViolations = attemptData?.maxViolations || 3;
+          if (userId && quizId) {
+            try { localStorage.setItem(`exam_violations_${userId}_${quizId}`, newCount.toString()); } catch {}
+          }
           if (newCount >= maxViolations) {
             toast.error(`Phát hiện gian lận chuyển Tab quá ${maxViolations} lần. Hệ thống tự động nộp bài!`);
-            // Delay slightly to allow toast to render
             setTimeout(() => submitExam(true), 500);
           } else {
             toast.warning(`Cảnh báo gian lận (${newCount}/${maxViolations}): Bạn đã chuyển Tab. Hệ thống sẽ tự động nộp bài nếu vi phạm ${maxViolations} lần!`);
@@ -193,12 +219,12 @@ export default function AntiCheatExamPage() {
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [isStarted, isSubmitting, result, submitExam, attemptData?.maxViolations]);
+  }, [isStarted, isSubmitting, result, submitExam, attemptData?.maxViolations, userId, quizId]);
 
 
   // Hàm xử lý vi phạm với debounce (tránh trigger liên tục)
   const handleViolation = useCallback((reason: string) => {
-    if (isSubmitting || result) return;
+    if (isSubmitting || result || hasAutoSubmittedRef.current) return;
     const now = Date.now();
     if (now - lastViolationTime.current < 2000) return; // Debounce 2 giây
     lastViolationTime.current = now;
@@ -206,6 +232,9 @@ export default function AntiCheatExamPage() {
     setViolationCount((prev) => {
       const newCount = prev + 1;
       const maxViolations = attemptData?.maxViolations || 3;
+      if (userId && quizId) {
+        try { localStorage.setItem(`exam_violations_${userId}_${quizId}`, newCount.toString()); } catch {}
+      }
       if (newCount >= maxViolations) {
         toast.error(`Bạn đã vi phạm quá ${maxViolations} lần. Hệ thống tự động nộp bài!`);
         submitExam(true);
@@ -214,7 +243,7 @@ export default function AntiCheatExamPage() {
       }
       return newCount;
     });
-  }, [isSubmitting, result, submitExam, attemptData?.maxViolations]);
+  }, [isSubmitting, result, submitExam, attemptData?.maxViolations, userId, quizId]);
 
   // 1. Chống chuyển tab
   useEffect(() => {
@@ -722,12 +751,14 @@ export default function AntiCheatExamPage() {
                 {isStarting ? 'Đang chuẩn bị...' : (!isProctored ? 'Bắt đầu làm bài mới' : isModelLoaded ? 'Bật Camera & Bắt đầu thi' : 'Đang tải AI Model...')}
               </button>
             )}
-            <button
-              onClick={() => router.back()}
-              className="text-ink-muted hover:text-ink font-semibold py-2 px-6 transition-colors"
-            >
-              Trở về khóa học
-            </button>
+            <div className="flex gap-4">
+              <button
+                onClick={() => router.replace(returnUrl || '/my-courses')}
+                className="flex-1 bg-accent text-white font-bold py-2 rounded shadow hover:bg-accent-hover"
+              >
+                Trở về an toàn
+              </button>
+            </div>
           </div>
         </div>
       </div>
