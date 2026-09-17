@@ -63,7 +63,7 @@ export default function NewCoursePage() {
   const handleSaveProfile = () => {
     if (!headline.trim() || bio.trim().length < 20) return;
     updateProfile.mutate(
-      { headline: headline.trim(), bio: bio.trim() } as any, // DTO updated
+      { headline: headline.trim(), bio: bio.trim() }, // DTO updated
       {
         onSuccess: () => {
           setShowProfileModal(false);

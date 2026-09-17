@@ -5,6 +5,8 @@ import type { PublicProfile, User } from '@/types/domain';
 interface UpdateMyProfileReq {
   fullName?: string;
   avatarUrl?: string;
+  headline?: string;
+  bio?: string;
   preferredLanguage?: string;
 }
 
