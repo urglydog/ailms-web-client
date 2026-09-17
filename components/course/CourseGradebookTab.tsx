@@ -72,7 +72,6 @@ export function CourseGradebookTab({ courseId }: { courseId: number }) {
           </thead>
           <tbody className="divide-y divide-line/50">
             {quizzes.map((quiz) => {
-              const latestAttempt = quiz.attempts.find(a => a.id === quiz.latestAttemptId) || quiz.attempts[0];
               return (
                 <tr key={quiz.quizId} className="hover:bg-surface-hover transition-colors">
                   <td className="py-4 px-4">
