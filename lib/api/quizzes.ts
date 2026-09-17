@@ -83,6 +83,7 @@ export interface HistoryRes {
   quizId: number;
   status: string;
   isArchived?: boolean;
+  allowReview?: boolean;
 }
 
 export const quizApi = {
