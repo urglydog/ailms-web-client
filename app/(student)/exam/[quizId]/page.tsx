@@ -144,6 +144,30 @@ export default function AntiCheatExamPage() {
     loadModels();
   }, [isProctored]);
 
+  // Tự động dọn dẹp LocalStorage rác khi load màn hình này nếu bài thi đã hoàn thành hoặc bị thu hồi
+  useEffect(() => {
+    if (typeof window === 'undefined' || !userId || !quizId) return;
+    const isDeleted = history?.some(h => h.isArchived);
+    const hasCompleted = history?.some(h => h.status === 'COMPLETED');
+    
+    if (isDeleted || hasCompleted) {
+      try {
+        localStorage.removeItem(`exam_draft_${userId}_${quizId}`);
+        localStorage.removeItem(`exam_violations_${userId}_${quizId}`);
+        localStorage.removeItem(`quiz_draft_${userId}_${quizId}`);
+        localStorage.removeItem(`quiz_draft_${quizId}`);
+        // Xóa rác QuickCheck
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith('quickcheck_state_') && key.endsWith(`_${quizId}`)) {
+            localStorage.removeItem(key);
+          }
+        }
+      } catch (e) {}
+    }
+  }, [history, userId, quizId]);
+
+
   // Hàm nộp bài
   const submitExam = useCallback((_isAuto = false) => {
     if (!attemptData || isSubmitting || hasAutoSubmittedRef.current) return;
@@ -165,6 +189,15 @@ export default function AntiCheatExamPage() {
           try {
             localStorage.removeItem(`exam_draft_${userId}_${quizId}`);
             localStorage.removeItem(`exam_violations_${userId}_${quizId}`);
+            localStorage.removeItem(`quiz_draft_${userId}_${quizId}`);
+            localStorage.removeItem(`quiz_draft_${quizId}`);
+            // Xóa rác QuickCheck
+            for (let i = 0; i < localStorage.length; i++) {
+              const key = localStorage.key(i);
+              if (key && key.startsWith('quickcheck_state_') && key.endsWith(`_${quizId}`)) {
+                localStorage.removeItem(key);
+              }
+            }
           } catch {}
         }
         // Dừng stream
@@ -385,7 +418,15 @@ export default function AntiCheatExamPage() {
     const examDurationMinutes = duration ? Number(duration) : null;
     if (!isStarted || !examDurationMinutes || result || !attemptData?.startedAt) return;
 
-    const startTimeMs = new Date(attemptData.startedAt).getTime();
+    const parseDate = (d: string | number[] | undefined) => {
+      if (!d) return 0;
+      if (Array.isArray(d)) {
+        return new Date(d[0] || 0, (d[1] || 1) - 1, d[2] || 1, d[3] || 0, d[4] || 0, d[5] || 0).getTime();
+      }
+      return new Date(d).getTime();
+    };
+
+    const startTimeMs = parseDate(attemptData.startedAt);
     const durationMs = examDurationMinutes * 60 * 1000;
     const expireTimeMs = startTimeMs + durationMs;
 
@@ -776,9 +817,12 @@ export default function AntiCheatExamPage() {
                 <span className="text-sm font-normal">Bạn chỉ có thể xem lại lịch sử làm bài.</span>
               </div>
             ) : !canStartNewAttempt ? (
-              <div className="text-ink-muted font-semibold p-4 bg-surface-hover rounded-lg border border-line">
-                Bạn đã hết số lần làm bài cho phép ({maxAttempts} lần).
-              </div>
+              <button
+                disabled
+                className="bg-gray-300 text-gray-500 font-bold py-3 px-8 rounded-full cursor-not-allowed shadow-none"
+              >
+                Đã hết số lượt làm bài ({completedCount}/{maxAtt})
+              </button>
             ) : (
               <button
                 onClick={startExam}

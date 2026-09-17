@@ -129,8 +129,13 @@ export const materialsApi = {
     api.delete(`/api/v1/materials/${id}`, { token: authToken() }),
     
   // Instructor APIs
-  createManualMaterial: (courseId: number, input: { materialType: string; language: string; title: string }) =>
-    api.post<InstructorMaterial>(`/api/v1/instructor/materials/courses/${courseId}/manual`, input, { token: authToken() }),
+  createManualMaterial: (courseId: number, input: { materialType: string; language: string; title: string; quizType?: string; scope?: string; scopeRefId?: string; customLessonIds?: string; allowReview?: boolean; maxAttempts?: number; durationMinutes?: number }) =>
+    api.post<InstructorMaterial>(`/api/v1/instructor/materials/courses/${courseId}/manual`, {
+      ...input,
+      allowReview: input.allowReview?.toString(),
+      maxAttempts: input.maxAttempts?.toString(),
+      durationMinutes: input.durationMinutes?.toString()
+    }, { token: authToken() }),
 
   getInstructorMaterials: (courseId: number) =>
     api.get<InstructorMaterial[]>(`/api/v1/instructor/materials/courses/${courseId}`, { token: authToken() }),
@@ -141,8 +146,8 @@ export const materialsApi = {
   setFlashcardOfficial: (id: number, isOfficial: boolean) =>
     api.put(`/api/v1/instructor/materials/flashcards/${id}/set-official?isOfficial=${isOfficial}`, undefined, { token: authToken() }),
     
-  setQuizOfficial: (id: number) =>
-    api.put(`/api/v1/instructor/quizzes/${id}/set-official`, undefined, { token: authToken() }),
+  setQuizOfficial: (id: number, isOfficial: boolean) =>
+    api.put(`/api/v1/instructor/quizzes/${id}/set-official?isOfficial=${isOfficial}`, undefined, { token: authToken() }),
     
   // Đính kèm vào bài học cụ thể hoặc chương
   attachMaterial: (id: number, target: { lessonId?: number | null; chapterId?: number | null }) =>

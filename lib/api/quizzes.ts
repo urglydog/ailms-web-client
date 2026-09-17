@@ -87,8 +87,8 @@ export interface HistoryRes {
 }
 
 export const quizApi = {
-  setOfficial: (quizId: number) => {
-    return api.put(`/api/v1/instructor/quizzes/${quizId}/set-official`, {}, { token: authToken() });
+  setOfficial: (quizId: number, isOfficial: boolean) => {
+    return api.put(`/api/v1/instructor/quizzes/${quizId}/set-official?isOfficial=${isOfficial}`, {}, { token: authToken() });
   },
 
   startAttempt: (quizId: number) => {
