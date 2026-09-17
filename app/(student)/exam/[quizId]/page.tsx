@@ -25,6 +25,7 @@ export default function AntiCheatExamPage() {
   const proctoredParam = searchParams.get('proctored');
   const isProctored = proctoredParam === 'true';
   const returnUrl = searchParams.get('returnUrl');
+  const isTakingMode = searchParams.get('mode') === 'taking';
 
   const { data: history } = useQuizHistory(Number(quizId));
 
@@ -172,6 +173,7 @@ export default function AntiCheatExamPage() {
         if (data && data.isArchived) {
           setArchivedError({ show: true, message: 'Bài nộp đã được lưu vào Bảng điểm. Bài thi này hiện đã được giảng viên lưu trữ.' });
         }
+        router.replace(`/exam/${quizId}${returnUrl ? `?returnUrl=${returnUrl}` : ''}`);
       },
       onError: (err: unknown) => {
         const error = err as { response?: { status?: number, data?: { code?: string, message?: string } } };
@@ -183,15 +185,17 @@ export default function AntiCheatExamPage() {
               localStorage.removeItem(`exam_violations_${userId}_${quizId}`);
             } catch {}
           }
+          router.replace(`/exam/${quizId}${returnUrl ? `?returnUrl=${returnUrl}` : ''}`);
         } else if (error.response?.status === 404 || error.response?.status === 500) {
           setArchivedError({ show: true, message: 'Bài tập này đã được giảng viên gỡ bỏ hoặc cập nhật. Phiên làm bài kết thúc.' });
+          router.replace(`/exam/${quizId}${returnUrl ? `?returnUrl=${returnUrl}` : ''}`);
         } else {
           toast.error('Có lỗi khi nộp bài. Vui lòng thử lại.');
         }
         setIsSubmitting(false);
       }
     });
-  }, [attemptData, answers, isSubmitting, submitQuiz, mediaStream, userId, quizId]);
+  }, [attemptData, answers, isSubmitting, submitQuiz, mediaStream, userId, quizId, router]);
 
   // Anti-Cheat: Track tab switching
   useEffect(() => {
@@ -338,12 +342,15 @@ export default function AntiCheatExamPage() {
     startQuiz(Number(quizId), {
       onSuccess: (data) => {
         setAttemptData(data);
-        setIsStarted(true);
         if (isProctored) {
           toast.success('Bắt đầu làm bài. Vui lòng không chuyển tab!');
         } else {
           toast.success('Bắt đầu làm bài!');
         }
+        let url = `/exam/${quizId}?mode=taking`;
+        if (proctoredParam) url += `&proctored=${proctoredParam}`;
+        if (returnUrl) url += `&returnUrl=${returnUrl}`;
+        router.push(url);
       },
       onError: (err: unknown) => {
         const error = err as { message?: string; response?: { data?: { message?: string; detail?: string }, status?: number } };
@@ -355,17 +362,23 @@ export default function AntiCheatExamPage() {
         if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
       }
     });
-  }, [isProctored, quizId, startQuiz, mediaStream]);
+  }, [isProctored, quizId, startQuiz, mediaStream, proctoredParam, returnUrl, router]);
 
-  // B. Giữ Viewport Khi F5
+  // Cập nhật isStarted dựa trên mode=taking và attemptData
   useEffect(() => {
-    if (history && history.length > 0 && !isStarted && !result && !isStarting && !attemptData) {
-      const inProgress = history.find(h => h.status === 'IN_PROGRESS');
-      if (inProgress) {
-        startExam();
-      }
+    if (isTakingMode && attemptData) {
+      setIsStarted(true);
+    } else {
+      setIsStarted(false);
     }
-  }, [history, isStarted, result, isStarting, attemptData, startExam]);
+  }, [isTakingMode, attemptData]);
+
+  // B. Giữ Viewport Khi F5: Gọi startExam nếu có mode=taking nhưng mất attemptData
+  useEffect(() => {
+    if (isTakingMode && !attemptData && !isStarting && !result) {
+      startExam();
+    }
+  }, [isTakingMode, attemptData, isStarting, result, startExam]);
 
   // Đồng hồ đếm ngược tuyệt đối dựa vào startedAt
   useEffect(() => {
@@ -478,6 +491,7 @@ export default function AntiCheatExamPage() {
                   setResult(null);
                   setIsStarted(false);
                   setAttemptData(null);
+                  router.replace(`/exam/${quizId}${returnUrl ? `?returnUrl=${returnUrl}` : ''}`);
                 }}
                 className="bg-surface-hover text-ink px-6 py-2 rounded-lg font-semibold text-sm shadow-sm border border-line hover:bg-line transition-all"
               >
@@ -722,9 +736,13 @@ export default function AntiCheatExamPage() {
                             <div className="text-xs font-semibold text-accent mt-1">{Number(h.score).toFixed(2).replace(/\.?0+$/, '')} điểm</div>
                           </td>
                           <td className="px-6 py-4 text-center">
-                            <Link href={`/exam/${quizId}/history?attemptId=${h.id}`} className="text-accent font-semibold hover:underline">
-                              Xem chi tiết
-                            </Link>
+                            {h.allowReview === false ? (
+                              <span className="text-ink-muted text-sm font-semibold opacity-60 cursor-not-allowed" title="Bài thi không cho phép xem lại đáp án">Chỉ xem điểm</span>
+                            ) : (
+                              <Link href={`/exam/${quizId}/history?attemptId=${h.id}`} className="text-accent font-semibold hover:underline">
+                                Xem chi tiết
+                              </Link>
+                            )}
                           </td>
                         </tr>
                       );
@@ -770,14 +788,6 @@ export default function AntiCheatExamPage() {
                 {isStarting ? 'Đang chuẩn bị...' : (!isProctored ? 'Bắt đầu làm bài mới' : isModelLoaded ? 'Bật Camera & Bắt đầu thi' : 'Đang tải AI Model...')}
               </button>
             )}
-            <div className="flex gap-4">
-              <button
-                onClick={() => router.replace(returnUrl || '/my-courses')}
-                className="flex-1 bg-accent text-white font-bold py-2 rounded shadow hover:bg-accent-hover"
-              >
-                Trở về an toàn
-              </button>
-            </div>
           </div>
         </div>
       </div>
