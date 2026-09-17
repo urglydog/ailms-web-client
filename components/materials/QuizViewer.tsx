@@ -135,7 +135,7 @@ export function QuizViewer({ questions, quizId }: { questions: QuizQuestion[], q
       if (userId && quizId) {
         try {
           localStorage.removeItem(`quiz_draft_${userId}_${quizId}`);
-        } catch(e){}
+        } catch {}
       }
     }
   };

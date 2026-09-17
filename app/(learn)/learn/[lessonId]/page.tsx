@@ -181,10 +181,10 @@ function LearnPageContent() {
             }
           }
           keysToRemove.forEach(k => localStorage.removeItem(k));
-        } catch(e) {}
+        } catch {}
       }).catch(() => {});
     }
-  }, [lesson?.courseId, userId]);
+  }, [lesson?.courseId]);
 
   // `languages[].track` chỉ mới sau khi gọi lại API — cần refetch mỗi khi có track mới sẵn sàng
   // (BR-DUB-04 trả AVAILABLE ngay, hoặc job vừa COMPLETED), nếu không `available`/`track` trong

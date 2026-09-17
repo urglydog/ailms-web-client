@@ -42,7 +42,7 @@ export default function AntiCheatExamPage() {
       try {
         const saved = localStorage.getItem(`exam_violations_${userId}_${quizId}`);
         if (saved) setViolationCount(parseInt(saved, 10) || 0);
-      } catch (e) {}
+      } catch {}
     }
   }, [userId, quizId]);
 
@@ -156,14 +156,14 @@ export default function AntiCheatExamPage() {
     const elapsed = startTimeRef.current ? Math.floor((Date.now() - startTimeRef.current.getTime()) / 1000) : 0;
     setElapsedSeconds(elapsed);
     submitQuiz({ attemptId: attemptData.attemptId, data: { answers } }, {
-      onSuccess: (data: any) => {
-        setResult(data);
+      onSuccess: (data) => {
+        setResult(data as any);
         setSubmitTime(new Date());
         if (userId && quizId) {
           try {
             localStorage.removeItem(`exam_draft_${userId}_${quizId}`);
             localStorage.removeItem(`exam_violations_${userId}_${quizId}`);
-          } catch(e){}
+          } catch {}
         }
         // Dừng stream
         if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
@@ -180,7 +180,7 @@ export default function AntiCheatExamPage() {
             try {
               localStorage.removeItem(`exam_draft_${userId}_${quizId}`);
               localStorage.removeItem(`exam_violations_${userId}_${quizId}`);
-            } catch(e){}
+            } catch {}
           }
         } else if (error.response?.status === 404 || error.response?.status === 500) {
           setArchivedError({ show: true, message: 'Bài tập này đã được giảng viên gỡ bỏ hoặc cập nhật. Phiên làm bài kết thúc.' });
@@ -190,7 +190,7 @@ export default function AntiCheatExamPage() {
         setIsSubmitting(false);
       }
     });
-  }, [attemptData, answers, isSubmitting, submitQuiz, mediaStream, router, userId, quizId]);
+  }, [attemptData, answers, isSubmitting, submitQuiz, mediaStream, userId, quizId]);
 
   // Anti-Cheat: Track tab switching
   useEffect(() => {
@@ -202,7 +202,7 @@ export default function AntiCheatExamPage() {
           const newCount = prev + 1;
           const maxViolations = attemptData?.maxViolations || 3;
           if (userId && quizId) {
-            try { localStorage.setItem(`exam_violations_${userId}_${quizId}`, newCount.toString()); } catch(e){}
+            try { localStorage.setItem(`exam_violations_${userId}_${quizId}`, newCount.toString()); } catch {}
           }
           if (newCount >= maxViolations) {
             toast.error(`Phát hiện gian lận chuyển Tab quá ${maxViolations} lần. Hệ thống tự động nộp bài!`);
@@ -233,7 +233,7 @@ export default function AntiCheatExamPage() {
       const newCount = prev + 1;
       const maxViolations = attemptData?.maxViolations || 3;
       if (userId && quizId) {
-        try { localStorage.setItem(`exam_violations_${userId}_${quizId}`, newCount.toString()); } catch(e){}
+        try { localStorage.setItem(`exam_violations_${userId}_${quizId}`, newCount.toString()); } catch {}
       }
       if (newCount >= maxViolations) {
         toast.error(`Bạn đã vi phạm quá ${maxViolations} lần. Hệ thống tự động nộp bài!`);
