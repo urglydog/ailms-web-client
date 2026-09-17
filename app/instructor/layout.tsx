@@ -22,8 +22,8 @@ export default function InstructorLayout({ children }: { children: React.ReactNo
 
   useEffect(() => {
     const role = getCurrentRole();
-    if (role !== 'INSTRUCTOR') {
-      router.replace(role ? '/' : '/login');
+    if (!role) {
+      router.replace('/login');
     }
   }, [router]);
 

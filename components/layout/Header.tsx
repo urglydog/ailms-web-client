@@ -379,11 +379,9 @@ export function Header() {
                       Hồ sơ cá nhân
                     </Link>
                     {/* Instructor links */}
-                    {currentUser?.role === 'INSTRUCTOR' && (
-                      <Link href="/instructor" className="rounded-lg px-3 py-2.5 text-[13.5px] text-ink hover:bg-surface">
-                        Kênh Giảng viên
-                      </Link>
-                    )}
+                    <Link href="/instructor/courses" className="rounded-lg px-3 py-2.5 text-[13.5px] text-ink hover:bg-surface font-semibold text-accent">
+                      Kênh quản lý
+                    </Link>
                     {/* Ngôn ngữ giao diện (14/09/2026, mở rộng) — CHỈ hiển thị danh sách kiểu
                         Udemy, chưa có logic đổi ngôn ngữ UI thật (xem LanguageModal.tsx). */}
                     <button
