@@ -5,7 +5,7 @@ import { useExplainWrongAnswer } from '@/hooks/useQuizzes';
 import { toast } from 'sonner';
 import { MarkdownRenderer } from '@/components/ui/MarkdownRenderer';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 
 interface QuizOption {
   id: number;
@@ -21,6 +21,7 @@ interface QuizQuestion {
 }
 
 export function QuizViewer({ questions, quizId }: { questions: QuizQuestion[], quizId?: number }) {
+  const router = useRouter();
   const { data: user } = useCurrentUser();
   const userId = user?.id;
   const params = useParams();
@@ -68,6 +69,12 @@ export function QuizViewer({ questions, quizId }: { questions: QuizQuestion[], q
   useEffect(() => {
     if (isHydrated && userId && quizId) {
       const draftKey = `quickcheck_state_${lessonId}_${quizId}`;
+      if (showResult) {
+        try {
+          localStorage.removeItem(draftKey);
+        } catch {}
+        return;
+      }
       try {
         localStorage.setItem(draftKey, JSON.stringify({ isDoing, currentIdx, selectedOption, showResult }));
       } catch (e) {
@@ -129,21 +136,11 @@ export function QuizViewer({ questions, quizId }: { questions: QuizQuestion[], q
         </p>
         <button
           onClick={() => {
-            setCurrentIdx(0);
-            setScore(0);
-            setSelectedOption(null);
-            setShowResult(false);
-            setIsDoing(false);
-            setExplanations({});
-            if (userId && quizId) {
-              try {
-                localStorage.removeItem(`quickcheck_state_${lessonId}_${quizId}`);
-              } catch {}
-            }
+            router.back();
           }}
           className="btn-primary"
         >
-          Làm lại từ đầu
+          Hoàn tất & Quay lại
         </button>
       </div>
     );
