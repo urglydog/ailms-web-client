@@ -166,7 +166,7 @@ export default function AntiCheatExamPage() {
         setIsSubmitting(false);
       }
     });
-  }, [attemptData, answers, isSubmitting, submitQuiz, mediaStream, router]);
+  }, [attemptData, answers, isSubmitting, submitQuiz, mediaStream, router, userId, quizId]);
 
   // Anti-Cheat: Track tab switching
   useEffect(() => {

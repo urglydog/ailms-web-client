@@ -37,7 +37,7 @@ type SidebarTab = 'content' | 'tutor';
 const MAIN_TABS: Array<{ key: MainTab; label: string }> = [
   { key: 'overview', label: 'Tổng quan' },
   { key: 'qna', label: 'Hỏi đáp' },
-  { key: 'materials', label: 'Học liệu AI' },
+  { key: 'materials', label: 'Học liệu' },
   { key: 'gradebook', label: 'Bảng điểm' },
   { key: 'resources', label: 'Tài nguyên' },
   { key: 'reviews', label: 'Đánh giá' },
@@ -692,7 +692,7 @@ function LearnPageContent() {
                   lesson.enrolled ? (
                     <MaterialManager courseId={lesson.courseId} lessonId={lesson.lessonId} />
                   ) : (
-                    <LockedFeatureNotice feature="Học liệu AI" courseSlug={lesson.courseSlug} />
+                    <LockedFeatureNotice feature="Học liệu" courseSlug={lesson.courseSlug} />
                   )
                 )}
               </div>
