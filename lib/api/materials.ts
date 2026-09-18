@@ -155,7 +155,7 @@ export const materialsApi = {
 
   // Đính kèm vào bài học cụ thể hoặc chương
   getFolders: (courseId: number) =>
-    api.get<any[]>(`/api/v1/instructor/material-folders/course/${courseId}`, { token: authToken() }),
+    api.get<{id: number, name: string, parentId?: number}[]>(`/api/v1/instructor/material-folders/course/${courseId}`, { token: authToken() }),
 
   createFolder: (courseId: number, name: string, parentId?: number) =>
     api.post(`/api/v1/instructor/material-folders`, { courseId, name, parentId }, { token: authToken() }),

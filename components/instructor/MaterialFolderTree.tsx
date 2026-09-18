@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Folder, MoreVertical, Plus, Edit2, Trash2, FileText, ChevronRight, ChevronDown, FolderOpen } from 'lucide-react';
+import { Folder, MoreVertical, Plus, Trash2, ChevronRight, ChevronDown, FolderOpen } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { materialsApi } from '@/lib/api/materials';
 import { toast } from 'sonner';
 import { createPortal } from 'react-dom';
 
-export function MaterialFolderTree({ courseId, folders, materials, onInspect, setConfirmAction, DraggableCard }: any) {
+export function MaterialFolderTree({ courseId, folders, materials, onInspect, setConfirmAction, DraggableCard }: { courseId: number, folders: {id: number, name: string, parentId?: number}[], materials: {id: number, title?: string, folderId?: number}[], onInspect: (id: number) => void, setConfirmAction: (action: any) => void, DraggableCard: React.ElementType }) {
   const queryClient = useQueryClient();
   const [contextMenu, setContextMenu] = useState<{ x: number, y: number, type: 'ROOT' | 'FOLDER' | 'MATERIAL', targetId?: number } | null>(null);
   const [expandedFolders, setExpandedFolders] = useState<Record<number, boolean>>({});
@@ -18,7 +18,7 @@ export function MaterialFolderTree({ courseId, folders, materials, onInspect, se
   const deleteFolderMutation = useMutation({
     mutationFn: (id: number) => materialsApi.deleteFolder(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['instructor-folders', courseId] }),
-    onError: (err: any) => toast.error('Không thể xóa thư mục (Có thể do lỗi ràng buộc)')
+    onError: (_err: unknown) => toast.error('Không thể xóa thư mục (Có thể do lỗi ràng buộc)')
   });
   const moveToFolderMutation = useMutation({
     mutationFn: (vars: { id: number, folderId: number | null }) => materialsApi.moveToFolder(vars.id, vars.folderId),
@@ -38,7 +38,7 @@ export function MaterialFolderTree({ courseId, folders, materials, onInspect, se
   };
 
   const handleDeleteFolder = (id: number) => {
-    const hasMaterials = materials.some((m: any) => m.folderId === id);
+    const hasMaterials = materials.some((m: {folderId?: number}) => m.folderId === id);
     if (hasMaterials) {
       setConfirmAction({
         title: "Thư mục đang chứa học liệu",
@@ -74,18 +74,18 @@ export function MaterialFolderTree({ courseId, folders, materials, onInspect, se
   }, []);
 
   // Build recursive tree
-  const rootFolders = folders.filter((f: any) => !f.parentId);
-  const rootMaterials = materials.filter((m: any) => !m.folderId);
+  const rootFolders = folders.filter((f: {parentId?: number}) => !f.parentId);
+  const rootMaterials = materials.filter((m: {folderId?: number}) => !m.folderId);
 
   const toggleFolder = (id: number, e: React.MouseEvent) => {
     e.stopPropagation();
     setExpandedFolders(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const renderFolder = (folder: any) => {
+  const renderFolder = (folder: {id: number, name: string}) => {
     const isExpanded = expandedFolders[folder.id];
-    const childFolders = folders.filter((f: any) => f.parentId === folder.id);
-    const childMaterials = materials.filter((m: any) => m.folderId === folder.id);
+    const childFolders = folders.filter((f: {parentId?: number}) => f.parentId === folder.id);
+    const childMaterials = materials.filter((m: {folderId?: number}) => m.folderId === folder.id);
 
     return (
       <div key={folder.id} className="ml-4 mt-2">
@@ -106,7 +106,7 @@ export function MaterialFolderTree({ courseId, folders, materials, onInspect, se
           <div className="ml-6 border-l border-gray-200 pl-2">
             {childFolders.map(renderFolder)}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2">
-              {childMaterials.map((mat: any) => (
+              {childMaterials.map((mat: {id: number, title?: string, folderId?: number}) => (
                 <div key={mat.id} className="relative group/mat" onContextMenu={(e) => handleContextMenu(e, 'MATERIAL', mat.id)}>
                   <DraggableCard mat={mat} onClick={() => onInspect(mat.id)} />
                   <button className="absolute top-2 right-2 opacity-0 group-hover/mat:opacity-100 p-1 bg-white/80 rounded hover:bg-gray-200 text-gray-600 z-10" onClick={(e) => handleContextMenu(e, 'MATERIAL', mat.id)}>
@@ -136,7 +136,7 @@ export function MaterialFolderTree({ courseId, folders, materials, onInspect, se
       {rootFolders.map(renderFolder)}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mt-4">
-        {rootMaterials.map((mat: any) => (
+        {rootMaterials.map((mat: {id: number, title?: string, folderId?: number}) => (
           <div key={mat.id} className="relative group/mat" onContextMenu={(e) => handleContextMenu(e, 'MATERIAL', mat.id)}>
             <DraggableCard mat={mat} onClick={() => onInspect(mat.id)} />
             <button className="absolute top-2 right-2 opacity-0 group-hover/mat:opacity-100 p-1 bg-white/80 rounded hover:bg-gray-200 text-gray-600 z-10" onClick={(e) => handleContextMenu(e, 'MATERIAL', mat.id)}>

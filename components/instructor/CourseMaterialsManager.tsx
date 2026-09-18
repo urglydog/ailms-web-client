@@ -15,7 +15,7 @@ import { MaterialLanguagePicker } from '@/components/materials/MaterialLanguageP
 import { MaterialFolderTree } from './MaterialFolderTree';
 
 import { DndContext, useDraggable, useDroppable, DragOverlay, DragStartEvent, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
-import { GripVertical, Link as LinkIcon, Trash2, Folder, FileText, MoreVertical, Plus, Layers } from 'lucide-react';
+import { GripVertical, Link as LinkIcon, Trash2, FileText, MoreVertical, Plus, Layers } from 'lucide-react';
 
 
 interface CourseMaterialsManagerProps {
@@ -121,12 +121,6 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
     onError: (err: Error) => toast.error(err.message || 'Lỗi khi cập nhật phiên bản'),
   });
 
-  const unassignMutation = useMutation({
-    mutationFn: (variables: { id: number, target: { lessonId?: number | null, chapterId?: number | null } }) => 
-      materialsApi.attachMaterial(variables.id, variables.target),
-    onSuccess: () => {
-      toast.success('Đã gỡ phân phối học liệu');
-      queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] });
       setConfirmAction(null);
     },
     onError: (err: Error) => toast.error(err.message || 'Lỗi khi gỡ phân phối'),
