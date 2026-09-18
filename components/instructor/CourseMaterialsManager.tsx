@@ -13,10 +13,77 @@ import { MindmapEditor } from '@/components/materials/MindmapEditor';
 import { MermaidViewer } from '@/components/materials/MermaidViewer';
 import { MaterialLanguagePicker } from '@/components/materials/MaterialLanguagePicker';
 
-import { Folder, FileText, MoreVertical, Plus, Trash2, BookOpen, Layers } from 'lucide-react';
+import { DndContext, useDraggable, useDroppable, DragOverlay, defaultDropAnimationSideEffects } from '@dnd-kit/core';
+import { GripVertical, Link as LinkIcon, Trash2, Folder, FileText, MoreVertical, Plus, BookOpen, Layers } from 'lucide-react';
+
 
 interface CourseMaterialsManagerProps {
   courseId: number;
+}
+
+
+function DraggableMaterialCard({ mat, onClick }: { mat: any, onClick: () => void }) {
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+    id: `material-${mat.id}`,
+    data: { material: mat },
+  });
+
+  const isAssigned = mat.assignments && mat.assignments.length > 0;
+
+  return (
+    <div 
+      ref={setNodeRef}
+      onDoubleClick={onClick}
+      className={`relative border bg-white rounded-lg flex flex-col overflow-hidden group hover:shadow-md transition-all cursor-pointer ${isDragging ? 'opacity-50 border-blue-400 border-dashed' : 'border-gray-200 hover:border-blue-300'}`}
+    >
+      <div className="absolute top-2 left-2 cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-700 p-1 bg-white/80 rounded-md z-10" {...attributes} {...listeners}>
+        <GripVertical className="w-4 h-4" />
+      </div>
+      <div className="p-3 pl-8 pb-2 flex-1">
+        <div className="flex items-start justify-between">
+          <div className="flex items-center gap-2 mb-2">
+            <div className={`p-1.5 rounded-md flex-shrink-0 ${mat.materialType === 'MINDMAP' ? 'bg-blue-100 text-blue-600' : mat.materialType === 'FLASHCARD' ? 'bg-purple-100 text-purple-600' : 'bg-orange-100 text-orange-600'}`}>
+              <FileText className="w-4 h-4" />
+            </div>
+            <span className="text-xs font-bold text-gray-500">{mat.materialType}</span>
+            {isAssigned && (
+              <span className="text-[10px] text-blue-500 bg-blue-50 px-1 rounded flex items-center gap-1" title="Đã phân phối">
+                <LinkIcon className="w-3 h-3" />
+              </span>
+            )}
+          </div>
+          <button className="text-gray-400 hover:text-gray-700 opacity-0 group-hover:opacity-100 transition-opacity p-1">
+            <MoreVertical className="w-4 h-4" />
+          </button>
+        </div>
+        <h4 className="text-sm font-bold text-gray-800 line-clamp-2 leading-tight">
+          {mat.title || 'Học liệu không tên'}
+        </h4>
+      </div>
+      <div className="px-3 py-2 bg-gray-50 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500">
+        <span>{new Date(mat.createdAt).toLocaleDateString('vi-VN')}</span>
+        <span className={`px-2 py-0.5 rounded-full font-medium text-[10px] ${mat.isOfficial ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-700'}`}>
+          {mat.isOfficial ? 'Official' : 'Draft'}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function DroppableNode({ id, title, type, children }: { id: string, title: string, type: string, children: React.ReactNode }) {
+  const { isOver, setNodeRef } = useDroppable({
+    id: id,
+    data: { type }
+  });
+
+  return (
+    <div ref={setNodeRef} className={`rounded-md transition-colors ${isOver ? 'bg-blue-50 border border-blue-200 border-dashed' : ''}`}>
+      <div className={`flex items-center gap-2 px-2 py-1.5 text-xs ${type === 'CHAPTER' ? 'font-bold text-gray-800 bg-gray-50' : 'font-semibold text-gray-700 bg-gray-50/50 mt-1'}`}>
+        <span>{type === 'CHAPTER' ? '📁' : '📄'}</span> {type === 'CHAPTER' ? `Chương: ${title}` : title}
+      </div>
+      {children}
+    </div>
+  );
 }
 
 export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps) {
@@ -39,6 +106,90 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
   const [genMaterialType, setGenMaterialType] = useState<'QUIZ' | 'FLASHCARD' | 'MINDMAP' | null>(null);
   const [manualMaterialType, setManualMaterialType] = useState<'QUIZ' | 'FLASHCARD' | 'MINDMAP' | null>(null);
   
+
+  const [activeDragId, setActiveDragId] = useState<number | null>(null);
+
+  const overwriteMaterialVersionMutation = useMutation({
+    mutationFn: (variables: { id: number, targetLessonId?: number, targetChapterId?: number }) =>
+      materialsApi.overwriteMaterialVersion(variables.id, variables),
+    onSuccess: () => {
+      toast.success('Đã cập nhật phiên bản mới (V2)');
+      queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] });
+      setConfirmAction(null);
+    },
+    onError: (err: Error) => toast.error(err.message || 'Lỗi khi cập nhật phiên bản'),
+  });
+
+  const unassignMutation = useMutation({
+    mutationFn: (variables: { id: number, target: { lessonId?: number | null, chapterId?: number | null } }) => 
+      materialsApi.attachMaterial(variables.id, variables.target),
+    onSuccess: () => {
+      toast.success('Đã gỡ phân phối học liệu');
+      queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] });
+      setConfirmAction(null);
+    },
+    onError: (err: Error) => toast.error(err.message || 'Lỗi khi gỡ phân phối'),
+  });
+
+  const attachLessonMutation = useMutation({
+    mutationFn: (variables: { id: number; target: { lessonId?: number | null; chapterId?: number | null } }) =>
+      materialsApi.attachMaterial(variables.id, variables.target),
+    onSuccess: () => {
+      toast.success('Đã phân phối học liệu thành công');
+      queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] });
+    },
+    onError: (err: Error) => toast.error(err.message || 'Lỗi khi phân phối'),
+  });
+
+  const handleDragStart = (event: any) => {
+    const { active } = event;
+    const materialId = parseInt(active.id.replace('material-', ''));
+    setActiveDragId(materialId);
+  };
+
+  const handleDragEnd = (event: any) => {
+    const { active, over } = event;
+    setActiveDragId(null);
+    
+    if (!over) return;
+
+    const materialId = parseInt(active.id.replace('material-', ''));
+    const material = materials?.find(m => m.id === materialId);
+    if (!material) return;
+
+    const targetIdStr = String(over.id);
+    const isChapter = targetIdStr.startsWith('chapter-');
+    const parsedTargetId = parseInt(targetIdStr.replace('lesson-', '').replace('chapter-', ''));
+
+    // Bắt đúng trạng thái Versioning Overwrite: Đã assign vào chính cái đích này
+    const isAlreadyAssignedToTarget = material.assignments?.some(a => 
+      isChapter ? a.chapterId === parsedTargetId : a.lessonId === parsedTargetId
+    );
+
+    if (isAlreadyAssignedToTarget) {
+      setConfirmAction({
+        title: "Cập nhật Phiên bản",
+        message: "Bạn có muốn cập nhật phiên bản mới (V2) cho học liệu này? Điểm số cũ của học viên sẽ được bảo lưu.",
+        onConfirm: () => {
+          overwriteMaterialVersionMutation.mutate({ 
+            id: materialId, 
+            targetLessonId: isChapter ? undefined : parsedTargetId,
+            targetChapterId: isChapter ? parsedTargetId : undefined 
+          });
+        }
+      });
+    } else {
+      // Phân phối mới (Epic 3)
+      attachLessonMutation.mutate({
+        id: materialId,
+        target: {
+          lessonId: isChapter ? undefined : parsedTargetId,
+          chapterId: isChapter ? parsedTargetId : undefined
+        }
+      });
+    }
+  };
+
   const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
   const [confirmAction, setConfirmAction] = useState<{title: string, message: string, onConfirm: () => void} | null>(null);
 
@@ -141,7 +292,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
         </div>
         <div className="overflow-y-auto p-2 flex flex-col gap-1 flex-1">
           {chapters?.map(chapter => {
-            const chapterMaterials = materials?.filter(m => m.chapterId === chapter.id) || [];
+            const chapterMaterials = materials?.filter(m => m.assignments?.some(a => a.chapterId === chapter.id)) || [];
             
             return (
               <div key={chapter.id} className="mt-2">
@@ -158,7 +309,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                 
                 <div className="flex flex-col gap-1 mt-1 ml-2">
                   {chapter.lessons.map(lesson => {
-                    const lessonMaterials = materials?.filter(m => m.lessonId === lesson.id) || [];
+                    const lessonMaterials = materials?.filter(m => m.assignments?.some(a => a.lessonId === lesson.id)) || [];
                     return (
                       <div key={lesson.id} className="border-l border-gray-100 pl-2">
                         <div className="flex items-center gap-2 px-2 py-1 text-xs font-semibold text-gray-700 bg-gray-50/50 rounded-md mt-1">

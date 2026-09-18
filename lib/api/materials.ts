@@ -51,9 +51,8 @@ export interface InstructorMaterial {
   usageCount?: number;
   isProctored?: boolean;
   maxViolations?: number | null;
-  chapterId?: number | '';
-  lessonId?: number | '';
   quizType?: 'LECTURE_QUIZ' | 'OFFICIAL_EXAM';
+  assignments?: { id: number, lessonId?: number, chapterId?: number, courseId?: number }[];
 }
 
 
@@ -149,6 +148,11 @@ export const materialsApi = {
   setQuizOfficial: (id: number, isOfficial: boolean) =>
     api.put(`/api/v1/instructor/quizzes/${id}/set-official?isOfficial=${isOfficial}`, undefined, { token: authToken() }),
     
+
+  // Epic 4 Versioning Overwrite
+  overwriteMaterialVersion: (id: number, target: { targetLessonId?: number, targetChapterId?: number }) =>
+    api.post(`/api/v1/instructor/materials/${id}/versioning-overwrite`, target, { token: authToken() }),
+
   // Đính kèm vào bài học cụ thể hoặc chương
   attachMaterial: (id: number, target: { lessonId?: number | null; chapterId?: number | null }) =>
     api.put(`/api/v1/instructor/materials/${id}/attach-lesson`, target, { token: authToken() }),

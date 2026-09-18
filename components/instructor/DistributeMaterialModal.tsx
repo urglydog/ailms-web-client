@@ -18,12 +18,12 @@ export function DistributeMaterialModal({ courseId, material, chapters, onClose 
   const [targetId, setTargetId] = useState<number | null>(null);
 
   useEffect(() => {
-    if (material.chapterId) {
+    if (material.assignments?.some(a => a.chapterId)) {
       setLevel('CHAPTER');
-      setTargetId(material.chapterId);
-    } else if (material.lessonId) {
+      setTargetId(material.assignments?.find(a => a.chapterId)?.chapterId || '');
+    } else if (material.assignments?.some(a => a.lessonId)) {
       setLevel('LESSON');
-      setTargetId(material.lessonId);
+      setTargetId(material.assignments?.find(a => a.lessonId)?.lessonId || '');
     } else {
       setLevel('COURSE');
       setTargetId(null);

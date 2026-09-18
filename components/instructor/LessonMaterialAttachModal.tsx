@@ -40,8 +40,8 @@ export function LessonMaterialAttachModal({ courseId, lesson, onClose }: LessonM
     !searchTerm || (mat.title && mat.title.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
-  const attachedMaterials = filteredMaterials.filter(mat => mat.lessonId === lesson.id);
-  const otherMaterials = filteredMaterials.filter(mat => mat.lessonId !== lesson.id);
+  const attachedMaterials = filteredMaterials.filter(mat => mat.assignments?.some(a => a.lessonId === lesson.id));
+  const otherMaterials = filteredMaterials.filter(mat => (!mat.assignments || !mat.assignments.some(a => a.lessonId === lesson.id)));
   
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in">
@@ -117,7 +117,7 @@ export function LessonMaterialAttachModal({ courseId, lesson, onClose }: LessonM
                 <div className="flex flex-col gap-3">
                   <div className="text-xs font-bold text-gray-500 uppercase tracking-wider mt-2">Học liệu khác:</div>
                   {otherMaterials.map(mat => {
-                    const isAttachedToOther = mat.lessonId !== null && mat.lessonId !== lesson.id;
+                    const isAttachedToOther = (mat.assignments && mat.assignments.some(a => a.lessonId)) && (!mat.assignments || !mat.assignments.some(a => a.lessonId === lesson.id));
                     
                     return (
                       <div key={mat.id} className="flex items-center justify-between p-4 rounded-xl border border-gray-200 bg-white hover:border-purple-200 transition-all">
