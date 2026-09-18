@@ -13,8 +13,8 @@ import { MindmapEditor } from '@/components/materials/MindmapEditor';
 import { MermaidViewer } from '@/components/materials/MermaidViewer';
 import { MaterialLanguagePicker } from '@/components/materials/MaterialLanguagePicker';
 
-import { DndContext, useDraggable, useDroppable, DragOverlay, defaultDropAnimationSideEffects } from '@dnd-kit/core';
-import { GripVertical, Link as LinkIcon, Trash2, Folder, FileText, MoreVertical, Plus, BookOpen, Layers } from 'lucide-react';
+import { DndContext, useDraggable, useDroppable, DragOverlay, DragStartEvent, DragEndEvent } from '@dnd-kit/core';
+import { GripVertical, Link as LinkIcon, Trash2, Folder, FileText, MoreVertical, Plus, Layers } from 'lucide-react';
 
 
 interface CourseMaterialsManagerProps {
@@ -22,7 +22,7 @@ interface CourseMaterialsManagerProps {
 }
 
 
-function DraggableMaterialCard({ mat, onClick }: { mat: any, onClick: () => void }) {
+function DraggableMaterialCard({ mat, onClick }: { mat: InstructorMaterial, onClick: () => void }) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: `material-${mat.id}`,
     data: { material: mat },
@@ -141,13 +141,13 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
     onError: (err: Error) => toast.error(err.message || 'Lỗi khi phân phối'),
   });
 
-  const handleDragStart = (event: any) => {
+  const handleDragStart = (event: DragStartEvent) => {
     const { active } = event;
     const materialId = parseInt(active.id.replace('material-', ''));
     setActiveDragId(materialId);
   };
 
-  const handleDragEnd = (event: any) => {
+  const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     setActiveDragId(null);
     
