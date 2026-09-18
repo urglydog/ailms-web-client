@@ -38,10 +38,15 @@ function DraggableMaterialCard({ mat, onClick }: { mat: InstructorMaterial, onCl
         e.stopPropagation();
         onClick();
       }}
-      {...attributes} {...listeners}
-      className={`relative border bg-white rounded-lg flex flex-col overflow-hidden group hover:shadow-md transition-all cursor-grab active:cursor-grabbing ${isDragging ? 'opacity-50 border-blue-400 border-dashed' : 'border-gray-200 hover:border-blue-300'}`}
+      {...attributes}
+      className={`relative border bg-white rounded-lg flex flex-col overflow-hidden group hover:shadow-md transition-all ${isDragging ? 'opacity-50 border-blue-400 border-dashed' : 'border-gray-200 hover:border-blue-300'}`}
     >
-      <div className="absolute top-2 left-2 text-gray-400 p-1 bg-white/80 rounded-md z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+      <div 
+        {...listeners}
+        className="absolute top-2 left-2 text-gray-400 p-1 bg-white/80 rounded-md z-10 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing"
+        title="Kéo để phân phối"
+        onClick={(e) => e.stopPropagation()}
+      >
         <GripVertical className="w-4 h-4" />
       </div>
       <div className="p-3 pl-8 pb-2 flex-1">
@@ -201,8 +206,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 8,
-        tolerance: 5,
+        distance: 5,
       },
     })
   );

@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import { Folder, MoreVertical, Plus, Trash2, ChevronRight, ChevronDown, FolderOpen } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
