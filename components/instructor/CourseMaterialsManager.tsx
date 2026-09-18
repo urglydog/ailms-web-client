@@ -33,7 +33,6 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
     }
   };
 
-  const [selectedTarget, setSelectedTarget] = useState<{type: 'WORKSPACE'|'CHAPTER'|'LESSON', id?: number}>({type: 'WORKSPACE'});
   
   const [breadcrumbs] = useState<{id: number | null, name: string}[]>([{id: null, name: 'Workspace'}]);
 
@@ -69,6 +68,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
 
   const renderDeleteModal = () => {
     if (!confirmDeleteId) return null;
+    
     
     return (
       <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in">
@@ -128,58 +128,59 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
     return <GenerateManualOfficialView courseId={courseId} initialType={manualMaterialType} onClose={() => setManualMaterialType(null)} onSuccess={(id) => { setManualMaterialType(null); queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] }); setInspectGenerationId(id); }} />;
   }
 
-  // Lọc theo selectedTarget
-  let displayedMaterials = materials || [];
-  if (selectedTarget.type === 'WORKSPACE') {
-    displayedMaterials = displayedMaterials.filter(m => !m.lessonId && !m.chapterId);
-  } else if (selectedTarget.type === 'CHAPTER') {
-    displayedMaterials = displayedMaterials.filter(m => m.chapterId === selectedTarget.id);
-  } else if (selectedTarget.type === 'LESSON') {
-    displayedMaterials = displayedMaterials.filter(m => m.lessonId === selectedTarget.id);
-  }
+  const displayedMaterials = materials || [];
 
   return (
     <div className="flex h-[calc(100vh-100px)] gap-4 bg-gray-50 p-4 font-sans text-gray-800">
       
-      {/* LEFT PANE: Curriculum Tree */}
+            {/* LEFT PANE: Curriculum Tree */}
       <div className="w-1/3 bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col shadow-sm">
         <div className="p-3 border-b border-gray-100 bg-gray-50 flex items-center gap-2">
           <Layers className="w-4 h-4 text-gray-500" />
           <h3 className="font-bold text-sm text-gray-700">Phân Phối (Shortcuts)</h3>
         </div>
         <div className="overflow-y-auto p-2 flex flex-col gap-1 flex-1">
-          <button
-            onClick={() => setSelectedTarget({type: 'WORKSPACE'})}
-            className={`flex items-center gap-2 px-2 py-1.5 text-xs font-semibold rounded-md transition-colors ${selectedTarget.type === 'WORKSPACE' ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-100'}`}
-          >
-            <span>🌐</span> Kho Lưu Trữ Chung (Workspace)
-          </button>
-          
-          {chapters?.map(chapter => (
-            <div key={chapter.id} className="mt-2">
-              <button
-                onClick={() => setSelectedTarget({type: 'CHAPTER', id: chapter.id})}
-                className={`flex w-full items-center gap-2 px-2 py-1.5 text-xs font-semibold rounded-md transition-colors ${selectedTarget.type === 'CHAPTER' && selectedTarget.id === chapter.id ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-100'}`}
-              >
-                <span>📁</span> Chương: {chapter.title}
-              </button>
-              <div className="pl-4 flex flex-col gap-1 mt-1 border-l border-gray-100 ml-2">
-                {chapter.lessons.map(lesson => (
-                  <button
-                    key={lesson.id}
-                    onClick={() => setSelectedTarget({type: 'LESSON', id: lesson.id})}
-                    className={`flex items-center gap-2 px-2 py-1 text-xs rounded-md transition-colors ${selectedTarget.type === 'LESSON' && selectedTarget.id === lesson.id ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-gray-600 hover:bg-gray-100'}`}
-                  >
-                    <span>��</span> {lesson.title}
-                  </button>
+          {chapters?.map(chapter => {
+            const chapterMaterials = materials?.filter(m => m.chapterId === chapter.id) || [];
+            
+            return (
+              <div key={chapter.id} className="mt-2">
+                <div className="flex w-full items-center gap-2 px-2 py-1.5 text-xs font-bold text-gray-800 bg-gray-50 rounded-md">
+                  <span>📁</span> Chương: {chapter.title}
+                </div>
+                
+                {/* Render chapter shortcuts */}
+                {chapterMaterials.map(mat => (
+                  <div key={`mat-${mat.id}`} className="flex items-center gap-2 px-2 py-1 text-xs text-gray-600 pl-6 hover:bg-blue-50 rounded-md cursor-pointer transition-colors" title="Nháy đúp để xem trước, nháy đơn để chọn gỡ phân phối">
+                    <span className="text-[10px]">🔗</span> {mat.title || 'Học liệu'}
+                  </div>
                 ))}
+                
+                <div className="flex flex-col gap-1 mt-1 ml-2">
+                  {chapter.lessons.map(lesson => {
+                    const lessonMaterials = materials?.filter(m => m.lessonId === lesson.id) || [];
+                    return (
+                      <div key={lesson.id} className="border-l border-gray-100 pl-2">
+                        <div className="flex items-center gap-2 px-2 py-1 text-xs font-semibold text-gray-700 bg-gray-50/50 rounded-md mt-1">
+                          <span>📄</span> {lesson.title}
+                        </div>
+                        {/* Render lesson shortcuts */}
+                        {lessonMaterials.map(mat => (
+                          <div key={`mat-${mat.id}`} className="flex items-center gap-2 px-2 py-1 text-[11px] text-gray-600 pl-6 hover:bg-blue-50 rounded-md cursor-pointer transition-colors" title="Nháy đúp để xem trước, nháy đơn để chọn gỡ phân phối">
+                            <span className="text-[10px]">🔗</span> {mat.title || 'Học liệu'}
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
-      {/* RIGHT PANE: Master Vault */}
+{/* RIGHT PANE: Master Vault */}
       <div className="w-2/3 bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col shadow-sm">
         <div className="p-3 border-b border-gray-100 flex items-center justify-between bg-gray-50">
           <div className="flex items-center gap-2 text-xs font-medium text-gray-600">
@@ -227,13 +228,9 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
               <div 
                 key={mat.id} 
                 onDoubleClick={() => {
-                  if (selectedTarget.type !== 'WORKSPACE') {
-                    toast.error("Đây là bản phân phối. Vui lòng mở file gốc tại Kho Lưu Trữ Chung (Pane Phải) để chỉnh sửa nội dung.");
-                  } else {
-                    setInspectGenerationId(mat.id);
-                  }
+                  setInspectGenerationId(mat.id);
                 }}
-                className={`relative border border-gray-200 bg-white rounded-lg flex flex-col overflow-hidden group hover:shadow-md transition-all cursor-pointer ${selectedTarget.type !== 'WORKSPACE' ? 'hover:border-purple-300' : 'hover:border-blue-300'}`}
+                className={`relative border border-gray-200 bg-white rounded-lg flex flex-col overflow-hidden group hover:shadow-md transition-all cursor-pointer hover:border-blue-300`}
               >
                 <div className="p-3 pb-2 flex-1">
                   <div className="flex items-start justify-between">
@@ -243,11 +240,9 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                       </div>
                       <span className="text-xs font-bold text-gray-500">{mat.materialType}</span>
                     </div>
-                    {selectedTarget.type === 'WORKSPACE' && (
-                      <button className="text-gray-400 hover:text-gray-700 opacity-0 group-hover:opacity-100 transition-opacity p-1">
+                    <button className="text-gray-400 hover:text-gray-700 opacity-0 group-hover:opacity-100 transition-opacity p-1">
                         <MoreVertical className="w-4 h-4" />
                       </button>
-                    )}
                   </div>
                   <h4 className="text-sm font-bold text-gray-800 line-clamp-2 leading-tight">
                     {mat.title || 'Học liệu không tên'}
