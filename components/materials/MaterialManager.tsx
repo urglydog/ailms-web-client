@@ -383,14 +383,14 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
   const filteredOfficialMaterials = officialMaterials?.filter(m => {
     if (!lessonId) {
       // Course level
-      return !m.chapterId && !m.lessonId;
+      return (!m.assignments || !m.assignments.some(a => a.chapterId)) && (!m.assignments || !m.assignments.some(a => a.lessonId));
     } else {
       // Lesson level: check if material is attached specifically to this lesson
-      if (m.lessonId === lessonId) return true;
+      if (m.assignments?.some(a => a.lessonId === lessonId)) return true;
       
       // Or check if material is attached to the chapter containing this lesson
-      if (m.chapterId && chapters) {
-        const chapter = chapters.find(c => c.id === m.chapterId);
+      if ((m.assignments && m.assignments.some(a => a.chapterId)) && chapters) {
+        const chapter = chapters.find(c => m.assignments?.some(a => a.chapterId === c.id));
         if (chapter && chapter.lessons.some(l => l.id === lessonId)) {
           return true;
         }

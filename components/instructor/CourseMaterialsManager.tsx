@@ -13,10 +13,77 @@ import { MindmapEditor } from '@/components/materials/MindmapEditor';
 import { MermaidViewer } from '@/components/materials/MermaidViewer';
 import { MaterialLanguagePicker } from '@/components/materials/MaterialLanguagePicker';
 
-import { Folder, FileText, MoreVertical, Plus, Trash2, BookOpen, Layers } from 'lucide-react';
+import { DndContext, useDraggable, useDroppable, DragOverlay, DragStartEvent, DragEndEvent } from '@dnd-kit/core';
+import { GripVertical, Link as LinkIcon, Trash2, Folder, FileText, MoreVertical, Plus, Layers } from 'lucide-react';
+
 
 interface CourseMaterialsManagerProps {
   courseId: number;
+}
+
+
+function DraggableMaterialCard({ mat, onClick }: { mat: InstructorMaterial, onClick: () => void }) {
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+    id: `material-${mat.id}`,
+    data: { material: mat },
+  });
+
+  const isAssigned = mat.assignments && mat.assignments.length > 0;
+
+  return (
+    <div 
+      ref={setNodeRef}
+      onDoubleClick={onClick}
+      className={`relative border bg-white rounded-lg flex flex-col overflow-hidden group hover:shadow-md transition-all cursor-pointer ${isDragging ? 'opacity-50 border-blue-400 border-dashed' : 'border-gray-200 hover:border-blue-300'}`}
+    >
+      <div className="absolute top-2 left-2 cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-700 p-1 bg-white/80 rounded-md z-10" {...attributes} {...listeners}>
+        <GripVertical className="w-4 h-4" />
+      </div>
+      <div className="p-3 pl-8 pb-2 flex-1">
+        <div className="flex items-start justify-between">
+          <div className="flex items-center gap-2 mb-2">
+            <div className={`p-1.5 rounded-md flex-shrink-0 ${mat.materialType === 'MINDMAP' ? 'bg-blue-100 text-blue-600' : mat.materialType === 'FLASHCARD' ? 'bg-purple-100 text-purple-600' : 'bg-orange-100 text-orange-600'}`}>
+              <FileText className="w-4 h-4" />
+            </div>
+            <span className="text-xs font-bold text-gray-500">{mat.materialType}</span>
+            {isAssigned && (
+              <span className="text-[10px] text-blue-500 bg-blue-50 px-1 rounded flex items-center gap-1" title="Đã phân phối">
+                <LinkIcon className="w-3 h-3" />
+              </span>
+            )}
+          </div>
+          <button className="text-gray-400 hover:text-gray-700 opacity-0 group-hover:opacity-100 transition-opacity p-1">
+            <MoreVertical className="w-4 h-4" />
+          </button>
+        </div>
+        <h4 className="text-sm font-bold text-gray-800 line-clamp-2 leading-tight">
+          {mat.title || 'Học liệu không tên'}
+        </h4>
+      </div>
+      <div className="px-3 py-2 bg-gray-50 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500">
+        <span>{new Date(mat.createdAt).toLocaleDateString('vi-VN')}</span>
+        <span className={`px-2 py-0.5 rounded-full font-medium text-[10px] ${mat.isOfficial ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-700'}`}>
+          {mat.isOfficial ? 'Official' : 'Draft'}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function DroppableNode({ id, title, type, children }: { id: string, title: string, type: string, children: React.ReactNode }) {
+  const { isOver, setNodeRef } = useDroppable({
+    id: id,
+    data: { type }
+  });
+
+  return (
+    <div ref={setNodeRef} className={`rounded-md transition-colors ${isOver ? 'bg-blue-50 border border-blue-200 border-dashed' : ''}`}>
+      <div className={`flex items-center gap-2 px-2 py-1.5 text-xs ${type === 'CHAPTER' ? 'font-bold text-gray-800 bg-gray-50' : 'font-semibold text-gray-700 bg-gray-50/50 mt-1'}`}>
+        <span>{type === 'CHAPTER' ? '📁' : '📄'}</span> {type === 'CHAPTER' ? `Chương: ${title}` : title}
+      </div>
+      {children}
+    </div>
+  );
 }
 
 export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps) {
@@ -39,6 +106,90 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
   const [genMaterialType, setGenMaterialType] = useState<'QUIZ' | 'FLASHCARD' | 'MINDMAP' | null>(null);
   const [manualMaterialType, setManualMaterialType] = useState<'QUIZ' | 'FLASHCARD' | 'MINDMAP' | null>(null);
   
+
+  const [activeDragId, setActiveDragId] = useState<number | null>(null);
+
+  const overwriteMaterialVersionMutation = useMutation({
+    mutationFn: (variables: { id: number, targetLessonId?: number, targetChapterId?: number }) =>
+      materialsApi.overwriteMaterialVersion(variables.id, variables),
+    onSuccess: () => {
+      toast.success('Đã cập nhật phiên bản mới (V2)');
+      queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] });
+      setConfirmAction(null);
+    },
+    onError: (err: Error) => toast.error(err.message || 'Lỗi khi cập nhật phiên bản'),
+  });
+
+  const unassignMutation = useMutation({
+    mutationFn: (variables: { id: number, target: { lessonId?: number | null, chapterId?: number | null } }) => 
+      materialsApi.attachMaterial(variables.id, variables.target),
+    onSuccess: () => {
+      toast.success('Đã gỡ phân phối học liệu');
+      queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] });
+      setConfirmAction(null);
+    },
+    onError: (err: Error) => toast.error(err.message || 'Lỗi khi gỡ phân phối'),
+  });
+
+  const attachLessonMutation = useMutation({
+    mutationFn: (variables: { id: number; target: { lessonId?: number | null; chapterId?: number | null } }) =>
+      materialsApi.attachMaterial(variables.id, variables.target),
+    onSuccess: () => {
+      toast.success('Đã phân phối học liệu thành công');
+      queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] });
+    },
+    onError: (err: Error) => toast.error(err.message || 'Lỗi khi phân phối'),
+  });
+
+  const handleDragStart = (event: DragStartEvent) => {
+    const { active } = event;
+    const materialId = parseInt(String(active.id).replace('material-', ''));
+    setActiveDragId(materialId);
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    setActiveDragId(null);
+    
+    if (!over) return;
+
+    const materialId = parseInt(String(active.id).replace('material-', ''));
+    const material = materials?.find(m => m.id === materialId);
+    if (!material) return;
+
+    const targetIdStr = String(over.id);
+    const isChapter = targetIdStr.startsWith('chapter-');
+    const parsedTargetId = parseInt(targetIdStr.replace('lesson-', '').replace('chapter-', ''));
+
+    // Bắt đúng trạng thái Versioning Overwrite: Đã assign vào chính cái đích này
+    const isAlreadyAssignedToTarget = material.assignments?.some(a => 
+      isChapter ? a.chapterId === parsedTargetId : a.lessonId === parsedTargetId
+    );
+
+    if (isAlreadyAssignedToTarget) {
+      setConfirmAction({
+        title: "Cập nhật Phiên bản",
+        message: "Bạn có muốn cập nhật phiên bản mới (V2) cho học liệu này? Điểm số cũ của học viên sẽ được bảo lưu.",
+        onConfirm: () => {
+          overwriteMaterialVersionMutation.mutate({ 
+            id: materialId, 
+            targetLessonId: isChapter ? undefined : parsedTargetId,
+            targetChapterId: isChapter ? parsedTargetId : undefined 
+          });
+        }
+      });
+    } else {
+      // Phân phối mới (Epic 3)
+      attachLessonMutation.mutate({
+        id: materialId,
+        target: {
+          lessonId: isChapter ? undefined : parsedTargetId,
+          chapterId: isChapter ? parsedTargetId : undefined
+        }
+      });
+    }
+  };
+
   const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
   const [confirmAction, setConfirmAction] = useState<{title: string, message: string, onConfirm: () => void} | null>(null);
 
@@ -130,156 +281,157 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
 
   const displayedMaterials = materials || [];
 
+  const activeDragMaterial = activeDragId ? materials?.find(m => m.id === activeDragId) : null;
+
   return (
-    <div className="flex h-[calc(100vh-100px)] gap-4 bg-gray-50 p-4 font-sans text-gray-800">
-      
-            {/* LEFT PANE: Curriculum Tree */}
-      <div className="w-1/3 bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col shadow-sm">
-        <div className="p-3 border-b border-gray-100 bg-gray-50 flex items-center gap-2">
-          <Layers className="w-4 h-4 text-gray-500" />
-          <h3 className="font-bold text-sm text-gray-700">Phân Phối (Shortcuts)</h3>
-        </div>
-        <div className="overflow-y-auto p-2 flex flex-col gap-1 flex-1">
-          {chapters?.map(chapter => {
-            const chapterMaterials = materials?.filter(m => m.chapterId === chapter.id) || [];
-            
-            return (
-              <div key={chapter.id} className="mt-2">
-                <div className="flex w-full items-center gap-2 px-2 py-1.5 text-xs font-bold text-gray-800 bg-gray-50 rounded-md">
-                  <span>📁</span> Chương: {chapter.title}
-                </div>
-                
-                {/* Render chapter shortcuts */}
-                {chapterMaterials.map(mat => (
-                  <div key={`mat-${mat.id}`} className="flex items-center gap-2 px-2 py-1 text-xs text-gray-600 pl-6 hover:bg-blue-50 rounded-md cursor-pointer transition-colors" title="Nháy đúp để xem trước, nháy đơn để chọn gỡ phân phối">
-                    <span className="text-[10px]">🔗</span> {mat.title || 'Học liệu'}
-                  </div>
-                ))}
-                
-                <div className="flex flex-col gap-1 mt-1 ml-2">
-                  {chapter.lessons.map(lesson => {
-                    const lessonMaterials = materials?.filter(m => m.lessonId === lesson.id) || [];
-                    return (
-                      <div key={lesson.id} className="border-l border-gray-100 pl-2">
-                        <div className="flex items-center gap-2 px-2 py-1 text-xs font-semibold text-gray-700 bg-gray-50/50 rounded-md mt-1">
-                          <span>📄</span> {lesson.title}
-                        </div>
-                        {/* Render lesson shortcuts */}
-                        {lessonMaterials.map(mat => (
-                          <div key={`mat-${mat.id}`} className="flex items-center gap-2 px-2 py-1 text-[11px] text-gray-600 pl-6 hover:bg-blue-50 rounded-md cursor-pointer transition-colors" title="Nháy đúp để xem trước, nháy đơn để chọn gỡ phân phối">
+    <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+      <div className="flex h-[calc(100vh-100px)] gap-4 bg-gray-50 p-4 font-sans text-gray-800">
+        
+        {/* LEFT PANE: Curriculum Tree */}
+        <div className="w-1/3 bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col shadow-sm">
+          <div className="p-3 border-b border-gray-100 bg-gray-50 flex items-center gap-2">
+            <Layers className="w-4 h-4 text-gray-500" />
+            <h3 className="font-bold text-sm text-gray-700">Phân Phối (Shortcuts)</h3>
+          </div>
+          <div className="overflow-y-auto p-2 flex flex-col gap-1 flex-1">
+            {chapters?.map(chapter => {
+              const chapterMaterials = materials?.filter(m => m.assignments?.some(a => a.chapterId === chapter.id)) || [];
+              
+              return (
+                <div key={chapter.id} className="mt-2">
+                  <DroppableNode id={`chapter-${chapter.id}`} title={chapter.title} type="CHAPTER">
+                    {/* Render chapter shortcuts */}
+                    {chapterMaterials.map(mat => {
+                      const assignment = mat.assignments?.find(a => a.chapterId === chapter.id);
+                      return (
+                        <div key={`mat-${mat.id}`} className="flex items-center justify-between px-2 py-1 text-xs text-gray-600 pl-6 hover:bg-blue-50 rounded-md cursor-pointer transition-colors group" title="Nháy đúp để xem trước">
+                          <div className="flex items-center gap-2">
                             <span className="text-[10px]">🔗</span> {mat.title || 'Học liệu'}
                           </div>
-                        ))}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-{/* RIGHT PANE: Master Vault */}
-      <div className="w-2/3 bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col shadow-sm">
-        <div className="p-3 border-b border-gray-100 flex items-center justify-between bg-gray-50">
-          <div className="flex items-center gap-2 text-xs font-medium text-gray-600">
-            {breadcrumbs.map((b, idx) => (
-              <React.Fragment key={idx}>
-                {idx > 0 && <span>/</span>}
-                <button className="hover:text-blue-600 hover:underline">{b.name}</button>
-              </React.Fragment>
-            ))}
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              title="Tạo Thư Mục"
-              className="p-1.5 rounded-md hover:bg-gray-200 text-gray-600 transition-colors"
-            >
-              <Folder className="w-4 h-4" />
-            </button>
-            <button
-              title="Tạo AI"
-              onClick={() => setGenMaterialType('QUIZ')}
-              className="p-1.5 rounded-md hover:bg-gray-200 text-blue-600 transition-colors bg-blue-50"
-            >
-              <span className="text-xs font-bold px-1">AI</span>
-            </button>
-            <button
-              title="Tạo Thủ công"
-              onClick={() => setManualMaterialType('QUIZ')}
-              className="p-1.5 rounded-md hover:bg-gray-200 text-emerald-600 transition-colors bg-emerald-50"
-            >
-              <Plus className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-
-        <div className="flex-1 overflow-y-auto p-4 bg-gray-50/50">
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
-            {folders.map((f) => (
-              <div key={f.id} className="border border-gray-200 bg-white p-3 rounded-lg flex items-center gap-3 cursor-pointer hover:bg-gray-50 hover:border-blue-200 transition-colors group">
-                <Folder className="w-8 h-8 text-blue-400 group-hover:text-blue-500 transition-colors" />
-                <span className="text-sm font-semibold text-gray-700 select-none truncate">{f.name}</span>
-              </div>
-            ))}
-
-            {displayedMaterials.map(mat => (
-              <div 
-                key={mat.id} 
-                onDoubleClick={() => {
-                  setInspectGenerationId(mat.id);
-                }}
-                className={`relative border border-gray-200 bg-white rounded-lg flex flex-col overflow-hidden group hover:shadow-md transition-all cursor-pointer hover:border-blue-300`}
-              >
-                <div className="p-3 pb-2 flex-1">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className={`p-1.5 rounded-md ${mat.materialType === 'MINDMAP' ? 'bg-blue-50 text-blue-600' : mat.materialType === 'FLASHCARD' ? 'bg-purple-50 text-purple-600' : 'bg-emerald-50 text-emerald-600'}`}>
-                        {mat.materialType === 'MINDMAP' ? <Layers className="w-4 h-4" /> : mat.materialType === 'FLASHCARD' ? <BookOpen className="w-4 h-4" /> : <FileText className="w-4 h-4" />}
-                      </div>
-                      <span className="text-xs font-bold text-gray-500">{mat.materialType}</span>
-                    </div>
-                    <button className="text-gray-400 hover:text-gray-700 opacity-0 group-hover:opacity-100 transition-opacity p-1">
-                        <MoreVertical className="w-4 h-4" />
-                      </button>
-                  </div>
-                  <h4 className="text-sm font-bold text-gray-800 line-clamp-2 leading-tight">
-                    {mat.title || 'Học liệu không tên'}
-                  </h4>
-                  <div className="mt-2 flex items-center gap-2 text-[10px] font-semibold text-gray-400 uppercase tracking-wide">
-                    <span>{new Date(mat.createdAt).toLocaleDateString('vi-VN')}</span>
-                    {mat.isOfficial && <span className="text-emerald-600 bg-emerald-50 px-1.5 rounded-sm">Official</span>}
+                          <button onClick={(e) => {
+                            e.stopPropagation();
+                            if (assignment) {
+                              setConfirmAction({
+                                title: "Gỡ phân phối",
+                                message: "Bạn có chắc chắn muốn gỡ học liệu này khỏi chương?",
+                                onConfirm: () => unassignMutation.mutate({ id: mat.id, target: { chapterId: null } })
+                              });
+                            }
+                          }} className="opacity-0 group-hover:opacity-100 p-0.5 text-gray-400 hover:text-red-500 transition-opacity">
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        </div>
+                      )
+                    })}
+                  </DroppableNode>
+                  
+                  <div className="flex flex-col gap-1 mt-1 ml-2">
+                    {chapter.lessons.map(lesson => {
+                      const lessonMaterials = materials?.filter(m => m.assignments?.some(a => a.lessonId === lesson.id)) || [];
+                      return (
+                        <div key={lesson.id} className="border-l border-gray-100 pl-2 mt-1">
+                          <DroppableNode id={`lesson-${lesson.id}`} title={lesson.title} type="LESSON">
+                            {/* Render lesson shortcuts */}
+                            {lessonMaterials.map(mat => {
+                              const assignment = mat.assignments?.find(a => a.lessonId === lesson.id);
+                              return (
+                                <div key={`mat-${mat.id}`} className="flex items-center justify-between px-2 py-1 text-[11px] text-gray-600 pl-6 hover:bg-blue-50 rounded-md cursor-pointer transition-colors group" title="Nháy đúp để xem trước">
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-[10px]">🔗</span> {mat.title || 'Học liệu'}
+                                  </div>
+                                  <button onClick={(e) => {
+                                    e.stopPropagation();
+                                    if (assignment) {
+                                      setConfirmAction({
+                                        title: "Gỡ phân phối",
+                                         message: "Bạn có chắc chắn muốn gỡ học liệu này khỏi bài học?",
+                                        onConfirm: () => unassignMutation.mutate({ id: mat.id, target: { lessonId: null } })
+                                      });
+                                    }
+                                  }} className="opacity-0 group-hover:opacity-100 p-0.5 text-gray-400 hover:text-red-500 transition-opacity">
+                                    <Trash2 className="w-3 h-3" />
+                                  </button>
+                                </div>
+                              )
+                            })}
+                          </DroppableNode>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
-                
-                {/* Status Bar */}
-                {mat.status !== 'COMPLETED' && (
-                  <div className="h-4 w-full bg-gray-100 overflow-hidden relative">
-                     {(mat.status === 'PENDING' || mat.status === 'PROCESSING' || mat.status === 'PENDING_TRANSCRIPT') ? (
-                      <div className="absolute top-0 left-0 h-full w-full bg-[repeating-linear-gradient(45deg,#000,#000_6px,#fbbf24_6px,#fbbf24_12px)] animate-[bg-scroll_1s_linear_infinite]" style={{ backgroundSize: '16px 16px' }} />
-                    ) : mat.status === 'FAILED' ? (
-                      <div className="absolute top-0 left-0 h-full w-full bg-red-500" />
-                    ) : (
-                      <div className="absolute top-0 left-0 h-full w-full bg-gray-400" />
-                    )}
-                  </div>
-                )}
-              </div>
-            ))}
+              );
+            })}
+          </div>
+        </div>
+
+        {/* RIGHT PANE: Master Vault */}
+        <div className="w-2/3 bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col shadow-sm">
+          <div className="p-3 border-b border-gray-100 flex items-center justify-between bg-gray-50">
+            <div className="flex items-center gap-2 text-xs font-medium text-gray-600">
+              {breadcrumbs.map((bc, idx) => (
+                <React.Fragment key={idx}>
+                  <span className="cursor-pointer hover:text-blue-600 transition-colors">{bc.name}</span>
+                  {idx < breadcrumbs.length - 1 && <span>/</span>}
+                </React.Fragment>
+              ))}
+            </div>
             
-            {displayedMaterials.length === 0 && folders.length === 0 && (
-              <div className="col-span-full py-12 flex flex-col items-center justify-center text-gray-400">
-                <Folder className="w-12 h-12 text-gray-200 mb-2" />
-                <p className="text-xs font-medium">Thư mục trống</p>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setManualMaterialType('QUIZ')}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-lg transition-colors border border-gray-200 shadow-sm"
+              >
+                <Plus className="w-3.5 h-3.5" /> Thủ Công
+              </button>
+              <button
+                onClick={() => setGenMaterialType('QUIZ')}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-[length:16px_16px] animate-[bg-scroll_1s_linear_infinite] bg-[repeating-linear-gradient(45deg,#0ea5e9,#0ea5e9_6px,#0284c7_6px,#0284c7_12px)] text-white text-xs font-bold rounded-lg shadow-sm hover:opacity-90 transition-opacity"
+              >
+                ✨ AI Auto
+              </button>
+            </div>
+          </div>
+          
+          <div className="flex-1 overflow-y-auto p-4 bg-gray-50/50">
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+              {folders.map((f) => (
+                <div key={f.id} className="border border-gray-200 bg-white p-3 rounded-lg flex items-center gap-3 cursor-pointer hover:bg-gray-50 hover:border-blue-200 transition-colors group">
+                  <Folder className="w-8 h-8 text-blue-400 group-hover:text-blue-500 transition-colors" />
+                  <span className="text-sm font-semibold text-gray-700 select-none truncate">{f.name}</span>
+                </div>
+              ))}
+              
+              {displayedMaterials.map(mat => (
+                <DraggableMaterialCard 
+                  key={mat.id} 
+                  mat={mat} 
+                  onClick={() => setInspectGenerationId(mat.id)} 
+                />
+              ))}
+            </div>
+            {displayedMaterials.length === 0 && folders.length === 0 && !isLoading && (
+              <div className="flex flex-col items-center justify-center h-full text-gray-400 py-10">
+                <Folder className="w-16 h-16 mb-2 opacity-50" />
+                <p className="text-sm font-medium">Thư mục trống</p>
+                <p className="text-xs mt-1">Sử dụng nút Tạo mới ở góc trên.</p>
               </div>
             )}
           </div>
         </div>
       </div>
-      
-      {/* Modals & Portals */}
+
+      <DragOverlay>
+        {activeDragMaterial ? (
+          <div className="bg-white opacity-90 shadow-2xl scale-105 border-blue-400 border rounded-lg px-3 py-2 text-xs flex items-center gap-2">
+            <FileText className="w-4 h-4 text-blue-500" />
+            <span className="font-bold text-gray-800 line-clamp-1">{activeDragMaterial.title || 'Học liệu'}</span>
+          </div>
+        ) : null}
+      </DragOverlay>
+
       {renderDeleteModal()}
+      
       {confirmAction && typeof window !== 'undefined' && createPortal(
         <div className="fixed inset-0 z-[100000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-white rounded-xl max-w-sm w-full p-5 shadow-2xl animate-in zoom-in-95 duration-200 border border-gray-200">
@@ -293,7 +445,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
         </div>,
         document.body
       )}
-    </div>
+    </DndContext>
   );
 }
 

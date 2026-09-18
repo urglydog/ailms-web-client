@@ -165,7 +165,7 @@ function LearnPageContent() {
     enabled: !!lesson?.courseId,
     staleTime: 0, // Cập nhật ngay khi tab mount (Test 2.1)
   });
-  const currentLessonMaterialCount = officialMaterials?.filter(m => m.lessonId === lessonId).length || 0;
+  const currentLessonMaterialCount = officialMaterials?.filter(m => m.assignments?.some(a => a.lessonId === lessonId)).length || 0;
 
   // Dọn dẹp Draft rác của các Quiz đã bị xóa mềm (Graceful In-flight cleanup)
   useEffect(() => {
