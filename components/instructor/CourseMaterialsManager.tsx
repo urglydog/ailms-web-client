@@ -33,7 +33,6 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
     }
   };
 
-  ||
   
   const [breadcrumbs] = useState<{id: number | null, name: string}[]>([{id: null, name: 'Workspace'}]);
 
@@ -69,6 +68,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
 
   const renderDeleteModal = () => {
     if (!confirmDeleteId) return null;
+    
     
     return (
       <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in">
@@ -978,7 +978,7 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
 function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: { courseId: number; initialType: 'QUIZ' | 'FLASHCARD' | 'MINDMAP'; onClose: () => void; onSuccess: () => void }) {
   const [materialType, setMaterialType] = useState<'QUIZ' | 'FLASHCARD' | 'MINDMAP'>(initialType);
   const [quizType, setQuizType] = useState<'LECTURE_QUIZ' | 'OFFICIAL_EXAM'>('OFFICIAL_EXAM');
-  const [scopeType, setScopeType] = useState<'WHOLE_COURSE' |  | 'LESSON'>('WHOLE_COURSE');
+  const [scopeType, setScopeType] = useState<'WHOLE_COURSE' | 'CHAPTER' | 'LESSON'>('WHOLE_COURSE');
   const [scopeRefId, setScopeRefId] = useState<number | undefined>(undefined);
   const [lessonId, setLessonId] = useState<number | undefined>(undefined);
   const [title, setTitle] = useState('');
@@ -1012,7 +1012,7 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
     if (scopeType === 'LESSON' && lessonId && chapters) {
       const lesson = chapters.flatMap(c => c.lessons).find(l => l.id === lessonId);
       if (lesson) newTitle = `${typeName} - ${lesson.title}`;
-    } else if (scopeType ===  && scopeRefId && chapters) {
+    } else if (scopeType === 'CHAPTER' && scopeRefId && chapters) {
       const chapter = chapters.find(c => c.id === scopeRefId);
       if (chapter) newTitle = `${typeName} Ôn tập - ${chapter.title}`;
     } else if (scopeType === 'WHOLE_COURSE') {
@@ -1045,7 +1045,7 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
       toast.error("Vui lòng nhập tiêu đề");
       return;
     }
-    if (scopeType ===  && !scopeRefId) {
+    if (scopeType === 'CHAPTER' && !scopeRefId) {
       toast.error("Vui lòng chọn một chương");
       return;
     }
@@ -1058,7 +1058,7 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
       materialType,
       title: title.trim(),
       scopeType: scopeType === 'LESSON' ? 'CUSTOM_LESSONS' : scopeType,
-      scopeRefId: scopeType ===  ? scopeRefId : undefined,
+      scopeRefId: scopeType === 'CHAPTER' ? scopeRefId : undefined,
       customLessonIds: scopeType === 'LESSON' && lessonId ? [lessonId] : undefined,
       difficultyLevel,
       quantityLevel,
@@ -1098,7 +1098,7 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
           <div
             onClick={() => {
               setMaterialType('FLASHCARD');
-              setScopeType();
+              setScopeType('CHAPTER');
             }}
             className={`cursor-pointer rounded-2xl p-4 border-2 transition-all flex flex-col items-center text-center gap-2 ${materialType === 'FLASHCARD' ? 'border-purple-500 bg-purple-50/50 shadow-md scale-[1.02]' : 'border-gray-200 hover:border-purple-300 bg-white'
               }`}
@@ -1111,7 +1111,7 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
           <div
             onClick={() => {
               setMaterialType('MINDMAP');
-              setScopeType();
+              setScopeType('CHAPTER');
             }}
             className={`cursor-pointer rounded-2xl p-4 border-2 transition-all flex flex-col items-center text-center gap-2 ${materialType === 'MINDMAP' ? 'border-blue-500 bg-blue-50/50 shadow-md scale-[1.02]' : 'border-gray-200 hover:border-blue-300 bg-white'
               }`}
@@ -1179,24 +1179,24 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
               <select
                 value={scopeType}
                 onChange={(e) => {
-                  setScopeType(e.target.value as 'WHOLE_COURSE' |  | 'LESSON');
+                  setScopeType(e.target.value as 'WHOLE_COURSE' | 'CHAPTER' | 'LESSON');
                   setIsTitleEdited(false); // Reset to allow auto-fill on change
                 }}
                 className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:border-cyan-500 outline-none bg-white"
               >
                 {materialType === 'QUIZ' && quizType === 'OFFICIAL_EXAM' && <option value="WHOLE_COURSE">Toàn bộ khóa học</option>}
-                {materialType === 'QUIZ' && quizType === 'OFFICIAL_EXAM' && <option value=>Theo chương cụ thể</option>}
+                {materialType === 'QUIZ' && quizType === 'OFFICIAL_EXAM' && <option value="CHAPTER">Theo chương cụ thể</option>}
                 {materialType === 'QUIZ' && quizType === 'LECTURE_QUIZ' && <option value="LESSON">Bài học cụ thể</option>}
                 
-                {materialType === 'FLASHCARD' && <option value=>Theo chương cụ thể</option>}
+                {materialType === 'FLASHCARD' && <option value="CHAPTER">Theo chương cụ thể</option>}
                 {materialType === 'FLASHCARD' && <option value="LESSON">Bài học cụ thể</option>}
                 
-                {materialType === 'MINDMAP' && <option value=>Theo chương cụ thể</option>}
+                {materialType === 'MINDMAP' && <option value="CHAPTER">Theo chương cụ thể</option>}
                 {materialType === 'MINDMAP' && <option value="LESSON">Bài học cụ thể</option>}
               </select>
             </label>
 
-            {scopeType ===  && (
+            {scopeType === 'CHAPTER' && (
               <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
                 Chọn chương
                 <select
