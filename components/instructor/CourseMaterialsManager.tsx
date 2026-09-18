@@ -3,7 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { materialsApi, InstructorMaterial, MaterialDetailRes } from '@/lib/api/materials';
 import { courseResourcesApi } from '@/lib/api/courseResourcesApi';
-
+import { useMyCourseDetail } from "@/hooks/useCourses";
 import { UploadStaticMaterialModal } from './UploadStaticMaterialModal';
 import { toast } from 'sonner';
 import React, { useState, useEffect } from 'react';
