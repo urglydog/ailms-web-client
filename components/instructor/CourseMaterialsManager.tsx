@@ -143,7 +143,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
 
   const handleDragStart = (event: DragStartEvent) => {
     const { active } = event;
-    const materialId = parseInt(active.id.replace('material-', ''));
+    const materialId = parseInt(String(active.id).replace('material-', ''));
     setActiveDragId(materialId);
   };
 
@@ -153,7 +153,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
     
     if (!over) return;
 
-    const materialId = parseInt(active.id.replace('material-', ''));
+    const materialId = parseInt(String(active.id).replace('material-', ''));
     const material = materials?.find(m => m.id === materialId);
     if (!material) return;
 
