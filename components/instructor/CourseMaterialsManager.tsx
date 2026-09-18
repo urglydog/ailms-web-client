@@ -13,6 +13,8 @@ import { MindmapEditor } from '@/components/materials/MindmapEditor';
 import { MermaidViewer } from '@/components/materials/MermaidViewer';
 import { MaterialLanguagePicker } from '@/components/materials/MaterialLanguagePicker';
 
+import { Folder, FileText, MoreVertical, Plus, Trash2, Edit2, Play, BookOpen, Layers } from 'lucide-react';
+
 interface CourseMaterialsManagerProps {
   courseId: number;
 }
@@ -20,7 +22,6 @@ interface CourseMaterialsManagerProps {
 export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps) {
   const router = useRouter();
   const queryClient = useQueryClient();
-
 
   const searchParams = useSearchParams();
   const inspectGenerationId = searchParams.get('inspect') ? Number(searchParams.get('inspect')) : null;
@@ -31,12 +32,15 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
       router.push(`/instructor/materials`);
     }
   };
+
+  const [selectedTarget, setSelectedTarget] = useState<{type: 'WORKSPACE'|'CHAPTER'|'LESSON', id?: number}>({type: 'WORKSPACE'});
+  const [currentFolderId, setCurrentFolderId] = useState<number | null>(null);
+  const [breadcrumbs, setBreadcrumbs] = useState<{id: number | null, name: string}[]>([{id: null, name: 'Workspace'}]);
+
   const [genMaterialType, setGenMaterialType] = useState<'QUIZ' | 'FLASHCARD' | 'MINDMAP' | null>(null);
   const [manualMaterialType, setManualMaterialType] = useState<'QUIZ' | 'FLASHCARD' | 'MINDMAP' | null>(null);
-  const [activeFilterTab, setActiveFilterTab] = useState<'ALL' | 'QUIZ' | 'FLASHCARD' | 'MINDMAP' | 'STATIC_FILE'>('ALL');
   const [showUploadStatic, setShowUploadStatic] = useState(false);
   const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
-  const [distributeMaterialId, setDistributeMaterialId] = useState<number | null>(null);
   const [confirmAction, setConfirmAction] = useState<{title: string, message: string, onConfirm: () => void} | null>(null);
 
   const { data: materials, isLoading } = useQuery({
@@ -48,13 +52,8 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
   const { data: courseDetail } = useMyCourseDetail(courseId);
   const chapters = courseDetail?.chapters;
 
-  const { data: courseResources } = useQuery({
-    queryKey: ['course-resources', courseId],
-    queryFn: () => courseResourcesApi.getCourseResources(courseId),
-    enabled: !!courseId,
-  });
-
-
+  // Placeholder for folder data
+  const folders: any[] = [];
 
   const toggleMindmapMutation = useMutation({
     mutationFn: (variables: { id: number; isOfficial: boolean }) =>
@@ -82,16 +81,6 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
     },
   });
 
-  const attachLessonMutation = useMutation({
-    mutationFn: (variables: { id: number; lessonId: number | null }) => 
-      materialsApi.attachMaterial(variables.id, { lessonId: variables.lessonId, chapterId: null }),
-    onSuccess: () => {
-      toast.success('Đã cập nhật bài học đính kèm');
-      queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] });
-    },
-    onError: (err: Error) => toast.error(err.message || 'Lỗi cập nhật bài học đính kèm')
-  });
-
   const deleteMaterialMutation = useMutation({
     mutationFn: (id: number) => materialsApi.deleteMaterial(id),
     onSuccess: () => {
@@ -106,45 +95,31 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
   const renderDeleteModal = () => {
     if (!confirmDeleteId) return null;
     const mat = materials?.find(m => m.id === confirmDeleteId);
-    const hasUsage = (mat?.usageCount ?? 0) > 0;
     
     return (
       <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in">
-        <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden border border-red-100">
-          <div className="bg-red-50 p-6 border-b border-red-100 flex items-center gap-4">
-            <div className="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center flex-shrink-0 text-2xl">
-              ⚠️
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-red-950">Xóa Học Liệu</h3>
-              <p className="text-sm text-red-700 mt-1">Hành động này không thể hoàn tác.</p>
-            </div>
+        <div className="bg-white rounded-xl max-w-sm w-full shadow-2xl overflow-hidden border border-red-100">
+          <div className="bg-red-50 p-4 border-b border-red-100 flex items-center gap-3">
+            <Trash2 className="w-5 h-5 text-red-600" />
+            <h3 className="text-base font-bold text-red-950">Xóa Học Liệu</h3>
           </div>
-          <div className="p-6">
-            {hasUsage ? (
-              <p className="text-red-700 font-medium text-sm mb-6 leading-relaxed bg-red-50 p-3 rounded-lg border border-red-100">
-                ⚠️ Học liệu đã có dữ liệu tương tác ({mat?.usageCount} lượt)! Việc xóa bài tập sẽ ẩn nội dung này khỏi bài học. Lịch sử làm bài và điểm số của học viên đã hoàn thành trước đó vẫn được bảo lưu.
-              </p>
-            ) : (
-              <p className="text-gray-600 text-sm mb-6 leading-relaxed">
-                Việc xóa bài tập sẽ ẩn nội dung này khỏi bài học. Lịch sử làm bài và điểm số của học viên đã hoàn thành trước đó vẫn được bảo lưu. Bạn có chắc chắn muốn xóa không?
-              </p>
-            )}
-            <div className="flex items-center justify-end gap-3">
+          <div className="p-4">
+            <p className="text-gray-600 text-sm mb-4">
+              Bạn có chắc chắn muốn xóa không? Hành động này không thể hoàn tác.
+            </p>
+            <div className="flex items-center justify-end gap-2">
               <button
                 onClick={() => setConfirmDeleteId(null)}
-                className="px-4 py-2 text-sm font-bold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors"
+                className="px-3 py-1.5 text-xs font-bold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
               >
-                Hủy bỏ
+                Hủy
               </button>
               <button
-                onClick={() => {
-                  deleteMaterialMutation.mutate(confirmDeleteId);
-                }}
+                onClick={() => deleteMaterialMutation.mutate(confirmDeleteId)}
                 disabled={deleteMaterialMutation.isPending}
-                className="px-4 py-2 text-sm font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-md shadow-red-200 transition-all disabled:opacity-50"
+                className="px-3 py-1.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-lg shadow-sm transition-all disabled:opacity-50"
               >
-                {deleteMaterialMutation.isPending ? 'Đang xóa...' : (hasUsage ? 'Xác nhận Xóa và Ẩn' : 'Xác nhận xóa')}
+                {deleteMaterialMutation.isPending ? 'Đang xóa...' : 'Xác nhận xóa'}
               </button>
             </div>
           </div>
@@ -153,10 +128,8 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
     );
   };
 
+  if (isLoading) return <div className="p-6 text-center text-sm text-gray-500 animate-pulse">Đang tải...</div>;
 
-  if (isLoading) return <div className="p-6 text-center text-sm text-gray-500 animate-pulse">Đang tải danh sách học liệu Giảng viên...</div>;
-
-  // Nếu Giảng viên bấm Xem Chi Tiết -> Hiển thị Workspace Mở Rộng Đầy Đủ Không Gian (Không phải Popup nhỏ)
   if (inspectGenerationId) {
     const activeMat = materials?.find(m => m.id === inspectGenerationId);
     return (
@@ -165,33 +138,8 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
           generationId={inspectGenerationId}
           material={activeMat}
           onBack={() => setInspectGenerationId(null)}
-          onToggleOfficial={() => {
-            if (!activeMat || !activeMat.materialId) return;
-            
-            const handleToggle = () => {
-              const materialId = activeMat.materialId as number;
-              if (activeMat.materialType === 'MINDMAP') {
-                toggleMindmapMutation.mutate({ id: materialId, isOfficial: !activeMat.isOfficial });
-              } else if (activeMat.materialType === 'FLASHCARD') {
-                toggleFlashcardMutation.mutate({ id: materialId, isOfficial: !activeMat.isOfficial });
-              } else if (activeMat.materialType === 'QUIZ') {
-                toggleQuizOfficialMutation.mutate({ id: materialId, isOfficial: !activeMat.isOfficial });
-              }
-            };
-
-            if (activeMat.isOfficial) {
-              setConfirmAction({
-                title: "Chuyển về bản nháp",
-                message: "Học liệu sẽ chuyển về bản nháp (Draft), học viên sẽ mất quyền truy cập vào tài nguyên này. Bạn có chắc chắn?",
-                onConfirm: handleToggle
-              });
-            } else {
-              handleToggle();
-            }
-          }}
-          onDelete={() => {
-            setConfirmDeleteId(inspectGenerationId);
-          }}
+          onToggleOfficial={() => {}}
+          onDelete={() => setConfirmDeleteId(inspectGenerationId)}
         />
         {renderDeleteModal()}
       </>
@@ -199,436 +147,178 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
   }
 
   if (genMaterialType) {
-    return (
-      <GenerateAiOfficialView
-        courseId={courseId}
-        initialType={genMaterialType}
-        onClose={() => setGenMaterialType(null)}
-        onSuccess={() => {
-          setGenMaterialType(null);
-          queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] });
-        }}
-      />
-    );
+    return <GenerateAiOfficialView courseId={courseId} initialType={genMaterialType} onClose={() => setGenMaterialType(null)} onSuccess={() => { setGenMaterialType(null); queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] }); }} />;
   }
 
   if (manualMaterialType) {
-    return (
-      <GenerateManualOfficialView
-        courseId={courseId}
-        initialType={manualMaterialType}
-        onClose={() => setManualMaterialType(null)}
-        onSuccess={(id) => {
-          setManualMaterialType(null);
-          queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] });
-          setInspectGenerationId(id);
-        }}
-      />
-    );
+    return <GenerateManualOfficialView courseId={courseId} initialType={manualMaterialType} onClose={() => setManualMaterialType(null)} onSuccess={(id) => { setManualMaterialType(null); queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] }); setInspectGenerationId(id); }} />;
   }
 
-  const filteredMaterials = materials?.filter(mat => activeFilterTab === 'ALL' || mat.materialType === activeFilterTab) || [];
+  // Lọc theo selectedTarget
+  let displayedMaterials = materials || [];
+  if (selectedTarget.type === 'WORKSPACE') {
+    displayedMaterials = displayedMaterials.filter(m => !m.lessonId && !m.chapterId);
+  } else if (selectedTarget.type === 'CHAPTER') {
+    displayedMaterials = displayedMaterials.filter(m => m.chapterId === selectedTarget.id);
+  } else if (selectedTarget.type === 'LESSON') {
+    displayedMaterials = displayedMaterials.filter(m => m.lessonId === selectedTarget.id);
+  }
 
   return (
-    <div className="flex flex-col gap-5">
-      {/* Top Banner & Quick Actions */}
-      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-900 p-5 text-white shadow-lg gap-4">
-        <div>
-          <h3 className="font-bold text-base flex items-center gap-2">
-            <span>🎓</span> Kho Học Liệu Official & Bài Thi Khóa Học
-          </h3>
-          <p className="text-xs text-blue-200 mt-1">
-            Sinh sơ đồ Mindmap, bộ Flashcard hoặc Bài thi trắc nghiệm Official cho toàn bộ học viên.
-          </p>
+    <div className="flex h-[calc(100vh-100px)] gap-4 bg-gray-50 p-4 font-sans text-gray-800">
+      
+      {/* LEFT PANE: Curriculum Tree */}
+      <div className="w-1/3 bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col shadow-sm">
+        <div className="p-3 border-b border-gray-100 bg-gray-50 flex items-center gap-2">
+          <Layers className="w-4 h-4 text-gray-500" />
+          <h3 className="font-bold text-sm text-gray-700">Phân Phối (Shortcuts)</h3>
         </div>
-
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="overflow-y-auto p-2 flex flex-col gap-1 flex-1">
           <button
-            onClick={() => setGenMaterialType('QUIZ')}
-            className="rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-bold text-white shadow hover:bg-blue-700 transition-all flex items-center gap-2"
+            onClick={() => setSelectedTarget({type: 'WORKSPACE'})}
+            className={`flex items-center gap-2 px-2 py-1.5 text-xs font-semibold rounded-md transition-colors ${selectedTarget.type === 'WORKSPACE' ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-100'}`}
           >
-            <span>🤖</span> Tạo Học Liệu AI
+            <span>🌐</span> Kho Lưu Trữ Chung (Workspace)
           </button>
-          <button
-            onClick={() => setManualMaterialType('QUIZ')}
-            className="rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white shadow hover:bg-emerald-700 transition-all flex items-center gap-2"
-          >
-            <span>✍️</span> Tạo Thủ Công
-          </button>
-          <button
-            onClick={() => setShowUploadStatic(true)}
-            className="rounded-xl bg-orange-600 px-4 py-2.5 text-sm font-bold text-white shadow hover:bg-orange-700 transition-all flex items-center gap-2"
-          >
-            <span>📁</span> Tải Lên File Tĩnh
-          </button>
-          <button
-            onClick={() => router.push(`/instructor/courses/${courseId}/gradebook`)}
-            className="rounded-xl bg-white px-4 py-2.5 text-sm font-bold text-blue-950 shadow hover:bg-blue-50 transition-all flex items-center gap-2 ml-1"
-          >
-            <span>📊</span> Bảng Điểm Lớp
-          </button>
-        </div>
-      </div>
-
-      {showUploadStatic && (
-        <UploadStaticMaterialModal 
-          courseId={courseId} 
-          onClose={() => setShowUploadStatic(false)} 
-        />
-      )}
-
-      <div className="flex items-center border-b gap-2 overflow-x-auto">
-        <button onClick={() => setActiveFilterTab('ALL')} className={`px-4 py-2 text-sm font-bold border-b-2 ${activeFilterTab === 'ALL' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>Tất cả AI</button>
-        <button onClick={() => setActiveFilterTab('QUIZ')} className={`px-4 py-2 text-sm font-bold border-b-2 ${activeFilterTab === 'QUIZ' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>Bài Thi Trắc Nghiệm</button>
-        <button onClick={() => setActiveFilterTab('FLASHCARD')} className={`px-4 py-2 text-sm font-bold border-b-2 ${activeFilterTab === 'FLASHCARD' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>Thẻ Flashcard</button>
-        <button onClick={() => setActiveFilterTab('MINDMAP')} className={`px-4 py-2 text-sm font-bold border-b-2 ${activeFilterTab === 'MINDMAP' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>Sơ Đồ Tư Duy</button>
-        <button onClick={() => setActiveFilterTab('STATIC_FILE')} className={`px-4 py-2 text-sm font-bold border-b-2 ${activeFilterTab === 'STATIC_FILE' ? 'border-orange-600 text-orange-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>Tài Liệu Tĩnh (PDF, Slide)</button>
-      </div>
-
-      {/* Materials List */}
-      <div className="flex flex-col gap-3">
-        {filteredMaterials.map((mat) => (
-          <div key={mat.id} className="flex flex-col gap-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:border-blue-200 transition-all">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <span className={`inline-flex items-center rounded-md px-2.5 py-1 text-xs font-bold ring-1 ring-inset ${mat.materialType === 'MINDMAP' ? 'bg-blue-50 text-blue-700 ring-blue-600/20' :
-                  mat.materialType === 'FLASHCARD' ? 'bg-purple-50 text-purple-700 ring-purple-600/20' :
-                    'bg-orange-50 text-orange-700 ring-orange-600/20'
-                  }`}>
-                  {mat.materialType}
-                </span>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-gray-900">{mat.title || 'Học liệu không tên'}</span>
-                    {mat.isOfficial && (
-                      <span className="bg-emerald-100 text-emerald-800 text-[11px] font-extrabold px-2 py-0.5 rounded-full border border-emerald-200">
-                        ★ Official
-                      </span>
-                    )}
-                    {mat.isProctored && (
-                      <span className="bg-red-100 text-red-800 text-[11px] font-extrabold px-2 py-0.5 rounded-full border border-red-200 flex items-center gap-1">
-                        <span>🔴</span> Anti-Cheat
-                      </span>
-                    )}
-                  </div>
-                  <div className="text-xs text-gray-500 mt-1 flex flex-col gap-1">
-                    {/* Breadcrumb Context */}
-                    <div className="flex items-center gap-1.5 text-gray-600 bg-gray-50 px-2 py-1 rounded-md w-fit border border-gray-100">
-                      {mat.lessonId && chapters ? (
-                        <>
-                          <span>📂</span>
-                          <span>{chapters.find(c => c.lessons.some(l => l.id === mat.lessonId))?.title}</span>
-                          <span>&gt;</span>
-                          <span>📄</span>
-                          <span className="font-semibold text-gray-800">{chapters.flatMap(c => c.lessons).find(l => l.id === mat.lessonId)?.title}</span>
-                        </>
-                      ) : mat.chapterId && chapters ? (
-                        <>
-                          <span>📂</span>
-                          <span>Cấp Chương:</span>
-                          <span className="font-semibold text-gray-800">{chapters.find(c => c.id === mat.chapterId)?.title}</span>
-                        </>
-                      ) : (
-                        <>
-                          <span>🌐</span>
-                          <span className="font-semibold text-gray-800">Cấp Khóa học</span>
-                        </>
-                      )}
-                    </div>
-                    {/* Other info */}
-                    <div className="flex items-center gap-3">
-                      <span>Tạo lúc: {new Date(mat.createdAt).toLocaleDateString('vi-VN')}</span>
-                      {mat.materialType === 'QUIZ' && mat.questionCount !== undefined && (
-                        <span className="font-semibold text-indigo-600">• Quy mô đề: {mat.randomPickCount ? mat.randomPickCount : mat.questionCount} câu hỏi</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {mat.status === 'COMPLETED' && (
-                <div className="flex items-center gap-2 w-full sm:w-auto justify-end border-t sm:border-t-0 pt-2 sm:pt-0">
-                  {/* Mở Workspace Xem / Chỉnh sửa */}
+          
+          {chapters?.map(chapter => (
+            <div key={chapter.id} className="mt-2">
+              <button
+                onClick={() => setSelectedTarget({type: 'CHAPTER', id: chapter.id})}
+                className={`flex w-full items-center gap-2 px-2 py-1.5 text-xs font-semibold rounded-md transition-colors ${selectedTarget.type === 'CHAPTER' && selectedTarget.id === chapter.id ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-100'}`}
+              >
+                <span>📁</span> Chương: {chapter.title}
+              </button>
+              <div className="pl-4 flex flex-col gap-1 mt-1 border-l border-gray-100 ml-2">
+                {chapter.lessons.map(lesson => (
                   <button
-                    onClick={() => setInspectGenerationId(mat.id)}
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-50 border border-indigo-200 px-3.5 py-1.5 text-xs font-bold text-indigo-700 hover:bg-indigo-100 transition-all shadow-sm"
+                    key={lesson.id}
+                    onClick={() => setSelectedTarget({type: 'LESSON', id: lesson.id})}
+                    className={`flex items-center gap-2 px-2 py-1 text-xs rounded-md transition-colors ${selectedTarget.type === 'LESSON' && selectedTarget.id === lesson.id ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-gray-600 hover:bg-gray-100'}`}
                   >
-                    🖥️ Quản Lý Nội Dung Workspace
+                    <span>��</span> {lesson.title}
                   </button>
-
-                  {/* Đánh dấu Official */}
-                  <button
-                    onClick={() => {
-                      const handleToggle = () => {
-                        if (mat.materialType === 'MINDMAP' && mat.materialId) {
-                          toggleMindmapMutation.mutate({ id: mat.materialId, isOfficial: !mat.isOfficial });
-                        } else if (mat.materialType === 'FLASHCARD' && mat.materialId) {
-                          toggleFlashcardMutation.mutate({ id: mat.materialId, isOfficial: !mat.isOfficial });
-                        } else if (mat.materialType === 'QUIZ' && mat.materialId) {
-                          toggleQuizOfficialMutation.mutate({ id: mat.materialId, isOfficial: !mat.isOfficial });
-                        }
-                      };
-
-                      if (mat.isOfficial) {
-                        setConfirmAction({
-                          title: "Chuyển về bản nháp",
-                          message: "Hạ học liệu này về bản nháp cá nhân? Học viên sẽ tạm thời không nhìn thấy nội dung này nữa.",
-                          onConfirm: handleToggle
-                        });
-                      } else {
-                        setConfirmAction({
-                          title: "Phát hành Official",
-                          message: "Xuất bản học liệu này thành nội dung chính thức của khóa học?",
-                          onConfirm: handleToggle
-                        });
-                      }
-                    }}
-                    className={`inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-semibold transition-all border ${mat.isOfficial
-                      ? 'bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100'
-                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                      }`}
-                  >
-                    {mat.isOfficial ? '★ Đang là Official' : '☆ Đánh dấu Official'}
-                  </button>
-
-                  {/* Đính kèm vào bài học (chỉ hiện khi đã Official) */}
-                  {mat.isOfficial && chapters && chapters.length > 0 && (
-                    <button
-                      onClick={() => setDistributeMaterialId(mat.id)}
-                      className={`ml-2 inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-semibold transition-all shadow-sm border ${
-                        mat.lessonId 
-                          ? 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100' 
-                          : mat.chapterId 
-                            ? 'bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100'
-                            : 'bg-orange-50 text-orange-700 border-orange-300 hover:bg-orange-100'
-                      }`}
-                      title={mat.lessonId || mat.chapterId ? 'Nhấn để thay đổi vị trí phân phối' : 'Nhấn để phân phối học liệu này'}
-                    >
-                      {mat.lessonId ? `📎 Đang gắn: ${chapters.flatMap(c => c.lessons).find(l => l.id === mat.lessonId)?.title || 'Bài học'}` 
-                        : mat.chapterId ? `📎 Đang gắn: ${chapters.find(c => c.id === mat.chapterId)?.title || 'Chương'}`
-                        : '⚠️ Chưa phân phối'}
-                    </button>
-                  )}
-
-                  {/* Xóa Bộ Học Liệu */}
-                  <button
-                    onClick={() => {
-                      setConfirmDeleteId(mat.id);
-                    }}
-                    className="inline-flex items-center rounded-lg bg-red-50 border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-100 transition-all shadow-sm ml-1"
-                    title="Xóa Học Liệu"
-                  >
-                    Xóa
-                  </button>
-                </div>
-              )}
-              {mat.status !== 'COMPLETED' && (
-                <div className="mt-4 border border-gray-900 rounded-none w-full bg-gray-100 overflow-hidden relative h-8 flex items-center shadow-inner">
-                  {(mat.status === 'PENDING' || mat.status === 'PROCESSING' || mat.status === 'PENDING_TRANSCRIPT') ? (
-                    <div className="absolute top-0 left-0 h-full w-full bg-[repeating-linear-gradient(45deg,#000,#000_10px,#fbbf24_10px,#fbbf24_20px)] animate-[bg-scroll_1s_linear_infinite]" style={{ backgroundSize: '28px 28px' }} />
-                  ) : mat.status === 'FAILED' ? (
-                    <div className="absolute top-0 left-0 h-full w-full bg-red-600" />
-                  ) : (
-                    <div className="absolute top-0 left-0 h-full w-full bg-gray-500" />
-                  )}
-                  <div className="relative z-10 w-full text-center px-4">
-                    <span className="text-[11px] font-black uppercase tracking-wider text-white mix-blend-difference drop-shadow-md">
-                      {mat.status === 'PENDING_TRANSCRIPT' ? 'ĐANG BÓC BĂNG VÀ DỊCH VIDEO...' : 
-                       (mat.status === 'PENDING' || mat.status === 'PROCESSING') ? 'ĐANG TỔNG HỢP HỌC LIỆU AI...' : 
-                       mat.status === 'FAILED' ? 'THẤT BẠI - HÃY THỬ LẠI' : mat.status}
-                    </span>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        ))}
-
-        {(!filteredMaterials || filteredMaterials.length === 0) && (
-          <div className="p-12 text-center text-sm text-gray-500 card bg-white">
-            <p className="font-semibold text-gray-700">Chưa có học liệu AI Official nào cho mục này.</p>
-            <p className="text-xs text-gray-400 mt-1">Bấm các nút sinh học liệu phía trên để tạo bài Quiz hoặc Mindmap/Flashcard cho học viên.</p>
-          </div>
-        )}
-
-      </div>
-
-      {/* Modal Xác Nhận Xóa */}
-      {renderDeleteModal()}
-
-      {/* Static Files List */}
-      {activeFilterTab === 'STATIC_FILE' && (
-        <div className="flex flex-col gap-3">
-          {(!courseResources || courseResources.length === 0) && (
-            <div className="text-center py-10 bg-gray-50 rounded-xl border border-dashed border-gray-300">
-              <span className="text-4xl block mb-2">📄</span>
-              <p className="text-gray-500 font-medium text-sm">Chưa có tài liệu tĩnh nào trong khóa học.</p>
-            </div>
-          )}
-          {courseResources?.map(res => (
-            <div key={res.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:border-orange-200 transition-all">
-              <div className="flex items-center gap-3">
-                <span className="inline-flex items-center rounded-md px-2.5 py-1 text-xs font-bold ring-1 ring-inset bg-orange-50 text-orange-700 ring-orange-600/20">
-                  STATIC_FILE
-                </span>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-gray-900">{res.title}</span>
-                  </div>
-                  <div className="text-xs text-gray-500 mt-0.5 flex items-center gap-3">
-                    <span>Tạo lúc: {new Date(res.createdAt).toLocaleDateString('vi-VN')}</span>
-                    {(res.chapterId || res.lessonId) ? (
-                      <span className="text-emerald-600 font-bold">
-                        Đã đính kèm (Chương: {res.chapterId || 'Không'}, Bài: {res.lessonId || 'Không'})
-                      </span>
-                    ) : (
-                      <span className="text-gray-400">Chung toàn khóa</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <a
-                  href={res.fileUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-50 border border-indigo-200 px-3.5 py-1.5 text-xs font-bold text-indigo-700 hover:bg-indigo-100 transition-all shadow-sm"
-                >
-                  👁 Xem File
-                </a>
-                <button
-                  onClick={() => courseResourcesApi.deleteResource(res.id).then(() => { toast.success('Đã xóa'); queryClient.invalidateQueries({ queryKey: ['course-resources', courseId] })})}
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-red-50 border border-red-200 px-3.5 py-1.5 text-xs font-bold text-red-700 hover:bg-red-100 transition-all shadow-sm"
-                >
-                  Xóa
-                </button>
+                ))}
               </div>
             </div>
           ))}
         </div>
-      )}
+      </div>
 
-      {/* Modal Phân Phối Học Liệu Tree-View */}
-      {distributeMaterialId && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in">
-          <div className="bg-white rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden border border-gray-100">
-            <div className="bg-blue-50 p-5 border-b border-blue-100 flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-bold text-blue-950 flex items-center gap-2">
-                  <span>📎</span> Phân phối Học liệu
-                </h3>
-                <p className="text-xs text-blue-700 mt-1">Chọn bài học mà bạn muốn đính kèm tài nguyên này.</p>
-              </div>
-              <button onClick={() => setDistributeMaterialId(null)} className="text-gray-400 hover:text-gray-600 transition-colors">✕</button>
-            </div>
-            <div className="p-5 max-h-[60vh] overflow-y-auto">
-              {(() => {
-                const matToDistribute = materials?.find(m => m.id === distributeMaterialId);
-                const currentLessonId = matToDistribute?.lessonId || null;
-                
-                return (
-                  <div className="flex flex-col gap-3">
-                    <label className="flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all hover:bg-gray-50 bg-white border-gray-200">
-                      <input 
-                        type="radio" 
-                        name="distribute_lesson" 
-                        checked={currentLessonId === null}
-                        onChange={() => {
-                          if (currentLessonId === null) return;
-                          
-                          setConfirmAction({
-                            title: "Hủy phân phối học liệu",
-                            message: "Học liệu sẽ chuyển về trạng thái Chưa phân phối, học viên sẽ không còn nhìn thấy ở bài học này. Bạn có chắc chắn?",
-                            onConfirm: () => attachLessonMutation.mutate({ id: distributeMaterialId, lessonId: null })
-                          });
-                        }}
-                        className="w-4 h-4 text-blue-600 focus:ring-blue-500"
-                      />
-                      <span className="text-sm font-semibold text-gray-800">[Cấp Khóa học] Không đính kèm cụ thể</span>
-                    </label>
-                    
-                    {chapters?.map((chapter, cIdx) => (
-                      <div key={chapter.id} className="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm">
-                        <div className="bg-gray-50 px-4 py-2.5 border-b border-gray-200 font-bold text-sm text-gray-800">
-                          Chương {cIdx + 1}: {chapter.title}
-                        </div>
-                        <div className="flex flex-col">
-                          {chapter.lessons.map((lesson, lIdx) => (
-                            <label key={lesson.id} className="flex items-center gap-3 p-3 border-b last:border-0 border-gray-100 cursor-pointer transition-colors hover:bg-blue-50/50">
-                              <input 
-                                type="radio" 
-                                name="distribute_lesson" 
-                                checked={currentLessonId === lesson.id}
-                                onChange={() => {
-                                  if (currentLessonId === lesson.id) return;
-                                  
-                                  let confirmMsg = "Học liệu này sẽ được đính kèm vào bài học mới.";
-                                  if (currentLessonId) {
-                                    confirmMsg = "Học liệu sẽ được di chuyển sang bài học mới. Học viên ở bài học cũ sẽ không còn nhìn thấy tài nguyên này. Bạn có chắc chắn?";
-                                  }
-                                  
-                                  setConfirmAction({
-                                    title: "Đính kèm học liệu",
-                                    message: confirmMsg,
-                                    onConfirm: () => attachLessonMutation.mutate({ id: distributeMaterialId, lessonId: lesson.id })
-                                  });
-                                }}
-                                className="w-4 h-4 text-blue-600 focus:ring-blue-500 ml-2"
-                              />
-                              <div className="flex flex-col">
-                                <span className="text-sm font-medium text-gray-800">Bài {lIdx + 1}: {lesson.title}</span>
-                                {currentLessonId === lesson.id && (
-                                  <span className="text-[10px] text-blue-600 font-bold uppercase mt-0.5">Đang đính kèm</span>
-                                )}
-                              </div>
-                            </label>
-                          ))}
-                          {chapter.lessons.length === 0 && (
-                            <div className="p-3 text-xs text-gray-400 italic text-center">Chưa có bài học nào trong chương này</div>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                );
-              })()}
-            </div>
-            <div className="p-4 border-t border-gray-100 bg-gray-50 flex justify-end">
-               <button
-                onClick={() => setDistributeMaterialId(null)}
-                className="px-5 py-2 text-sm font-bold text-gray-700 bg-white border border-gray-200 hover:bg-gray-100 rounded-xl transition-colors shadow-sm"
-              >
-                Đóng
-              </button>
-            </div>
+      {/* RIGHT PANE: Master Vault */}
+      <div className="w-2/3 bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col shadow-sm">
+        <div className="p-3 border-b border-gray-100 flex items-center justify-between bg-gray-50">
+          <div className="flex items-center gap-2 text-xs font-medium text-gray-600">
+            {breadcrumbs.map((b, idx) => (
+              <React.Fragment key={idx}>
+                {idx > 0 && <span>/</span>}
+                <button className="hover:text-blue-600 hover:underline">{b.name}</button>
+              </React.Fragment>
+            ))}
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              title="Tạo Thư Mục"
+              className="p-1.5 rounded-md hover:bg-gray-200 text-gray-600 transition-colors"
+            >
+              <Folder className="w-4 h-4" />
+            </button>
+            <button
+              title="Tạo AI"
+              onClick={() => setGenMaterialType('QUIZ')}
+              className="p-1.5 rounded-md hover:bg-gray-200 text-blue-600 transition-colors bg-blue-50"
+            >
+              <span className="text-xs font-bold px-1">AI</span>
+            </button>
+            <button
+              title="Tạo Thủ công"
+              onClick={() => setManualMaterialType('QUIZ')}
+              className="p-1.5 rounded-md hover:bg-gray-200 text-emerald-600 transition-colors bg-emerald-50"
+            >
+              <Plus className="w-4 h-4" />
+            </button>
           </div>
         </div>
-      )}
+
+        <div className="flex-1 overflow-y-auto p-4 bg-gray-50/50">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+            {folders.map((f: any) => (
+              <div key={f.id} className="border border-gray-200 bg-white p-3 rounded-lg flex items-center gap-3 cursor-pointer hover:bg-gray-50 hover:border-blue-200 transition-colors group">
+                <Folder className="w-8 h-8 text-blue-400 group-hover:text-blue-500 transition-colors" />
+                <span className="text-sm font-semibold text-gray-700 select-none truncate">{f.name}</span>
+              </div>
+            ))}
+
+            {displayedMaterials.map(mat => (
+              <div 
+                key={mat.id} 
+                onDoubleClick={() => {
+                  if (selectedTarget.type !== 'WORKSPACE') {
+                    toast.error("Đây là bản phân phối. Vui lòng mở file gốc tại Kho Lưu Trữ Chung (Pane Phải) để chỉnh sửa nội dung.");
+                  } else {
+                    setInspectGenerationId(mat.id);
+                  }
+                }}
+                className={`relative border border-gray-200 bg-white rounded-lg flex flex-col overflow-hidden group hover:shadow-md transition-all cursor-pointer ${selectedTarget.type !== 'WORKSPACE' ? 'hover:border-purple-300' : 'hover:border-blue-300'}`}
+              >
+                <div className="p-3 pb-2 flex-1">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className={`p-1.5 rounded-md ${mat.materialType === 'MINDMAP' ? 'bg-blue-50 text-blue-600' : mat.materialType === 'FLASHCARD' ? 'bg-purple-50 text-purple-600' : 'bg-emerald-50 text-emerald-600'}`}>
+                        {mat.materialType === 'MINDMAP' ? <Layers className="w-4 h-4" /> : mat.materialType === 'FLASHCARD' ? <BookOpen className="w-4 h-4" /> : <FileText className="w-4 h-4" />}
+                      </div>
+                      <span className="text-xs font-bold text-gray-500">{mat.materialType}</span>
+                    </div>
+                    {selectedTarget.type === 'WORKSPACE' && (
+                      <button className="text-gray-400 hover:text-gray-700 opacity-0 group-hover:opacity-100 transition-opacity p-1">
+                        <MoreVertical className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                  <h4 className="text-sm font-bold text-gray-800 line-clamp-2 leading-tight">
+                    {mat.title || 'Học liệu không tên'}
+                  </h4>
+                  <div className="mt-2 flex items-center gap-2 text-[10px] font-semibold text-gray-400 uppercase tracking-wide">
+                    <span>{new Date(mat.createdAt).toLocaleDateString('vi-VN')}</span>
+                    {mat.isOfficial && <span className="text-emerald-600 bg-emerald-50 px-1.5 rounded-sm">Official</span>}
+                  </div>
+                </div>
+                
+                {/* Status Bar */}
+                {mat.status !== 'COMPLETED' && (
+                  <div className="h-4 w-full bg-gray-100 overflow-hidden relative">
+                     {(mat.status === 'PENDING' || mat.status === 'PROCESSING' || mat.status === 'PENDING_TRANSCRIPT') ? (
+                      <div className="absolute top-0 left-0 h-full w-full bg-[repeating-linear-gradient(45deg,#000,#000_6px,#fbbf24_6px,#fbbf24_12px)] animate-[bg-scroll_1s_linear_infinite]" style={{ backgroundSize: '16px 16px' }} />
+                    ) : mat.status === 'FAILED' ? (
+                      <div className="absolute top-0 left-0 h-full w-full bg-red-500" />
+                    ) : (
+                      <div className="absolute top-0 left-0 h-full w-full bg-gray-400" />
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+            
+            {displayedMaterials.length === 0 && folders.length === 0 && (
+              <div className="col-span-full py-12 flex flex-col items-center justify-center text-gray-400">
+                <Folder className="w-12 h-12 text-gray-200 mb-2" />
+                <p className="text-xs font-medium">Thư mục trống</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
       
-      {/* Modal Xác nhận Action chung (Portal) */}
+      {/* Modals & Portals */}
+      {renderDeleteModal()}
       {confirmAction && typeof window !== 'undefined' && createPortal(
         <div className="fixed inset-0 z-[100000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl animate-in zoom-in-95 duration-200 border border-gray-200">
-            <h3 className="text-lg font-bold text-gray-900 mb-2">{confirmAction.title}</h3>
-            <p className="text-sm text-gray-600 mb-6">
-              {confirmAction.message}
-            </p>
-            <div className="flex gap-3 justify-end">
-              <button
-                onClick={() => setConfirmAction(null)}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
-              >
-                Hủy bỏ
-              </button>
-              <button
-                onClick={() => {
-                  confirmAction.onConfirm();
-                  setConfirmAction(null);
-                }}
-                className="px-4 py-2 text-sm font-bold text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-colors shadow-sm hover:shadow"
-              >
-                Xác nhận
-              </button>
+          <div className="bg-white rounded-xl max-w-sm w-full p-5 shadow-2xl animate-in zoom-in-95 duration-200 border border-gray-200">
+            <h3 className="text-base font-bold text-gray-900 mb-2">{confirmAction.title}</h3>
+            <p className="text-sm text-gray-600 mb-5 leading-relaxed">{confirmAction.message}</p>
+            <div className="flex gap-2 justify-end">
+              <button onClick={() => setConfirmAction(null)} className="px-3 py-1.5 text-xs font-bold text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">Hủy</button>
+              <button onClick={() => { confirmAction.onConfirm(); setConfirmAction(null); }} className="px-3 py-1.5 text-xs font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors">Xác nhận</button>
             </div>
           </div>
         </div>,
