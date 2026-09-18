@@ -3,7 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { materialsApi, InstructorMaterial, MaterialDetailRes } from '@/lib/api/materials';
 import { courseResourcesApi } from '@/lib/api/courseResourcesApi';
-import { useCourseChapters } from "@/hooks/useMaterials";
+
 import { useMyCourseDetail } from "@/hooks/useCourses";
 import { UploadStaticMaterialModal } from './UploadStaticMaterialModal';
 import { toast } from 'sonner';
@@ -2059,7 +2059,7 @@ function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess 
   });
 
   const { data: courseDetail } = useMyCourseDetail(courseId);
-  const structure = courseDetail?.chapters;
+
 
   useEffect(() => {
     if (languages && languages.length > 0 && !language) {
