@@ -61,6 +61,15 @@ const config: Config = {
       maxWidth: {
         shell: '1280px',
       },
+      keyframes: {
+        'bg-scroll': {
+          '0%': { backgroundPosition: '0 0' },
+          '100%': { backgroundPosition: '28px 0' },
+        },
+      },
+      animation: {
+        'bg-scroll': 'bg-scroll 1s linear infinite',
+      },
     },
   },
   plugins: [],

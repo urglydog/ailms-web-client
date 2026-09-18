@@ -424,9 +424,22 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                 </div>
               )}
               {mat.status !== 'COMPLETED' && (
-                <span className="text-xs text-amber-600 bg-amber-50 px-2.5 py-1 rounded-md font-medium">
-                  ⏳ Trạng thái: {mat.status}
-                </span>
+                <div className="mt-4 border border-gray-900 rounded-none w-full bg-gray-100 overflow-hidden relative h-8 flex items-center shadow-inner">
+                  {(mat.status === 'PENDING' || mat.status === 'PROCESSING' || mat.status === 'PENDING_TRANSCRIPT') ? (
+                    <div className="absolute top-0 left-0 h-full w-full bg-[repeating-linear-gradient(45deg,#000,#000_10px,#fbbf24_10px,#fbbf24_20px)] animate-[bg-scroll_1s_linear_infinite]" style={{ backgroundSize: '28px 28px' }} />
+                  ) : mat.status === 'FAILED' ? (
+                    <div className="absolute top-0 left-0 h-full w-full bg-red-600" />
+                  ) : (
+                    <div className="absolute top-0 left-0 h-full w-full bg-gray-500" />
+                  )}
+                  <div className="relative z-10 w-full text-center px-4">
+                    <span className="text-[11px] font-black uppercase tracking-wider text-white mix-blend-difference drop-shadow-md">
+                      {mat.status === 'PENDING_TRANSCRIPT' ? 'ĐANG BÓC BĂNG VÀ DỊCH VIDEO...' : 
+                       (mat.status === 'PENDING' || mat.status === 'PROCESSING') ? 'ĐANG TỔNG HỢP HỌC LIỆU AI...' : 
+                       mat.status === 'FAILED' ? 'THẤT BẠI - HÃY THỬ LẠI' : mat.status}
+                    </span>
+                  </div>
+                </div>
               )}
             </div>
           </div>
