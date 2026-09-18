@@ -5,7 +5,7 @@ import { materialsApi } from '@/lib/api/materials';
 import { toast } from 'sonner';
 import { createPortal } from 'react-dom';
 
-export function MaterialFolderTree({ courseId, folders, materials, onInspect, setConfirmAction, DraggableCard }: { courseId: number, folders: {id: number, name: string, parentId?: number}[], materials: {id: number, title?: string, folderId?: number}[], onInspect: (id: number) => void, setConfirmAction: (action: any) => void, DraggableCard: React.ElementType }) {
+export function MaterialFolderTree({ courseId, folders, materials, onInspect, setConfirmAction, DraggableCard }: { courseId: number, folders: {id: number, name: string, parentId?: number}[], materials: {id: number, title?: string, folderId?: number}[], onInspect: (id: number) => void, setConfirmAction: (action: {title: string, message: string, onConfirm: () => void} | null) => void, DraggableCard: React.ElementType }) {
   const queryClient = useQueryClient();
   const [contextMenu, setContextMenu] = useState<{ x: number, y: number, type: 'ROOT' | 'FOLDER' | 'MATERIAL', targetId?: number } | null>(null);
   const [expandedFolders, setExpandedFolders] = useState<Record<number, boolean>>({});

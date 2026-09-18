@@ -121,10 +121,6 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
     onError: (err: Error) => toast.error(err.message || 'Lỗi khi cập nhật phiên bản'),
   });
 
-      setConfirmAction(null);
-    },
-    onError: (err: Error) => toast.error(err.message || 'Lỗi khi gỡ phân phối'),
-  });
 
   const attachLessonMutation = useMutation({
     mutationFn: (variables: { id: number; target: { lessonId?: number | null; chapterId?: number | null } }) =>
