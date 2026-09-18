@@ -2,9 +2,9 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { materialsApi, InstructorMaterial, MaterialDetailRes } from '@/lib/api/materials';
-import { courseResourcesApi } from '@/lib/api/courseResourcesApi';
+
 import { useMyCourseDetail } from "@/hooks/useCourses";
-import { UploadStaticMaterialModal } from './UploadStaticMaterialModal';
+
 import { toast } from 'sonner';
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
@@ -13,7 +13,7 @@ import { MindmapEditor } from '@/components/materials/MindmapEditor';
 import { MermaidViewer } from '@/components/materials/MermaidViewer';
 import { MaterialLanguagePicker } from '@/components/materials/MaterialLanguagePicker';
 
-import { Folder, FileText, MoreVertical, Plus, Trash2, Edit2, Play, BookOpen, Layers } from 'lucide-react';
+import { Folder, FileText, MoreVertical, Plus, Trash2, BookOpen, Layers } from 'lucide-react';
 
 interface CourseMaterialsManagerProps {
   courseId: number;
@@ -34,12 +34,12 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
   };
 
   const [selectedTarget, setSelectedTarget] = useState<{type: 'WORKSPACE'|'CHAPTER'|'LESSON', id?: number}>({type: 'WORKSPACE'});
-  const [currentFolderId, setCurrentFolderId] = useState<number | null>(null);
-  const [breadcrumbs, setBreadcrumbs] = useState<{id: number | null, name: string}[]>([{id: null, name: 'Workspace'}]);
+  
+  const [breadcrumbs] = useState<{id: number | null, name: string}[]>([{id: null, name: 'Workspace'}]);
 
   const [genMaterialType, setGenMaterialType] = useState<'QUIZ' | 'FLASHCARD' | 'MINDMAP' | null>(null);
   const [manualMaterialType, setManualMaterialType] = useState<'QUIZ' | 'FLASHCARD' | 'MINDMAP' | null>(null);
-  const [showUploadStatic, setShowUploadStatic] = useState(false);
+  
   const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
   const [confirmAction, setConfirmAction] = useState<{title: string, message: string, onConfirm: () => void} | null>(null);
 
@@ -53,33 +53,8 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
   const chapters = courseDetail?.chapters;
 
   // Placeholder for folder data
-  const folders: any[] = [];
+  const folders: {id: number, name: string}[] = [];
 
-  const toggleMindmapMutation = useMutation({
-    mutationFn: (variables: { id: number; isOfficial: boolean }) =>
-      materialsApi.setMindmapOfficial(variables.id, variables.isOfficial),
-    onSuccess: () => {
-      toast.success('Đã cập nhật trạng thái Mindmap Official');
-      queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] });
-    },
-  });
-
-  const toggleFlashcardMutation = useMutation({
-    mutationFn: (variables: { id: number; isOfficial: boolean }) =>
-      materialsApi.setFlashcardOfficial(variables.id, variables.isOfficial),
-    onSuccess: () => {
-      toast.success('Đã cập nhật trạng thái Flashcard Official');
-      queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] });
-    },
-  });
-
-  const toggleQuizOfficialMutation = useMutation({
-    mutationFn: (variables: { id: number; isOfficial: boolean }) => materialsApi.setQuizOfficial(variables.id, variables.isOfficial),
-    onSuccess: (data, variables) => {
-      toast.success(variables.isOfficial ? 'Đã phát hành bài Quiz thành Official' : 'Đã chuyển bài Quiz về bản nháp');
-      queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] });
-    },
-  });
 
   const deleteMaterialMutation = useMutation({
     mutationFn: (id: number) => materialsApi.deleteMaterial(id),
@@ -94,7 +69,6 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
 
   const renderDeleteModal = () => {
     if (!confirmDeleteId) return null;
-    const mat = materials?.find(m => m.id === confirmDeleteId);
     
     return (
       <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in">
@@ -242,7 +216,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
 
         <div className="flex-1 overflow-y-auto p-4 bg-gray-50/50">
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
-            {folders.map((f: any) => (
+            {folders.map((f) => (
               <div key={f.id} className="border border-gray-200 bg-white p-3 rounded-lg flex items-center gap-3 cursor-pointer hover:bg-gray-50 hover:border-blue-200 transition-colors group">
                 <Folder className="w-8 h-8 text-blue-400 group-hover:text-blue-500 transition-colors" />
                 <span className="text-sm font-semibold text-gray-700 select-none truncate">{f.name}</span>
