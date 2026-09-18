@@ -12,8 +12,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { MindmapEditor } from '@/components/materials/MindmapEditor';
 import { MermaidViewer } from '@/components/materials/MermaidViewer';
 import { MaterialLanguagePicker } from '@/components/materials/MaterialLanguagePicker';
+import { MaterialFolderTree } from './MaterialFolderTree';
 
-import { DndContext, useDraggable, useDroppable, DragOverlay, DragStartEvent, DragEndEvent } from '@dnd-kit/core';
+import { DndContext, useDraggable, useDroppable, DragOverlay, DragStartEvent, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { GripVertical, Link as LinkIcon, Trash2, Folder, FileText, MoreVertical, Plus, Layers } from 'lucide-react';
 
 
@@ -179,18 +180,41 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
         }
       });
     } else {
-      // Phân phối mới (Epic 3)
+// Phân phối mới (Epic 3)
       attachLessonMutation.mutate({
         id: materialId,
         target: {
           lessonId: isChapter ? undefined : parsedTargetId,
           chapterId: isChapter ? parsedTargetId : undefined
         }
+      }, {
+        onSuccess: () => {
+           setConfirmAction({
+             title: "Phát hành Học liệu",
+             message: "Học liệu đã được đưa vào bài học. Bạn có muốn Đặt làm Official (Phát hành) để học sinh thấy ngay không?",
+             onConfirm: () => {
+                if (material.materialType === 'QUIZ') materialsApi.setQuizOfficial(materialId, true).then(() => queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] }));
+                if (material.materialType === 'MINDMAP') materialsApi.setMindmapOfficial(materialId, true).then(() => queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] }));
+                if (material.materialType === 'FLASHCARD') materialsApi.setFlashcardOfficial(materialId, true).then(() => queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] }));
+             }
+           });
+        }
       });
     }
   };
 
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+        tolerance: 5,
+      },
+    })
+  );
+
   const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
+
   const [confirmAction, setConfirmAction] = useState<{title: string, message: string, onConfirm: () => void} | null>(null);
 
   const { data: materials, isLoading } = useQuery({
@@ -202,8 +226,14 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
   const { data: courseDetail } = useMyCourseDetail(courseId);
   const chapters = courseDetail?.chapters;
 
-  // Placeholder for folder data
-  const folders: {id: number, name: string}[] = [];
+
+  const { data: rawFolders } = useQuery({
+    queryKey: ['instructor-folders', courseId],
+    queryFn: () => materialsApi.getFolders(courseId),
+    enabled: !!courseId,
+  });
+  const folders = rawFolders || [];
+
 
 
   const deleteMaterialMutation = useMutation({
@@ -284,7 +314,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
   const activeDragMaterial = activeDragId ? materials?.find(m => m.id === activeDragId) : null;
 
   return (
-    <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+    <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
       <div className="flex h-[calc(100vh-100px)] gap-4 bg-gray-50 p-4 font-sans text-gray-800">
         
         {/* LEFT PANE: Curriculum Tree */}
@@ -314,7 +344,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                               setConfirmAction({
                                 title: "Gỡ phân phối",
                                 message: "Bạn có chắc chắn muốn gỡ học liệu này khỏi chương?",
-                                onConfirm: () => unassignMutation.mutate({ id: mat.id, target: { chapterId: null } })
+                                onConfirm: () => { if(assignment?.id) materialsApi.deleteAssignment(assignment.id).then(() => queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] })) }
                               });
                             }
                           }} className="opacity-0 group-hover:opacity-100 p-0.5 text-gray-400 hover:text-red-500 transition-opacity">
@@ -345,7 +375,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                                       setConfirmAction({
                                         title: "Gỡ phân phối",
                                          message: "Bạn có chắc chắn muốn gỡ học liệu này khỏi bài học?",
-                                        onConfirm: () => unassignMutation.mutate({ id: mat.id, target: { lessonId: null } })
+                                        onConfirm: () => { if(assignment?.id) materialsApi.deleteAssignment(assignment.id).then(() => queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] })) }
                                       });
                                     }
                                   }} className="opacity-0 group-hover:opacity-100 p-0.5 text-gray-400 hover:text-red-500 transition-opacity">
@@ -393,31 +423,14 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
             </div>
           </div>
           
-          <div className="flex-1 overflow-y-auto p-4 bg-gray-50/50">
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
-              {folders.map((f) => (
-                <div key={f.id} className="border border-gray-200 bg-white p-3 rounded-lg flex items-center gap-3 cursor-pointer hover:bg-gray-50 hover:border-blue-200 transition-colors group">
-                  <Folder className="w-8 h-8 text-blue-400 group-hover:text-blue-500 transition-colors" />
-                  <span className="text-sm font-semibold text-gray-700 select-none truncate">{f.name}</span>
-                </div>
-              ))}
-              
-              {displayedMaterials.map(mat => (
-                <DraggableMaterialCard 
-                  key={mat.id} 
-                  mat={mat} 
-                  onClick={() => setInspectGenerationId(mat.id)} 
-                />
-              ))}
-            </div>
-            {displayedMaterials.length === 0 && folders.length === 0 && !isLoading && (
-              <div className="flex flex-col items-center justify-center h-full text-gray-400 py-10">
-                <Folder className="w-16 h-16 mb-2 opacity-50" />
-                <p className="text-sm font-medium">Thư mục trống</p>
-                <p className="text-xs mt-1">Sử dụng nút Tạo mới ở góc trên.</p>
-              </div>
-            )}
-          </div>
+          <MaterialFolderTree 
+            courseId={courseId} 
+            folders={folders} 
+            materials={displayedMaterials} 
+            onInspect={setInspectGenerationId} 
+            setConfirmAction={setConfirmAction} 
+            DraggableCard={DraggableMaterialCard} 
+          />
         </div>
       </div>
 

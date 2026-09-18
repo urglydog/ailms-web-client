@@ -154,6 +154,24 @@ export const materialsApi = {
     api.post(`/api/v1/instructor/materials/${id}/versioning-overwrite`, target, { token: authToken() }),
 
   // Đính kèm vào bài học cụ thể hoặc chương
+  getFolders: (courseId: number) =>
+    api.get<any[]>(`/api/v1/instructor/material-folders/course/${courseId}`, { token: authToken() }),
+
+  createFolder: (courseId: number, name: string, parentId?: number) =>
+    api.post(`/api/v1/instructor/material-folders`, { courseId, name, parentId }, { token: authToken() }),
+
+  deleteFolder: (id: number) =>
+    api.delete(`/api/v1/instructor/material-folders/${id}`, { token: authToken() }),
+
+  renameFolder: (id: number, name: string, courseId: number, parentId?: number) =>
+    api.put(`/api/v1/instructor/material-folders/${id}`, { name, courseId, parentId }, { token: authToken() }),
+
+  deleteAssignment: (assignmentId: number) =>
+    api.delete(`/api/v1/instructor/materials/assignments/${assignmentId}`, { token: authToken() }),
+
+  moveToFolder: (materialId: number, folderId: number | null) =>
+    api.put(`/api/v1/instructor/materials/${materialId}/move-to-folder`, { folderId }, { token: authToken() }),
+
   attachMaterial: (id: number, target: { lessonId?: number | null; chapterId?: number | null }) =>
     api.put(`/api/v1/instructor/materials/${id}/attach-lesson`, target, { token: authToken() }),
     
