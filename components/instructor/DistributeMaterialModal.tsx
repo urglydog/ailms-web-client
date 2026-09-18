@@ -20,10 +20,10 @@ export function DistributeMaterialModal({ courseId, material, chapters, onClose 
   useEffect(() => {
     if (material.assignments?.some(a => a.chapterId)) {
       setLevel('CHAPTER');
-      setTargetId(material.assignments?.find(a => a.chapterId)?.chapterId || '');
+      setTargetId(material.assignments?.find(a => a.chapterId)?.chapterId || null);
     } else if (material.assignments?.some(a => a.lessonId)) {
       setLevel('LESSON');
-      setTargetId(material.assignments?.find(a => a.lessonId)?.lessonId || '');
+      setTargetId(material.assignments?.find(a => a.lessonId)?.lessonId || null);
     } else {
       setLevel('COURSE');
       setTargetId(null);
