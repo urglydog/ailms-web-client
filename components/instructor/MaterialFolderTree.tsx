@@ -9,6 +9,7 @@ export function MaterialFolderTree({ courseId, folders, materials, onInspect, se
   const queryClient = useQueryClient();
   const [contextMenu, setContextMenu] = useState<{ x: number, y: number, type: 'ROOT' | 'FOLDER' | 'MATERIAL', targetId?: number } | null>(null);
   const [expandedFolders, setExpandedFolders] = useState<Record<number, boolean>>({});
+  const [promptAction, setPromptAction] = useState<{ title: string, placeholder: string, onSubmit: (val: string) => void } | null>(null);
 
   // Mutations
   const createFolderMutation = useMutation({
@@ -31,9 +32,15 @@ export function MaterialFolderTree({ courseId, folders, materials, onInspect, se
     setContextMenu({ x: e.clientX, y: e.clientY, type, targetId });
   };
 
+
   const handleCreateFolder = (parentId?: number) => {
-    const name = prompt("Nhập tên thư mục:");
-    if (name) createFolderMutation.mutate({ name, parentId });
+    setPromptAction({
+      title: "Tạo thư mục mới",
+      placeholder: "Nhập tên thư mục...",
+      onSubmit: (name) => {
+        if (name) createFolderMutation.mutate({ name, parentId });
+      }
+    });
     setContextMenu(null);
   };
 
@@ -55,14 +62,20 @@ export function MaterialFolderTree({ courseId, folders, materials, onInspect, se
     setContextMenu(null);
   };
 
+
   const handleMoveMaterial = (matId: number) => {
-    const folderName = prompt("Nhập ID thư mục để chuyển đến (Để trống = Đẩy ra Workspace gốc):");
-    const folderId = folderName ? parseInt(folderName) : null;
-    if (folderName && isNaN(folderId as number)) {
-      toast.error("ID thư mục không hợp lệ");
-      return;
-    }
-    moveToFolderMutation.mutate({ id: matId, folderId });
+    setPromptAction({
+      title: "Di chuyển học liệu",
+      placeholder: "Nhập ID thư mục (để trống = Workspace gốc)",
+      onSubmit: (folderName) => {
+        const folderId = folderName ? parseInt(folderName) : null;
+        if (folderName && isNaN(folderId as number)) {
+          toast.error("ID thư mục không hợp lệ");
+          return;
+        }
+        moveToFolderMutation.mutate({ id: matId, folderId });
+      }
+    });
     setContextMenu(null);
   };
 
@@ -186,6 +199,28 @@ export function MaterialFolderTree({ courseId, folders, materials, onInspect, se
               </button>
             </>
           )}
+        </div>,
+        document.body
+      )}
+
+      {/* Prompt Modal */}
+      {promptAction && createPortal(
+        <div className="fixed inset-0 z-[100000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-white rounded-xl max-w-sm w-full p-5 shadow-2xl border border-gray-200">
+            <h3 className="text-base font-bold text-gray-900 mb-3">{promptAction.title}</h3>
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              const val = new FormData(e.currentTarget).get('promptValue') as string;
+              promptAction.onSubmit(val);
+              setPromptAction(null);
+            }}>
+              <input name="promptValue" autoFocus className="w-full px-3 py-2 border rounded-lg mb-4 outline-none focus:border-blue-500" placeholder={promptAction.placeholder} />
+              <div className="flex gap-2 justify-end">
+                <button type="button" onClick={() => setPromptAction(null)} className="px-3 py-1.5 text-xs font-bold text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200">Hủy</button>
+                <button type="submit" className="px-3 py-1.5 text-xs font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700">Xác nhận</button>
+              </div>
+            </form>
+          </div>
         </div>,
         document.body
       )}

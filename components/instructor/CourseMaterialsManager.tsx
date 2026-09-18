@@ -34,10 +34,14 @@ function DraggableMaterialCard({ mat, onClick }: { mat: InstructorMaterial, onCl
   return (
     <div 
       ref={setNodeRef}
-      onDoubleClick={onClick}
+      onDoubleClick={(e) => {
+        e.stopPropagation();
+        onClick();
+      }}
+      {...attributes} {...listeners}
       className={`relative border bg-white rounded-lg flex flex-col overflow-hidden group hover:shadow-md transition-all cursor-pointer ${isDragging ? 'opacity-50 border-blue-400 border-dashed' : 'border-gray-200 hover:border-blue-300'}`}
     >
-      <div className="absolute top-2 left-2 cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-700 p-1 bg-white/80 rounded-md z-10" {...attributes} {...listeners}>
+      <div className="absolute top-2 left-2 text-gray-400 p-1 bg-white/80 rounded-md z-10 opacity-0 group-hover:opacity-100 transition-opacity">
         <GripVertical className="w-4 h-4" />
       </div>
       <div className="p-3 pl-8 pb-2 flex-1">
