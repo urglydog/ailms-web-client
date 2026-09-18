@@ -39,7 +39,7 @@ function DraggableMaterialCard({ mat, onClick }: { mat: InstructorMaterial, onCl
         onClick();
       }}
       {...attributes} {...listeners}
-      className={`relative border bg-white rounded-lg flex flex-col overflow-hidden group hover:shadow-md transition-all cursor-pointer ${isDragging ? 'opacity-50 border-blue-400 border-dashed' : 'border-gray-200 hover:border-blue-300'}`}
+      className={`relative border bg-white rounded-lg flex flex-col overflow-hidden group hover:shadow-md transition-all cursor-grab active:cursor-grabbing ${isDragging ? 'opacity-50 border-blue-400 border-dashed' : 'border-gray-200 hover:border-blue-300'}`}
     >
       <div className="absolute top-2 left-2 text-gray-400 p-1 bg-white/80 rounded-md z-10 opacity-0 group-hover:opacity-100 transition-opacity">
         <GripVertical className="w-4 h-4" />
