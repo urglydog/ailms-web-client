@@ -128,7 +128,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
     return <GenerateManualOfficialView courseId={courseId} initialType={manualMaterialType} onClose={() => setManualMaterialType(null)} onSuccess={(id) => { setManualMaterialType(null); queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] }); setInspectGenerationId(id); }} />;
   }
 
-  let displayedMaterials = materials || [];
+  const displayedMaterials = materials || [];
 
   return (
     <div className="flex h-[calc(100vh-100px)] gap-4 bg-gray-50 p-4 font-sans text-gray-800">
