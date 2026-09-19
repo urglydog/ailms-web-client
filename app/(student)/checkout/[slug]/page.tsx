@@ -22,6 +22,8 @@ function CheckoutPageContent() {
 
   const [billingName, setBillingName] = useState('');
   const [billingPhone, setBillingPhone] = useState('');
+  // "Đăng ký (Quyền riêng tư)" kiểu Udemy (19/09/2026) — chỉ hiện khi `course.requiresPassword`.
+  const [courseAccessPassword, setCourseAccessPassword] = useState('');
 
   // Mã giảm giá (15/09/2026, mở rộng) — UC57. `finalPrice`/`discountPercent` mặc định đến từ
   // coupon autoApply (BR-COUPON-04); nhập mã ở đây có thể thay bằng mức tốt hơn (BR-COUPON-01).
@@ -83,6 +85,7 @@ function CheckoutPageContent() {
         billingName,
         billingPhone,
         couponCode: appliedCode ?? undefined,
+        courseAccessPassword: course.requiresPassword ? courseAccessPassword : undefined,
       });
       window.location.href = res.paymentUrl;
     } catch (err: unknown) {
@@ -171,6 +174,22 @@ function CheckoutPageContent() {
               </div>
               <p className="mt-3 text-xs text-ink-muted">* Thông tin trên chỉ dùng để liên hệ hỗ trợ khi cần thiết, không ảnh hưởng đến tài khoản thanh toán của bạn.</p>
             </div>
+
+            {course.requiresPassword && (
+              <div className="rounded-2xl border border-line bg-white p-6 shadow-sm">
+                <h2 className="mb-1 text-lg font-bold text-ink">Mật khẩu đăng ký</h2>
+                <p className="mb-3 text-xs text-ink-muted">
+                  Khóa học này là khóa riêng tư — bạn cần nhập đúng mật khẩu do Giảng viên cung cấp mới thanh toán được.
+                </p>
+                <input
+                  type="text"
+                  placeholder="Nhập mật khẩu đăng ký"
+                  className="w-full rounded-xl border border-line px-4 py-2.5 text-sm outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+                  value={courseAccessPassword}
+                  onChange={(e) => setCourseAccessPassword(e.target.value)}
+                />
+              </div>
+            )}
           </div>
 
           {/* Cột phải: Phương thức thanh toán */}

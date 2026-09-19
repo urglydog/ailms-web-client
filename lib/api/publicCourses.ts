@@ -74,6 +74,7 @@ interface RawDetail extends RawSummary {
   sourceLanguage: string | null;
   dubbedLanguages: string[];
   learnerCount: number;
+  requiresPassword: boolean;
 }
 
 /**
@@ -136,6 +137,7 @@ function toDetail(raw: RawDetail): CourseDetail {
     sourceLanguage: raw.sourceLanguage,
     dubbedLanguages: raw.dubbedLanguages,
     learnerCount: raw.learnerCount,
+    requiresPassword: raw.requiresPassword,
   };
 }
 

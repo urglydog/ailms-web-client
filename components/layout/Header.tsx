@@ -1,7 +1,7 @@
 'use client';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState, useRef, type KeyboardEvent } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -34,8 +34,19 @@ function useHoverDropdown() {
   return { open, openNow, closeWithDelay };
 }
 
+/** So khớp mục nav đang active — trùng chính xác HOẶC là trang con của mục đó (VD: đang ở
+ * `/courses/react-co-ban` thì mục "Khóa học" (`/courses`) vẫn phải sáng), cùng quy ước đã dùng
+ * ở sidebar `admin/layout.tsx`/`instructor/layout.tsx`. Không dùng `startsWith` trần cho `/` vì
+ * MỌI đường dẫn đều bắt đầu bằng `/`, sẽ luôn khớp — không áp dụng cho mục Trang chủ (không có
+ * trong nav này, xử lý riêng ở logo).
+ */
+function isNavItemActive(pathname: string, href: string): boolean {
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
 export function Header() {
   const router = useRouter();
+  const pathname = usePathname();
   const { notifications, unreadCount, markAllAsRead } = useNotification();
   // Giỏ hàng (06/09/2026, mở rộng ngoài đặc tả gốc) — badge số lượng THẬT, thay số "2" gắn
   // cứng cũ (icon giỏ hàng vốn để sẵn từ trước nhưng chưa từng nối API/route thật).
@@ -140,20 +151,50 @@ export function Header() {
               </span>
             </Link>
             <nav className="hidden items-center gap-1 md:flex">
-              <Link href="/courses" className="rounded-lg px-2.5 py-2 text-sm font-semibold text-ink hover:bg-surface no-underline">
+              {/* (19/09/2026, sửa lỗi) — trước đây không mục nào đánh dấu đang ở trang nào, học
+                  viên không biết đang xem "Khóa học" hay "Live" chỉ nhìn vào thanh nav. */}
+              <Link
+                href="/courses"
+                className={`rounded-lg px-2.5 py-2 text-sm font-semibold no-underline ${
+                  isNavItemActive(pathname, '/courses')
+                    ? 'bg-accent/10 text-accent'
+                    : 'text-ink hover:bg-surface'
+                }`}
+              >
                 Khóa học
               </Link>
               {isLoggedIn && (
-                <Link href="/my-courses" className="rounded-lg px-2.5 py-2 text-sm font-semibold text-ink hover:bg-surface no-underline">
+                <Link
+                  href="/my-courses"
+                  className={`rounded-lg px-2.5 py-2 text-sm font-semibold no-underline ${
+                    isNavItemActive(pathname, '/my-courses')
+                      ? 'bg-accent/10 text-accent'
+                      : 'text-ink hover:bg-surface'
+                  }`}
+                >
                   Khóa học của tôi
                 </Link>
               )}
               {/* F11.9 — lối vào mới cho trang khám phá buổi live, không gate theo đăng nhập
                   (Guest vẫn xem được buổi Public — BR-LIVE-01). */}
-              <Link href="/live" className="rounded-lg px-2.5 py-2 text-sm font-semibold text-ink hover:bg-surface no-underline">
+              <Link
+                href="/live"
+                className={`rounded-lg px-2.5 py-2 text-sm font-semibold no-underline ${
+                  isNavItemActive(pathname, '/live')
+                    ? 'bg-accent/10 text-accent'
+                    : 'text-ink hover:bg-surface'
+                }`}
+              >
                 Live
               </Link>
-              <Link href="/about" className="rounded-lg px-2.5 py-2 text-sm font-medium text-ink-muted hover:bg-surface no-underline">
+              <Link
+                href="/about"
+                className={`rounded-lg px-2.5 py-2 text-sm font-medium no-underline ${
+                  isNavItemActive(pathname, '/about')
+                    ? 'bg-accent/10 text-accent'
+                    : 'text-ink-muted hover:bg-surface'
+                }`}
+              >
                 Về chúng tôi
               </Link>
             </nav>
@@ -378,10 +419,19 @@ export function Header() {
                     <Link href="/profile" className="rounded-lg px-3 py-2.5 text-[13.5px] text-ink hover:bg-surface">
                       Hồ sơ cá nhân
                     </Link>
-                    {/* Instructor links */}
-                    <Link href="/instructor/courses" className="rounded-lg px-3 py-2.5 text-[13.5px] text-ink hover:bg-surface font-semibold text-accent">
-                      Kênh quản lý
-                    </Link>
+                    {/* "Trở thành Giảng viên" (19/09/2026, sửa lỗi) — trước đây mục này LUÔN
+                        hiện "Kênh quản lý" trỏ thẳng `/instructor/courses` cho MỌI vai trò, kể
+                        cả Học viên chưa từng là Giảng viên (bấm vào sẽ thấy trang trống/lỗi vì
+                        chưa có quyền). Giờ đổi nhãn + đích đến theo đúng vai trò hiện tại. */}
+                    {currentUser?.role === 'INSTRUCTOR' ? (
+                      <Link href="/instructor/courses" className="rounded-lg px-3 py-2.5 text-[13.5px] text-ink hover:bg-surface">
+                        Kênh Giảng viên
+                      </Link>
+                    ) : currentUser?.role === 'STUDENT' ? (
+                      <Link href="/teaching" className="rounded-lg px-3 py-2.5 text-[13.5px] text-ink hover:bg-surface">
+                        Trở thành Giảng viên
+                      </Link>
+                    ) : null}
                     {/* Ngôn ngữ giao diện (14/09/2026, mở rộng) — CHỈ hiển thị danh sách kiểu
                         Udemy, chưa có logic đổi ngôn ngữ UI thật (xem LanguageModal.tsx). */}
                     <button

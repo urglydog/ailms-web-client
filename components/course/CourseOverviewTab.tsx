@@ -1,8 +1,10 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
 import { publicCoursesApi } from '@/lib/api/publicCourses';
 import { StarRating } from '@/components/ui/StarRating';
+import { useCourseAnnouncements, useStartConversationAsStudent } from '@/hooks/useCommunication';
 import type { CourseSummary } from '@/types/domain';
 
 const LEVEL_LABEL: Record<CourseSummary['level'], string> = {
@@ -20,7 +22,16 @@ const LEVEL_LABEL: Record<CourseSummary['level'], string> = {
  * (`app/(public)/courses/[slug]/page.tsx`) — không thêm field/endpoint mới ở be/, dữ liệu này vốn
  * đã công khai và không đổi theo từng bài học nên tận dụng lại được toàn bộ.
  */
-export function CourseOverviewTab({ courseSlug }: { courseSlug: string }) {
+export function CourseOverviewTab({
+  courseSlug,
+  courseId,
+  enrolled = false,
+}: {
+  courseSlug: string;
+  /** (19/09/2026) — cần cho "Thông báo" + "Nhắn tin giảng viên", chỉ hiện khi ĐÃ sở hữu khóa. */
+  courseId?: number;
+  enrolled?: boolean;
+}) {
   const { data: course, isLoading } = useQuery({
     queryKey: ['courses', 'public', courseSlug],
     queryFn: () => publicCoursesApi.getBySlug(courseSlug),
@@ -50,15 +61,63 @@ export function CourseOverviewTab({ courseSlug }: { courseSlug: string }) {
         <span>Có thể lồng tiếng sang {course.langs.length} ngôn ngữ</span>
       </div>
 
-      <div className="flex items-center gap-3 border-t border-line-soft pt-4">
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-accent/10 font-display text-base font-bold text-accent">
-          {course.instructorName.charAt(0).toUpperCase()}
+      <div className="flex items-center justify-between gap-3 border-t border-line-soft pt-4">
+        <div className="flex items-center gap-3">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-accent/10 font-display text-base font-bold text-accent">
+            {course.instructorName.charAt(0).toUpperCase()}
+          </div>
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-ink-faint">Giảng viên</p>
+            <p className="text-sm font-semibold text-ink">{course.instructorName}</p>
+          </div>
         </div>
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-ink-faint">Giảng viên</p>
-          <p className="text-sm font-semibold text-ink">{course.instructorName}</p>
-        </div>
+        {enrolled && courseId && <MessageInstructorButton courseId={courseId} />}
       </div>
+
+      {enrolled && courseId && <CourseAnnouncementsList courseId={courseId} />}
+    </div>
+  );
+}
+
+/** "Nhắn tin cho giảng viên" (19/09/2026, tính năng mới) — bắt đầu/tìm lại hội thoại với giảng
+ * viên của khóa này rồi chuyển sang hộp thư chung `/messages`. */
+function MessageInstructorButton({ courseId }: { courseId: number }) {
+  const router = useRouter();
+  const startConversation = useStartConversationAsStudent();
+
+  return (
+    <button
+      type="button"
+      disabled={startConversation.isPending}
+      onClick={() =>
+        startConversation.mutate(courseId, {
+          onSuccess: (conversation) => router.push(`/messages?conversationId=${conversation.id}`),
+        })
+      }
+      className="shrink-0 rounded-full border border-accent/30 px-3.5 py-2 text-[12.5px] font-bold text-accent hover:bg-accent/10"
+    >
+      Nhắn tin giảng viên
+    </button>
+  );
+}
+
+function CourseAnnouncementsList({ courseId }: { courseId: number }) {
+  const { data: announcements, isLoading } = useCourseAnnouncements(courseId, true);
+
+  if (isLoading || !announcements || announcements.length === 0) return null;
+
+  return (
+    <div className="flex flex-col gap-2 border-t border-line-soft pt-4">
+      <p className="text-[11px] font-semibold uppercase tracking-wide text-ink-faint">Thông báo từ giảng viên</p>
+      {announcements.slice(0, 3).map((a) => (
+        <div key={a.id} className="rounded-lg bg-surface-hover p-3">
+          <div className="mb-0.5 flex items-center justify-between gap-3">
+            <span className="text-[13px] font-bold text-ink">{a.title}</span>
+            <span className="shrink-0 text-[11px] text-ink-faint">{new Date(a.createdAt).toLocaleDateString('vi-VN')}</span>
+          </div>
+          <p className="whitespace-pre-line text-[12.5px] text-ink-muted">{a.content}</p>
+        </div>
+      ))}
     </div>
   );
 }

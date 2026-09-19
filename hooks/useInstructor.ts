@@ -3,7 +3,7 @@ import { toast } from 'sonner';
 import { ApiError } from '@/lib/api/client';
 import { authApi } from '@/lib/api/auth';
 import { instructorApi, type SubmitVerificationReq } from '@/lib/api/instructor';
-import { getAccessToken } from '@/lib/auth/token';
+import { getAccessToken, getCurrentRole } from '@/lib/auth/token';
 
 const CURRENT_USER_QUERY_KEY = ['users', 'me'] as const;
 const VERIFICATION_STATUS_QUERY_KEY = ['instructor', 'verification', 'status'] as const;
@@ -13,16 +13,28 @@ const VERIFICATION_STATUS_QUERY_KEY = ['instructor', 'verification', 'status'] a
  * Bắt buộc gọi {@link authApi.refresh} ngay sau khi thành công: JWT nhồi role lúc KÝ, không
  * đọc lại DB mỗi request, nên access token cũ vẫn mang role STUDENT tới khi refresh (xem
  * docblock `InstructorController.becomeInstructor`).
+ *
+ * (19/09/2026, sửa lỗi) — `instructorApi.become()` có thể báo lỗi "đã là Giảng viên rồi" ngay
+ * cả khi CHÍNH lần gọi trước đó của người dùng đã nâng role thành công (vd. bấm "Hoàn tất" 2
+ * lần do bước `refresh()` sau đó bị trục trặc mạng, khiến FE tưởng cả thao tác thất bại). Lỗi
+ * đó phản ánh ĐÚNG state ở server (role đã là INSTRUCTOR) nên không nên coi là thất bại — gọi
+ * `refresh()` để đọc role thật rồi mới quyết định có ném lỗi tiếp hay không, thay vì tin tưởng
+ * tuyệt đối vào kết quả của `become()`.
  */
 export function useBecomeInstructor() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async () => {
-      await instructorApi.become();
+      try {
+        await instructorApi.become();
+      } catch (err) {
+        await authApi.refresh();
+        if (getCurrentRole() !== 'INSTRUCTOR') throw err;
+        return;
+      }
       await authApi.refresh();
     },
     onSuccess: () => {
-      toast.success('Chúc mừng! Bạn đã trở thành Giảng viên.');
       void queryClient.invalidateQueries({ queryKey: CURRENT_USER_QUERY_KEY });
     },
     onError: (err) => {
@@ -45,7 +57,6 @@ export function useSubmitInstructorVerification() {
   return useMutation({
     mutationFn: (req: SubmitVerificationReq) => instructorApi.submitVerification(req),
     onSuccess: () => {
-      toast.success('Đã gửi thông tin xác minh thành công.');
       void queryClient.invalidateQueries({ queryKey: VERIFICATION_STATUS_QUERY_KEY });
     },
     onError: (err) => {

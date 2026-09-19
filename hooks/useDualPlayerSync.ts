@@ -217,6 +217,12 @@ interface UseYouTubeDualPlayerSyncOptions {
   /** Giao diện tham khảo Udemy (06/09/2026) — video kết thúc, dùng cho tính năng tự động chuyển
    * sang bài học tiếp theo (trang cha quyết định, hook chỉ báo sự kiện). */
   onEnded?: () => void;
+  /** (19/09/2026) — tự phát ngay khi player sẵn sàng, dùng lúc CHUYỂN BÀI (không áp dụng lúc mở
+   * bài lần đầu — trang cha (`learn/[lessonId]/page.tsx`) tự quyết định khi nào truyền `true`).
+   * Chỉ đọc giá trị NÀY tại đúng thời điểm `onReady` bắn ra (1 lần/lượt tạo player), không cần
+   * theo dõi đổi giá trị qua ref như `dubActive`/`timeOffsetSec` — vì `DualPlayer` đã tự remount
+   * (key theo `lessonId`) mỗi lần đổi bài, nên hook này vốn dĩ chỉ "sống" đúng 1 bài/lần tạo. */
+  autoPlay?: boolean;
 }
 
 /** Điều khiển thanh control tuỳ biến (Udemy-style) cho nguồn YouTube — thay hẳn UI có sẵn của
@@ -267,7 +273,7 @@ export function useYouTubeDualPlayerSync(
   containerRef: React.RefObject<HTMLElement | null>,
   audioRef: React.RefObject<HTMLAudioElement | null>,
   youtubeId: string | null,
-  { dubActive = false, timeOffsetSec = 0, onEnded }: UseYouTubeDualPlayerSyncOptions = {},
+  { dubActive = false, timeOffsetSec = 0, onEnded, autoPlay = false }: UseYouTubeDualPlayerSyncOptions = {},
 ): YouTubePlayerController {
   const playerRef = useRef<YouTubePlayerLike | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -355,6 +361,7 @@ export function useYouTubeDualPlayerSync(
             setQualities(event.target.getAvailableQualityLevels());
             setQualityState(event.target.getPlaybackQuality());
             playerRef.current = event.target;
+            if (autoPlay) event.target.playVideo();
           },
           onStateChange: (event) => {
             setIsPlaying(event.data === YT_STATE.PLAYING || event.data === YT_STATE.BUFFERING);
@@ -409,6 +416,11 @@ export function useYouTubeDualPlayerSync(
       playerRef.current = null;
       player?.destroy();
     };
+    // `autoPlay` cố ý KHÔNG nằm trong dependency — chỉ cần đọc đúng 1 lần lúc tạo player (xem
+    // docblock `UseYouTubeDualPlayerSyncOptions.autoPlay`); đưa vào đây sẽ huỷ/tạo lại player
+    // (mất vị trí phát) mỗi khi giá trị này đổi, dù `DualPlayer` đã tự remount theo `lessonId`
+    // nên hiệu ứng thật sự chỉ xảy ra đúng 1 lần/bài học như mong muốn.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [containerRef, audioRef, youtubeId]);
 
   /** UC30 — tua video theo mốc thời gian trích dẫn của Gia sư AI (BR-TUTOR-02), cũng dùng cho

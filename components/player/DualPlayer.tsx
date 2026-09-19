@@ -77,6 +77,11 @@ interface DualPlayerProps {
   onToggleTranscript: () => void;
   autoNextEnabled: boolean;
   onToggleAutoNext: () => void;
+  /** (19/09/2026) — tự phát ngay khi sẵn sàng, dùng lúc CHUYỂN BÀI (trang cha `learn/[lessonId]/
+   * page.tsx` chỉ truyền `true` khi đây là lần đổi bài, KHÔNG truyền lúc mở bài lần đầu). Component
+   * này đã được trang cha `key` theo `lessonId` (remount hoàn toàn mỗi khi đổi bài — xem đó để biết
+   * lý do), nên giá trị này chỉ cần đọc đúng 1 lần lúc mount, không cần theo dõi đổi giữa chừng. */
+  autoPlay?: boolean;
 }
 
 /** Câu đang phát tại `currentSec`, hoặc `null` nếu đang ở khoảng lặng giữa 2 câu. */
@@ -133,6 +138,7 @@ export const DualPlayer = forwardRef<DualPlayerHandle, DualPlayerProps>(function
   onToggleTranscript,
   autoNextEnabled,
   onToggleAutoNext,
+  autoPlay = false,
 }: DualPlayerProps, ref) {
   const internalVideoRef = useRef<HTMLVideoElement>(null);
   const internalAudioRef = useRef<HTMLAudioElement>(null);
@@ -186,7 +192,7 @@ export const DualPlayer = forwardRef<DualPlayerHandle, DualPlayerProps>(function
   });
   const youtube = useYouTubeDualPlayerSync(
     youtubeContainerRef, audioRef, isYoutube ? youtubeId : null,
-    { dubActive: audioSrc !== null, timeOffsetSec: offsetSec, onEnded: handleEnded },
+    { dubActive: audioSrc !== null, timeOffsetSec: offsetSec, onEnded: handleEnded, autoPlay },
   );
   useEffect(() => {
     if (isYoutube) setCurrentSec(youtube.currentSec);
@@ -424,7 +430,10 @@ export const DualPlayer = forwardRef<DualPlayerHandle, DualPlayerProps>(function
   return (
     <div ref={containerRef} className="relative aspect-video w-full overflow-hidden rounded-card bg-ink">
       {isYoutube ? (
-        <div key={youtubeId} ref={youtubeContainerRef} className="h-full w-full" />
+        // Không cần `key={youtubeId}` riêng — `DualPlayer` đã được trang cha `key` theo `lessonId`
+        // (remount toàn bộ mỗi khi đổi bài, xem docblock prop `autoPlay`), tự key thêm ở đây từng
+        // là nguyên nhân huỷ/tạo lại IFrame Player 2 LẦN không cần thiết cho cùng 1 lần đổi bài.
+        <div ref={youtubeContainerRef} className="h-full w-full" />
       ) : videoUrl ? (
         <video
           ref={videoRef}
@@ -432,6 +441,7 @@ export const DualPlayer = forwardRef<DualPlayerHandle, DualPlayerProps>(function
           // Chỉ tắt tiếng khi có bản lồng tiếng đang phát qua thẻ <audio> bên dưới — chưa có
           // bản lồng tiếng nào (audioSrc null) thì phát thẳng âm thanh gốc của video.
           muted={audioSrc !== null}
+          autoPlay={autoPlay}
           playsInline
           onTimeUpdate={(e) => setCurrentSec(e.currentTarget.currentTime)}
           onPlay={() => setUploadIsPlaying(true)}
