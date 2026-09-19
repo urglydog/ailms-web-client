@@ -14,6 +14,9 @@ interface EnrollButtonProps {
   enrolled: boolean;
   /** Bài học đầu tiên của khoá (theo thứ tự chương/bài) — null nếu khoá chưa có bài nào. */
   firstLessonId: number | null;
+  /** "Đăng ký (Quyền riêng tư)" kiểu Udemy (19/09/2026) — true khi khóa ở chế độ
+   * PRIVATE_PASSWORD, cần nhập đúng mật khẩu mới ghi danh/thanh toán được. */
+  requiresPassword: boolean;
 }
 
 export function EnrollButton({
@@ -22,10 +25,12 @@ export function EnrollButton({
   isFree,
   enrolled: initialEnrolled,
   firstLessonId,
+  requiresPassword,
 }: EnrollButtonProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [enrolled, setEnrolled] = useState(initialEnrolled);
+  const [accessPassword, setAccessPassword] = useState('');
   // Giỏ hàng (06/09/2026, mở rộng ngoài đặc tả gốc) — khóa TRẢ PHÍ vừa mua ngay được, vừa
   // thêm vào giỏ để gộp thanh toán sau cùng các khóa khác (giống Udemy). Gọi hook TRƯỚC mọi
   // return sớm bên dưới (rules-of-hooks) dù chỉ dùng ở nhánh trả phí/chưa sở hữu.
@@ -74,7 +79,7 @@ export function EnrollButton({
   const handleEnrollFree = async () => {
     try {
       setLoading(true);
-      await enrollmentsApi.enrollFree(courseId);
+      await enrollmentsApi.enrollFree(courseId, requiresPassword ? accessPassword : undefined);
       toast.success('Ghi danh thành công!');
       router.refresh();
     } catch (err: unknown) {
@@ -86,37 +91,59 @@ export function EnrollButton({
 
   if (isFree) {
     return (
-      <div className="flex items-center gap-2">
-        <button
-          type="button"
-          onClick={handleEnrollFree}
-          disabled={loading}
-          className={`flex-1 rounded-full bg-accent px-6 py-3 font-display text-base font-bold text-white hover:bg-accent-dark ${
-            loading ? 'opacity-50 cursor-not-allowed' : ''
-          }`}
-        >
-          {loading ? 'Đang xử lý...' : 'Đăng ký học ngay'}
-        </button>
-        <WishlistHeartButton inWishlist={inWishlist} pending={wishlistPending} onClick={toggleWishlist} />
+      <div className="flex flex-col gap-2">
+        {requiresPassword && (
+          <input
+            type="text"
+            value={accessPassword}
+            onChange={(e) => setAccessPassword(e.target.value)}
+            placeholder="Nhập mật khẩu đăng ký"
+            className="rounded-full border-2 border-accent/30 px-4 py-2 text-sm focus:border-accent focus:outline-none"
+          />
+        )}
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleEnrollFree}
+            disabled={loading || (requiresPassword && !accessPassword.trim())}
+            className={`flex-1 rounded-full bg-accent px-6 py-3 font-display text-base font-bold text-white hover:bg-accent-dark disabled:cursor-not-allowed disabled:opacity-50 ${
+              loading ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
+          >
+            {loading ? 'Đang xử lý...' : 'Đăng ký học ngay'}
+          </button>
+          <WishlistHeartButton inWishlist={inWishlist} pending={wishlistPending} onClick={toggleWishlist} />
+        </div>
       </div>
     );
   }
 
   // (14/09/2026, sửa theo yêu cầu) — hàng "Thêm vào giỏ hàng" + tim đứng TRƯỚC "Mua ngay",
   // đúng thứ tự trang chi tiết khóa của Udemy (khác thứ tự cũ: Mua ngay đứng trước).
+  //
+  // "Đăng ký (Quyền riêng tư)" kiểu Udemy (19/09/2026) — khóa PRIVATE_PASSWORD không hỗ trợ
+  // "Thêm vào giỏ hàng" (BE luôn từ chối, xem CourseAccessService.verifyCanAddToCart), chỉ
+  // "Mua ngay" mới có ô nhập mật khẩu (trang checkout).
   return (
     <div className="flex flex-col gap-2.5">
-      <div className="flex items-center gap-2">
-        <button
-          type="button"
-          onClick={() => !inCart && addToCart.mutate(courseId)}
-          disabled={inCart || addToCart.isPending}
-          className="flex-1 rounded-full border-2 border-accent bg-white px-6 py-3 font-display text-base font-bold text-accent hover:bg-accent/5 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {inCart ? 'Đã có trong giỏ hàng ✓' : addToCart.isPending ? 'Đang thêm...' : 'Thêm vào giỏ hàng'}
-        </button>
-        <WishlistHeartButton inWishlist={inWishlist} pending={wishlistPending} onClick={toggleWishlist} />
-      </div>
+      {!requiresPassword && (
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => !inCart && addToCart.mutate(courseId)}
+            disabled={inCart || addToCart.isPending}
+            className="flex-1 rounded-full border-2 border-accent bg-white px-6 py-3 font-display text-base font-bold text-accent hover:bg-accent/5 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {inCart ? 'Đã có trong giỏ hàng ✓' : addToCart.isPending ? 'Đang thêm...' : 'Thêm vào giỏ hàng'}
+          </button>
+          <WishlistHeartButton inWishlist={inWishlist} pending={wishlistPending} onClick={toggleWishlist} />
+        </div>
+      )}
+      {requiresPassword && (
+        <p className="text-center text-[12.5px] text-ink-muted">
+          Khóa học riêng tư — nhập mật khẩu ở bước thanh toán để mua trực tiếp.
+        </p>
+      )}
       <button
         type="button"
         onClick={() => router.push(`/checkout/${courseSlug}`)}

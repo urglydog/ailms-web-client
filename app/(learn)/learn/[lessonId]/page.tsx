@@ -7,6 +7,7 @@ import { useCallback, useEffect, useRef, useState, Suspense } from 'react';
 import { toast } from 'sonner';
 import { CourseOverviewTab } from '@/components/course/CourseOverviewTab';
 import { CourseGradebookTab } from '@/components/course/CourseGradebookTab';
+import { LessonAssignmentsList } from '@/components/course/LessonAssignmentsList';
 import { CourseResourcesTab } from '@/components/course/CourseResourcesTab';
 import { ReviewsSection } from '@/components/course/ReviewsSection';
 import { MaterialManager } from '@/components/materials/MaterialManager';
@@ -239,6 +240,14 @@ function LearnPageContent() {
   // (vd đang xem tiếng Nhật ở bài A thì bài B tự nhảy vào `mode="processing"` do lẫn state cũ).
   // Không reset `sidebarTab`/`autoNextEnabled` — đây là tuỳ chọn của học viên cho cả khoá học,
   // không phải theo từng bài, nên phải giữ nguyên khi chuyển bài (giống Udemy).
+  //
+  // `autoPlayIntent` (19/09/2026) — tự phát video ngay khi CHUYỂN sang bài khác (dù bấm "bài tiếp
+  // theo" tự động hết video, hay tự bấm 1 bài khác trong sidebar), nhưng KHÔNG tự phát lúc mở
+  // thẳng 1 đường link bài học lần đầu (`hasSeenLessonRef` mới là `false`). `<DualPlayer>` được
+  // `key` theo `lesson.lessonId` (xem JSX bên dưới) nên chỉ cần đọc giá trị này đúng 1 lần lúc nó
+  // remount, không cần đồng bộ lại giữa chừng.
+  const hasSeenLessonRef = useRef(false);
+  const [autoPlayIntent, setAutoPlayIntent] = useState(false);
   useEffect(() => {
     setMode('watching');
     setActiveLang(null);
@@ -252,6 +261,8 @@ function LearnPageContent() {
     setShowTranslatedSub(false);
     setPlayerCurrentSec(0);
     setStreamConflict(false);
+    setAutoPlayIntent(hasSeenLessonRef.current);
+    hasSeenLessonRef.current = true;
   }, [lessonId]);
 
   // Tự động chuyển sang bài tiếp theo khi phát hết bài hiện tại — nhớ lựa chọn của học viên giữa
@@ -598,6 +609,17 @@ function LearnPageContent() {
                 vẫn giữ nguyên bài CŨ trên màn hình, không biến mất như trước. */}
             <div className="relative">
               <DualPlayer
+                // (19/09/2026) — `key` theo bài học ĐÃ TẢI XONG (`lesson.lessonId`, KHÔNG phải
+                // `lessonId` từ URL) để remount đúng 1 LẦN DUY NHẤT sau khi dữ liệu bài mới sẵn
+                // sàng — trong lúc đang tải (`isSwitchingLesson`), video bài CŨ vẫn tiếp tục phát
+                // bình thường nhờ `keepPreviousData`, không remount sớm/thừa. Trước đây component
+                // này không hề remount theo bài học — mọi lần đổi bài chỉ cập nhật prop, khiến
+                // nhánh UPLOAD/YOUTUBE trong JSX bên dưới phải tự dò dẫm huỷ/tạo lại player, dễ vỡ
+                // khi đổi NGUỒN video (UPLOAD ↔ YOUTUBE) giữa 2 bài liền kề (thường xảy ra khi
+                // đổi chương). Remount sạch bằng `key` là cách chuẩn của React để "làm mới hoàn
+                // toàn" một cây con khi danh tính của nó đổi, thay vì tự quản lý từng nhánh.
+                key={lesson.lessonId}
+                autoPlay={autoPlayIntent}
                 ref={dualPlayerRef}
                 videoSource={lesson.videoSource}
                 videoUrl={lesson.videoUrl}
@@ -696,7 +718,9 @@ function LearnPageContent() {
               </div>
 
               <div className="p-5">
-                {mainTab === 'overview' && <CourseOverviewTab courseSlug={lesson.courseSlug} />}
+                {mainTab === 'overview' && (
+                  <CourseOverviewTab courseSlug={lesson.courseSlug} courseId={lesson.courseId} enrolled={lesson.enrolled} />
+                )}
 
                 {mainTab === 'qna' && (
                   lesson.enrolled ? (
@@ -714,7 +738,10 @@ function LearnPageContent() {
                 {mainTab === 'resources' && <CourseResourcesTab courseId={lesson.courseId} />}
                 {mainTab === 'materials' && (
                   lesson.enrolled ? (
-                    <MaterialManager courseId={lesson.courseId} lessonId={lesson.lessonId} />
+                    <div className="flex flex-col gap-5">
+                      <LessonAssignmentsList lessonId={lesson.lessonId} />
+                      <MaterialManager courseId={lesson.courseId} lessonId={lesson.lessonId} />
+                    </div>
                   ) : (
                     <LockedFeatureNotice feature="Học liệu" courseSlug={lesson.courseSlug} />
                   )

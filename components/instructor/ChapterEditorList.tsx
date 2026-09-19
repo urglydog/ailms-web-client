@@ -1,9 +1,11 @@
 'use client';
 
 import { useState, type DragEvent } from 'react';
+import { PencilIcon, TrashIcon, DragHandleIcon } from '@/components/instructor/CurriculumIcons';
 import { LessonEditorRow } from '@/components/instructor/LessonEditorRow';
 import { LessonMediaModal } from '@/components/instructor/LessonMediaModal';
 import { LessonMaterialAttachModal } from '@/components/instructor/LessonMaterialAttachModal';
+import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import {
   useCreateChapter,
   useCreateLesson,
@@ -18,19 +20,35 @@ import type { ChapterEditItem } from '@/types/domain';
 
 interface ChapterEditorListProps {
   courseId: number;
+  courseSlug: string;
   chapters: ChapterEditItem[];
 }
 
-/** Sắp xếp lại chương/bài học bằng kéo-thả (HTML5 drag & drop, không cần thư viện). */
-export function ChapterEditorList({ courseId, chapters }: ChapterEditorListProps) {
+/**
+ * "Chương trình giảng dạy" — giao diện tham khảo Udemy (15/09/2026, redesign toàn bộ).
+ *
+ * Kéo-thả sắp xếp lại Phần/Bài giảng bằng HTML5 Drag & Drop thuần (không cần thư viện) — cả
+ * NGUYÊN CẢ CARD (không chỉ 1 icon nắm nhỏ như bản cũ) đều kéo được, để chuột vào khoảng trống
+ * bất kỳ trong card sẽ đổi thành con trỏ "di chuyển" (`cursor-move`) đúng như Udemy. Nhãn "Phần
+ * N"/"Bài giảng N" LUÔN tính lại từ vị trí hiện tại trong mảng đã sắp xếp (`index + 1`), không
+ * dùng số cứng nào lưu sẵn — nên tự động đổi số ngay khi kéo-thả xong, không cần chờ tải lại.
+ */
+export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEditorListProps) {
   const [newChapterTitle, setNewChapterTitle] = useState('');
+  const [newChapterDescription, setNewChapterDescription] = useState('');
+  const [showAddChapterForm, setShowAddChapterForm] = useState(false);
   const [newLessonTitleByChapter, setNewLessonTitleByChapter] = useState<Record<number, string>>({});
+  const [addLessonFormOpenFor, setAddLessonFormOpenFor] = useState<number | null>(null);
+  const [editingChapterId, setEditingChapterId] = useState<number | null>(null);
+  const [editChapterTitle, setEditChapterTitle] = useState('');
+  const [editChapterDescription, setEditChapterDescription] = useState('');
   const [draggedChapterId, setDraggedChapterId] = useState<number | null>(null);
   const [dropTargetChapterId, setDropTargetChapterId] = useState<number | null>(null);
   const [draggedLesson, setDraggedLesson] = useState<{ chapterId: number; lessonId: number } | null>(null);
   const [dropTargetLessonId, setDropTargetLessonId] = useState<number | null>(null);
   const [manageVideoLessonId, setManageVideoLessonId] = useState<number | null>(null);
   const [attachMaterialLessonId, setAttachMaterialLessonId] = useState<number | null>(null);
+  const [confirmDeleteChapterId, setConfirmDeleteChapterId] = useState<number | null>(null);
 
   const createChapter = useCreateChapter(courseId);
   const updateChapter = useUpdateChapter(courseId);
@@ -85,13 +103,58 @@ export function ChapterEditorList({ courseId, chapters }: ChapterEditorListProps
 
   const allowDrop = (e: DragEvent) => e.preventDefault();
 
+  const openChapterEdit = (chapter: ChapterEditItem) => {
+    setEditingChapterId(chapter.id);
+    setEditChapterTitle(chapter.title);
+    setEditChapterDescription(chapter.description ?? '');
+  };
+
+  const handleSaveChapterEdit = () => {
+    if (!editChapterTitle.trim() || editingChapterId === null) return;
+    updateChapter.mutate({
+      id: editingChapterId,
+      input: { title: editChapterTitle.trim(), description: editChapterDescription.trim() || null },
+    });
+    setEditingChapterId(null);
+  };
+
+  const handleCreateChapter = () => {
+    if (!newChapterTitle.trim()) return;
+    const description = newChapterDescription.trim();
+    createChapter.mutate(
+      { title: newChapterTitle.trim() },
+      {
+        // Backend chỉ nhận `title` lúc tạo (đúng khuôn UC32 hiện có) — mô tả (nếu đã nhập ngay ở
+        // form thêm Phần, theo đúng giao diện Udemy) được lưu tiếp qua 1 lượt update ngay sau đó.
+        onSuccess: (created) => {
+          if (description) {
+            updateChapter.mutate({ id: created.id, input: { title: created.title, description } });
+          }
+        },
+      },
+    );
+    setNewChapterTitle('');
+    setNewChapterDescription('');
+    setShowAddChapterForm(false);
+  };
+
   return (
     <div className="flex flex-col gap-4">
-      {sortedChapters.map((chapter) => {
+      {sortedChapters.map((chapter, chapterIndex) => {
         const lessons = [...chapter.lessons].sort((a, b) => a.displayOrder - b.displayOrder);
+        const isEditing = editingChapterId === chapter.id;
         return (
           <div
             key={chapter.id}
+            draggable={!isEditing}
+            onDragStart={(e) => {
+              e.dataTransfer.effectAllowed = 'move';
+              setDraggedChapterId(chapter.id);
+            }}
+            onDragEnd={() => {
+              setDraggedChapterId(null);
+              setDropTargetChapterId(null);
+            }}
             onDragOver={(e) => {
               allowDrop(e);
               if (draggedChapterId !== null) setDropTargetChapterId(chapter.id);
@@ -101,45 +164,104 @@ export function ChapterEditorList({ courseId, chapters }: ChapterEditorListProps
               e.preventDefault();
               handleChapterDrop(chapter.id);
             }}
+            title="Kéo để đổi thứ tự chương"
             className={`rounded-xl border bg-white p-4 shadow-sm transition-colors ${
+              isEditing ? '' : 'cursor-move'
+            } ${
               dropTargetChapterId === chapter.id && draggedChapterId !== chapter.id
                 ? 'border-cyan-300 bg-cyan-50/40'
                 : 'border-gray-200'
             }`}
           >
-            <div className="mb-3 flex items-center gap-2.5">
-              <span
-                draggable
-                onDragStart={(e) => {
-                  e.dataTransfer.effectAllowed = 'move';
-                  setDraggedChapterId(chapter.id);
-                }}
-                onDragEnd={() => {
-                  setDraggedChapterId(null);
-                  setDropTargetChapterId(null);
-                }}
-                title="Kéo để đổi thứ tự chương"
-                className="shrink-0 cursor-grab select-none text-lg leading-none text-gray-300 hover:text-gray-500 active:cursor-grabbing"
-              >
-                ⠿
-              </span>
-              <ChapterTitleInput
-                title={chapter.title}
-                onSave={(title) => updateChapter.mutate({ id: chapter.id, input: { title } })}
-              />
-              <button
-                type="button"
-                onClick={() => {
-                  deleteChapter.mutate(chapter.id);
-                }}
-                className="shrink-0 text-[12px] font-bold text-red-500 hover:text-red-700"
-              >
-                Xóa chương
-              </button>
-            </div>
+            {isEditing ? (
+              <div className="mb-3 flex flex-col gap-2" draggable={false} onDragStart={(e) => e.preventDefault()}>
+                <label className="flex flex-col gap-1">
+                  <span className="text-[11.5px] font-bold text-gray-500">Phần {chapterIndex + 1}:</span>
+                  <input
+                    value={editChapterTitle}
+                    onChange={(e) => setEditChapterTitle(e.target.value)}
+                    draggable={false}
+                    className="rounded-lg border border-gray-200 px-3 py-1.5 font-display text-[14.5px] font-bold focus:border-cyan-400 focus:outline-none"
+                  />
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span className="text-[11.5px] text-gray-500">
+                    Sau khi hoàn thành phần này, học viên sẽ có thể làm được những gì?
+                  </span>
+                  <textarea
+                    value={editChapterDescription}
+                    onChange={(e) => setEditChapterDescription(e.target.value)}
+                    rows={2}
+                    placeholder="Nhập mục tiêu học tập..."
+                    draggable={false}
+                    className="rounded-lg border border-gray-200 px-3 py-1.5 text-[12.5px] focus:border-cyan-400 focus:outline-none"
+                  />
+                </label>
+                <div className="flex justify-end gap-2">
+                  <button
+                    type="button"
+                    draggable={false}
+                    onClick={() => setEditingChapterId(null)}
+                    className="rounded-lg px-3 py-1.5 text-[12px] font-semibold text-gray-500 hover:bg-gray-100"
+                  >
+                    Hủy bỏ
+                  </button>
+                  <button
+                    type="button"
+                    draggable={false}
+                    onClick={handleSaveChapterEdit}
+                    className="rounded-lg bg-cyan-600 px-3 py-1.5 text-[12px] font-bold text-white hover:bg-cyan-700"
+                  >
+                    Lưu phần
+                  </button>
+                </div>
+              </div>
+            ) : (
+              // (19/09/2026) — `group` đặt NGAY TRÊN HÀNG TIÊU ĐỀ này (không phải cả thẻ Phần ở
+              // ngoài) — hàng danh sách bài học nằm NGOÀI phạm vi group này (là 1 div anh em, xem
+              // JSX bên dưới), nên hover 1 bài giảng bên trong KHÔNG còn làm lộ nhầm icon sửa/xóa
+              // của Phần cha (trước đây `group` đặt trên cả thẻ nên bị "leo" lên do hover con luôn
+              // kéo theo :hover của mọi phần tử cha trong CSS).
+              <div className="group mb-1 flex items-center gap-2.5">
+                <div className="flex min-w-0 flex-1 items-center gap-1.5">
+                  <span className="truncate font-display text-[14.5px] font-bold text-gray-900">
+                    Phần {chapterIndex + 1}: {chapter.title}
+                  </span>
+                  <button
+                    type="button"
+                    draggable={false}
+                    onClick={() => openChapterEdit(chapter)}
+                    title="Đổi tên/mô tả phần"
+                    className="shrink-0 text-gray-400 opacity-0 hover:text-gray-700 group-hover:opacity-100"
+                  >
+                    <PencilIcon />
+                  </button>
+                  <button
+                    type="button"
+                    draggable={false}
+                    onClick={() => setConfirmDeleteChapterId(chapter.id)}
+                    title="Xóa chương"
+                    className="shrink-0 text-gray-400 opacity-0 hover:text-red-600 group-hover:opacity-100"
+                  >
+                    <TrashIcon />
+                  </button>
+                </div>
+                <span
+                  aria-hidden
+                  title="Kéo để đổi thứ tự"
+                  className="shrink-0 select-none text-gray-300 opacity-0 group-hover:opacity-100"
+                >
+                  <DragHandleIcon />
+                </span>
+              </div>
+            )}
+            {!isEditing && chapter.description && (
+              <p className="mb-3 text-[12px] text-gray-400">{chapter.description}</p>
+            )}
+            {!isEditing && !chapter.description && <div className="mb-3" />}
 
             <div className="flex flex-col gap-2">
-              {lessons.map((lesson) => (
+              {lessons.map((lesson, lessonIndex) => (
                 <div
                   key={lesson.id}
                   onDragOver={(e) => {
@@ -156,6 +278,8 @@ export function ChapterEditorList({ courseId, chapters }: ChapterEditorListProps
                 >
                   <LessonEditorRow
                     lesson={lesson}
+                    index={lessonIndex}
+                    courseSlug={courseSlug}
                     isDropTarget={dropTargetLessonId === lesson.id && draggedLesson?.lessonId !== lesson.id}
                     onDragStart={() => setDraggedLesson({ chapterId: chapter.id, lessonId: lesson.id })}
                     onDragEnd={() => {
@@ -163,10 +287,13 @@ export function ChapterEditorList({ courseId, chapters }: ChapterEditorListProps
                       setDropTargetLessonId(null);
                     }}
                     onRename={(title) =>
-                      updateLesson.mutate({ id: lesson.id, input: { title, isPreview: lesson.isPreview } })
+                      updateLesson.mutate({ id: lesson.id, input: { title, isPreview: lesson.isPreview, description: lesson.description } })
+                    }
+                    onUpdateDescription={(description) =>
+                      updateLesson.mutate({ id: lesson.id, input: { title: lesson.title, isPreview: lesson.isPreview, description: description || null } })
                     }
                     onTogglePreview={(isPreview) =>
-                      updateLesson.mutate({ id: lesson.id, input: { title: lesson.title, isPreview } })
+                      updateLesson.mutate({ id: lesson.id, input: { title: lesson.title, isPreview, description: lesson.description } })
                     }
                     onDelete={() => {
                       deleteLesson.mutate(lesson.id);
@@ -181,31 +308,62 @@ export function ChapterEditorList({ courseId, chapters }: ChapterEditorListProps
               )}
             </div>
 
-            <form
-              className="mt-3 flex gap-2"
-              onSubmit={(e) => {
-                e.preventDefault();
-                const title = (newLessonTitleByChapter[chapter.id] ?? '').trim();
-                if (!title) return;
-                createLesson.mutate({ chapterId: chapter.id, input: { title } });
-                setNewLessonTitleByChapter((prev) => ({ ...prev, [chapter.id]: '' }));
-              }}
-            >
-              <input
-                value={newLessonTitleByChapter[chapter.id] ?? ''}
-                onChange={(e) =>
-                  setNewLessonTitleByChapter((prev) => ({ ...prev, [chapter.id]: e.target.value }))
-                }
-                placeholder="Tên bài học mới..."
-                className="min-w-0 flex-1 rounded-lg border border-gray-200 px-3 py-1.5 text-[13px] focus:border-cyan-400 focus:outline-none"
-              />
-              <button
-                type="submit"
-                className="shrink-0 rounded-lg bg-gray-100 px-3 py-1.5 text-[12.5px] font-bold text-gray-700 hover:bg-gray-200"
+            {addLessonFormOpenFor === chapter.id ? (
+              <form
+                className="mt-3 flex flex-col gap-2 rounded-lg border border-gray-200 bg-gray-50/60 p-3"
+                draggable={false}
+                onDragStart={(e) => e.preventDefault()}
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const title = (newLessonTitleByChapter[chapter.id] ?? '').trim();
+                  if (!title) return;
+                  createLesson.mutate({ chapterId: chapter.id, input: { title } });
+                  setNewLessonTitleByChapter((prev) => ({ ...prev, [chapter.id]: '' }));
+                  setAddLessonFormOpenFor(null);
+                }}
               >
-                + Thêm bài học
+                <span className="text-[11.5px] font-bold text-gray-500">Bài giảng {lessons.length + 1}:</span>
+                <input
+                  autoFocus
+                  value={newLessonTitleByChapter[chapter.id] ?? ''}
+                  onChange={(e) =>
+                    setNewLessonTitleByChapter((prev) => ({ ...prev, [chapter.id]: e.target.value }))
+                  }
+                  placeholder="Nhập tiêu đề bài giảng"
+                  draggable={false}
+                  className="rounded-lg border border-gray-200 px-3 py-1.5 text-[13px] focus:border-cyan-400 focus:outline-none"
+                />
+                <p className="text-[11px] text-gray-400">
+                  Sau khi thêm, bấm &quot;+ Nội dung&quot; ở hàng bài giảng để tải video hoặc dán link YouTube.
+                </p>
+                <div className="flex justify-end gap-2">
+                  <button
+                    type="button"
+                    draggable={false}
+                    onClick={() => setAddLessonFormOpenFor(null)}
+                    className="rounded-lg px-3 py-1.5 text-[12px] font-semibold text-gray-500 hover:bg-gray-100"
+                  >
+                    Hủy bỏ
+                  </button>
+                  <button
+                    type="submit"
+                    draggable={false}
+                    className="rounded-lg bg-cyan-600 px-3 py-1.5 text-[12px] font-bold text-white hover:bg-cyan-700"
+                  >
+                    Thêm bài giảng
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <button
+                type="button"
+                draggable={false}
+                onClick={() => setAddLessonFormOpenFor(chapter.id)}
+                className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-lg border border-dashed border-gray-300 py-2 text-[12.5px] font-bold text-gray-600 hover:border-cyan-300 hover:text-cyan-700"
+              >
+                + Mục trong chương trình giảng dạy
               </button>
-            </form>
+            )}
           </div>
         );
       })}
@@ -216,28 +374,61 @@ export function ChapterEditorList({ courseId, chapters }: ChapterEditorListProps
         </p>
       )}
 
-      <form
-        className="flex gap-2"
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (!newChapterTitle.trim()) return;
-          createChapter.mutate({ title: newChapterTitle.trim() });
-          setNewChapterTitle('');
-        }}
-      >
-        <input
-          value={newChapterTitle}
-          onChange={(e) => setNewChapterTitle(e.target.value)}
-          placeholder="Tên chương mới..."
-          className="min-w-0 flex-1 rounded-lg border border-gray-200 px-3 py-2 text-[13px] focus:border-cyan-400 focus:outline-none"
-        />
-        <button
-          type="submit"
-          className="shrink-0 rounded-lg bg-cyan-600 px-4 py-2 text-[12.5px] font-bold text-white hover:bg-cyan-700"
+      {showAddChapterForm ? (
+        <form
+          className="flex flex-col gap-2 rounded-xl border border-gray-200 bg-white p-4 shadow-sm"
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleCreateChapter();
+          }}
         >
-          + Thêm chương
+          <span className="text-[11.5px] font-bold text-gray-500">Phần mới:</span>
+          <input
+            autoFocus
+            value={newChapterTitle}
+            onChange={(e) => setNewChapterTitle(e.target.value)}
+            placeholder="Nhập tiêu đề"
+            className="rounded-lg border border-gray-200 px-3 py-2 text-[13px] focus:border-cyan-400 focus:outline-none"
+          />
+          <span className="text-[11.5px] text-gray-500">
+            Sau khi hoàn thành phần này, học viên sẽ có thể làm được những gì?
+          </span>
+          <textarea
+            value={newChapterDescription}
+            onChange={(e) => setNewChapterDescription(e.target.value)}
+            rows={2}
+            placeholder="Nhập mục tiêu học tập..."
+            className="rounded-lg border border-gray-200 px-3 py-1.5 text-[12.5px] focus:border-cyan-400 focus:outline-none"
+          />
+          <div className="flex justify-end gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setShowAddChapterForm(false);
+                setNewChapterTitle('');
+                setNewChapterDescription('');
+              }}
+              className="rounded-lg px-3 py-1.5 text-[12px] font-semibold text-gray-500 hover:bg-gray-100"
+            >
+              Hủy bỏ
+            </button>
+            <button
+              type="submit"
+              className="rounded-lg bg-cyan-600 px-4 py-1.5 text-[12.5px] font-bold text-white hover:bg-cyan-700"
+            >
+              Thêm phần
+            </button>
+          </div>
+        </form>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setShowAddChapterForm(true)}
+          className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-gray-300 py-3 text-[13px] font-bold text-gray-600 hover:border-cyan-300 hover:text-cyan-700"
+        >
+          + Phần
         </button>
-      </form>
+      )}
 
       {activeLesson && (
         <LessonMediaModal
@@ -254,20 +445,17 @@ export function ChapterEditorList({ courseId, chapters }: ChapterEditorListProps
           onClose={() => setAttachMaterialLessonId(null)}
         />
       )}
-    </div>
-  );
-}
 
-function ChapterTitleInput({ title, onSave }: { title: string; onSave: (title: string) => void }) {
-  const [value, setValue] = useState(title);
-  return (
-    <input
-      value={value}
-      onChange={(e) => setValue(e.target.value)}
-      onBlur={() => {
-        if (value.trim() && value !== title) onSave(value.trim());
-      }}
-      className="min-w-0 flex-1 rounded-md border border-transparent bg-transparent px-1 py-1 font-display text-[14.5px] font-bold text-gray-900 focus:border-cyan-300 focus:bg-white focus:outline-none"
-    />
+      {confirmDeleteChapterId !== null && (
+        <ConfirmModal
+          message="Bạn sắp xóa 1 Phần và toàn bộ bài giảng bên trong. Bạn có chắc chắn muốn tiếp tục không?"
+          onCancel={() => setConfirmDeleteChapterId(null)}
+          onConfirm={() => {
+            deleteChapter.mutate(confirmDeleteChapterId);
+            setConfirmDeleteChapterId(null);
+          }}
+        />
+      )}
+    </div>
   );
 }

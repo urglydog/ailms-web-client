@@ -35,6 +35,10 @@ export function LoginForm() {
           localStorage.setItem('refreshToken', data.refreshToken);
         }
         
+        // (19/09/2026, sửa theo yêu cầu) — Giảng viên đăng nhập giờ cũng về trang chủ như Học
+        // viên, KHÔNG còn tự động nhảy thẳng vào trang quản lý khóa học nữa (muốn vào thì tự bấm
+        // "Kênh Giảng viên" ở dropdown avatar). Chỉ còn Admin có trang đích riêng vì đó không
+        // phải trang có ý nghĩa với vai trò khác.
         let targetUrl = '/';
         if (data?.accessToken) {
           try {
@@ -50,8 +54,6 @@ export function LoginForm() {
 
               if (roleStr.includes('ADMIN')) {
                 targetUrl = '/admin';
-              } else if (roleStr.includes('INSTRUCTOR')) {
-                targetUrl = '/instructor';
               }
             }
           } catch (e) {

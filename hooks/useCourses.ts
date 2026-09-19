@@ -5,6 +5,7 @@ import { lessonsApi } from '@/lib/api/lessons';
 import { getAccessToken } from '@/lib/auth/token';
 import type {
   CourseStatus,
+  CourseVisibility,
   CreateChapterInput,
   CreateCourseInput,
   CreateLessonInput,
@@ -73,6 +74,53 @@ export function useDeleteCourse() {
   return useMutation({
     mutationFn: (id: number) => coursesApi.remove(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['courses', 'mine'] }),
+  });
+}
+
+/** "Kích hoạt lại" (19/09/2026, tính năng mới) — khôi phục khóa đang ở trạng thái lưu trữ. */
+export function useReactivateCourse() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => coursesApi.reactivate(id),
+    onSuccess: (_data, id) => {
+      queryClient.invalidateQueries({ queryKey: ['courses', 'mine', id] });
+      queryClient.invalidateQueries({ queryKey: ['courses', 'mine'] });
+    },
+  });
+}
+
+// ==================== "Đăng ký (Quyền riêng tư)" kiểu Udemy (19/09/2026) ====================
+
+export function useUpdateCourseVisibility(id: number) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: { visibility: CourseVisibility; password?: string | null }) =>
+      coursesApi.updateVisibility(id, input),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['courses', 'mine', id] }),
+  });
+}
+
+export function useCourseInvites(id: number, enabled: boolean) {
+  return useQuery({
+    queryKey: ['courses', 'mine', id, 'invites'],
+    queryFn: () => coursesApi.listInvites(id),
+    enabled: enabled && !!getAccessToken(),
+  });
+}
+
+export function useAddCourseInvite(id: number) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (email: string) => coursesApi.addInvite(id, email),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['courses', 'mine', id, 'invites'] }),
+  });
+}
+
+export function useRemoveCourseInvite(id: number) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (email: string) => coursesApi.removeInvite(id, email),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['courses', 'mine', id, 'invites'] }),
   });
 }
 
@@ -217,6 +265,14 @@ export function useModerationLessonDocuments(lessonId: number | null) {
     queryKey: ['lessons', lessonId, 'documents', 'moderation'],
     queryFn: () => lessonsApi.listDocumentsForModeration(lessonId as number),
     enabled: lessonId !== null && !!getAccessToken(),
+  });
+}
+
+export function useAddLessonDocumentLink(lessonId: number | null) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: { title: string; url: string }) => lessonsApi.addDocumentLink(lessonId as number, input),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['lessons', lessonId, 'documents'] }),
   });
 }
 

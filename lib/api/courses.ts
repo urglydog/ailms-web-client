@@ -3,6 +3,7 @@ import { getAccessToken } from '@/lib/auth/token';
 import type {
   CourseEditDetail,
   CourseStatus,
+  CourseVisibility,
   CreateCourseInput,
   InstructorCourseSummary,
   Page,
@@ -52,6 +53,10 @@ export const coursesApi = {
   remove: (id: number) =>
     api.delete<void>(`/api/v1/courses/mine/${id}`, { token: authToken() }),
 
+  /** "Kích hoạt lại" (19/09/2026, tính năng mới) — khôi phục khóa đang ở trạng thái lưu trữ. */
+  reactivate: (id: number) =>
+    api.post<CourseEditDetail>(`/api/v1/courses/mine/${id}/reactivate`, undefined, { token: authToken() }),
+
   listModeration: (params: { status?: CourseStatus; page?: number; size?: number } = {}) =>
     api.get<Page<InstructorCourseSummary>>(
       `/api/v1/courses/moderation${buildQuery(params)}`,
@@ -66,4 +71,17 @@ export const coursesApi = {
 
   reject: (id: number, input: RejectCourseInput) =>
     api.post<CourseEditDetail>(`/api/v1/courses/moderation/${id}/reject`, input, { token: authToken() }),
+
+  /** "Đăng ký (Quyền riêng tư)" kiểu Udemy (19/09/2026) — Cài đặt khóa học. */
+  updateVisibility: (id: number, input: { visibility: CourseVisibility; password?: string | null }) =>
+    api.put<CourseEditDetail>(`/api/v1/courses/mine/${id}/visibility`, input, { token: authToken() }),
+
+  listInvites: (id: number) =>
+    api.get<string[]>(`/api/v1/courses/mine/${id}/invites`, { token: authToken() }),
+
+  addInvite: (id: number, email: string) =>
+    api.post<void>(`/api/v1/courses/mine/${id}/invites`, { email }, { token: authToken() }),
+
+  removeInvite: (id: number, email: string) =>
+    api.delete<void>(`/api/v1/courses/mine/${id}/invites/${encodeURIComponent(email)}`, { token: authToken() }),
 };

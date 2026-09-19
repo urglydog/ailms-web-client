@@ -11,6 +11,9 @@
 // ── Enum (khớp com.lms.common.enums) ────────────────────────────
 export type Role = 'STUDENT' | 'INSTRUCTOR' | 'ADMIN';
 export type CourseStatus = 'DRAFT' | 'PENDING' | 'PUBLISHED' | 'REJECTED' | 'ARCHIVED';
+
+/** "Đăng ký (Quyền riêng tư)" kiểu Udemy (19/09/2026). */
+export type CourseVisibility = 'PUBLIC' | 'PRIVATE_INVITE' | 'PRIVATE_PASSWORD';
 export type PaymentStatus = 'PENDING' | 'PAID' | 'FAILED' | 'EXPIRED';
 export type JobStatus = 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED' | 'SKIPPED' | 'CANCELLED';
 /** PARTIAL = đã có chunk phát được nhưng chưa ghép final.mp3 (BR-CHUNK-05) */
@@ -142,6 +145,9 @@ export interface CourseDetail extends CourseSummary {
   /** Ngôn ngữ đã lồng tiếng XONG (ít nhất 1 bài) — rỗng nếu chưa có. */
   dubbedLanguages: string[];
   learnerCount: number;
+  /** "Đăng ký (Quyền riêng tư)" kiểu Udemy (19/09/2026) — true khi cần nhập đúng mật khẩu mới
+   * ghi danh được (chế độ PRIVATE_PASSWORD). Không ảnh hưởng việc XEM trang chi tiết. */
+  requiresPassword: boolean;
 }
 
 export interface Chapter {
@@ -395,6 +401,9 @@ export interface InstructorCourseSummary {
   avgRating: number;
   totalLessons: number;
   createdAt: string;
+  /** % hồ sơ khóa học đã điền đủ (19/09/2026, mở rộng — giao diện tham khảo Udemy "Hoàn thành
+   * khóa học của bạn" ở trang danh sách): tiêu đề/mô tả/ảnh bìa/≥1 chương/≥1 bài học sẵn sàng. */
+  completionPercent: number;
 }
 
 export interface LessonEditItem {
@@ -407,6 +416,8 @@ export interface LessonEditItem {
   videoUrl: string | null;
   youtubeId: string | null;
   durationSec: number | null;
+  /** Mô tả bài giảng (15/09/2026, mở rộng — giao diện tham khảo Udemy) — null nếu chưa nhập. */
+  description: string | null;
 }
 
 export interface ChapterEditItem {
@@ -414,6 +425,8 @@ export interface ChapterEditItem {
   title: string;
   displayOrder: number;
   lessons: LessonEditItem[];
+  /** Mục tiêu học tập của phần này (15/09/2026, mở rộng — giao diện tham khảo Udemy). */
+  description: string | null;
 }
 
 export interface CourseEditDetail {
@@ -435,6 +448,8 @@ export interface CourseEditDetail {
   chapters: ChapterEditItem[];
   missingConditions: string[];
   canSubmit: boolean;
+  visibility: CourseVisibility;
+  hasEnrollPassword: boolean;
 }
 
 export interface CreateChapterInput {
@@ -443,6 +458,7 @@ export interface CreateChapterInput {
 
 export interface UpdateChapterInput {
   title: string;
+  description: string | null;
 }
 
 export interface CreateLessonInput {
@@ -452,6 +468,7 @@ export interface CreateLessonInput {
 export interface UpdateLessonInput {
   title: string;
   isPreview: boolean;
+  description: string | null;
 }
 
 export interface ReorderInput {
@@ -651,6 +668,9 @@ export interface CreatePaymentReq {
   /** Mã giảm giá học viên tự nhập (15/09/2026, mở rộng) — bỏ trống nếu không dùng mã (coupon
    * autoApply vẫn được xét dù không nhập gì, xem BR-COUPON-01/04). */
   couponCode?: string;
+  /** "Đăng ký (Quyền riêng tư)" kiểu Udemy (19/09/2026) — chỉ cần khi khóa học ở chế độ
+   * PRIVATE_PASSWORD (`CourseDetail.requiresPassword`), bỏ qua với mọi khóa khác. */
+  courseAccessPassword?: string;
 }
 
 export interface PaymentUrlRes {
