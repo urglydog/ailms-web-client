@@ -8,6 +8,7 @@ import { couponsApi } from '@/lib/api/coupons';
 import { ApiError } from '@/lib/api/client';
 import type { CourseDetail } from '@/types/domain';
 import { paymentsApi } from '@/lib/api/payments';
+import { getReferralCode } from '@/lib/referral';
 import { toast } from 'sonner';
 
 function CheckoutPageContent() {
@@ -86,6 +87,7 @@ function CheckoutPageContent() {
         billingPhone,
         couponCode: appliedCode ?? undefined,
         courseAccessPassword: course.requiresPassword ? courseAccessPassword : undefined,
+        referralCode: getReferralCode(course.id),
       });
       window.location.href = res.paymentUrl;
     } catch (err: unknown) {

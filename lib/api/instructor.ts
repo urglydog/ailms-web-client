@@ -1,11 +1,9 @@
-import { ApiError, api, resolveBaseUrl } from '@/lib/api/client';
+import { api } from '@/lib/api/client';
 import { getAccessToken } from '@/lib/auth/token';
-import type { ProblemDetail } from '@/types/domain';
 
 export interface InstructorVerification {
   id: number;
   idNumber: string;
-  idPhotoUrl: string;
   addressText: string;
   contentOwnershipConfirmed: boolean;
   verifiedAt: string;
@@ -19,7 +17,6 @@ export interface SubmitVerificationReq {
   idNumber: string;
   addressText: string;
   contentOwnershipConfirmed: boolean;
-  file: File;
 }
 
 /**
@@ -42,42 +39,8 @@ export const instructorApi = {
       token: getAccessToken() ?? undefined,
     }),
 
-  /**
-   * Multipart có kèm field text (`idNumber`/`addressText`/`contentOwnershipConfirmed`) NGOÀI
-   * file ảnh CCCD — khác khuôn `uploadFile()` dùng chung ở `lib/api/client.ts` (chỉ gửi đúng 1
-   * field `"file"`), nên tự dựng `FormData` + `fetch` ở đây thay vì tái dùng hàm đó.
-   */
-  submitVerification: async (req: SubmitVerificationReq): Promise<InstructorVerification> => {
-    const formData = new FormData();
-    formData.append('idNumber', req.idNumber);
-    formData.append('addressText', req.addressText);
-    formData.append('contentOwnershipConfirmed', String(req.contentOwnershipConfirmed));
-    formData.append('file', req.file);
-
-    const token = getAccessToken();
-    const res = await fetch(`${resolveBaseUrl()}/api/v1/instructor/verification`, {
-      method: 'POST',
-      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-      body: formData,
-    });
-
-    if (!res.ok) {
-      let problem: ProblemDetail;
-      try {
-        problem = (await res.json()) as ProblemDetail;
-      } catch {
-        problem = {
-          type: 'about:blank',
-          title: res.statusText,
-          status: res.status,
-          detail: `Yêu cầu thất bại với mã ${res.status}`,
-          instance: res.url,
-          code: 'NON_JSON_RESPONSE',
-          timestamp: new Date().toISOString(),
-        };
-      }
-      throw new ApiError(problem);
-    }
-    return (await res.json()) as InstructorVerification;
-  },
+  submitVerification: (req: SubmitVerificationReq) =>
+    api.post<InstructorVerification>('/api/v1/instructor/verification', req, {
+      token: getAccessToken() ?? undefined,
+    }),
 };

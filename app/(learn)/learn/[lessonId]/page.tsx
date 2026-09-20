@@ -29,8 +29,9 @@ import { useVoiceOptions } from '@/hooks/useVoiceOptions';
 import { api, ApiError } from '@/lib/api/client';
 import { lessonPlayerApi } from '@/lib/api/lessonPlayer';
 import { LiveChatPanel } from '@/components/community/LiveChatPanel';
+import { MessageInstructorFloatingButton } from '@/components/course/MessageInstructorFloatingButton';
 import { useSetLearnTitle } from '@/components/layout/LearnTitleContext';
-import { decodeAccessToken, getAccessToken } from '@/lib/auth/token';
+import { getAccessToken } from '@/lib/auth/token';
 import type { PipelineStep } from '@/types/domain';
 
 type MainTab = 'overview' | 'qna' | 'reviews' | 'materials' | 'gradebook' | 'resources';
@@ -726,7 +727,8 @@ function LearnPageContent() {
                   lesson.enrolled ? (
                     <LiveChatPanel
                       lessonId={lesson.lessonId}
-                      userName={hasToken ? (decodeAccessToken()?.sub ?? 'Học viên') : 'Học viên'}
+                      userName={currentUser?.fullName ?? 'Học viên'}
+                      currentUserId={currentUser?.id != null ? String(currentUser.id) : undefined}
                     />
                   ) : (
                     <LockedFeatureNotice feature="Hỏi đáp bài học" courseSlug={lesson.courseSlug} />
@@ -832,6 +834,10 @@ function LearnPageContent() {
             </button>
           </div>
         </div>
+      )}
+
+      {lesson?.enrolled && lesson.courseId && (
+        <MessageInstructorFloatingButton courseId={lesson.courseId} />
       )}
     </div>
   );

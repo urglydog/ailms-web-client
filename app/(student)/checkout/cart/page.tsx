@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useCart } from '@/hooks/useCart';
 import { paymentsApi } from '@/lib/api/payments';
+import { getReferralCodesFor } from '@/lib/referral';
 import { couponsApi } from '@/lib/api/coupons';
 import { ApiError } from '@/lib/api/client';
 import type { CouponPriceRes } from '@/types/domain';
@@ -87,6 +88,7 @@ function CartCheckoutContent() {
         billingName,
         billingPhone,
         couponCode: appliedCode ?? undefined,
+        referralCodes: getReferralCodesFor(items.map((item) => item.courseId)),
       });
       window.location.href = res.paymentUrl;
     } catch (err: unknown) {

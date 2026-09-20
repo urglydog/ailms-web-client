@@ -22,6 +22,8 @@ export interface AdminPayment {
   originalAmount: number | null;
   discountAmount: number;
   couponCode: string | null;
+  /** Chia doanh thu 2 mức (20/09/2026) — quyết định tỷ lệ ĐÃ áp dụng cho platformFee/instructorEarning ở trên. */
+  revenueSource: 'ORGANIC' | 'INSTRUCTOR_REFERRAL';
 }
 
 type SortField = 'txnRef' | 'userEmail' | 'amount' | 'paidAt';
@@ -231,6 +233,7 @@ export default function AdminPaymentsPage() {
                   </th>
                   <th className="px-6 py-4">Phí nền tảng</th>
                   <th className="px-6 py-4">Thực nhận</th>
+                  <th className="px-6 py-4">Nguồn</th>
                   <th className="px-6 py-4 cursor-pointer hover:bg-line/30" onClick={() => handleSort('paymentMethod' as SortField)}>
                     Phương thức <SortIcon field={'paymentMethod' as SortField} />
                   </th>
@@ -244,7 +247,7 @@ export default function AdminPaymentsPage() {
               <tbody className="divide-y divide-line">
                 {paginatedPayments.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="px-6 py-8 text-center">Không tìm thấy giao dịch nào phù hợp với bộ lọc.</td>
+                    <td colSpan={9} className="px-6 py-8 text-center">Không tìm thấy giao dịch nào phù hợp với bộ lọc.</td>
                   </tr>
                 ) : (
                   paginatedPayments.map((p) => (
@@ -259,6 +262,13 @@ export default function AdminPaymentsPage() {
                       </td>
                       <td className="px-6 py-4 text-success font-semibold">
                         {p.instructorEarning ? p.instructorEarning.toLocaleString('vi-VN') + 'đ' : '-'}
+                      </td>
+                      <td className="px-6 py-4">
+                        {p.revenueSource === 'INSTRUCTOR_REFERRAL' ? (
+                          <span className="inline-block bg-cyan-50 px-2.5 py-1 rounded-full text-xs font-semibold text-cyan-700">Giới thiệu</span>
+                        ) : (
+                          <span className="inline-block bg-line/20 px-2.5 py-1 rounded-full text-xs font-semibold text-ink-muted">Tự tìm thấy</span>
+                        )}
                       </td>
                       <td className="px-6 py-4">
                         <span className="inline-block bg-line/20 px-2.5 py-1 rounded-full text-xs font-semibold text-ink">
@@ -354,15 +364,32 @@ export default function AdminPaymentsPage() {
                   <p className="font-medium text-ink">{selectedPayment.billingPhone || 'Không có'}</p>
                 </div>
 
+                <div className="col-span-2">
+                  <p className="text-sm font-medium text-ink-muted mb-1">Nguồn doanh thu</p>
+                  {selectedPayment.revenueSource === 'INSTRUCTOR_REFERRAL' ? (
+                    <span className="inline-block rounded-full bg-cyan-50 px-2.5 py-1 text-xs font-semibold text-cyan-700">
+                      Liên kết giới thiệu riêng của Giảng viên
+                    </span>
+                  ) : (
+                    <span className="inline-block rounded-full bg-line/20 px-2.5 py-1 text-xs font-semibold text-ink-muted">
+                      Học viên tự tìm thấy trên nền tảng
+                    </span>
+                  )}
+                </div>
+
                 <div>
-                  <p className="text-sm font-medium text-ink-muted mb-1">Phí nền tảng (30%)</p>
+                  <p className="text-sm font-medium text-ink-muted mb-1">
+                    Phí nền tảng ({selectedPayment.revenueSource === 'INSTRUCTOR_REFERRAL' ? '3' : '63'}%)
+                  </p>
                   <p className="font-medium text-warning font-semibold">
                     {selectedPayment.platformFee ? selectedPayment.platformFee.toLocaleString('vi-VN') + 'đ' : '-'}
                   </p>
                 </div>
 
                 <div>
-                  <p className="text-sm font-medium text-ink-muted mb-1">Giảng viên nhận (70%)</p>
+                  <p className="text-sm font-medium text-ink-muted mb-1">
+                    Giảng viên nhận ({selectedPayment.revenueSource === 'INSTRUCTOR_REFERRAL' ? '97' : '37'}%)
+                  </p>
                   <p className="font-medium text-success font-semibold">
                     {selectedPayment.instructorEarning ? selectedPayment.instructorEarning.toLocaleString('vi-VN') + 'đ' : '-'}
                   </p>

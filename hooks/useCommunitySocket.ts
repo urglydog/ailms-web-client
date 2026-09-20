@@ -6,11 +6,18 @@ import { useEffect, useRef, useState } from 'react';
 import { getAccessToken, decodeAccessToken } from '@/lib/auth/token';
 
 export interface ChatMessage {
+  /** Id THẬT của tin nhắn (server gán lúc lưu) — (20/09/2026, sửa lỗi) trước đây bị lẫn với id
+   * người gửi, khiến nhiều tin GỐC cùng người gửi trong 1 phiên live trùng id, hỏng việc gom
+   * nhóm câu trả lời theo `parentId`. */
   id: string;
+  senderId: string;
   senderName: string;
+  senderAvatarUrl: string | null;
   content: string;
   timestamp: string;
   parentId?: string;
+  /** true nếu người gửi là giảng viên sở hữu khóa học — dùng để gắn nhãn "Giảng viên". */
+  isInstructor: boolean;
 }
 
 export function useCommunitySocket(lessonId: number | null) {
@@ -69,12 +76,14 @@ export function useCommunitySocket(lessonId: number | null) {
   const sendMessage = (content: string, senderName: string, parentId?: string) => {
     if (clientRef.current && clientRef.current.connected) {
       const decoded = decodeAccessToken();
-      const userId = decoded ? String(decoded.id) : crypto.randomUUID();
-      const payload: Record<string, string> = { 
-          id: userId, 
-          content, 
-          senderName, 
-          timestamp: new Date().toISOString() 
+      const senderId = decoded ? String(decoded.id) : '';
+      if (!senderId) return;
+      // id/timestamp/isInstructor do SERVER gán lúc lưu (xem ChatMessageDto) — client chỉ cần
+      // gửi senderId/senderName/content/parentId, các field còn lại bị bỏ qua khi nhận vào.
+      const payload: Record<string, string> = {
+          senderId,
+          content,
+          senderName,
       };
       if (parentId) {
           payload.parentId = parentId;

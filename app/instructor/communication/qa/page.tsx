@@ -5,6 +5,7 @@ import { ColumnsIcon, ListIcon } from '@/components/instructor/SidebarIcons';
 import { CourseFilterDropdown } from '@/components/instructor/communication/CourseFilterDropdown';
 import { useInstructorCourseOptions } from '@/hooks/useDashboard';
 import { useQaQuestions, useQaThread, useReplyToQuestion } from '@/hooks/useCommunication';
+import { Avatar } from '@/components/ui/Avatar';
 import type { QaQuestion } from '@/lib/api/communication';
 
 type SortOption = 'newest' | 'oldest';
@@ -165,8 +166,9 @@ function QuestionRow({ question: q, active, onClick }: { question: QaQuestion; a
         <span className="truncate text-[12px] font-semibold text-cyan-700">{q.courseTitle} · {q.lessonTitle}</span>
         <span className="shrink-0 text-[11.5px] text-gray-400">{new Date(q.createdAt).toLocaleDateString('vi-VN')}</span>
       </div>
-      <p className="line-clamp-2 text-[13.5px] text-gray-800">
-        <span className="font-semibold">{q.userName}: </span>{q.content}
+      <p className="line-clamp-2 flex items-start gap-1.5 text-[13.5px] text-gray-800">
+        <Avatar name={q.userName} avatarUrl={q.userAvatarUrl} size={18} />
+        <span><span className="font-semibold">{q.userName}: </span>{q.content}</span>
       </p>
       <div className="flex items-center gap-2 text-[11.5px]">
         <span className={`rounded-full px-2 py-0.5 font-semibold ${q.answerCount === 0 ? 'bg-amber-50 text-amber-700' : 'bg-gray-100 text-gray-600'}`}>
@@ -196,24 +198,30 @@ function QaThreadPanel({ questionId }: { questionId: string }) {
         {isLoading && <p className="text-sm text-gray-500">Đang tải...</p>}
         {thread && (
           <div className="flex flex-col gap-3">
-            <div className="rounded-lg bg-gray-50 p-3">
-              <div className="mb-1 flex items-center justify-between text-[12px] text-gray-500">
-                <span className="font-semibold text-gray-800">{thread.question.userName}</span>
-                <span>{new Date(thread.question.createdAt).toLocaleString('vi-VN')}</span>
+            <div className="flex items-start gap-2 rounded-lg bg-gray-50 p-3">
+              <Avatar name={thread.question.userName} avatarUrl={thread.question.userAvatarUrl} size={26} />
+              <div className="min-w-0 flex-1">
+                <div className="mb-1 flex items-center justify-between text-[12px] text-gray-500">
+                  <span className="font-semibold text-gray-800">{thread.question.userName}</span>
+                  <span>{new Date(thread.question.createdAt).toLocaleString('vi-VN')}</span>
+                </div>
+                <p className="text-[13.5px] text-gray-800">{thread.question.content}</p>
+                <p className="mt-1.5 text-[11.5px] text-gray-400">{thread.question.courseTitle} · {thread.question.lessonTitle}</p>
               </div>
-              <p className="text-[13.5px] text-gray-800">{thread.question.content}</p>
-              <p className="mt-1.5 text-[11.5px] text-gray-400">{thread.question.courseTitle} · {thread.question.lessonTitle}</p>
             </div>
 
             {thread.answers.map((a) => (
-              <div key={a.id} className={`rounded-lg p-3 ${a.isInstructor ? 'bg-cyan-50' : 'bg-gray-50'}`}>
-                <div className="mb-1 flex items-center justify-between text-[12px] text-gray-500">
-                  <span className={`font-semibold ${a.isInstructor ? 'text-cyan-700' : 'text-gray-800'}`}>
-                    {a.userName}{a.isInstructor ? ' (Giảng viên)' : ''}
-                  </span>
-                  <span>{new Date(a.createdAt).toLocaleString('vi-VN')}</span>
+              <div key={a.id} className={`flex items-start gap-2 rounded-lg p-3 ${a.isInstructor ? 'bg-cyan-50' : 'bg-gray-50'}`}>
+                <Avatar name={a.userName} avatarUrl={a.userAvatarUrl} size={26} />
+                <div className="min-w-0 flex-1">
+                  <div className="mb-1 flex items-center justify-between text-[12px] text-gray-500">
+                    <span className={`font-semibold ${a.isInstructor ? 'text-cyan-700' : 'text-gray-800'}`}>
+                      {a.userName}{a.isInstructor ? ' (Giảng viên)' : ''}
+                    </span>
+                    <span>{new Date(a.createdAt).toLocaleString('vi-VN')}</span>
+                  </div>
+                  <p className="text-[13.5px] text-gray-800">{a.content}</p>
                 </div>
-                <p className="text-[13.5px] text-gray-800">{a.content}</p>
               </div>
             ))}
           </div>

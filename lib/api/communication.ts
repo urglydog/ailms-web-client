@@ -14,6 +14,7 @@ export interface QaQuestion {
   courseId: number;
   courseTitle: string;
   userName: string;
+  userAvatarUrl: string | null;
   content: string;
   createdAt: string;
   answerCount: number;
@@ -23,6 +24,7 @@ export interface QaQuestion {
 export interface QaAnswer {
   id: string;
   userName: string;
+  userAvatarUrl: string | null;
   content: string;
   createdAt: string;
   isInstructor: boolean;
@@ -97,6 +99,7 @@ export interface MessageItem {
   id: number;
   senderId: number;
   senderName: string;
+  senderAvatarUrl: string | null;
   content: string;
   createdAt: string;
   mine: boolean;

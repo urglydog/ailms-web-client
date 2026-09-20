@@ -19,6 +19,9 @@ export interface RevenueRow {
   instructorEarning: number;
   paidAt: string;
   couponCode: string | null;
+  /** Chia doanh thu 2 mức (20/09/2026) — ORGANIC (37%) hoặc INSTRUCTOR_REFERRAL (97%, mua qua
+   * liên kết giới thiệu riêng của Giảng viên). */
+  revenueSource: 'ORGANIC' | 'INSTRUCTOR_REFERRAL';
 }
 
 export interface StudentRow {
