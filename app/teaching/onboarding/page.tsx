@@ -47,7 +47,6 @@ export default function BecomeInstructorWizard() {
   const [idNumber, setIdNumber] = useState('');
   const [addressText, setAddressText] = useState('');
   const [confirmed, setConfirmed] = useState(false);
-  const [file, setFile] = useState<File | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -64,7 +63,7 @@ export default function BecomeInstructorWizard() {
     if (verificationStatus?.verified) router.replace('/instructor/courses');
   }, [verificationStatus, router]);
 
-  const isFormValid = idNumber.trim().length > 0 && addressText.trim().length > 0 && !!file && confirmed;
+  const isFormValid = idNumber.trim().length > 0 && addressText.trim().length > 0 && confirmed;
   const isSubmitting = becomeInstructor.isPending || submitVerification.isPending;
 
   const handleFinish = async () => {
@@ -77,7 +76,6 @@ export default function BecomeInstructorWizard() {
         idNumber: idNumber.trim(),
         addressText: addressText.trim(),
         contentOwnershipConfirmed: confirmed,
-        file: file as File,
       });
       setStep(4);
     } catch (err) {
@@ -176,17 +174,6 @@ export default function BecomeInstructorWizard() {
                 value={addressText}
                 onChange={(e) => setAddressText(e.target.value)}
                 className="w-full rounded-lg border border-line p-3 text-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
-              />
-            </div>
-            <div>
-              <label className="mb-1.5 block text-sm font-semibold text-ink">
-                Ảnh CCCD/CMND <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-                className="w-full rounded-lg border border-line p-2.5 text-sm"
               />
             </div>
             <label className="flex items-start gap-2 text-sm text-ink">

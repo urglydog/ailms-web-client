@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { ChapterAccordion } from '@/components/course/ChapterAccordion';
 import { CoursePreview } from '@/components/course/CoursePreview';
 import { EnrollButton } from '@/components/course/EnrollButton';
+import { ReferralCapture } from '@/components/course/ReferralCapture';
 import { ReviewsSection } from '@/components/course/ReviewsSection';
 import { CourseLiveBanner } from '@/components/live/CourseLiveBanner';
 import { Badge } from '@/components/ui/Badge';
@@ -32,6 +33,8 @@ export function CourseDetailView({ course }: { course: CourseDetail }) {
 
   return (
     <div>
+      <ReferralCapture courseId={course.id} />
+
       {/* ── Vùng hero nền đen ── */}
       <div className="bg-ink text-white">
         <div className="shell flex flex-col gap-4 py-10">

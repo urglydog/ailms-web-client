@@ -336,7 +336,7 @@ export function Header() {
                         notifications.map(n => (
                           <div key={n.id} className={`flex flex-col gap-1 rounded-xl p-3 ${!n.isRead ? 'bg-accent/5' : 'hover:bg-surface'}`}>
                             <span className="text-[13px] font-semibold text-ink">{n.title}</span>
-                            <span className="text-[12.5px] text-ink-muted">{n.message}</span>
+                            <span className="text-[12.5px] text-ink-muted">{n.content}</span>
                             <span className="text-[10px] text-ink-faint">{new Date(n.createdAt).toLocaleDateString('vi-VN')}</span>
                           </div>
                         ))

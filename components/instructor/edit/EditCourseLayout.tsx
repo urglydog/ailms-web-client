@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState, type ReactNode } from 'react';
 import { CourseStatusBadge } from '@/components/course/CourseStatusBadge';
 import { ChevronDownIcon } from '@/components/instructor/CurriculumIcons';
+import { CourseReferralSection } from '@/components/instructor/edit/CourseReferralSection';
 import { CourseVisibilitySection } from '@/components/instructor/edit/CourseVisibilitySection';
 import { ArrowLeftIcon, EyeIcon, SettingsIcon } from '@/components/instructor/SidebarIcons';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
@@ -274,6 +275,8 @@ export function EditCourseLayout({ courseId, children }: { courseId: number; chi
               </div>
 
               <CourseVisibilitySection courseId={courseId} course={course} />
+
+              <CourseReferralSection course={course} />
 
               <div className="p-6 text-[12.5px] text-gray-400">
                 Quản lý đồng giảng viên đang được phát triển, sẽ bổ sung ở bản cập nhật sau.

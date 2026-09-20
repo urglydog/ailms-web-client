@@ -450,6 +450,9 @@ export interface CourseEditDetail {
   canSubmit: boolean;
   visibility: CourseVisibility;
   hasEnrollPassword: boolean;
+  /** Chia doanh thu 2 mức (20/09/2026) — dựng liên kết giới thiệu `/courses/{slug}?ref=
+   * {referralCode}`. Chỉ trả về ở đây (CHÍNH chủ khóa học), không lộ qua API công khai. */
+  referralCode: string;
 }
 
 export interface CreateChapterInput {
@@ -671,6 +674,10 @@ export interface CreatePaymentReq {
   /** "Đăng ký (Quyền riêng tư)" kiểu Udemy (19/09/2026) — chỉ cần khi khóa học ở chế độ
    * PRIVATE_PASSWORD (`CourseDetail.requiresPassword`), bỏ qua với mọi khóa khác. */
   courseAccessPassword?: string;
+  /** Chia doanh thu 2 mức (20/09/2026) — mã từ liên kết giới thiệu riêng của Giảng viên
+   * (query `?ref=` đọc lúc vào trang chi tiết khóa học, xem `lib/referral.ts`). Khớp mã của
+   * ĐÚNG khóa này thì Giảng viên hưởng 97% thay vì 37%. */
+  referralCode?: string;
 }
 
 export interface PaymentUrlRes {
@@ -705,6 +712,9 @@ export interface CreateBatchPaymentReq {
    * toán, mỗi khóa vẫn tự tính coupon tốt nhất — có thể một khóa lại có coupon autoApply lời
    * hơn coupon nhập tay, xem `CouponService.resolveBestPrice`). */
   couponCode?: string;
+  /** Chia doanh thu 2 mức (20/09/2026) — mã giới thiệu RIÊNG cho từng khóa trong giỏ, khoá
+   * theo `courseId` (xem `lib/referral.ts`). Khóa nào không có entry ở đây tính ORGANIC. */
+  referralCodes?: Record<number, string>;
 }
 
 /** 1 dòng trong giỏ hàng — đủ dữ liệu để hiển thị trực tiếp, không cần gọi thêm API chi tiết

@@ -55,10 +55,11 @@ export default function RevenueListPage() {
       </div>
 
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-        <div className="grid grid-cols-[1.6fr_120px_120px_120px_140px] gap-3 border-b border-gray-200 bg-gray-50 px-4 py-2.5 text-[11.5px] font-bold text-gray-500">
+        <div className="grid grid-cols-[1.4fr_110px_110px_130px_100px_130px] gap-3 border-b border-gray-200 bg-gray-50 px-4 py-2.5 text-[11.5px] font-bold text-gray-500">
           <span>Khóa học</span>
           <span>Số tiền</span>
           <span>Thực nhận</span>
+          <span>Nguồn</span>
           <span>Mã giảm giá</span>
           <span>Ngày thanh toán</span>
         </div>
@@ -71,13 +72,20 @@ export default function RevenueListPage() {
         {rows?.map((row, idx) => (
           <div
             key={idx}
-            className={`grid grid-cols-[1.6fr_120px_120px_120px_140px] items-center gap-3 px-4 py-2.5 text-[13px] ${
+            className={`grid grid-cols-[1.4fr_110px_110px_130px_100px_130px] items-center gap-3 px-4 py-2.5 text-[13px] ${
               idx < rows.length - 1 ? 'border-b border-gray-100' : ''
             }`}
           >
             <span className="truncate font-semibold text-gray-900">{row.courseTitle}</span>
             <span className="text-gray-600">{formatMoney(row.amount)}</span>
             <span className="font-semibold text-green-600">{formatMoney(row.instructorEarning)}</span>
+            <span>
+              {row.revenueSource === 'INSTRUCTOR_REFERRAL' ? (
+                <span className="rounded-full bg-cyan-50 px-2 py-0.5 text-[11px] font-bold text-cyan-700">Giới thiệu (97%)</span>
+              ) : (
+                <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[11px] font-bold text-gray-600">Tự tìm thấy (37%)</span>
+              )}
+            </span>
             <span className="font-mono text-[12px] text-gray-500">{row.couponCode ?? '—'}</span>
             <span className="text-gray-500">{new Date(row.paidAt).toLocaleDateString('vi-VN')}</span>
           </div>

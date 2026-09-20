@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 
 interface Notification {
   id: number;
-  message: string;
+  title: string;
+  content: string;
   type: string;
   isRead: boolean;
   createdAt: string;
@@ -66,14 +67,31 @@ export default function NotificationsPage() {
     });
   };
 
+  /** (20/09/2026, sửa lỗi) — trước đây map theo SUCCESS/WARNING/ERROR/INFO, không khớp bất kỳ
+   * `type` thật nào backend từng gửi (`NotificationService.notify`) nên luôn rơi về hiển thị
+   * chuỗi type thô. */
   const getTypeLabel = (type: string) => {
     const labels: { [key: string]: string } = {
-      'SUCCESS': 'Thành công',
-      'WARNING': 'Cảnh báo',
-      'ERROR': 'Lỗi',
-      'INFO': 'Thông tin'
+      NEW_MESSAGE: 'Tin nhắn',
+      ANNOUNCEMENT: 'Thông báo khóa học',
+      ASSIGNMENT_GRADED: 'Chấm bài tập',
+      DUBBING_COMPLETED: 'Lồng tiếng xong',
+      DUBBING_FAILED: 'Lồng tiếng lỗi',
+      COURSE_APPROVED: 'Khóa học được duyệt',
+      NEW_OFFICIAL_MATERIAL: 'Học liệu mới',
+      NEW_PERSONAL_MATERIAL: 'Học liệu cá nhân',
+      SRS_REMINDER: 'Ôn tập Flashcard',
     };
     return labels[type] || type;
+  };
+
+  const getTypeColor = (type: string) => {
+    if (type === 'DUBBING_FAILED') return { bg: '#fee2e2', text: '#991b1b' };
+    if (type === 'ANNOUNCEMENT' || type === 'COURSE_APPROVED' || type === 'DUBBING_COMPLETED') {
+      return { bg: '#dcfce7', text: '#166534' };
+    }
+    if (type === 'SRS_REMINDER') return { bg: '#fef3c7', text: '#b45309' };
+    return { bg: '#dbeafe', text: '#1e40af' };
   };
 
   if (loading) {
@@ -118,18 +136,18 @@ export default function NotificationsPage() {
               <div className="flex justify-between items-start gap-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="text-xs font-semibold px-2 py-1 rounded"
-                          style={{
-                            backgroundColor: notif.type === 'SUCCESS' ? '#dcfce7' : notif.type === 'ERROR' ? '#fee2e2' : notif.type === 'WARNING' ? '#fef3c7' : '#dbeafe',
-                            color: notif.type === 'SUCCESS' ? '#166534' : notif.type === 'ERROR' ? '#991b1b' : notif.type === 'WARNING' ? '#b45309' : '#1e40af'
-                          }}>
+                    <span
+                      className="text-xs font-semibold px-2 py-1 rounded"
+                      style={{ backgroundColor: getTypeColor(notif.type).bg, color: getTypeColor(notif.type).text }}
+                    >
                       {getTypeLabel(notif.type)}
                     </span>
                     {!notif.isRead && (
                       <span className="inline-block w-2 h-2 bg-accent rounded-full"></span>
                     )}
                   </div>
-                  <p className="text-ink text-sm">{notif.message}</p>
+                  <p className="font-semibold text-ink text-sm">{notif.title}</p>
+                  <p className="text-ink-muted text-sm mt-0.5">{notif.content}</p>
                   <p className="text-xs text-ink-muted mt-2">
                     {formatDate(notif.createdAt)}
                   </p>

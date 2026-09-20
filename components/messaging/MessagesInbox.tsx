@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { SearchIcon, SendIcon } from '@/components/instructor/SidebarIcons';
 import { useConversationMessages, useConversations, useSendMessage } from '@/hooks/useCommunication';
+import { Avatar } from '@/components/ui/Avatar';
 
 type SortOption = 'newest' | 'oldest';
 
@@ -105,22 +106,25 @@ export function MessagesInbox({
               key={c.id}
               type="button"
               onClick={() => setSelectedId(c.id)}
-              className={`flex w-full flex-col gap-0.5 border-b border-gray-50 px-3 py-2.5 text-left transition-colors ${
+              className={`flex w-full items-start gap-2.5 border-b border-gray-50 px-3 py-2.5 text-left transition-colors ${
                 selectedId === c.id ? 'bg-cyan-50' : 'hover:bg-gray-50'
               }`}
             >
-              <div className="flex items-center justify-between gap-2">
-                <span className="truncate text-[13px] font-semibold text-gray-900">{c.otherUserName}</span>
-                {c.unreadCount > 0 && (
-                  <span className="shrink-0 rounded-full bg-cyan-600 px-1.5 py-0.5 text-[10px] font-bold text-white">
-                    {c.unreadCount > 9 ? '9+' : c.unreadCount}
-                  </span>
+              <Avatar name={c.otherUserName} avatarUrl={c.otherUserAvatarUrl} size={34} />
+              <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="truncate text-[13px] font-semibold text-gray-900">{c.otherUserName}</span>
+                  {c.unreadCount > 0 && (
+                    <span className="shrink-0 rounded-full bg-cyan-600 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                      {c.unreadCount > 9 ? '9+' : c.unreadCount}
+                    </span>
+                  )}
+                </div>
+                {c.courseTitle && <span className="truncate text-[11px] text-gray-400">{c.courseTitle}</span>}
+                {c.lastMessagePreview && (
+                  <span className="truncate text-[12px] text-gray-500">{c.lastMessagePreview}</span>
                 )}
               </div>
-              {c.courseTitle && <span className="truncate text-[11px] text-gray-400">{c.courseTitle}</span>}
-              {c.lastMessagePreview && (
-                <span className="truncate text-[12px] text-gray-500">{c.lastMessagePreview}</span>
-              )}
             </button>
           ))}
         </div>
@@ -132,14 +136,22 @@ export function MessagesInbox({
             Chọn 1 hội thoại để xem tin nhắn
           </div>
         ) : (
-          <ConversationThread conversationId={selected.id} otherUserName={selected.otherUserName} />
+          <ConversationThread
+            conversationId={selected.id}
+            otherUserName={selected.otherUserName}
+            otherUserAvatarUrl={selected.otherUserAvatarUrl}
+          />
         )}
       </div>
     </div>
   );
 }
 
-function ConversationThread({ conversationId, otherUserName }: { conversationId: number; otherUserName: string }) {
+function ConversationThread({
+  conversationId, otherUserName, otherUserAvatarUrl,
+}: {
+  conversationId: number; otherUserName: string; otherUserAvatarUrl: string | null;
+}) {
   const { data: messages, isLoading } = useConversationMessages(conversationId);
   const sendMessage = useSendMessage();
   const [content, setContent] = useState('');
@@ -151,7 +163,8 @@ function ConversationThread({ conversationId, otherUserName }: { conversationId:
 
   return (
     <>
-      <div className="border-b border-gray-100 px-4 py-3">
+      <div className="flex items-center gap-2.5 border-b border-gray-100 px-4 py-3">
+        <Avatar name={otherUserName} avatarUrl={otherUserAvatarUrl} size={30} />
         <span className="font-display text-[14px] font-bold text-gray-900">{otherUserName}</span>
       </div>
 
@@ -159,7 +172,8 @@ function ConversationThread({ conversationId, otherUserName }: { conversationId:
         {isLoading && <p className="text-center text-[13px] text-gray-500">Đang tải...</p>}
         <div className="flex flex-col gap-2">
           {messages?.map((m) => (
-            <div key={m.id} className={`flex ${m.mine ? 'justify-end' : 'justify-start'}`}>
+            <div key={m.id} className={`flex items-end gap-2 ${m.mine ? 'flex-row-reverse' : ''}`}>
+              <Avatar name={m.senderName} avatarUrl={m.senderAvatarUrl} size={24} />
               <div
                 className={`max-w-[70%] rounded-xl px-3 py-2 text-[13px] ${
                   m.mine ? 'bg-cyan-600 text-white' : 'bg-gray-100 text-gray-800'
