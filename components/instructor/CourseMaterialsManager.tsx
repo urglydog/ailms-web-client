@@ -15,7 +15,7 @@ import { MaterialLanguagePicker } from '@/components/materials/MaterialLanguageP
 import { MaterialFolderTree } from './MaterialFolderTree';
 
 import { DndContext, useDraggable, useDroppable, DragOverlay, DragStartEvent, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
-import { GripVertical, Link as LinkIcon, Trash2, FileText, MoreVertical, Plus, Layers, LayoutGrid, List, Search, X, ChevronDown } from 'lucide-react';
+import { GripVertical, Link as LinkIcon, Trash2, FileText, Plus, Layers, LayoutGrid, List, Search, X, ChevronDown } from 'lucide-react';
 
 
 interface CourseMaterialsManagerProps {

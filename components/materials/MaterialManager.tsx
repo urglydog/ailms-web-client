@@ -407,10 +407,7 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
     }
   }) || [];
 
-  // Context-aware badge: count official materials newer than last visit to this tab
-  const officialUnreadCount = filteredOfficialMaterials.filter(
-    m => new Date(m.createdAt).getTime() > officialLastSeen
-  ).length;
+  // Context-aware badge
 
   const filteredCourseResources = courseResources?.filter(r => {
     if (!lessonId) {

@@ -387,7 +387,6 @@ export function MaterialFolderTree({
           )}
 
           {contextMenu.type === 'MATERIAL' && (() => {
-            const mat = materials.find(m => m.id === contextMenu.targetId);
             return (
               <>
                 <button
