@@ -24,8 +24,16 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
   const deleteMutation = useDeleteMaterial(courseId);
 
   const { notifications } = useNotification();
-  const officialUnreadCount = notifications.filter(n => !n.isRead && n.type === 'NEW_OFFICIAL_MATERIAL').length;
+  // Only track personal material notifications (global unread)
   const personalUnreadCount = notifications.filter(n => !n.isRead && n.type === 'NEW_PERSONAL_MATERIAL').length;
+
+  // Badge for Official tab: count NEW official materials seen since last visit
+  // using a localStorage timestamp per course, so it's context-aware.
+  const [officialLastSeen, setOfficialLastSeen] = useState<number>(() => {
+    if (typeof window === 'undefined') return 0;
+    const key = `official_last_seen_${courseId}`;
+    return parseInt(localStorage.getItem(key) ?? '0', 10);
+  });
 
   const { data: officialMaterials } = useQuery<InstructorMaterial[]>({
     queryKey: ['official-materials', courseId],
@@ -399,6 +407,11 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
     }
   }) || [];
 
+  // Context-aware badge: count official materials newer than last visit to this tab
+  const officialUnreadCount = filteredOfficialMaterials.filter(
+    m => new Date(m.createdAt).getTime() > officialLastSeen
+  ).length;
+
   const filteredCourseResources = courseResources?.filter(r => {
     if (!lessonId) {
       return !r.chapterId && !r.lessonId;
@@ -501,7 +514,15 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
       {/* Tabs Navigation */}
       <div className="flex border-b border-line gap-6">
         <button
-          onClick={() => setActiveTab('OFFICIAL')}
+          onClick={() => {
+            setActiveTab('OFFICIAL');
+            // Mark all current official materials as "seen" → reset badge
+            const now = Date.now();
+            if (typeof window !== 'undefined') {
+              localStorage.setItem(`official_last_seen_${courseId}`, String(now));
+            }
+            setOfficialLastSeen(now);
+          }}
           className={`pb-3 text-sm font-bold border-b-2 transition-colors relative ${
             activeTab === 'OFFICIAL' ? 'border-accent text-accent' : 'border-transparent text-ink-muted hover:text-ink'
           }`}

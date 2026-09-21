@@ -11,6 +11,9 @@ export const useReviewFlashcard = () => {
     onSuccess: () => {
       // Invalidate deck study cards to refresh due status
       queryClient.invalidateQueries({ queryKey: ['deck-study-cards'] });
+      // Also invalidate material detail so FlashcardStudyMode (which reads
+      // from useMaterialDetail, NOT useDeckStudyCards) gets updated isDue flags.
+      queryClient.invalidateQueries({ queryKey: ['materials', 'detail'] });
     },
     onError: (error: Error) => {
       toast.error(error.message || 'Lỗi khi cập nhật tiến độ ôn tập');

@@ -40,6 +40,7 @@ export interface InstructorMaterial {
   language?: string;
   versionNo?: number;
   materialId?: number;
+  folderId?: number | null;
   questionCount?: number;
   randomPickCount?: number | null;
   allowReview?: boolean;

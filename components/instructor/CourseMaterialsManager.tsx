@@ -291,7 +291,6 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
           generationId={inspectGenerationId}
           material={activeMat}
           onBack={() => setInspectGenerationId(null)}
-          onToggleOfficial={() => {}}
           onDelete={() => setConfirmDeleteId(inspectGenerationId)}
         />
         {renderDeleteModal()}
@@ -465,13 +464,11 @@ function MaterialWorkspaceViewer({
   generationId,
   material,
   onBack,
-  onToggleOfficial,
   onDelete
 }: {
   generationId: number;
   material?: InstructorMaterial;
   onBack: () => void;
-  onToggleOfficial: () => void;
   onDelete?: () => void;
 }) {
   const { data: detail, isLoading } = useQuery<MaterialDetailRes>({
@@ -564,29 +561,20 @@ function MaterialWorkspaceViewer({
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Removed old configure quiz button */}
-
-          <button
-            onClick={onToggleOfficial}
-            className={`inline-flex items-center rounded-xl px-4 py-2 text-xs font-bold transition-all border ${material?.isOfficial
-              ? 'bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100'
-              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 shadow-sm'
-              }`}
-          >
-            {material?.isOfficial ? '★ Đang là Official' : '☆ Phát hành làm Official'}
-          </button>
+          {/* Official & Delete actions: primary via right-click context menu,
+              secondary buttons here for quick access when workspace is open */}
           {onDelete && (
             <button
               onClick={onDelete}
-              className="inline-flex items-center rounded-xl px-4 py-2 text-xs font-bold bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 transition-all ml-1 shadow-sm"
+              className="inline-flex items-center rounded-xl px-3 py-1.5 text-xs font-bold bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 transition-all shadow-sm"
               title="Xóa toàn bộ học liệu này"
             >
-              Xóa Bộ Học Liệu
+              Xóa
             </button>
           )}
           <button
             onClick={onBack}
-            className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors ml-2"
+            className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors"
             title="Đóng Workspace"
           >
             ✕
