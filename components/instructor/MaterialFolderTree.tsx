@@ -1,134 +1,269 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Folder, MoreVertical, Plus, Trash2, ChevronRight, ChevronDown, FolderOpen } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Folder, MoreVertical, Plus, Trash2, ChevronRight, ChevronDown, FolderOpen, Star, MoveRight } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { materialsApi } from '@/lib/api/materials';
+import { materialsApi, InstructorMaterial } from '@/lib/api/materials';
 import { toast } from 'sonner';
 import { createPortal } from 'react-dom';
 
-export function MaterialFolderTree({ courseId, folders, materials, onInspect, setConfirmAction, DraggableCard }: { courseId: number, folders: {id: number, name: string, parentId?: number}[], materials: {id: number, title?: string, folderId?: number}[], onInspect: (id: number) => void, setConfirmAction: (action: {title: string, message: string, onConfirm: () => void} | null) => void, DraggableCard: React.ElementType }) {
+type FolderItem = { id: number; name: string; parentId?: number };
+type MaterialItem = InstructorMaterial;
+
+interface MaterialFolderTreeProps {
+  courseId: number;
+  folders: FolderItem[];
+  materials: MaterialItem[];
+  onInspect: (id: number) => void;
+  setConfirmAction: (action: { title: string; message: string; onConfirm: () => void } | null) => void;
+  DraggableCard: React.ElementType;
+}
+
+export function MaterialFolderTree({
+  courseId,
+  folders,
+  materials,
+  onInspect,
+  setConfirmAction,
+  DraggableCard,
+}: MaterialFolderTreeProps) {
   const queryClient = useQueryClient();
-  const [contextMenu, setContextMenu] = useState<{ x: number, y: number, type: 'ROOT' | 'FOLDER' | 'MATERIAL', targetId?: number } | null>(null);
+
+  const [contextMenu, setContextMenu] = useState<{
+    x: number;
+    y: number;
+    type: 'ROOT' | 'FOLDER' | 'MATERIAL';
+    targetId?: number;
+  } | null>(null);
+
   const [expandedFolders, setExpandedFolders] = useState<Record<number, boolean>>({});
-  const [promptAction, setPromptAction] = useState<{ title: string, placeholder: string, onSubmit: (val: string) => void } | null>(null);
+
+  // New: folder-picker modal state (replaces raw-ID prompt for move-to-folder)
+  const [folderPickerFor, setFolderPickerFor] = useState<number | null>(null); // materialId
+  const [folderPickerSearch, setFolderPickerSearch] = useState('');
+
+  // Simple text-input modal for folder creation (name only — no raw IDs)
+  const [createFolderModal, setCreateFolderModal] = useState<{ parentId?: number } | null>(null);
+  const [createFolderName, setCreateFolderName] = useState('');
+
+  // Keyboard clipboard state (Issue 4)
+  const [selectedMaterialId, setSelectedMaterialId] = useState<number | null>(null);
+  const [clipboard, setClipboard] = useState<number | null>(null); // materialId copied
 
   // Mutations
   const createFolderMutation = useMutation({
-    mutationFn: (vars: { name: string, parentId?: number }) => materialsApi.createFolder(courseId, vars.name, vars.parentId),
+    mutationFn: (vars: { name: string; parentId?: number }) =>
+      materialsApi.createFolder(courseId, vars.name, vars.parentId),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['instructor-folders', courseId] }),
+    onError: () => toast.error('Không thể tạo thư mục'),
   });
+
   const deleteFolderMutation = useMutation({
     mutationFn: (id: number) => materialsApi.deleteFolder(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['instructor-folders', courseId] }),
-    onError: (_err: unknown) => toast.error('Không thể xóa thư mục (Có thể do lỗi ràng buộc)')
+    onError: () => toast.error('Không thể xóa thư mục (Có thể do lỗi ràng buộc)'),
   });
+
   const moveToFolderMutation = useMutation({
-    mutationFn: (vars: { id: number, folderId: number | null }) => materialsApi.moveToFolder(vars.id, vars.folderId),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] }),
+    mutationFn: (vars: { id: number; folderId: number | null }) =>
+      materialsApi.moveToFolder(vars.id, vars.folderId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] });
+      toast.success('Đã di chuyển học liệu');
+    },
+    onError: () => toast.error('Không thể di chuyển học liệu'),
   });
 
-  const handleContextMenu = (e: React.MouseEvent, type: 'ROOT' | 'FOLDER' | 'MATERIAL', targetId?: number) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setContextMenu({ x: e.clientX, y: e.clientY, type, targetId });
-  };
+  const deleteMaterialMutation = useMutation({
+    mutationFn: (id: number) => materialsApi.deleteMaterial(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] });
+      toast.success('Đã xóa học liệu');
+    },
+    onError: () => toast.error('Không thể xóa học liệu'),
+  });
 
+  // Official toggle mutations
+  const setOfficialMutation = useMutation({
+    mutationFn: (vars: { id: number; type: string; isOfficial: boolean }) => {
+      if (vars.type === 'QUIZ') return materialsApi.setQuizOfficial(vars.id, vars.isOfficial);
+      if (vars.type === 'MINDMAP') return materialsApi.setMindmapOfficial(vars.id, vars.isOfficial);
+      return materialsApi.setFlashcardOfficial(vars.id, vars.isOfficial);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] });
+      toast.success('Đã cập nhật trạng thái Official');
+    },
+    onError: () => toast.error('Không thể cập nhật trạng thái Official'),
+  });
 
-  const handleCreateFolder = (parentId?: number) => {
-    setPromptAction({
-      title: "Tạo thư mục mới",
-      placeholder: "Nhập tên thư mục...",
-      onSubmit: (name) => {
-        if (name) createFolderMutation.mutate({ name, parentId });
-      }
-    });
-    setContextMenu(null);
-  };
-
-  const handleDeleteFolder = (id: number) => {
-    const hasMaterials = materials.some((m: {folderId?: number}) => m.folderId === id);
-    if (hasMaterials) {
-      setConfirmAction({
-        title: "Thư mục đang chứa học liệu",
-        message: "Thư mục này đang chứa học liệu. Nếu tiếp tục xóa, các học liệu bên trong sẽ bị đẩy ra ngoài Workspace gốc. Bạn có chắc chắn không?",
-        onConfirm: () => deleteFolderMutation.mutate(id)
-      });
-    } else {
-      setConfirmAction({
-        title: "Xóa Thư Mục",
-        message: "Bạn có chắc chắn muốn xóa thư mục này không?",
-        onConfirm: () => deleteFolderMutation.mutate(id)
-      });
-    }
-    setContextMenu(null);
-  };
-
-
-  const handleMoveMaterial = (matId: number) => {
-    setPromptAction({
-      title: "Di chuyển học liệu",
-      placeholder: "Nhập ID thư mục (để trống = Workspace gốc)",
-      onSubmit: (folderName) => {
-        const folderId = folderName ? parseInt(folderName) : null;
-        if (folderName && isNaN(folderId as number)) {
-          toast.error("ID thư mục không hợp lệ");
-          return;
-        }
-        moveToFolderMutation.mutate({ id: matId, folderId });
-      }
-    });
-    setContextMenu(null);
-  };
-
-  // Close context menu on click anywhere
-  React.useEffect(() => {
+  // Close context menu on global click
+  useEffect(() => {
     const close = () => setContextMenu(null);
     document.addEventListener('click', close);
     return () => document.removeEventListener('click', close);
   }, []);
 
-  // Build recursive tree
-  const rootFolders = folders.filter((f: {parentId?: number}) => !f.parentId);
-  const rootMaterials = materials.filter((m: {folderId?: number}) => !m.folderId);
+  // ─── Keyboard Shortcuts (Issue 4) ────────────────────────────────────────────
+  // GUARDRAIL: Only active when focus is NOT inside an input / textarea / select / contenteditable
+  const isInputFocused = useCallback(() => {
+    const el = document.activeElement;
+    if (!el) return false;
+    const tag = el.tagName.toLowerCase();
+    return (
+      tag === 'input' ||
+      tag === 'textarea' ||
+      tag === 'select' ||
+      (el as HTMLElement).isContentEditable
+    );
+  }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Guard: ignore when user is typing
+      if (isInputFocused()) return;
+      if (!selectedMaterialId) return;
+
+      const mat = materials.find(m => m.id === selectedMaterialId);
+
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        e.preventDefault();
+        if (mat) {
+          setConfirmAction({
+            title: 'Xóa Học Liệu',
+            message: `Bạn có chắc chắn muốn xóa "${mat.title || 'học liệu này'}" không? Hành động này không thể hoàn tác.`,
+            onConfirm: () => deleteMaterialMutation.mutate(selectedMaterialId),
+          });
+        }
+      } else if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
+        e.preventDefault();
+        setClipboard(selectedMaterialId);
+        toast.info(`Đã copy "${mat?.title || 'học liệu'}" vào clipboard`);
+      } else if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
+        e.preventDefault();
+        if (clipboard !== null) {
+          setFolderPickerFor(clipboard);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedMaterialId, clipboard, materials, setConfirmAction, deleteMaterialMutation, isInputFocused]);
+
+  // ─── Folder Picker Helpers ────────────────────────────────────────────────
+  const filteredFolders = folders.filter(f =>
+    f.name.toLowerCase().includes(folderPickerSearch.toLowerCase())
+  );
+
+  const handleContextMenu = (
+    e: React.MouseEvent,
+    type: 'ROOT' | 'FOLDER' | 'MATERIAL',
+    targetId?: number
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setContextMenu({ x: e.clientX, y: e.clientY, type, targetId });
+    if (type === 'MATERIAL' && targetId) setSelectedMaterialId(targetId);
+  };
+
+  const handleCreateFolder = (parentId?: number) => {
+    setCreateFolderModal({ parentId });
+    setCreateFolderName('');
+    setContextMenu(null);
+  };
+
+  const handleDeleteFolder = (id: number) => {
+    const hasMaterials = materials.some(m => m.folderId === id);
+    setConfirmAction({
+      title: hasMaterials ? 'Thư mục đang chứa học liệu' : 'Xóa Thư Mục',
+      message: hasMaterials
+        ? 'Thư mục này đang chứa học liệu. Nếu tiếp tục xóa, các học liệu bên trong sẽ bị đẩy ra ngoài Workspace gốc. Bạn có chắc chắn không?'
+        : 'Bạn có chắc chắn muốn xóa thư mục này không?',
+      onConfirm: () => deleteFolderMutation.mutate(id),
+    });
+    setContextMenu(null);
+  };
+
+  const handleMoveMaterial = (matId: number) => {
+    setFolderPickerFor(matId);
+    setFolderPickerSearch('');
+    setContextMenu(null);
+  };
+
+  const handleToggleOfficial = (mat: MaterialItem) => {
+    setOfficialMutation.mutate({
+      id: mat.id,
+      type: mat.materialType,
+      isOfficial: !mat.isOfficial,
+    });
+    setContextMenu(null);
+  };
+
+  const handleDeleteMaterial = (matId: number) => {
+    const mat = materials.find(m => m.id === matId);
+    setConfirmAction({
+      title: 'Xóa Học Liệu',
+      message: `Bạn có chắc chắn muốn xóa "${mat?.title || 'học liệu này'}" không? Hành động này không thể hoàn tác.`,
+      onConfirm: () => deleteMaterialMutation.mutate(matId),
+    });
+    setContextMenu(null);
+  };
 
   const toggleFolder = (id: number, e: React.MouseEvent) => {
     e.stopPropagation();
     setExpandedFolders(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const renderFolder = (folder: {id: number, name: string}) => {
+  // Build recursive tree
+  const rootFolders = folders.filter(f => !f.parentId);
+  const rootMaterials = materials.filter(m => !m.folderId);
+
+  const renderMaterialCard = (mat: MaterialItem) => (
+    <div
+      key={mat.id}
+      className={`relative group/mat ${selectedMaterialId === mat.id ? 'ring-2 ring-blue-400 rounded-lg' : ''}`}
+      onContextMenu={e => handleContextMenu(e, 'MATERIAL', mat.id)}
+      onClick={() => setSelectedMaterialId(mat.id)}
+    >
+      <DraggableCard mat={mat} onClick={() => onInspect(mat.id)} />
+      <button
+        className="absolute top-2 right-2 opacity-0 group-hover/mat:opacity-100 p-1 bg-white/80 rounded hover:bg-gray-200 text-gray-600 z-10"
+        onClick={e => { e.stopPropagation(); handleContextMenu(e, 'MATERIAL', mat.id); }}
+      >
+        <MoreVertical className="w-4 h-4" />
+      </button>
+    </div>
+  );
+
+  const renderFolder = (folder: FolderItem) => {
     const isExpanded = expandedFolders[folder.id];
-    const childFolders = folders.filter((f: {parentId?: number}) => f.parentId === folder.id);
-    const childMaterials = materials.filter((m: {folderId?: number}) => m.folderId === folder.id);
+    const childFolders = folders.filter(f => f.parentId === folder.id);
+    const childMaterials = materials.filter(m => m.folderId === folder.id);
 
     return (
       <div key={folder.id} className="ml-4 mt-2">
-        <div 
-          onClick={(e) => toggleFolder(folder.id, e)}
-          onContextMenu={(e) => handleContextMenu(e, 'FOLDER', folder.id)}
+        <div
+          onClick={e => toggleFolder(folder.id, e)}
+          onContextMenu={e => handleContextMenu(e, 'FOLDER', folder.id)}
           className="flex items-center gap-2 p-2 rounded-lg hover:bg-blue-50 cursor-pointer text-gray-700 transition-colors group"
         >
           {isExpanded ? <ChevronDown className="w-4 h-4 text-gray-400" /> : <ChevronRight className="w-4 h-4 text-gray-400" />}
           {isExpanded ? <FolderOpen className="w-5 h-5 text-blue-500" /> : <Folder className="w-5 h-5 text-blue-400" />}
           <span className="font-semibold text-sm">{folder.name}</span>
-          <button className="ml-auto opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-200 rounded text-gray-500" onClick={(e) => handleContextMenu(e, 'FOLDER', folder.id)}>
+          <button
+            className="ml-auto opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-200 rounded text-gray-500"
+            onClick={e => { e.stopPropagation(); handleContextMenu(e, 'FOLDER', folder.id); }}
+          >
             <MoreVertical className="w-4 h-4" />
           </button>
         </div>
-        
+
         {isExpanded && (
           <div className="ml-6 border-l border-gray-200 pl-2">
             {childFolders.map(renderFolder)}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2">
-              {childMaterials.map((mat: {id: number, title?: string, folderId?: number}) => (
-                <div key={mat.id} className="relative group/mat" onContextMenu={(e) => handleContextMenu(e, 'MATERIAL', mat.id)}>
-                  <DraggableCard mat={mat} onClick={() => onInspect(mat.id)} />
-                  <button className="absolute top-2 right-2 opacity-0 group-hover/mat:opacity-100 p-1 bg-white/80 rounded hover:bg-gray-200 text-gray-600 z-10" onClick={(e) => handleContextMenu(e, 'MATERIAL', mat.id)}>
-                    <MoreVertical className="w-4 h-4" />
-                  </button>
-                </div>
-              ))}
+              {childMaterials.map(renderMaterialCard)}
             </div>
             {childFolders.length === 0 && childMaterials.length === 0 && (
               <div className="text-xs text-gray-400 py-2 pl-2 italic">Thư mục trống</div>
@@ -139,26 +274,53 @@ export function MaterialFolderTree({ courseId, folders, materials, onInspect, se
     );
   };
 
+  // Render folder tree nodes for picker
+  const renderPickerNode = (f: FolderItem, depth = 0) => (
+    <button
+      key={f.id}
+      className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 rounded-lg flex items-center gap-2 transition-colors"
+      style={{ paddingLeft: `${12 + depth * 16}px` }}
+      onClick={() => {
+        if (folderPickerFor !== null) {
+          moveToFolderMutation.mutate({ id: folderPickerFor, folderId: f.id });
+          setFolderPickerFor(null);
+        }
+      }}
+    >
+      <Folder className="w-4 h-4 text-blue-400 flex-shrink-0" />
+      {f.name}
+    </button>
+  );
+
+  const buildPickerTree = (parentId?: number, depth = 0): React.ReactNode[] => {
+    const children = filteredFolders.filter(f => (f.parentId ?? undefined) === parentId);
+    return children.flatMap(f => [
+      renderPickerNode(f, depth),
+      ...buildPickerTree(f.id, depth + 1),
+    ]);
+  };
+
   return (
-    <div 
+    <div
       className="flex-1 overflow-y-auto p-4 bg-gray-50/50 min-h-[400px]"
-      onContextMenu={(e) => handleContextMenu(e, 'ROOT')}
+      onContextMenu={e => handleContextMenu(e, 'ROOT')}
+      onClick={() => setSelectedMaterialId(null)}
     >
       <div className="mb-4 flex items-center justify-between">
-        <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Thư Mục Gốc (Click chuột phải để thêm)</span>
+        <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+          Thư Mục Gốc (Click chuột phải để thêm)
+        </span>
+        {selectedMaterialId && (
+          <span className="text-[10px] text-gray-400 italic">
+            ✓ Đã chọn — Del: xóa · Ctrl+C: copy · Ctrl+V: chuyển thư mục
+          </span>
+        )}
       </div>
-      
+
       {rootFolders.map(renderFolder)}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mt-4">
-        {rootMaterials.map((mat: {id: number, title?: string, folderId?: number}) => (
-          <div key={mat.id} className="relative group/mat" onContextMenu={(e) => handleContextMenu(e, 'MATERIAL', mat.id)}>
-            <DraggableCard mat={mat} onClick={() => onInspect(mat.id)} />
-            <button className="absolute top-2 right-2 opacity-0 group-hover/mat:opacity-100 p-1 bg-white/80 rounded hover:bg-gray-200 text-gray-600 z-10" onClick={(e) => handleContextMenu(e, 'MATERIAL', mat.id)}>
-              <MoreVertical className="w-4 h-4" />
-            </button>
-          </div>
-        ))}
+        {rootMaterials.map(renderMaterialCard)}
       </div>
 
       {rootFolders.length === 0 && rootMaterials.length === 0 && (
@@ -169,59 +331,178 @@ export function MaterialFolderTree({ courseId, folders, materials, onInspect, se
         </div>
       )}
 
-      {/* Context Menu Portal */}
+      {/* ─── Context Menu Portal ─── */}
       {contextMenu && createPortal(
-        <div 
-          className="fixed bg-white rounded-lg shadow-xl border border-gray-200 py-1 min-w-[160px] z-[100000]"
+        <div
+          className="fixed bg-white rounded-lg shadow-xl border border-gray-200 py-1 min-w-[200px] z-[100000]"
           style={{ top: contextMenu.y, left: contextMenu.x }}
-          onClick={(e) => e.stopPropagation()}
+          onClick={e => e.stopPropagation()}
         >
           {contextMenu.type === 'ROOT' && (
-            <button onClick={() => handleCreateFolder()} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 flex items-center gap-2">
+            <button
+              onClick={() => handleCreateFolder()}
+              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 flex items-center gap-2"
+            >
               <Plus className="w-4 h-4" /> Tạo Thư mục Mới
             </button>
           )}
-          
+
           {contextMenu.type === 'FOLDER' && (
             <>
-              <button onClick={() => handleCreateFolder(contextMenu.targetId)} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 flex items-center gap-2">
+              <button
+                onClick={() => handleCreateFolder(contextMenu.targetId)}
+                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 flex items-center gap-2"
+              >
                 <Plus className="w-4 h-4" /> Tạo Thư mục con
               </button>
               <div className="h-px bg-gray-100 my-1" />
-              <button onClick={() => handleDeleteFolder(contextMenu.targetId!)} className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2">
+              <button
+                onClick={() => handleDeleteFolder(contextMenu.targetId!)}
+                className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+              >
                 <Trash2 className="w-4 h-4" /> Xóa Thư mục
               </button>
             </>
           )}
-          
-          {contextMenu.type === 'MATERIAL' && (
-            <>
-              <button onClick={() => handleMoveMaterial(contextMenu.targetId!)} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 flex items-center gap-2">
-                <Folder className="w-4 h-4" /> Move to Folder...
-              </button>
-            </>
-          )}
+
+          {contextMenu.type === 'MATERIAL' && (() => {
+            const mat = materials.find(m => m.id === contextMenu.targetId);
+            return (
+              <>
+                <button
+                  onClick={() => { if (contextMenu.targetId) onInspect(contextMenu.targetId); setContextMenu(null); }}
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 flex items-center gap-2"
+                >
+                  <FolderOpen className="w-4 h-4" /> Xem / Chỉnh sửa
+                </button>
+                <div className="h-px bg-gray-100 my-1" />
+                {mat && (
+                  <button
+                    onClick={() => handleToggleOfficial(mat)}
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-yellow-50 flex items-center gap-2"
+                  >
+                    <Star className={`w-4 h-4 ${mat.isOfficial ? 'text-yellow-500 fill-yellow-400' : 'text-gray-400'}`} />
+                    {mat.isOfficial ? 'Bỏ Official (Draft)' : 'Đánh dấu Official'}
+                  </button>
+                )}
+                <button
+                  onClick={() => { if (contextMenu.targetId) handleMoveMaterial(contextMenu.targetId); }}
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 flex items-center gap-2"
+                >
+                  <MoveRight className="w-4 h-4" /> Chuyển vào Thư mục...
+                </button>
+                <div className="h-px bg-gray-100 my-1" />
+                <button
+                  onClick={() => { if (contextMenu.targetId) handleDeleteMaterial(contextMenu.targetId); }}
+                  className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                >
+                  <Trash2 className="w-4 h-4" /> Xóa Học Liệu
+                </button>
+              </>
+            );
+          })()}
         </div>,
         document.body
       )}
 
-      {/* Prompt Modal */}
-      {promptAction && createPortal(
-        <div className="fixed inset-0 z-[100000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200" onClick={(e) => e.stopPropagation()}>
-          <div className="bg-white rounded-xl max-w-sm w-full p-5 shadow-2xl border border-gray-200">
-            <h3 className="text-base font-bold text-gray-900 mb-3">{promptAction.title}</h3>
-            <form onSubmit={(e) => {
-              e.preventDefault();
-              const val = new FormData(e.currentTarget).get('promptValue') as string;
-              promptAction.onSubmit(val);
-              setPromptAction(null);
-            }}>
-              <input name="promptValue" autoFocus className="w-full px-3 py-2 border rounded-lg mb-4 outline-none focus:border-blue-500" placeholder={promptAction.placeholder} />
-              <div className="flex gap-2 justify-end">
-                <button type="button" onClick={() => setPromptAction(null)} className="px-3 py-1.5 text-xs font-bold text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200">Hủy</button>
-                <button type="submit" className="px-3 py-1.5 text-xs font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700">Xác nhận</button>
-              </div>
-            </form>
+      {/* ─── Folder Picker Modal (thay thế raw-ID prompt) ─── */}
+      {folderPickerFor !== null && createPortal(
+        <div
+          className="fixed inset-0 z-[100000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          onClick={() => setFolderPickerFor(null)}
+        >
+          <div
+            className="bg-white rounded-xl max-w-sm w-full p-5 shadow-2xl border border-gray-200"
+            onClick={e => e.stopPropagation()}
+          >
+            <h3 className="text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
+              <Folder className="w-5 h-5 text-blue-500" /> Chọn Thư mục Đích
+            </h3>
+            <input
+              autoFocus
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg mb-3 outline-none focus:border-blue-500 text-sm"
+              placeholder="Tìm kiếm thư mục..."
+              value={folderPickerSearch}
+              onChange={e => setFolderPickerSearch(e.target.value)}
+            />
+            <div className="max-h-56 overflow-y-auto flex flex-col gap-0.5">
+              {/* Option: move to root workspace */}
+              <button
+                className="w-full text-left px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg flex items-center gap-2 italic"
+                onClick={() => {
+                  if (folderPickerFor !== null) {
+                    moveToFolderMutation.mutate({ id: folderPickerFor, folderId: null });
+                    setFolderPickerFor(null);
+                  }
+                }}
+              >
+                <FolderOpen className="w-4 h-4 text-gray-400" /> Workspace gốc (bỏ khỏi thư mục)
+              </button>
+              <div className="h-px bg-gray-100 my-1" />
+              {buildPickerTree(undefined)}
+              {filteredFolders.length === 0 && (
+                <p className="text-xs text-gray-400 text-center py-4">Không tìm thấy thư mục nào</p>
+              )}
+            </div>
+            <div className="mt-3 flex justify-end">
+              <button
+                onClick={() => setFolderPickerFor(null)}
+                className="px-3 py-1.5 text-xs font-bold text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200"
+              >
+                Hủy
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* ─── Create Folder Modal (name-only, no raw IDs) ─── */}
+      {createFolderModal !== null && createPortal(
+        <div
+          className="fixed inset-0 z-[100000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          onClick={() => setCreateFolderModal(null)}
+        >
+          <div
+            className="bg-white rounded-xl max-w-xs w-full p-5 shadow-2xl border border-gray-200"
+            onClick={e => e.stopPropagation()}
+          >
+            <h3 className="text-base font-bold text-gray-900 mb-3">
+              {createFolderModal.parentId ? 'Tạo Thư mục Con' : 'Tạo Thư mục Mới'}
+            </h3>
+            <input
+              autoFocus
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg mb-4 outline-none focus:border-blue-500 text-sm"
+              placeholder="Tên thư mục..."
+              value={createFolderName}
+              onChange={e => setCreateFolderName(e.target.value)}
+              onKeyDown={e => {
+                if (e.key === 'Enter' && createFolderName.trim()) {
+                  createFolderMutation.mutate({ name: createFolderName.trim(), parentId: createFolderModal.parentId });
+                  setCreateFolderModal(null);
+                }
+              }}
+            />
+            <div className="flex gap-2 justify-end">
+              <button
+                onClick={() => setCreateFolderModal(null)}
+                className="px-3 py-1.5 text-xs font-bold text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200"
+              >
+                Hủy
+              </button>
+              <button
+                disabled={!createFolderName.trim()}
+                onClick={() => {
+                  if (createFolderName.trim()) {
+                    createFolderMutation.mutate({ name: createFolderName.trim(), parentId: createFolderModal.parentId });
+                    setCreateFolderModal(null);
+                  }
+                }}
+                className="px-3 py-1.5 text-xs font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+              >
+                Tạo
+              </button>
+            </div>
           </div>
         </div>,
         document.body
