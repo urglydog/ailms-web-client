@@ -511,38 +511,43 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
 
   return (
     <div className="flex flex-col gap-8">
-      {/* Tabs Navigation */}
-      <div className="flex border-b border-line gap-6">
+      {/* Tabs Navigation - Pill Style */}
+      <div className="flex gap-2 p-1 bg-surface-hover rounded-xl border border-line w-fit">
         <button
           onClick={() => {
             setActiveTab('OFFICIAL');
-            // Mark all current official materials as "seen" → reset badge
             const now = Date.now();
             if (typeof window !== 'undefined') {
               localStorage.setItem(`official_last_seen_${courseId}`, String(now));
             }
             setOfficialLastSeen(now);
           }}
-          className={`pb-3 text-sm font-bold border-b-2 transition-colors relative ${
-            activeTab === 'OFFICIAL' ? 'border-accent text-accent' : 'border-transparent text-ink-muted hover:text-ink'
+          className={`flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-bold transition-all duration-200 relative ${
+            activeTab === 'OFFICIAL'
+              ? 'bg-white shadow-sm text-accent border border-line'
+              : 'text-ink-muted hover:text-ink hover:bg-white/60'
           }`}
         >
-          Kho Học Liệu Official
-          {officialUnreadCount > 0 && (
-            <span className="absolute -top-2 -right-3 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
-              {officialUnreadCount}
+          📚 Kho Học Liệu Official
+          {filteredOfficialMaterials.length > 0 && (
+            <span className={`text-[10px] font-black px-1.5 py-0.5 rounded-full ${
+              activeTab === 'OFFICIAL' ? 'bg-accent text-white' : 'bg-gray-200 text-gray-600'
+            }`}>
+              {filteredOfficialMaterials.length}
             </span>
           )}
         </button>
         <button
           onClick={() => setActiveTab('PERSONAL')}
-          className={`pb-3 text-sm font-bold border-b-2 transition-colors relative ${
-            activeTab === 'PERSONAL' ? 'border-accent text-accent' : 'border-transparent text-ink-muted hover:text-ink'
+          className={`flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-bold transition-all duration-200 relative ${
+            activeTab === 'PERSONAL'
+              ? 'bg-white shadow-sm text-accent border border-line'
+              : 'text-ink-muted hover:text-ink hover:bg-white/60'
           }`}
         >
-          Kho Học Liệu Cá Nhân
+          🎯 Kho Học Liệu Cá Nhân
           {personalUnreadCount > 0 && (
-            <span className="absolute -top-2 -right-3 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+            <span className="text-[10px] font-black px-1.5 py-0.5 rounded-full bg-red-500 text-white animate-pulse">
               {personalUnreadCount}
             </span>
           )}

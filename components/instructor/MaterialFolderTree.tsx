@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Folder, MoreVertical, Plus, Trash2, ChevronRight, ChevronDown, FolderOpen, Star, MoveRight } from 'lucide-react';
+import { Folder, MoreVertical, Plus, Trash2, ChevronRight, ChevronDown, FolderOpen, MoveRight } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { materialsApi, InstructorMaterial } from '@/lib/api/materials';
 import { toast } from 'sonner';
@@ -17,6 +17,7 @@ interface MaterialFolderTreeProps {
   onInspect: (id: number) => void;
   setConfirmAction: (action: { title: string; message: string; onConfirm: () => void } | null) => void;
   DraggableCard: React.ElementType;
+  viewMode?: 'grid' | 'list';
 }
 
 export function MaterialFolderTree({
@@ -26,6 +27,7 @@ export function MaterialFolderTree({
   onInspect,
   setConfirmAction,
   DraggableCard,
+  viewMode = 'grid',
 }: MaterialFolderTreeProps) {
   const queryClient = useQueryClient();
 
@@ -83,19 +85,6 @@ export function MaterialFolderTree({
     onError: () => toast.error('Không thể xóa học liệu'),
   });
 
-  // Official toggle mutations
-  const setOfficialMutation = useMutation({
-    mutationFn: (vars: { id: number; type: string; isOfficial: boolean }) => {
-      if (vars.type === 'QUIZ') return materialsApi.setQuizOfficial(vars.id, vars.isOfficial);
-      if (vars.type === 'MINDMAP') return materialsApi.setMindmapOfficial(vars.id, vars.isOfficial);
-      return materialsApi.setFlashcardOfficial(vars.id, vars.isOfficial);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] });
-      toast.success('Đã cập nhật trạng thái Official');
-    },
-    onError: () => toast.error('Không thể cập nhật trạng thái Official'),
-  });
 
   // Close context menu on global click
   useEffect(() => {
@@ -191,14 +180,6 @@ export function MaterialFolderTree({
     setContextMenu(null);
   };
 
-  const handleToggleOfficial = (mat: MaterialItem) => {
-    setOfficialMutation.mutate({
-      id: mat.id,
-      type: mat.materialType,
-      isOfficial: !mat.isOfficial,
-    });
-    setContextMenu(null);
-  };
 
   const handleDeleteMaterial = (matId: number) => {
     const mat = materials.find(m => m.id === matId);
@@ -222,7 +203,7 @@ export function MaterialFolderTree({
   const renderMaterialCard = (mat: MaterialItem) => (
     <div
       key={mat.id}
-      className={`relative group/mat ${selectedMaterialId === mat.id ? 'ring-2 ring-blue-400 rounded-lg' : ''}`}
+      className={`relative group/mat ${selectedMaterialId === mat.id ? 'ring-2 ring-blue-400 rounded-xl' : ''}`}
       onContextMenu={e => handleContextMenu(e, 'MATERIAL', mat.id)}
       onClick={() => setSelectedMaterialId(mat.id)}
     >
@@ -235,6 +216,40 @@ export function MaterialFolderTree({
       </button>
     </div>
   );
+
+  const renderMaterialRow = (mat: MaterialItem) => {
+    const typeIcon = mat.materialType === 'FLASHCARD' ? '🃏' : mat.materialType === 'QUIZ' ? '📝' : '🗺️';
+    const isAssigned = mat.assignments && mat.assignments.length > 0;
+    return (
+      <div
+        key={mat.id}
+        onContextMenu={e => handleContextMenu(e, 'MATERIAL', mat.id)}
+        onClick={() => setSelectedMaterialId(mat.id)}
+        className={`flex items-center gap-3 px-4 py-2.5 border-b border-gray-50 hover:bg-gray-50 cursor-pointer transition-colors group/row ${
+          selectedMaterialId === mat.id ? 'bg-blue-50' : ''
+        }`}
+      >
+        <span className="text-lg w-6 flex-shrink-0">{typeIcon}</span>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold text-gray-800 truncate">{mat.title || 'Học liệu không tên'}</p>
+          <p className="text-[10px] text-gray-400">{new Date(mat.createdAt).toLocaleDateString('vi-VN')}</p>
+        </div>
+        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${
+          isAssigned ? 'bg-blue-100 text-blue-700' :
+          mat.isOfficial ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-200 text-gray-600'
+        }`}>
+          {isAssigned ? '📌 Đã gán' : mat.isOfficial ? '✅ Official' : 'Draft'}
+        </span>
+        {/* Row actions */}
+        <div className="flex items-center gap-1 opacity-0 group-hover/row:opacity-100 transition-opacity">
+          <button onClick={(e) => { e.stopPropagation(); onInspect(mat.id); }} className="p-1.5 rounded hover:bg-blue-100 text-blue-500 text-[10px] font-bold">Xem</button>
+          <button onClick={(e) => { e.stopPropagation(); handleContextMenu(e, 'MATERIAL', mat.id); }} className="p-1 rounded hover:bg-gray-200">
+            <MoreVertical className="w-3.5 h-3.5 text-gray-500" />
+          </button>
+        </div>
+      </div>
+    );
+  };
 
   const renderFolder = (folder: FolderItem) => {
     const isExpanded = expandedFolders[folder.id];
@@ -319,9 +334,15 @@ export function MaterialFolderTree({
 
       {rootFolders.map(renderFolder)}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mt-4">
-        {rootMaterials.map(renderMaterialCard)}
-      </div>
+      {viewMode === 'list' ? (
+        <div className="border border-gray-100 rounded-xl overflow-hidden mt-3">
+          {rootMaterials.length === 0 ? null : rootMaterials.map(renderMaterialRow)}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mt-4">
+          {rootMaterials.map(renderMaterialCard)}
+        </div>
+      )}
 
       {rootFolders.length === 0 && rootMaterials.length === 0 && (
         <div className="flex flex-col items-center justify-center h-full text-gray-400 py-10">
@@ -376,15 +397,6 @@ export function MaterialFolderTree({
                   <FolderOpen className="w-4 h-4" /> Xem / Chỉnh sửa
                 </button>
                 <div className="h-px bg-gray-100 my-1" />
-                {mat && (
-                  <button
-                    onClick={() => handleToggleOfficial(mat)}
-                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-yellow-50 flex items-center gap-2"
-                  >
-                    <Star className={`w-4 h-4 ${mat.isOfficial ? 'text-yellow-500 fill-yellow-400' : 'text-gray-400'}`} />
-                    {mat.isOfficial ? 'Bỏ Official (Draft)' : 'Đánh dấu Official'}
-                  </button>
-                )}
                 <button
                   onClick={() => { if (contextMenu.targetId) handleMoveMaterial(contextMenu.targetId); }}
                   className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 flex items-center gap-2"

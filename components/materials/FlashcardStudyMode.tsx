@@ -220,44 +220,41 @@ export function FlashcardStudyMode({ deckName: _deckName, cards, language, onFin
           {/* Rating buttons (only show after flip) */}
           {isFlipped && (
             <div className="mt-6 w-full" onClick={e => e.stopPropagation()}>
-              <div className="flex justify-center gap-3">
-                <div className="flex flex-col items-center">
-                  <span className="text-xs text-ink-muted mb-1">&lt;1m</span>
-                  <button
-                    onClick={() => handleRate(0)}
-                    className="px-6 py-3 bg-red-500 hover:bg-red-600 text-white font-bold rounded-xl text-sm shadow-md transition-all hover:shadow-lg"
-                  >
-                    Again
-                  </button>
-                </div>
-                <div className="flex flex-col items-center">
-                  <span className="text-xs text-ink-muted mb-1">&lt;6m</span>
-                  <button
-                    onClick={() => handleRate(2)}
-                    className="px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl text-sm shadow-md transition-all hover:shadow-lg"
-                  >
-                    Hard
-                  </button>
-                </div>
-                <div className="flex flex-col items-center">
-                  <span className="text-xs text-ink-muted mb-1">&lt;10m</span>
-                  <button
-                    onClick={() => handleRate(3)}
-                    className="px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-bold rounded-xl text-sm shadow-md transition-all hover:shadow-lg"
-                  >
-                    Good
-                  </button>
-                </div>
-                <div className="flex flex-col items-center">
-                  <span className="text-xs text-ink-muted mb-1">3d</span>
-                  <button
-                    onClick={() => handleRate(5)}
-                    className="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-xl text-sm shadow-md transition-all hover:shadow-lg"
-                  >
-                    Easy
-                  </button>
-                </div>
-              </div>
+              {(() => {
+                const now = new Date();
+                const fmt = (d: Date) => {
+                  const diff = d.getTime() - now.getTime();
+                  if (diff < 3600000) return `${Math.round(diff / 60000)} phút`;
+                  if (diff < 86400000) return `${Math.round(diff / 3600000)} giờ`;
+                  return `${Math.round(diff / 86400000)} ngày`;
+                };
+                const nextAgain  = new Date(now.getTime() + 1   * 60000);
+                const nextHard   = new Date(now.getTime() + 6   * 60000);
+                const nextGood   = new Date(now.getTime() + 10  * 60000);
+                const nextEasy   = new Date(now.getTime() + 3   * 86400000);
+                return (
+                  <div className="flex justify-center gap-3">
+                    {[
+                      { label: 'Again', quality: 0, next: nextAgain, cls: 'bg-red-500 hover:bg-red-600 shadow-red-200' },
+                      { label: 'Hard',  quality: 2, next: nextHard,  cls: 'bg-amber-500 hover:bg-amber-600 shadow-amber-200' },
+                      { label: 'Good',  quality: 3, next: nextGood,  cls: 'bg-green-500 hover:bg-green-600 shadow-green-200' },
+                      { label: 'Easy',  quality: 5, next: nextEasy,  cls: 'bg-blue-500 hover:bg-blue-600 shadow-blue-200' },
+                    ].map(btn => (
+                      <div key={btn.label} className="flex flex-col items-center gap-1">
+                        <span className="text-[10px] text-ink-muted font-medium flex items-center gap-0.5">
+                          🗓️ {fmt(btn.next)}
+                        </span>
+                        <button
+                          onClick={() => handleRate(btn.quality)}
+                          className={`px-5 py-2.5 ${btn.cls} text-white font-bold rounded-xl text-sm shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5`}
+                        >
+                          {btn.label}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
             </div>
           )}
         </div>
