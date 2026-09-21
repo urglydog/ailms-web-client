@@ -27,13 +27,6 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
   // Only track personal material notifications (global unread)
   const personalUnreadCount = notifications.filter(n => !n.isRead && n.type === 'NEW_PERSONAL_MATERIAL').length;
 
-  // Badge for Official tab: count NEW official materials seen since last visit
-  // using a localStorage timestamp per course, so it's context-aware.
-  const [officialLastSeen, setOfficialLastSeen] = useState<number>(() => {
-    if (typeof window === 'undefined') return 0;
-    const key = `official_last_seen_${courseId}`;
-    return parseInt(localStorage.getItem(key) ?? '0', 10);
-  });
 
   const { data: officialMaterials } = useQuery<InstructorMaterial[]>({
     queryKey: ['official-materials', courseId],
@@ -511,14 +504,7 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
       {/* Tabs Navigation - Pill Style */}
       <div className="flex gap-2 p-1 bg-surface-hover rounded-xl border border-line w-fit">
         <button
-          onClick={() => {
-            setActiveTab('OFFICIAL');
-            const now = Date.now();
-            if (typeof window !== 'undefined') {
-              localStorage.setItem(`official_last_seen_${courseId}`, String(now));
-            }
-            setOfficialLastSeen(now);
-          }}
+          onClick={() => setActiveTab('OFFICIAL')}
           className={`flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-bold transition-all duration-200 relative ${
             activeTab === 'OFFICIAL'
               ? 'bg-white shadow-sm text-accent border border-line'
