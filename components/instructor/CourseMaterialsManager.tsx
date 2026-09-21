@@ -15,7 +15,7 @@ import { MaterialLanguagePicker } from '@/components/materials/MaterialLanguageP
 import { MaterialFolderTree } from './MaterialFolderTree';
 
 import { DndContext, useDraggable, useDroppable, DragOverlay, DragStartEvent, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
-import { GripVertical, Link as LinkIcon, Trash2, FileText, MoreVertical, Plus, Layers } from 'lucide-react';
+import { GripVertical, Link as LinkIcon, Trash2, FileText, Plus, Layers, LayoutGrid, List, Search, X, ChevronDown } from 'lucide-react';
 
 
 interface CourseMaterialsManagerProps {
@@ -23,7 +23,7 @@ interface CourseMaterialsManagerProps {
 }
 
 
-function DraggableMaterialCard({ mat, onClick }: { mat: InstructorMaterial, onClick: () => void }) {
+function DraggableMaterialCard({ mat, onClick, isLoading: isPending }: { mat: InstructorMaterial; onClick: () => void; isLoading?: boolean }) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: `material-${mat.id}`,
     data: { material: mat },
@@ -31,49 +31,77 @@ function DraggableMaterialCard({ mat, onClick }: { mat: InstructorMaterial, onCl
 
   const isAssigned = mat.assignments && mat.assignments.length > 0;
 
+  // Color coding per type
+  const typeConfig: Record<string, { bg: string; text: string; icon: string; label: string }> = {
+    QUIZ:      { bg: 'bg-emerald-50 border-emerald-200', text: 'text-emerald-700', icon: '📝', label: 'Quiz' },
+    FLASHCARD: { bg: 'bg-violet-50 border-violet-200', text: 'text-violet-700', icon: '🃏', label: 'Flashcard' },
+    MINDMAP:   { bg: 'bg-amber-50 border-amber-200',   text: 'text-amber-700',   icon: '🗺️', label: 'Mindmap' },
+  };
+  const cfg = typeConfig[mat.materialType] ?? { bg: 'bg-gray-50 border-gray-200', text: 'text-gray-700', icon: '📄', label: mat.materialType };
+
   return (
-    <div 
+    <div
       ref={setNodeRef}
-      onDoubleClick={(e) => {
-        e.stopPropagation();
-        onClick();
-      }}
+      onDoubleClick={(e) => { e.stopPropagation(); onClick(); }}
       {...attributes}
-      className={`relative border bg-white rounded-lg flex flex-col overflow-hidden group hover:shadow-md transition-all ${isDragging ? 'opacity-50 border-blue-400 border-dashed' : 'border-gray-200 hover:border-blue-300'}`}
+      onClick={(e) => e.stopPropagation()}
+      className={`relative border rounded-xl flex flex-col overflow-hidden group transition-all duration-200 ${
+        isDragging ? 'opacity-40 scale-95 border-blue-400 border-dashed shadow-lg' :
+        isPending  ? 'opacity-60 pointer-events-none' :
+        `${cfg.bg} hover:shadow-md hover:-translate-y-0.5`
+      }`}
     >
-      <div 
+      {/* Loading overlay */}
+      {isPending && (
+        <div className="absolute inset-0 flex items-center justify-center bg-white/60 z-20 rounded-xl">
+          <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+        </div>
+      )}
+
+      {/* Drag handle */}
+      <div
         {...listeners}
         className="absolute top-2 left-2 text-gray-400 p-1 bg-white/80 rounded-md z-10 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing"
-        title="Kéo để phân phối"
+        title="Kéo để phân phối vào bài học"
         onClick={(e) => e.stopPropagation()}
       >
         <GripVertical className="w-4 h-4" />
       </div>
+
       <div className="p-3 pl-8 pb-2 flex-1">
-        <div className="flex items-start justify-between">
-          <div className="flex items-center gap-2 mb-2">
-            <div className={`p-1.5 rounded-md flex-shrink-0 ${mat.materialType === 'MINDMAP' ? 'bg-blue-100 text-blue-600' : mat.materialType === 'FLASHCARD' ? 'bg-purple-100 text-purple-600' : 'bg-orange-100 text-orange-600'}`}>
-              <FileText className="w-4 h-4" />
-            </div>
-            <span className="text-xs font-bold text-gray-500">{mat.materialType}</span>
+        <div className="flex items-start justify-between mb-1.5">
+          <div className="flex items-center gap-1.5">
+            <span className="text-base leading-none">{cfg.icon}</span>
+            <span className={`text-[10px] font-bold uppercase tracking-wider ${cfg.text}`}>{cfg.label}</span>
             {isAssigned && (
-              <span className="text-[10px] text-blue-500 bg-blue-50 px-1 rounded flex items-center gap-1" title="Đã phân phối">
-                <LinkIcon className="w-3 h-3" />
+              <span className="text-[9px] bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded-full font-bold flex items-center gap-0.5" title="Đã phân phối">
+                <LinkIcon className="w-2.5 h-2.5" /> Đã gán
               </span>
             )}
           </div>
-          <button className="text-gray-400 hover:text-gray-700 opacity-0 group-hover:opacity-100 transition-opacity p-1">
-            <MoreVertical className="w-4 h-4" />
-          </button>
+          {/* Hover actions */}
+          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button
+              onClick={(e) => { e.stopPropagation(); onClick(); }}
+              className="p-1 rounded-lg bg-white/90 hover:bg-blue-50 text-gray-500 hover:text-blue-600 transition-colors shadow-sm border border-gray-100"
+              title="Xem / chỉnh sửa"
+            >
+              <FileText className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
         <h4 className="text-sm font-bold text-gray-800 line-clamp-2 leading-tight">
           {mat.title || 'Học liệu không tên'}
         </h4>
       </div>
-      <div className="px-3 py-2 bg-gray-50 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500">
+
+      <div className="px-3 py-1.5 border-t border-black/5 flex items-center justify-between text-[10px] text-gray-500">
         <span>{new Date(mat.createdAt).toLocaleDateString('vi-VN')}</span>
-        <span className={`px-2 py-0.5 rounded-full font-medium text-[10px] ${mat.isOfficial ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-700'}`}>
-          {mat.isOfficial ? 'Official' : 'Draft'}
+        <span className={`px-2 py-0.5 rounded-full font-bold ${
+          isAssigned ? 'bg-blue-100 text-blue-700' :
+          mat.isOfficial ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-200 text-gray-600'
+        }`}>
+          {isAssigned ? '📌 Đã phân phối' : mat.isOfficial ? '✅ Official' : 'Draft'}
         </span>
       </div>
     </div>
@@ -118,6 +146,9 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
   
 
   const [activeDragId, setActiveDragId] = useState<number | null>(null);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showCreateDropdown, setShowCreateDropdown] = useState(false);
 
   const overwriteMaterialVersionMutation = useMutation({
     mutationFn: (variables: { id: number, targetLessonId?: number, targetChapterId?: number }) =>
@@ -179,24 +210,12 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
         }
       });
     } else {
-// Phân phối mới (Epic 3)
+      // Phân phối mới (Epic 3)
       attachLessonMutation.mutate({
         id: materialId,
         target: {
           lessonId: isChapter ? undefined : parsedTargetId,
           chapterId: isChapter ? parsedTargetId : undefined
-        }
-      }, {
-        onSuccess: () => {
-           setConfirmAction({
-             title: "Phát hành Học liệu",
-             message: "Học liệu đã được đưa vào bài học. Bạn có muốn Đặt làm Official (Phát hành) để học sinh thấy ngay không?",
-             onConfirm: () => {
-                if (material.materialType === 'QUIZ') materialsApi.setQuizOfficial(materialId, true).then(() => queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] }));
-                if (material.materialType === 'MINDMAP') materialsApi.setMindmapOfficial(materialId, true).then(() => queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] }));
-                if (material.materialType === 'FLASHCARD') materialsApi.setFlashcardOfficial(materialId, true).then(() => queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] }));
-             }
-           });
         }
       });
     }
@@ -394,7 +413,8 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
 
         {/* RIGHT PANE: Master Vault */}
         <div className="w-2/3 bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col shadow-sm">
-          <div className="p-3 border-b border-gray-100 flex items-center justify-between bg-gray-50">
+          {/* Toolbar row 1: Breadcrumb + Create Dropdown */}
+          <div className="px-3 pt-3 pb-2 border-b border-gray-100 flex items-center justify-between bg-gray-50">
             <div className="flex items-center gap-2 text-xs font-medium text-gray-600">
               {breadcrumbs.map((bc, idx) => (
                 <React.Fragment key={idx}>
@@ -403,19 +423,74 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                 </React.Fragment>
               ))}
             </div>
-            
+
             <div className="flex items-center gap-2">
+              {/* Dropdown: Tạo Mới */}
+              <div className="relative">
+                <button
+                  id="create-material-btn"
+                  onClick={() => setShowCreateDropdown(v => !v)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition-colors shadow-sm"
+                >
+                  <Plus className="w-3.5 h-3.5" /> Tạo Mới <ChevronDown className="w-3 h-3" />
+                </button>
+                {showCreateDropdown && (
+                  <div
+                    className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-xl z-50 min-w-[180px] overflow-hidden"
+                    onMouseLeave={() => setShowCreateDropdown(false)}
+                  >
+                    <div className="px-3 py-1.5 text-[10px] font-bold uppercase text-gray-400 tracking-wider border-b border-gray-100">✏️ Thủ công</div>
+                    {(['FLASHCARD', 'QUIZ', 'MINDMAP'] as const).map(t => (
+                      <button key={t} onClick={() => { setManualMaterialType(t); setShowCreateDropdown(false); }}
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 flex items-center gap-2 transition-colors">
+                        {t === 'FLASHCARD' ? '🃏' : t === 'QUIZ' ? '📝' : '🗺️'} {t}
+                      </button>
+                    ))}
+                    <div className="px-3 py-1.5 text-[10px] font-bold uppercase text-gray-400 tracking-wider border-t border-b border-gray-100">✨ AI Auto</div>
+                    {(['FLASHCARD', 'QUIZ', 'MINDMAP'] as const).map(t => (
+                      <button key={`ai-${t}`} onClick={() => { setGenMaterialType(t); setShowCreateDropdown(false); }}
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-sky-50 flex items-center gap-2 transition-colors">
+                        {t === 'FLASHCARD' ? '🃏' : t === 'QUIZ' ? '📝' : '🗺️'} {t} <span className="ml-auto text-[9px] bg-sky-100 text-sky-600 px-1.5 rounded-full font-bold">AI</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Toolbar row 2: Search + View Toggle */}
+          <div className="px-3 py-2 border-b border-gray-100 flex items-center gap-2 bg-white">
+            <div className="relative flex-1">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Tìm kiếm học liệu..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                className="w-full pl-8 pr-8 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-blue-400 transition-colors"
+              />
+              {searchQuery && (
+                <button onClick={() => setSearchQuery('')} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+            {/* View toggle */}
+            <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
               <button
-                onClick={() => setManualMaterialType('QUIZ')}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-lg transition-colors border border-gray-200 shadow-sm"
+                onClick={() => setViewMode('grid')}
+                className={`p-1.5 transition-colors ${ viewMode === 'grid' ? 'bg-blue-600 text-white' : 'text-gray-500 hover:bg-gray-100' }`}
+                title="Grid View"
               >
-                <Plus className="w-3.5 h-3.5" /> Thủ Công
+                <LayoutGrid className="w-4 h-4" />
               </button>
               <button
-                onClick={() => setGenMaterialType('QUIZ')}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-[length:16px_16px] animate-[bg-scroll_1s_linear_infinite] bg-[repeating-linear-gradient(45deg,#0ea5e9,#0ea5e9_6px,#0284c7_6px,#0284c7_12px)] text-white text-xs font-bold rounded-lg shadow-sm hover:opacity-90 transition-opacity"
+                onClick={() => setViewMode('list')}
+                className={`p-1.5 transition-colors border-l border-gray-200 ${ viewMode === 'list' ? 'bg-blue-600 text-white' : 'text-gray-500 hover:bg-gray-100' }`}
+                title="List View"
               >
-                ✨ AI Auto
+                <List className="w-4 h-4" />
               </button>
             </div>
           </div>
@@ -423,10 +498,11 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
           <MaterialFolderTree 
             courseId={courseId} 
             folders={folders} 
-            materials={displayedMaterials} 
+            materials={searchQuery ? displayedMaterials.filter(m => (m.title || '').toLowerCase().includes(searchQuery.toLowerCase())) : displayedMaterials}
             onInspect={setInspectGenerationId} 
             setConfirmAction={setConfirmAction} 
-            DraggableCard={DraggableMaterialCard} 
+            DraggableCard={DraggableMaterialCard}
+            viewMode={viewMode}
           />
         </div>
       </div>
