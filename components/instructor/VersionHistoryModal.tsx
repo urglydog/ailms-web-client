@@ -10,7 +10,7 @@ interface VersionHistoryModalProps {
   courseId: number;
   materialId: number;
   onClose: () => void;
-  onInspect: (id: number) => void;
+  onInspect: (id: number, readOnly?: boolean) => void;
 }
 
 export function VersionHistoryModal({ courseId, materialId, onClose, onInspect }: VersionHistoryModalProps) {
@@ -74,8 +74,8 @@ export function VersionHistoryModal({ courseId, materialId, onClose, onInspect }
               </div>
               <div className="flex items-center gap-1 flex-shrink-0">
                 <button
-                  onClick={() => { onClose(); onInspect(v.id); }}
-                  title="Xem phiên bản này"
+                  onClick={() => { onClose(); onInspect(v.id, true); }}
+                  title="Xem phiên bản này (chỉ đọc)"
                   className="p-1.5 rounded-lg hover:bg-blue-100 text-blue-600"
                 >
                   <Eye className="w-3.5 h-3.5" />

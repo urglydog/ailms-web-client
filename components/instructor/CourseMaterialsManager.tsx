@@ -14,6 +14,7 @@ import { MermaidViewer } from '@/components/materials/MermaidViewer';
 import { MaterialLanguagePicker } from '@/components/materials/MaterialLanguagePicker';
 import { MaterialFolderTree } from './MaterialFolderTree';
 import { getMaterialDistributionBadge } from '@/lib/materialStatus';
+import { CourseActivityPanel } from './CourseActivityPanel';
 
 import { DndContext, useDraggable, useDroppable, DragOverlay, DragStartEvent, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { GripVertical, Trash2, FileText, Plus, Layers, LayoutGrid, List, Search, X, ChevronDown } from 'lucide-react';
@@ -157,9 +158,10 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
 
   const searchParams = useSearchParams();
   const inspectGenerationId = searchParams.get('inspect') ? Number(searchParams.get('inspect')) : null;
-  const setInspectGenerationId = (id: number | null) => {
+  const inspectReadOnly = searchParams.get('readonly') === '1';
+  const setInspectGenerationId = (id: number | null, readOnly = false) => {
     if (id) {
-      router.push(`?inspect=${id}`);
+      router.push(`?inspect=${id}${readOnly ? '&readonly=1' : ''}`);
     } else {
       router.push(`/instructor/materials`);
     }
@@ -176,6 +178,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchQuery, setSearchQuery] = useState('');
   const [showCreateDropdown, setShowCreateDropdown] = useState(false);
+  const [showActivityPanel, setShowActivityPanel] = useState(false);
 
   const overwriteMaterialVersionMutation = useMutation({
     mutationFn: (variables: { id: number, targetLessonId?: number, targetChapterId?: number }) =>
@@ -344,6 +347,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
           material={activeMat}
           onBack={() => setInspectGenerationId(null)}
           onDelete={() => setConfirmDeleteId(inspectGenerationId)}
+          readOnly={inspectReadOnly}
         />
         {renderDeleteModal()}
       </>
@@ -383,7 +387,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                     {chapterMaterials.map(mat => {
                       const assignment = mat.assignments?.find(a => a.chapterId === chapter.id);
                       return (
-                        <div key={`mat-${mat.id}`} onDoubleClick={() => setInspectGenerationId(mat.id)} className="flex items-center justify-between px-2 py-1 text-xs text-gray-600 pl-6 hover:bg-blue-50 rounded-md cursor-pointer transition-colors group" title="Nháy đúp để xem trước">
+                        <div key={`mat-${mat.id}`} onDoubleClick={() => setInspectGenerationId(mat.id, true)} className="flex items-center justify-between px-2 py-1 text-xs text-gray-600 pl-6 hover:bg-blue-50 rounded-md cursor-pointer transition-colors group" title="Nháy đúp để xem trước">
                           <div className="flex items-center gap-2">
                             <span className="text-[10px]">🔗</span> {mat.title || 'Học liệu'}
                           </div>
@@ -414,7 +418,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                             {lessonMaterials.map(mat => {
                               const assignment = mat.assignments?.find(a => a.lessonId === lesson.id);
                               return (
-                                <div key={`mat-${mat.id}`} onDoubleClick={() => setInspectGenerationId(mat.id)} className="flex items-center justify-between px-2 py-1 text-[11px] text-gray-600 pl-6 hover:bg-blue-50 rounded-md cursor-pointer transition-colors group" title="Nháy đúp để xem trước">
+                                <div key={`mat-${mat.id}`} onDoubleClick={() => setInspectGenerationId(mat.id, true)} className="flex items-center justify-between px-2 py-1 text-[11px] text-gray-600 pl-6 hover:bg-blue-50 rounded-md cursor-pointer transition-colors group" title="Nháy đúp để xem trước">
                                   <div className="flex items-center gap-2">
                                     <span className="text-[10px]">🔗</span> {mat.title || 'Học liệu'}
                                   </div>
@@ -445,7 +449,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
         </div>
 
         {/* RIGHT PANE: Master Vault */}
-        <div className="w-2/3 bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col shadow-sm">
+        <div className="flex-1 min-w-0 bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col shadow-sm">
           {/* Toolbar row 1: Breadcrumb + Create Dropdown */}
           <div className="px-3 pt-3 pb-2 border-b border-gray-100 flex items-center justify-between bg-gray-50">
             <div className="flex items-center gap-2 text-xs font-medium text-gray-600">
@@ -458,6 +462,15 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
             </div>
 
             <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowActivityPanel(v => !v)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg transition-colors border ${
+                  showActivityPanel ? 'bg-gray-800 text-white border-gray-800' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                }`}
+                title="Xem hoạt động gần đây"
+              >
+                🕐 Hoạt động
+              </button>
               {/* Dropdown: Tạo Mới */}
               <div className="relative">
                 <button
@@ -539,6 +552,8 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
             viewMode={viewMode}
           />
         </div>
+
+        {showActivityPanel && <CourseActivityPanel courseId={courseId} />}
       </div>
 
       <DragOverlay>
@@ -574,12 +589,14 @@ function MaterialWorkspaceViewer({
   generationId,
   material,
   onBack,
-  onDelete
+  onDelete,
+  readOnly = false,
 }: {
   generationId: number;
   material?: InstructorMaterial;
   onBack: () => void;
   onDelete?: () => void;
+  readOnly?: boolean;
 }) {
   const { data: detail, isLoading } = useQuery<MaterialDetailRes>({
     queryKey: ['material-detail', generationId],
@@ -644,6 +661,11 @@ function MaterialWorkspaceViewer({
 
   return (
     <div className="flex flex-col gap-6 rounded-2xl bg-white p-6 shadow-sm border border-gray-200 min-h-[750px]">
+      {readOnly && (
+        <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold px-4 py-2 rounded-xl">
+          🔒 Chế độ xem trước — không thể chỉnh sửa nội dung ở đây.
+        </div>
+      )}
       {/* Top Workspace Bar */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b pb-4 gap-4">
         <div className="flex items-center gap-3">
@@ -673,7 +695,7 @@ function MaterialWorkspaceViewer({
         <div className="flex items-center gap-2">
           {/* Official & Delete actions: primary via right-click context menu,
               secondary buttons here for quick access when workspace is open */}
-          {onDelete && (
+          {!readOnly && onDelete && (
             <button
               onClick={onDelete}
               className="inline-flex items-center rounded-xl px-3 py-1.5 text-xs font-bold bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 transition-all shadow-sm"
@@ -708,32 +730,38 @@ function MaterialWorkspaceViewer({
                 >
                   Ngân Hàng Câu Hỏi ({detail.quizQuestions.length})
                 </button>
-                <button
-                  onClick={() => setActiveTab('SETTINGS')}
-                  className={`px-4 py-2 text-sm font-bold rounded-xl transition-all ${activeTab === 'SETTINGS' ? 'bg-indigo-600 text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                    }`}
-                >
-                  Cấu Hình Bài Thi
-                </button>
+                {!readOnly && (
+                  <button
+                    onClick={() => setActiveTab('SETTINGS')}
+                    className={`px-4 py-2 text-sm font-bold rounded-xl transition-all ${activeTab === 'SETTINGS' ? 'bg-indigo-600 text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      }`}
+                  >
+                    Cấu Hình Bài Thi
+                  </button>
+                )}
               </div>
 
               {activeTab === 'QUESTIONS' && (
                 <div className="grid grid-cols-1 gap-4">
-                  <div className="flex justify-end mb-2">
-                    <button onClick={() => setIsAddingQuestion(true)} className="px-4 py-2 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded-xl font-bold text-sm border border-indigo-200 transition-colors">
-                      + Thêm Câu Hỏi Mới
-                    </button>
-                  </div>
+                  {!readOnly && (
+                    <div className="flex justify-end mb-2">
+                      <button onClick={() => setIsAddingQuestion(true)} className="px-4 py-2 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded-xl font-bold text-sm border border-indigo-200 transition-colors">
+                        + Thêm Câu Hỏi Mới
+                      </button>
+                    </div>
+                  )}
                   {detail.quizQuestions.map((q, idx) => (
                     <div key={q.id} className="p-5 rounded-2xl border border-gray-200 bg-gray-50/70 space-y-3 shadow-sm hover:border-blue-300 transition-all">
                       <div className="flex items-start justify-between gap-3">
                         <div className="font-bold text-base text-gray-900">
                           <span className="text-blue-600 mr-2">Câu {idx + 1}:</span> {q.content}
                         </div>
-                        <div className="flex gap-2 shrink-0">
-                          <button onClick={() => setEditingQuestion(q)} className="text-xs font-semibold bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg hover:bg-gray-200 border border-gray-200">Sửa</button>
-                          <button onClick={() => deleteQuestionMutation.mutate(q.id)} className="text-xs font-semibold bg-red-50 text-red-600 px-3 py-1.5 rounded-lg hover:bg-red-100 border border-red-200">Xóa</button>
-                        </div>
+                        {!readOnly && (
+                          <div className="flex gap-2 shrink-0">
+                            <button onClick={() => setEditingQuestion(q)} className="text-xs font-semibold bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg hover:bg-gray-200 border border-gray-200">Sửa</button>
+                            <button onClick={() => deleteQuestionMutation.mutate(q.id)} className="text-xs font-semibold bg-red-50 text-red-600 px-3 py-1.5 rounded-lg hover:bg-red-100 border border-red-200">Xóa</button>
+                          </div>
+                        )}
                       </div>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mt-3">
@@ -780,12 +808,14 @@ function MaterialWorkspaceViewer({
                   >
                     Xem Tĩnh
                   </button>
-                  <button
-                    onClick={() => setActiveTab('DRAG_DROP')}
-                    className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all ${activeTab === 'DRAG_DROP' ? 'bg-accent text-white shadow-sm' : 'text-blue-700 hover:bg-blue-50'}`}
-                  >
-                    ✏️ Chỉnh Sửa
-                  </button>
+                  {!readOnly && (
+                    <button
+                      onClick={() => setActiveTab('DRAG_DROP')}
+                      className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all ${activeTab === 'DRAG_DROP' ? 'bg-accent text-white shadow-sm' : 'text-blue-700 hover:bg-blue-50'}`}
+                    >
+                      ✏️ Chỉnh Sửa
+                    </button>
+                  )}
                   <button
                     onClick={() => setActiveTab('RAW_CODE')}
                     className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all ${activeTab === 'RAW_CODE' ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-50'}`}
@@ -823,6 +853,7 @@ function MaterialWorkspaceViewer({
                   <MindmapEditor
                     initialMermaidCode={detail.mermaidCode}
                     initialTemplate={(detail as unknown as { extraConfig?: { mapTemplate?: string } }).extraConfig?.mapTemplate}
+                    readOnly={readOnly}
                     onSave={(code) => {
                       updateMermaidMutation.mutate({ id: detail.id, mermaidCode: code });
                       setActiveTab('VIEW');
@@ -845,9 +876,11 @@ function MaterialWorkspaceViewer({
                   <span className="bg-purple-600 text-white font-extrabold text-xs px-3 py-1 rounded-full">
                     {detail.flashcards.length} Thẻ ôn tập
                   </span>
-                  <button onClick={() => setIsAddingFlashcard(true)} className="px-3 py-1.5 bg-purple-100 hover:bg-purple-200 text-purple-800 rounded-lg text-xs font-bold border border-purple-200 transition-colors">
-                    + Thêm Thẻ Mới
-                  </button>
+                  {!readOnly && (
+                    <button onClick={() => setIsAddingFlashcard(true)} className="px-3 py-1.5 bg-purple-100 hover:bg-purple-200 text-purple-800 rounded-lg text-xs font-bold border border-purple-200 transition-colors">
+                      + Thêm Thẻ Mới
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -876,10 +909,12 @@ function MaterialWorkspaceViewer({
                         <div className="text-[11px] opacity-70">
                           {isFlipped ? 'Nhấn để lật lại' : 'Nhấn để xem giải nghĩa'}
                         </div>
-                        <div className="flex gap-2">
-                          <button onClick={(e) => { e.stopPropagation(); setEditingFlashcard(card); }} className="text-[11px] font-bold bg-white/50 hover:bg-white text-purple-700 px-2.5 py-1 rounded-md border border-purple-200">Sửa</button>
-                          <button onClick={(e) => { e.stopPropagation(); deleteFlashcardMutation.mutate(card.id); }} className="text-[11px] font-bold bg-red-50 hover:bg-red-100 text-red-600 px-2.5 py-1 rounded-md border border-red-200">Xóa</button>
-                        </div>
+                        {!readOnly && (
+                          <div className="flex gap-2">
+                            <button onClick={(e) => { e.stopPropagation(); setEditingFlashcard(card); }} className="text-[11px] font-bold bg-white/50 hover:bg-white text-purple-700 px-2.5 py-1 rounded-md border border-purple-200">Sửa</button>
+                            <button onClick={(e) => { e.stopPropagation(); deleteFlashcardMutation.mutate(card.id); }} className="text-[11px] font-bold bg-red-50 hover:bg-red-100 text-red-600 px-2.5 py-1 rounded-md border border-red-200">Xóa</button>
+                          </div>
+                        )}
                       </div>
                     </div>
                   );
