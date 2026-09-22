@@ -13,10 +13,11 @@ import { MindmapEditor } from '@/components/materials/MindmapEditor';
 import { MermaidViewer } from '@/components/materials/MermaidViewer';
 import { MaterialLanguagePicker } from '@/components/materials/MaterialLanguagePicker';
 import { MaterialFolderTree } from './MaterialFolderTree';
-import { getMaterialDistributionBadge } from '@/lib/materialStatus';
+import { getMaterialDistributionBadge, getMaterialProcessingBadge } from '@/lib/materialStatus';
 import { CourseActivityPanel } from './CourseActivityPanel';
 import { MaterialBadge } from '@/components/materials/ui/MaterialBadge';
 import { MaterialTabs } from '@/components/materials/ui/MaterialTabs';
+import { CautionProgressBar } from '@/components/materials/ui/CautionProgressBar';
 
 import { DndContext, useDraggable, useDroppable, DragOverlay, DragStartEvent, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { GripVertical, Trash2, FileText, Plus, Layers, LayoutGrid, List, Search, X, ChevronDown, FileQuestion, Workflow, File, Folder, Link as LinkIcon, History, FileEdit, Sparkles, Lock, ShieldAlert, Check, Copy, Save, GitBranch, Network, AlertTriangle, PencilLine } from 'lucide-react';
@@ -34,6 +35,7 @@ function DraggableMaterialCard({ mat, onClick, isLoading: isPending }: { mat: In
   });
 
   const badge = getMaterialDistributionBadge(mat);
+  const processingBadge = getMaterialProcessingBadge(mat.status);
 
   const typeConfig: Record<string, { Icon: typeof FileQuestion; label: string }> = {
     QUIZ:      { Icon: FileQuestion, label: 'Quiz' },
@@ -92,9 +94,14 @@ function DraggableMaterialCard({ mat, onClick, isLoading: isPending }: { mat: In
         </h4>
       </div>
 
+      {processingBadge && <CautionProgressBar tone="warning" height="h-1" />}
       <div className="px-3 py-1.5 border-t border-line flex items-center justify-between text-[10px] text-ink-faint">
         <span>{new Date(mat.createdAt).toLocaleDateString('vi-VN')}</span>
-        <MaterialBadge tone={badge.tone}>{badge.label}</MaterialBadge>
+        {processingBadge ? (
+          <MaterialBadge tone={processingBadge.tone}>{processingBadge.label}</MaterialBadge>
+        ) : (
+          <MaterialBadge tone={badge.tone}>{badge.label}</MaterialBadge>
+        )}
       </div>
     </div>
   );
@@ -106,6 +113,7 @@ function DraggableMaterialRow({ mat, onDoubleClick }: { mat: InstructorMaterial;
     data: { material: mat },
   });
   const badge = getMaterialDistributionBadge(mat);
+  const processingBadge = getMaterialProcessingBadge(mat.status);
   const TypeIcon = mat.materialType === 'FLASHCARD' ? Layers : mat.materialType === 'QUIZ' ? FileQuestion : Workflow;
 
   return (
@@ -128,7 +136,11 @@ function DraggableMaterialRow({ mat, onDoubleClick }: { mat: InstructorMaterial;
         <p className="text-sm font-semibold text-ink truncate">{mat.title || 'Học liệu không tên'}</p>
         <p className="text-[10px] text-ink-faint">{new Date(mat.createdAt).toLocaleDateString('vi-VN')}</p>
       </div>
-      <MaterialBadge tone={badge.tone} className="flex-shrink-0">{badge.label}</MaterialBadge>
+      {processingBadge ? (
+        <MaterialBadge tone={processingBadge.tone} className="flex-shrink-0">{processingBadge.label}</MaterialBadge>
+      ) : (
+        <MaterialBadge tone={badge.tone} className="flex-shrink-0">{badge.label}</MaterialBadge>
+      )}
     </div>
   );
 }
@@ -235,13 +247,11 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
       setConfirmAction({
         title: "Cập nhật Phiên bản",
         message: "Bạn có muốn cập nhật phiên bản mới cho học liệu này? Điểm số cũ của học viên sẽ được bảo lưu.",
-        onConfirm: () => {
-          overwriteMaterialVersionMutation.mutate({
-            id: latestInLineage.id,
-            targetLessonId: isChapter ? undefined : parsedTargetId,
-            targetChapterId: isChapter ? parsedTargetId : undefined
-          });
-        }
+        onConfirm: () => overwriteMaterialVersionMutation.mutateAsync({
+          id: latestInLineage.id,
+          targetLessonId: isChapter ? undefined : parsedTargetId,
+          targetChapterId: isChapter ? parsedTargetId : undefined
+        })
       });
     } else {
       // Phân phối mới (Epic 3)
@@ -266,12 +276,18 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
 
   const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
 
-  const [confirmAction, setConfirmAction] = useState<{title: string, message: string, onConfirm: () => void} | null>(null);
+  const [confirmAction, setConfirmAction] = useState<{title: string, message: string, onConfirm: () => void | Promise<unknown>} | null>(null);
+  const [isConfirmProcessing, setIsConfirmProcessing] = useState(false);
 
   const { data: materials, isLoading } = useQuery({
     queryKey: ['instructor-materials', courseId],
     queryFn: () => materialsApi.getInstructorMaterials(courseId),
     enabled: !!courseId,
+    refetchInterval: (query) => {
+      const data = query.state.data;
+      const isProcessing = (s?: string) => s === 'PENDING' || s === 'PENDING_TRANSCRIPT' || s === 'PROCESSING';
+      return data && data.some(m => isProcessing(m.status)) ? 3000 : false;
+    },
   });
 
   const { data: courseDetail } = useMyCourseDetail(courseId);
@@ -313,6 +329,12 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
             <p className="text-ink-muted text-sm mb-4">
               Bạn có chắc chắn muốn xóa không? Hành động này không thể hoàn tác.
             </p>
+            {deleteMaterialMutation.isPending && (
+              <div className="mb-4">
+                <CautionProgressBar tone="warning" />
+                <p className="text-[11px] text-ink-faint mt-1.5">Đang xóa, vui lòng đợi...</p>
+              </div>
+            )}
             <div className="flex items-center justify-end gap-2">
               <button
                 onClick={() => setConfirmDeleteId(null)}
@@ -395,7 +417,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                               setConfirmAction({
                                 title: "Gỡ phân phối",
                                 message: "Bạn có chắc chắn muốn gỡ học liệu này khỏi chương?",
-                                onConfirm: () => { if(assignment?.id) materialsApi.deleteAssignment(assignment.id).then(() => queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] })) }
+                                onConfirm: () => assignment?.id ? materialsApi.deleteAssignment(assignment.id).then(() => queryClient.invalidateQueries({ queryKey: ["instructor-materials", courseId] })) : undefined
                               });
                             }
                           }} className="opacity-0 group-hover:opacity-100 p-0.5 text-ink-faint hover:text-danger transition-opacity">
@@ -426,7 +448,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                                       setConfirmAction({
                                         title: "Gỡ phân phối",
                                          message: "Bạn có chắc chắn muốn gỡ học liệu này khỏi bài học?",
-                                        onConfirm: () => { if(assignment?.id) materialsApi.deleteAssignment(assignment.id).then(() => queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] })) }
+                                        onConfirm: () => assignment?.id ? materialsApi.deleteAssignment(assignment.id).then(() => queryClient.invalidateQueries({ queryKey: ["instructor-materials", courseId] })) : undefined
                                       });
                                     }
                                   }} className="opacity-0 group-hover:opacity-100 p-0.5 text-ink-faint hover:text-danger transition-opacity">
@@ -567,10 +589,34 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
         <div className="fixed inset-0 z-[100000] flex items-center justify-center p-4 bg-ink/50 backdrop-blur-sm">
           <div className="bg-surface-raised rounded-card max-w-sm w-full p-5 shadow-card-hover border border-line">
             <h3 className="text-base font-bold text-ink mb-2">{confirmAction.title}</h3>
-            <p className="text-sm text-ink-muted mb-5 leading-relaxed">{confirmAction.message}</p>
+            <p className="text-sm text-ink-muted mb-4 leading-relaxed">{confirmAction.message}</p>
+            {isConfirmProcessing && (
+              <div className="mb-4">
+                <CautionProgressBar />
+                <p className="text-[11px] text-ink-faint mt-1.5">Đang xử lý, vui lòng đợi...</p>
+              </div>
+            )}
             <div className="flex gap-2 justify-end">
-              <button onClick={() => setConfirmAction(null)} className="px-3 py-1.5 text-xs font-bold text-ink-muted bg-surface-hover rounded-card hover:bg-line-soft transition-colors">Hủy</button>
-              <button onClick={() => { confirmAction.onConfirm(); setConfirmAction(null); }} className="px-3 py-1.5 text-xs font-bold text-white bg-accent rounded-card hover:bg-accent-dark transition-colors">Xác nhận</button>
+              <button
+                onClick={() => setConfirmAction(null)}
+                disabled={isConfirmProcessing}
+                className="px-3 py-1.5 text-xs font-bold text-ink-muted bg-surface-hover rounded-card hover:bg-line-soft transition-colors disabled:opacity-50"
+              >
+                Hủy
+              </button>
+              <button
+                onClick={() => {
+                  setIsConfirmProcessing(true);
+                  Promise.resolve(confirmAction.onConfirm()).finally(() => {
+                    setIsConfirmProcessing(false);
+                    setConfirmAction(null);
+                  });
+                }}
+                disabled={isConfirmProcessing}
+                className="px-3 py-1.5 text-xs font-bold text-white bg-accent rounded-card hover:bg-accent-dark transition-colors disabled:opacity-50"
+              >
+                {isConfirmProcessing ? 'Đang xử lý...' : 'Xác nhận'}
+              </button>
             </div>
           </div>
         </div>,

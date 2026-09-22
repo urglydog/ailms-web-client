@@ -9,7 +9,7 @@ export function useCourseMaterials(courseId: number) {
     staleTime: 0,
     refetchInterval: (query) => {
       const data = query.state.data;
-      if (data && data.some(m => m.status === 'PENDING')) {
+      if (data && data.some(m => m.status === 'PENDING' || m.status === 'PENDING_TRANSCRIPT' || m.status === 'PROCESSING')) {
         return 3000;
       }
       return false;
