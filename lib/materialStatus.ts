@@ -9,7 +9,7 @@ export function getMaterialDistributionBadge(mat: Pick<InstructorMaterial, 'isOf
   const assignedCount = mat.assignments?.length ?? 0;
   if (assignedCount > 0) {
     return {
-      label: assignedCount > 1 ? `✅ Official — Đã phân phối (${assignedCount})` : '✅ Official — Đã phân phối',
+      label: assignedCount > 1 ? `✅ Official — Đang dùng ở ${assignedCount} vị trí` : '✅ Official — Đã phân phối',
       className: 'bg-emerald-100 text-emerald-700',
     };
   }
