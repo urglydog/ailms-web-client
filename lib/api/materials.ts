@@ -59,6 +59,15 @@ export interface InstructorMaterial {
 
 
 
+export interface VersionHistoryItem {
+  id: number;
+  displayVersionNo: number;
+  title: string | null;
+  createdAt: string;
+  createdBy: string | null;
+  isActive: boolean;
+}
+
 export interface MaterialGenerationRes {
   id: number;
   materialType: MaterialType;
@@ -144,6 +153,12 @@ export const materialsApi = {
   // Epic 4 Versioning Overwrite
   overwriteMaterialVersion: (id: number, target: { targetLessonId?: number, targetChapterId?: number }) =>
     api.post(`/api/v1/instructor/materials/${id}/versioning-overwrite`, target, { token: authToken() }),
+
+  getVersionHistory: (id: number) =>
+    api.get<VersionHistoryItem[]>(`/api/v1/instructor/materials/${id}/versions`, { token: authToken() }),
+
+  restoreVersion: (id: number) =>
+    api.post<{ id: number; materialId: number | null; message: string }>(`/api/v1/instructor/materials/${id}/restore-version`, {}, { token: authToken() }),
 
   // Đính kèm vào bài học cụ thể hoặc chương
   getFolders: (courseId: number) =>

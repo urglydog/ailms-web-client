@@ -45,7 +45,6 @@ function DraggableMaterialCard({ mat, onClick, isLoading: isPending }: { mat: In
       ref={setNodeRef}
       onDoubleClick={(e) => { e.stopPropagation(); onClick(); }}
       {...attributes}
-      onClick={(e) => e.stopPropagation()}
       className={`relative border rounded-xl flex flex-col overflow-hidden group transition-all duration-200 ${
         isDragging ? 'opacity-40 scale-95 border-blue-400 border-dashed shadow-lg' :
         isPending  ? 'opacity-60 pointer-events-none' :
@@ -97,6 +96,41 @@ function DraggableMaterialCard({ mat, onClick, isLoading: isPending }: { mat: In
           {badge.label}
         </span>
       </div>
+    </div>
+  );
+}
+
+function DraggableMaterialRow({ mat, onDoubleClick }: { mat: InstructorMaterial; onDoubleClick: () => void }) {
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+    id: `material-${mat.id}`,
+    data: { material: mat },
+  });
+  const badge = getMaterialDistributionBadge(mat);
+  const typeIcon = mat.materialType === 'FLASHCARD' ? '🃏' : mat.materialType === 'QUIZ' ? '📝' : '🗺️';
+
+  return (
+    <div
+      ref={setNodeRef}
+      {...attributes}
+      onDoubleClick={(e) => { e.stopPropagation(); onDoubleClick(); }}
+      className={`flex items-center gap-2 flex-1 min-w-0 ${isDragging ? 'opacity-40' : ''}`}
+    >
+      <span
+        {...listeners}
+        onClick={(e) => e.stopPropagation()}
+        className="cursor-grab active:cursor-grabbing text-gray-300 hover:text-gray-500 flex-shrink-0"
+        title="Kéo để phân phối vào bài học"
+      >
+        <GripVertical className="w-3.5 h-3.5" />
+      </span>
+      <span className="text-lg w-6 flex-shrink-0">{typeIcon}</span>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-semibold text-gray-800 truncate">{mat.title || 'Học liệu không tên'}</p>
+        <p className="text-[10px] text-gray-400">{new Date(mat.createdAt).toLocaleDateString('vi-VN')}</p>
+      </div>
+      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${badge.className}`}>
+        {badge.label}
+      </span>
     </div>
   );
 }
@@ -349,7 +383,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                     {chapterMaterials.map(mat => {
                       const assignment = mat.assignments?.find(a => a.chapterId === chapter.id);
                       return (
-                        <div key={`mat-${mat.id}`} className="flex items-center justify-between px-2 py-1 text-xs text-gray-600 pl-6 hover:bg-blue-50 rounded-md cursor-pointer transition-colors group" title="Nháy đúp để xem trước">
+                        <div key={`mat-${mat.id}`} onDoubleClick={() => setInspectGenerationId(mat.id)} className="flex items-center justify-between px-2 py-1 text-xs text-gray-600 pl-6 hover:bg-blue-50 rounded-md cursor-pointer transition-colors group" title="Nháy đúp để xem trước">
                           <div className="flex items-center gap-2">
                             <span className="text-[10px]">🔗</span> {mat.title || 'Học liệu'}
                           </div>
@@ -380,7 +414,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                             {lessonMaterials.map(mat => {
                               const assignment = mat.assignments?.find(a => a.lessonId === lesson.id);
                               return (
-                                <div key={`mat-${mat.id}`} className="flex items-center justify-between px-2 py-1 text-[11px] text-gray-600 pl-6 hover:bg-blue-50 rounded-md cursor-pointer transition-colors group" title="Nháy đúp để xem trước">
+                                <div key={`mat-${mat.id}`} onDoubleClick={() => setInspectGenerationId(mat.id)} className="flex items-center justify-between px-2 py-1 text-[11px] text-gray-600 pl-6 hover:bg-blue-50 rounded-md cursor-pointer transition-colors group" title="Nháy đúp để xem trước">
                                   <div className="flex items-center gap-2">
                                     <span className="text-[10px]">🔗</span> {mat.title || 'Học liệu'}
                                   </div>
@@ -501,6 +535,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
             onInspect={setInspectGenerationId} 
             setConfirmAction={setConfirmAction} 
             DraggableCard={DraggableMaterialCard}
+            DraggableRow={DraggableMaterialRow}
             viewMode={viewMode}
           />
         </div>

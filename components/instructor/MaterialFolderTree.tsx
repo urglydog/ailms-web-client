@@ -1,12 +1,12 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Folder, MoreVertical, Plus, Trash2, ChevronRight, ChevronDown, FolderOpen, MoveRight } from 'lucide-react';
+import { Folder, MoreVertical, Plus, Trash2, ChevronRight, ChevronDown, FolderOpen, MoveRight, Pencil, History } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { materialsApi, InstructorMaterial } from '@/lib/api/materials';
-import { getMaterialDistributionBadge } from '@/lib/materialStatus';
 import { toast } from 'sonner';
 import { createPortal } from 'react-dom';
+import { VersionHistoryModal } from './VersionHistoryModal';
 
 type FolderItem = { id: number; name: string; parentId?: number };
 type MaterialItem = InstructorMaterial;
@@ -18,6 +18,7 @@ interface MaterialFolderTreeProps {
   onInspect: (id: number) => void;
   setConfirmAction: (action: { title: string; message: string; onConfirm: () => void } | null) => void;
   DraggableCard: React.ElementType;
+  DraggableRow: React.ElementType;
   viewMode?: 'grid' | 'list';
 }
 
@@ -28,6 +29,7 @@ export function MaterialFolderTree({
   onInspect,
   setConfirmAction,
   DraggableCard,
+  DraggableRow,
   viewMode = 'grid',
 }: MaterialFolderTreeProps) {
   const queryClient = useQueryClient();
@@ -48,6 +50,13 @@ export function MaterialFolderTree({
   // Simple text-input modal for folder creation (name only — no raw IDs)
   const [createFolderModal, setCreateFolderModal] = useState<{ parentId?: number } | null>(null);
   const [createFolderName, setCreateFolderName] = useState('');
+
+  // Rename modal for materials
+  const [renameModal, setRenameModal] = useState<{ materialId: number } | null>(null);
+  const [renameValue, setRenameValue] = useState('');
+
+  // Version history modal
+  const [versionHistoryFor, setVersionHistoryFor] = useState<number | null>(null);
 
   // Keyboard clipboard state (Issue 4)
   const [selectedMaterialId, setSelectedMaterialId] = useState<number | null>(null);
@@ -78,6 +87,15 @@ export function MaterialFolderTree({
       toast.success('Đã di chuyển học liệu');
     },
     onError: (err: Error) => toast.error(err.message || 'Không thể di chuyển học liệu'),
+  });
+
+  const renameMaterialMutation = useMutation({
+    mutationFn: (vars: { id: number; title: string }) => materialsApi.renameMaterial(vars.id, vars.title),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] });
+      toast.success('Đã đổi tên học liệu');
+    },
+    onError: (err: Error) => toast.error(err.message || 'Không thể đổi tên học liệu'),
   });
 
   const deleteMaterialMutation = useMutation({
@@ -187,6 +205,13 @@ export function MaterialFolderTree({
     setContextMenu(null);
   };
 
+  const handleRenameMaterial = (matId: number) => {
+    const mat = materials.find(m => m.id === matId);
+    setRenameModal({ materialId: matId });
+    setRenameValue(mat?.title || '');
+    setContextMenu(null);
+  };
+
 
   const handleDeleteMaterial = (matId: number) => {
     const mat = materials.find(m => m.id === matId);
@@ -225,8 +250,6 @@ export function MaterialFolderTree({
   );
 
   const renderMaterialRow = (mat: MaterialItem) => {
-    const typeIcon = mat.materialType === 'FLASHCARD' ? '🃏' : mat.materialType === 'QUIZ' ? '📝' : '🗺️';
-    const badge = getMaterialDistributionBadge(mat);
     return (
       <div
         key={mat.id}
@@ -236,14 +259,7 @@ export function MaterialFolderTree({
           selectedMaterialId === mat.id ? 'bg-blue-50' : ''
         }`}
       >
-        <span className="text-lg w-6 flex-shrink-0">{typeIcon}</span>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-gray-800 truncate">{mat.title || 'Học liệu không tên'}</p>
-          <p className="text-[10px] text-gray-400">{new Date(mat.createdAt).toLocaleDateString('vi-VN')}</p>
-        </div>
-        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${badge.className}`}>
-          {badge.label}
-        </span>
+        <DraggableRow mat={mat} onDoubleClick={() => onInspect(mat.id)} />
         {/* Row actions */}
         <div className="flex items-center gap-1 opacity-0 group-hover/row:opacity-100 transition-opacity">
           <button onClick={(e) => { e.stopPropagation(); onInspect(mat.id); }} className="p-1.5 rounded hover:bg-blue-100 text-blue-500 text-[10px] font-bold">Xem</button>
@@ -406,6 +422,18 @@ export function MaterialFolderTree({
                 >
                   <FolderOpen className="w-4 h-4" /> Xem / Chỉnh sửa
                 </button>
+                <button
+                  onClick={() => { if (contextMenu.targetId) handleRenameMaterial(contextMenu.targetId); }}
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 flex items-center gap-2"
+                >
+                  <Pencil className="w-4 h-4" /> Đổi tên
+                </button>
+                <button
+                  onClick={() => { if (contextMenu.targetId) { setVersionHistoryFor(contextMenu.targetId); setContextMenu(null); } }}
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 flex items-center gap-2"
+                >
+                  <History className="w-4 h-4" /> Lịch sử phiên bản
+                </button>
                 <div className="h-px bg-gray-100 my-1" />
                 <button
                   onClick={() => { if (contextMenu.targetId) handleMoveMaterial(contextMenu.targetId); }}
@@ -528,6 +556,64 @@ export function MaterialFolderTree({
           </div>
         </div>,
         document.body
+      )}
+
+      {/* ─── Rename Material Modal ─── */}
+      {renameModal !== null && createPortal(
+        <div
+          className="fixed inset-0 z-[100000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          onClick={() => setRenameModal(null)}
+        >
+          <div
+            className="bg-white rounded-xl max-w-xs w-full p-5 shadow-2xl border border-gray-200"
+            onClick={e => e.stopPropagation()}
+          >
+            <h3 className="text-base font-bold text-gray-900 mb-3">Đổi tên Học liệu</h3>
+            <input
+              autoFocus
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg mb-4 outline-none focus:border-blue-500 text-sm"
+              placeholder="Tên học liệu..."
+              value={renameValue}
+              onChange={e => setRenameValue(e.target.value)}
+              onKeyDown={e => {
+                if (e.key === 'Enter' && renameValue.trim()) {
+                  renameMaterialMutation.mutate({ id: renameModal.materialId, title: renameValue.trim() });
+                  setRenameModal(null);
+                }
+              }}
+            />
+            <div className="flex gap-2 justify-end">
+              <button
+                onClick={() => setRenameModal(null)}
+                className="px-3 py-1.5 text-xs font-bold text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200"
+              >
+                Hủy
+              </button>
+              <button
+                disabled={!renameValue.trim()}
+                onClick={() => {
+                  if (renameValue.trim()) {
+                    renameMaterialMutation.mutate({ id: renameModal.materialId, title: renameValue.trim() });
+                    setRenameModal(null);
+                  }
+                }}
+                className="px-3 py-1.5 text-xs font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+              >
+                Lưu
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {versionHistoryFor !== null && (
+        <VersionHistoryModal
+          courseId={courseId}
+          materialId={versionHistoryFor}
+          onClose={() => setVersionHistoryFor(null)}
+          onInspect={onInspect}
+        />
       )}
     </div>
   );

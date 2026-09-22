@@ -51,7 +51,7 @@ export function LessonSidebar({ chapters, currentLessonId, officialMaterials = [
                     <span className="min-w-0 flex-1 truncate flex items-center gap-1.5">
                       {lesson.lessonTitle}
 
-                      {officialMaterials.some(m => m.assignments?.some(a => a.lessonId === lesson.lessonId)) && (
+                      {officialMaterials.some(m => m.assignments?.some(a => a.lessonId === lesson.lessonId || a.chapterId === chapter.chapterId)) && (
 
                         <span title="Có bài tập/học liệu đính kèm" className="text-[10px] text-ink-muted">📎</span>
                       )}
