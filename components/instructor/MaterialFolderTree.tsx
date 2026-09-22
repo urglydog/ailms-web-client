@@ -62,8 +62,11 @@ export function MaterialFolderTree({
 
   const deleteFolderMutation = useMutation({
     mutationFn: (id: number) => materialsApi.deleteFolder(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['instructor-folders', courseId] }),
-    onError: () => toast.error('Không thể xóa thư mục (Có thể do lỗi ràng buộc)'),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['instructor-folders', courseId] });
+      queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] });
+    },
+    onError: (err: Error) => toast.error(err.message || 'Không thể xóa thư mục'),
   });
 
   const moveToFolderMutation = useMutation({
@@ -126,8 +129,11 @@ export function MaterialFolderTree({
         }
       } else if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
         e.preventDefault();
+        toast.info('Chức năng Copy (nhân bản) chưa được hỗ trợ');
+      } else if ((e.ctrlKey || e.metaKey) && e.key === 'x') {
+        e.preventDefault();
         setClipboard(selectedMaterialId);
-        toast.info(`Đã copy "${mat?.title || 'học liệu'}" vào clipboard`);
+        toast.info(`Đã cắt "${mat?.title || 'học liệu'}" — chọn thư mục đích và nhấn Ctrl+V để dán`);
       } else if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
         e.preventDefault();
         if (clipboard !== null) {
@@ -277,9 +283,15 @@ export function MaterialFolderTree({
         {isExpanded && (
           <div className="ml-6 border-l border-gray-200 pl-2">
             {childFolders.map(renderFolder)}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2">
-              {childMaterials.map(renderMaterialCard)}
-            </div>
+            {viewMode === 'list' ? (
+              <div className="border border-gray-100 rounded-xl overflow-hidden mt-2">
+                {childMaterials.map(renderMaterialRow)}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2">
+                {childMaterials.map(renderMaterialCard)}
+              </div>
+            )}
             {childFolders.length === 0 && childMaterials.length === 0 && (
               <div className="text-xs text-gray-400 py-2 pl-2 italic">Thư mục trống</div>
             )}
@@ -299,6 +311,7 @@ export function MaterialFolderTree({
         if (folderPickerFor !== null) {
           moveToFolderMutation.mutate({ id: folderPickerFor, folderId: f.id });
           setFolderPickerFor(null);
+          setClipboard(null);
         }
       }}
     >
@@ -327,7 +340,7 @@ export function MaterialFolderTree({
         </span>
         {selectedMaterialId && (
           <span className="text-[10px] text-gray-400 italic">
-            ✓ Đã chọn — Del: xóa · Ctrl+C: copy · Ctrl+V: chuyển thư mục
+            ✓ Đã chọn — Del: xóa · Ctrl+X: cắt · Ctrl+V: dán
           </span>
         )}
       </div>
