@@ -13,6 +13,7 @@ import { usePathname, useSearchParams, useRouter } from 'next/navigation';
 import { useNotification } from '@/components/providers/NotificationProvider';
 import { MaterialTabs } from '@/components/materials/ui/MaterialTabs';
 import { MaterialBadge } from '@/components/materials/ui/MaterialBadge';
+import { CautionProgressBar } from '@/components/materials/ui/CautionProgressBar';
 import { BookOpen, Target, Trash2, ShieldAlert, Clock, Ban } from 'lucide-react';
 
 export function MaterialManager({ courseId, lessonId }: { courseId: number, lessonId?: number }) {
@@ -352,6 +353,9 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
                     <span>•</span>
                     <span>{new Date(m.createdAt).toLocaleString('vi-VN')}</span>
                   </div>
+                  {(m.status === 'PENDING' || m.status === 'PENDING_TRANSCRIPT' || m.status === 'PROCESSING') && (
+                    <CautionProgressBar tone="warning" height="h-1.5" className="mt-2 max-w-xs" />
+                  )}
                 </div>
                 <div className="flex items-center gap-3">
                   {m.status === 'COMPLETED' && (

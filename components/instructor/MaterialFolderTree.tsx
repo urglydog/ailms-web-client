@@ -16,7 +16,7 @@ interface MaterialFolderTreeProps {
   folders: FolderItem[];
   materials: MaterialItem[];
   onInspect: (id: number, readOnly?: boolean) => void;
-  setConfirmAction: (action: { title: string; message: string; onConfirm: () => void } | null) => void;
+  setConfirmAction: (action: { title: string; message: string; onConfirm: () => void | Promise<unknown> } | null) => void;
   DraggableCard: React.ElementType;
   DraggableRow: React.ElementType;
   viewMode?: 'grid' | 'list';
@@ -143,7 +143,7 @@ export function MaterialFolderTree({
           setConfirmAction({
             title: 'Xóa Học Liệu',
             message: `Bạn có chắc chắn muốn xóa "${mat.title || 'học liệu này'}" không? Hành động này không thể hoàn tác.`,
-            onConfirm: () => deleteMaterialMutation.mutate(selectedMaterialId),
+            onConfirm: () => deleteMaterialMutation.mutateAsync(selectedMaterialId),
           });
         }
       } else if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
@@ -194,7 +194,7 @@ export function MaterialFolderTree({
       message: hasMaterials
         ? 'Thư mục này đang chứa học liệu. Nếu tiếp tục xóa, các học liệu bên trong sẽ bị đẩy ra ngoài Workspace gốc. Bạn có chắc chắn không?'
         : 'Bạn có chắc chắn muốn xóa thư mục này không?',
-      onConfirm: () => deleteFolderMutation.mutate(id),
+      onConfirm: () => deleteFolderMutation.mutateAsync(id),
     });
     setContextMenu(null);
   };
@@ -218,7 +218,7 @@ export function MaterialFolderTree({
     setConfirmAction({
       title: 'Xóa Học Liệu',
       message: `Bạn có chắc chắn muốn xóa "${mat?.title || 'học liệu này'}" không? Hành động này không thể hoàn tác.`,
-      onConfirm: () => deleteMaterialMutation.mutate(matId),
+      onConfirm: () => deleteMaterialMutation.mutateAsync(matId),
     });
     setContextMenu(null);
   };
