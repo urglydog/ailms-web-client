@@ -164,11 +164,15 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
     throw new ApiError(await parseProblem(response));
   }
 
-  // 204 No Content không có body để parse
+  // 204 No Content, hoặc bất kỳ response "ok" nào có body rỗng — không có gì để parse
   if (response.status === 204) {
     return undefined as T;
   }
-  return (await response.json()) as T;
+  const text = await response.text();
+  if (!text) {
+    return undefined as T;
+  }
+  return JSON.parse(text) as T;
 }
 
 /** Cố gắng đọc ProblemDetail; nếu backend trả HTML/text thì tự dựng một cái tương đương. */

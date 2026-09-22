@@ -7,7 +7,7 @@ function authToken() {
 
 export type MaterialType = 'MINDMAP' | 'QUIZ' | 'FLASHCARD';
 export type ScopeType = 'WHOLE_COURSE' | 'CHAPTER' | 'CUSTOM_LESSONS';
-export type GenStatus = 'PENDING' | 'COMPLETED' | 'FAILED';
+export type GenStatus = 'PENDING_TRANSCRIPT' | 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED' | 'ARCHIVED';
 
 export interface MaterialGenerationReq {
   courseId: number;
@@ -39,6 +39,7 @@ export interface InstructorMaterial {
   isOfficial: boolean;
   language?: string;
   versionNo?: number;
+  rootGenerationId?: number;
   materialId?: number;
   folderId?: number | null;
   questionCount?: number;
@@ -139,16 +140,6 @@ export const materialsApi = {
 
   getInstructorMaterials: (courseId: number) =>
     api.get<InstructorMaterial[]>(`/api/v1/instructor/materials/courses/${courseId}`, { token: authToken() }),
-    
-  setMindmapOfficial: (id: number, isOfficial: boolean) =>
-    api.put(`/api/v1/instructor/materials/mindmaps/${id}/set-official?isOfficial=${isOfficial}`, undefined, { token: authToken() }),
-    
-  setFlashcardOfficial: (id: number, isOfficial: boolean) =>
-    api.put(`/api/v1/instructor/materials/flashcards/${id}/set-official?isOfficial=${isOfficial}`, undefined, { token: authToken() }),
-    
-  setQuizOfficial: (id: number, isOfficial: boolean) =>
-    api.put(`/api/v1/instructor/quizzes/${id}/set-official?isOfficial=${isOfficial}`, undefined, { token: authToken() }),
-    
 
   // Epic 4 Versioning Overwrite
   overwriteMaterialVersion: (id: number, target: { targetLessonId?: number, targetChapterId?: number }) =>
