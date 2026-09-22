@@ -22,6 +22,7 @@ import { TutorEmbedded } from '@/components/tutor/TutorEmbedded';
 import { useActivateDubbing, useCancelDubbing } from '@/hooks/useDubbing';
 import { useDubbingSocket } from '@/hooks/useDubbingSocket';
 import { useEnrolledLessonPlayer } from '@/hooks/useEnrolledLessonPlayer';
+import { useMyEnrollments } from '@/hooks/useEnrollments';
 import { useLessonProgress } from '@/hooks/useLessonProgress';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useLessonPlayer } from '@/hooks/usePublicCourses';
@@ -30,7 +31,7 @@ import { api, ApiError } from '@/lib/api/client';
 import { lessonPlayerApi } from '@/lib/api/lessonPlayer';
 import { LiveChatPanel } from '@/components/community/LiveChatPanel';
 import { MessageInstructorFloatingButton } from '@/components/course/MessageInstructorFloatingButton';
-import { useSetLearnTitle } from '@/components/layout/LearnTitleContext';
+import { useSetLearnTitle, useSetLearnProgress } from '@/components/layout/LearnTitleContext';
 import { getAccessToken } from '@/lib/auth/token';
 import type { PipelineStep } from '@/types/domain';
 
@@ -146,6 +147,12 @@ function LearnPageContent() {
   // 1 chỉ báo nhỏ trên khung video, không che mất cả trang như `isLoading`.
   const isSwitchingLesson = (hasToken ? enrolled.isFetching : preview.isFetching) && !isLoading;
   useSetLearnTitle(lesson?.courseTitle);
+
+  // Task 1 — progress bar trên thanh header màn hình học, tái dùng đúng progressPct đã có
+  // ở "Khóa học của tôi" (BR-PROGRESS-02), không cần BE mới.
+  const { data: myEnrollments } = useMyEnrollments();
+  const currentEnrollment = myEnrollments?.find((e) => e.courseId === lesson?.courseId);
+  useSetLearnProgress(currentEnrollment?.progressPct);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);

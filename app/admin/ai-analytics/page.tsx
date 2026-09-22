@@ -1,6 +1,7 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { api } from '@/lib/api/client';
 import { getAccessToken } from '@/lib/auth/token';
 import { toast } from 'sonner';
@@ -13,6 +14,12 @@ interface AiUsageSummary {
   totalCost: number;
 }
 
+interface AiUsageDaily {
+  day: string;
+  totalTokens: number;
+  totalCost: number;
+}
+
 export default function AiAnalyticsPage() {
   const queryClient = useQueryClient();
 
@@ -20,6 +27,15 @@ export default function AiAnalyticsPage() {
     queryKey: ['admin-ai-usage'],
     queryFn: () =>
       api.get<AiUsageSummary[]>('/api/v1/admin/ai-usage', {
+        token: getAccessToken() ?? undefined,
+      }),
+    enabled: !!getAccessToken(),
+  });
+
+  const { data: dailyData } = useQuery({
+    queryKey: ['admin-ai-usage-daily'],
+    queryFn: () =>
+      api.get<AiUsageDaily[]>('/api/v1/admin/ai-usage/daily', {
         token: getAccessToken() ?? undefined,
       }),
     enabled: !!getAccessToken(),
@@ -46,6 +62,26 @@ export default function AiAnalyticsPage() {
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-gray-900">AI Analytics</h1>
         <p className="mt-2 text-sm text-gray-600">Giám sát lượng tiêu thụ API của học viên và chặn quyền sử dụng AI nếu cần thiết.</p>
+      </div>
+
+      <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+        <h2 className="mb-4 text-sm font-semibold text-gray-700">Chi phí AI theo ngày (30 ngày gần nhất)</h2>
+        {dailyData && dailyData.length > 0 ? (
+          <ResponsiveContainer width="100%" height={240}>
+            <AreaChart data={dailyData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+              <XAxis dataKey="day" tick={{ fontSize: 11 }} />
+              <YAxis tick={{ fontSize: 11 }} tickFormatter={(v: number) => `$${v.toFixed(2)}`} />
+              <Tooltip
+                formatter={(value) => [`$${Number(value ?? 0).toFixed(4)}`, 'Chi phí']}
+                labelFormatter={(label) => `Ngày ${label ?? ''}`}
+              />
+              <Area type="monotone" dataKey="totalCost" stroke="#059669" fill="#059669" fillOpacity={0.15} />
+            </AreaChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="py-8 text-center text-sm text-gray-500">Chưa có dữ liệu theo ngày</div>
+        )}
       </div>
 
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">

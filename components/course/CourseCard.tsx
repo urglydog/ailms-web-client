@@ -159,9 +159,25 @@ export function CourseCard({ course }: { course: CourseSummary }) {
           levelLabel={LEVEL_LABEL[course.level]}
         />
 
+        {isOwned && (
+          <div className="flex items-center gap-2">
+            <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-surface-hover">
+              <div
+                className="h-full rounded-full bg-accent transition-[width]"
+                style={{ width: `${Math.min(100, Math.max(0, enrollment.progressPct))}%` }}
+              />
+            </div>
+            <span className="shrink-0 text-[11px] font-semibold text-ink-muted">
+              {Math.round(enrollment.progressPct)}%
+            </span>
+          </div>
+        )}
+
         <div className="mt-auto flex items-center justify-between gap-2 border-t border-line-soft pt-2">
           {isOwned ? (
-            <span className="font-display text-[15px] font-bold text-accent">Đã sở hữu</span>
+            <span className="font-display text-[15px] font-bold text-accent">
+              {enrollment.progressPct >= 100 ? 'Đã hoàn thành' : 'Đã sở hữu'}
+            </span>
           ) : course.isFree ? (
             <span className="font-display text-[15px] font-bold text-success">Miễn phí</span>
           ) : course.discountPercent ? (

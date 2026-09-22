@@ -1,4 +1,4 @@
-import { api } from '@/lib/api/client';
+import { api, uploadFile } from '@/lib/api/client';
 import { getAccessToken } from '@/lib/auth/token';
 
 function authToken() {
@@ -191,11 +191,25 @@ export const materialsApi = {
   addQuizQuestion: (quizId: number, req: Record<string, unknown>) =>
     api.post(`/api/v1/instructor/quizzes/${quizId}/questions`, req, { token: authToken() }),
 
+  importQuizQuestionsCsv: (quizId: number, file: File) =>
+    uploadFile<{ importedCount: number; errors: string[] }>(
+      `/api/v1/instructor/quizzes/${quizId}/questions/import-csv`,
+      file,
+      { token: authToken() },
+    ),
+
   deleteQuizQuestion: (questionId: number) =>
     api.delete(`/api/v1/instructor/quizzes/questions/${questionId}`, { token: authToken() }),
 
   addFlashcard: (generationId: number, req: Record<string, unknown>) =>
     api.post(`/api/v1/flashcards/deck/${generationId}`, req, { token: authToken() }),
+
+  importFlashcardsCsv: (generationId: number, file: File) =>
+    uploadFile<{ importedCount: number; errors: string[] }>(
+      `/api/v1/flashcards/deck/${generationId}/import-csv`,
+      file,
+      { token: authToken() },
+    ),
 
   updateFlashcard: (id: number, req: Record<string, unknown>) =>
     api.patch(`/api/v1/flashcards/${id}`, req, { token: authToken() }),
