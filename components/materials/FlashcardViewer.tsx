@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useUpdateFlashcard, useAddFlashcard, useDeleteFlashcard } from '@/hooks/useFlashcards';
 import { toast } from 'sonner';
+import { Pencil, Plus, Trash2, Volume2, ChevronLeft, ChevronRight, LayoutGrid } from 'lucide-react';
+import { MaterialBadge } from '@/components/materials/ui/MaterialBadge';
 
 /** Map mã ngôn ngữ backend → BCP-47 tag cho Web Speech API */
 const LANGUAGE_MAP: Record<string, string> = {
@@ -98,8 +100,8 @@ export function FlashcardViewer({ flashcards, language, deckId, readOnly = false
       <div className="text-center text-ink-muted flex flex-col items-center">
         Chưa có flashcard nào.
         {deckId && (
-          <button onClick={() => setAddMode({ front: '', back: '' })} className="mt-4 bg-accent text-white px-4 py-2 rounded-full font-bold">
-            + Thêm thẻ mới
+          <button onClick={() => setAddMode({ front: '', back: '' })} className="mt-4 flex items-center gap-1.5 bg-accent text-white px-4 py-2 rounded-card font-semibold hover:bg-accent-dark transition-colors">
+            <Plus className="w-4 h-4" /> Thêm thẻ mới
           </button>
         )}
       </div>
@@ -157,7 +159,7 @@ export function FlashcardViewer({ flashcards, language, deckId, readOnly = false
           <h3 className="font-display text-lg font-bold text-ink flex items-center gap-2">
             Thêm Flashcard mới
           </h3>
-          <button onClick={() => setAddMode(null)} className="text-ink-muted hover:text-ink text-sm font-semibold px-3 py-1 rounded-lg hover:bg-surface-hover transition-colors">
+          <button onClick={() => setAddMode(null)} className="text-ink-muted hover:text-ink text-sm font-semibold px-3 py-1 rounded-card hover:bg-surface-hover transition-colors">
             Hủy
           </button>
         </div>
@@ -165,7 +167,7 @@ export function FlashcardViewer({ flashcards, language, deckId, readOnly = false
           <div>
             <label className="block text-sm font-semibold text-ink-muted mb-1">Mặt trước (Front)</label>
             <textarea
-              className="w-full p-3 rounded-xl border border-line bg-surface focus:ring-2 focus:ring-accent outline-none text-ink text-lg font-medium resize-none h-24"
+              className="w-full p-3 rounded-card border border-line bg-surface focus:ring-2 focus:ring-accent outline-none text-ink text-lg font-medium resize-none h-24"
               value={addMode?.front || ''}
               onChange={e => setAddMode(prev => prev ? { ...prev, front: e.target.value } : null)}
             />
@@ -173,7 +175,7 @@ export function FlashcardViewer({ flashcards, language, deckId, readOnly = false
           <div>
             <label className="block text-sm font-semibold text-ink-muted mb-1">Mặt sau (Back)</label>
             <textarea
-              className="w-full p-3 rounded-xl border border-line bg-surface focus:ring-2 focus:ring-accent outline-none text-ink text-lg font-medium resize-none h-24"
+              className="w-full p-3 rounded-card border border-line bg-surface focus:ring-2 focus:ring-accent outline-none text-ink text-lg font-medium resize-none h-24"
               value={addMode?.back || ''}
               onChange={e => setAddMode(prev => prev ? { ...prev, back: e.target.value } : null)}
             />
@@ -181,7 +183,7 @@ export function FlashcardViewer({ flashcards, language, deckId, readOnly = false
           <div className="pt-4 flex justify-end">
             <button
               onClick={handleAddSave}
-              className="bg-accent hover:bg-accent-dark text-white font-bold px-6 py-2 rounded-full shadow-md transition-all"
+              className="bg-accent hover:bg-accent-dark text-white font-bold px-6 py-2 rounded-card shadow-card transition-all"
             >
               Thêm Thẻ
             </button>
@@ -198,7 +200,7 @@ export function FlashcardViewer({ flashcards, language, deckId, readOnly = false
           <h3 className="font-display text-lg font-bold text-ink flex items-center gap-2">
             Chỉnh sửa Flashcard
           </h3>
-          <button onClick={() => setEditMode(null)} className="text-ink-muted hover:text-ink text-sm font-semibold px-3 py-1 rounded-lg hover:bg-surface-hover transition-colors">
+          <button onClick={() => setEditMode(null)} className="text-ink-muted hover:text-ink text-sm font-semibold px-3 py-1 rounded-card hover:bg-surface-hover transition-colors">
             Hủy
           </button>
         </div>
@@ -206,7 +208,7 @@ export function FlashcardViewer({ flashcards, language, deckId, readOnly = false
           <div>
             <label className="block text-sm font-semibold text-ink-muted mb-1">Mặt trước (Front)</label>
             <textarea
-              className="w-full p-3 rounded-xl border border-line bg-surface focus:ring-2 focus:ring-accent outline-none text-ink text-lg font-medium resize-none h-24"
+              className="w-full p-3 rounded-card border border-line bg-surface focus:ring-2 focus:ring-accent outline-none text-ink text-lg font-medium resize-none h-24"
               value={editMode?.front || ''}
               onChange={e => setEditMode(prev => prev ? { ...prev, front: e.target.value } : null)}
             />
@@ -214,7 +216,7 @@ export function FlashcardViewer({ flashcards, language, deckId, readOnly = false
           <div>
             <label className="block text-sm font-semibold text-ink-muted mb-1">Mặt sau (Back)</label>
             <textarea
-              className="w-full p-3 rounded-xl border border-line bg-surface focus:ring-2 focus:ring-accent outline-none text-ink text-lg font-medium resize-none h-24"
+              className="w-full p-3 rounded-card border border-line bg-surface focus:ring-2 focus:ring-accent outline-none text-ink text-lg font-medium resize-none h-24"
               value={editMode?.back || ''}
               onChange={e => setEditMode(prev => prev ? { ...prev, back: e.target.value } : null)}
             />
@@ -222,7 +224,7 @@ export function FlashcardViewer({ flashcards, language, deckId, readOnly = false
           <div className="pt-4 flex justify-end">
             <button
               onClick={handleEditSave}
-              className="bg-accent hover:bg-accent-dark text-white font-bold px-6 py-2 rounded-full shadow-md transition-all"
+              className="bg-accent hover:bg-accent-dark text-white font-bold px-6 py-2 rounded-card shadow-card transition-all"
             >
               Lưu thay đổi
             </button>
@@ -246,24 +248,24 @@ export function FlashcardViewer({ flashcards, language, deckId, readOnly = false
                 onClick={() => setEditMode({ id: card.id, front: card.frontText, back: card.backText })}
                 className="text-accent hover:underline flex items-center gap-1"
               >
-                ✏️ Sửa thẻ này
+                <Pencil className="w-3.5 h-3.5" /> Sửa thẻ này
               </button>
               <button
                 onClick={() => setAddMode({ front: '', back: '' })}
-                className="text-green-600 hover:underline flex items-center gap-1"
+                className="text-success hover:underline flex items-center gap-1"
               >
-                ➕ Thêm thẻ mới
+                <Plus className="w-3.5 h-3.5" /> Thêm thẻ mới
               </button>
               <button
                 onClick={() => handleDelete(card.id)}
-                className="text-red-500 hover:underline flex items-center gap-1"
+                className="text-danger hover:underline flex items-center gap-1"
               >
-                🗑️ Xóa thẻ này
+                <Trash2 className="w-3.5 h-3.5" /> Xóa thẻ này
               </button>
             </>
           )}
         </div>
-        <span className="bg-surface-hover px-3 py-1 rounded-full border border-line">Click vào thẻ để lật</span>
+        <span className="bg-surface-hover px-3 py-1 rounded-card border border-line">Click vào thẻ để lật</span>
       </div>
 
       <div 
@@ -278,47 +280,47 @@ export function FlashcardViewer({ flashcards, language, deckId, readOnly = false
         <div className={`w-full h-full transition-transform duration-500 transform-style-3d ${isFlipped ? 'rotate-y-180' : ''}`}>
           
           {/* Front */}
-          <div className="absolute inset-0 backface-hidden bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border-2 border-line-soft flex flex-col items-center justify-center p-8 group-hover:border-accent/30 transition-colors">
+          <div className="absolute inset-0 backface-hidden bg-surface-raised/90 backdrop-blur-md rounded-card shadow-card-hover border border-line flex flex-col items-center justify-center p-8 group-hover:border-accent/40 transition-colors">
             {isSpeakSupported && (
-            <button 
+            <button
               onClick={(e) => handleSpeak(card.frontText, e)}
-              className="absolute top-4 right-4 p-2 text-ink-muted hover:text-accent bg-surface hover:bg-surface-hover rounded-full transition-colors"
+              className="absolute top-4 right-4 p-2 text-ink-muted hover:text-accent bg-surface hover:bg-surface-hover rounded-card transition-colors"
               title={`Nghe phát âm (${LANGUAGE_MAP[langCode]})`}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
+              <Volume2 className="h-5 w-5" strokeWidth={1.75} />
             </button>
             )}
             <h3 className="text-3xl font-display font-medium text-ink text-center leading-relaxed">
               {card.frontText}
             </h3>
-            
+
             {card.nextReviewAt && (
-              <div className={`absolute top-4 left-4 px-3 py-1 rounded-full text-xs font-semibold ${card.isDue ? 'bg-red-100 text-red-700 border border-red-200' : 'bg-green-100 text-green-700 border border-green-200'}`}>
+              <MaterialBadge tone={card.isDue ? 'danger' : 'success'} className="absolute top-4 left-4">
                 {card.isDue ? 'Tới hạn ôn tập' : `Ôn tập: ${new Date(card.nextReviewAt).toLocaleDateString()}`}
-              </div>
+              </MaterialBadge>
             )}
-            
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-xs text-ink-muted flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-xs text-ink-muted flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+              <LayoutGrid className="h-3.5 w-3.5" strokeWidth={1.75} />
               <span>Lật thẻ</span>
             </div>
           </div>
 
           {/* Back */}
-          <div className="absolute inset-0 backface-hidden bg-accent text-white rounded-2xl shadow-lg flex flex-col items-center justify-center p-8 rotate-y-180">
+          <div className="absolute inset-0 backface-hidden bg-accent text-white rounded-card shadow-card-hover flex flex-col items-center justify-center p-8 rotate-y-180">
             {isSpeakSupported && (
-            <button 
+            <button
               onClick={(e) => handleSpeak(card.backText, e)}
-              className="absolute top-4 right-4 p-2 text-white/70 hover:text-white bg-black/10 hover:bg-black/20 rounded-full transition-colors"
+              className="absolute top-4 right-4 p-2 text-white/70 hover:text-white bg-black/10 hover:bg-black/20 rounded-card transition-colors"
               title={`Nghe phát âm (${LANGUAGE_MAP[langCode]})`}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
+              <Volume2 className="h-5 w-5" strokeWidth={1.75} />
             </button>
             )}
             <h3 className="text-3xl font-display font-medium text-center leading-relaxed">
               {card.backText}
             </h3>
-            
+
 
           </div>
 
@@ -329,16 +331,16 @@ export function FlashcardViewer({ flashcards, language, deckId, readOnly = false
         <button
           onClick={handlePrev}
           disabled={safeIdx === 0}
-          className={`w-14 h-14 rounded-full flex items-center justify-center transition-all ${safeIdx === 0 ? 'bg-surface border border-line text-ink-muted opacity-50 cursor-not-allowed' : 'bg-white border border-line shadow-sm hover:border-accent hover:text-accent transform hover:-translate-x-1'}`}
+          className={`w-11 h-11 rounded-card flex items-center justify-center transition-all ${safeIdx === 0 ? 'bg-surface border border-line text-ink-muted opacity-50 cursor-not-allowed' : 'bg-surface-raised border border-line shadow-card hover:border-accent hover:text-accent'}`}
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+          <ChevronLeft className="h-5 w-5" strokeWidth={1.75} />
         </button>
 
         <div className="flex space-x-2">
           {flashcards.map((_, i) => (
-            <div 
-              key={i} 
-              className={`h-2.5 rounded-full transition-all ${i === safeIdx ? 'w-8 bg-accent' : 'w-2.5 bg-line hover:bg-line-soft cursor-pointer'}`}
+            <div
+              key={i}
+              className={`h-2 rounded-full transition-all ${i === safeIdx ? 'w-6 bg-accent' : 'w-2 bg-line hover:bg-line-soft cursor-pointer'}`}
               onClick={() => {
                 setIsFlipped(false);
                 setCurrentIdx(i);
@@ -350,9 +352,9 @@ export function FlashcardViewer({ flashcards, language, deckId, readOnly = false
         <button
           onClick={handleNext}
           disabled={safeIdx === flashcards.length - 1}
-          className={`w-14 h-14 rounded-full flex items-center justify-center transition-all ${safeIdx === flashcards.length - 1 ? 'bg-surface border border-line text-ink-muted opacity-50 cursor-not-allowed' : 'bg-white border border-line shadow-sm hover:border-accent hover:text-accent transform hover:translate-x-1'}`}
+          className={`w-11 h-11 rounded-card flex items-center justify-center transition-all ${safeIdx === flashcards.length - 1 ? 'bg-surface border border-line text-ink-muted opacity-50 cursor-not-allowed' : 'bg-surface-raised border border-line shadow-card hover:border-accent hover:text-accent'}`}
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+          <ChevronRight className="h-5 w-5" strokeWidth={1.75} />
         </button>
       </div>
       

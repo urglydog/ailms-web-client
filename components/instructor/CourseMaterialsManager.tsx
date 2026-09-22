@@ -15,9 +15,11 @@ import { MaterialLanguagePicker } from '@/components/materials/MaterialLanguageP
 import { MaterialFolderTree } from './MaterialFolderTree';
 import { getMaterialDistributionBadge } from '@/lib/materialStatus';
 import { CourseActivityPanel } from './CourseActivityPanel';
+import { MaterialBadge } from '@/components/materials/ui/MaterialBadge';
+import { MaterialTabs } from '@/components/materials/ui/MaterialTabs';
 
 import { DndContext, useDraggable, useDroppable, DragOverlay, DragStartEvent, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
-import { GripVertical, Trash2, FileText, Plus, Layers, LayoutGrid, List, Search, X, ChevronDown } from 'lucide-react';
+import { GripVertical, Trash2, FileText, Plus, Layers, LayoutGrid, List, Search, X, ChevronDown, FileQuestion, Workflow, File, Folder, Link as LinkIcon, History, FileEdit, Sparkles, Lock, ShieldAlert, Check, Copy, Save, GitBranch, Network, AlertTriangle, PencilLine } from 'lucide-react';
 
 
 interface CourseMaterialsManagerProps {
@@ -33,36 +35,35 @@ function DraggableMaterialCard({ mat, onClick, isLoading: isPending }: { mat: In
 
   const badge = getMaterialDistributionBadge(mat);
 
-  // Color coding per type
-  const typeConfig: Record<string, { bg: string; text: string; icon: string; label: string }> = {
-    QUIZ:      { bg: 'bg-emerald-50 border-emerald-200', text: 'text-emerald-700', icon: '📝', label: 'Quiz' },
-    FLASHCARD: { bg: 'bg-violet-50 border-violet-200', text: 'text-violet-700', icon: '🃏', label: 'Flashcard' },
-    MINDMAP:   { bg: 'bg-amber-50 border-amber-200',   text: 'text-amber-700',   icon: '🗺️', label: 'Mindmap' },
+  const typeConfig: Record<string, { Icon: typeof FileQuestion; label: string }> = {
+    QUIZ:      { Icon: FileQuestion, label: 'Quiz' },
+    FLASHCARD: { Icon: Layers, label: 'Flashcard' },
+    MINDMAP:   { Icon: Workflow, label: 'Mindmap' },
   };
-  const cfg = typeConfig[mat.materialType] ?? { bg: 'bg-gray-50 border-gray-200', text: 'text-gray-700', icon: '📄', label: mat.materialType };
+  const cfg = typeConfig[mat.materialType] ?? { Icon: File, label: mat.materialType };
 
   return (
     <div
       ref={setNodeRef}
       onDoubleClick={(e) => { e.stopPropagation(); onClick(); }}
       {...attributes}
-      className={`relative border rounded-xl flex flex-col overflow-hidden group transition-all duration-200 ${
-        isDragging ? 'opacity-40 scale-95 border-blue-400 border-dashed shadow-lg' :
+      className={`relative border rounded-card flex flex-col overflow-hidden group transition-all duration-200 ${
+        isDragging ? 'opacity-40 scale-95 border-accent border-dashed shadow-card-hover' :
         isPending  ? 'opacity-60 pointer-events-none' :
-        `${cfg.bg} hover:shadow-md hover:-translate-y-0.5`
+        'bg-surface-raised border-line hover:shadow-card-hover hover:border-accent/40'
       }`}
     >
       {/* Loading overlay */}
       {isPending && (
-        <div className="absolute inset-0 flex items-center justify-center bg-white/60 z-20 rounded-xl">
-          <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+        <div className="absolute inset-0 flex items-center justify-center bg-surface-raised/60 z-20 rounded-card">
+          <div className="w-5 h-5 border-2 border-accent border-t-transparent rounded-full animate-spin" />
         </div>
       )}
 
       {/* Drag handle */}
       <div
         {...listeners}
-        className="absolute top-2 left-2 text-gray-400 p-1 bg-white/80 rounded-md z-10 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing"
+        className="absolute top-2 left-2 text-ink-faint p-1 bg-surface-raised/80 rounded-card z-10 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing"
         title="Kéo để phân phối vào bài học"
         onClick={(e) => e.stopPropagation()}
       >
@@ -72,30 +73,28 @@ function DraggableMaterialCard({ mat, onClick, isLoading: isPending }: { mat: In
       <div className="p-3 pl-8 pb-2 flex-1">
         <div className="flex items-start justify-between mb-1.5">
           <div className="flex items-center gap-1.5">
-            <span className="text-base leading-none">{cfg.icon}</span>
-            <span className={`text-[10px] font-bold uppercase tracking-wider ${cfg.text}`}>{cfg.label}</span>
+            <cfg.Icon className="w-3.5 h-3.5 text-ink-muted" strokeWidth={1.75} />
+            <span className="text-[10px] font-bold uppercase tracking-wider text-ink-muted">{cfg.label}</span>
           </div>
           {/* Hover actions */}
           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
             <button
               onClick={(e) => { e.stopPropagation(); onClick(); }}
-              className="p-1 rounded-lg bg-white/90 hover:bg-blue-50 text-gray-500 hover:text-blue-600 transition-colors shadow-sm border border-gray-100"
+              className="p-1 rounded-card bg-surface-raised/90 hover:bg-accent/10 text-ink-muted hover:text-accent transition-colors shadow-card border border-line"
               title="Xem / chỉnh sửa"
             >
               <FileText className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>
-        <h4 className="text-sm font-bold text-gray-800 line-clamp-2 leading-tight">
+        <h4 className="text-sm font-bold text-ink line-clamp-2 leading-tight">
           {mat.title || 'Học liệu không tên'}
         </h4>
       </div>
 
-      <div className="px-3 py-1.5 border-t border-black/5 flex items-center justify-between text-[10px] text-gray-500">
+      <div className="px-3 py-1.5 border-t border-line flex items-center justify-between text-[10px] text-ink-faint">
         <span>{new Date(mat.createdAt).toLocaleDateString('vi-VN')}</span>
-        <span className={`px-2 py-0.5 rounded-full font-bold ${badge.className}`}>
-          {badge.label}
-        </span>
+        <MaterialBadge tone={badge.tone}>{badge.label}</MaterialBadge>
       </div>
     </div>
   );
@@ -107,7 +106,7 @@ function DraggableMaterialRow({ mat, onDoubleClick }: { mat: InstructorMaterial;
     data: { material: mat },
   });
   const badge = getMaterialDistributionBadge(mat);
-  const typeIcon = mat.materialType === 'FLASHCARD' ? '🃏' : mat.materialType === 'QUIZ' ? '📝' : '🗺️';
+  const TypeIcon = mat.materialType === 'FLASHCARD' ? Layers : mat.materialType === 'QUIZ' ? FileQuestion : Workflow;
 
   return (
     <div
@@ -119,19 +118,17 @@ function DraggableMaterialRow({ mat, onDoubleClick }: { mat: InstructorMaterial;
       <span
         {...listeners}
         onClick={(e) => e.stopPropagation()}
-        className="cursor-grab active:cursor-grabbing text-gray-300 hover:text-gray-500 flex-shrink-0"
+        className="cursor-grab active:cursor-grabbing text-ink-faint hover:text-ink-muted flex-shrink-0"
         title="Kéo để phân phối vào bài học"
       >
         <GripVertical className="w-3.5 h-3.5" />
       </span>
-      <span className="text-lg w-6 flex-shrink-0">{typeIcon}</span>
+      <TypeIcon className="w-4 h-4 flex-shrink-0 text-ink-muted" strokeWidth={1.75} />
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold text-gray-800 truncate">{mat.title || 'Học liệu không tên'}</p>
-        <p className="text-[10px] text-gray-400">{new Date(mat.createdAt).toLocaleDateString('vi-VN')}</p>
+        <p className="text-sm font-semibold text-ink truncate">{mat.title || 'Học liệu không tên'}</p>
+        <p className="text-[10px] text-ink-faint">{new Date(mat.createdAt).toLocaleDateString('vi-VN')}</p>
       </div>
-      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${badge.className}`}>
-        {badge.label}
-      </span>
+      <MaterialBadge tone={badge.tone} className="flex-shrink-0">{badge.label}</MaterialBadge>
     </div>
   );
 }
@@ -143,9 +140,10 @@ function DroppableNode({ id, title, type, children }: { id: string, title: strin
   });
 
   return (
-    <div ref={setNodeRef} className={`rounded-md transition-colors ${isOver ? 'bg-blue-50 border border-blue-200 border-dashed' : ''}`}>
-      <div className={`flex items-center gap-2 px-2 py-1.5 text-xs ${type === 'CHAPTER' ? 'font-bold text-gray-800 bg-gray-50' : 'font-semibold text-gray-700 bg-gray-50/50 mt-1'}`}>
-        <span>{type === 'CHAPTER' ? '📁' : '📄'}</span> {type === 'CHAPTER' ? `Chương: ${title}` : title}
+    <div ref={setNodeRef} className={`rounded-card transition-colors ${isOver ? 'bg-accent/5 border border-accent/30 border-dashed' : ''}`}>
+      <div className={`flex items-center gap-2 px-2 py-1.5 text-xs ${type === 'CHAPTER' ? 'font-bold text-ink bg-surface-hover rounded-card' : 'font-semibold text-ink-muted bg-surface-hover/50 mt-1 rounded-card'}`}>
+        {type === 'CHAPTER' ? <Folder className="w-3.5 h-3.5 flex-shrink-0" strokeWidth={1.75} /> : <File className="w-3.5 h-3.5 flex-shrink-0" strokeWidth={1.75} />}
+        {type === 'CHAPTER' ? `Chương: ${title}` : title}
       </div>
       {children}
     </div>
@@ -305,27 +303,27 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
     
     
     return (
-      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in">
-        <div className="bg-white rounded-xl max-w-sm w-full shadow-2xl overflow-hidden border border-red-100">
-          <div className="bg-red-50 p-4 border-b border-red-100 flex items-center gap-3">
-            <Trash2 className="w-5 h-5 text-red-600" />
-            <h3 className="text-base font-bold text-red-950">Xóa Học Liệu</h3>
+      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-ink/50 backdrop-blur-sm p-4">
+        <div className="bg-surface-raised rounded-card max-w-sm w-full shadow-card-hover overflow-hidden border border-line">
+          <div className="bg-danger/5 p-4 border-b border-danger/10 flex items-center gap-3">
+            <Trash2 className="w-5 h-5 text-danger" />
+            <h3 className="text-base font-bold text-ink">Xóa Học Liệu</h3>
           </div>
           <div className="p-4">
-            <p className="text-gray-600 text-sm mb-4">
+            <p className="text-ink-muted text-sm mb-4">
               Bạn có chắc chắn muốn xóa không? Hành động này không thể hoàn tác.
             </p>
             <div className="flex items-center justify-end gap-2">
               <button
                 onClick={() => setConfirmDeleteId(null)}
-                className="px-3 py-1.5 text-xs font-bold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                className="px-3 py-1.5 text-xs font-bold text-ink-muted bg-surface-hover hover:bg-line-soft rounded-card transition-colors"
               >
                 Hủy
               </button>
               <button
                 onClick={() => deleteMaterialMutation.mutate(confirmDeleteId)}
                 disabled={deleteMaterialMutation.isPending}
-                className="px-3 py-1.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-lg shadow-sm transition-all disabled:opacity-50"
+                className="px-3 py-1.5 text-xs font-bold text-white bg-danger hover:bg-danger/90 rounded-card shadow-card transition-all disabled:opacity-50"
               >
                 {deleteMaterialMutation.isPending ? 'Đang xóa...' : 'Xác nhận xóa'}
               </button>
@@ -336,7 +334,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
     );
   };
 
-  if (isLoading) return <div className="p-6 text-center text-sm text-gray-500 animate-pulse">Đang tải...</div>;
+  if (isLoading) return <div className="p-6 text-center text-sm text-ink-muted animate-pulse">Đang tải...</div>;
 
   if (inspectGenerationId) {
     const activeMat = materials?.find(m => m.id === inspectGenerationId);
@@ -368,13 +366,13 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
 
   return (
     <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-      <div className="flex h-[calc(100vh-100px)] gap-4 bg-gray-50 p-4 font-sans text-gray-800">
+      <div className="flex h-[calc(100vh-100px)] gap-4 bg-surface-hover p-4 font-sans text-ink">
         
         {/* LEFT PANE: Curriculum Tree */}
-        <div className="w-1/3 bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col shadow-sm">
-          <div className="p-3 border-b border-gray-100 bg-gray-50 flex items-center gap-2">
-            <Layers className="w-4 h-4 text-gray-500" />
-            <h3 className="font-bold text-sm text-gray-700">Phân Phối (Shortcuts)</h3>
+        <div className="w-1/3 bg-surface-raised border border-line rounded-card overflow-hidden flex flex-col shadow-sm">
+          <div className="p-3 border-b border-line bg-surface-hover flex items-center gap-2">
+            <Layers className="w-4 h-4 text-ink-muted" />
+            <h3 className="font-bold text-sm text-ink">Phân Phối (Shortcuts)</h3>
           </div>
           <div className="overflow-y-auto p-2 flex flex-col gap-1 flex-1">
             {chapters?.map(chapter => {
@@ -387,9 +385,9 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                     {chapterMaterials.map(mat => {
                       const assignment = mat.assignments?.find(a => a.chapterId === chapter.id);
                       return (
-                        <div key={`mat-${mat.id}`} onDoubleClick={() => setInspectGenerationId(mat.id, true)} className="flex items-center justify-between px-2 py-1 text-xs text-gray-600 pl-6 hover:bg-blue-50 rounded-md cursor-pointer transition-colors group" title="Nháy đúp để xem trước">
+                        <div key={`mat-${mat.id}`} onDoubleClick={() => setInspectGenerationId(mat.id, true)} className="flex items-center justify-between px-2 py-1 text-xs text-ink-muted pl-6 hover:bg-accent/5 rounded-card cursor-pointer transition-colors group" title="Nháy đúp để xem trước">
                           <div className="flex items-center gap-2">
-                            <span className="text-[10px]">🔗</span> {mat.title || 'Học liệu'}
+                            <LinkIcon className="w-3 h-3 text-ink-faint flex-shrink-0" /> {mat.title || 'Học liệu'}
                           </div>
                           <button onClick={(e) => {
                             e.stopPropagation();
@@ -400,7 +398,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                                 onConfirm: () => { if(assignment?.id) materialsApi.deleteAssignment(assignment.id).then(() => queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] })) }
                               });
                             }
-                          }} className="opacity-0 group-hover:opacity-100 p-0.5 text-gray-400 hover:text-red-500 transition-opacity">
+                          }} className="opacity-0 group-hover:opacity-100 p-0.5 text-ink-faint hover:text-danger transition-opacity">
                             <Trash2 className="w-3 h-3" />
                           </button>
                         </div>
@@ -412,15 +410,15 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                     {chapter.lessons.map(lesson => {
                       const lessonMaterials = materials?.filter(m => m.assignments?.some(a => a.lessonId === lesson.id)) || [];
                       return (
-                        <div key={lesson.id} className="border-l border-gray-100 pl-2 mt-1">
+                        <div key={lesson.id} className="border-l border-line pl-2 mt-1">
                           <DroppableNode id={`lesson-${lesson.id}`} title={lesson.title} type="LESSON">
                             {/* Render lesson shortcuts */}
                             {lessonMaterials.map(mat => {
                               const assignment = mat.assignments?.find(a => a.lessonId === lesson.id);
                               return (
-                                <div key={`mat-${mat.id}`} onDoubleClick={() => setInspectGenerationId(mat.id, true)} className="flex items-center justify-between px-2 py-1 text-[11px] text-gray-600 pl-6 hover:bg-blue-50 rounded-md cursor-pointer transition-colors group" title="Nháy đúp để xem trước">
+                                <div key={`mat-${mat.id}`} onDoubleClick={() => setInspectGenerationId(mat.id, true)} className="flex items-center justify-between px-2 py-1 text-[11px] text-ink-muted pl-6 hover:bg-accent/5 rounded-card cursor-pointer transition-colors group" title="Nháy đúp để xem trước">
                                   <div className="flex items-center gap-2">
-                                    <span className="text-[10px]">🔗</span> {mat.title || 'Học liệu'}
+                                    <LinkIcon className="w-3 h-3 text-ink-faint flex-shrink-0" /> {mat.title || 'Học liệu'}
                                   </div>
                                   <button onClick={(e) => {
                                     e.stopPropagation();
@@ -431,7 +429,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                                         onConfirm: () => { if(assignment?.id) materialsApi.deleteAssignment(assignment.id).then(() => queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] })) }
                                       });
                                     }
-                                  }} className="opacity-0 group-hover:opacity-100 p-0.5 text-gray-400 hover:text-red-500 transition-opacity">
+                                  }} className="opacity-0 group-hover:opacity-100 p-0.5 text-ink-faint hover:text-danger transition-opacity">
                                     <Trash2 className="w-3 h-3" />
                                   </button>
                                 </div>
@@ -449,13 +447,13 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
         </div>
 
         {/* RIGHT PANE: Master Vault */}
-        <div className="flex-1 min-w-0 bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col shadow-sm">
+        <div className="flex-1 min-w-0 bg-surface-raised border border-line rounded-card overflow-hidden flex flex-col shadow-sm">
           {/* Toolbar row 1: Breadcrumb + Create Dropdown */}
-          <div className="px-3 pt-3 pb-2 border-b border-gray-100 flex items-center justify-between bg-gray-50">
-            <div className="flex items-center gap-2 text-xs font-medium text-gray-600">
+          <div className="px-3 pt-3 pb-2 border-b border-line flex items-center justify-between bg-surface-hover">
+            <div className="flex items-center gap-2 text-xs font-medium text-ink-muted">
               {breadcrumbs.map((bc, idx) => (
                 <React.Fragment key={idx}>
-                  <span className="cursor-pointer hover:text-blue-600 transition-colors">{bc.name}</span>
+                  <span className="cursor-pointer hover:text-accent transition-colors">{bc.name}</span>
                   {idx < breadcrumbs.length - 1 && <span>/</span>}
                 </React.Fragment>
               ))}
@@ -464,41 +462,47 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setShowActivityPanel(v => !v)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg transition-colors border ${
-                  showActivityPanel ? 'bg-gray-800 text-white border-gray-800' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-card transition-colors border ${
+                  showActivityPanel ? 'bg-ink text-white border-ink' : 'bg-surface-raised text-ink-muted border-line hover:bg-surface-hover'
                 }`}
                 title="Xem hoạt động gần đây"
               >
-                🕐 Hoạt động
+                <History className="w-3.5 h-3.5" /> Hoạt động
               </button>
               {/* Dropdown: Tạo Mới */}
               <div className="relative">
                 <button
                   id="create-material-btn"
                   onClick={() => setShowCreateDropdown(v => !v)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition-colors shadow-sm"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-accent hover:bg-accent-dark text-white text-xs font-bold rounded-card transition-colors shadow-card"
                 >
                   <Plus className="w-3.5 h-3.5" /> Tạo Mới <ChevronDown className="w-3 h-3" />
                 </button>
                 {showCreateDropdown && (
                   <div
-                    className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-xl z-50 min-w-[180px] overflow-hidden"
+                    className="absolute right-0 top-full mt-1 bg-surface-raised border border-line rounded-card shadow-card-hover z-50 min-w-[180px] overflow-hidden"
                     onMouseLeave={() => setShowCreateDropdown(false)}
                   >
-                    <div className="px-3 py-1.5 text-[10px] font-bold uppercase text-gray-400 tracking-wider border-b border-gray-100">✏️ Thủ công</div>
-                    {(['FLASHCARD', 'QUIZ', 'MINDMAP'] as const).map(t => (
-                      <button key={t} onClick={() => { setManualMaterialType(t); setShowCreateDropdown(false); }}
-                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 flex items-center gap-2 transition-colors">
-                        {t === 'FLASHCARD' ? '🃏' : t === 'QUIZ' ? '📝' : '🗺️'} {t}
-                      </button>
-                    ))}
-                    <div className="px-3 py-1.5 text-[10px] font-bold uppercase text-gray-400 tracking-wider border-t border-b border-gray-100">✨ AI Auto</div>
-                    {(['FLASHCARD', 'QUIZ', 'MINDMAP'] as const).map(t => (
-                      <button key={`ai-${t}`} onClick={() => { setGenMaterialType(t); setShowCreateDropdown(false); }}
-                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-sky-50 flex items-center gap-2 transition-colors">
-                        {t === 'FLASHCARD' ? '🃏' : t === 'QUIZ' ? '📝' : '🗺️'} {t} <span className="ml-auto text-[9px] bg-sky-100 text-sky-600 px-1.5 rounded-full font-bold">AI</span>
-                      </button>
-                    ))}
+                    <div className="px-3 py-1.5 text-[10px] font-bold uppercase text-ink-faint tracking-wider border-b border-line flex items-center gap-1.5"><FileEdit className="w-3 h-3" /> Thủ công</div>
+                    {(['FLASHCARD', 'QUIZ', 'MINDMAP'] as const).map(t => {
+                      const TIcon = t === 'FLASHCARD' ? Layers : t === 'QUIZ' ? FileQuestion : Workflow;
+                      return (
+                        <button key={t} onClick={() => { setManualMaterialType(t); setShowCreateDropdown(false); }}
+                          className="w-full text-left px-4 py-2 text-sm text-ink hover:bg-accent/5 flex items-center gap-2 transition-colors">
+                          <TIcon className="w-3.5 h-3.5 text-ink-muted" strokeWidth={1.75} /> {t}
+                        </button>
+                      );
+                    })}
+                    <div className="px-3 py-1.5 text-[10px] font-bold uppercase text-ink-faint tracking-wider border-t border-b border-line flex items-center gap-1.5"><Sparkles className="w-3 h-3" /> AI Auto</div>
+                    {(['FLASHCARD', 'QUIZ', 'MINDMAP'] as const).map(t => {
+                      const TIcon = t === 'FLASHCARD' ? Layers : t === 'QUIZ' ? FileQuestion : Workflow;
+                      return (
+                        <button key={`ai-${t}`} onClick={() => { setGenMaterialType(t); setShowCreateDropdown(false); }}
+                          className="w-full text-left px-4 py-2 text-sm text-ink hover:bg-accent/5 flex items-center gap-2 transition-colors">
+                          <TIcon className="w-3.5 h-3.5 text-ink-muted" strokeWidth={1.75} /> {t} <MaterialBadge tone="accent" className="ml-auto">AI</MaterialBadge>
+                        </button>
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -506,39 +510,31 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
           </div>
 
           {/* Toolbar row 2: Search + View Toggle */}
-          <div className="px-3 py-2 border-b border-gray-100 flex items-center gap-2 bg-white">
+          <div className="px-3 py-2 border-b border-line flex items-center gap-2 bg-surface-raised">
             <div className="relative flex-1">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-ink-faint" />
               <input
                 type="text"
                 placeholder="Tìm kiếm học liệu..."
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                className="w-full pl-8 pr-8 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-blue-400 transition-colors"
+                className="w-full pl-8 pr-8 py-1.5 text-sm border border-line rounded-card focus:outline-none focus:border-accent transition-colors bg-surface"
               />
               {searchQuery && (
-                <button onClick={() => setSearchQuery('')} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                <button onClick={() => setSearchQuery('')} className="absolute right-2 top-1/2 -translate-y-1/2 text-ink-faint hover:text-ink-muted">
                   <X className="w-3.5 h-3.5" />
                 </button>
               )}
             </div>
             {/* View toggle */}
-            <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
-              <button
-                onClick={() => setViewMode('grid')}
-                className={`p-1.5 transition-colors ${ viewMode === 'grid' ? 'bg-blue-600 text-white' : 'text-gray-500 hover:bg-gray-100' }`}
-                title="Grid View"
-              >
-                <LayoutGrid className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => setViewMode('list')}
-                className={`p-1.5 transition-colors border-l border-gray-200 ${ viewMode === 'list' ? 'bg-blue-600 text-white' : 'text-gray-500 hover:bg-gray-100' }`}
-                title="List View"
-              >
-                <List className="w-4 h-4" />
-              </button>
-            </div>
+            <MaterialTabs
+              active={viewMode}
+              onChange={(key) => setViewMode(key as 'grid' | 'list')}
+              tabs={[
+                { key: 'grid', label: '', icon: <LayoutGrid className="w-4 h-4" /> },
+                { key: 'list', label: '', icon: <List className="w-4 h-4" /> },
+              ]}
+            />
           </div>
           
           <MaterialFolderTree 
@@ -553,28 +549,28 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
           />
         </div>
 
-        {showActivityPanel && <CourseActivityPanel courseId={courseId} />}
+        {showActivityPanel && <CourseActivityPanel courseId={courseId} onClose={() => setShowActivityPanel(false)} />}
       </div>
 
       <DragOverlay>
         {activeDragMaterial ? (
-          <div className="bg-white opacity-90 shadow-2xl scale-105 border-blue-400 border rounded-lg px-3 py-2 text-xs flex items-center gap-2">
-            <FileText className="w-4 h-4 text-blue-500" />
-            <span className="font-bold text-gray-800 line-clamp-1">{activeDragMaterial.title || 'Học liệu'}</span>
+          <div className="bg-surface-raised opacity-90 shadow-card-hover scale-105 border-accent border rounded-card px-3 py-2 text-xs flex items-center gap-2">
+            <FileText className="w-4 h-4 text-accent" />
+            <span className="font-bold text-ink line-clamp-1">{activeDragMaterial.title || 'Học liệu'}</span>
           </div>
         ) : null}
       </DragOverlay>
 
       {renderDeleteModal()}
-      
+
       {confirmAction && typeof window !== 'undefined' && createPortal(
-        <div className="fixed inset-0 z-[100000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white rounded-xl max-w-sm w-full p-5 shadow-2xl animate-in zoom-in-95 duration-200 border border-gray-200">
-            <h3 className="text-base font-bold text-gray-900 mb-2">{confirmAction.title}</h3>
-            <p className="text-sm text-gray-600 mb-5 leading-relaxed">{confirmAction.message}</p>
+        <div className="fixed inset-0 z-[100000] flex items-center justify-center p-4 bg-ink/50 backdrop-blur-sm">
+          <div className="bg-surface-raised rounded-card max-w-sm w-full p-5 shadow-card-hover border border-line">
+            <h3 className="text-base font-bold text-ink mb-2">{confirmAction.title}</h3>
+            <p className="text-sm text-ink-muted mb-5 leading-relaxed">{confirmAction.message}</p>
             <div className="flex gap-2 justify-end">
-              <button onClick={() => setConfirmAction(null)} className="px-3 py-1.5 text-xs font-bold text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">Hủy</button>
-              <button onClick={() => { confirmAction.onConfirm(); setConfirmAction(null); }} className="px-3 py-1.5 text-xs font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors">Xác nhận</button>
+              <button onClick={() => setConfirmAction(null)} className="px-3 py-1.5 text-xs font-bold text-ink-muted bg-surface-hover rounded-card hover:bg-line-soft transition-colors">Hủy</button>
+              <button onClick={() => { confirmAction.onConfirm(); setConfirmAction(null); }} className="px-3 py-1.5 text-xs font-bold text-white bg-accent rounded-card hover:bg-accent-dark transition-colors">Xác nhận</button>
             </div>
           </div>
         </div>,
@@ -660,33 +656,31 @@ function MaterialWorkspaceViewer({
   };
 
   return (
-    <div className="flex flex-col gap-6 rounded-2xl bg-white p-6 shadow-sm border border-gray-200 min-h-[750px]">
+    <div className="flex flex-col gap-6 rounded-card bg-surface-raised p-6 shadow-sm border border-line min-h-[750px]">
       {readOnly && (
-        <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold px-4 py-2 rounded-xl">
-          🔒 Chế độ xem trước — không thể chỉnh sửa nội dung ở đây.
+        <div className="flex items-center gap-2 bg-star/10 border border-star/20 text-star text-xs font-bold px-4 py-2 rounded-card">
+          <Lock className="w-3.5 h-3.5" /> Chế độ xem trước — không thể chỉnh sửa nội dung ở đây.
         </div>
       )}
       {/* Top Workspace Bar */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b pb-4 gap-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-line pb-4 gap-4">
         <div className="flex items-center gap-3">
           {/* Removed Back to list button */}
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-lg font-bold text-gray-900">{detail?.title || material?.title || 'Học liệu AI'}</h2>
+              <h2 className="text-lg font-bold text-ink">{detail?.title || material?.title || 'Học liệu AI'}</h2>
               {material && (
-                <span className={`text-xs font-extrabold px-2.5 py-0.5 rounded-full ${getMaterialDistributionBadge(material).className}`}>
+                <MaterialBadge tone={getMaterialDistributionBadge(material).tone}>
                   {getMaterialDistributionBadge(material).label}
-                </span>
+                </MaterialBadge>
               )}
               {material?.isProctored && (
-                <span className="bg-red-100 text-red-800 text-xs font-extrabold px-2.5 py-0.5 rounded-full border border-red-200">
-                  🔴 AI Anti-Cheat
-                </span>
+                <MaterialBadge tone="danger" icon={<ShieldAlert className="w-3 h-3" />}>AI Anti-Cheat</MaterialBadge>
               )}
             </div>
-            <p className="text-xs text-gray-500 mt-0.5">
-              Loại: <strong className="text-indigo-600">{detail?.materialType || material?.materialType}</strong> •
-              Ngôn ngữ: <strong className="text-gray-700">{detail?.language || material?.language || 'Tiếng Việt'}</strong> •
+            <p className="text-xs text-ink-muted mt-0.5">
+              Loại: <strong className="text-accent">{detail?.materialType || material?.materialType}</strong> •
+              Ngôn ngữ: <strong className="text-ink">{detail?.language || material?.language || 'Tiếng Việt'}</strong> •
               Phiên bản: #{detail?.versionNo || material?.versionNo || 1}
             </p>
           </div>
@@ -698,7 +692,7 @@ function MaterialWorkspaceViewer({
           {!readOnly && onDelete && (
             <button
               onClick={onDelete}
-              className="inline-flex items-center rounded-xl px-3 py-1.5 text-xs font-bold bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 transition-all shadow-sm"
+              className="inline-flex items-center rounded-card px-3 py-1.5 text-xs font-bold bg-danger/10 text-danger border border-danger/20 hover:bg-danger/20 transition-all"
               title="Xóa toàn bộ học liệu này"
             >
               Xóa
@@ -706,60 +700,52 @@ function MaterialWorkspaceViewer({
           )}
           <button
             onClick={onBack}
-            className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors"
+            className="flex items-center justify-center w-8 h-8 rounded-card bg-surface-hover hover:bg-line-soft text-ink-muted transition-colors"
             title="Đóng Workspace"
           >
-            ✕
+            <X className="w-4 h-4" />
           </button>
         </div>
       </div>
 
       {isLoading ? (
-        <div className="py-20 text-center text-gray-500 animate-pulse font-medium">Đang tải toàn bộ dữ liệu học liệu vào Workspace...</div>
+        <div className="py-20 text-center text-ink-muted animate-pulse font-medium">Đang tải toàn bộ dữ liệu học liệu vào Workspace...</div>
       ) : detail ? (
         <div className="flex flex-col gap-6">
 
           {/* Render Quiz Workspace */}
           {detail.materialType === 'QUIZ' && detail.quizQuestions && (
             <div className="space-y-6">
-              <div className="flex items-center gap-2 border-b pb-2">
-                <button
-                  onClick={() => setActiveTab('QUESTIONS')}
-                  className={`px-4 py-2 text-sm font-bold rounded-xl transition-all ${activeTab === 'QUESTIONS' ? 'bg-indigo-600 text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                    }`}
-                >
-                  Ngân Hàng Câu Hỏi ({detail.quizQuestions.length})
-                </button>
-                {!readOnly && (
-                  <button
-                    onClick={() => setActiveTab('SETTINGS')}
-                    className={`px-4 py-2 text-sm font-bold rounded-xl transition-all ${activeTab === 'SETTINGS' ? 'bg-indigo-600 text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                      }`}
-                  >
-                    Cấu Hình Bài Thi
-                  </button>
-                )}
+              <div className="border-b border-line pb-2">
+                <MaterialTabs
+                  active={activeTab}
+                  onChange={(key) => setActiveTab(key as 'QUESTIONS' | 'SETTINGS')}
+                  tabs={[
+                    { key: 'QUESTIONS', label: `Ngân Hàng Câu Hỏi (${detail.quizQuestions.length})` },
+                    ...(!readOnly ? [{ key: 'SETTINGS', label: 'Cấu Hình Bài Thi' }] : []),
+                  ]}
+                />
               </div>
 
               {activeTab === 'QUESTIONS' && (
                 <div className="grid grid-cols-1 gap-4">
                   {!readOnly && (
                     <div className="flex justify-end mb-2">
-                      <button onClick={() => setIsAddingQuestion(true)} className="px-4 py-2 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded-xl font-bold text-sm border border-indigo-200 transition-colors">
-                        + Thêm Câu Hỏi Mới
+                      <button onClick={() => setIsAddingQuestion(true)} className="flex items-center gap-1.5 px-4 py-2 bg-accent/10 text-accent hover:bg-accent/20 rounded-card font-bold text-sm border border-accent/20 transition-colors">
+                        <Plus className="w-4 h-4" /> Thêm Câu Hỏi Mới
                       </button>
                     </div>
                   )}
                   {detail.quizQuestions.map((q, idx) => (
-                    <div key={q.id} className="p-5 rounded-2xl border border-gray-200 bg-gray-50/70 space-y-3 shadow-sm hover:border-blue-300 transition-all">
+                    <div key={q.id} className="p-5 rounded-card border border-line bg-surface-hover/70 space-y-3 shadow-card hover:border-accent/40 transition-all">
                       <div className="flex items-start justify-between gap-3">
-                        <div className="font-bold text-base text-gray-900">
-                          <span className="text-blue-600 mr-2">Câu {idx + 1}:</span> {q.content}
+                        <div className="font-bold text-base text-ink">
+                          <span className="text-accent mr-2">Câu {idx + 1}:</span> {q.content}
                         </div>
                         {!readOnly && (
                           <div className="flex gap-2 shrink-0">
-                            <button onClick={() => setEditingQuestion(q)} className="text-xs font-semibold bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg hover:bg-gray-200 border border-gray-200">Sửa</button>
-                            <button onClick={() => deleteQuestionMutation.mutate(q.id)} className="text-xs font-semibold bg-red-50 text-red-600 px-3 py-1.5 rounded-lg hover:bg-red-100 border border-red-200">Xóa</button>
+                            <button onClick={() => setEditingQuestion(q)} className="text-xs font-semibold bg-surface-hover text-ink px-3 py-1.5 rounded-card hover:bg-line-soft border border-line transition-colors">Sửa</button>
+                            <button onClick={() => deleteQuestionMutation.mutate(q.id)} className="text-xs font-semibold bg-danger/10 text-danger px-3 py-1.5 rounded-card hover:bg-danger/20 border border-danger/20 transition-colors">Xóa</button>
                           </div>
                         )}
                       </div>
@@ -768,16 +754,14 @@ function MaterialWorkspaceViewer({
                         {q.options.map((opt) => (
                           <div
                             key={opt.id}
-                            className={`p-3.5 rounded-xl text-sm font-medium border flex items-center justify-between transition-all ${opt.isCorrect
-                              ? 'bg-emerald-100/80 border-emerald-400 text-emerald-950 font-bold shadow-sm'
-                              : 'bg-white border-gray-200 text-gray-700'
+                            className={`p-3.5 rounded-card text-sm font-medium border flex items-center justify-between transition-all ${opt.isCorrect
+                              ? 'bg-success/10 border-success/30 text-success font-bold'
+                              : 'bg-surface-raised border-line text-ink'
                               }`}
                           >
                             <span>{opt.content}</span>
                             {opt.isCorrect && (
-                              <span className="text-xs bg-emerald-600 text-white px-2.5 py-1 rounded-md font-extrabold flex items-center gap-1">
-                                Đáp án đúng ✓
-                              </span>
+                              <MaterialBadge tone="success" icon={<Check className="w-3 h-3" />}>Đáp án đúng</MaterialBadge>
                             )}
                           </div>
                         ))}
@@ -796,33 +780,20 @@ function MaterialWorkspaceViewer({
           {/* Render Mindmap Workspace (Unified React Flow) */}
           {detail.materialType === 'MINDMAP' && detail.mermaidCode && (
             <div className="space-y-4">
-              <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="bg-accent/5 border border-accent/15 rounded-card p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                  <h3 className="font-bold text-sm text-blue-950">Bảng Vẽ Sơ Đồ Tư Duy (Mindmap)</h3>
-                  <p className="text-xs text-blue-700 mt-0.5">Sử dụng chuột để kéo thả vị trí, click đúp vào chữ để sửa tên nhánh.</p>
+                  <h3 className="font-bold text-sm text-ink">Bảng Vẽ Sơ Đồ Tư Duy (Mindmap)</h3>
+                  <p className="text-xs text-accent-dark/80 mt-0.5">Sử dụng chuột để kéo thả vị trí, click đúp vào chữ để sửa tên nhánh.</p>
                 </div>
-                <div className="flex bg-white rounded-lg p-1 border border-blue-200">
-                  <button
-                    onClick={() => setActiveTab('VIEW')}
-                    className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all ${activeTab === 'VIEW' ? 'bg-blue-600 text-white shadow-sm' : 'text-blue-700 hover:bg-blue-50'}`}
-                  >
-                    Xem Tĩnh
-                  </button>
-                  {!readOnly && (
-                    <button
-                      onClick={() => setActiveTab('DRAG_DROP')}
-                      className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all ${activeTab === 'DRAG_DROP' ? 'bg-accent text-white shadow-sm' : 'text-blue-700 hover:bg-blue-50'}`}
-                    >
-                      ✏️ Chỉnh Sửa
-                    </button>
-                  )}
-                  <button
-                    onClick={() => setActiveTab('RAW_CODE')}
-                    className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all ${activeTab === 'RAW_CODE' ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-50'}`}
-                  >
-                    Mã Mermaid
-                  </button>
-                </div>
+                <MaterialTabs
+                  active={activeTab}
+                  onChange={(key) => setActiveTab(key as 'VIEW' | 'DRAG_DROP' | 'RAW_CODE')}
+                  tabs={[
+                    { key: 'VIEW', label: 'Xem Tĩnh' },
+                    ...(!readOnly ? [{ key: 'DRAG_DROP', label: 'Chỉnh Sửa', icon: <FileEdit className="w-3.5 h-3.5" /> }] : []),
+                    { key: 'RAW_CODE', label: 'Mã Mermaid' },
+                  ]}
+                />
               </div>
 
               {activeTab === 'RAW_CODE' ? (
@@ -836,20 +807,20 @@ function MaterialWorkspaceViewer({
                       className="flex items-center gap-2 text-xs font-mono w-full h-full outline-none"
                       title="Copy to clipboard"
                     >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                      <Copy className="w-3.5 h-3.5" />
                       {detail.mermaidCode ? detail.mermaidCode.split('\n').length : 0} lines
                     </button>
                   </div>
-                  <pre className="p-6 pt-16 rounded-2xl bg-slate-900 text-cyan-300 font-mono text-xs overflow-x-auto min-h-[500px] border border-slate-800 leading-relaxed shadow-inner">
+                  <pre className="p-6 pt-16 rounded-card bg-slate-900 text-cyan-300 font-mono text-xs overflow-x-auto min-h-[500px] border border-slate-800 leading-relaxed shadow-inner">
                     {detail.mermaidCode}
                   </pre>
                 </div>
               ) : activeTab === 'VIEW' ? (
-                <div className="w-full bg-white rounded-2xl shadow-sm border border-gray-200">
+                <div className="w-full bg-surface-raised rounded-card shadow-sm border border-line">
                   <MermaidViewer chart={detail.mermaidCode} />
                 </div>
               ) : (
-                <div className="w-full h-[700px] border border-gray-200 rounded-2xl overflow-hidden bg-gray-50 shadow-inner">
+                <div className="w-full h-[700px] border border-line rounded-card overflow-hidden bg-surface-hover shadow-inner">
                   <MindmapEditor
                     initialMermaidCode={detail.mermaidCode}
                     initialTemplate={(detail as unknown as { extraConfig?: { mapTemplate?: string } }).extraConfig?.mapTemplate}
@@ -867,18 +838,18 @@ function MaterialWorkspaceViewer({
           {/* Render Flashcards Workspace */}
           {detail.materialType === 'FLASHCARD' && detail.flashcards && (
             <div className="space-y-6">
-              <div className="bg-purple-50 border border-purple-100 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="bg-accent/5 border border-accent/15 rounded-card p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                  <h3 className="font-bold text-sm text-purple-950">Bộ Thẻ Học Flashcards 2 Mặt Trực Quan</h3>
-                  <p className="text-xs text-purple-700 mt-0.5">Bấm vào thẻ để lật, hoặc Sửa/Xóa bên dưới thẻ.</p>
+                  <h3 className="font-bold text-sm text-ink">Bộ Thẻ Học Flashcards 2 Mặt Trực Quan</h3>
+                  <p className="text-xs text-accent-dark/80 mt-0.5">Bấm vào thẻ để lật, hoặc Sửa/Xóa bên dưới thẻ.</p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="bg-purple-600 text-white font-extrabold text-xs px-3 py-1 rounded-full">
+                  <span className="bg-accent text-white font-extrabold text-xs px-3 py-1 rounded-card">
                     {detail.flashcards.length} Thẻ ôn tập
                   </span>
                   {!readOnly && (
-                    <button onClick={() => setIsAddingFlashcard(true)} className="px-3 py-1.5 bg-purple-100 hover:bg-purple-200 text-purple-800 rounded-lg text-xs font-bold border border-purple-200 transition-colors">
-                      + Thêm Thẻ Mới
+                    <button onClick={() => setIsAddingFlashcard(true)} className="flex items-center gap-1.5 px-3 py-1.5 bg-accent/10 hover:bg-accent/20 text-accent rounded-card text-xs font-bold border border-accent/20 transition-colors">
+                      <Plus className="w-3.5 h-3.5" /> Thêm Thẻ Mới
                     </button>
                   )}
                 </div>
@@ -891,9 +862,9 @@ function MaterialWorkspaceViewer({
                     <div
                       key={card.id}
                       onClick={() => toggleCard(card.id)}
-                      className={`cursor-pointer min-h-[160px] p-5 rounded-2xl border transition-all duration-300 flex flex-col justify-between shadow-sm hover:shadow-md ${isFlipped
-                        ? 'bg-gradient-to-br from-indigo-900 to-purple-950 text-white border-purple-800'
-                        : 'bg-purple-50/60 text-purple-950 border-purple-200 hover:border-purple-400'
+                      className={`cursor-pointer min-h-[160px] p-5 rounded-card border transition-all duration-300 flex flex-col justify-between shadow-card hover:shadow-card-hover ${isFlipped
+                        ? 'bg-accent text-white border-accent-dark'
+                        : 'bg-surface-raised text-ink border-line hover:border-accent/40'
                         }`}
                     >
                       <div className="flex justify-between items-center text-xs font-extrabold opacity-80 mb-2">
@@ -905,14 +876,14 @@ function MaterialWorkspaceViewer({
                         {isFlipped ? card.backText : card.frontText}
                       </div>
 
-                      <div className="flex items-center justify-between mt-3 border-t border-purple-100 pt-3">
+                      <div className={`flex items-center justify-between mt-3 border-t pt-3 ${isFlipped ? 'border-white/20' : 'border-line'}`}>
                         <div className="text-[11px] opacity-70">
                           {isFlipped ? 'Nhấn để lật lại' : 'Nhấn để xem giải nghĩa'}
                         </div>
                         {!readOnly && (
                           <div className="flex gap-2">
-                            <button onClick={(e) => { e.stopPropagation(); setEditingFlashcard(card); }} className="text-[11px] font-bold bg-white/50 hover:bg-white text-purple-700 px-2.5 py-1 rounded-md border border-purple-200">Sửa</button>
-                            <button onClick={(e) => { e.stopPropagation(); deleteFlashcardMutation.mutate(card.id); }} className="text-[11px] font-bold bg-red-50 hover:bg-red-100 text-red-600 px-2.5 py-1 rounded-md border border-red-200">Xóa</button>
+                            <button onClick={(e) => { e.stopPropagation(); setEditingFlashcard(card); }} className={`text-[11px] font-bold px-2.5 py-1 rounded-card border transition-colors ${isFlipped ? 'bg-white/10 hover:bg-white/20 text-white border-white/20' : 'bg-surface-hover hover:bg-line-soft text-ink border-line'}`}>Sửa</button>
+                            <button onClick={(e) => { e.stopPropagation(); deleteFlashcardMutation.mutate(card.id); }} className={`text-[11px] font-bold px-2.5 py-1 rounded-card border transition-colors ${isFlipped ? 'bg-white/10 hover:bg-white/20 text-white border-white/20' : 'bg-danger/10 hover:bg-danger/20 text-danger border-danger/20'}`}>Xóa</button>
                           </div>
                         )}
                       </div>
@@ -981,21 +952,21 @@ function CustomDateTimePicker({ value, onChange, label, onClear, hint }: { value
     <div className="flex flex-col gap-1.5">
       <div className="flex justify-between items-end">
         <div>
-          <label className="text-sm font-semibold text-gray-700 block">{label}</label>
-          {hint && <span className="font-normal text-[11px] text-gray-500 mt-0.5 block">{hint}</span>}
+          <label className="text-sm font-semibold text-ink block">{label}</label>
+          {hint && <span className="font-normal text-[11px] text-ink-muted mt-0.5 block">{hint}</span>}
         </div>
         {onClear && value && (
-          <button type="button" onClick={onClear} className="text-[11px] text-red-600 hover:text-red-800 font-semibold bg-red-50 hover:bg-red-100 px-2 py-0.5 rounded transition-colors">Xóa</button>
+          <button type="button" onClick={onClear} className="text-[11px] text-danger hover:text-danger/80 font-semibold bg-danger/10 hover:bg-danger/20 px-2 py-0.5 rounded-card transition-colors">Xóa</button>
         )}
       </div>
-      <div className="flex items-stretch rounded-lg border border-gray-300 focus-within:border-cyan-500 focus-within:ring-1 focus-within:ring-cyan-500 overflow-hidden bg-white shadow-sm transition-all">
+      <div className="flex items-stretch rounded-card border border-line focus-within:border-accent focus-within:ring-1 focus-within:ring-accent overflow-hidden bg-surface-raised shadow-card transition-all">
         <input
           type="datetime-local"
           value={value}
           onChange={e => onChange(e.target.value)}
-          className="px-3 py-2 text-sm outline-none hover:bg-gray-50 flex-1 min-w-[150px] bg-transparent text-gray-800"
+          className="px-3 py-2 text-sm outline-none hover:bg-surface-hover flex-1 min-w-[150px] bg-transparent text-ink"
         />
-        <button type="button" onClick={handleSetNow} title="Hiện tại" className="px-3 py-2 text-xs font-semibold text-gray-600 bg-gray-50 hover:bg-gray-100 hover:text-cyan-700 border-l border-gray-200 transition-colors flex items-center justify-center">
+        <button type="button" onClick={handleSetNow} title="Hiện tại" className="px-3 py-2 text-xs font-semibold text-ink-muted bg-surface-hover hover:bg-line-soft hover:text-accent border-l border-line transition-colors flex items-center justify-center">
           Hiện tại
         </button>
       </div>
@@ -1092,25 +1063,25 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
   };
 
   return (
-    <div className="bg-white p-2">
+    <div className="bg-surface-raised p-2">
       <div className="flex justify-between items-center pb-4 mb-6 border-b">
         <div>
           <div className="flex items-center gap-3">
-            <h3 className="text-xl font-bold text-gray-900">Cấu Hình Bài Thi</h3>
+            <h3 className="text-xl font-bold text-ink">Cấu Hình Bài Thi</h3>
             {quiz.quizType === 'LECTURE_QUIZ' ? (
-              <span className="px-2.5 py-1 text-xs font-extrabold bg-emerald-100 text-emerald-700 rounded-md uppercase tracking-wider">Quick Check</span>
+              <MaterialBadge tone="neutral">Quick Check</MaterialBadge>
             ) : (
-              <span className="px-2.5 py-1 text-xs font-extrabold bg-purple-100 text-purple-700 rounded-md uppercase tracking-wider">Official Exam</span>
+              <MaterialBadge tone="accent">Official Exam</MaterialBadge>
             )}
           </div>
-          <p className="text-sm text-gray-500 mt-1">Quản lý thời gian, số lượt làm bài, sinh đề ngẫu nhiên và tính năng giám sát</p>
+          <p className="text-sm text-ink-muted mt-1">Quản lý thời gian, số lượt làm bài, sinh đề ngẫu nhiên và tính năng giám sát</p>
         </div>
         <button
           onClick={handleSave}
           disabled={updateQuizSettingsMutation.isPending}
-          className="rounded-xl bg-cyan-600 px-6 py-2.5 text-sm font-bold text-white hover:bg-cyan-700 disabled:opacity-50 shadow-md transition-all"
+          className="flex items-center gap-2 rounded-card bg-accent px-6 py-2.5 text-sm font-bold text-white hover:bg-accent-dark disabled:opacity-50 shadow-card transition-all"
         >
-          {updateQuizSettingsMutation.isPending ? 'Đang lưu...' : '💾 Lưu Cấu Hình'}
+          <Save className="w-4 h-4" /> {updateQuizSettingsMutation.isPending ? 'Đang lưu...' : 'Lưu Cấu Hình'}
         </button>
       </div>
 
@@ -1119,33 +1090,33 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
 
           {/* Policy Selector */}
           <div className="flex flex-col gap-3">
-            <label className="text-sm font-bold text-gray-700">Chế độ bài thi</label>
+            <label className="text-sm font-bold text-ink">Chế độ bài thi</label>
             <div className="grid grid-cols-1 gap-3">
-              <label className={`cursor-pointer flex items-start gap-3 p-4 rounded-xl border-2 transition-all ${examPolicy === 'PRACTICE_UNLIMITED' ? 'border-cyan-500 bg-cyan-50' : 'border-gray-200 hover:border-cyan-300'}`}>
+              <label className={`cursor-pointer flex items-start gap-3 p-4 rounded-card border-2 transition-all ${examPolicy === 'PRACTICE_UNLIMITED' ? 'border-accent bg-accent/5' : 'border-line hover:border-accent/50'}`}>
                 <input
                   type="radio"
                   name="examPolicy"
                   checked={examPolicy === 'PRACTICE_UNLIMITED'}
                   onChange={() => handlePolicyChange('PRACTICE_UNLIMITED')}
-                  className="mt-1 w-4 h-4 text-cyan-600 focus:ring-cyan-500"
+                  className="mt-1 w-4 h-4 text-accent focus:ring-accent"
                 />
                 <div>
-                  <div className="font-bold text-gray-900 text-sm">Luyện tập (Vô hạn)</div>
-                  <div className="text-xs text-gray-500 mt-0.5">Sinh viên làm bao nhiêu lần tùy ý. Tự động lưu điểm cao nhất.</div>
+                  <div className="font-bold text-ink text-sm">Luyện tập (Vô hạn)</div>
+                  <div className="text-xs text-ink-muted mt-0.5">Sinh viên làm bao nhiêu lần tùy ý. Tự động lưu điểm cao nhất.</div>
                 </div>
               </label>
 
-              <label className={`cursor-pointer flex items-start gap-3 p-4 rounded-xl border-2 transition-all ${examPolicy === 'PRACTICE_LIMITED' ? 'border-cyan-500 bg-cyan-50' : 'border-gray-200 hover:border-cyan-300'}`}>
+              <label className={`cursor-pointer flex items-start gap-3 p-4 rounded-card border-2 transition-all ${examPolicy === 'PRACTICE_LIMITED' ? 'border-accent bg-accent/5' : 'border-line hover:border-accent/50'}`}>
                 <input
                   type="radio"
                   name="examPolicy"
                   checked={examPolicy === 'PRACTICE_LIMITED'}
                   onChange={() => handlePolicyChange('PRACTICE_LIMITED')}
-                  className="mt-1 w-4 h-4 text-cyan-600 focus:ring-cyan-500"
+                  className="mt-1 w-4 h-4 text-accent focus:ring-accent"
                 />
                 <div className="w-full">
-                  <div className="font-bold text-gray-900 text-sm">Ôn tập có giới hạn</div>
-                  <div className="text-xs text-gray-500 mt-0.5 mb-2">Giới hạn số lần làm. Tự động lưu điểm cao nhất.</div>
+                  <div className="font-bold text-ink text-sm">Ôn tập có giới hạn</div>
+                  <div className="text-xs text-ink-muted mt-0.5 mb-2">Giới hạn số lần làm. Tự động lưu điểm cao nhất.</div>
                   {examPolicy === 'PRACTICE_LIMITED' && (
                     <input
                       type="number"
@@ -1153,29 +1124,29 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
                       value={customAttempts}
                       onChange={(e) => setCustomAttempts(e.target.value)}
                       placeholder="Số lần"
-                      className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none w-24"
+                      className="rounded-lg border border-line px-3 py-1.5 text-sm focus:border-accent focus:ring-1 focus:ring-accent outline-none w-24"
                     />
                   )}
                 </div>
               </label>
 
-              <label className={`cursor-pointer flex items-start gap-3 p-4 rounded-xl border-2 transition-all ${examPolicy === 'EXAM_STRICT' ? 'border-cyan-500 bg-cyan-50' : 'border-gray-200 hover:border-cyan-300'}`}>
+              <label className={`cursor-pointer flex items-start gap-3 p-4 rounded-card border-2 transition-all ${examPolicy === 'EXAM_STRICT' ? 'border-accent bg-accent/5' : 'border-line hover:border-accent/50'}`}>
                 <input
                   type="radio"
                   name="examPolicy"
                   checked={examPolicy === 'EXAM_STRICT'}
                   onChange={() => handlePolicyChange('EXAM_STRICT')}
-                  className="mt-1 w-4 h-4 text-cyan-600 focus:ring-cyan-500"
+                  className="mt-1 w-4 h-4 text-accent focus:ring-accent"
                 />
                 <div>
-                  <div className="font-bold text-gray-900 text-sm">Thi chính thức (1 Lần)</div>
-                  <div className="text-xs text-gray-500 mt-0.5">Mỗi sinh viên chỉ được làm 1 lần duy nhất. Bắt buộc nhập thời gian Mở bài.</div>
+                  <div className="font-bold text-ink text-sm">Thi chính thức (1 Lần)</div>
+                  <div className="text-xs text-ink-muted mt-0.5">Mỗi sinh viên chỉ được làm 1 lần duy nhất. Bắt buộc nhập thời gian Mở bài.</div>
                 </div>
               </label>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-gray-100">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-line">
             <CustomDateTimePicker
               label="Khung giờ mở bài"
               value={startTime}
@@ -1192,28 +1163,28 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
             />
           </div>
 
-          <label className="flex items-center gap-3 text-sm font-bold text-gray-700 bg-gray-50 p-4 rounded-xl border">
+          <label className="flex items-center gap-3 text-sm font-bold text-ink bg-surface-hover p-4 rounded-card border">
             <input
               type="checkbox"
               checked={allowReview}
               onChange={(e) => setAllowReview(e.target.checked)}
-              className="h-5 w-5 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500"
+              className="h-5 w-5 rounded border-line text-accent focus:ring-accent"
             />
             Cho phép học viên xem lại đáp án sau khi nộp bài
           </label>
 
-          <div className="grid grid-cols-2 gap-4 border-t border-gray-100 pt-4">
-            <label className="flex flex-col gap-2 text-sm font-bold text-gray-700">
+          <div className="grid grid-cols-2 gap-4 border-t border-line pt-4">
+            <label className="flex flex-col gap-2 text-sm font-bold text-ink">
               Thời gian làm bài (Phút)
               <input
                 type="number"
                 min="1"
                 value={durationMinutes}
                 onChange={(e) => handleDurationChange(e.target.value)}
-                className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none"
+                className="rounded-card border border-line px-4 py-2.5 text-sm focus:border-accent focus:ring-1 focus:ring-accent outline-none"
               />
             </label>
-            <label className="flex flex-col gap-2 text-sm font-bold text-gray-700">
+            <label className="flex flex-col gap-2 text-sm font-bold text-ink">
               Số câu hỏi mỗi lượt
               <input
                 type="number"
@@ -1222,17 +1193,17 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
                 value={randomPickCount}
                 onChange={(e) => setRandomPickCount(e.target.value)}
                 placeholder={`Mặc định: ${quiz.questionCount ?? '0'} câu`}
-                className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none"
+                className="rounded-card border border-line px-4 py-2.5 text-sm focus:border-accent focus:ring-1 focus:ring-accent outline-none"
               />
             </label>
           </div>
         </div>
 
         <div className="space-y-6">
-          <div className="rounded-2xl border border-red-200 bg-red-50/60 p-6 space-y-4 shadow-sm">
+          <div className="rounded-card border border-danger/20 bg-danger/5 p-6 space-y-4 shadow-card">
             <div className="flex items-center justify-between">
-              <span className="text-base font-black text-red-950 flex items-center gap-2">
-                Giám Sát Thi Cử AI (Anti-Cheat)
+              <span className="text-base font-black text-ink flex items-center gap-2">
+                <ShieldAlert className="w-4 h-4 text-danger" /> Giám Sát Thi Cử AI (Anti-Cheat)
               </span>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input
@@ -1241,16 +1212,16 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
                   onChange={(e) => setIsProctored(e.target.checked)}
                   className="sr-only peer"
                 />
-                <div className="w-14 h-7 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-red-600"></div>
+                <div className="w-14 h-7 bg-line peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-surface-raised after:border-line after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-danger"></div>
               </label>
             </div>
-            <p className="text-sm text-red-800 leading-relaxed border-l-2 border-red-300 pl-3">
+            <p className="text-sm text-ink-muted leading-relaxed border-l-2 border-danger/30 pl-3">
               Yêu cầu bật Camera. Hệ thống AI sẽ tự động giám sát khuôn mặt, cảnh báo khi học viên rời khỏi màn hình hoặc chuyển sang tab khác.
             </p>
 
             {isProctored && (
-              <div className="pt-4 border-t border-red-200">
-                <label className="flex flex-col gap-2 text-sm font-bold text-red-900">
+              <div className="pt-4 border-t border-danger/20">
+                <label className="flex flex-col gap-2 text-sm font-bold text-ink">
                   Số lần vi phạm tối đa trước khi tự động thu bài
                   <input
                     type="number"
@@ -1258,7 +1229,7 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
                     max="10"
                     value={maxViolations}
                     onChange={(e) => setMaxViolations(e.target.value)}
-                    className="rounded-xl border border-red-300 px-4 py-2.5 text-sm bg-white focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none w-full sm:w-1/2"
+                    className="rounded-card border border-danger/30 px-4 py-2.5 text-sm bg-surface-raised focus:border-danger focus:ring-1 focus:ring-danger outline-none w-full sm:w-1/2"
                   />
                 </label>
               </div>
@@ -1365,13 +1336,13 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
   };
 
   return (
-    <div className="w-full rounded-3xl bg-white p-8 shadow-sm border border-gray-200 relative">
+    <div className="w-full rounded-3xl bg-surface-raised p-8 shadow-sm border border-line relative">
       <div className="border-b pb-4 mb-6 flex justify-between items-start">
         <div>
-          <h3 className="text-2xl font-black text-gray-900">Tạo Học Liệu AI Tự Động</h3>
-          <p className="text-sm text-gray-500 mt-1">Lựa chọn loại học liệu bạn muốn AI tự động tổng hợp từ nội dung bài giảng.</p>
+          <h3 className="text-2xl font-black text-ink">Tạo Học Liệu AI Tự Động</h3>
+          <p className="text-sm text-ink-muted mt-1">Lựa chọn loại học liệu bạn muốn AI tự động tổng hợp từ nội dung bài giảng.</p>
         </div>
-        <button type="button" onClick={onClose} className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors" title="Đóng">✕</button>
+        <button type="button" onClick={onClose} className="flex items-center justify-center w-8 h-8 rounded-card bg-surface-hover hover:bg-line-soft text-ink-muted transition-colors" title="Đóng"><X className="w-4 h-4" /></button>
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-6">
@@ -1383,12 +1354,12 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
               setMaterialType('QUIZ');
               setScopeType(quizType === 'LECTURE_QUIZ' ? 'LESSON' : 'WHOLE_COURSE');
             }}
-            className={`cursor-pointer rounded-2xl p-4 border-2 transition-all flex flex-col items-center text-center gap-2 ${materialType === 'QUIZ' ? 'border-cyan-500 bg-cyan-50/50 shadow-md scale-[1.02]' : 'border-gray-200 hover:border-cyan-300 bg-white'
+            className={`cursor-pointer rounded-card p-4 border-2 transition-all flex flex-col items-center text-center gap-2 ${materialType === 'QUIZ' ? 'border-accent bg-accent/5 shadow-md scale-[1.02]' : 'border-line hover:border-accent/50 bg-surface-raised'
               }`}
           >
-            <div className="text-4xl">📝</div>
-            <div className="font-bold text-gray-900">Bài Thi Trắc Nghiệm</div>
-            <div className="text-xs text-gray-500">Sinh câu hỏi trắc nghiệm kèm giải thích</div>
+            <div className="flex justify-center"><FileQuestion className="w-9 h-9 text-accent" strokeWidth={1.5} /></div>
+            <div className="font-bold text-ink">Bài Thi Trắc Nghiệm</div>
+            <div className="text-xs text-ink-muted">Sinh câu hỏi trắc nghiệm kèm giải thích</div>
           </div>
 
           <div
@@ -1396,12 +1367,12 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
               setMaterialType('FLASHCARD');
               setScopeType('CHAPTER');
             }}
-            className={`cursor-pointer rounded-2xl p-4 border-2 transition-all flex flex-col items-center text-center gap-2 ${materialType === 'FLASHCARD' ? 'border-purple-500 bg-purple-50/50 shadow-md scale-[1.02]' : 'border-gray-200 hover:border-purple-300 bg-white'
+            className={`cursor-pointer rounded-card p-4 border-2 transition-all flex flex-col items-center text-center gap-2 ${materialType === 'FLASHCARD' ? 'border-accent bg-accent/5 shadow-md scale-[1.02]' : 'border-line hover:border-accent/40 bg-surface-raised'
               }`}
           >
-            <div className="text-4xl">🃏</div>
-            <div className="font-bold text-gray-900">Thẻ Flashcard</div>
-            <div className="text-xs text-gray-500">Trích xuất thuật ngữ & khái niệm 2 mặt</div>
+            <div className="flex justify-center"><Layers className="w-9 h-9 text-accent" strokeWidth={1.5} /></div>
+            <div className="font-bold text-ink">Thẻ Flashcard</div>
+            <div className="text-xs text-ink-muted">Trích xuất thuật ngữ & khái niệm 2 mặt</div>
           </div>
 
           <div
@@ -1409,25 +1380,25 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
               setMaterialType('MINDMAP');
               setScopeType('CHAPTER');
             }}
-            className={`cursor-pointer rounded-2xl p-4 border-2 transition-all flex flex-col items-center text-center gap-2 ${materialType === 'MINDMAP' ? 'border-blue-500 bg-blue-50/50 shadow-md scale-[1.02]' : 'border-gray-200 hover:border-blue-300 bg-white'
+            className={`cursor-pointer rounded-card p-4 border-2 transition-all flex flex-col items-center text-center gap-2 ${materialType === 'MINDMAP' ? 'border-accent bg-accent/5 shadow-md scale-[1.02]' : 'border-line hover:border-accent/40 bg-surface-raised'
               }`}
           >
-            <div className="text-4xl">🧠</div>
-            <div className="font-bold text-gray-900">Sơ Đồ Tư Duy</div>
-            <div className="text-xs text-gray-500">Vẽ sơ đồ luồng kiến thức trực quan</div>
+            <div className="flex justify-center"><Workflow className="w-9 h-9 text-accent" strokeWidth={1.5} /></div>
+            <div className="font-bold text-ink">Sơ Đồ Tư Duy</div>
+            <div className="text-xs text-ink-muted">Vẽ sơ đồ luồng kiến thức trực quan</div>
           </div>
         </div>
 
         {/* Bước 2: Hiển thị các Option nếu đã chọn loại */}
         {materialType && (
-          <div className="animate-in fade-in slide-in-from-bottom-4 duration-300 flex flex-col gap-4 bg-gray-50 p-5 rounded-2xl border border-gray-200">
-            <h4 className="font-bold text-gray-800 border-b pb-2">Cấu Hình Chi Tiết</h4>
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-300 flex flex-col gap-4 bg-surface-hover p-5 rounded-card border border-line">
+            <h4 className="font-bold text-ink border-b pb-2">Cấu Hình Chi Tiết</h4>
 
             {materialType === 'QUIZ' && (
               <div className="flex flex-col gap-2 pt-2 pb-2">
-                <span className="text-sm font-semibold text-gray-700">Phân loại Trắc nghiệm</span>
+                <span className="text-sm font-semibold text-ink">Phân loại Trắc nghiệm</span>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <label className={`cursor-pointer flex items-start gap-3 p-3 rounded-xl border-2 transition-all ${quizType === 'LECTURE_QUIZ' ? 'border-cyan-500 bg-cyan-50' : 'border-gray-200 bg-white hover:border-cyan-200'}`}>
+                  <label className={`cursor-pointer flex items-start gap-3 p-3 rounded-card border-2 transition-all ${quizType === 'LECTURE_QUIZ' ? 'border-accent bg-accent/5' : 'border-line bg-surface-raised hover:border-accent/30'}`}>
                     <input type="radio" name="aiQuizType" value="LECTURE_QUIZ" checked={quizType === 'LECTURE_QUIZ'} onChange={() => {
                       setQuizType('LECTURE_QUIZ');
                       setScopeType('LESSON');
@@ -1435,11 +1406,11 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
                       setLessonId(undefined);
                     }} className="mt-1" />
                     <div className="flex flex-col">
-                      <span className="font-bold text-gray-900 text-sm">Kiểm tra nhanh (Quick Check)</span>
-                      <span className="text-xs text-gray-500">Gắn vào 1 Bài học. Luôn hiện giải thích, làm vô hạn lần, không tính giờ.</span>
+                      <span className="font-bold text-ink text-sm">Kiểm tra nhanh (Quick Check)</span>
+                      <span className="text-xs text-ink-muted">Gắn vào 1 Bài học. Luôn hiện giải thích, làm vô hạn lần, không tính giờ.</span>
                     </div>
                   </label>
-                  <label className={`cursor-pointer flex items-start gap-3 p-3 rounded-xl border-2 transition-all ${quizType === 'OFFICIAL_EXAM' ? 'border-cyan-500 bg-cyan-50' : 'border-gray-200 bg-white hover:border-cyan-200'}`}>
+                  <label className={`cursor-pointer flex items-start gap-3 p-3 rounded-card border-2 transition-all ${quizType === 'OFFICIAL_EXAM' ? 'border-accent bg-accent/5' : 'border-line bg-surface-raised hover:border-accent/30'}`}>
                     <input type="radio" name="aiQuizType" value="OFFICIAL_EXAM" checked={quizType === 'OFFICIAL_EXAM'} onChange={() => {
                       setQuizType('OFFICIAL_EXAM');
                       setScopeType('WHOLE_COURSE');
@@ -1447,15 +1418,15 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
                       setLessonId(undefined);
                     }} className="mt-1" />
                     <div className="flex flex-col">
-                      <span className="font-bold text-gray-900 text-sm">Thi chính thức (Official Exam)</span>
-                      <span className="text-xs text-gray-500">Thi theo Chương/Khóa học. Có tính giờ, ghi Bảng điểm, tùy chỉnh lượt làm.</span>
+                      <span className="font-bold text-ink text-sm">Thi chính thức (Official Exam)</span>
+                      <span className="text-xs text-ink-muted">Thi theo Chương/Khóa học. Có tính giờ, ghi Bảng điểm, tùy chỉnh lượt làm.</span>
                     </div>
                   </label>
                 </div>
               </div>
             )}
 
-            <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
+            <label className="flex flex-col gap-1 text-sm font-semibold text-ink">
               Tiêu đề học liệu
               <input
                 type="text"
@@ -1465,12 +1436,12 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
                   setTitle(e.target.value);
                   setIsTitleEdited(true);
                 }}
-                className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:border-cyan-500 outline-none bg-white"
+                className="rounded-card border border-line px-4 py-2.5 text-sm focus:border-accent outline-none bg-surface-raised"
                 required
               />
             </label>
 
-            <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
+            <label className="flex flex-col gap-1 text-sm font-semibold text-ink">
               Phạm vi tạo học liệu
               <select
                 value={scopeType}
@@ -1478,7 +1449,7 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
                   setScopeType(e.target.value as 'WHOLE_COURSE' | 'CHAPTER' | 'LESSON');
                   setIsTitleEdited(false); // Reset to allow auto-fill on change
                 }}
-                className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:border-cyan-500 outline-none bg-white"
+                className="rounded-card border border-line px-4 py-2.5 text-sm focus:border-accent outline-none bg-surface-raised"
               >
                 {materialType === 'QUIZ' && quizType === 'OFFICIAL_EXAM' && <option value="WHOLE_COURSE">Toàn bộ khóa học</option>}
                 {materialType === 'QUIZ' && quizType === 'OFFICIAL_EXAM' && <option value="CHAPTER">Theo chương cụ thể</option>}
@@ -1493,7 +1464,7 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
             </label>
 
             {scopeType === 'CHAPTER' && (
-              <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
+              <label className="flex flex-col gap-1 text-sm font-semibold text-ink">
                 Chọn chương
                 <select
                   value={scopeRefId ?? ''}
@@ -1502,7 +1473,7 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
                     setIsTitleEdited(false);
                   }}
                   required
-                  className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-cyan-500 focus:outline-none"
+                  className="rounded-lg border border-line px-3 py-2 text-sm focus:border-accent focus:outline-none"
                 >
                   <option value="">-- Chọn chương --</option>
                   {chapters?.map((ch) => (
@@ -1513,7 +1484,7 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
             )}
 
             {scopeType === 'LESSON' && (
-              <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
+              <label className="flex flex-col gap-1 text-sm font-semibold text-ink">
                 Chọn bài học
                 <select
                   value={lessonId ?? ''}
@@ -1522,7 +1493,7 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
                     setIsTitleEdited(false);
                   }}
                   required
-                  className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-cyan-500 focus:outline-none"
+                  className="rounded-lg border border-line px-3 py-2 text-sm focus:border-accent focus:outline-none"
                 >
                   <option value="">-- Chọn bài học --</option>
                   {chapters?.flatMap(ch => ch.lessons).map((lesson) => (
@@ -1535,24 +1506,24 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
             {/* Các tùy chọn đặc thù theo từng loại học liệu */}
             {materialType === 'QUIZ' && (
               <div className="grid grid-cols-2 gap-3">
-                <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
+                <label className="flex flex-col gap-1 text-sm font-semibold text-ink">
                   Độ khó câu hỏi
                   <select
                     value={difficultyLevel}
                     onChange={(e) => setDifficultyLevel(e.target.value as 'EASY' | 'MEDIUM' | 'HARD')}
-                    className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-cyan-500 focus:outline-none"
+                    className="rounded-lg border border-line px-3 py-2 text-sm focus:border-accent focus:outline-none"
                   >
                     <option value="EASY">Cơ bản (Easy)</option>
                     <option value="MEDIUM">Vừa (Medium)</option>
                     <option value="HARD">Nâng cao (Hard)</option>
                   </select>
                 </label>
-                <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
+                <label className="flex flex-col gap-1 text-sm font-semibold text-ink">
                   Số lượng câu hỏi
                   <select
                     value={quantityLevel}
                     onChange={(e) => setQuantityLevel(e.target.value as 'FEWER' | 'STANDARD' | 'MORE')}
-                    className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-cyan-500 focus:outline-none"
+                    className="rounded-lg border border-line px-3 py-2 text-sm focus:border-accent focus:outline-none"
                   >
                     <option value="FEWER">Ít (~10 câu)</option>
                     <option value="STANDARD">Vừa (~20 câu)</option>
@@ -1563,12 +1534,12 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
             )}
 
             {materialType === 'FLASHCARD' && (
-              <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
+              <label className="flex flex-col gap-1 text-sm font-semibold text-ink">
                 Số lượng thẻ Flashcard
                 <select
                   value={quantityLevel}
                   onChange={(e) => setQuantityLevel(e.target.value as 'FEWER' | 'STANDARD' | 'MORE')}
-                  className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-cyan-500 focus:outline-none"
+                  className="rounded-lg border border-line px-3 py-2 text-sm focus:border-accent focus:outline-none"
                 >
                   <option value="FEWER">Ít (~10 thẻ)</option>
                   <option value="STANDARD">Vừa (~20 thẻ)</option>
@@ -1580,30 +1551,30 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
             {materialType === 'MINDMAP' && (
               <div className="flex flex-col gap-4">
                 <div>
-                  <label className="text-sm font-bold text-gray-700 block mb-3">Mẫu sơ đồ (Template)</label>
+                  <label className="text-sm font-bold text-ink block mb-3">Mẫu sơ đồ (Template)</label>
                   <div className="grid grid-cols-4 gap-2">
                     {[
-                      { id: 'LOGIC_CHART', name: 'Logic Chart', icon: '➡️' },
-                      { id: 'ORG_CHART', name: 'Org Chart', icon: '🏢' },
+                      { id: 'LOGIC_CHART', name: 'Logic Chart', Icon: GitBranch },
+                      { id: 'ORG_CHART', name: 'Org Chart', Icon: Network },
                     ].map(tpl => (
-                      <div 
-                        key={tpl.id} 
+                      <div
+                        key={tpl.id}
                         onClick={() => setMapTemplate(tpl.id)}
-                        className={`cursor-pointer border rounded-xl p-3 flex flex-col items-center justify-center gap-2 transition-all ${mapTemplate === tpl.id ? 'border-cyan-500 bg-cyan-50 shadow-sm ring-1 ring-cyan-500' : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50 bg-white'}`}
+                        className={`cursor-pointer border rounded-card p-3 flex flex-col items-center justify-center gap-2 transition-all ${mapTemplate === tpl.id ? 'border-accent bg-accent/5 shadow-card ring-1 ring-accent' : 'border-line hover:border-line hover:bg-surface-hover bg-surface-raised'}`}
                       >
-                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-xl ${mapTemplate === tpl.id ? 'bg-cyan-100/50 opacity-100' : 'bg-gray-50 grayscale opacity-60'}`}>{tpl.icon}</div>
-                        <span className={`text-[11px] font-bold text-center ${mapTemplate === tpl.id ? 'text-cyan-700' : 'text-gray-500'}`}>{tpl.name}</span>
+                        <div className={`w-8 h-8 rounded-card flex items-center justify-center ${mapTemplate === tpl.id ? 'bg-accent/10 text-accent opacity-100' : 'bg-surface-hover text-ink-muted opacity-60'}`}><tpl.Icon className="w-4 h-4" strokeWidth={1.75} /></div>
+                        <span className={`text-[11px] font-bold text-center ${mapTemplate === tpl.id ? 'text-accent' : 'text-ink-muted'}`}>{tpl.name}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
+                <label className="flex flex-col gap-1 text-sm font-semibold text-ink">
                   Mức độ chi tiết nhánh
                   <select
                     value={quantityLevel}
                     onChange={(e) => setQuantityLevel(e.target.value as 'FEWER' | 'STANDARD' | 'MORE')}
-                    className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/20"
+                    className="rounded-lg border border-line px-3 py-2.5 text-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
                   >
                     <option value="FEWER">Cơ bản, nhánh chính</option>
                     <option value="STANDARD">Tiêu chuẩn, vừa phải</option>
@@ -1613,7 +1584,7 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
               </div>
             )}
 
-            <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
+            <label className="flex flex-col gap-1 text-sm font-semibold text-ink">
               Ngôn ngữ học liệu
               <MaterialLanguagePicker
                 languages={languages ?? []}
@@ -1623,15 +1594,15 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
             </label>
 
             <div className="mt-6 flex justify-end gap-3 border-t pt-5">
-              <button type="button" onClick={onClose} className="rounded-xl px-5 py-2.5 text-sm font-bold text-gray-600 hover:bg-gray-200 transition-colors">
+              <button type="button" onClick={onClose} className="rounded-card px-5 py-2.5 text-sm font-bold text-ink-muted hover:bg-line-soft transition-colors">
                 Hủy
               </button>
               <button
                 type="submit"
                 disabled={generateMutation.isPending || !materialType}
-                className="rounded-xl bg-cyan-600 px-6 py-2.5 text-sm font-bold text-white hover:bg-cyan-700 disabled:opacity-50 shadow-md"
+                className="flex items-center gap-2 rounded-card bg-accent px-6 py-2.5 text-sm font-bold text-white hover:bg-accent-dark disabled:opacity-50 shadow-card"
               >
-                {generateMutation.isPending ? 'Đang gọi AI...' : '✨ Bắt Đầu Sinh'}
+                <Sparkles className="w-4 h-4" /> {generateMutation.isPending ? 'Đang gọi AI...' : 'Bắt Đầu Sinh'}
               </button>
             </div>
           </div>
@@ -1684,45 +1655,46 @@ function QuizQuestionEditorModal({ question, onClose, onSuccess }: QuizQuestionE
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-      <div className="bg-white p-6 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
-        <h3 className="font-bold text-lg mb-4 text-gray-900">Chỉnh sửa Nội Dung Câu Hỏi</h3>
-        
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/50 p-4">
+      <div className="bg-surface-raised p-6 rounded-card w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-card-hover border border-line">
+        <h3 className="font-bold text-lg mb-4 text-ink">Chỉnh sửa Nội Dung Câu Hỏi</h3>
+
         {question.usageCount && question.usageCount > 0 ? (
-          <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-sm font-medium">
-            ⚠️ Lưu ý: Học liệu này đã có lượt làm bài. Sửa đáp án câu hỏi sẽ ảnh hưởng đến kết quả chấm điểm của các bài thi đã nộp trước đó.
+          <div className="mb-4 p-3 bg-star/10 border border-star/20 rounded-card text-star text-sm font-medium flex items-start gap-2">
+            <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+            Lưu ý: Học liệu này đã có lượt làm bài. Sửa đáp án câu hỏi sẽ ảnh hưởng đến kết quả chấm điểm của các bài thi đã nộp trước đó.
           </div>
         ) : null}
 
-        <label className="block text-sm font-semibold text-gray-700 mb-1">Nội dung câu hỏi</label>
+        <label className="block text-sm font-semibold text-ink mb-1">Nội dung câu hỏi</label>
         <textarea
           value={content}
           onChange={e => setContent(e.target.value)}
-          className="w-full border border-gray-300 p-3 rounded-xl mb-5 focus:border-indigo-500 focus:outline-none"
+          className="w-full border border-line p-3 rounded-card mb-5 focus:border-accent focus:outline-none"
           rows={3}
         />
 
-        <label className="block text-sm font-semibold text-gray-700 mb-1">Loại câu hỏi</label>
+        <label className="block text-sm font-semibold text-ink mb-1">Loại câu hỏi</label>
         <div className="flex gap-4 mb-4">
           <label className="flex items-center gap-2 text-sm cursor-pointer">
-            <input type="radio" checked={!isMultipleChoice} onChange={() => setIsMultipleChoice(false)} className="w-4 h-4 text-indigo-600 focus:ring-indigo-500" />
+            <input type="radio" checked={!isMultipleChoice} onChange={() => setIsMultipleChoice(false)} className="w-4 h-4 text-accent focus:ring-accent" />
             Single Choice (1 đáp án đúng)
           </label>
           <label className="flex items-center gap-2 text-sm cursor-pointer">
-            <input type="radio" checked={isMultipleChoice} onChange={() => setIsMultipleChoice(true)} className="w-4 h-4 text-indigo-600 focus:ring-indigo-500" />
+            <input type="radio" checked={isMultipleChoice} onChange={() => setIsMultipleChoice(true)} className="w-4 h-4 text-accent focus:ring-accent" />
             Multiple Choice (Nhiều đáp án đúng)
           </label>
         </div>
 
-        <label className="block text-sm font-semibold text-gray-700 mb-2">Các đáp án</label>
+        <label className="block text-sm font-semibold text-ink mb-2">Các đáp án</label>
         <div className="space-y-3">
           {options.map((opt, idx) => (
-            <div key={idx} className={`flex gap-3 items-center p-3 rounded-xl border ${opt.isCorrect ? 'bg-emerald-50 border-emerald-300' : 'bg-gray-50 border-gray-200'}`}>
+            <div key={idx} className={`flex gap-3 items-center p-3 rounded-card border ${opt.isCorrect ? 'bg-success/10 border-success/30' : 'bg-surface-hover border-line'}`}>
               <input
                 type={isMultipleChoice ? "checkbox" : "radio"}
                 checked={opt.isCorrect}
                 onChange={() => handleToggleCorrect(idx)}
-                className="w-5 h-5 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                className="w-5 h-5 text-success focus:ring-success cursor-pointer"
               />
               <input
                 type="text"
@@ -1742,22 +1714,22 @@ function QuizQuestionEditorModal({ question, onClose, onSuccess }: QuizQuestionE
                     }, 50);
                   }
                 }}
-                className={`option-input flex-1 p-2 bg-transparent border-b ${opt.isCorrect ? 'border-emerald-200 focus:border-emerald-500' : 'border-gray-300 focus:border-indigo-500'} focus:outline-none text-sm font-medium`}
+                className={`option-input flex-1 p-2 bg-transparent border-b ${opt.isCorrect ? 'border-success/20 focus:border-success' : 'border-line focus:border-accent'} focus:outline-none text-sm font-medium`}
               />
               {options.length > 2 && (
                 <button
                   type="button"
                   onClick={() => setOptions(options.filter((_, i) => i !== idx))}
-                  className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                  className="p-1 text-ink-faint hover:text-danger transition-colors"
                   title="Xóa đáp án"
                 >
-                  ✕
+                  <X className="w-3.5 h-3.5" />
                 </button>
               )}
             </div>
           ))}
           {isMultipleChoice && (
-            <div className="flex gap-3 items-center p-3 rounded-xl border border-dashed border-gray-300 opacity-60 hover:opacity-100 transition-opacity">
+            <div className="flex gap-3 items-center p-3 rounded-card border border-dashed border-line opacity-60 hover:opacity-100 transition-opacity">
               <input type="checkbox" disabled className="w-5 h-5 cursor-not-allowed" />
               <input
                 type="text"
@@ -1775,18 +1747,18 @@ function QuizQuestionEditorModal({ question, onClose, onSuccess }: QuizQuestionE
                     }, 50);
                   }
                 }}
-                className={`flex-1 p-2 bg-transparent border-b border-gray-300 focus:outline-none text-sm font-medium`}
+                className={`flex-1 p-2 bg-transparent border-b border-line focus:outline-none text-sm font-medium`}
               />
             </div>
           )}
         </div>
 
         <div className="mt-6 flex justify-end gap-3 border-t pt-4">
-          <button onClick={onClose} className="px-5 py-2 bg-gray-100 font-semibold text-gray-700 rounded-lg hover:bg-gray-200">Hủy</button>
+          <button onClick={onClose} className="px-5 py-2 bg-surface-hover font-semibold text-ink rounded-lg hover:bg-line-soft">Hủy</button>
           <button
             onClick={() => updateMutation.mutate()}
             disabled={updateMutation.isPending}
-            className="px-5 py-2 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 shadow disabled:opacity-50"
+            className="px-5 py-2 bg-accent text-white font-bold rounded-lg hover:bg-accent-dark shadow disabled:opacity-50"
           >
             {updateMutation.isPending ? 'Đang lưu...' : 'Lưu Thay Đổi'}
           </button>
@@ -1829,40 +1801,40 @@ function NewQuizQuestionEditorModal({ quizId, onClose, onSuccess }: { quizId: nu
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-      <div className="bg-white p-6 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
-        <h3 className="font-bold text-lg mb-4 text-gray-900">Thêm Câu Hỏi Mới</h3>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/50 p-4">
+      <div className="bg-surface-raised p-6 rounded-card w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-card-hover border border-line">
+        <h3 className="font-bold text-lg mb-4 text-ink">Thêm Câu Hỏi Mới</h3>
 
-        <label className="block text-sm font-semibold text-gray-700 mb-1">Nội dung câu hỏi</label>
+        <label className="block text-sm font-semibold text-ink mb-1">Nội dung câu hỏi</label>
         <textarea
           value={content}
           onChange={e => setContent(e.target.value)}
           placeholder="Nhập nội dung câu hỏi..."
-          className="w-full border border-gray-300 p-3 rounded-xl mb-5 focus:border-indigo-500 focus:outline-none"
+          className="w-full border border-line p-3 rounded-card mb-5 focus:border-accent focus:outline-none"
           rows={3}
         />
 
-        <label className="block text-sm font-semibold text-gray-700 mb-1">Loại câu hỏi</label>
+        <label className="block text-sm font-semibold text-ink mb-1">Loại câu hỏi</label>
         <div className="flex gap-4 mb-4">
           <label className="flex items-center gap-2 text-sm cursor-pointer">
-            <input type="radio" checked={!isMultipleChoice} onChange={() => setIsMultipleChoice(false)} className="w-4 h-4 text-indigo-600 focus:ring-indigo-500" />
+            <input type="radio" checked={!isMultipleChoice} onChange={() => setIsMultipleChoice(false)} className="w-4 h-4 text-accent focus:ring-accent" />
             Single Choice (1 đáp án đúng)
           </label>
           <label className="flex items-center gap-2 text-sm cursor-pointer">
-            <input type="radio" checked={isMultipleChoice} onChange={() => setIsMultipleChoice(true)} className="w-4 h-4 text-indigo-600 focus:ring-indigo-500" />
+            <input type="radio" checked={isMultipleChoice} onChange={() => setIsMultipleChoice(true)} className="w-4 h-4 text-accent focus:ring-accent" />
             Multiple Choice (Nhiều đáp án đúng)
           </label>
         </div>
 
-        <label className="block text-sm font-semibold text-gray-700 mb-2">Các đáp án</label>
+        <label className="block text-sm font-semibold text-ink mb-2">Các đáp án</label>
         <div className="space-y-3">
           {options.map((opt, idx) => (
-            <div key={idx} className={`flex gap-3 items-center p-3 rounded-xl border ${opt.isCorrect ? 'bg-emerald-50 border-emerald-300' : 'bg-gray-50 border-gray-200'}`}>
+            <div key={idx} className={`flex gap-3 items-center p-3 rounded-card border ${opt.isCorrect ? 'bg-success/10 border-success/30' : 'bg-surface-hover border-line'}`}>
               <input
                 type={isMultipleChoice ? "checkbox" : "radio"}
                 checked={opt.isCorrect}
                 onChange={() => handleToggleCorrect(idx)}
-                className="w-5 h-5 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                className="w-5 h-5 text-success focus:ring-success cursor-pointer"
               />
               <input
                 type="text"
@@ -1882,22 +1854,22 @@ function NewQuizQuestionEditorModal({ quizId, onClose, onSuccess }: { quizId: nu
                     }, 50);
                   }
                 }}
-                className={`option-input flex-1 p-2 bg-transparent border-b ${opt.isCorrect ? 'border-emerald-200 focus:border-emerald-500' : 'border-gray-300 focus:border-indigo-500'} focus:outline-none text-sm font-medium`}
+                className={`option-input flex-1 p-2 bg-transparent border-b ${opt.isCorrect ? 'border-success/20 focus:border-success' : 'border-line focus:border-accent'} focus:outline-none text-sm font-medium`}
               />
               {options.length > 2 && (
                 <button
                   type="button"
                   onClick={() => setOptions(options.filter((_, i) => i !== idx))}
-                  className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                  className="p-1 text-ink-faint hover:text-danger transition-colors"
                   title="Xóa đáp án"
                 >
-                  ✕
+                  <X className="w-3.5 h-3.5" />
                 </button>
               )}
             </div>
           ))}
           {isMultipleChoice && (
-            <div className="flex gap-3 items-center p-3 rounded-xl border border-dashed border-gray-300 opacity-60 hover:opacity-100 transition-opacity">
+            <div className="flex gap-3 items-center p-3 rounded-card border border-dashed border-line opacity-60 hover:opacity-100 transition-opacity">
               <input type="checkbox" disabled className="w-5 h-5 cursor-not-allowed" />
               <input
                 type="text"
@@ -1915,21 +1887,21 @@ function NewQuizQuestionEditorModal({ quizId, onClose, onSuccess }: { quizId: nu
                     }, 50);
                   }
                 }}
-                className={`flex-1 p-2 bg-transparent border-b border-gray-300 focus:outline-none text-sm font-medium`}
+                className={`flex-1 p-2 bg-transparent border-b border-line focus:outline-none text-sm font-medium`}
               />
             </div>
           )}
         </div>
 
         <div className="mt-6 flex justify-end gap-3 border-t pt-4">
-          <button onClick={onClose} className="px-5 py-2 bg-gray-100 font-semibold text-gray-700 rounded-lg hover:bg-gray-200">Hủy</button>
+          <button onClick={onClose} className="px-5 py-2 bg-surface-hover font-semibold text-ink rounded-lg hover:bg-line-soft">Hủy</button>
           <button
             onClick={() => {
               if (!content.trim()) return toast.error('Vui lòng nhập nội dung câu hỏi');
               addMutation.mutate();
             }}
             disabled={addMutation.isPending}
-            className="px-5 py-2 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 shadow disabled:opacity-50"
+            className="px-5 py-2 bg-accent text-white font-bold rounded-lg hover:bg-accent-dark shadow disabled:opacity-50"
           >
             {addMutation.isPending ? 'Đang thêm...' : 'Thêm Câu Hỏi'}
           </button>
@@ -1952,17 +1924,17 @@ function FlashcardEditorModal({ flashcard, onClose, onSuccess }: { flashcard: { 
   });
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-      <div className="bg-white p-6 rounded-2xl w-full max-w-lg shadow-2xl">
-        <h3 className="font-bold text-lg mb-4 text-gray-900">Chỉnh sửa Flashcard</h3>
-        <label className="block text-sm font-semibold text-gray-700 mb-1">Mặt Trước (Thuật ngữ)</label>
-        <textarea value={frontText} onChange={e => setFrontText(e.target.value)} className="w-full border border-gray-300 p-3 rounded-xl mb-4 focus:border-purple-500 focus:outline-none" rows={3} />
-        <label className="block text-sm font-semibold text-gray-700 mb-1">Mặt Sau (Khái niệm)</label>
-        <textarea value={backText} onChange={e => setBackText(e.target.value)} className="w-full border border-gray-300 p-3 rounded-xl mb-5 focus:border-purple-500 focus:outline-none" rows={3} />
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/50 p-4">
+      <div className="bg-surface-raised p-6 rounded-card w-full max-w-lg shadow-card-hover border border-line">
+        <h3 className="font-bold text-lg mb-4 text-ink">Chỉnh sửa Flashcard</h3>
+        <label className="block text-sm font-semibold text-ink mb-1">Mặt Trước (Thuật ngữ)</label>
+        <textarea value={frontText} onChange={e => setFrontText(e.target.value)} className="w-full border border-line p-3 rounded-card mb-4 focus:border-accent focus:outline-none" rows={3} />
+        <label className="block text-sm font-semibold text-ink mb-1">Mặt Sau (Khái niệm)</label>
+        <textarea value={backText} onChange={e => setBackText(e.target.value)} className="w-full border border-line p-3 rounded-card mb-5 focus:border-accent focus:outline-none" rows={3} />
         
         <div className="flex justify-end gap-3 border-t pt-4">
-          <button onClick={onClose} className="px-5 py-2 bg-gray-100 font-semibold text-gray-700 rounded-lg hover:bg-gray-200">Hủy</button>
-          <button onClick={() => updateMutation.mutate()} disabled={updateMutation.isPending} className="px-5 py-2 bg-purple-600 text-white font-bold rounded-lg hover:bg-purple-700 shadow disabled:opacity-50">Lưu Thay Đổi</button>
+          <button onClick={onClose} className="px-5 py-2 bg-surface-hover font-semibold text-ink rounded-lg hover:bg-line-soft">Hủy</button>
+          <button onClick={() => updateMutation.mutate()} disabled={updateMutation.isPending} className="px-5 py-2 bg-accent text-white font-bold rounded-lg hover:bg-accent-dark shadow disabled:opacity-50">Lưu Thay Đổi</button>
         </div>
       </div>
     </div>
@@ -1982,17 +1954,17 @@ function NewFlashcardEditorModal({ generationId, onClose, onSuccess }: { generat
   });
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-      <div className="bg-white p-6 rounded-2xl w-full max-w-lg shadow-2xl">
-        <h3 className="font-bold text-lg mb-4 text-gray-900">Thêm Flashcard Mới</h3>
-        <label className="block text-sm font-semibold text-gray-700 mb-1">Mặt Trước (Thuật ngữ)</label>
-        <textarea value={frontText} onChange={e => setFrontText(e.target.value)} className="w-full border border-gray-300 p-3 rounded-xl mb-4 focus:border-purple-500 focus:outline-none" rows={3} />
-        <label className="block text-sm font-semibold text-gray-700 mb-1">Mặt Sau (Khái niệm)</label>
-        <textarea value={backText} onChange={e => setBackText(e.target.value)} className="w-full border border-gray-300 p-3 rounded-xl mb-5 focus:border-purple-500 focus:outline-none" rows={3} />
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/50 p-4">
+      <div className="bg-surface-raised p-6 rounded-card w-full max-w-lg shadow-card-hover border border-line">
+        <h3 className="font-bold text-lg mb-4 text-ink">Thêm Flashcard Mới</h3>
+        <label className="block text-sm font-semibold text-ink mb-1">Mặt Trước (Thuật ngữ)</label>
+        <textarea value={frontText} onChange={e => setFrontText(e.target.value)} className="w-full border border-line p-3 rounded-card mb-4 focus:border-accent focus:outline-none" rows={3} />
+        <label className="block text-sm font-semibold text-ink mb-1">Mặt Sau (Khái niệm)</label>
+        <textarea value={backText} onChange={e => setBackText(e.target.value)} className="w-full border border-line p-3 rounded-card mb-5 focus:border-accent focus:outline-none" rows={3} />
         
         <div className="flex justify-end gap-3 border-t pt-4">
-          <button onClick={onClose} className="px-5 py-2 bg-gray-100 font-semibold text-gray-700 rounded-lg hover:bg-gray-200">Hủy</button>
-          <button onClick={() => addMutation.mutate()} disabled={addMutation.isPending || !frontText.trim() || !backText.trim()} className="px-5 py-2 bg-purple-600 text-white font-bold rounded-lg hover:bg-purple-700 shadow disabled:opacity-50">Thêm Thẻ</button>
+          <button onClick={onClose} className="px-5 py-2 bg-surface-hover font-semibold text-ink rounded-lg hover:bg-line-soft">Hủy</button>
+          <button onClick={() => addMutation.mutate()} disabled={addMutation.isPending || !frontText.trim() || !backText.trim()} className="px-5 py-2 bg-accent text-white font-bold rounded-lg hover:bg-accent-dark shadow disabled:opacity-50">Thêm Thẻ</button>
         </div>
       </div>
     </div>
@@ -2063,15 +2035,15 @@ function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess 
   };
 
   return (
-    <div className="w-full rounded-3xl bg-white p-8 shadow-sm border border-emerald-200 relative">
-      <div className="border-b pb-4 mb-6 flex justify-between items-start">
+    <div className="w-full rounded-card bg-surface-raised p-8 shadow-card border border-line relative">
+      <div className="border-b border-line pb-4 mb-6 flex justify-between items-start">
         <div>
-          <h3 className="text-2xl font-black text-gray-900 flex items-center gap-2">
-            <span>✍️</span> Tạo Học Liệu Thủ Công
+          <h3 className="text-2xl font-black text-ink flex items-center gap-2">
+            <PencilLine className="w-5 h-5 text-accent" /> Tạo Học Liệu Thủ Công
           </h3>
-          <p className="text-sm text-gray-500 mt-1">Khởi tạo một bản ghi rỗng để bạn tự tay nhập nội dung 100%.</p>
+          <p className="text-sm text-ink-muted mt-1">Khởi tạo một bản ghi rỗng để bạn tự tay nhập nội dung 100%.</p>
         </div>
-        <button type="button" onClick={onClose} className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors" title="Đóng">✕</button>
+        <button type="button" onClick={onClose} className="flex items-center justify-center w-8 h-8 rounded-card bg-surface-hover hover:bg-line-soft text-ink-muted transition-colors" title="Đóng"><X className="w-4 h-4" /></button>
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-6">
@@ -2080,36 +2052,36 @@ function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess 
             onClick={() => {
               setMaterialType('QUIZ');
             }}
-            className={`cursor-pointer rounded-2xl p-4 border-2 transition-all flex flex-col items-center text-center gap-2 ${materialType === 'QUIZ' ? 'border-emerald-500 bg-emerald-50 shadow-md scale-[1.02]' : 'border-gray-200 hover:border-emerald-300 bg-white'}`}
+            className={`cursor-pointer rounded-card p-4 border-2 transition-all flex flex-col items-center text-center gap-2 ${materialType === 'QUIZ' ? 'border-accent bg-accent/5 shadow-md scale-[1.02]' : 'border-line hover:border-accent/40 bg-surface-raised'}`}
           >
-            <div className="text-4xl">📝</div>
-            <div className="font-bold text-gray-900">Bài Thi (Quiz)</div>
-            <div className="text-[10px] font-bold text-emerald-600 uppercase bg-emerald-100 px-2 py-0.5 rounded">Khởi tạo trống</div>
+            <div className="flex justify-center"><FileQuestion className="w-9 h-9 text-accent" strokeWidth={1.5} /></div>
+            <div className="font-bold text-ink">Bài Thi (Quiz)</div>
+            <div className="text-[10px] font-bold text-accent uppercase bg-accent/10 px-2 py-0.5 rounded">Khởi tạo trống</div>
           </div>
           <div
             onClick={() => {
               setMaterialType('FLASHCARD');
             }}
-            className={`cursor-pointer rounded-2xl p-4 border-2 transition-all flex flex-col items-center text-center gap-2 ${materialType === 'FLASHCARD' ? 'border-emerald-500 bg-emerald-50 shadow-md scale-[1.02]' : 'border-gray-200 hover:border-emerald-300 bg-white'}`}
+            className={`cursor-pointer rounded-card p-4 border-2 transition-all flex flex-col items-center text-center gap-2 ${materialType === 'FLASHCARD' ? 'border-accent bg-accent/5 shadow-md scale-[1.02]' : 'border-line hover:border-accent/40 bg-surface-raised'}`}
           >
-            <div className="text-4xl">🃏</div>
-            <div className="font-bold text-gray-900">Flashcard</div>
-            <div className="text-[10px] font-bold text-emerald-600 uppercase bg-emerald-100 px-2 py-0.5 rounded">Khởi tạo trống</div>
+            <div className="flex justify-center"><Layers className="w-9 h-9 text-accent" strokeWidth={1.5} /></div>
+            <div className="font-bold text-ink">Flashcard</div>
+            <div className="text-[10px] font-bold text-accent uppercase bg-accent/10 px-2 py-0.5 rounded">Khởi tạo trống</div>
           </div>
           <div
             onClick={() => {
               setMaterialType('MINDMAP');
             }}
-            className={`cursor-pointer rounded-2xl p-4 border-2 transition-all flex flex-col items-center text-center gap-2 ${materialType === 'MINDMAP' ? 'border-emerald-500 bg-emerald-50 shadow-md scale-[1.02]' : 'border-gray-200 hover:border-emerald-300 bg-white'}`}
+            className={`cursor-pointer rounded-card p-4 border-2 transition-all flex flex-col items-center text-center gap-2 ${materialType === 'MINDMAP' ? 'border-accent bg-accent/5 shadow-md scale-[1.02]' : 'border-line hover:border-accent/40 bg-surface-raised'}`}
           >
-            <div className="text-4xl">🧠</div>
-            <div className="font-bold text-gray-900">Mindmap</div>
-            <div className="text-[10px] font-bold text-emerald-600 uppercase bg-emerald-100 px-2 py-0.5 rounded">Khởi tạo trống</div>
+            <div className="flex justify-center"><Workflow className="w-9 h-9 text-accent" strokeWidth={1.5} /></div>
+            <div className="font-bold text-ink">Mindmap</div>
+            <div className="text-[10px] font-bold text-accent uppercase bg-accent/10 px-2 py-0.5 rounded">Khởi tạo trống</div>
           </div>
         </div>
 
-        <div className="flex flex-col gap-4 bg-gray-50 p-5 rounded-2xl border border-gray-200">
-          <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
+        <div className="flex flex-col gap-4 bg-surface-hover p-5 rounded-card border border-line">
+          <label className="flex flex-col gap-1 text-sm font-semibold text-ink">
             Tên học liệu
             <input
               type="text"
@@ -2120,11 +2092,11 @@ function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess 
                 setIsTitleEdited(true);
               }}
               placeholder="VD: Bài thi giữa kỳ, Khái niệm cơ bản..."
-              className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:border-emerald-500 outline-none bg-white"
+              className="rounded-card border border-line px-4 py-2.5 text-sm focus:border-accent outline-none bg-surface-raised"
               required
             />
           </label>
-          <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
+          <label className="flex flex-col gap-1 text-sm font-semibold text-ink">
             Ngôn ngữ học liệu
             <MaterialLanguagePicker
               languages={languages ?? []}
@@ -2135,24 +2107,24 @@ function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess 
 
           {materialType === 'QUIZ' && (
             <div className="flex flex-col gap-2 pt-2">
-              <span className="text-sm font-semibold text-gray-700">Phân loại Trắc nghiệm</span>
+              <span className="text-sm font-semibold text-ink">Phân loại Trắc nghiệm</span>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <label className={`cursor-pointer flex items-start gap-3 p-3 rounded-xl border-2 transition-all ${quizType === 'LECTURE_QUIZ' ? 'border-emerald-500 bg-emerald-50' : 'border-gray-200 bg-white hover:border-emerald-200'}`}>
+                <label className={`cursor-pointer flex items-start gap-3 p-3 rounded-card border-2 transition-all ${quizType === 'LECTURE_QUIZ' ? 'border-accent bg-accent/5' : 'border-line bg-surface-raised hover:border-accent/20'}`}>
                   <input type="radio" name="quizTypeTop" value="LECTURE_QUIZ" checked={quizType === 'LECTURE_QUIZ'} onChange={() => {
                     setQuizType('LECTURE_QUIZ');
                   }} className="mt-1" />
                   <div className="flex flex-col">
-                    <span className="font-bold text-gray-900 text-sm">Kiểm tra nhanh (Quick Check)</span>
-                    <span className="text-xs text-gray-500">Gắn vào 1 Bài học. Luôn hiện giải thích, làm vô hạn lần, không tính giờ.</span>
+                    <span className="font-bold text-ink text-sm">Kiểm tra nhanh (Quick Check)</span>
+                    <span className="text-xs text-ink-muted">Gắn vào 1 Bài học. Luôn hiện giải thích, làm vô hạn lần, không tính giờ.</span>
                   </div>
                 </label>
-                <label className={`cursor-pointer flex items-start gap-3 p-3 rounded-xl border-2 transition-all ${quizType === 'OFFICIAL_EXAM' ? 'border-emerald-500 bg-emerald-50' : 'border-gray-200 bg-white hover:border-emerald-200'}`}>
+                <label className={`cursor-pointer flex items-start gap-3 p-3 rounded-card border-2 transition-all ${quizType === 'OFFICIAL_EXAM' ? 'border-accent bg-accent/5' : 'border-line bg-surface-raised hover:border-accent/20'}`}>
                   <input type="radio" name="quizTypeTop" value="OFFICIAL_EXAM" checked={quizType === 'OFFICIAL_EXAM'} onChange={() => {
                     setQuizType('OFFICIAL_EXAM');
                   }} className="mt-1" />
                   <div className="flex flex-col">
-                    <span className="font-bold text-gray-900 text-sm">Thi chính thức (Official Exam)</span>
-                    <span className="text-xs text-gray-500">Thi theo Chương/Khóa học. Có tính giờ, ghi Bảng điểm, tùy chỉnh lượt làm.</span>
+                    <span className="font-bold text-ink text-sm">Thi chính thức (Official Exam)</span>
+                    <span className="text-xs text-ink-muted">Thi theo Chương/Khóa học. Có tính giờ, ghi Bảng điểm, tùy chỉnh lượt làm.</span>
                   </div>
                 </label>
               </div>
@@ -2165,15 +2137,15 @@ function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess 
 
           
           <div className="mt-4 flex justify-end gap-3 border-t pt-5">
-            <button type="button" onClick={onClose} className="rounded-xl px-5 py-2.5 text-sm font-bold text-gray-600 hover:bg-gray-200 transition-colors">
+            <button type="button" onClick={onClose} className="rounded-card px-5 py-2.5 text-sm font-bold text-ink-muted hover:bg-line-soft transition-colors">
               Hủy
             </button>
             <button
               type="submit"
               disabled={generateManualMutation.isPending || !materialType || !title.trim()}
-              className="rounded-xl bg-emerald-600 px-6 py-2.5 text-sm font-bold text-white hover:bg-emerald-700 disabled:opacity-50 shadow-md"
+              className="flex items-center gap-2 rounded-card bg-accent px-6 py-2.5 text-sm font-bold text-white hover:bg-accent-dark disabled:opacity-50 shadow-card"
             >
-              {generateManualMutation.isPending ? 'Đang tạo...' : '✨ Tạo Bản Ghi Trống'}
+              <Plus className="w-4 h-4" /> {generateManualMutation.isPending ? 'Đang tạo...' : 'Tạo Bản Ghi Trống'}
             </button>
           </div>
         </div>

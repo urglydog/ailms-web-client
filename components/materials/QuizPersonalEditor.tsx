@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { useUpdatePersonalQuestion, useAddPersonalQuestion, useDeletePersonalQuestion } from '@/hooks/useQuizzes';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
+import { Plus, Check, X } from 'lucide-react';
+import { MaterialBadge } from '@/components/materials/ui/MaterialBadge';
 
 interface QuizOption {
   id: number;
@@ -81,17 +83,17 @@ export function QuizPersonalEditor({ questions, quizId }: { questions: QuizQuest
   return (
     <div className="space-y-4">
       <div className="flex justify-end mb-4">
-        <button 
-          onClick={() => setIsAddingQuestion(true)} 
-          className="px-4 py-2 bg-accent text-white hover:bg-accent-hover rounded-xl font-bold text-sm transition-colors shadow-sm"
+        <button
+          onClick={() => setIsAddingQuestion(true)}
+          className="flex items-center gap-1.5 px-4 py-2 bg-accent text-white hover:bg-accent-dark rounded-card font-semibold text-sm transition-colors shadow-card"
         >
-          + Thêm Câu Hỏi Mới
+          <Plus className="w-4 h-4" /> Thêm Câu Hỏi Mới
         </button>
       </div>
 
       {(isAddingQuestion || editingQuestion) && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 bg-ink/50 flex items-center justify-center p-4">
+          <div className="bg-surface-raised rounded-card max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
             <h3 className="text-xl font-bold mb-4 font-display text-ink">
               {isAddingQuestion ? 'Thêm Câu Hỏi' : 'Sửa Câu Hỏi'}
             </h3>
@@ -123,21 +125,21 @@ export function QuizPersonalEditor({ questions, quizId }: { questions: QuizQuest
 
       <div className="grid grid-cols-1 gap-4">
         {questions.map((q, idx) => (
-          <div key={q.id} className="p-5 rounded-2xl border border-line-soft bg-surface space-y-3 shadow-sm hover:border-accent transition-all">
+          <div key={q.id} className="p-5 rounded-card border border-line bg-surface-raised space-y-3 shadow-card hover:border-accent transition-all">
             <div className="flex items-start justify-between gap-3">
               <div className="font-bold text-base text-ink">
                 <span className="text-accent mr-2">Câu {idx + 1}:</span> {q.content}
               </div>
               <div className="flex gap-2 shrink-0">
-                <button 
-                  onClick={() => setEditingQuestion(q)} 
-                  className="text-xs font-semibold bg-surface-hover text-ink px-3 py-1.5 rounded-lg hover:bg-line border border-line transition-colors"
+                <button
+                  onClick={() => setEditingQuestion(q)}
+                  className="text-xs font-semibold bg-surface-hover text-ink px-3 py-1.5 rounded-card hover:bg-line border border-line transition-colors"
                 >
                   Sửa
                 </button>
-                <button 
-                  onClick={() => handleDelete(q.id)} 
-                  className="text-xs font-semibold bg-red-50 text-red-600 px-3 py-1.5 rounded-lg hover:bg-red-100 border border-red-200 transition-colors"
+                <button
+                  onClick={() => handleDelete(q.id)}
+                  className="text-xs font-semibold bg-danger/10 text-danger px-3 py-1.5 rounded-card hover:bg-danger/20 border border-danger/20 transition-colors"
                 >
                   Xóa
                 </button>
@@ -148,16 +150,14 @@ export function QuizPersonalEditor({ questions, quizId }: { questions: QuizQuest
               {q.options.map((opt, oIdx) => (
                 <div
                   key={opt.id || oIdx}
-                  className={`p-3.5 rounded-xl text-sm font-medium border flex items-center justify-between transition-all ${opt.isCorrect
-                    ? 'bg-green-50 border-green-200 text-green-900 font-bold shadow-sm'
-                    : 'bg-white border-line text-ink-muted'
+                  className={`p-3.5 rounded-card text-sm font-medium border flex items-center justify-between transition-all ${opt.isCorrect
+                    ? 'bg-success/10 border-success/30 text-success font-bold'
+                    : 'bg-surface border-line text-ink-muted'
                     }`}
                 >
                   <span>{opt.content}</span>
                   {opt.isCorrect && (
-                    <span className="text-[10px] bg-green-500 text-white px-2 py-0.5 rounded-md font-extrabold uppercase">
-                      Đáp án đúng ✓
-                    </span>
+                    <MaterialBadge tone="success" icon={<Check className="w-3 h-3" />}>Đáp án đúng</MaterialBadge>
                   )}
                 </div>
               ))}
@@ -182,7 +182,7 @@ function QuestionForm({ initialData, onSave, onCancel }: { initialData: QuizQues
         <textarea
           value={q.content}
           onChange={e => setQ({ ...q, content: e.target.value })}
-          className="w-full border rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent"
+          className="w-full border border-line rounded-card p-3 text-sm text-ink bg-surface focus:outline-none focus:ring-2 focus:ring-accent"
           rows={3}
         />
       </div>
@@ -246,7 +246,7 @@ function QuestionForm({ initialData, onSave, onCancel }: { initialData: QuizQues
                     setQ({ ...q, options: newOpts });
                   }
                 }}
-                className="flex-1 border rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent"
+                className="flex-1 border border-line rounded-card p-2 text-sm text-ink bg-surface focus:outline-none focus:ring-2 focus:ring-accent"
                 placeholder={`Đáp án ${idx + 1}`}
               />
               <button
@@ -255,9 +255,9 @@ function QuestionForm({ initialData, onSave, onCancel }: { initialData: QuizQues
                   const newOpts = q.options.filter((_, i) => i !== idx);
                   setQ({ ...q, options: newOpts });
                 }}
-                className="p-2 text-red-500 hover:bg-red-50 rounded-lg"
+                className="p-2 text-danger hover:bg-danger/10 rounded-card transition-colors"
               >
-                ✕
+                <X className="w-4 h-4" />
               </button>
             </div>
             );
@@ -274,13 +274,13 @@ function QuestionForm({ initialData, onSave, onCancel }: { initialData: QuizQues
         </button>
       </div>
 
-      <div className="flex justify-end gap-3 mt-6 pt-4 border-t">
-        <button onClick={onCancel} className="px-4 py-2 font-semibold text-ink-muted hover:bg-surface-hover rounded-xl">
+      <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-line">
+        <button onClick={onCancel} className="px-4 py-2 font-semibold text-ink-muted hover:bg-surface-hover rounded-card transition-colors">
           Hủy bỏ
         </button>
-        <button 
-          onClick={() => onSave(q)} 
-          className="px-6 py-2 bg-accent text-white font-bold rounded-xl hover:bg-accent-hover shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+        <button
+          onClick={() => onSave(q)}
+          className="px-6 py-2 bg-accent text-white font-semibold rounded-card hover:bg-accent-dark shadow-card transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={!q.content.trim() || q.options.length < 2 || !q.options.some(o => o.isCorrect)}
         >
           Lưu Câu Hỏi

@@ -11,6 +11,9 @@ import { ApiError } from '@/lib/api/client';
 import Link from 'next/link';
 import { usePathname, useSearchParams, useRouter } from 'next/navigation';
 import { useNotification } from '@/components/providers/NotificationProvider';
+import { MaterialTabs } from '@/components/materials/ui/MaterialTabs';
+import { MaterialBadge } from '@/components/materials/ui/MaterialBadge';
+import { BookOpen, Target, Trash2, ShieldAlert, Clock, Ban } from 'lucide-react';
 
 export function MaterialManager({ courseId, lessonId }: { courseId: number, lessonId?: number }) {
   const pathname = usePathname();
@@ -259,7 +262,7 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
         <button
           onClick={handleRequest}
           disabled={requestMutation.isPending || (!language && availableLanguages?.length === 0) || (scopeType === 'CUSTOM_LESSONS' && customLessonIds.length === 0)}
-          className="rounded-full bg-accent px-6 py-2 text-sm font-semibold text-white hover:bg-accent-dark disabled:opacity-50"
+          className="rounded-card bg-accent px-6 py-2 text-sm font-semibold text-white hover:bg-accent-dark transition-colors disabled:opacity-50"
         >
           {requestMutation.isPending ? 'Đang gửi...' : 'Tạo học liệu'}
         </button>
@@ -271,10 +274,10 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full sm:w-auto">
             {/* Filter */}
             <div className="flex flex-wrap gap-2">
-              <button onClick={() => setFilterType('ALL')} className={`px-3 py-1 text-xs font-semibold rounded-full border ${filterType === 'ALL' ? 'bg-ink text-white border-ink' : 'bg-surface hover:bg-surface-hover border-line text-ink-muted'}`}>Tất cả</button>
-              <button onClick={() => setFilterType('MINDMAP')} className={`px-3 py-1 text-xs font-semibold rounded-full border ${filterType === 'MINDMAP' ? 'bg-ink text-white border-ink' : 'bg-surface hover:bg-surface-hover border-line text-ink-muted'}`}>Sơ đồ tư duy</button>
-              <button onClick={() => setFilterType('FLASHCARD')} className={`px-3 py-1 text-xs font-semibold rounded-full border ${filterType === 'FLASHCARD' ? 'bg-ink text-white border-ink' : 'bg-surface hover:bg-surface-hover border-line text-ink-muted'}`}>Flashcard</button>
-              <button onClick={() => setFilterType('QUIZ')} className={`px-3 py-1 text-xs font-semibold rounded-full border ${filterType === 'QUIZ' ? 'bg-ink text-white border-ink' : 'bg-surface hover:bg-surface-hover border-line text-ink-muted'}`}>Trắc nghiệm</button>
+              <button onClick={() => setFilterType('ALL')} className={`px-3 py-1 text-xs font-semibold rounded-card border transition-colors ${filterType === 'ALL' ? 'bg-ink text-white border-ink' : 'bg-surface hover:bg-surface-hover border-line text-ink-muted'}`}>Tất cả</button>
+              <button onClick={() => setFilterType('MINDMAP')} className={`px-3 py-1 text-xs font-semibold rounded-card border transition-colors ${filterType === 'MINDMAP' ? 'bg-ink text-white border-ink' : 'bg-surface hover:bg-surface-hover border-line text-ink-muted'}`}>Sơ đồ tư duy</button>
+              <button onClick={() => setFilterType('FLASHCARD')} className={`px-3 py-1 text-xs font-semibold rounded-card border transition-colors ${filterType === 'FLASHCARD' ? 'bg-ink text-white border-ink' : 'bg-surface hover:bg-surface-hover border-line text-ink-muted'}`}>Flashcard</button>
+              <button onClick={() => setFilterType('QUIZ')} className={`px-3 py-1 text-xs font-semibold rounded-card border transition-colors ${filterType === 'QUIZ' ? 'bg-ink text-white border-ink' : 'bg-surface hover:bg-surface-hover border-line text-ink-muted'}`}>Trắc nghiệm</button>
             </div>
             
             <div className="h-4 w-px bg-line hidden sm:block"></div>
@@ -335,13 +338,13 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
                     <span>•</span>
                     <span>Trạng thái:{' '}
                       {m.status === 'COMPLETED' ? (
-                        <span className="text-green-600 font-medium">Hoàn thành</span>
+                        <span className="text-success font-medium">Hoàn thành</span>
                       ) : m.status === 'FAILED' ? (
-                        <span className="text-red-600 font-medium">Lỗi</span>
+                        <span className="text-danger font-medium">Lỗi</span>
                       ) : (
-                        <span className="text-orange-500 font-medium">
-                          {new Date().getTime() - new Date(m.createdAt).getTime() > 120000 
-                            ? 'Đang chờ lâu' 
+                        <span className="text-star font-medium">
+                          {new Date().getTime() - new Date(m.createdAt).getTime() > 120000
+                            ? 'Đang chờ lâu'
                             : 'Đang xử lý'}
                         </span>
                       )}
@@ -354,17 +357,17 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
                   {m.status === 'COMPLETED' && (
                     <Link
                       href={`/materials/${m.id}`}
-                      className="rounded-full bg-surface-hover px-4 py-2 text-sm font-semibold text-ink hover:bg-line-soft whitespace-nowrap"
+                      className="rounded-card bg-surface-hover px-4 py-2 text-sm font-semibold text-ink hover:bg-line-soft transition-colors whitespace-nowrap"
                     >
                       Xem
                     </Link>
                   )}
                   <button
                     onClick={() => handleDelete(m.id)}
-                    className="p-2 text-ink-muted hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
+                    className="p-2 text-ink-muted hover:text-danger hover:bg-danger/10 rounded-card transition-colors"
                     title="Xóa học liệu"
                   >
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18" /><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6" /><path d="M10 11v6M14 11v6" /></svg>
+                    <Trash2 className="w-[15px] h-[15px]" strokeWidth={2} />
                   </button>
                 </div>
               </div>
@@ -432,38 +435,34 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
       : `/materials/${item.id}?isOfficial=true`;
 
     return (
-      <Link 
-        key={item.id} 
+      <Link
+        key={item.id}
         href={href}
-        className="block flex flex-col sm:flex-row items-start sm:items-center justify-between p-5 mb-3 bg-white border border-line rounded-xl hover:border-accent hover:shadow-sm transition-all cursor-pointer group"
+        className="block flex flex-col sm:flex-row items-start sm:items-center justify-between p-5 mb-3 bg-surface-raised border border-line rounded-card hover:border-accent hover:shadow-card-hover transition-all cursor-pointer group"
       >
         <div className="flex-1 w-full">
-          <div className="flex items-center gap-2 mb-2">
+          <div className="flex items-center gap-2 mb-2 flex-wrap">
             <h3 className="font-bold text-ink text-lg group-hover:text-accent transition-colors">{item.title || 'Học liệu khóa học'}</h3>
             {item.materialType === 'QUIZ' ? (
-              <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-md shadow-sm ${item.quizType === 'LECTURE_QUIZ' ? 'text-teal-700 bg-teal-50 border border-teal-200' : 'text-accent-dark bg-accent/10 border border-accent/20'}`}>
-                {item.quizType === 'LECTURE_QUIZ' ? 'QUICK CHECK' : 'THI CHÍNH THỨC'}
-              </span>
+              <MaterialBadge tone={item.quizType === 'LECTURE_QUIZ' ? 'neutral' : 'accent'}>
+                {item.quizType === 'LECTURE_QUIZ' ? 'Quick Check' : 'Thi chính thức'}
+              </MaterialBadge>
             ) : (
-              <span className="text-[10px] uppercase font-bold text-ink-muted bg-surface-hover px-2 py-0.5 rounded-md">
-                {item.materialType === 'FLASHCARD' ? 'Flashcard' : 'Mindmap'}
-              </span>
+              <MaterialBadge tone="neutral">{item.materialType === 'FLASHCARD' ? 'Flashcard' : 'Mindmap'}</MaterialBadge>
             )}
             {item.isProctored && (
-              <span className="text-[10px] font-bold text-red-600 border border-red-200 bg-red-50 px-2 py-0.5 rounded-md">
-                AI Proctored
-              </span>
+              <MaterialBadge tone="danger" icon={<ShieldAlert className="w-3 h-3" />}>AI Proctored</MaterialBadge>
             )}
-            
+
             {/* Status indicators */}
             {item.materialType === 'QUIZ' && isBeforeStart && (
-               <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md ml-auto sm:ml-2">Chưa mở</span>
+              <MaterialBadge tone="warning" icon={<Clock className="w-3 h-3" />} className="ml-auto sm:ml-2">Chưa mở</MaterialBadge>
             )}
             {item.materialType === 'QUIZ' && isAfterEnd && (
-               <span className="text-[10px] font-bold text-ink-muted bg-surface-hover px-2 py-0.5 rounded-md ml-auto sm:ml-2">Đã đóng</span>
+              <MaterialBadge tone="neutral" icon={<Ban className="w-3 h-3" />} className="ml-auto sm:ml-2">Đã đóng</MaterialBadge>
             )}
             {item.materialType === 'QUIZ' && outOfAttempts && !isAfterEnd && (
-               <span className="text-[10px] font-bold text-ink-muted bg-surface-hover px-2 py-0.5 rounded-md ml-auto sm:ml-2">Hết lượt</span>
+              <MaterialBadge tone="neutral" icon={<Ban className="w-3 h-3" />} className="ml-auto sm:ml-2">Hết lượt</MaterialBadge>
             )}
           </div>
           
@@ -501,40 +500,21 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
 
   return (
     <div className="flex flex-col gap-8">
-      {/* Tabs Navigation - Pill Style */}
-      <div className="flex gap-2 p-1 bg-surface-hover rounded-xl border border-line w-fit">
-        <button
-          onClick={() => setActiveTab('OFFICIAL')}
-          className={`flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-bold transition-all duration-200 relative ${
-            activeTab === 'OFFICIAL'
-              ? 'bg-white shadow-sm text-accent border border-line'
-              : 'text-ink-muted hover:text-ink hover:bg-white/60'
-          }`}
-        >
-          📚 Kho Học Liệu Official
-          {filteredOfficialMaterials.length > 0 && (
-            <span className={`text-[10px] font-black px-1.5 py-0.5 rounded-full ${
-              activeTab === 'OFFICIAL' ? 'bg-accent text-white' : 'bg-gray-200 text-gray-600'
-            }`}>
-              {filteredOfficialMaterials.length}
-            </span>
-          )}
-        </button>
-        <button
-          onClick={() => setActiveTab('PERSONAL')}
-          className={`flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-bold transition-all duration-200 relative ${
-            activeTab === 'PERSONAL'
-              ? 'bg-white shadow-sm text-accent border border-line'
-              : 'text-ink-muted hover:text-ink hover:bg-white/60'
-          }`}
-        >
-          🎯 Kho Học Liệu Cá Nhân
-          {personalUnreadCount > 0 && (
-            <span className="text-[10px] font-black px-1.5 py-0.5 rounded-full bg-red-500 text-white animate-pulse">
-              {personalUnreadCount}
-            </span>
-          )}
-        </button>
+      {/* Tabs Navigation */}
+      <div className="flex items-center gap-3">
+        <MaterialTabs
+          active={activeTab}
+          onChange={(key) => setActiveTab(key as 'OFFICIAL' | 'PERSONAL')}
+          tabs={[
+            { key: 'OFFICIAL', label: 'Kho Học Liệu Official', icon: <BookOpen className="w-3.5 h-3.5" />, count: filteredOfficialMaterials.length || undefined },
+            { key: 'PERSONAL', label: 'Kho Học Liệu Cá Nhân', icon: <Target className="w-3.5 h-3.5" /> },
+          ]}
+        />
+        {personalUnreadCount > 0 && (
+          <span className="flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-card text-[10px] font-bold bg-danger text-white">
+            {personalUnreadCount}
+          </span>
+        )}
       </div>
 
       {activeTab === 'OFFICIAL' ? (
@@ -553,14 +533,12 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
                   href={res.fileUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="block flex flex-col sm:flex-row items-start sm:items-center justify-between p-5 mb-3 bg-white border border-line rounded-xl hover:border-orange-200 hover:shadow-sm transition-all cursor-pointer group"
+                  className="block flex flex-col sm:flex-row items-start sm:items-center justify-between p-5 mb-3 bg-surface-raised border border-line rounded-card hover:border-accent hover:shadow-card-hover transition-all cursor-pointer group"
                 >
                   <div className="flex-1 w-full">
                     <div className="flex items-center gap-2 mb-2">
-                      <h3 className="font-bold text-ink text-lg group-hover:text-orange-600 transition-colors">{res.title}</h3>
-                      <span className="text-[10px] uppercase font-bold text-orange-700 bg-orange-50 border border-orange-200 px-2 py-0.5 rounded-md shadow-sm">
-                        Tài liệu tham khảo
-                      </span>
+                      <h3 className="font-bold text-ink text-lg group-hover:text-accent transition-colors">{res.title}</h3>
+                      <MaterialBadge tone="warning">Tài liệu tham khảo</MaterialBadge>
                     </div>
                     <div className="flex items-center gap-4 text-xs text-ink-muted">
                       <span>Tải lên lúc: {new Date(res.createdAt).toLocaleDateString('vi-VN')}</span>
@@ -571,8 +549,8 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
               {filteredOfficialMaterials.map(renderOfficialItem)}
             </div>
           ) : (
-            <div className="text-center py-10 bg-surface rounded-xl border border-line">
-              <div className="text-4xl mb-3">📚</div>
+            <div className="text-center py-10 bg-surface rounded-card border border-line">
+              <BookOpen className="w-9 h-9 mx-auto mb-3 text-ink-faint" strokeWidth={1.5} />
               <h3 className="text-ink font-semibold mb-1">Chưa có học liệu chính thức</h3>
               <p className="text-sm text-ink-muted max-w-sm mx-auto">
                 {lessonId ? 'Bài học này chưa có học liệu đính kèm.' : 'Giảng viên chưa công bố học liệu nào cho khóa học này.'}

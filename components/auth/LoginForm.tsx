@@ -7,6 +7,7 @@ import { useSearchParams } from 'next/navigation';
 import { GoogleSignInButton } from './GoogleSignInButton';
 import Link from 'next/link';
 import { toast } from 'sonner';
+import { CheckCircle2 } from 'lucide-react';
 
 export function LoginForm() {
 
@@ -73,8 +74,13 @@ export function LoginForm() {
 
   return (
     <div className="flex flex-col gap-4">
-      {successMessage && <div className="text-green-500 text-sm text-center font-medium">{successMessage}</div>}
-      {error && <div className="text-red-500 text-sm text-center">{((error as unknown) as { response?: { data?: { detail?: string } } })?.response?.data?.detail || 'Đã có lỗi xảy ra'}</div>}
+      {successMessage && (
+        <div className="flex items-center justify-center gap-1.5 text-success text-sm text-center font-medium">
+          <CheckCircle2 className="w-4 h-4" strokeWidth={1.75} />
+          {successMessage}
+        </div>
+      )}
+      {error && <div className="text-danger text-sm text-center">{((error as unknown) as { response?: { data?: { detail?: string } } })?.response?.data?.detail || 'Đã có lỗi xảy ra'}</div>}
 
       {/* Google Sign-In Button */}
       <GoogleSignInButton />

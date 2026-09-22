@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import { toast } from 'sonner';
 import { materialsApi } from '@/lib/api/materials';
 import { History, Eye, RotateCcw, X } from 'lucide-react';
+import { MaterialBadge } from '@/components/materials/ui/MaterialBadge';
 
 interface VersionHistoryModalProps {
   courseId: number;
@@ -34,41 +35,39 @@ export function VersionHistoryModal({ courseId, materialId, onClose, onInspect }
   });
 
   return createPortal(
-    <div className="fixed inset-0 z-[100000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={onClose}>
+    <div className="fixed inset-0 z-[100000] flex items-center justify-center p-4 bg-ink/50 backdrop-blur-sm" onClick={onClose}>
       <div
-        className="bg-white rounded-xl max-w-lg w-full p-5 shadow-2xl border border-gray-200 max-h-[80vh] flex flex-col"
+        className="bg-surface-raised rounded-card max-w-lg w-full p-5 shadow-card-hover border border-line max-h-[80vh] flex flex-col"
         onClick={e => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
-            <History className="w-4 h-4 text-gray-500" /> Lịch sử phiên bản
+          <h3 className="text-base font-bold text-ink flex items-center gap-2">
+            <History className="w-4 h-4 text-ink-muted" /> Lịch sử phiên bản
           </h3>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+          <button onClick={onClose} className="text-ink-faint hover:text-ink-muted transition-colors">
             <X className="w-4 h-4" />
           </button>
         </div>
 
         <div className="overflow-y-auto flex-1 flex flex-col gap-2">
-          {isLoading && <div className="text-sm text-gray-500 text-center py-6">Đang tải...</div>}
+          {isLoading && <div className="text-sm text-ink-muted text-center py-6">Đang tải...</div>}
           {!isLoading && (versions?.length ?? 0) === 0 && (
-            <div className="text-sm text-gray-500 text-center py-6">Chưa có lịch sử phiên bản nào.</div>
+            <div className="text-sm text-ink-muted text-center py-6">Chưa có lịch sử phiên bản nào.</div>
           )}
           {versions?.map(v => (
             <div
               key={v.id}
-              className={`flex items-center justify-between px-3 py-2.5 rounded-lg border ${
-                v.isActive ? 'border-emerald-200 bg-emerald-50' : 'border-gray-200 bg-white'
+              className={`flex items-center justify-between px-3 py-2.5 rounded-card border transition-colors ${
+                v.isActive ? 'border-success/30 bg-success/5' : 'border-line bg-surface-raised'
               }`}
             >
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-gray-800">V{v.displayVersionNo}</span>
-                  {v.isActive && (
-                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded-full">Đang dùng</span>
-                  )}
+                  <span className="text-xs font-bold text-ink">V{v.displayVersionNo}</span>
+                  {v.isActive && <MaterialBadge tone="success">Đang dùng</MaterialBadge>}
                 </div>
-                <p className="text-xs text-gray-600 truncate">{v.title || 'Học liệu không tên'}</p>
-                <p className="text-[10px] text-gray-400">
+                <p className="text-xs text-ink-muted truncate">{v.title || 'Học liệu không tên'}</p>
+                <p className="text-[10px] text-ink-faint">
                   {new Date(v.createdAt).toLocaleString('vi-VN')}{v.createdBy ? ` · ${v.createdBy}` : ''}
                 </p>
               </div>
@@ -76,7 +75,7 @@ export function VersionHistoryModal({ courseId, materialId, onClose, onInspect }
                 <button
                   onClick={() => { onClose(); onInspect(v.id, true); }}
                   title="Xem phiên bản này (chỉ đọc)"
-                  className="p-1.5 rounded-lg hover:bg-blue-100 text-blue-600"
+                  className="p-1.5 rounded-card hover:bg-accent/10 text-accent transition-colors"
                 >
                   <Eye className="w-3.5 h-3.5" />
                 </button>
@@ -85,7 +84,7 @@ export function VersionHistoryModal({ courseId, materialId, onClose, onInspect }
                     onClick={() => restoreMutation.mutate(v.id)}
                     disabled={restoreMutation.isPending}
                     title="Khôi phục nội dung này thành phiên bản mới nhất"
-                    className="p-1.5 rounded-lg hover:bg-amber-100 text-amber-600 disabled:opacity-50"
+                    className="p-1.5 rounded-card hover:bg-star/10 text-star transition-colors disabled:opacity-50"
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
                   </button>

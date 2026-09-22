@@ -4,23 +4,53 @@ import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { useRegister, useVerifyOtp } from '@/hooks/useAuthMutations';
 import { useRouter } from 'next/navigation';
+import { Check, X, Mail } from 'lucide-react';
 
 function getPasswordStrength(password: string) {
   if (!password) return { score: 0, label: '', color: 'bg-line', textColor: 'text-ink-muted' };
-  if (password.length < 6) return { score: 1, label: 'Quá ngắn (tối thiểu 6 ký tự)', color: 'bg-red-500', textColor: 'text-red-500' };
-  
+  if (password.length < 6) return { score: 1, label: 'Quá ngắn (tối thiểu 6 ký tự)', color: 'bg-danger', textColor: 'text-danger' };
+
   const hasLetter = /[A-Za-z]/.test(password);
   const hasNumber = /\d/.test(password);
   const hasSpecial = /[@$!%*#?&.]/.test(password);
-  
+
   if (hasLetter && hasNumber && hasSpecial && password.length >= 8) {
-    return { score: 4, label: 'Mạnh (Tuyệt vời!)', color: 'bg-green-500', textColor: 'text-green-500' };
+    return { score: 4, label: 'Mạnh (Tuyệt vời!)', color: 'bg-success', textColor: 'text-success' };
   }
   if (hasLetter && hasNumber) {
     return { score: 3, label: 'Tốt', color: 'bg-accent', textColor: 'text-accent' };
   }
-  
-  return { score: 2, label: 'Yếu (Cần cả chữ và số)', color: 'bg-orange-500', textColor: 'text-orange-500' };
+
+  return { score: 2, label: 'Yếu (Cần cả chữ và số)', color: 'bg-star', textColor: 'text-star' };
+}
+
+/** Thanh tiến trình 2 bước Đăng ký → Xác thực OTP — thuần hiển thị. */
+function StepIndicator({ step }: { step: 'register' | 'otp' }) {
+  const steps: { key: 'register' | 'otp'; label: string }[] = [
+    { key: 'register', label: 'Thông tin' },
+    { key: 'otp', label: 'Xác thực OTP' },
+  ];
+  return (
+    <div className="flex items-center gap-2 mb-5">
+      {steps.map((s, idx) => {
+        const isDone = step === 'otp' && s.key === 'register';
+        const isActive = step === s.key;
+        return (
+          <div key={s.key} className="flex items-center gap-2 flex-1">
+            <div
+              className={`flex items-center justify-center w-6 h-6 rounded-full text-[11px] font-bold flex-shrink-0 transition-colors ${
+                isDone ? 'bg-success text-white' : isActive ? 'bg-accent text-white' : 'bg-line-soft text-ink-faint'
+              }`}
+            >
+              {isDone ? <Check className="w-3.5 h-3.5" /> : idx + 1}
+            </div>
+            <span className={`text-xs font-medium ${isActive ? 'text-ink' : 'text-ink-faint'}`}>{s.label}</span>
+            {idx < steps.length - 1 && <div className={`flex-1 h-px ${isDone ? 'bg-success' : 'bg-line'}`} />}
+          </div>
+        );
+      })}
+    </div>
+  );
 }
 
 export function RegisterForm() {
@@ -84,24 +114,34 @@ export function RegisterForm() {
 
   if (step === 'otp') {
     return (
-      <form onSubmit={handleVerify} className="flex flex-col gap-4">
-        {verifyError && <div className="text-red-500 text-sm text-center">{((verifyError as unknown) as { response?: { data?: { detail?: string, message?: string } } }).response?.data?.detail || ((verifyError as unknown) as { response?: { data?: { message?: string } } }).response?.data?.message || 'OTP không đúng'}</div>}
-        <p className="text-sm text-ink-muted text-center mb-4">
-          Vui lòng kiểm tra email <b>{formData.email}</b> để lấy mã OTP (6 chữ số).
-        </p>
-        <Input id="otp" label="Mã OTP" required value={otp} onChange={e => setOtp(e.target.value)} maxLength={6} />
-        <Button type="submit" disabled={isVerifyPending} className="mt-2 w-full">
-          {isVerifyPending ? 'Đang xác thực...' : 'Xác thực'}
-        </Button>
-      </form>
+      <>
+        <StepIndicator step={step} />
+        <form onSubmit={handleVerify} className="flex flex-col gap-4">
+          {verifyError && <div className="text-danger text-sm text-center">{((verifyError as unknown) as { response?: { data?: { detail?: string, message?: string } } }).response?.data?.detail || ((verifyError as unknown) as { response?: { data?: { message?: string } } }).response?.data?.message || 'OTP không đúng'}</div>}
+          <div className="flex flex-col items-center gap-2 text-center mb-2">
+            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-accent/10 text-accent">
+              <Mail className="w-5 h-5" strokeWidth={1.75} />
+            </div>
+            <p className="text-sm text-ink-muted">
+              Vui lòng kiểm tra email <b className="text-ink">{formData.email}</b> để lấy mã OTP (6 chữ số).
+            </p>
+          </div>
+          <Input id="otp" label="Mã OTP" required value={otp} onChange={e => setOtp(e.target.value)} maxLength={6} />
+          <Button type="submit" disabled={isVerifyPending} className="mt-2 w-full">
+            {isVerifyPending ? 'Đang xác thực...' : 'Xác thực'}
+          </Button>
+        </form>
+      </>
     );
   }
 
   return (
-    <form onSubmit={handleRegister} className="flex flex-col gap-4">
-      {validationError && <div className="text-red-500 text-sm text-center">{validationError}</div>}
-      {regError && <div className="text-red-500 text-sm text-center">{((regError as unknown) as { response?: { data?: { detail?: string, message?: string } } }).response?.data?.detail || ((regError as unknown) as { response?: { data?: { message?: string } } }).response?.data?.message || 'Lỗi kết nối đến máy chủ. Vui lòng thử lại.'}</div>}
-      
+    <>
+      <StepIndicator step={step} />
+      <form onSubmit={handleRegister} className="flex flex-col gap-4">
+      {validationError && <div className="text-danger text-sm text-center">{validationError}</div>}
+      {regError && <div className="text-danger text-sm text-center">{((regError as unknown) as { response?: { data?: { detail?: string, message?: string } } }).response?.data?.detail || ((regError as unknown) as { response?: { data?: { message?: string } } }).response?.data?.message || 'Lỗi kết nối đến máy chủ. Vui lòng thử lại.'}</div>}
+
       <Input id="fullName" label="Họ tên" required value={formData.fullName} onChange={e => setFormData({...formData, fullName: e.target.value})} />
       <Input id="email" label="Email" type="email" required value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
       
@@ -128,15 +168,17 @@ export function RegisterForm() {
         <Input id="confirmPassword" label="Xác nhận mật khẩu" type="password" required value={formData.confirmPassword} onChange={e => setFormData({...formData, confirmPassword: e.target.value})} />
         {/* Confirm Password Match Indicator */}
         <div className={`transition-all duration-300 overflow-hidden ${showMatchStatus ? 'h-4 opacity-100 mt-1' : 'h-0 opacity-0'}`}>
-          <span className={`text-[11px] font-semibold ${isMatch ? 'text-green-500' : 'text-red-500'}`}>
-            {isMatch ? '✓ Mật khẩu khớp' : '✗ Mật khẩu chưa khớp'}
+          <span className={`flex items-center gap-1 text-[11px] font-semibold ${isMatch ? 'text-success' : 'text-danger'}`}>
+            {isMatch ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
+            {isMatch ? 'Mật khẩu khớp' : 'Mật khẩu chưa khớp'}
           </span>
         </div>
       </div>
-      
+
       <Button type="submit" disabled={isRegPending} className="mt-2 w-full">
         {isRegPending ? 'Đang xử lý...' : 'Đăng ký'}
       </Button>
-    </form>
+      </form>
+    </>
   );
 }
