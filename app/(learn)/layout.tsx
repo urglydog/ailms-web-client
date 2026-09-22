@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { LearnTitleProvider, useLearnTitle } from '@/components/layout/LearnTitleContext';
+import { LearnTitleProvider, useLearnTitle, useLearnProgress } from '@/components/layout/LearnTitleContext';
 
 /**
  * Trang xem bài học cần tối đa không gian dọc cho video (điểm #1 trong yêu cầu chỉnh UI —
@@ -12,6 +12,7 @@ import { LearnTitleProvider, useLearnTitle } from '@/components/layout/LearnTitl
  */
 function LearnHeaderBar() {
   const courseTitle = useLearnTitle();
+  const progressPct = useLearnProgress();
   return (
     <div className="sticky top-0 z-30 border-b border-line bg-surface-raised">
       <div className="mx-auto flex h-12 max-w-[1800px] items-center gap-3 px-4 md:px-8">
@@ -28,6 +29,19 @@ function LearnHeaderBar() {
             <span className="h-5 w-px shrink-0 bg-line" aria-hidden />
             <span className="truncate text-[14px] font-semibold text-ink-muted">{courseTitle}</span>
           </>
+        )}
+        {progressPct !== null && (
+          <div className="ml-auto flex shrink-0 items-center gap-2">
+            <div className="h-1.5 w-24 overflow-hidden rounded-full bg-surface-hover md:w-40">
+              <div
+                className="h-full rounded-full bg-accent transition-[width]"
+                style={{ width: `${Math.min(100, Math.max(0, progressPct))}%` }}
+              />
+            </div>
+            <span className="whitespace-nowrap text-[12px] font-semibold text-ink-muted">
+              {Math.round(progressPct)}%
+            </span>
+          </div>
         )}
       </div>
     </div>

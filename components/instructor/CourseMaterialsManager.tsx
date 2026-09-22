@@ -20,7 +20,7 @@ import { MaterialTabs } from '@/components/materials/ui/MaterialTabs';
 import { CautionProgressBar } from '@/components/materials/ui/CautionProgressBar';
 
 import { DndContext, useDraggable, useDroppable, DragOverlay, DragStartEvent, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
-import { GripVertical, Trash2, FileText, Plus, Layers, LayoutGrid, List, Search, X, ChevronDown, FileQuestion, Workflow, File, Folder, Link as LinkIcon, History, FileEdit, Sparkles, Lock, ShieldAlert, Check, Copy, Save, GitBranch, Network, AlertTriangle, PencilLine } from 'lucide-react';
+import { GripVertical, Trash2, FileText, Plus, Layers, LayoutGrid, List, Search, X, ChevronDown, FileQuestion, Workflow, File, Folder, Link as LinkIcon, History, FileEdit, Sparkles, Lock, ShieldAlert, Check, Copy, Save, GitBranch, Network, AlertTriangle, PencilLine, Upload } from 'lucide-react';
 
 
 interface CourseMaterialsManagerProps {
@@ -776,7 +776,12 @@ function MaterialWorkspaceViewer({
               {activeTab === 'QUESTIONS' && (
                 <div className="grid grid-cols-1 gap-4">
                   {!readOnly && (
-                    <div className="flex justify-end mb-2">
+                    <div className="flex justify-end items-center gap-2 mb-2">
+                      <CsvImportButton
+                        inputId={`quiz-csv-import-${material!.materialId}`}
+                        onUpload={(file) => materialsApi.importQuizQuestionsCsv(material!.materialId!, file)}
+                        onDone={() => queryClient.invalidateQueries({ queryKey: ['material-detail', generationId] })}
+                      />
                       <button onClick={() => setIsAddingQuestion(true)} className="flex items-center gap-1.5 px-4 py-2 bg-accent/10 text-accent hover:bg-accent/20 rounded-card font-bold text-sm border border-accent/20 transition-colors">
                         <Plus className="w-4 h-4" /> Thêm Câu Hỏi Mới
                       </button>
@@ -894,9 +899,16 @@ function MaterialWorkspaceViewer({
                     {detail.flashcards.length} Thẻ ôn tập
                   </span>
                   {!readOnly && (
-                    <button onClick={() => setIsAddingFlashcard(true)} className="flex items-center gap-1.5 px-3 py-1.5 bg-accent/10 hover:bg-accent/20 text-accent rounded-card text-xs font-bold border border-accent/20 transition-colors">
-                      <Plus className="w-3.5 h-3.5" /> Thêm Thẻ Mới
-                    </button>
+                    <>
+                      <CsvImportButton
+                        inputId={`flashcard-csv-import-${detail.id}`}
+                        onUpload={(file) => materialsApi.importFlashcardsCsv(detail.id, file)}
+                        onDone={() => queryClient.invalidateQueries({ queryKey: ['material-detail', generationId] })}
+                      />
+                      <button onClick={() => setIsAddingFlashcard(true)} className="flex items-center gap-1.5 px-3 py-1.5 bg-accent/10 hover:bg-accent/20 text-accent rounded-card text-xs font-bold border border-accent/20 transition-colors">
+                        <Plus className="w-3.5 h-3.5" /> Thêm Thẻ Mới
+                      </button>
+                    </>
                   )}
                 </div>
               </div>
@@ -984,6 +996,59 @@ function MaterialWorkspaceViewer({
         />
       )}
     </div>
+  );
+}
+
+/** Task 4 — nút "Tải CSV" dùng chung cho import hàng loạt Quiz/Flashcard. Input file ẩn, bấm
+ * label để mở hộp thoại chọn file; kết quả (số dòng thêm + lỗi từng dòng) hiện qua toast. */
+function CsvImportButton({ inputId, onUpload, onDone }: {
+  inputId: string;
+  onUpload: (file: File) => Promise<{ importedCount: number; errors: string[] }>;
+  onDone: () => void;
+}) {
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleFile = async (file: File) => {
+    setIsUploading(true);
+    try {
+      const result = await onUpload(file);
+      if (result.importedCount > 0) {
+        toast.success(`Đã thêm ${result.importedCount} dòng từ CSV.`);
+        onDone();
+      }
+      if (result.errors.length > 0) {
+        toast.error(`${result.errors.length} dòng lỗi: ${result.errors.slice(0, 3).join('; ')}${result.errors.length > 3 ? '...' : ''}`);
+      }
+      if (result.importedCount === 0 && result.errors.length === 0) {
+        toast.error('File CSV không có dòng dữ liệu hợp lệ.');
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Lỗi khi tải file CSV');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  return (
+    <>
+      <input
+        id={inputId}
+        type="file"
+        accept=".csv"
+        hidden
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          e.target.value = '';
+          if (file) handleFile(file);
+        }}
+      />
+      <label
+        htmlFor={inputId}
+        className="flex items-center gap-1.5 px-3 py-1.5 bg-surface-hover hover:bg-line-soft text-ink rounded-card text-xs font-bold border border-line transition-colors cursor-pointer"
+      >
+        <Upload className="w-3.5 h-3.5" /> {isUploading ? 'Đang tải lên...' : 'Tải CSV'}
+      </label>
+    </>
   );
 }
 

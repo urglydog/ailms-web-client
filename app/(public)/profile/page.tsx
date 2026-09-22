@@ -9,6 +9,15 @@ import { useCurrentUser, useUpdatePrivacy } from '@/hooks/useCurrentUser';
 import EditProfileModal from './edit-modal';
 import ChangePasswordModal from './change-password-modal';
 import { toast } from 'sonner';
+import { useQuery } from '@tanstack/react-query';
+import { api } from '@/lib/api/client';
+import { Monitor } from 'lucide-react';
+
+interface ActiveSession {
+  deviceName: string;
+  ip: string;
+  lastActiveAt: string;
+}
 
 /**
  * Hồ sơ cá nhân (14/09/2026, hợp nhất) — trước đây tự `fetch()` thô + tự đọc token, không
@@ -36,6 +45,11 @@ function ProfilePageContent() {
 
   const [showEditModal, setShowEditModal] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
+
+  const { data: sessions } = useQuery({
+    queryKey: ['my-sessions'],
+    queryFn: () => api.get<ActiveSession[]>('/api/v1/users/me/sessions', { token: getAccessToken() ?? undefined }),
+  });
 
   useEffect(() => {
     if (!getAccessToken()) {
@@ -152,6 +166,23 @@ function ProfilePageContent() {
             <p className="mb-4 text-sm text-ink-muted">
               Đăng xuất khỏi tất cả các thiết bị khác đang sử dụng tài khoản này.
             </p>
+
+            {sessions && sessions.length > 0 && (
+              <div className="mb-4 flex flex-col gap-2">
+                {sessions.map((s, idx) => (
+                  <div key={idx} className="flex items-center gap-3 rounded-card border border-line bg-surface px-3 py-2 text-sm">
+                    <Monitor className="w-4 h-4 text-ink-muted flex-shrink-0" strokeWidth={1.75} />
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium text-ink truncate">{s.deviceName}</p>
+                      <p className="text-[11px] text-ink-faint">
+                        {s.ip ? `IP: ${s.ip} · ` : ''}Hoạt động gần đây: {new Date(s.lastActiveAt).toLocaleString('vi-VN')}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
             <button
               onClick={async () => {
                 try {
