@@ -409,9 +409,6 @@ export function Header() {
                         Xem hồ sơ công khai
                       </Link>
                     )}
-                    <Link href="/progress" className="rounded-lg px-3 py-2.5 text-[13.5px] text-ink hover:bg-surface">
-                      Báo cáo tiến độ
-                    </Link>
                     <Link href="/payments" className="rounded-lg px-3 py-2.5 text-[13.5px] text-ink hover:bg-surface">
                       Lịch sử giao dịch
                     </Link>

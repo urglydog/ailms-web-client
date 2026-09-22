@@ -1,4 +1,4 @@
-import { api } from '@/lib/api/client';
+import { api, uploadFile } from '@/lib/api/client';
 import { getAccessToken } from '@/lib/auth/token';
 
 function authToken() {
@@ -53,4 +53,11 @@ export const flashcardsApi = {
 
   deleteFlashcard: (flashcardId: number) =>
     api.delete<void>(`/api/v1/flashcards/${flashcardId}`, { token: authToken() }),
+
+  importFromTxt: (deckId: number, file: File) =>
+    uploadFile<{ importedCount: number; errors: string[] }>(
+      `/api/v1/flashcards/deck/${deckId}/import-txt`,
+      file,
+      { token: authToken() },
+    ),
 };

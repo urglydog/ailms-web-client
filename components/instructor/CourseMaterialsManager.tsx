@@ -15,6 +15,7 @@ import { MaterialLanguagePicker } from '@/components/materials/MaterialLanguageP
 import { MaterialFolderTree } from './MaterialFolderTree';
 import { getMaterialDistributionBadge, getMaterialProcessingBadge } from '@/lib/materialStatus';
 import { CourseActivityPanel } from './CourseActivityPanel';
+import { StaticResourcesPanel } from './StaticResourcesPanel';
 import { MaterialBadge } from '@/components/materials/ui/MaterialBadge';
 import { MaterialTabs } from '@/components/materials/ui/MaterialTabs';
 import { CautionProgressBar } from '@/components/materials/ui/CautionProgressBar';
@@ -189,6 +190,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
   const [searchQuery, setSearchQuery] = useState('');
   const [showCreateDropdown, setShowCreateDropdown] = useState(false);
   const [showActivityPanel, setShowActivityPanel] = useState(false);
+  const [showStaticResourcesPanel, setShowStaticResourcesPanel] = useState(false);
 
   const overwriteMaterialVersionMutation = useMutation({
     mutationFn: (variables: { id: number, targetLessonId?: number, targetChapterId?: number }) =>
@@ -491,6 +493,13 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
               >
                 <History className="w-3.5 h-3.5" /> Hoạt động
               </button>
+              <button
+                onClick={() => setShowStaticResourcesPanel(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-card transition-colors border bg-surface-raised text-ink-muted border-line hover:bg-surface-hover"
+                title="Tài nguyên tĩnh toàn khoá học (PDF, slide dùng chung)"
+              >
+                <Folder className="w-3.5 h-3.5" /> Tài Nguyên Tĩnh
+              </button>
               {/* Dropdown: Tạo Mới */}
               <div className="relative">
                 <button
@@ -621,6 +630,10 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
           </div>
         </div>,
         document.body
+      )}
+
+      {showStaticResourcesPanel && (
+        <StaticResourcesPanel courseId={courseId} onClose={() => setShowStaticResourcesPanel(false)} />
       )}
     </DndContext>
   );
