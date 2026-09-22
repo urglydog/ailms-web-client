@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { useReviewFlashcard } from '@/hooks/useFlashcards';
 import { toast } from 'sonner';
 import type { FlashcardCardWithReview } from '@/lib/api/flashcards';
+import { CheckCircle2, ArrowLeft, Volume2, CalendarClock } from 'lucide-react';
 
 /** Map language code → BCP-47 tag for Web Speech API */
 const LANGUAGE_MAP: Record<string, string> = {
@@ -94,8 +95,8 @@ export function FlashcardStudyMode({ deckName: _deckName, cards, language, onFin
   if (isFinished) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[500px] text-center">
-        <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-success/10 text-success">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
+        <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-card bg-success/10 text-success">
+          <CheckCircle2 className="w-8 h-8" strokeWidth={1.75} />
         </div>
         <h2 className="font-display text-2xl font-bold text-ink mb-3">
           Congratulations! You have finished this deck for now.
@@ -106,9 +107,9 @@ export function FlashcardStudyMode({ deckName: _deckName, cards, language, onFin
         {onFinish && (
           <button
             onClick={onFinish}
-            className="bg-accent hover:bg-accent-dark text-white font-bold px-8 py-3 rounded-full shadow-lg transition-all"
+            className="flex items-center gap-2 bg-accent hover:bg-accent-dark text-white font-semibold px-8 py-3 rounded-card shadow-card transition-all"
           >
-            ← Quay lại
+            <ArrowLeft className="w-4 h-4" /> Quay lại
           </button>
         )}
       </div>
@@ -143,9 +144,9 @@ export function FlashcardStudyMode({ deckName: _deckName, cards, language, onFin
         <div className="flex items-center gap-0 text-sm font-bold select-none">
           <span className="text-accent">{newCards.length}</span>
           <span className="text-ink-muted mx-1">+</span>
-          <span className="text-red-500">{learningCards.length}</span>
+          <span className="text-star">{learningCards.length}</span>
           <span className="text-ink-muted mx-1">+</span>
-          <span className="text-green-600">{reviewCards.length}</span>
+          <span className="text-success">{reviewCards.length}</span>
         </div>
       </div>
 
@@ -159,16 +160,16 @@ export function FlashcardStudyMode({ deckName: _deckName, cards, language, onFin
             <div className={`w-full min-h-[400px] transition-transform duration-500 transform-style-3d ${isFlipped ? 'rotate-y-180' : ''}`}>
               {/* Front */}
               <div
-                className="absolute inset-0 backface-hidden bg-white/90 backdrop-blur-md rounded-2xl shadow-lg border-2 border-line-soft flex flex-col items-center justify-center p-8 group-hover:border-accent/30 transition-colors"
+                className="absolute inset-0 backface-hidden bg-surface-raised/95 backdrop-blur-md rounded-card shadow-card-hover border border-line flex flex-col items-center justify-center p-8 group-hover:border-accent/40 transition-colors"
                 style={{ minHeight: '400px' }}
               >
                 {isSpeakSupported && (
                   <button
                     onClick={(e) => { e.stopPropagation(); handleSpeak(currentCard.frontText); }}
-                    className="absolute top-4 right-4 p-2 text-ink-muted hover:text-accent bg-surface hover:bg-surface-hover rounded-full transition-colors"
+                    className="absolute top-4 right-4 p-2 text-ink-muted hover:text-accent bg-surface hover:bg-surface-hover rounded-card transition-colors"
                     title="Nghe phát âm"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
+                    <Volume2 className="h-5 w-5" strokeWidth={1.75} />
                   </button>
                 )}
                 <h3
@@ -184,16 +185,16 @@ export function FlashcardStudyMode({ deckName: _deckName, cards, language, onFin
 
               {/* Back */}
               <div
-                className="absolute inset-0 backface-hidden rotate-y-180 bg-gradient-to-b from-slate-800 to-slate-900 text-white rounded-2xl shadow-lg flex flex-col items-center justify-center p-8"
+                className="absolute inset-0 backface-hidden rotate-y-180 bg-accent text-white rounded-card shadow-card-hover flex flex-col items-center justify-center p-8"
                 style={{ minHeight: '400px' }}
               >
                 {isSpeakSupported && (
                   <button
                     onClick={(e) => { e.stopPropagation(); handleSpeak(currentCard.backText); }}
-                    className="absolute top-4 right-4 p-2 text-white/60 hover:text-white bg-white/10 hover:bg-white/20 rounded-full transition-colors"
+                    className="absolute top-4 right-4 p-2 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 rounded-card transition-colors"
                     title="Nghe phát âm"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
+                    <Volume2 className="h-5 w-5" strokeWidth={1.75} />
                   </button>
                 )}
 
@@ -235,18 +236,18 @@ export function FlashcardStudyMode({ deckName: _deckName, cards, language, onFin
                 return (
                   <div className="flex justify-center gap-3">
                     {[
-                      { label: 'Again', quality: 0, next: nextAgain, cls: 'bg-red-500 hover:bg-red-600 shadow-red-200' },
-                      { label: 'Hard',  quality: 2, next: nextHard,  cls: 'bg-amber-500 hover:bg-amber-600 shadow-amber-200' },
-                      { label: 'Good',  quality: 3, next: nextGood,  cls: 'bg-green-500 hover:bg-green-600 shadow-green-200' },
-                      { label: 'Easy',  quality: 5, next: nextEasy,  cls: 'bg-blue-500 hover:bg-blue-600 shadow-blue-200' },
+                      { label: 'Again', quality: 0, next: nextAgain, cls: 'bg-danger hover:bg-danger/90' },
+                      { label: 'Hard',  quality: 2, next: nextHard,  cls: 'bg-star hover:bg-star/90' },
+                      { label: 'Good',  quality: 3, next: nextGood,  cls: 'bg-success hover:bg-success/90' },
+                      { label: 'Easy',  quality: 5, next: nextEasy,  cls: 'bg-accent hover:bg-accent-dark' },
                     ].map(btn => (
                       <div key={btn.label} className="flex flex-col items-center gap-1">
-                        <span className="text-[10px] text-ink-muted font-medium flex items-center gap-0.5">
-                          🗓️ {fmt(btn.next)}
+                        <span className="text-[10px] text-ink-muted font-medium flex items-center gap-1">
+                          <CalendarClock className="w-3 h-3" /> {fmt(btn.next)}
                         </span>
                         <button
                           onClick={() => handleRate(btn.quality)}
-                          className={`px-5 py-2.5 ${btn.cls} text-white font-bold rounded-xl text-sm shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5`}
+                          className={`px-5 py-2.5 ${btn.cls} text-white font-semibold rounded-card text-sm shadow-card hover:shadow-card-hover transition-all`}
                         >
                           {btn.label}
                         </button>

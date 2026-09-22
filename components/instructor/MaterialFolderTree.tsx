@@ -235,7 +235,7 @@ export function MaterialFolderTree({
   const renderMaterialCard = (mat: MaterialItem) => (
     <div
       key={mat.id}
-      className={`relative group/mat ${selectedMaterialId === mat.id ? 'ring-2 ring-blue-400 rounded-xl' : ''}`}
+      className={`relative group/mat ${selectedMaterialId === mat.id ? 'ring-2 ring-blue-400 rounded-card' : ''}`}
       onContextMenu={e => handleContextMenu(e, 'MATERIAL', mat.id)}
       onClick={e => { e.stopPropagation(); setSelectedMaterialId(mat.id); }}
     >
@@ -249,8 +249,8 @@ export function MaterialFolderTree({
         key={mat.id}
         onContextMenu={e => handleContextMenu(e, 'MATERIAL', mat.id)}
         onClick={e => { e.stopPropagation(); setSelectedMaterialId(mat.id); }}
-        className={`flex items-center gap-3 px-4 py-2.5 border-b border-gray-50 hover:bg-gray-50 cursor-pointer transition-colors group/row ${
-          selectedMaterialId === mat.id ? 'bg-blue-50' : ''
+        className={`flex items-center gap-3 px-4 py-2.5 border-b border-gray-50 hover:bg-surface-hover cursor-pointer transition-colors group/row ${
+          selectedMaterialId === mat.id ? 'bg-accent/5' : ''
         }`}
       >
         <DraggableRow mat={mat} onDoubleClick={() => onInspect(mat.id)} />
@@ -268,13 +268,13 @@ export function MaterialFolderTree({
         <div
           onClick={e => toggleFolder(folder.id, e)}
           onContextMenu={e => handleContextMenu(e, 'FOLDER', folder.id)}
-          className="flex items-center gap-2 p-2 rounded-lg hover:bg-blue-50 cursor-pointer text-gray-700 transition-colors group"
+          className="flex items-center gap-2 p-2 rounded-lg hover:bg-accent/5 cursor-pointer text-ink transition-colors group"
         >
-          {isExpanded ? <ChevronDown className="w-4 h-4 text-gray-400" /> : <ChevronRight className="w-4 h-4 text-gray-400" />}
-          {isExpanded ? <FolderOpen className="w-5 h-5 text-blue-500" /> : <Folder className="w-5 h-5 text-blue-400" />}
+          {isExpanded ? <ChevronDown className="w-4 h-4 text-ink-faint" /> : <ChevronRight className="w-4 h-4 text-ink-faint" />}
+          {isExpanded ? <FolderOpen className="w-5 h-5 text-accent" /> : <Folder className="w-5 h-5 text-accent/70" />}
           <span className="font-semibold text-sm">{folder.name}</span>
           <button
-            className="ml-auto opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-200 rounded text-gray-500"
+            className="ml-auto opacity-0 group-hover:opacity-100 p-1 hover:bg-line-soft rounded text-ink-muted"
             onClick={e => { e.stopPropagation(); handleContextMenu(e, 'FOLDER', folder.id); }}
           >
             <MoreVertical className="w-4 h-4" />
@@ -282,10 +282,10 @@ export function MaterialFolderTree({
         </div>
 
         {isExpanded && (
-          <div className="ml-6 border-l border-gray-200 pl-2">
+          <div className="ml-6 border-l border-line pl-2">
             {childFolders.map(renderFolder)}
             {viewMode === 'list' ? (
-              <div className="border border-gray-100 rounded-xl overflow-hidden mt-2">
+              <div className="border border-line rounded-card overflow-hidden mt-2">
                 {childMaterials.map(renderMaterialRow)}
               </div>
             ) : (
@@ -294,7 +294,7 @@ export function MaterialFolderTree({
               </div>
             )}
             {childFolders.length === 0 && childMaterials.length === 0 && (
-              <div className="text-xs text-gray-400 py-2 pl-2 italic">Thư mục trống</div>
+              <div className="text-xs text-ink-faint py-2 pl-2 italic">Thư mục trống</div>
             )}
           </div>
         )}
@@ -306,7 +306,7 @@ export function MaterialFolderTree({
   const renderPickerNode = (f: FolderItem, depth = 0) => (
     <button
       key={f.id}
-      className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 rounded-lg flex items-center gap-2 transition-colors"
+      className="w-full text-left px-3 py-2 text-sm text-ink hover:bg-accent/5 rounded-lg flex items-center gap-2 transition-colors"
       style={{ paddingLeft: `${12 + depth * 16}px` }}
       onClick={() => {
         if (folderPickerFor !== null) {
@@ -316,7 +316,7 @@ export function MaterialFolderTree({
         }
       }}
     >
-      <Folder className="w-4 h-4 text-blue-400 flex-shrink-0" />
+      <Folder className="w-4 h-4 text-accent/70 flex-shrink-0" />
       {f.name}
     </button>
   );
@@ -331,16 +331,16 @@ export function MaterialFolderTree({
 
   return (
     <div
-      className="flex-1 overflow-y-auto p-4 bg-gray-50/50 min-h-[400px]"
+      className="flex-1 overflow-y-auto p-4 bg-surface-hover/50 min-h-[400px]"
       onContextMenu={e => handleContextMenu(e, 'ROOT')}
       onClick={() => setSelectedMaterialId(null)}
     >
       <div className="mb-4 flex items-center justify-between">
-        <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+        <span className="text-xs font-semibold text-ink-muted uppercase tracking-wider">
           Thư Mục Gốc (Click chuột phải để thêm)
         </span>
         {selectedMaterialId && (
-          <span className="text-[10px] text-gray-400 italic">
+          <span className="text-[10px] text-ink-faint italic">
             ✓ Đã chọn — Del: xóa · Ctrl+X: cắt · Ctrl+V: dán
           </span>
         )}
@@ -349,7 +349,7 @@ export function MaterialFolderTree({
       {rootFolders.map(renderFolder)}
 
       {viewMode === 'list' ? (
-        <div className="border border-gray-100 rounded-xl overflow-hidden mt-3">
+        <div className="border border-line rounded-card overflow-hidden mt-3">
           {rootMaterials.length === 0 ? null : rootMaterials.map(renderMaterialRow)}
         </div>
       ) : (
@@ -359,7 +359,7 @@ export function MaterialFolderTree({
       )}
 
       {rootFolders.length === 0 && rootMaterials.length === 0 && (
-        <div className="flex flex-col items-center justify-center h-full text-gray-400 py-10">
+        <div className="flex flex-col items-center justify-center h-full text-ink-faint py-10">
           <Folder className="w-16 h-16 mb-2 opacity-30" />
           <p className="text-sm font-medium">Workspace đang trống</p>
           <p className="text-xs mt-1">Click chuột phải để tạo thư mục mới.</p>
@@ -369,14 +369,14 @@ export function MaterialFolderTree({
       {/* ─── Context Menu Portal ─── */}
       {contextMenu && createPortal(
         <div
-          className="fixed bg-white rounded-lg shadow-xl border border-gray-200 py-1 min-w-[200px] z-[100000]"
+          className="fixed bg-surface-raised rounded-lg shadow-xl border border-line py-1 min-w-[200px] z-[100000]"
           style={{ top: contextMenu.y, left: contextMenu.x }}
           onClick={e => e.stopPropagation()}
         >
           {contextMenu.type === 'ROOT' && (
             <button
               onClick={() => handleCreateFolder()}
-              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 flex items-center gap-2"
+              className="w-full text-left px-4 py-2 text-sm text-ink hover:bg-accent/5 flex items-center gap-2"
             >
               <Plus className="w-4 h-4" /> Tạo Thư mục Mới
             </button>
@@ -386,14 +386,14 @@ export function MaterialFolderTree({
             <>
               <button
                 onClick={() => handleCreateFolder(contextMenu.targetId)}
-                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 flex items-center gap-2"
+                className="w-full text-left px-4 py-2 text-sm text-ink hover:bg-accent/5 flex items-center gap-2"
               >
                 <Plus className="w-4 h-4" /> Tạo Thư mục con
               </button>
-              <div className="h-px bg-gray-100 my-1" />
+              <div className="h-px bg-surface-hover my-1" />
               <button
                 onClick={() => handleDeleteFolder(contextMenu.targetId!)}
-                className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                className="w-full text-left px-4 py-2 text-sm text-danger hover:bg-danger/10 flex items-center gap-2"
               >
                 <Trash2 className="w-4 h-4" /> Xóa Thư mục
               </button>
@@ -405,33 +405,33 @@ export function MaterialFolderTree({
               <>
                 <button
                   onClick={() => { if (contextMenu.targetId) onInspect(contextMenu.targetId); setContextMenu(null); }}
-                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 flex items-center gap-2"
+                  className="w-full text-left px-4 py-2 text-sm text-ink hover:bg-accent/5 flex items-center gap-2"
                 >
                   <FolderOpen className="w-4 h-4" /> Xem / Chỉnh sửa
                 </button>
                 <button
                   onClick={() => { if (contextMenu.targetId) handleRenameMaterial(contextMenu.targetId); }}
-                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 flex items-center gap-2"
+                  className="w-full text-left px-4 py-2 text-sm text-ink hover:bg-accent/5 flex items-center gap-2"
                 >
                   <Pencil className="w-4 h-4" /> Đổi tên
                 </button>
                 <button
                   onClick={() => { if (contextMenu.targetId) { setVersionHistoryFor(contextMenu.targetId); setContextMenu(null); } }}
-                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 flex items-center gap-2"
+                  className="w-full text-left px-4 py-2 text-sm text-ink hover:bg-accent/5 flex items-center gap-2"
                 >
                   <History className="w-4 h-4" /> Lịch sử phiên bản
                 </button>
-                <div className="h-px bg-gray-100 my-1" />
+                <div className="h-px bg-surface-hover my-1" />
                 <button
                   onClick={() => { if (contextMenu.targetId) handleMoveMaterial(contextMenu.targetId); }}
-                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 flex items-center gap-2"
+                  className="w-full text-left px-4 py-2 text-sm text-ink hover:bg-accent/5 flex items-center gap-2"
                 >
                   <MoveRight className="w-4 h-4" /> Chuyển vào Thư mục...
                 </button>
-                <div className="h-px bg-gray-100 my-1" />
+                <div className="h-px bg-surface-hover my-1" />
                 <button
                   onClick={() => { if (contextMenu.targetId) handleDeleteMaterial(contextMenu.targetId); }}
-                  className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                  className="w-full text-left px-4 py-2 text-sm text-danger hover:bg-danger/10 flex items-center gap-2"
                 >
                   <Trash2 className="w-4 h-4" /> Xóa Học Liệu
                 </button>
@@ -449,15 +449,15 @@ export function MaterialFolderTree({
           onClick={() => setFolderPickerFor(null)}
         >
           <div
-            className="bg-white rounded-xl max-w-sm w-full p-5 shadow-2xl border border-gray-200"
+            className="bg-surface-raised rounded-card max-w-sm w-full p-5 shadow-2xl border border-line"
             onClick={e => e.stopPropagation()}
           >
-            <h3 className="text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
-              <Folder className="w-5 h-5 text-blue-500" /> Chọn Thư mục Đích
+            <h3 className="text-base font-bold text-ink mb-3 flex items-center gap-2">
+              <Folder className="w-5 h-5 text-accent" /> Chọn Thư mục Đích
             </h3>
             <input
               autoFocus
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg mb-3 outline-none focus:border-blue-500 text-sm"
+              className="w-full px-3 py-2 border border-line rounded-lg mb-3 outline-none focus:border-accent text-sm"
               placeholder="Tìm kiếm thư mục..."
               value={folderPickerSearch}
               onChange={e => setFolderPickerSearch(e.target.value)}
@@ -465,7 +465,7 @@ export function MaterialFolderTree({
             <div className="max-h-56 overflow-y-auto flex flex-col gap-0.5">
               {/* Option: move to root workspace */}
               <button
-                className="w-full text-left px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg flex items-center gap-2 italic"
+                className="w-full text-left px-3 py-2 text-sm text-ink-muted hover:bg-surface-hover rounded-lg flex items-center gap-2 italic"
                 onClick={() => {
                   if (folderPickerFor !== null) {
                     moveToFolderMutation.mutate({ id: folderPickerFor, folderId: null });
@@ -473,18 +473,18 @@ export function MaterialFolderTree({
                   }
                 }}
               >
-                <FolderOpen className="w-4 h-4 text-gray-400" /> Workspace gốc (bỏ khỏi thư mục)
+                <FolderOpen className="w-4 h-4 text-ink-faint" /> Workspace gốc (bỏ khỏi thư mục)
               </button>
-              <div className="h-px bg-gray-100 my-1" />
+              <div className="h-px bg-surface-hover my-1" />
               {buildPickerTree(undefined)}
               {filteredFolders.length === 0 && (
-                <p className="text-xs text-gray-400 text-center py-4">Không tìm thấy thư mục nào</p>
+                <p className="text-xs text-ink-faint text-center py-4">Không tìm thấy thư mục nào</p>
               )}
             </div>
             <div className="mt-3 flex justify-end">
               <button
                 onClick={() => setFolderPickerFor(null)}
-                className="px-3 py-1.5 text-xs font-bold text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200"
+                className="px-3 py-1.5 text-xs font-bold text-ink-muted bg-surface-hover rounded-lg hover:bg-line-soft"
               >
                 Hủy
               </button>
@@ -501,15 +501,15 @@ export function MaterialFolderTree({
           onClick={() => setCreateFolderModal(null)}
         >
           <div
-            className="bg-white rounded-xl max-w-xs w-full p-5 shadow-2xl border border-gray-200"
+            className="bg-surface-raised rounded-card max-w-xs w-full p-5 shadow-2xl border border-line"
             onClick={e => e.stopPropagation()}
           >
-            <h3 className="text-base font-bold text-gray-900 mb-3">
+            <h3 className="text-base font-bold text-ink mb-3">
               {createFolderModal.parentId ? 'Tạo Thư mục Con' : 'Tạo Thư mục Mới'}
             </h3>
             <input
               autoFocus
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg mb-4 outline-none focus:border-blue-500 text-sm"
+              className="w-full px-3 py-2 border border-line rounded-lg mb-4 outline-none focus:border-accent text-sm"
               placeholder="Tên thư mục..."
               value={createFolderName}
               onChange={e => setCreateFolderName(e.target.value)}
@@ -523,7 +523,7 @@ export function MaterialFolderTree({
             <div className="flex gap-2 justify-end">
               <button
                 onClick={() => setCreateFolderModal(null)}
-                className="px-3 py-1.5 text-xs font-bold text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200"
+                className="px-3 py-1.5 text-xs font-bold text-ink-muted bg-surface-hover rounded-lg hover:bg-line-soft"
               >
                 Hủy
               </button>
@@ -535,7 +535,7 @@ export function MaterialFolderTree({
                     setCreateFolderModal(null);
                   }
                 }}
-                className="px-3 py-1.5 text-xs font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                className="px-3 py-1.5 text-xs font-bold text-white bg-accent rounded-lg hover:bg-accent-dark disabled:opacity-50"
               >
                 Tạo
               </button>
@@ -552,13 +552,13 @@ export function MaterialFolderTree({
           onClick={() => setRenameModal(null)}
         >
           <div
-            className="bg-white rounded-xl max-w-xs w-full p-5 shadow-2xl border border-gray-200"
+            className="bg-surface-raised rounded-card max-w-xs w-full p-5 shadow-2xl border border-line"
             onClick={e => e.stopPropagation()}
           >
-            <h3 className="text-base font-bold text-gray-900 mb-3">Đổi tên Học liệu</h3>
+            <h3 className="text-base font-bold text-ink mb-3">Đổi tên Học liệu</h3>
             <input
               autoFocus
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg mb-4 outline-none focus:border-blue-500 text-sm"
+              className="w-full px-3 py-2 border border-line rounded-lg mb-4 outline-none focus:border-accent text-sm"
               placeholder="Tên học liệu..."
               value={renameValue}
               onChange={e => setRenameValue(e.target.value)}
@@ -572,7 +572,7 @@ export function MaterialFolderTree({
             <div className="flex gap-2 justify-end">
               <button
                 onClick={() => setRenameModal(null)}
-                className="px-3 py-1.5 text-xs font-bold text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200"
+                className="px-3 py-1.5 text-xs font-bold text-ink-muted bg-surface-hover rounded-lg hover:bg-line-soft"
               >
                 Hủy
               </button>
@@ -584,7 +584,7 @@ export function MaterialFolderTree({
                     setRenameModal(null);
                   }
                 }}
-                className="px-3 py-1.5 text-xs font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                className="px-3 py-1.5 text-xs font-bold text-white bg-accent rounded-lg hover:bg-accent-dark disabled:opacity-50"
               >
                 Lưu
               </button>
