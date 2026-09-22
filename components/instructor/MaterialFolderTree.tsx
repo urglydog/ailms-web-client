@@ -15,7 +15,7 @@ interface MaterialFolderTreeProps {
   courseId: number;
   folders: FolderItem[];
   materials: MaterialItem[];
-  onInspect: (id: number) => void;
+  onInspect: (id: number, readOnly?: boolean) => void;
   setConfirmAction: (action: { title: string; message: string; onConfirm: () => void } | null) => void;
   DraggableCard: React.ElementType;
   DraggableRow: React.ElementType;

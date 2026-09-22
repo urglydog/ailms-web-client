@@ -84,4 +84,14 @@ export const coursesApi = {
 
   removeInvite: (id: number, email: string) =>
     api.delete<void>(`/api/v1/courses/mine/${id}/invites/${encodeURIComponent(email)}`, { token: authToken() }),
+
+  getActivities: (id: number, limit = 50) =>
+    api.get<CourseActivityItem[]>(`/api/v1/courses/mine/${id}/activities?limit=${limit}`, { token: authToken() }),
 };
+
+export interface CourseActivityItem {
+  id: number;
+  actorName: string | null;
+  description: string;
+  createdAt: string;
+}
