@@ -24,7 +24,7 @@ export function LessonMaterialAttachModal({ courseId, lesson, onClose }: LessonM
   });
 
   const attachLessonMutation = useMutation({
-    mutationFn: (variables: { id: number; lessonId: number | null }) => 
+    mutationFn: (variables: { id: number; lessonId: number }) =>
       materialsApi.attachMaterial(variables.id, { lessonId: variables.lessonId, chapterId: null }),
     onSuccess: () => {
       toast.success('Đã cập nhật đính kèm học liệu!');
@@ -32,6 +32,16 @@ export function LessonMaterialAttachModal({ courseId, lesson, onClose }: LessonM
       queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] });
     },
     onError: (err: Error) => toast.error(err.message || 'Lỗi cập nhật đính kèm')
+  });
+
+  const unassignMutation = useMutation({
+    mutationFn: (assignmentId: number) => materialsApi.deleteAssignment(assignmentId),
+    onSuccess: () => {
+      toast.success('Đã hủy gán học liệu!');
+      queryClient.invalidateQueries({ queryKey: ['official-materials', courseId] });
+      queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] });
+    },
+    onError: (err: Error) => toast.error(err.message || 'Lỗi hủy gán học liệu')
   });
 
   const officialMaterials = materials?.filter(m => m.isOfficial) || [];
@@ -102,8 +112,11 @@ export function LessonMaterialAttachModal({ courseId, lesson, onClose }: LessonM
                       </div>
                       
                       <button
-                        onClick={() => attachLessonMutation.mutate({ id: mat.id, lessonId: null })}
-                        disabled={attachLessonMutation.isPending}
+                        onClick={() => {
+                          const assignmentId = mat.assignments?.find(a => a.lessonId === lesson.id)?.id;
+                          if (assignmentId) unassignMutation.mutate(assignmentId);
+                        }}
+                        disabled={unassignMutation.isPending}
                         className="shrink-0 px-4 py-1.5 rounded-lg text-xs font-bold transition-all bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 disabled:opacity-50"
                       >
                         Hủy gán
