@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import Link from 'next/link';
 import { useMaterialDetail } from '@/hooks/useMaterials';
 import { MermaidViewer } from '@/components/materials/MermaidViewer';
@@ -9,6 +11,7 @@ import { QuizViewer } from '@/components/materials/QuizViewer';
 import { FlashcardViewer } from '@/components/materials/FlashcardViewer';
 import { FlashcardStudyMode } from '@/components/materials/FlashcardStudyMode';
 import { QuizPersonalEditor } from '@/components/materials/QuizPersonalEditor';
+import { flashcardsApi } from '@/lib/api/flashcards';
 import { ApiError } from '@/lib/api/client';
 
 export default function MaterialDetailPage() {
@@ -26,6 +29,29 @@ export default function MaterialDetailPage() {
   const { data: material, isLoading, error } = useMaterialDetail(id);
   const [flashcardMode, setFlashcardMode] = useState<'study' | 'browse'>('study');
   const [quizMode, setQuizMode] = useState<'study' | 'browse'>('study');
+  const [isImportingTxt, setIsImportingTxt] = useState(false);
+  const queryClient = useQueryClient();
+
+  const handleImportTxt = async (file: File) => {
+    setIsImportingTxt(true);
+    try {
+      const result = await flashcardsApi.importFromTxt(id, file);
+      if (result.importedCount > 0) {
+        toast.success(`Đã thêm ${result.importedCount} thẻ từ file.`);
+        queryClient.invalidateQueries({ queryKey: ['materials', 'detail', id] });
+      }
+      if (result.errors.length > 0) {
+        toast.error(`${result.errors.length} dòng lỗi: ${result.errors.slice(0, 3).join('; ')}${result.errors.length > 3 ? '...' : ''}`);
+      }
+      if (result.importedCount === 0 && result.errors.length === 0) {
+        toast.error('File .txt không có dòng dữ liệu hợp lệ.');
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Lỗi khi tải file .txt');
+    } finally {
+      setIsImportingTxt(false);
+    }
+  };
 
   if (!id || isLoading) {
     return (
@@ -169,22 +195,41 @@ export default function MaterialDetailPage() {
                       📋 Duyệt tất cả (Browse)
                     </button>
                   </div>
-                  <button
-                    onClick={() => {
-                      if (!material?.flashcards) return;
-                      const content = material.flashcards.map(c => `${c.frontText.replace(/\t/g, ' ')}\t${c.backText.replace(/\n/g, ' ')}`).join('\n');
-                      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-                      const url = URL.createObjectURL(blob);
-                      const a = document.createElement('a');
-                      a.href = url;
-                      a.download = `flashcards_${material.id}.txt`;
-                      a.click();
-                      URL.revokeObjectURL(url);
-                    }}
-                    className="text-sm font-semibold text-accent hover:underline flex items-center gap-1"
-                  >
-                    📥 Xuất ra file Anki/Quizlet
-                  </button>
+                  <div className="flex items-center gap-4">
+                    <button
+                      onClick={() => {
+                        if (!material?.flashcards) return;
+                        const content = material.flashcards.map(c => `${c.frontText.replace(/\t/g, ' ')}\t${c.backText.replace(/\n/g, ' ')}`).join('\n');
+                        const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `flashcards_${material.id}.txt`;
+                        a.click();
+                        URL.revokeObjectURL(url);
+                      }}
+                      className="text-sm font-semibold text-accent hover:underline flex items-center gap-1"
+                    >
+                      📥 Xuất ra file Anki/Quizlet
+                    </button>
+                    <input
+                      id="anki-txt-import"
+                      type="file"
+                      accept=".txt"
+                      hidden
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        e.target.value = '';
+                        if (file) handleImportTxt(file);
+                      }}
+                    />
+                    <label
+                      htmlFor="anki-txt-import"
+                      className="text-sm font-semibold text-accent hover:underline flex items-center gap-1 cursor-pointer"
+                    >
+                      {isImportingTxt ? 'Đang nhập...' : '📤 Nhập từ file Anki/Quizlet'}
+                    </label>
+                  </div>
                 </div>
 
                 {flashcardMode === 'study' ? (
