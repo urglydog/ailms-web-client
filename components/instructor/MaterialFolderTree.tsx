@@ -237,15 +237,9 @@ export function MaterialFolderTree({
       key={mat.id}
       className={`relative group/mat ${selectedMaterialId === mat.id ? 'ring-2 ring-blue-400 rounded-xl' : ''}`}
       onContextMenu={e => handleContextMenu(e, 'MATERIAL', mat.id)}
-      onClick={() => setSelectedMaterialId(mat.id)}
+      onClick={e => { e.stopPropagation(); setSelectedMaterialId(mat.id); }}
     >
       <DraggableCard mat={mat} onClick={() => onInspect(mat.id)} />
-      <button
-        className="absolute top-2 right-2 opacity-0 group-hover/mat:opacity-100 p-1 bg-white/80 rounded hover:bg-gray-200 text-gray-600 z-10"
-        onClick={e => { e.stopPropagation(); handleContextMenu(e, 'MATERIAL', mat.id); }}
-      >
-        <MoreVertical className="w-4 h-4" />
-      </button>
     </div>
   );
 
@@ -254,19 +248,12 @@ export function MaterialFolderTree({
       <div
         key={mat.id}
         onContextMenu={e => handleContextMenu(e, 'MATERIAL', mat.id)}
-        onClick={() => setSelectedMaterialId(mat.id)}
+        onClick={e => { e.stopPropagation(); setSelectedMaterialId(mat.id); }}
         className={`flex items-center gap-3 px-4 py-2.5 border-b border-gray-50 hover:bg-gray-50 cursor-pointer transition-colors group/row ${
           selectedMaterialId === mat.id ? 'bg-blue-50' : ''
         }`}
       >
         <DraggableRow mat={mat} onDoubleClick={() => onInspect(mat.id)} />
-        {/* Row actions */}
-        <div className="flex items-center gap-1 opacity-0 group-hover/row:opacity-100 transition-opacity">
-          <button onClick={(e) => { e.stopPropagation(); onInspect(mat.id); }} className="p-1.5 rounded hover:bg-blue-100 text-blue-500 text-[10px] font-bold">Xem</button>
-          <button onClick={(e) => { e.stopPropagation(); handleContextMenu(e, 'MATERIAL', mat.id); }} className="p-1 rounded hover:bg-gray-200">
-            <MoreVertical className="w-3.5 h-3.5 text-gray-500" />
-          </button>
-        </div>
       </div>
     );
   };
