@@ -13,9 +13,10 @@ import { MindmapEditor } from '@/components/materials/MindmapEditor';
 import { MermaidViewer } from '@/components/materials/MermaidViewer';
 import { MaterialLanguagePicker } from '@/components/materials/MaterialLanguagePicker';
 import { MaterialFolderTree } from './MaterialFolderTree';
+import { getMaterialDistributionBadge } from '@/lib/materialStatus';
 
 import { DndContext, useDraggable, useDroppable, DragOverlay, DragStartEvent, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
-import { GripVertical, Link as LinkIcon, Trash2, FileText, Plus, Layers, LayoutGrid, List, Search, X, ChevronDown } from 'lucide-react';
+import { GripVertical, Trash2, FileText, Plus, Layers, LayoutGrid, List, Search, X, ChevronDown } from 'lucide-react';
 
 
 interface CourseMaterialsManagerProps {
@@ -29,7 +30,7 @@ function DraggableMaterialCard({ mat, onClick, isLoading: isPending }: { mat: In
     data: { material: mat },
   });
 
-  const isAssigned = mat.assignments && mat.assignments.length > 0;
+  const badge = getMaterialDistributionBadge(mat);
 
   // Color coding per type
   const typeConfig: Record<string, { bg: string; text: string; icon: string; label: string }> = {
@@ -73,11 +74,6 @@ function DraggableMaterialCard({ mat, onClick, isLoading: isPending }: { mat: In
           <div className="flex items-center gap-1.5">
             <span className="text-base leading-none">{cfg.icon}</span>
             <span className={`text-[10px] font-bold uppercase tracking-wider ${cfg.text}`}>{cfg.label}</span>
-            {isAssigned && (
-              <span className="text-[9px] bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded-full font-bold flex items-center gap-0.5" title="Đã phân phối">
-                <LinkIcon className="w-2.5 h-2.5" /> Đã gán
-              </span>
-            )}
           </div>
           {/* Hover actions */}
           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -97,11 +93,8 @@ function DraggableMaterialCard({ mat, onClick, isLoading: isPending }: { mat: In
 
       <div className="px-3 py-1.5 border-t border-black/5 flex items-center justify-between text-[10px] text-gray-500">
         <span>{new Date(mat.createdAt).toLocaleDateString('vi-VN')}</span>
-        <span className={`px-2 py-0.5 rounded-full font-bold ${
-          isAssigned ? 'bg-blue-100 text-blue-700' :
-          mat.isOfficial ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-200 text-gray-600'
-        }`}>
-          {isAssigned ? '📌 Đã phân phối' : mat.isOfficial ? '✅ Official' : 'Draft'}
+        <span className={`px-2 py-0.5 rounded-full font-bold ${badge.className}`}>
+          {badge.label}
         </span>
       </div>
     </div>
@@ -154,7 +147,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
     mutationFn: (variables: { id: number, targetLessonId?: number, targetChapterId?: number }) =>
       materialsApi.overwriteMaterialVersion(variables.id, variables),
     onSuccess: () => {
-      toast.success('Đã cập nhật phiên bản mới (V2)');
+      toast.success('Đã cập nhật phiên bản mới');
       queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] });
       setConfirmAction(null);
     },
@@ -192,20 +185,26 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
     const isChapter = targetIdStr.startsWith('chapter-');
     const parsedTargetId = parseInt(targetIdStr.replace('lesson-', '').replace('chapter-', ''));
 
-    // Bắt đúng trạng thái Versioning Overwrite: Đã assign vào chính cái đích này
-    const isAlreadyAssignedToTarget = material.assignments?.some(a => 
-      isChapter ? a.chapterId === parsedTargetId : a.lessonId === parsedTargetId
+    // Bắt đúng trạng thái Versioning Overwrite: bất kỳ bản nào trong CÙNG DÒNG VERSION
+    // (rootGenerationId) đã được gán vào đúng đích này — không chỉ riêng bản đang kéo,
+    // để tránh trường hợp kéo lại bản gốc (đã archive assignment chuyển sang bản mới) bị
+    // hiểu nhầm là "gán mới" thay vì tiếp tục version chain.
+    const rootId = material.rootGenerationId ?? material.id;
+    const lineage = materials?.filter(m => (m.rootGenerationId ?? m.id) === rootId) ?? [material];
+    const alreadyAssignedInLineage = lineage.find(m =>
+      m.assignments?.some(a => isChapter ? a.chapterId === parsedTargetId : a.lessonId === parsedTargetId)
     );
 
-    if (isAlreadyAssignedToTarget) {
+    if (alreadyAssignedInLineage) {
+      const latestInLineage = lineage.reduce((a, b) => (b.versionNo ?? 1) > (a.versionNo ?? 1) ? b : a);
       setConfirmAction({
         title: "Cập nhật Phiên bản",
-        message: "Bạn có muốn cập nhật phiên bản mới (V2) cho học liệu này? Điểm số cũ của học viên sẽ được bảo lưu.",
+        message: "Bạn có muốn cập nhật phiên bản mới cho học liệu này? Điểm số cũ của học viên sẽ được bảo lưu.",
         onConfirm: () => {
-          overwriteMaterialVersionMutation.mutate({ 
-            id: materialId, 
+          overwriteMaterialVersionMutation.mutate({
+            id: latestInLineage.id,
             targetLessonId: isChapter ? undefined : parsedTargetId,
-            targetChapterId: isChapter ? parsedTargetId : undefined 
+            targetChapterId: isChapter ? parsedTargetId : undefined
           });
         }
       });
@@ -617,9 +616,9 @@ function MaterialWorkspaceViewer({
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-lg font-bold text-gray-900">{detail?.title || material?.title || 'Học liệu AI'}</h2>
-              {material?.isOfficial && (
-                <span className="bg-emerald-100 text-emerald-800 text-xs font-extrabold px-2.5 py-0.5 rounded-full border border-emerald-200">
-                  ★ Official
+              {material && (
+                <span className={`text-xs font-extrabold px-2.5 py-0.5 rounded-full ${getMaterialDistributionBadge(material).className}`}>
+                  {getMaterialDistributionBadge(material).label}
                 </span>
               )}
               {material?.isProctored && (

@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Folder, MoreVertical, Plus, Trash2, ChevronRight, ChevronDown, FolderOpen, MoveRight } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { materialsApi, InstructorMaterial } from '@/lib/api/materials';
+import { getMaterialDistributionBadge } from '@/lib/materialStatus';
 import { toast } from 'sonner';
 import { createPortal } from 'react-dom';
 
@@ -76,7 +77,7 @@ export function MaterialFolderTree({
       queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] });
       toast.success('Đã di chuyển học liệu');
     },
-    onError: () => toast.error('Không thể di chuyển học liệu'),
+    onError: (err: Error) => toast.error(err.message || 'Không thể di chuyển học liệu'),
   });
 
   const deleteMaterialMutation = useMutation({
@@ -225,7 +226,7 @@ export function MaterialFolderTree({
 
   const renderMaterialRow = (mat: MaterialItem) => {
     const typeIcon = mat.materialType === 'FLASHCARD' ? '🃏' : mat.materialType === 'QUIZ' ? '📝' : '🗺️';
-    const isAssigned = mat.assignments && mat.assignments.length > 0;
+    const badge = getMaterialDistributionBadge(mat);
     return (
       <div
         key={mat.id}
@@ -240,11 +241,8 @@ export function MaterialFolderTree({
           <p className="text-sm font-semibold text-gray-800 truncate">{mat.title || 'Học liệu không tên'}</p>
           <p className="text-[10px] text-gray-400">{new Date(mat.createdAt).toLocaleDateString('vi-VN')}</p>
         </div>
-        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${
-          isAssigned ? 'bg-blue-100 text-blue-700' :
-          mat.isOfficial ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-200 text-gray-600'
-        }`}>
-          {isAssigned ? '📌 Đã gán' : mat.isOfficial ? '✅ Official' : 'Draft'}
+        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${badge.className}`}>
+          {badge.label}
         </span>
         {/* Row actions */}
         <div className="flex items-center gap-1 opacity-0 group-hover/row:opacity-100 transition-opacity">
