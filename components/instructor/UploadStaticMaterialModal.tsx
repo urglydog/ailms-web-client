@@ -15,11 +15,7 @@ export function UploadStaticMaterialModal({ courseId, onClose }: Props) {
   const uploadMutation = useMutation({
     mutationFn: async () => {
       if (files.length === 0) throw new Error('Vui lòng chọn ít nhất 1 file');
-      
-      const formData = new FormData();
-      files.forEach(f => formData.append('files', f));
-      
-      return courseResourcesApi.uploadResource(courseId, formData);
+      return courseResourcesApi.uploadResource(courseId, files);
     },
     onSuccess: (data) => {
       if (data.failures && data.failures.length > 0) {

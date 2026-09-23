@@ -25,6 +25,24 @@ import {
 import '@xyflow/react/dist/style.css';
 import dagre from 'dagre';
 import { toPng, toJpeg, toSvg } from 'html-to-image';
+import {
+  GitBranch,
+  ArrowLeftRight,
+  LayoutGrid,
+  ArrowRight,
+  ArrowLeft,
+  ArrowDown,
+  ArrowUp,
+  Download,
+  Undo2,
+  Redo2,
+  Save,
+  MousePointer2,
+  Move,
+  Pencil,
+  ChevronRight,
+  ChevronLeft,
+} from 'lucide-react';
 
 interface MindmapEditorProps {
   initialMermaidCode: string;
@@ -70,10 +88,10 @@ const THEME_PRESETS: Record<string, { background: string, palette: string[], roo
 };
 
 const LAYOUTS = [
-  { id: 'LR', name: 'Logic Chart (L-R)', icon: '➡️' },
-  { id: 'RL', name: 'Logic Chart (R-L)', icon: '⬅️' },
-  { id: 'TB', name: 'Org Chart (T-B)', icon: '⬇️' },
-  { id: 'BT', name: 'Org Chart (B-T)', icon: '⬆️' },
+  { id: 'LR', name: 'Logic Chart (L-R)', Icon: ArrowRight },
+  { id: 'RL', name: 'Logic Chart (R-L)', Icon: ArrowLeft },
+  { id: 'TB', name: 'Org Chart (T-B)', Icon: ArrowDown },
+  { id: 'BT', name: 'Org Chart (B-T)', Icon: ArrowUp },
 ];
 
 function getLayoutedElements(nodes: Node[], edges: Edge[], direction = 'LR') {
@@ -733,23 +751,23 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 bg-white shadow-xl rounded-xl border border-gray-200 px-2 py-1.5 flex gap-1 items-center animate-in slide-in-from-top-4">
             {/* FIX 4: Disabled states */}
             <button onClick={() => triggerAction('TAB')} disabled={!hasSelectedNode} className={`flex flex-col items-center justify-center p-2 rounded-lg min-w-[64px] transition-colors ${hasSelectedNode ? 'hover:bg-gray-100 text-gray-600' : 'opacity-40 cursor-not-allowed text-gray-400'}`} title="Thêm nhánh con (Tab)">
-                <span className="text-lg">🌿</span><span className="text-[10px] font-bold mt-1">Subtopic</span>
+                <GitBranch className="w-[18px] h-[18px]" strokeWidth={1.75} /><span className="text-[10px] font-bold mt-1">Subtopic</span>
             </button>
             <button onClick={() => triggerAction('ENTER')} disabled={!hasSelectedNode || nodes.find(n => n.selected)?.id === 'root'} className={`flex flex-col items-center justify-center p-2 rounded-lg min-w-[64px] transition-colors ${hasSelectedNode && nodes.find(n => n.selected)?.id !== 'root' ? 'hover:bg-gray-100 text-gray-600' : 'opacity-40 cursor-not-allowed text-gray-400'}`} title="Thêm nhánh ngang hàng (Enter)">
-                <span className="text-lg">↔️</span><span className="text-[10px] font-bold mt-1">Topic</span>
+                <ArrowLeftRight className="w-[18px] h-[18px]" strokeWidth={1.75} /><span className="text-[10px] font-bold mt-1">Topic</span>
             </button>
-            
+
             <div className="w-[1px] h-8 bg-gray-200 mx-1"></div>
-            
+
             <div className="relative" ref={layoutRef}>
                 <button onClick={() => setShowLayouts(!showLayouts)} className="flex flex-col items-center justify-center p-2 hover:bg-gray-100 rounded-lg min-w-[64px] text-gray-600 transition-colors">
-                    <span className="text-lg">✨</span><span className="text-[10px] font-bold mt-1">Layout</span>
+                    <LayoutGrid className="w-[18px] h-[18px]" strokeWidth={1.75} /><span className="text-[10px] font-bold mt-1">Layout</span>
                 </button>
                 {showLayouts && (
                     <div className="absolute top-full left-0 mt-2 w-64 bg-white border border-gray-200 rounded-xl shadow-2xl p-3 grid grid-cols-2 gap-2 z-50">
                         {LAYOUTS.map(l => (
                             <button key={l.id} onClick={() => { setMapStyle(l.id); setShowLayouts(false); applyLayout(nodes, edges, l.id); }} className={`flex flex-col items-center justify-center p-3 rounded-lg border transition-all ${mapStyle === l.id ? 'border-cyan-500 bg-cyan-50' : 'border-gray-100 hover:border-gray-300 hover:bg-gray-50'}`}>
-                                <span className="text-2xl mb-1">{l.icon}</span>
+                                <l.Icon className="w-5 h-5 mb-1 text-gray-600" strokeWidth={1.75} />
                                 <span className="text-[10px] font-bold text-center text-gray-600 leading-tight">{l.name}</span>
                             </button>
                         ))}
@@ -759,7 +777,7 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
             <div className="w-[1px] h-8 bg-gray-200 mx-1"></div>
             <div className="relative" ref={exportRef}>
                 <button onClick={() => setShowExport(!showExport)} className="flex flex-col items-center justify-center p-2 hover:bg-gray-100 rounded-lg min-w-[64px] text-gray-600 transition-colors">
-                    <span className="text-lg">📤</span><span className="text-[10px] font-bold mt-1">Export</span>
+                    <Download className="w-[18px] h-[18px]" strokeWidth={1.75} /><span className="text-[10px] font-bold mt-1">Export</span>
                 </button>
                 {showExport && (
                     <div className="absolute top-full left-0 mt-2 w-48 bg-white border border-gray-200 rounded-xl shadow-2xl py-2 flex flex-col z-50">
@@ -773,12 +791,12 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
             <div className="w-[1px] h-8 bg-gray-200 mx-1"></div>
             
             <button onClick={handleUndo} disabled={historyIndex <= 0} className={`flex flex-col items-center justify-center p-2 rounded-lg min-w-[48px] transition-colors ${historyIndex > 0 ? 'hover:bg-gray-100 text-gray-600' : 'opacity-40 cursor-not-allowed text-gray-400'}`} title="Hoàn tác (Ctrl+Z)">
-                <span className="text-lg">↩️</span><span className="text-[10px] font-bold mt-1">Undo</span>
+                <Undo2 className="w-[18px] h-[18px]" strokeWidth={1.75} /><span className="text-[10px] font-bold mt-1">Undo</span>
             </button>
             <button onClick={handleRedo} disabled={historyIndex >= history.length - 1} className={`flex flex-col items-center justify-center p-2 rounded-lg min-w-[48px] transition-colors ${historyIndex < history.length - 1 ? 'hover:bg-gray-100 text-gray-600' : 'opacity-40 cursor-not-allowed text-gray-400'}`} title="Làm lại (Ctrl+Y)">
-                <span className="text-lg">↪️</span><span className="text-[10px] font-bold mt-1">Redo</span>
+                <Redo2 className="w-[18px] h-[18px]" strokeWidth={1.75} /><span className="text-[10px] font-bold mt-1">Redo</span>
             </button>
-            
+
             {onSave && (
                 <>
                     <div className="w-[1px] h-8 bg-gray-200 mx-1"></div>
@@ -786,7 +804,7 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
                         const newCode = parseFlowToMermaid(nodes, edges, mapStyle, colorTheme);
                         onSave(newCode);
                     }} className="flex flex-col items-center justify-center p-2 hover:bg-cyan-50 rounded-lg min-w-[80px] text-cyan-600 transition-colors border border-transparent hover:border-cyan-200">
-                        <span className="text-lg">💾</span><span className="text-[10px] font-bold mt-1">Lưu & Áp dụng</span>
+                        <Save className="w-[18px] h-[18px]" strokeWidth={1.75} /><span className="text-[10px] font-bold mt-1">Lưu & Áp dụng</span>
                     </button>
                 </>
             )}
@@ -803,7 +821,7 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
                 className={`absolute top-1/2 -translate-y-1/2 z-30 bg-white border border-gray-200 hover:bg-gray-50 text-gray-500 shadow-lg flex items-center justify-center transition-all ${isSidebarOpen ? 'right-0 rounded-l-lg border-r-0 w-6 h-12' : 'right-0 rounded-l-lg w-8 h-16'}`}
                 title="Toggle Sidebar"
             >
-                {isSidebarOpen ? '▶' : '◀'}
+                {isSidebarOpen ? <ChevronRight className="w-4 h-4" strokeWidth={2} /> : <ChevronLeft className="w-4 h-4" strokeWidth={2} />}
             </button>
         )}
 
@@ -826,8 +844,8 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
         >
           {readOnly && (
               <Panel position="bottom-center" className="bg-white/90 backdrop-blur border border-gray-200 px-4 py-2 rounded-full shadow-lg mb-4 flex gap-4 text-xs font-bold text-gray-600">
-                  <span className="flex items-center gap-1">🖱️ Shift+Scroll to pan</span>
-                  <span className="flex items-center gap-1">✋ Drag/Pinch to zoom</span>
+                  <span className="flex items-center gap-1"><MousePointer2 className="w-3.5 h-3.5" strokeWidth={1.75} /> Shift+Scroll to pan</span>
+                  <span className="flex items-center gap-1"><Move className="w-3.5 h-3.5" strokeWidth={1.75} /> Drag/Pinch to zoom</span>
               </Panel>
           )}
           <Controls className="bg-white border-gray-200 shadow-md" />
@@ -839,7 +857,7 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
         {editingNode && (
           <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm">
             <div className="bg-white p-6 rounded-2xl shadow-2xl border border-gray-100 w-96 max-w-[90%] animate-in zoom-in-95">
-              <h3 className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">✏️ Nhập nội dung</h3>
+              <h3 className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2"><Pencil className="w-4 h-4" strokeWidth={1.75} /> Nhập nội dung</h3>
               <textarea
                 autoFocus
                 value={editingNode.label}

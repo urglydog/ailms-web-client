@@ -23,7 +23,7 @@ import { MaterialTabs } from '@/components/materials/ui/MaterialTabs';
 import { CautionProgressBar } from '@/components/materials/ui/CautionProgressBar';
 
 import { DndContext, useDraggable, useDroppable, DragOverlay, DragStartEvent, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
-import { GripVertical, Trash2, FileText, Plus, Layers, LayoutGrid, List, Search, X, ChevronDown, FileQuestion, Workflow, File, Folder, Link as LinkIcon, History, FileEdit, Sparkles, Lock, ShieldAlert, Check, Copy, Save, GitBranch, Network, AlertTriangle, PencilLine, Upload } from 'lucide-react';
+import { GripVertical, Trash2, FileText, Plus, Layers, LayoutGrid, List, Search, X, ChevronDown, FileQuestion, Workflow, File, Folder, Link as LinkIcon, History, FileEdit, Sparkles, Lock, ShieldAlert, Check, Save, GitBranch, Network, AlertTriangle, PencilLine, Upload } from 'lucide-react';
 
 
 interface CourseMaterialsManagerProps {
@@ -819,16 +819,20 @@ function MaterialWorkspaceViewer({
                       <button
                         onClick={() => handleExportQuizPdf(material!.materialId!, 'blank')}
                         disabled={isExportingPdf !== null}
-                        className="px-3 py-1.5 text-xs font-bold rounded-card border bg-surface-raised text-ink-muted border-line hover:bg-surface-hover transition-colors disabled:opacity-50"
+                        title="Xuất PDF đề trắng, đáp án ở trang cuối"
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-card border bg-surface-raised text-ink-muted border-line hover:bg-surface-hover transition-colors disabled:opacity-50"
                       >
-                        {isExportingPdf === 'blank' ? 'Đang xuất...' : 'Xuất Đề Trắng (PDF)'}
+                        <FileText className="w-3.5 h-3.5" strokeWidth={1.75} />
+                        {isExportingPdf === 'blank' ? 'Đang xuất...' : 'Đề trắng'}
                       </button>
                       <button
                         onClick={() => handleExportQuizPdf(material!.materialId!, 'cheatsheet')}
                         disabled={isExportingPdf !== null}
-                        className="px-3 py-1.5 text-xs font-bold rounded-card border bg-surface-raised text-ink-muted border-line hover:bg-surface-hover transition-colors disabled:opacity-50"
+                        title="Xuất PDF cheatsheet, đáp án in kèm"
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-card border bg-surface-raised text-ink-muted border-line hover:bg-surface-hover transition-colors disabled:opacity-50"
                       >
-                        {isExportingPdf === 'cheatsheet' ? 'Đang xuất...' : 'Xuất Cheatsheet (PDF)'}
+                        <FileText className="w-3.5 h-3.5" strokeWidth={1.75} />
+                        {isExportingPdf === 'cheatsheet' ? 'Đang xuất...' : 'Cheatsheet'}
                       </button>
                     </div>
                   )}
@@ -895,41 +899,21 @@ function MaterialWorkspaceViewer({
                 </div>
                 <MaterialTabs
                   active={activeTab}
-                  onChange={(key) => setActiveTab(key as 'VIEW' | 'DRAG_DROP' | 'RAW_CODE' | 'CODE_EDITOR')}
+                  onChange={(key) => setActiveTab(key as 'VIEW' | 'DRAG_DROP' | 'CODE_EDITOR')}
                   tabs={[
                     { key: 'VIEW', label: 'Xem Tĩnh' },
                     ...(!readOnly ? [{ key: 'DRAG_DROP', label: 'Chỉnh Sửa', icon: <FileEdit className="w-3.5 h-3.5" /> }] : []),
                     ...(!readOnly ? [{ key: 'CODE_EDITOR', label: 'Soạn Code', icon: <PencilLine className="w-3.5 h-3.5" /> }] : []),
-                    { key: 'RAW_CODE', label: 'Mã Mermaid' },
                   ]}
                 />
               </div>
 
-              {activeTab === 'RAW_CODE' ? (
-                <div className="w-full relative group">
-                  <div className="absolute top-4 right-4 z-10 flex items-center gap-2 text-slate-400 bg-slate-800/80 backdrop-blur px-3 py-1.5 rounded-lg border border-slate-700 hover:bg-slate-700 hover:text-white transition-colors cursor-pointer">
-                    <button
-                      onClick={() => {
-                        navigator.clipboard.writeText(detail.mermaidCode || '');
-                        toast.success('Đã copy!');
-                      }}
-                      className="flex items-center gap-2 text-xs font-mono w-full h-full outline-none"
-                      title="Copy to clipboard"
-                    >
-                      <Copy className="w-3.5 h-3.5" />
-                      {detail.mermaidCode ? detail.mermaidCode.split('\n').length : 0} lines
-                    </button>
-                  </div>
-                  <pre className="p-6 pt-16 rounded-card bg-slate-900 text-cyan-300 font-mono text-xs overflow-x-auto min-h-[500px] border border-slate-800 leading-relaxed shadow-inner">
-                    {detail.mermaidCode}
-                  </pre>
-                </div>
-              ) : activeTab === 'VIEW' ? (
+              {activeTab === 'VIEW' ? (
                 <div className="w-full bg-surface-raised rounded-card shadow-sm border border-line">
                   <MermaidViewer chart={detail.mermaidCode} />
                 </div>
               ) : activeTab === 'CODE_EDITOR' ? (
-                <div className="w-full min-h-[700px]">
+                <div className="w-full h-[700px] overflow-hidden">
                   <MermaidCodeEditor
                     initialCode={detail.mermaidCode || ''}
                     isSaving={updateMermaidMutation.isPending}

@@ -14,6 +14,7 @@ import { QuizPersonalEditor } from '@/components/materials/QuizPersonalEditor';
 import { flashcardsApi } from '@/lib/api/flashcards';
 import { ApiError } from '@/lib/api/client';
 import { getAccessToken } from '@/lib/auth/token';
+import { Download, Upload, FileText } from 'lucide-react';
 
 export default function MaterialDetailPage() {
   const router = useRouter();
@@ -187,16 +188,20 @@ export default function MaterialDetailPage() {
                   <button
                     onClick={() => handleExportQuizPdf(material.id, 'blank')}
                     disabled={isExportingQuizPdf !== null}
-                    className="text-sm font-semibold text-accent hover:underline disabled:opacity-50"
+                    title="Xuất PDF đề trắng, đáp án ở trang cuối"
+                    className="flex items-center gap-1.5 text-sm font-semibold text-accent hover:underline disabled:opacity-50"
                   >
-                    {isExportingQuizPdf === 'blank' ? 'Đang xuất...' : '📄 Xuất đề trắng (PDF)'}
+                    <FileText className="w-4 h-4" strokeWidth={1.75} />
+                    {isExportingQuizPdf === 'blank' ? 'Đang xuất...' : 'Đề trắng'}
                   </button>
                   <button
                     onClick={() => handleExportQuizPdf(material.id, 'cheatsheet')}
                     disabled={isExportingQuizPdf !== null}
-                    className="text-sm font-semibold text-accent hover:underline disabled:opacity-50"
+                    title="Xuất PDF cheatsheet, đáp án in kèm"
+                    className="flex items-center gap-1.5 text-sm font-semibold text-accent hover:underline disabled:opacity-50"
                   >
-                    {isExportingQuizPdf === 'cheatsheet' ? 'Đang xuất...' : '📄 Xuất cheatsheet (PDF)'}
+                    <FileText className="w-4 h-4" strokeWidth={1.75} />
+                    {isExportingQuizPdf === 'cheatsheet' ? 'Đang xuất...' : 'Cheatsheet'}
                   </button>
                 </div>
               </div>
@@ -249,9 +254,10 @@ export default function MaterialDetailPage() {
                         a.click();
                         URL.revokeObjectURL(url);
                       }}
-                      className="text-sm font-semibold text-accent hover:underline flex items-center gap-1"
+                      title="Xuất file .txt tương thích Anki/Quizlet"
+                      className="text-sm font-semibold text-accent hover:underline flex items-center gap-1.5"
                     >
-                      📥 Xuất ra file Anki/Quizlet
+                      <Download className="w-4 h-4" strokeWidth={1.75} /> Xuất
                     </button>
                     <input
                       id="anki-txt-import"
@@ -266,9 +272,10 @@ export default function MaterialDetailPage() {
                     />
                     <label
                       htmlFor="anki-txt-import"
-                      className="text-sm font-semibold text-accent hover:underline flex items-center gap-1 cursor-pointer"
+                      title="Nhập file .txt từ Anki/Quizlet"
+                      className="text-sm font-semibold text-accent hover:underline flex items-center gap-1.5 cursor-pointer"
                     >
-                      {isImportingTxt ? 'Đang nhập...' : '📤 Nhập từ file Anki/Quizlet'}
+                      <Upload className="w-4 h-4" strokeWidth={1.75} /> {isImportingTxt ? 'Đang nhập...' : 'Nhập'}
                     </label>
                   </div>
                 </div>
