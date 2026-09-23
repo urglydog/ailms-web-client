@@ -59,7 +59,7 @@ export default function InstructorGradebookPage() {
             <div className="flex items-center gap-2 text-sm text-ink-muted mb-1">
               <button onClick={() => router.push('/instructor')} className="hover:underline">Giảng viên</button>
               <span>/</span>
-              <button onClick={() => router.push('/instructor/materials')} className="hover:underline text-accent">Kho Học Liệu & Đề Thi</button>
+              <button onClick={() => router.push(`/instructor/courses/${courseId}/edit/materials`)} className="hover:underline text-accent">Kho Học Liệu & Đề Thi</button>
               <span>/</span>
               <span>Bảng điểm</span>
             </div>
@@ -67,8 +67,8 @@ export default function InstructorGradebookPage() {
               Bảng Điểm Lớp Học: <span className="text-accent">{gradebook.courseTitle}</span>
             </h1>
           </div>
-          <button 
-            onClick={() => router.push('/instructor/materials')}
+          <button
+            onClick={() => router.push(`/instructor/courses/${courseId}/edit/materials`)}
             className="bg-ink text-white px-4 py-2 rounded-xl text-sm font-bold shadow hover:bg-gray-800 transition-all"
           >
             Kho Học Liệu & Đề Thi

@@ -22,7 +22,6 @@ interface LessonEditorRowProps {
   onTogglePreview: (isPreview: boolean) => void;
   onDelete: () => void;
   onManageVideo: () => void;
-  onAttachMaterial: () => void;
   onDragStart: () => void;
   onDragEnd: () => void;
   isDropTarget: boolean;
@@ -55,8 +54,11 @@ function deriveVideoDisplayName(lesson: LessonEditItem): string {
  * 2. Xóa bài giảng phải xác nhận qua {@link ConfirmModal} (giống Udemy "Please confirm").
  * 3. Nút mũi tên (▾) bỏ viền/màu; bấm vào MỞ RỘNG (không phải popover nổi) hiện: video đã thêm
  *    (thumbnail/tên/trạng thái + nút "Xem trước" khi đã sẵn sàng), "+ Sự miêu tả", "+ Tài
- *    nguyên", "+ Đính kèm" (dời từ nút riêng ngoài header vào đây, bỏ màu/icon). Mũi tên tự đổi
- *    chiều theo trạng thái mở rộng.
+ *    nguyên", "+ Bài tập". Mũi tên tự đổi chiều theo trạng thái mở rộng.
+ *
+ * (23/09/2026) — bỏ nút "+ Đính kèm": trùng chức năng với khung "Phân Phối" (kéo-thả) trong
+ * Materials Workspace (tab "Học liệu & Quiz thi cử" ở Edit khoá học) — cùng gọi 1 API gán học
+ * liệu vào bài học, chỉ là bản giới hạn hơn.
  */
 export function LessonEditorRow({
   lesson,
@@ -67,7 +69,6 @@ export function LessonEditorRow({
   onTogglePreview,
   onDelete,
   onManageVideo,
-  onAttachMaterial,
   onDragStart,
   onDragEnd,
   isDropTarget,
@@ -377,17 +378,6 @@ export function LessonEditorRow({
             + Bài tập
           </button>
           {showAssignmentPanel && <LessonAssignmentPanel lessonId={lesson.id} />}
-
-          {/* (19/09/2026) — dời từ nút riêng "📎 Đính kèm" (màu tím, có icon) ở ngoài header vào
-              đây, bỏ màu/icon cho đồng nhất với 2 nút phía trên. */}
-          <button
-            type="button"
-            draggable={false}
-            onClick={onAttachMaterial}
-            className="self-start rounded-full border border-purple-200 px-3 py-1.5 text-[12px] font-bold text-purple-700 hover:bg-purple-50 transition-colors"
-          >
-            + Đính kèm
-          </button>
         </div>
       )}
 

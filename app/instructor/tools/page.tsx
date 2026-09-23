@@ -1,19 +1,18 @@
 'use client';
 
 import Link from 'next/link';
-import { BookOpenIcon, TagIcon, VideoIcon } from '@/components/instructor/SidebarIcons';
+import { TagIcon, VideoIcon } from '@/components/instructor/SidebarIcons';
 
 /** "Công cụ" (19/09/2026, mở rộng — giao diện tham khảo Udemy) — gộp các mục trước đây nằm rời
  * ở sidebar to (Kho Học Liệu & Đề Thi/Live/Mã giảm giá) thành 1 trang trung tâm dạng thẻ, đúng
  * cách Udemy tổ chức "Tools" (Video thử nghiệm/Thông tin thị trường/Tạo mã giảm giá hàng loạt/
- * Gộp khóa học). Icon SVG đơn sắc đơn giản — không dùng icon nhiều màu/hiệu ứng 3D. */
+ * Gộp khóa học). Icon SVG đơn sắc đơn giản — không dùng icon nhiều màu/hiệu ứng 3D.
+ *
+ * (23/09/2026) — bỏ thẻ "Kho Học Liệu & Đề Thi" khỏi đây: Materials Workspace giờ chỉ còn
+ * đúng 1 nơi (route lồng trong Edit khoá học, tab "Học liệu & Quiz thi cử") — trước đây route
+ * `/instructor/materials` đứng riêng ở đây tạo ra 2 chỗ cùng quản lý học liệu, gây rối luồng
+ * điều hướng (đóng khung xem chi tiết ở route lồng còn bị đá nhầm sang route này). */
 const TOOLS = [
-  {
-    href: '/instructor/materials',
-    icon: BookOpenIcon,
-    title: 'Kho Học Liệu & Đề Thi',
-    description: 'Quản lý Mindmap, Flashcard, Quiz do AI tạo hoặc tự soạn cho các khóa học của bạn.',
-  },
   {
     href: '/instructor/live',
     icon: VideoIcon,

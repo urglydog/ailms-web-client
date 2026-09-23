@@ -8,7 +8,7 @@ import { useMyCourseDetail } from "@/hooks/useCourses";
 import { toast } from 'sonner';
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { MindmapEditor } from '@/components/materials/MindmapEditor';
 import { MermaidCodeEditor } from '@/components/materials/MermaidCodeEditor';
 import { MermaidViewer } from '@/components/materials/MermaidViewer';
@@ -167,6 +167,7 @@ function DroppableNode({ id, title, type, children }: { id: string, title: strin
 
 export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const queryClient = useQueryClient();
 
   const searchParams = useSearchParams();
@@ -176,7 +177,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
     if (id) {
       router.push(`?inspect=${id}${readOnly ? '&readonly=1' : ''}`);
     } else {
-      router.push(`/instructor/materials`);
+      router.push(pathname);
     }
   };
 

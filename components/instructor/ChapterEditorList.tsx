@@ -4,7 +4,6 @@ import { useState, type DragEvent } from 'react';
 import { PencilIcon, TrashIcon, DragHandleIcon } from '@/components/instructor/CurriculumIcons';
 import { LessonEditorRow } from '@/components/instructor/LessonEditorRow';
 import { LessonMediaModal } from '@/components/instructor/LessonMediaModal';
-import { LessonMaterialAttachModal } from '@/components/instructor/LessonMaterialAttachModal';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import {
   useCreateChapter,
@@ -47,7 +46,6 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
   const [draggedLesson, setDraggedLesson] = useState<{ chapterId: number; lessonId: number } | null>(null);
   const [dropTargetLessonId, setDropTargetLessonId] = useState<number | null>(null);
   const [manageVideoLessonId, setManageVideoLessonId] = useState<number | null>(null);
-  const [attachMaterialLessonId, setAttachMaterialLessonId] = useState<number | null>(null);
   const [confirmDeleteChapterId, setConfirmDeleteChapterId] = useState<number | null>(null);
 
   const createChapter = useCreateChapter(courseId);
@@ -63,11 +61,6 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
   const activeLesson =
     manageVideoLessonId !== null
       ? (sortedChapters.flatMap((c) => c.lessons).find((l) => l.id === manageVideoLessonId) ?? null)
-      : null;
-
-  const activeAttachLesson =
-    attachMaterialLessonId !== null
-      ? (sortedChapters.flatMap((c) => c.lessons).find((l) => l.id === attachMaterialLessonId) ?? null)
       : null;
 
   const handleChapterDrop = (targetChapterId: number) => {
@@ -299,7 +292,6 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
                       deleteLesson.mutate(lesson.id);
                     }}
                     onManageVideo={() => setManageVideoLessonId(lesson.id)}
-                    onAttachMaterial={() => setAttachMaterialLessonId(lesson.id)}
                   />
                 </div>
               ))}
@@ -435,14 +427,6 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
           courseId={courseId}
           lesson={activeLesson}
           onClose={() => setManageVideoLessonId(null)}
-        />
-      )}
-
-      {activeAttachLesson && (
-        <LessonMaterialAttachModal
-          courseId={courseId}
-          lesson={activeAttachLesson}
-          onClose={() => setAttachMaterialLessonId(null)}
         />
       )}
 
