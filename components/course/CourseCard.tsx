@@ -3,13 +3,16 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import type { MouseEvent } from 'react';
+import { useState, type MouseEvent } from 'react';
+import { toast } from 'sonner';
+import { Award } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import { StarRating } from '@/components/ui/StarRating';
 import type { CourseSummary } from '@/types/domain';
 import { useMyEnrollments } from '@/hooks/useEnrollments';
 import { useAddToCart, useCart } from '@/hooks/useCart';
 import { useAddToWishlist, useRemoveFromWishlist, useWishlist } from '@/hooks/useWishlist';
+import { getAccessToken } from '@/lib/auth/token';
 
 /**
  * Thẻ khoá học — dịch từ `CourseCard.dc.html` của Claude Design.
@@ -78,6 +81,32 @@ export function CourseCard({ course }: { course: CourseSummary }) {
   const targetHref = isOwned && enrollment.firstLessonId
     ? `/learn/${enrollment.firstLessonId}`
     : `/courses/${course.slug}`;
+
+  // Task A1 (UpComming_Plan.md) — chứng chỉ PDF, chỉ tải được khi đã hoàn thành 100%.
+  const [isDownloadingCert, setIsDownloadingCert] = useState(false);
+  const handleDownloadCertificate = async (e: MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (isDownloadingCert) return;
+    setIsDownloadingCert(true);
+    try {
+      const res = await fetch(`/api/v1/enrollments/${course.id}/certificate`, {
+        headers: { Authorization: `Bearer ${getAccessToken() ?? ''}` },
+      });
+      if (!res.ok) throw new Error('Không tải được chứng chỉ');
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `chung-chi-${course.slug}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      toast.error('Có lỗi khi tải chứng chỉ, vui lòng thử lại.');
+    } finally {
+      setIsDownloadingCert(false);
+    }
+  };
 
   return (
     <Link
@@ -175,9 +204,19 @@ export function CourseCard({ course }: { course: CourseSummary }) {
 
         <div className="mt-auto flex items-center justify-between gap-2 border-t border-line-soft pt-2">
           {isOwned ? (
-            <span className="font-display text-[15px] font-bold text-accent">
-              {enrollment.progressPct >= 100 ? 'Đã hoàn thành' : 'Đã sở hữu'}
-            </span>
+            enrollment.progressPct >= 100 ? (
+              <button
+                type="button"
+                onClick={handleDownloadCertificate}
+                disabled={isDownloadingCert}
+                className="flex items-center gap-1.5 font-display text-[13px] font-bold text-accent hover:text-accent-dark transition-colors disabled:opacity-50"
+              >
+                <Award className="w-3.5 h-3.5" strokeWidth={1.75} />
+                {isDownloadingCert ? 'Đang tải...' : 'Tải chứng chỉ'}
+              </button>
+            ) : (
+              <span className="font-display text-[15px] font-bold text-accent">Đã sở hữu</span>
+            )
           ) : course.isFree ? (
             <span className="font-display text-[15px] font-bold text-success">Miễn phí</span>
           ) : course.discountPercent ? (
