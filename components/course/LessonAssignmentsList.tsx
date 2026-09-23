@@ -45,7 +45,7 @@ function AssignmentCard({ lessonId, item }: { lessonId: number; item: StudentAss
         <div>
           <p className="text-[14px] font-bold text-ink">{assignment.title}</p>
           {assignment.dueDate && (
-            <p className="text-[12px] text-ink-faint">Hạn nộp: {new Date(assignment.dueDate).toLocaleDateString('vi-VN')}</p>
+            <p className="text-[12px] text-ink-muted">Hạn nộp: {new Date(assignment.dueDate).toLocaleDateString('vi-VN')}</p>
           )}
         </div>
         {assignment.maxScore != null && (
@@ -78,7 +78,7 @@ function AssignmentCard({ lessonId, item }: { lessonId: number; item: StudentAss
               {mySubmission.feedback && <p className="mt-0.5 text-[12.5px] text-ink-muted">{mySubmission.feedback}</p>}
             </div>
           ) : (
-            <p className="mt-2 text-[12px] text-ink-faint">Đang chờ giảng viên chấm điểm.</p>
+            <p className="mt-2 text-[12px] text-ink-muted">Đang chờ giảng viên chấm điểm.</p>
           )}
         </div>
       ) : (

@@ -18,13 +18,12 @@ import { getMaterialDistributionBadge, getMaterialProcessingBadge } from '@/lib/
 import { getAccessToken } from '@/lib/auth/token';
 import { resolveBaseUrl } from '@/lib/api/client';
 import { CourseActivityPanel } from './CourseActivityPanel';
-import { StaticResourcesPanel } from './StaticResourcesPanel';
 import { MaterialBadge } from '@/components/materials/ui/MaterialBadge';
 import { MaterialTabs } from '@/components/materials/ui/MaterialTabs';
 import { CautionProgressBar } from '@/components/materials/ui/CautionProgressBar';
 
 import { DndContext, useDraggable, useDroppable, DragOverlay, DragStartEvent, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
-import { GripVertical, Trash2, FileText, Plus, Layers, LayoutGrid, List, Search, X, ChevronDown, FileQuestion, Workflow, File, Folder, Link as LinkIcon, History, FileEdit, Sparkles, Lock, ShieldAlert, Check, Save, GitBranch, Network, AlertTriangle, PencilLine, Upload } from 'lucide-react';
+import { GripVertical, Trash2, FileText, Plus, Layers, LayoutGrid, List, Search, X, FileQuestion, Workflow, File, Folder, Link as LinkIcon, History, FileEdit, Sparkles, Lock, ShieldAlert, Check, Save, GitBranch, Network, AlertTriangle, PencilLine, Upload } from 'lucide-react';
 
 
 interface CourseMaterialsManagerProps {
@@ -191,9 +190,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
   const [activeDragId, setActiveDragId] = useState<number | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchQuery, setSearchQuery] = useState('');
-  const [showCreateDropdown, setShowCreateDropdown] = useState(false);
   const [showActivityPanel, setShowActivityPanel] = useState(false);
-  const [showStaticResourcesPanel, setShowStaticResourcesPanel] = useState(false);
 
   const overwriteMaterialVersionMutation = useMutation({
     mutationFn: (variables: { id: number, targetLessonId?: number, targetChapterId?: number }) =>
@@ -496,50 +493,22 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
               >
                 <History className="w-3.5 h-3.5" /> Hoạt động
               </button>
+              {/* Tạo Mới — trước đây là dropdown 6 dòng (3 loại × Thủ công/AI), nhưng cả 2 màn
+                  đích (`GenerateManualOfficialView`/`GenerateAiOfficialView`) đều tự hiện lại đủ
+                  3 thẻ chọn loại học liệu ngay bước đầu — phần tiền chọn loại ở dropdown dư thừa.
+                  Rút gọn còn đúng 2 nút theo sự khác biệt thật sự duy nhất: Thủ công hay AI. */}
               <button
-                onClick={() => setShowStaticResourcesPanel(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-card transition-colors border bg-surface-raised text-ink-muted border-line hover:bg-surface-hover"
-                title="Tài nguyên tĩnh toàn khoá học (PDF, slide dùng chung)"
+                onClick={() => setManualMaterialType('QUIZ')}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-surface-raised hover:bg-surface-hover text-ink text-xs font-bold rounded-card border border-line transition-colors"
               >
-                <Folder className="w-3.5 h-3.5" /> Tài Nguyên Tĩnh
+                <PencilLine className="w-3.5 h-3.5" /> Thủ Công
               </button>
-              {/* Dropdown: Tạo Mới */}
-              <div className="relative">
-                <button
-                  id="create-material-btn"
-                  onClick={() => setShowCreateDropdown(v => !v)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-accent hover:bg-accent-dark text-white text-xs font-bold rounded-card transition-colors shadow-card"
-                >
-                  <Plus className="w-3.5 h-3.5" /> Tạo Mới <ChevronDown className="w-3 h-3" />
-                </button>
-                {showCreateDropdown && (
-                  <div
-                    className="absolute right-0 top-full mt-1 bg-surface-raised border border-line rounded-card shadow-card-hover z-50 min-w-[180px] overflow-hidden"
-                    onMouseLeave={() => setShowCreateDropdown(false)}
-                  >
-                    <div className="px-3 py-1.5 text-[10px] font-bold uppercase text-ink-faint tracking-wider border-b border-line flex items-center gap-1.5"><FileEdit className="w-3 h-3" /> Thủ công</div>
-                    {(['FLASHCARD', 'QUIZ', 'MINDMAP'] as const).map(t => {
-                      const TIcon = t === 'FLASHCARD' ? Layers : t === 'QUIZ' ? FileQuestion : Workflow;
-                      return (
-                        <button key={t} onClick={() => { setManualMaterialType(t); setShowCreateDropdown(false); }}
-                          className="w-full text-left px-4 py-2 text-sm text-ink hover:bg-accent/5 flex items-center gap-2 transition-colors">
-                          <TIcon className="w-3.5 h-3.5 text-ink-muted" strokeWidth={1.75} /> {t}
-                        </button>
-                      );
-                    })}
-                    <div className="px-3 py-1.5 text-[10px] font-bold uppercase text-ink-faint tracking-wider border-t border-b border-line flex items-center gap-1.5"><Sparkles className="w-3 h-3" /> AI Auto</div>
-                    {(['FLASHCARD', 'QUIZ', 'MINDMAP'] as const).map(t => {
-                      const TIcon = t === 'FLASHCARD' ? Layers : t === 'QUIZ' ? FileQuestion : Workflow;
-                      return (
-                        <button key={`ai-${t}`} onClick={() => { setGenMaterialType(t); setShowCreateDropdown(false); }}
-                          className="w-full text-left px-4 py-2 text-sm text-ink hover:bg-accent/5 flex items-center gap-2 transition-colors">
-                          <TIcon className="w-3.5 h-3.5 text-ink-muted" strokeWidth={1.75} /> {t} <MaterialBadge tone="accent" className="ml-auto">AI</MaterialBadge>
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
+              <button
+                onClick={() => setGenMaterialType('QUIZ')}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-accent hover:bg-accent-dark text-white text-xs font-bold rounded-card transition-colors shadow-card"
+              >
+                <Sparkles className="w-3.5 h-3.5" /> AI
+              </button>
             </div>
           </div>
 
@@ -635,9 +604,6 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
         document.body
       )}
 
-      {showStaticResourcesPanel && (
-        <StaticResourcesPanel courseId={courseId} onClose={() => setShowStaticResourcesPanel(false)} />
-      )}
     </DndContext>
   );
 }
@@ -815,10 +781,15 @@ function MaterialWorkspaceViewer({
 
               {activeTab === 'QUESTIONS' && (
                 <div className="grid grid-cols-1 gap-4">
-                  {detail.quizQuestions.length > 0 && (
+                  {/* `material` là prop optional (tra từ list `materials`, có thể chưa tải kịp khi
+                      vào thẳng bằng link ?inspect=id) trong khi `detail` tải độc lập nên luôn có
+                      mặt ở đây. Guard `material &&` trước khi dùng `material.materialId` — trước
+                      đây ép kiểu `material!.materialId!` khiến cả trang crash trắng màn hình khi
+                      `material` chưa sẵn sàng. */}
+                  {detail.quizQuestions.length > 0 && material && (
                     <div className="flex justify-end items-center gap-2">
                       <button
-                        onClick={() => handleExportQuizPdf(material!.materialId!, 'blank')}
+                        onClick={() => handleExportQuizPdf(material.materialId!, 'blank')}
                         disabled={isExportingPdf !== null}
                         title="Xuất PDF đề trắng, đáp án ở trang cuối"
                         className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-card border bg-surface-raised text-ink-muted border-line hover:bg-surface-hover transition-colors disabled:opacity-50"
@@ -827,7 +798,7 @@ function MaterialWorkspaceViewer({
                         {isExportingPdf === 'blank' ? 'Đang xuất...' : 'Đề trắng'}
                       </button>
                       <button
-                        onClick={() => handleExportQuizPdf(material!.materialId!, 'cheatsheet')}
+                        onClick={() => handleExportQuizPdf(material.materialId!, 'cheatsheet')}
                         disabled={isExportingPdf !== null}
                         title="Xuất PDF cheatsheet, đáp án in kèm"
                         className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-card border bg-surface-raised text-ink-muted border-line hover:bg-surface-hover transition-colors disabled:opacity-50"
@@ -837,11 +808,11 @@ function MaterialWorkspaceViewer({
                       </button>
                     </div>
                   )}
-                  {!readOnly && (
+                  {!readOnly && material && (
                     <div className="flex justify-end items-center gap-2 mb-2">
                       <CsvImportButton
-                        inputId={`quiz-csv-import-${material!.materialId}`}
-                        onUpload={(file) => materialsApi.importQuizQuestionsCsv(material!.materialId!, file)}
+                        inputId={`quiz-csv-import-${material.materialId}`}
+                        onUpload={(file) => materialsApi.importQuizQuestionsCsv(material.materialId!, file)}
                         onDone={() => queryClient.invalidateQueries({ queryKey: ['material-detail', generationId] })}
                       />
                       <button onClick={() => setIsAddingQuestion(true)} className="flex items-center gap-1.5 px-4 py-2 bg-accent/10 text-accent hover:bg-accent/20 rounded-card font-bold text-sm border border-accent/20 transition-colors">
@@ -1021,9 +992,9 @@ function MaterialWorkspaceViewer({
           }}
         />
       )}
-      {isAddingQuestion && detail?.quizQuestions && (
+      {isAddingQuestion && detail?.quizQuestions && material && (
         <NewQuizQuestionEditorModal
-          quizId={material!.materialId!}
+          quizId={material.materialId!}
           onClose={() => setIsAddingQuestion(false)}
           onSuccess={() => {
             setIsAddingQuestion(false);

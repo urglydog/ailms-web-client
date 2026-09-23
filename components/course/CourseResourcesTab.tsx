@@ -3,6 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api/client';
 import { Spinner } from '@/components/ui/Spinner';
+import { FileText, Presentation, FileArchive, File as FileIcon, Download, FolderOpen } from 'lucide-react';
 
 interface Resource {
   id: number;
@@ -24,6 +25,17 @@ function formatBytes(bytes: number, decimals = 2) {
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
 }
 
+/** Icon + màu theo đúng 8 MIME type backend cho phép (InstructorResourceController.
+ * ALLOWED_MIME_TYPES) — để phân biệt loại file ngay từ cái nhìn đầu tiên thay vì icon xám
+ * đồng nhất. */
+function getFileVisual(fileType: string): { Icon: typeof FileText; bg: string; text: string; label: string } {
+  if (fileType.includes('pdf')) return { Icon: FileText, bg: 'bg-danger/10', text: 'text-danger', label: 'PDF' };
+  if (fileType.includes('word') || fileType.includes('document')) return { Icon: FileText, bg: 'bg-blue-500/10', text: 'text-blue-600', label: 'Word' };
+  if (fileType.includes('powerpoint') || fileType.includes('presentation')) return { Icon: Presentation, bg: 'bg-orange-500/10', text: 'text-orange-600', label: 'PowerPoint' };
+  if (fileType.includes('zip') || fileType.includes('rar')) return { Icon: FileArchive, bg: 'bg-purple-500/10', text: 'text-purple-600', label: 'Nén' };
+  return { Icon: FileIcon, bg: 'bg-surface-hover', text: 'text-ink-muted', label: fileType.split('/')[1] || fileType };
+}
+
 export function CourseResourcesTab({ courseId }: { courseId: number }) {
   const { data: resources, isLoading, error } = useQuery<Resource[]>({
     queryKey: ['student', 'course-resources', courseId],
@@ -37,47 +49,43 @@ export function CourseResourcesTab({ courseId }: { courseId: number }) {
   if (!resources || resources.length === 0) {
     return (
       <div className="py-12 text-center card bg-surface-hover border-dashed border-2">
-        <div className="text-4xl mb-4">🗂️</div>
+        <FolderOpen className="w-10 h-10 mx-auto mb-4 text-ink-faint" strokeWidth={1.5} />
         <h4 className="text-lg font-bold mb-2">Chưa có tài nguyên tĩnh</h4>
         <p className="text-ink-muted">Giảng viên chưa đăng tải tài liệu đính kèm nào (PDF, ZIP,...) cho khóa học này.</p>
       </div>
     );
   }
 
-  const getFileIcon = (fileType: string) => {
-    if (fileType.includes('pdf')) return <span className="text-xl">📄</span>;
-    if (fileType.includes('zip') || fileType.includes('rar') || fileType.includes('tar')) return <span className="text-xl">📦</span>;
-    if (fileType.includes('image')) return <span className="text-xl">🖼️</span>;
-    return <span className="text-xl">📁</span>;
-  };
-
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-bold mb-4">Tài nguyên đính kèm</h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {resources.map(res => (
-          <a
-            key={res.id}
-            href={res.fileUrl}
-            target="_blank"
-            rel="noreferrer noopener"
-            className="flex items-start gap-4 p-4 card hover:border-accent hover:shadow-md transition-all group"
-          >
-            <div className="p-3 rounded-xl bg-surface-hover group-hover:bg-accent/10 transition-colors">
-              {getFileIcon(res.fileType)}
-            </div>
-            <div className="flex-1 min-w-0">
-              <h4 className="font-semibold text-sm truncate group-hover:text-accent transition-colors" title={res.title}>
-                {res.title}
-              </h4>
-              <p className="text-xs text-ink-muted mt-1 flex justify-between items-center">
-                <span>{formatBytes(res.fileSize)}</span>
-                <span className="uppercase">{res.fileType.split('/')[1] || res.fileType}</span>
-              </p>
-            </div>
-            <div className="w-4 h-4 text-ink-muted opacity-0 group-hover:opacity-100 group-hover:text-accent transition-all shrink-0 mt-2">↗</div>
-          </a>
-        ))}
+      {/* Danh sách dọc gọn (không phải lưới thẻ to) — không tràn trang dù có nhiều tài nguyên. */}
+      <div className="flex flex-col rounded-card border border-line divide-y divide-line-soft overflow-hidden">
+        {resources.map(res => {
+          const { Icon, bg, text, label } = getFileVisual(res.fileType);
+          return (
+            <a
+              key={res.id}
+              href={res.fileUrl}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="flex items-center gap-3 px-4 py-3 bg-surface-raised hover:bg-surface-hover transition-colors group"
+            >
+              <div className={`shrink-0 flex items-center justify-center w-9 h-9 rounded-lg ${bg} ${text}`}>
+                <Icon className="w-[18px] h-[18px]" strokeWidth={1.75} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-sm text-ink truncate group-hover:text-accent transition-colors" title={res.title}>
+                  {res.title}
+                </p>
+                <p className="text-xs text-ink-muted mt-0.5">
+                  {label} · {formatBytes(res.fileSize)}
+                </p>
+              </div>
+              <Download className="w-4 h-4 text-ink-faint group-hover:text-accent transition-colors shrink-0" strokeWidth={1.75} />
+            </a>
+          );
+        })}
       </div>
     </div>
   );

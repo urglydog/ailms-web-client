@@ -54,7 +54,7 @@ export function CourseOverviewTab({
         <StarRating rating={course.avgRating} reviewCount={course.reviewCount} levelLabel={LEVEL_LABEL[course.level]} />
       </div>
 
-      <p className="whitespace-pre-line text-[14.5px] leading-relaxed text-ink-muted">{course.description}</p>
+      <p className="whitespace-pre-line text-[14.5px] leading-relaxed text-ink">{course.description}</p>
 
       <div className="flex flex-wrap gap-x-6 gap-y-2 border-t border-line-soft pt-4 text-sm text-ink-muted">
         <span>{course.chapters.length} chương · {totalLessons} bài giảng</span>

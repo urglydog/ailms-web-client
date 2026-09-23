@@ -186,7 +186,7 @@ export default function MaterialDetailPage() {
                 </div>
                 <div className="flex items-center gap-3">
                   <button
-                    onClick={() => handleExportQuizPdf(material.id, 'blank')}
+                    onClick={() => material.quizId && handleExportQuizPdf(material.quizId, 'blank')}
                     disabled={isExportingQuizPdf !== null}
                     title="Xuất PDF đề trắng, đáp án ở trang cuối"
                     className="flex items-center gap-1.5 text-sm font-semibold text-accent hover:underline disabled:opacity-50"
@@ -195,7 +195,7 @@ export default function MaterialDetailPage() {
                     {isExportingQuizPdf === 'blank' ? 'Đang xuất...' : 'Đề trắng'}
                   </button>
                   <button
-                    onClick={() => handleExportQuizPdf(material.id, 'cheatsheet')}
+                    onClick={() => material.quizId && handleExportQuizPdf(material.quizId, 'cheatsheet')}
                     disabled={isExportingQuizPdf !== null}
                     title="Xuất PDF cheatsheet, đáp án in kèm"
                     className="flex items-center gap-1.5 text-sm font-semibold text-accent hover:underline disabled:opacity-50"

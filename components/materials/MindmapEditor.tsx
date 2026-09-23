@@ -40,7 +40,8 @@ import {
   MousePointer2,
   Move,
   Pencil,
-  Sparkles,
+  ChevronRight,
+  ChevronLeft,
 } from 'lucide-react';
 
 interface MindmapEditorProps {
@@ -541,6 +542,7 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
 
   const [mapStyle, setMapStyle] = useState(parsedConfig.layout);
   const [colorTheme, setColorTheme] = useState(parsedConfig.theme);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(!readOnly);
 
   const initData = useCallback(() => {
     const { nodes: n, edges: ed } = parseMermaidToFlow(initialMermaidCode, parsedConfig.theme);
@@ -769,30 +771,21 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
       {/* Main Flow Canvas */}
       <div className="flex-1 relative">
 
-        {/* Top Floating Toolbar — thu gọn thành 1 nút tròn, hover mới bung ra đủ nút (dùng
-            thao tác thường xuyên nên cần bung/thu rất nhanh — 150ms, cùng tốc độ với thanh
-            volume ở PlayerControls.tsx). transition-[max-width] thay vì width vì "width: auto"
-            không animate được bằng CSS. */}
-        {/* overflow-x-hidden (không phải overflow-hidden cả 2 trục) — chỉ cắt theo chiều ngang để
-            phục vụ animation thu/bung độ rộng; nếu cắt cả chiều dọc thì popup Layout/Export
-            (position: absolute, top-full) bên trong sẽ bị ẩn mất theo trục dọc. */}
+        {/* Top Floating Toolbar — theo yêu cầu của bạn: quay lại hiện cố định như bản gốc (không
+            thu gọn hover-reveal nữa), chỉ tăng padding cho viền không sát icon như phản ánh. */}
         {!readOnly && (
-          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 flex items-center h-11 max-w-[44px] hover:max-w-[640px] overflow-x-hidden overflow-y-visible rounded-full bg-surface-raised shadow-card hover:shadow-card-hover border border-line transition-[max-width] duration-150 ease-out">
-            <div className="flex items-center justify-center w-11 h-11 shrink-0 text-ink-muted">
-                <Sparkles className="w-[18px] h-[18px]" strokeWidth={1.75} />
-            </div>
-            <div className="flex items-center gap-1 pr-2 whitespace-nowrap">
-                <button onClick={() => triggerAction('TAB')} disabled={!hasSelectedNode} className={`flex flex-col items-center justify-center p-2 rounded-lg min-w-[64px] transition-colors ${hasSelectedNode ? 'hover:bg-surface-hover text-ink-muted' : 'opacity-40 cursor-not-allowed text-ink-faint'}`} title="Thêm nhánh con (Tab)">
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 bg-surface-raised shadow-card rounded-xl border border-line px-2.5 py-2 flex gap-1 items-center animate-in slide-in-from-top-4">
+                <button onClick={() => triggerAction('TAB')} disabled={!hasSelectedNode} className={`flex flex-col items-center justify-center p-2.5 rounded-lg min-w-[64px] transition-colors ${hasSelectedNode ? 'hover:bg-surface-hover text-ink-muted' : 'opacity-40 cursor-not-allowed text-ink-faint'}`} title="Thêm nhánh con (Tab)">
                     <GitBranch className="w-[18px] h-[18px]" strokeWidth={1.75} /><span className="text-[10px] font-bold mt-1">Subtopic</span>
                 </button>
-                <button onClick={() => triggerAction('ENTER')} disabled={!hasSelectedNode || nodes.find(n => n.selected)?.id === 'root'} className={`flex flex-col items-center justify-center p-2 rounded-lg min-w-[64px] transition-colors ${hasSelectedNode && nodes.find(n => n.selected)?.id !== 'root' ? 'hover:bg-surface-hover text-ink-muted' : 'opacity-40 cursor-not-allowed text-ink-faint'}`} title="Thêm nhánh ngang hàng (Enter)">
+                <button onClick={() => triggerAction('ENTER')} disabled={!hasSelectedNode || nodes.find(n => n.selected)?.id === 'root'} className={`flex flex-col items-center justify-center p-2.5 rounded-lg min-w-[64px] transition-colors ${hasSelectedNode && nodes.find(n => n.selected)?.id !== 'root' ? 'hover:bg-surface-hover text-ink-muted' : 'opacity-40 cursor-not-allowed text-ink-faint'}`} title="Thêm nhánh ngang hàng (Enter)">
                     <ArrowLeftRight className="w-[18px] h-[18px]" strokeWidth={1.75} /><span className="text-[10px] font-bold mt-1">Topic</span>
                 </button>
 
                 <div className="w-[1px] h-8 bg-line mx-1"></div>
 
                 <div className="relative" ref={layoutRef}>
-                    <button onClick={() => setShowLayouts(!showLayouts)} className="flex flex-col items-center justify-center p-2 hover:bg-surface-hover rounded-lg min-w-[64px] text-ink-muted transition-colors">
+                    <button onClick={() => setShowLayouts(!showLayouts)} className="flex flex-col items-center justify-center p-2.5 hover:bg-surface-hover rounded-lg min-w-[64px] text-ink-muted transition-colors">
                         <LayoutGrid className="w-[18px] h-[18px]" strokeWidth={1.75} /><span className="text-[10px] font-bold mt-1">Layout</span>
                     </button>
                     {showLayouts && (
@@ -808,7 +801,7 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
                 </div>
                 <div className="w-[1px] h-8 bg-line mx-1"></div>
                 <div className="relative" ref={exportRef}>
-                    <button onClick={() => setShowExport(!showExport)} className="flex flex-col items-center justify-center p-2 hover:bg-surface-hover rounded-lg min-w-[64px] text-ink-muted transition-colors">
+                    <button onClick={() => setShowExport(!showExport)} className="flex flex-col items-center justify-center p-2.5 hover:bg-surface-hover rounded-lg min-w-[64px] text-ink-muted transition-colors">
                         <Download className="w-[18px] h-[18px]" strokeWidth={1.75} /><span className="text-[10px] font-bold mt-1">Export</span>
                     </button>
                     {showExport && (
@@ -822,10 +815,10 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
 
                 <div className="w-[1px] h-8 bg-line mx-1"></div>
 
-                <button onClick={handleUndo} disabled={historyIndex <= 0} className={`flex flex-col items-center justify-center p-2 rounded-lg min-w-[48px] transition-colors ${historyIndex > 0 ? 'hover:bg-surface-hover text-ink-muted' : 'opacity-40 cursor-not-allowed text-ink-faint'}`} title="Hoàn tác (Ctrl+Z)">
+                <button onClick={handleUndo} disabled={historyIndex <= 0} className={`flex flex-col items-center justify-center p-2.5 rounded-lg min-w-[48px] transition-colors ${historyIndex > 0 ? 'hover:bg-surface-hover text-ink-muted' : 'opacity-40 cursor-not-allowed text-ink-faint'}`} title="Hoàn tác (Ctrl+Z)">
                     <Undo2 className="w-[18px] h-[18px]" strokeWidth={1.75} /><span className="text-[10px] font-bold mt-1">Undo</span>
                 </button>
-                <button onClick={handleRedo} disabled={historyIndex >= history.length - 1} className={`flex flex-col items-center justify-center p-2 rounded-lg min-w-[48px] transition-colors ${historyIndex < history.length - 1 ? 'hover:bg-surface-hover text-ink-muted' : 'opacity-40 cursor-not-allowed text-ink-faint'}`} title="Làm lại (Ctrl+Y)">
+                <button onClick={handleRedo} disabled={historyIndex >= history.length - 1} className={`flex flex-col items-center justify-center p-2.5 rounded-lg min-w-[48px] transition-colors ${historyIndex < history.length - 1 ? 'hover:bg-surface-hover text-ink-muted' : 'opacity-40 cursor-not-allowed text-ink-faint'}`} title="Làm lại (Ctrl+Y)">
                     <Redo2 className="w-[18px] h-[18px]" strokeWidth={1.75} /><span className="text-[10px] font-bold mt-1">Redo</span>
                 </button>
 
@@ -835,12 +828,11 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
                         <button onClick={() => {
                             const newCode = parseFlowToMermaid(nodes, edges, mapStyle, colorTheme);
                             onSave(newCode);
-                        }} className="flex flex-col items-center justify-center p-2 hover:bg-accent/5 rounded-lg min-w-[80px] text-accent transition-colors border border-transparent hover:border-accent/30">
+                        }} className="flex flex-col items-center justify-center p-2.5 hover:bg-accent/5 rounded-lg min-w-[80px] text-accent transition-colors border border-transparent hover:border-accent/30">
                             <Save className="w-[18px] h-[18px]" strokeWidth={1.75} /><span className="text-[10px] font-bold mt-1">Save & Apply</span>
                         </button>
                     </>
                 )}
-            </div>
           </div>
         )}
         
@@ -910,12 +902,23 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
             </div>
           </div>
         )}
+
+        {/* Nút ẩn/hiện sidebar phải — theo yêu cầu của bạn, khôi phục lại (đợt trước đã bỏ hẳn).
+            Lần này dùng nền accent tương phản rõ thay vì bg-white/border-gray-200/text-gray-500
+            gần như vô hình như bản gốc, để không lặp lại lỗi khó thấy đã sửa. */}
+        {!readOnly && (
+            <button
+                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                className="absolute top-1/2 right-0 -translate-y-1/2 z-30 flex items-center justify-center w-6 h-12 rounded-l-lg bg-accent text-white shadow-card-hover hover:bg-accent-dark transition-colors"
+                title={isSidebarOpen ? 'Ẩn bảng điều khiển' : 'Hiện bảng điều khiển'}
+            >
+                {isSidebarOpen ? <ChevronRight className="w-4 h-4" strokeWidth={2} /> : <ChevronLeft className="w-4 h-4" strokeWidth={2} />}
+            </button>
+        )}
       </div>
 
-      {/* Right Inspector Panel — cột cố định thật (flex sibling của canvas), luôn hiện, không
-          còn toggle/overlay — canvas ở trên đã tự nhường chỗ qua flex-1, không cần margin mô
-          phỏng nữa. */}
-      {!readOnly && (
+      {/* Right Inspector Panel — cột flex, ẩn/hiện qua isSidebarOpen (khôi phục theo yêu cầu). */}
+      {!readOnly && isSidebarOpen && (
           <div className="w-80 shrink-0 bg-surface-raised border-l border-line flex flex-col shadow-card z-10">
               <div className="flex border-b border-line-soft p-2 gap-1">
                   {['Map', 'Style'].map(tab => (
