@@ -13,6 +13,7 @@ import { useMyEnrollments } from '@/hooks/useEnrollments';
 import { useAddToCart, useCart } from '@/hooks/useCart';
 import { useAddToWishlist, useRemoveFromWishlist, useWishlist } from '@/hooks/useWishlist';
 import { getAccessToken } from '@/lib/auth/token';
+import { resolveBaseUrl } from '@/lib/api/client';
 
 /**
  * Thẻ khoá học — dịch từ `CourseCard.dc.html` của Claude Design.
@@ -90,7 +91,7 @@ export function CourseCard({ course }: { course: CourseSummary }) {
     if (isDownloadingCert) return;
     setIsDownloadingCert(true);
     try {
-      const res = await fetch(`/api/v1/enrollments/${course.id}/certificate`, {
+      const res = await fetch(`${resolveBaseUrl()}/api/v1/enrollments/${course.id}/certificate`, {
         headers: { Authorization: `Bearer ${getAccessToken() ?? ''}` },
       });
       if (!res.ok) throw new Error('Không tải được chứng chỉ');

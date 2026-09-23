@@ -3,6 +3,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import mermaid from 'mermaid';
 import { toast } from 'sonner';
+import { ArrowDown, ArrowRight, ArrowUp, ArrowLeft } from 'lucide-react';
+
+const DIRECTIONS = [
+  { id: 'TB', name: 'Top-Bottom', Icon: ArrowDown },
+  { id: 'LR', name: 'Left-Right', Icon: ArrowRight },
+  { id: 'BT', name: 'Bottom-Top', Icon: ArrowUp },
+  { id: 'RL', name: 'Right-Left', Icon: ArrowLeft },
+] as const;
 
 interface MermaidViewerProps {
   chart: string;
@@ -61,7 +69,16 @@ export function MermaidViewer({ chart, readOnly = false }: MermaidViewerProps) {
         
         const id = `mermaid-${Math.random().toString(36).substring(2, 9)}`;
         const { svg } = await mermaid.render(id, modifiedChart);
-        setSvgContent(svg);
+        // Mermaid mặc định chỉ ràng buộc SVG theo chiều RỘNG (width="100%" + max-width, không set
+        // height) — sơ đồ hẹp-nhưng-cao (thường gặp ở hướng LR/RL nhiều nhánh) sẽ tràn khung theo
+        // chiều dọc, phải cuộn mới xem hết. Ép luôn width="100%" height="100%" +
+        // preserveAspectRatio="xMidYMid meet" để SVG co theo CẢ 2 chiều vừa khít khung hiển thị
+        // (kiểu object-fit: contain), giống hệt trải nghiệm TB/BT hiện có.
+        const containedSvg = svg
+          .replace(/width="[^"]*"/, 'width="100%"')
+          .replace(/style="max-width:[^"]*"/, '') // bỏ trần "chỉ giới hạn theo chiều rộng" mermaid tự thêm
+          .replace('<svg ', '<svg height="100%" preserveAspectRatio="xMidYMid meet" ');
+        setSvgContent(containedSvg);
       } catch (err: unknown) {
         console.error("Mermaid Render Error:", err);
         setError("Không thể vẽ Sơ đồ tư duy. Dữ liệu có thể bị lỗi định dạng.");
@@ -136,21 +153,16 @@ export function MermaidViewer({ chart, readOnly = false }: MermaidViewerProps) {
       <div className="flex flex-wrap items-center justify-between gap-4 bg-gray-50 p-2 rounded-xl border border-line">
         {!readOnly ? (
           <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-line">
-            {[
-              { id: 'TB', label: '⬇️' },
-              { id: 'LR', label: '➡️' },
-              { id: 'BT', label: '⬆️' },
-              { id: 'RL', label: '⬅️' }
-            ].map(dir => (
+            {DIRECTIONS.map(dir => (
               <button
                 key={dir.id}
-                onClick={() => setLayoutDirection(dir.id as 'TB' | 'LR' | 'BT' | 'RL')}
-                className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                onClick={() => setLayoutDirection(dir.id)}
+                className={`p-2 rounded-md transition-colors ${
                   layoutDirection === dir.id ? 'bg-accent text-white shadow-sm' : 'text-ink-muted hover:bg-surface-hover hover:text-ink'
                 }`}
-                title={`Xoay sơ đồ hướng ${dir.label}`}
+                title={`Xoay sơ đồ hướng ${dir.name}`}
               >
-                {dir.label}
+                <dir.Icon className="w-4 h-4" strokeWidth={1.75} />
               </button>
             ))}
           </div>
