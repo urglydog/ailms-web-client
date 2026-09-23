@@ -6,8 +6,9 @@ import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api/client';
 import { Spinner } from '@/components/ui/Spinner';
 import Link from 'next/link';
-import { Trophy, AlertTriangle, X, CheckCircle2 } from 'lucide-react';
+import { Trophy, AlertTriangle, X, Hash, Calendar, CheckCheck } from 'lucide-react';
 import { MaterialBadge } from '@/components/materials/ui/MaterialBadge';
+import { Tooltip } from '@/components/ui/Tooltip';
 
 interface GradebookResponse {
   courseId: number;
@@ -61,7 +62,12 @@ export function CourseGradebookTab({ courseId }: { courseId: number }) {
   if (isLoading) return <div className="py-10 text-center"><Spinner className="mx-auto" /></div>;
   if (error) return <div className="py-10 text-center text-danger">Lỗi khi tải bảng điểm.</div>;
 
-  const quizzes = data?.quizzes || [];
+  // B1 — bài làm gần nhất lên đầu; quiz chưa làm lần nào (không có latestSubmittedAt) xuống cuối.
+  const quizzes = [...(data?.quizzes || [])].sort((a, b) => {
+    if (!a.latestSubmittedAt) return 1;
+    if (!b.latestSubmittedAt) return -1;
+    return new Date(b.latestSubmittedAt).getTime() - new Date(a.latestSubmittedAt).getTime();
+  });
 
   if (quizzes.length === 0) {
     return (
@@ -167,46 +173,41 @@ export function CourseGradebookTab({ courseId }: { courseId: number }) {
               </button>
             </div>
             <div className="p-6 overflow-y-auto">
-              <table className="w-full text-sm text-left">
-                <thead className="bg-surface text-ink-muted font-semibold border-b border-line">
-                  <tr>
-                    <th className="px-6 py-4">Lần thi</th>
-                    <th className="px-6 py-4">Trạng thái</th>
-                    <th className="px-6 py-4 text-center">Kết quả</th>
-                    <th className="px-6 py-4 text-center">Xem lại</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-line">
-                  {(!historyQuiz.attempts || historyQuiz.attempts.length === 0) ? (
-                    <tr>
-                      <td colSpan={4} className="px-6 py-8 text-center text-ink-muted">
-                        Bạn chưa có lượt làm bài nào cho bài thi này.
-                      </td>
-                    </tr>
-                  ) : (
-                    historyQuiz.attempts.map((h, index) => (
-                      <tr key={h.id} className="hover:bg-surface-hover transition-colors">
-                        <td className="px-6 py-4 font-bold text-ink">{index + 1}</td>
-                        <td className="px-6 py-4">
-                          <div className="font-medium text-success flex items-center gap-1.5">
-                            <CheckCircle2 className="w-3.5 h-3.5" /> Đã xong
-                          </div>
-                          <div className="text-ink-muted text-xs mt-1">Đã nộp {new Date(h.submittedAt).toLocaleString('vi-VN')}</div>
-                        </td>
-                        <td className="px-6 py-4 text-center">
-                          <div className="font-bold text-lg text-ink">{h.correctCount} / {h.totalQuestions} <span className="text-sm font-normal text-ink-muted">câu</span></div>
-                          <div className="text-xs font-semibold text-accent mt-1">{Number(h.score).toFixed(2).replace(/\.?0+$/, '')} điểm</div>
-                        </td>
-                        <td className="px-6 py-4 text-center">
-                          <Link href={`/exam/${historyQuiz.quizId}/history?attemptId=${h.id}`} className="text-accent font-semibold hover:underline">
-                            Xem chi tiết
-                          </Link>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
+              {(!historyQuiz.attempts || historyQuiz.attempts.length === 0) ? (
+                <p className="py-8 text-center text-ink-muted">Bạn chưa có lượt làm bài nào cho bài thi này.</p>
+              ) : (
+                <div className="flex flex-col divide-y divide-line">
+                  {historyQuiz.attempts.map((h, index) => (
+                    <div key={h.id} className="flex items-center justify-between gap-4 py-3 hover:bg-surface-hover transition-colors">
+                      <div className="flex items-center gap-4 text-[13px]">
+                        <Tooltip label="Lần">
+                          <span className="flex items-center gap-1 font-bold text-ink">
+                            <Hash className="w-3.5 h-3.5 text-ink-faint" /> {index + 1}
+                          </span>
+                        </Tooltip>
+                        <Tooltip label="Ngày nộp">
+                          <span className="flex items-center gap-1 text-ink-muted">
+                            <Calendar className="w-3.5 h-3.5" /> {new Date(h.submittedAt).toLocaleDateString('vi-VN')}
+                          </span>
+                        </Tooltip>
+                        <Tooltip label="Điểm">
+                          <span className="flex items-center gap-1 font-bold text-accent">
+                            <Trophy className="w-3.5 h-3.5" /> {Number(h.score).toFixed(2).replace(/\.?0+$/, '')}/10
+                          </span>
+                        </Tooltip>
+                        <Tooltip label="Số câu đúng">
+                          <span className="flex items-center gap-1 text-ink-muted">
+                            <CheckCheck className="w-3.5 h-3.5" /> {h.correctCount}/{h.totalQuestions}
+                          </span>
+                        </Tooltip>
+                      </div>
+                      <Link href={`/exam/${historyQuiz.quizId}/history?attemptId=${h.id}`} className="text-accent font-semibold text-sm hover:underline shrink-0">
+                        Xem chi tiết
+                      </Link>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>,

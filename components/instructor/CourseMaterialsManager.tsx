@@ -40,19 +40,24 @@ function DraggableMaterialCard({ mat, onClick, isLoading: isPending }: { mat: In
   const badge = getMaterialDistributionBadge(mat);
   const processingBadge = getMaterialProcessingBadge(mat.status);
 
-  const typeConfig: Record<string, { Icon: typeof FileQuestion; label: string }> = {
-    QUIZ:      { Icon: FileQuestion, label: 'Quiz' },
-    FLASHCARD: { Icon: Layers, label: 'Flashcard' },
-    MINDMAP:   { Icon: Workflow, label: 'Mindmap' },
+  const typeConfig: Record<string, { Icon: typeof FileQuestion; label: string; band: string; iconTone: string }> = {
+    QUIZ:      { Icon: FileQuestion, label: 'Quiz',      band: 'bg-accent/5',  iconTone: 'text-accent/70' },
+    FLASHCARD: { Icon: Layers,       label: 'Flashcard', band: 'bg-success/5', iconTone: 'text-success/70' },
+    MINDMAP:   { Icon: Workflow,     label: 'Mindmap',   band: 'bg-star/5',    iconTone: 'text-star/70' },
   };
-  const cfg = typeConfig[mat.materialType] ?? { Icon: File, label: mat.materialType };
+  const cfg = typeConfig[mat.materialType] ?? { Icon: File, label: mat.materialType, band: 'bg-line-soft', iconTone: 'text-ink-faint' };
+  const statLabel =
+    mat.materialType === 'QUIZ' && mat.questionCount != null ? `${mat.questionCount} câu hỏi` :
+    mat.materialType === 'FLASHCARD' && mat.cardCount != null ? `${mat.cardCount} thẻ` :
+    null;
 
   return (
     <div
       ref={setNodeRef}
       onDoubleClick={(e) => { e.stopPropagation(); onClick(); }}
+      onMouseDown={(e) => { if (e.detail > 1) e.preventDefault(); }}
       {...attributes}
-      className={`relative border rounded-card flex flex-col overflow-hidden group transition-all duration-200 ${
+      className={`relative border rounded-card flex flex-col overflow-hidden group transition-all duration-200 select-none ${
         isDragging ? 'opacity-40 scale-95 border-accent border-dashed shadow-card-hover' :
         isPending  ? 'opacity-60 pointer-events-none' :
         'bg-surface-raised border-line hover:shadow-card-hover hover:border-accent/40'
@@ -75,23 +80,27 @@ function DraggableMaterialCard({ mat, onClick, isLoading: isPending }: { mat: In
         <GripVertical className="w-4 h-4" />
       </div>
 
-      <div className="p-3 pl-8 pb-2 flex-1">
-        <div className="flex items-start justify-between mb-1.5">
-          <div className="flex items-center gap-1.5">
-            <cfg.Icon className="w-3.5 h-3.5 text-ink-muted" strokeWidth={1.75} />
-            <span className="text-[10px] font-bold uppercase tracking-wider text-ink-muted">{cfg.label}</span>
-          </div>
-          {/* Hover actions */}
-          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            <button
-              onClick={(e) => { e.stopPropagation(); onClick(); }}
-              className="p-1 rounded-card bg-surface-raised/90 hover:bg-accent/10 text-ink-muted hover:text-accent transition-colors shadow-card border border-line"
-              title="Xem / chỉnh sửa"
-            >
-              <FileText className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </div>
+      {/* Hover actions */}
+      <div className="absolute top-2 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+        <button
+          onClick={(e) => { e.stopPropagation(); onClick(); }}
+          className="p-1 rounded-card bg-surface-raised/90 hover:bg-accent/10 text-ink-muted hover:text-accent transition-colors shadow-card border border-line"
+          title="Xem / chỉnh sửa"
+        >
+          <FileText className="w-3.5 h-3.5" />
+        </button>
+      </div>
+
+      {/* Dải icon lớn theo màu loại học liệu — giúp nhận biết loại/nội dung ngay từ xa thay vì
+          chỉ có icon nhỏ + chữ, đặc biệt khi lướt nhanh 1 thư mục nhiều học liệu. */}
+      <div className={`h-16 flex flex-col items-center justify-center gap-0.5 border-b border-line ${cfg.band}`}>
+        <cfg.Icon className={`w-7 h-7 ${cfg.iconTone}`} strokeWidth={1.5} />
+        <span className="text-[9.5px] font-bold uppercase tracking-wider text-ink-muted">
+          {cfg.label}{statLabel ? ` · ${statLabel}` : ''}
+        </span>
+      </div>
+
+      <div className="p-3 pb-2 flex-1">
         <h4 className="text-sm font-bold text-ink line-clamp-2 leading-tight">
           {mat.title || 'Học liệu không tên'}
         </h4>
@@ -117,14 +126,20 @@ function DraggableMaterialRow({ mat, onDoubleClick }: { mat: InstructorMaterial;
   });
   const badge = getMaterialDistributionBadge(mat);
   const processingBadge = getMaterialProcessingBadge(mat.status);
-  const TypeIcon = mat.materialType === 'FLASHCARD' ? Layers : mat.materialType === 'QUIZ' ? FileQuestion : Workflow;
+  const rowConfig: Record<string, { Icon: typeof FileQuestion; chip: string; iconTone: string }> = {
+    QUIZ:      { Icon: FileQuestion, chip: 'bg-accent/5',  iconTone: 'text-accent' },
+    FLASHCARD: { Icon: Layers,       chip: 'bg-success/5', iconTone: 'text-success' },
+    MINDMAP:   { Icon: Workflow,     chip: 'bg-star/5',    iconTone: 'text-star' },
+  };
+  const rowCfg = rowConfig[mat.materialType] ?? { Icon: File, chip: 'bg-line-soft', iconTone: 'text-ink-faint' };
 
   return (
     <div
       ref={setNodeRef}
       {...attributes}
       onDoubleClick={(e) => { e.stopPropagation(); onDoubleClick(); }}
-      className={`flex items-center gap-2 flex-1 min-w-0 ${isDragging ? 'opacity-40' : ''}`}
+      onMouseDown={(e) => { if (e.detail > 1) e.preventDefault(); }}
+      className={`flex items-center gap-2 flex-1 min-w-0 select-none ${isDragging ? 'opacity-40' : ''}`}
     >
       <span
         {...listeners}
@@ -134,7 +149,9 @@ function DraggableMaterialRow({ mat, onDoubleClick }: { mat: InstructorMaterial;
       >
         <GripVertical className="w-3.5 h-3.5" />
       </span>
-      <TypeIcon className="w-4 h-4 flex-shrink-0 text-ink-muted" strokeWidth={1.75} />
+      <span className={`flex items-center justify-center w-8 h-8 rounded-card flex-shrink-0 ${rowCfg.chip}`}>
+        <rowCfg.Icon className={`w-4 h-4 ${rowCfg.iconTone}`} strokeWidth={1.75} />
+      </span>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-semibold text-ink truncate">{mat.title || 'Học liệu không tên'}</p>
         <p className="text-[10px] text-ink-faint">{new Date(mat.createdAt).toLocaleDateString('vi-VN')}</p>
@@ -215,6 +232,29 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
     onError: (err: Error) => toast.error(err.message || 'Lỗi khi phân phối'),
   });
 
+  // Dùng chung cho cả 2 lối "di chuyển vào thư mục": kéo-thả thẻ học liệu thả vào dòng thư mục
+  // (handleDragEnd bên dưới) và Ctrl+X/Ctrl+V cắt-dán trong MaterialFolderTree — tránh 2 mutation
+  // riêng biệt cho cùng 1 hành động.
+  const moveToFolderMutation = useMutation({
+    mutationFn: (vars: { id: number; folderId: number | null }) =>
+      materialsApi.moveToFolder(vars.id, vars.folderId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] });
+      toast.success('Đã di chuyển học liệu');
+    },
+    onError: (err: Error) => toast.error(err.message || 'Không thể di chuyển học liệu'),
+  });
+
+  const duplicateMaterialMutation = useMutation({
+    mutationFn: (vars: { id: number; targetFolderId: number | null }) =>
+      materialsApi.duplicateMaterial(vars.id, vars.targetFolderId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] });
+      toast.success('Đã nhân bản học liệu');
+    },
+    onError: (err: Error) => toast.error(err.message || 'Không thể nhân bản học liệu'),
+  });
+
   const handleDragStart = (event: DragStartEvent) => {
     const { active } = event;
     const materialId = parseInt(String(active.id).replace('material-', ''));
@@ -232,6 +272,14 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
     if (!material) return;
 
     const targetIdStr = String(over.id);
+
+    if (targetIdStr.startsWith('folder-')) {
+      const folderIdStr = targetIdStr.replace('folder-', '');
+      const targetFolderId = folderIdStr === 'root' ? null : parseInt(folderIdStr);
+      moveToFolderMutation.mutate({ id: materialId, folderId: targetFolderId });
+      return;
+    }
+
     const isChapter = targetIdStr.startsWith('chapter-');
     const parsedTargetId = parseInt(targetIdStr.replace('lesson-', '').replace('chapter-', ''));
 
@@ -410,7 +458,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                     {chapterMaterials.map(mat => {
                       const assignment = mat.assignments?.find(a => a.chapterId === chapter.id);
                       return (
-                        <div key={`mat-${mat.id}`} onDoubleClick={() => setInspectGenerationId(mat.id, true)} className="flex items-center justify-between px-2 py-1 text-xs text-ink-muted pl-6 hover:bg-accent/5 rounded-card cursor-pointer transition-colors group" title="Nháy đúp để xem trước">
+                        <div key={`mat-${mat.id}`} onDoubleClick={() => setInspectGenerationId(mat.id, true)} onMouseDown={(e) => { if (e.detail > 1) e.preventDefault(); }} className="flex items-center justify-between px-2 py-1 text-xs text-ink-muted pl-6 hover:bg-accent/5 rounded-card cursor-pointer transition-colors group select-none" title="Nháy đúp để xem trước">
                           <div className="flex items-center gap-2">
                             <LinkIcon className="w-3 h-3 text-ink-faint flex-shrink-0" /> {mat.title || 'Học liệu'}
                           </div>
@@ -441,7 +489,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                             {lessonMaterials.map(mat => {
                               const assignment = mat.assignments?.find(a => a.lessonId === lesson.id);
                               return (
-                                <div key={`mat-${mat.id}`} onDoubleClick={() => setInspectGenerationId(mat.id, true)} className="flex items-center justify-between px-2 py-1 text-[11px] text-ink-muted pl-6 hover:bg-accent/5 rounded-card cursor-pointer transition-colors group" title="Nháy đúp để xem trước">
+                                <div key={`mat-${mat.id}`} onDoubleClick={() => setInspectGenerationId(mat.id, true)} onMouseDown={(e) => { if (e.detail > 1) e.preventDefault(); }} className="flex items-center justify-between px-2 py-1 text-[11px] text-ink-muted pl-6 hover:bg-accent/5 rounded-card cursor-pointer transition-colors group select-none" title="Nháy đúp để xem trước">
                                   <div className="flex items-center gap-2">
                                     <LinkIcon className="w-3 h-3 text-ink-faint flex-shrink-0" /> {mat.title || 'Học liệu'}
                                   </div>
@@ -541,14 +589,16 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
             />
           </div>
           
-          <MaterialFolderTree 
-            courseId={courseId} 
-            folders={folders} 
+          <MaterialFolderTree
+            courseId={courseId}
+            folders={folders}
             materials={searchQuery ? displayedMaterials.filter(m => (m.title || '').toLowerCase().includes(searchQuery.toLowerCase())) : displayedMaterials}
-            onInspect={setInspectGenerationId} 
-            setConfirmAction={setConfirmAction} 
+            onInspect={setInspectGenerationId}
+            setConfirmAction={setConfirmAction}
             DraggableCard={DraggableMaterialCard}
             DraggableRow={DraggableMaterialRow}
+            moveToFolderMutation={moveToFolderMutation}
+            duplicateMaterialMutation={duplicateMaterialMutation}
             viewMode={viewMode}
           />
         </div>
