@@ -186,10 +186,10 @@ function ProfilePageContent() {
             <button
               onClick={async () => {
                 try {
-                  await fetch('/api/v1/users/me/logout-all', {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${getAccessToken()}` }
-                  });
+                  // Trước đây dùng fetch('/api/...') đường dẫn tương đối — trên Vercel sẽ resolve
+                  // vào domain của chính FE thay vì backend thật, gây 404 (cùng lỗi đã sửa ở nút
+                  // xuất PDF/chứng chỉ). Đổi sang `api.post` để tự đi qua resolveBaseUrl() đúng.
+                  await api.post('/api/v1/users/me/logout-all', undefined, { token: getAccessToken() ?? undefined });
                   toast.success('Đã đăng xuất khỏi tất cả các thiết bị khác.');
                 } catch {
                   toast.error('Có lỗi xảy ra, vui lòng thử lại.');

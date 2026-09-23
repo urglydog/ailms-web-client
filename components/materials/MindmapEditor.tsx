@@ -40,8 +40,7 @@ import {
   MousePointer2,
   Move,
   Pencil,
-  ChevronRight,
-  ChevronLeft,
+  Sparkles,
 } from 'lucide-react';
 
 interface MindmapEditorProps {
@@ -54,36 +53,58 @@ interface MindmapEditorProps {
 const nodeWidth = 200;
 const nodeHeight = 50;
 
-const THEME_PRESETS: Record<string, { background: string, palette: string[], rootBg: string, rootColor: string }> = {
+/** `textColor` — màu chữ node cấp ≥2 (nhánh cháu), chọn riêng theo từng theme để luôn đủ tương
+ * phản với `background`. Trước đây hardcode 1 màu xám tối chung cho mọi theme — khiến theme nền
+ * tối ("Dark Nebula") bị ẩn chữ hoàn toàn, đã sửa ở đây. */
+const THEME_PRESETS: Record<string, { background: string, palette: string[], rootBg: string, rootColor: string, textColor: string }> = {
   Dawn: {
     background: '#FFFFFF',
     palette: ['#FF6B6B', '#FFA94D', '#FFD43B', '#69DB7C', '#4DABF7', '#DA77F2'],
     rootBg: '#212529',
-    rootColor: '#FFFFFF'
+    rootColor: '#FFFFFF',
+    textColor: '#475569'
   },
   'Dark Nebula': {
     background: '#1E1E2E',
     palette: ['#F38BA8', '#FAB387', '#A6E3A1', '#89B4FA', '#CBA6F7'],
     rootBg: '#CBA6F7',
-    rootColor: '#1E1E2E'
+    rootColor: '#1E1E2E',
+    textColor: '#CDD6F4'
   },
   'Classic Business': {
     background: '#F8F9FA',
     palette: ['#2B4C7E', '#3D6B9C', '#4A7FB2', '#679BCE', '#86B5E3'],
     rootBg: '#1A365D',
-    rootColor: '#FFFFFF'
+    rootColor: '#FFFFFF',
+    textColor: '#334155'
   },
   'Oceanic': {
     background: '#E0F2FE',
     palette: ['#0284C7', '#0369A1', '#075985', '#0C4A6E', '#082F49'],
     rootBg: '#0284C7',
-    rootColor: '#FFFFFF'
+    rootColor: '#FFFFFF',
+    textColor: '#0C4A6E'
   },
   'Forest': {
     background: '#F0FDF4',
     palette: ['#16A34A', '#15803D', '#166534', '#14532D', '#052E16'],
     rootBg: '#16A34A',
-    rootColor: '#FFFFFF'
+    rootColor: '#FFFFFF',
+    textColor: '#14532D'
+  },
+  Slate: {
+    background: '#F8FAFC',
+    palette: ['#2563EB', '#1D4ED8', '#3B82F6', '#60A5FA', '#1E40AF'],
+    rootBg: '#0F172A',
+    rootColor: '#FFFFFF',
+    textColor: '#334155'
+  },
+  Sunset: {
+    background: '#FFF7ED',
+    palette: ['#F97316', '#EA580C', '#F43F5E', '#FB923C', '#FDBA74'],
+    rootBg: '#C2410C',
+    rootColor: '#FFFFFF',
+    textColor: '#7C2D12'
   }
 };
 
@@ -281,7 +302,7 @@ function parseMermaidToFlow(code: string, theme: string) {
       } else if (level === 1) {
           n.style = { background: '#FFFFFF', color: paletteColor, border: `2px solid ${paletteColor}`, borderRadius: '20px', padding: '10px 20px', fontWeight: 'bold', fontSize: '14px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' };
       } else {
-          n.style = { background: 'transparent', color: '#475569', border: 'none', borderBottom: `2px solid ${paletteColor}`, borderRadius: '0', padding: '6px 12px', fontWeight: '500', fontSize: '13px' };
+          n.style = { background: 'transparent', color: t.textColor, border: 'none', borderBottom: `2px solid ${paletteColor}`, borderRadius: '0', padding: '6px 12px', fontWeight: '500', fontSize: '13px' };
       }
       
       const shape = n.data.shape as string;
@@ -367,7 +388,7 @@ function parseFlowToMermaid(nodes: Node[], edges: Edge[], layout: string, theme:
     const paletteColor = t.palette[bIdx % t.palette.length] || '#000000';
     
     let themeBg = 'none';
-    let themeColor = '#475569';
+    let themeColor = t.textColor;
     let themeStroke = 'none';
     
     if (level === 0) {
@@ -435,7 +456,7 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
           } else if (level === 1) {
               Object.assign(newStyle, { background: '#FFFFFF', color: paletteColor, border: `2px solid ${paletteColor}`, borderRadius: '20px', padding: '10px 20px', fontWeight: 'bold', fontSize: '14px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' });
           } else {
-              Object.assign(newStyle, { background: 'transparent', color: '#475569', border: 'none', borderBottom: `2px solid ${paletteColor}`, borderRadius: '0', padding: '6px 12px', fontWeight: '500', fontSize: '13px' });
+              Object.assign(newStyle, { background: 'transparent', color: t.textColor, border: 'none', borderBottom: `2px solid ${paletteColor}`, borderRadius: '0', padding: '6px 12px', fontWeight: '500', fontSize: '13px' });
           }
           
           const shape = n.data.shape as string;
@@ -520,7 +541,6 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
 
   const [mapStyle, setMapStyle] = useState(parsedConfig.layout);
   const [colorTheme, setColorTheme] = useState(parsedConfig.theme);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(!readOnly);
 
   const initData = useCallback(() => {
     const { nodes: n, edges: ed } = parseMermaidToFlow(initialMermaidCode, parsedConfig.theme);
@@ -744,87 +764,86 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
   const hasSelectedNode = nodes.some(n => n.selected);
 
   return (
-    <div className="flex h-[800px] w-full border border-gray-200 rounded-xl overflow-hidden bg-gray-50 relative" ref={ref} style={{ backgroundColor: THEME_PRESETS[colorTheme]?.background }}>
-      
-      {/* Top Floating Toolbar */}
-      {!readOnly && (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 bg-white shadow-xl rounded-xl border border-gray-200 px-2 py-1.5 flex gap-1 items-center animate-in slide-in-from-top-4">
-            {/* FIX 4: Disabled states */}
-            <button onClick={() => triggerAction('TAB')} disabled={!hasSelectedNode} className={`flex flex-col items-center justify-center p-2 rounded-lg min-w-[64px] transition-colors ${hasSelectedNode ? 'hover:bg-gray-100 text-gray-600' : 'opacity-40 cursor-not-allowed text-gray-400'}`} title="Thêm nhánh con (Tab)">
-                <GitBranch className="w-[18px] h-[18px]" strokeWidth={1.75} /><span className="text-[10px] font-bold mt-1">Subtopic</span>
-            </button>
-            <button onClick={() => triggerAction('ENTER')} disabled={!hasSelectedNode || nodes.find(n => n.selected)?.id === 'root'} className={`flex flex-col items-center justify-center p-2 rounded-lg min-w-[64px] transition-colors ${hasSelectedNode && nodes.find(n => n.selected)?.id !== 'root' ? 'hover:bg-gray-100 text-gray-600' : 'opacity-40 cursor-not-allowed text-gray-400'}`} title="Thêm nhánh ngang hàng (Enter)">
-                <ArrowLeftRight className="w-[18px] h-[18px]" strokeWidth={1.75} /><span className="text-[10px] font-bold mt-1">Topic</span>
-            </button>
-
-            <div className="w-[1px] h-8 bg-gray-200 mx-1"></div>
-
-            <div className="relative" ref={layoutRef}>
-                <button onClick={() => setShowLayouts(!showLayouts)} className="flex flex-col items-center justify-center p-2 hover:bg-gray-100 rounded-lg min-w-[64px] text-gray-600 transition-colors">
-                    <LayoutGrid className="w-[18px] h-[18px]" strokeWidth={1.75} /><span className="text-[10px] font-bold mt-1">Layout</span>
-                </button>
-                {showLayouts && (
-                    <div className="absolute top-full left-0 mt-2 w-64 bg-white border border-gray-200 rounded-xl shadow-2xl p-3 grid grid-cols-2 gap-2 z-50">
-                        {LAYOUTS.map(l => (
-                            <button key={l.id} onClick={() => { setMapStyle(l.id); setShowLayouts(false); applyLayout(nodes, edges, l.id); }} className={`flex flex-col items-center justify-center p-3 rounded-lg border transition-all ${mapStyle === l.id ? 'border-cyan-500 bg-cyan-50' : 'border-gray-100 hover:border-gray-300 hover:bg-gray-50'}`}>
-                                <l.Icon className="w-5 h-5 mb-1 text-gray-600" strokeWidth={1.75} />
-                                <span className="text-[10px] font-bold text-center text-gray-600 leading-tight">{l.name}</span>
-                            </button>
-                        ))}
-                    </div>
-                )}
-            </div>
-            <div className="w-[1px] h-8 bg-gray-200 mx-1"></div>
-            <div className="relative" ref={exportRef}>
-                <button onClick={() => setShowExport(!showExport)} className="flex flex-col items-center justify-center p-2 hover:bg-gray-100 rounded-lg min-w-[64px] text-gray-600 transition-colors">
-                    <Download className="w-[18px] h-[18px]" strokeWidth={1.75} /><span className="text-[10px] font-bold mt-1">Export</span>
-                </button>
-                {showExport && (
-                    <div className="absolute top-full left-0 mt-2 w-48 bg-white border border-gray-200 rounded-xl shadow-2xl py-2 flex flex-col z-50">
-                        <button onClick={() => handleExport('png')} className="px-4 py-2 text-left hover:bg-gray-50 text-sm font-medium">PNG Image</button>
-                        <button onClick={() => handleExport('svg')} className="px-4 py-2 text-left hover:bg-gray-50 text-sm font-medium">SVG Vector</button>
-                        <button onClick={() => handleExport('md')} className="px-4 py-2 text-left hover:bg-gray-50 text-sm font-medium border-t border-gray-100 mt-1 pt-2">Markdown Code</button>
-                    </div>
-                )}
-            </div>
-
-            <div className="w-[1px] h-8 bg-gray-200 mx-1"></div>
-            
-            <button onClick={handleUndo} disabled={historyIndex <= 0} className={`flex flex-col items-center justify-center p-2 rounded-lg min-w-[48px] transition-colors ${historyIndex > 0 ? 'hover:bg-gray-100 text-gray-600' : 'opacity-40 cursor-not-allowed text-gray-400'}`} title="Hoàn tác (Ctrl+Z)">
-                <Undo2 className="w-[18px] h-[18px]" strokeWidth={1.75} /><span className="text-[10px] font-bold mt-1">Undo</span>
-            </button>
-            <button onClick={handleRedo} disabled={historyIndex >= history.length - 1} className={`flex flex-col items-center justify-center p-2 rounded-lg min-w-[48px] transition-colors ${historyIndex < history.length - 1 ? 'hover:bg-gray-100 text-gray-600' : 'opacity-40 cursor-not-allowed text-gray-400'}`} title="Làm lại (Ctrl+Y)">
-                <Redo2 className="w-[18px] h-[18px]" strokeWidth={1.75} /><span className="text-[10px] font-bold mt-1">Redo</span>
-            </button>
-
-            {onSave && (
-                <>
-                    <div className="w-[1px] h-8 bg-gray-200 mx-1"></div>
-                    <button onClick={() => {
-                        const newCode = parseFlowToMermaid(nodes, edges, mapStyle, colorTheme);
-                        onSave(newCode);
-                    }} className="flex flex-col items-center justify-center p-2 hover:bg-cyan-50 rounded-lg min-w-[80px] text-cyan-600 transition-colors border border-transparent hover:border-cyan-200">
-                        <Save className="w-[18px] h-[18px]" strokeWidth={1.75} /><span className="text-[10px] font-bold mt-1">Lưu & Áp dụng</span>
-                    </button>
-                </>
-            )}
-        </div>
-      )}
+    <div className="flex h-[800px] w-full border border-line rounded-card overflow-hidden bg-surface relative" ref={ref} style={{ backgroundColor: THEME_PRESETS[colorTheme]?.background }}>
 
       {/* Main Flow Canvas */}
-      <div className={`flex-1 relative transition-all duration-300 ${!isSidebarOpen ? 'mr-0' : 'mr-80'}`}>
-        
-        {/* FIX 1: Sidebar Toggle Arrow */}
-        {!readOnly && (
-            <button 
-                onClick={() => setIsSidebarOpen(!isSidebarOpen)} 
-                className={`absolute top-1/2 -translate-y-1/2 z-30 bg-white border border-gray-200 hover:bg-gray-50 text-gray-500 shadow-lg flex items-center justify-center transition-all ${isSidebarOpen ? 'right-0 rounded-l-lg border-r-0 w-6 h-12' : 'right-0 rounded-l-lg w-8 h-16'}`}
-                title="Toggle Sidebar"
-            >
-                {isSidebarOpen ? <ChevronRight className="w-4 h-4" strokeWidth={2} /> : <ChevronLeft className="w-4 h-4" strokeWidth={2} />}
-            </button>
-        )}
+      <div className="flex-1 relative">
 
+        {/* Top Floating Toolbar — thu gọn thành 1 nút tròn, hover mới bung ra đủ nút (dùng
+            thao tác thường xuyên nên cần bung/thu rất nhanh — 150ms, cùng tốc độ với thanh
+            volume ở PlayerControls.tsx). transition-[max-width] thay vì width vì "width: auto"
+            không animate được bằng CSS. */}
+        {/* overflow-x-hidden (không phải overflow-hidden cả 2 trục) — chỉ cắt theo chiều ngang để
+            phục vụ animation thu/bung độ rộng; nếu cắt cả chiều dọc thì popup Layout/Export
+            (position: absolute, top-full) bên trong sẽ bị ẩn mất theo trục dọc. */}
+        {!readOnly && (
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 flex items-center h-11 max-w-[44px] hover:max-w-[640px] overflow-x-hidden overflow-y-visible rounded-full bg-surface-raised shadow-card hover:shadow-card-hover border border-line transition-[max-width] duration-150 ease-out">
+            <div className="flex items-center justify-center w-11 h-11 shrink-0 text-ink-muted">
+                <Sparkles className="w-[18px] h-[18px]" strokeWidth={1.75} />
+            </div>
+            <div className="flex items-center gap-1 pr-2 whitespace-nowrap">
+                <button onClick={() => triggerAction('TAB')} disabled={!hasSelectedNode} className={`flex flex-col items-center justify-center p-2 rounded-lg min-w-[64px] transition-colors ${hasSelectedNode ? 'hover:bg-surface-hover text-ink-muted' : 'opacity-40 cursor-not-allowed text-ink-faint'}`} title="Thêm nhánh con (Tab)">
+                    <GitBranch className="w-[18px] h-[18px]" strokeWidth={1.75} /><span className="text-[10px] font-bold mt-1">Subtopic</span>
+                </button>
+                <button onClick={() => triggerAction('ENTER')} disabled={!hasSelectedNode || nodes.find(n => n.selected)?.id === 'root'} className={`flex flex-col items-center justify-center p-2 rounded-lg min-w-[64px] transition-colors ${hasSelectedNode && nodes.find(n => n.selected)?.id !== 'root' ? 'hover:bg-surface-hover text-ink-muted' : 'opacity-40 cursor-not-allowed text-ink-faint'}`} title="Thêm nhánh ngang hàng (Enter)">
+                    <ArrowLeftRight className="w-[18px] h-[18px]" strokeWidth={1.75} /><span className="text-[10px] font-bold mt-1">Topic</span>
+                </button>
+
+                <div className="w-[1px] h-8 bg-line mx-1"></div>
+
+                <div className="relative" ref={layoutRef}>
+                    <button onClick={() => setShowLayouts(!showLayouts)} className="flex flex-col items-center justify-center p-2 hover:bg-surface-hover rounded-lg min-w-[64px] text-ink-muted transition-colors">
+                        <LayoutGrid className="w-[18px] h-[18px]" strokeWidth={1.75} /><span className="text-[10px] font-bold mt-1">Layout</span>
+                    </button>
+                    {showLayouts && (
+                        <div className="absolute top-full left-0 mt-2 w-64 bg-surface-raised border border-line rounded-card shadow-card-hover p-3 grid grid-cols-2 gap-2 z-50">
+                            {LAYOUTS.map(l => (
+                                <button key={l.id} onClick={() => { setMapStyle(l.id); setShowLayouts(false); applyLayout(nodes, edges, l.id); }} className={`flex flex-col items-center justify-center p-3 rounded-lg border transition-all ${mapStyle === l.id ? 'border-accent bg-accent/5' : 'border-line hover:border-line-dot hover:bg-surface-hover'}`}>
+                                    <l.Icon className="w-5 h-5 mb-1 text-ink-muted" strokeWidth={1.75} />
+                                    <span className="text-[10px] font-bold text-center text-ink-muted leading-tight">{l.name}</span>
+                                </button>
+                            ))}
+                        </div>
+                    )}
+                </div>
+                <div className="w-[1px] h-8 bg-line mx-1"></div>
+                <div className="relative" ref={exportRef}>
+                    <button onClick={() => setShowExport(!showExport)} className="flex flex-col items-center justify-center p-2 hover:bg-surface-hover rounded-lg min-w-[64px] text-ink-muted transition-colors">
+                        <Download className="w-[18px] h-[18px]" strokeWidth={1.75} /><span className="text-[10px] font-bold mt-1">Export</span>
+                    </button>
+                    {showExport && (
+                        <div className="absolute top-full left-0 mt-2 w-48 bg-surface-raised border border-line rounded-card shadow-card-hover py-2 flex flex-col z-50">
+                            <button onClick={() => handleExport('png')} className="px-4 py-2 text-left hover:bg-surface-hover text-sm font-medium text-ink">PNG Image</button>
+                            <button onClick={() => handleExport('svg')} className="px-4 py-2 text-left hover:bg-surface-hover text-sm font-medium text-ink">SVG Vector</button>
+                            <button onClick={() => handleExport('md')} className="px-4 py-2 text-left hover:bg-surface-hover text-sm font-medium text-ink border-t border-line-soft mt-1 pt-2">Markdown Code</button>
+                        </div>
+                    )}
+                </div>
+
+                <div className="w-[1px] h-8 bg-line mx-1"></div>
+
+                <button onClick={handleUndo} disabled={historyIndex <= 0} className={`flex flex-col items-center justify-center p-2 rounded-lg min-w-[48px] transition-colors ${historyIndex > 0 ? 'hover:bg-surface-hover text-ink-muted' : 'opacity-40 cursor-not-allowed text-ink-faint'}`} title="Hoàn tác (Ctrl+Z)">
+                    <Undo2 className="w-[18px] h-[18px]" strokeWidth={1.75} /><span className="text-[10px] font-bold mt-1">Undo</span>
+                </button>
+                <button onClick={handleRedo} disabled={historyIndex >= history.length - 1} className={`flex flex-col items-center justify-center p-2 rounded-lg min-w-[48px] transition-colors ${historyIndex < history.length - 1 ? 'hover:bg-surface-hover text-ink-muted' : 'opacity-40 cursor-not-allowed text-ink-faint'}`} title="Làm lại (Ctrl+Y)">
+                    <Redo2 className="w-[18px] h-[18px]" strokeWidth={1.75} /><span className="text-[10px] font-bold mt-1">Redo</span>
+                </button>
+
+                {onSave && (
+                    <>
+                        <div className="w-[1px] h-8 bg-line mx-1"></div>
+                        <button onClick={() => {
+                            const newCode = parseFlowToMermaid(nodes, edges, mapStyle, colorTheme);
+                            onSave(newCode);
+                        }} className="flex flex-col items-center justify-center p-2 hover:bg-accent/5 rounded-lg min-w-[80px] text-accent transition-colors border border-transparent hover:border-accent/30">
+                            <Save className="w-[18px] h-[18px]" strokeWidth={1.75} /><span className="text-[10px] font-bold mt-1">Save & Apply</span>
+                        </button>
+                    </>
+                )}
+            </div>
+          </div>
+        )}
+        
         <ReactFlow
           nodes={nodes}
           edges={edges}
@@ -893,12 +912,14 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
         )}
       </div>
 
-      {/* Right Inspector Panel */}
+      {/* Right Inspector Panel — cột cố định thật (flex sibling của canvas), luôn hiện, không
+          còn toggle/overlay — canvas ở trên đã tự nhường chỗ qua flex-1, không cần margin mô
+          phỏng nữa. */}
       {!readOnly && (
-          <div className={`w-80 bg-white border-l border-gray-200 flex flex-col shadow-2xl z-20 absolute right-0 top-0 bottom-0 transition-transform duration-300 ${isSidebarOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-              <div className="flex border-b border-gray-100 p-2 gap-1 pt-16">
+          <div className="w-80 shrink-0 bg-surface-raised border-l border-line flex flex-col shadow-card z-10">
+              <div className="flex border-b border-line-soft p-2 gap-1">
                   {['Map', 'Style'].map(tab => (
-                      <button key={tab} onClick={() => setActiveTab(tab as 'Style' | 'Map')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-colors ${activeTab === tab ? 'bg-gray-100 text-gray-800' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'}`}>{tab}</button>
+                      <button key={tab} onClick={() => setActiveTab(tab as 'Style' | 'Map')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-colors ${activeTab === tab ? 'bg-surface-hover text-ink' : 'text-ink-faint hover:text-ink-muted hover:bg-surface-hover'}`}>{tab}</button>
                   ))}
               </div>
 
@@ -906,13 +927,22 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
                   {activeTab === 'Map' && (
                       <div className="space-y-6">
                           <div>
-                              <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-3 block">Color Theme (Bảng màu)</label>
+                              <label className="text-[11px] font-bold text-ink-faint uppercase tracking-wider mb-3 block">Color Theme</label>
                               <div className="grid gap-2">
-                                  {Object.keys(THEME_PRESETS).map(theme => (
-                                      <button key={theme} onClick={() => { setColorTheme(theme); applyTheme(theme, nodes, edges); }} className={`p-3 rounded-xl border text-left transition-all flex flex-col gap-2 ${colorTheme === theme ? 'border-cyan-500 bg-cyan-50 shadow-sm' : 'border-gray-200 hover:border-gray-300'}`}>
-                                          <span className="text-xs font-bold text-gray-700">{theme}</span>
-                                          <div className="flex gap-1 h-3 rounded-full overflow-hidden w-full">
-                                              {THEME_PRESETS[theme]?.palette.map(c => <div key={c} className="flex-1" style={{backgroundColor: c}}></div>)}
+                                  {Object.entries(THEME_PRESETS).map(([theme, t]) => (
+                                      <button key={theme} onClick={() => { setColorTheme(theme); applyTheme(theme, nodes, edges); }} className={`p-3 rounded-card border text-left transition-all flex items-center gap-3 ${colorTheme === theme ? 'border-accent bg-accent/5 shadow-card' : 'border-line hover:border-line-dot hover:bg-surface-hover'}`}>
+                                          {/* Preview: node gốc thu nhỏ đúng màu theme, thay vì chỉ dải màu trừu tượng */}
+                                          <div
+                                              className="shrink-0 flex items-center justify-center w-9 h-9 rounded-full text-[10px] font-bold border border-black/5"
+                                              style={{ background: t.rootBg, color: t.rootColor }}
+                                          >
+                                              Aa
+                                          </div>
+                                          <div className="flex-1 min-w-0">
+                                              <span className="text-xs font-bold text-ink block">{theme}</span>
+                                              <div className="flex gap-1 h-2 rounded-full overflow-hidden w-full mt-1.5">
+                                                  {t.palette.map(c => <div key={c} className="flex-1" style={{backgroundColor: c}}></div>)}
+                                              </div>
                                           </div>
                                       </button>
                                   ))}
@@ -924,30 +954,29 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
                       <div className="space-y-6">
                         {nodes.filter(n => n.selected).length === 1 ? (
                             <div className="space-y-4">
-                                <div className="border p-4 rounded-xl border-gray-200">
-                                    <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-3 block">Định dạng Khối (Shape)</label>
-                                    <div className="grid grid-cols-2 gap-2">
+                                <div className="border p-4 rounded-card border-line">
+                                    <label className="text-[11px] font-bold text-ink-faint uppercase tracking-wider mb-3 block">Shape</label>
+                                    <div className="grid grid-cols-3 gap-2">
                                         {[
-                                            { id: 'rect', label: 'Vuông', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="6" width="18" height="12"></rect></svg> },
-                                            { id: 'rounded', label: 'Bo Góc', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="6" width="18" height="12" rx="6"></rect></svg> },
-                                            { id: 'circle', label: 'Tròn', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"></circle></svg> }
+                                            { id: 'rect', name: 'Hình vuông', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="6" width="18" height="12"></rect></svg> },
+                                            { id: 'rounded', name: 'Bo góc', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="6" width="18" height="12" rx="6"></rect></svg> },
+                                            { id: 'circle', name: 'Hình tròn', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"></circle></svg> }
                                         ].map(s => (
-                                            <button key={s.id} onClick={() => {
+                                            <button key={s.id} title={s.name} onClick={() => {
                                                 const selectedId = nodes.find(n => n.selected)!.id;
                                                 setNodes(nds => {
                                                     const nextNodes = nds.map(n => n.id === selectedId ? {...n, data: {...n.data, shape: s.id}} : n);
                                                     setTimeout(() => applyTheme(colorTheme, nextNodes, edges), 0);
                                                     return nextNodes;
                                                 });
-                                            }} className={`flex flex-col items-center gap-1 py-2 text-xs font-bold rounded-lg border transition-all ${nodes.find(n => n.selected)?.data.shape === s.id || (s.id === 'rect' && !nodes.find(n => n.selected)?.data.shape) ? 'bg-cyan-50 border-cyan-500 text-cyan-700' : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'}`}>
+                                            }} className={`flex items-center justify-center py-2.5 rounded-lg border transition-all ${nodes.find(n => n.selected)?.data.shape === s.id || (s.id === 'rect' && !nodes.find(n => n.selected)?.data.shape) ? 'bg-accent/5 border-accent text-accent' : 'bg-surface-hover border-line text-ink-muted hover:border-line-dot'}`}>
                                                 {s.icon}
-                                                <span>{s.label}</span>
                                             </button>
                                         ))}
                                     </div>
                                 </div>
-                                <div className="border p-4 rounded-xl border-gray-200">
-                                    <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2 block">Màu Nền (Fill)</label>
+                                <div className="border p-4 rounded-card border-line">
+                                    <label className="text-[11px] font-bold text-ink-faint uppercase tracking-wider mb-2 block">Màu Nền (Fill)</label>
                                     <div className="flex gap-2">
                                         <input type="color" className="w-10 h-10 rounded cursor-pointer border-0 p-0" onChange={(e) => {
                                             const selectedId = nodes.find(n => n.selected)!.id;
@@ -963,13 +992,13 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
                                             const selectedId = nodes.find(n => n.selected)!.id;
                                             setNodes(nds => nds.map(n => n.id === selectedId ? {...n, data: {...n.data, customBg: undefined}, style: {...n.style, background: undefined}} : n));
                                             setTimeout(() => applyTheme(colorTheme, nodes, edges), 0);
-                                        }} className="text-xs bg-gray-100 hover:bg-gray-200 px-3 rounded text-gray-600 font-bold">Về mặc định</button>
+                                        }} className="text-xs bg-surface-hover hover:bg-line-soft px-3 rounded-lg text-ink-muted font-bold">Về mặc định</button>
                                     </div>
                                 </div>
-                                <div className="border p-4 rounded-xl border-gray-200">
-                                    <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2 block">Văn Bản (Text)</label>
+                                <div className="border p-4 rounded-card border-line">
+                                    <label className="text-[11px] font-bold text-ink-faint uppercase tracking-wider mb-2 block">Văn Bản (Text)</label>
                                     <div className="flex gap-2 mb-3">
-                                        <button onClick={() => {
+                                        <button title="In đậm" onClick={() => {
                                             const selectedId = nodes.find(n => n.selected)!.id;
                                             setNodes(nds => {
                                                 const sn = nds.find(n => n.id === selectedId)!;
@@ -977,8 +1006,8 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
                                                 setTimeout(() => applyTheme(colorTheme, nextNodes, edges), 0);
                                                 return nextNodes;
                                             });
-                                        }} className={`flex-1 py-1.5 text-xs font-bold rounded-lg border ${nodes.find(n => n.selected)?.data.isBold ? 'bg-gray-800 text-white border-gray-800' : 'bg-gray-50 text-gray-600 border-gray-200'}`}>B</button>
-                                        <button onClick={() => {
+                                        }} className={`flex-1 py-1.5 text-xs font-bold rounded-lg border ${nodes.find(n => n.selected)?.data.isBold ? 'bg-ink text-white border-ink' : 'bg-surface-hover text-ink-muted border-line'}`}>B</button>
+                                        <button title="In nghiêng" onClick={() => {
                                             const selectedId = nodes.find(n => n.selected)!.id;
                                             setNodes(nds => {
                                                 const sn = nds.find(n => n.id === selectedId)!;
@@ -986,7 +1015,7 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
                                                 setTimeout(() => applyTheme(colorTheme, nextNodes, edges), 0);
                                                 return nextNodes;
                                             });
-                                        }} className={`flex-1 py-1.5 text-xs italic rounded-lg border ${nodes.find(n => n.selected)?.data.isItalic ? 'bg-gray-800 text-white border-gray-800' : 'bg-gray-50 text-gray-600 border-gray-200'}`}>I</button>
+                                        }} className={`flex-1 py-1.5 text-xs italic rounded-lg border ${nodes.find(n => n.selected)?.data.isItalic ? 'bg-ink text-white border-ink' : 'bg-surface-hover text-ink-muted border-line'}`}>I</button>
                                     </div>
                                     <div className="flex gap-2">
                                         <input type="color" className="w-10 h-10 rounded cursor-pointer border-0 p-0" onChange={(e) => {
@@ -1003,14 +1032,14 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
                                             const selectedId = nodes.find(n => n.selected)!.id;
                                             setNodes(nds => nds.map(n => n.id === selectedId ? {...n, data: {...n.data, customColor: undefined}, style: {...n.style, color: undefined}} : n));
                                             setTimeout(() => applyTheme(colorTheme, nodes, edges), 0);
-                                        }} className="text-xs bg-gray-100 hover:bg-gray-200 px-3 rounded text-gray-600 font-bold">Về mặc định</button>
+                                        }} className="text-xs bg-surface-hover hover:bg-line-soft px-3 rounded-lg text-ink-muted font-bold">Về mặc định</button>
                                     </div>
                                 </div>
-                                <div className="text-xs text-gray-400 mt-2 text-center">Tùy chỉnh sẽ được đồng bộ khi bạn nhấn &quot;Lưu &amp; Áp dụng&quot;</div>
+                                <div className="text-xs text-ink-faint mt-2 text-center">Tùy chỉnh sẽ được đồng bộ khi bạn nhấn &quot;Save &amp; Apply&quot;</div>
                             </div>
                         ) : (
-                            <div className="text-center text-gray-400 text-sm mt-10 p-4 border border-dashed rounded-xl border-gray-200">
-                                <strong>Node Style</strong><br/><br/>
+                            <div className="text-center text-ink-faint text-sm mt-10 p-4 border border-dashed rounded-card border-line">
+                                <strong className="text-ink-muted">Node Style</strong><br/><br/>
                                 Hãy click chọn một node cụ thể trên bản đồ để tuỳ chỉnh Shape, Font, Màu nền và Màu chữ.
                             </div>
                         )}

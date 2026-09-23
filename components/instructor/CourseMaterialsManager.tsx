@@ -16,6 +16,7 @@ import { MaterialLanguagePicker } from '@/components/materials/MaterialLanguageP
 import { MaterialFolderTree } from './MaterialFolderTree';
 import { getMaterialDistributionBadge, getMaterialProcessingBadge } from '@/lib/materialStatus';
 import { getAccessToken } from '@/lib/auth/token';
+import { resolveBaseUrl } from '@/lib/api/client';
 import { CourseActivityPanel } from './CourseActivityPanel';
 import { StaticResourcesPanel } from './StaticResourcesPanel';
 import { MaterialBadge } from '@/components/materials/ui/MaterialBadge';
@@ -670,7 +671,7 @@ function MaterialWorkspaceViewer({
   const handleExportQuizPdf = async (quizId: number, mode: 'blank' | 'cheatsheet') => {
     setIsExportingPdf(mode);
     try {
-      const res = await fetch(`/api/v1/instructor/quizzes/${quizId}/export-pdf?mode=${mode}`, {
+      const res = await fetch(`${resolveBaseUrl()}/api/v1/instructor/quizzes/${quizId}/export-pdf?mode=${mode}`, {
         headers: { Authorization: `Bearer ${getAccessToken() ?? ''}` },
       });
       if (!res.ok) throw new Error('Không xuất được PDF');
@@ -910,7 +911,9 @@ function MaterialWorkspaceViewer({
 
               {activeTab === 'VIEW' ? (
                 <div className="w-full bg-surface-raised rounded-card shadow-sm border border-line">
-                  <MermaidViewer chart={detail.mermaidCode} />
+                  {/* readOnly: bỏ 4 nút xoay hướng — giảng viên đã có 2 tab riêng (Chỉnh Sửa/Soạn
+                      Code) để đổi hướng, nút ở đây thừa. */}
+                  <MermaidViewer chart={detail.mermaidCode} readOnly />
                 </div>
               ) : activeTab === 'CODE_EDITOR' ? (
                 <div className="w-full h-[700px] overflow-hidden">
