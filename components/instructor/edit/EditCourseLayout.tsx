@@ -32,6 +32,7 @@ const NAV_SECTIONS: NavSection[] = [
     items: [
       { key: 'curriculum', label: 'Chương trình giảng dạy', href: (id) => `/instructor/courses/${id}/edit/curriculum` },
       { key: 'materials', label: 'Học liệu & Quiz thi cử', href: (id) => `/instructor/courses/${id}/edit/materials` },
+      { key: 'resources', label: 'Tài nguyên tĩnh', href: (id) => `/instructor/courses/${id}/edit/resources` },
     ],
   },
   {

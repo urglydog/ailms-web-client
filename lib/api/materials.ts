@@ -89,6 +89,9 @@ export interface LanguageAvailability {
 }
 
 export interface MaterialDetailRes extends MaterialGenerationRes {
+  /** ID entity Quiz thật (khác `id` = MaterialGeneration) — chỉ có khi materialType=QUIZ. Dùng
+   * cho các endpoint /api/v1/quizzes/{quizId}/... (export-pdf...), KHÔNG dùng `id` ở đây. */
+  quizId?: number;
   mermaidCode?: string;
   flashcards?: {
     id: number;
