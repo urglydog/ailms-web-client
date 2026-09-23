@@ -2,11 +2,13 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { Folder, MoreVertical, Plus, Trash2, ChevronRight, ChevronDown, FolderOpen, MoveRight, Pencil, History } from 'lucide-react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient, type UseMutationResult } from '@tanstack/react-query';
+import { useDroppable } from '@dnd-kit/core';
 import { materialsApi, InstructorMaterial } from '@/lib/api/materials';
 import { toast } from 'sonner';
 import { createPortal } from 'react-dom';
 import { VersionHistoryModal } from './VersionHistoryModal';
+import { MaterialBadge } from '@/components/materials/ui/MaterialBadge';
 
 type FolderItem = { id: number; name: string; parentId?: number };
 type MaterialItem = InstructorMaterial;
@@ -20,6 +22,10 @@ interface MaterialFolderTreeProps {
   DraggableCard: React.ElementType;
   DraggableRow: React.ElementType;
   viewMode?: 'grid' | 'list';
+  /** Dùng chung với CourseMaterialsManager — cả kéo-thả thả vào dòng thư mục và Ctrl+X/Ctrl+V
+   * cắt-dán ở đây đều gọi cùng 1 mutation, tránh 2 bản riêng biệt cho cùng 1 hành động. */
+  moveToFolderMutation: UseMutationResult<unknown, Error, { id: number; folderId: number | null }>;
+  duplicateMaterialMutation: UseMutationResult<unknown, Error, { id: number; targetFolderId: number | null }>;
 }
 
 export function MaterialFolderTree({
@@ -31,6 +37,8 @@ export function MaterialFolderTree({
   DraggableCard,
   DraggableRow,
   viewMode = 'grid',
+  moveToFolderMutation,
+  duplicateMaterialMutation,
 }: MaterialFolderTreeProps) {
   const queryClient = useQueryClient();
 
@@ -43,8 +51,9 @@ export function MaterialFolderTree({
 
   const [expandedFolders, setExpandedFolders] = useState<Record<number, boolean>>({});
 
-  // New: folder-picker modal state (replaces raw-ID prompt for move-to-folder)
-  const [folderPickerFor, setFolderPickerFor] = useState<number | null>(null); // materialId
+  // New: folder-picker modal state (replaces raw-ID prompt for move-to-folder). `mode` phân biệt
+  // "Chuyển vào Thư mục..." (chuột phải, luôn move) với Ctrl+V dán bản đã Ctrl+C (copy = nhân bản).
+  const [folderPickerFor, setFolderPickerFor] = useState<{ materialId: number; mode: 'move' | 'copy' } | null>(null);
   const [folderPickerSearch, setFolderPickerSearch] = useState('');
 
   // Simple text-input modal for folder creation (name only — no raw IDs)
@@ -60,7 +69,10 @@ export function MaterialFolderTree({
 
   // Keyboard clipboard state (Issue 4)
   const [selectedMaterialId, setSelectedMaterialId] = useState<number | null>(null);
-  const [clipboard, setClipboard] = useState<number | null>(null); // materialId copied
+  const [clipboard, setClipboard] = useState<{ id: number; mode: 'copy' | 'cut' } | null>(null);
+
+  // A5 — vùng thả "về Workspace gốc" khi kéo học liệu ra khỏi thư mục.
+  const { isOver: rootDropOver, setNodeRef: setRootDropRef } = useDroppable({ id: 'folder-root', data: { type: 'folder' } });
 
   // Mutations
   const createFolderMutation = useMutation({
@@ -77,16 +89,6 @@ export function MaterialFolderTree({
       queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] });
     },
     onError: (err: Error) => toast.error(err.message || 'Không thể xóa thư mục'),
-  });
-
-  const moveToFolderMutation = useMutation({
-    mutationFn: (vars: { id: number; folderId: number | null }) =>
-      materialsApi.moveToFolder(vars.id, vars.folderId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] });
-      toast.success('Đã di chuyển học liệu');
-    },
-    onError: (err: Error) => toast.error(err.message || 'Không thể di chuyển học liệu'),
   });
 
   const renameMaterialMutation = useMutation({
@@ -148,15 +150,16 @@ export function MaterialFolderTree({
         }
       } else if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
         e.preventDefault();
-        toast.info('Chức năng Copy (nhân bản) chưa được hỗ trợ');
+        setClipboard({ id: selectedMaterialId, mode: 'copy' });
+        toast.info(`Đã sao chép "${mat?.title || 'học liệu'}" — chọn thư mục đích và nhấn Ctrl+V để dán bản sao`);
       } else if ((e.ctrlKey || e.metaKey) && e.key === 'x') {
         e.preventDefault();
-        setClipboard(selectedMaterialId);
+        setClipboard({ id: selectedMaterialId, mode: 'cut' });
         toast.info(`Đã cắt "${mat?.title || 'học liệu'}" — chọn thư mục đích và nhấn Ctrl+V để dán`);
       } else if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
         e.preventDefault();
         if (clipboard !== null) {
-          setFolderPickerFor(clipboard);
+          setFolderPickerFor({ materialId: clipboard.id, mode: clipboard.mode === 'copy' ? 'copy' : 'move' });
         }
       }
     };
@@ -200,7 +203,7 @@ export function MaterialFolderTree({
   };
 
   const handleMoveMaterial = (matId: number) => {
-    setFolderPickerFor(matId);
+    setFolderPickerFor({ materialId: matId, mode: 'move' });
     setFolderPickerSearch('');
     setContextMenu(null);
   };
@@ -235,9 +238,10 @@ export function MaterialFolderTree({
   const renderMaterialCard = (mat: MaterialItem) => (
     <div
       key={mat.id}
-      className={`relative group/mat ${selectedMaterialId === mat.id ? 'ring-2 ring-blue-400 rounded-card' : ''}`}
+      className={`relative group/mat select-none ${selectedMaterialId === mat.id ? 'ring-2 ring-accent rounded-card' : ''}`}
       onContextMenu={e => handleContextMenu(e, 'MATERIAL', mat.id)}
       onClick={e => { e.stopPropagation(); setSelectedMaterialId(mat.id); }}
+      onMouseDown={e => { if (e.detail > 1) e.preventDefault(); }}
     >
       <DraggableCard mat={mat} onClick={() => onInspect(mat.id)} />
     </div>
@@ -249,8 +253,9 @@ export function MaterialFolderTree({
         key={mat.id}
         onContextMenu={e => handleContextMenu(e, 'MATERIAL', mat.id)}
         onClick={e => { e.stopPropagation(); setSelectedMaterialId(mat.id); }}
-        className={`flex items-center gap-3 px-4 py-2.5 border-b border-gray-50 hover:bg-surface-hover cursor-pointer transition-colors group/row ${
-          selectedMaterialId === mat.id ? 'bg-accent/5' : ''
+        onMouseDown={e => { if (e.detail > 1) e.preventDefault(); }}
+        className={`flex items-center gap-3 px-4 py-2.5 border-b border-gray-50 hover:bg-surface-hover cursor-pointer transition-colors group/row select-none ${
+          selectedMaterialId === mat.id ? 'bg-accent/10 ring-1 ring-inset ring-accent/40' : ''
         }`}
       >
         <DraggableRow mat={mat} onDoubleClick={() => onInspect(mat.id)} />
@@ -258,21 +263,33 @@ export function MaterialFolderTree({
     );
   };
 
-  const renderFolder = (folder: FolderItem) => {
+  /** Dòng thư mục — component riêng (không phải hàm closure gọi trong .map) vì cần dùng hook
+   * `useDroppable` (A5, kéo-thả thả vào thư mục) — hook không được gọi bên trong 1 hàm lặp lại
+   * nhiều lần trong 1 lượt render như `renderFolder` cũ. */
+  const FolderRow = ({ folder }: { folder: FolderItem }) => {
     const isExpanded = expandedFolders[folder.id];
     const childFolders = folders.filter(f => f.parentId === folder.id);
     const childMaterials = materials.filter(m => m.folderId === folder.id);
+    const { isOver, setNodeRef } = useDroppable({ id: `folder-${folder.id}`, data: { type: 'folder' } });
 
     return (
-      <div key={folder.id} className="ml-4 mt-2">
+      <div className="ml-4 mt-2">
         <div
+          ref={setNodeRef}
           onClick={e => toggleFolder(folder.id, e)}
           onContextMenu={e => handleContextMenu(e, 'FOLDER', folder.id)}
-          className="flex items-center gap-2 p-2 rounded-lg hover:bg-accent/5 cursor-pointer text-ink transition-colors group"
+          className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer text-ink transition-colors group select-none ${
+            isOver ? 'bg-accent/10 border border-accent/40 border-dashed' : 'hover:bg-accent/5'
+          }`}
         >
           {isExpanded ? <ChevronDown className="w-4 h-4 text-ink-faint" /> : <ChevronRight className="w-4 h-4 text-ink-faint" />}
-          {isExpanded ? <FolderOpen className="w-5 h-5 text-accent" /> : <Folder className="w-5 h-5 text-accent/70" />}
+          <span className="flex items-center justify-center w-7 h-7 rounded-card bg-accent/5">
+            {isExpanded ? <FolderOpen className="w-4 h-4 text-accent" /> : <Folder className="w-4 h-4 text-accent/70" />}
+          </span>
           <span className="font-semibold text-sm">{folder.name}</span>
+          {childMaterials.length > 0 && (
+            <MaterialBadge tone="neutral">{childMaterials.length}</MaterialBadge>
+          )}
           <button
             className="ml-auto opacity-0 group-hover:opacity-100 p-1 hover:bg-line-soft rounded text-ink-muted"
             onClick={e => { e.stopPropagation(); handleContextMenu(e, 'FOLDER', folder.id); }}
@@ -283,7 +300,7 @@ export function MaterialFolderTree({
 
         {isExpanded && (
           <div className="ml-6 border-l border-line pl-2">
-            {childFolders.map(renderFolder)}
+            {childFolders.map(f => <FolderRow key={f.id} folder={f} />)}
             {viewMode === 'list' ? (
               <div className="border border-line rounded-card overflow-hidden mt-2">
                 {childMaterials.map(renderMaterialRow)}
@@ -302,19 +319,26 @@ export function MaterialFolderTree({
     );
   };
 
+  // Thực thi paste: 'move' gọi mutation di chuyển, 'copy' gọi mutation nhân bản — dùng chung 1
+  // hàm cho cả picker (chuột phải) lẫn Ctrl+V, tránh lặp logic branch ở 2 nơi.
+  const commitFolderPickerTarget = (targetFolderId: number | null) => {
+    if (folderPickerFor === null) return;
+    if (folderPickerFor.mode === 'copy') {
+      duplicateMaterialMutation.mutate({ id: folderPickerFor.materialId, targetFolderId });
+    } else {
+      moveToFolderMutation.mutate({ id: folderPickerFor.materialId, folderId: targetFolderId });
+    }
+    setFolderPickerFor(null);
+    setClipboard(null);
+  };
+
   // Render folder tree nodes for picker
   const renderPickerNode = (f: FolderItem, depth = 0) => (
     <button
       key={f.id}
       className="w-full text-left px-3 py-2 text-sm text-ink hover:bg-accent/5 rounded-lg flex items-center gap-2 transition-colors"
       style={{ paddingLeft: `${12 + depth * 16}px` }}
-      onClick={() => {
-        if (folderPickerFor !== null) {
-          moveToFolderMutation.mutate({ id: folderPickerFor, folderId: f.id });
-          setFolderPickerFor(null);
-          setClipboard(null);
-        }
-      }}
+      onClick={() => commitFolderPickerTarget(f.id)}
     >
       <Folder className="w-4 h-4 text-accent/70 flex-shrink-0" />
       {f.name}
@@ -335,18 +359,23 @@ export function MaterialFolderTree({
       onContextMenu={e => handleContextMenu(e, 'ROOT')}
       onClick={() => setSelectedMaterialId(null)}
     >
-      <div className="mb-4 flex items-center justify-between">
+      <div
+        ref={setRootDropRef}
+        className={`mb-4 flex items-center justify-between rounded-card p-1.5 transition-colors ${
+          rootDropOver ? 'bg-accent/10 border border-accent/40 border-dashed' : ''
+        }`}
+      >
         <span className="text-xs font-semibold text-ink-muted uppercase tracking-wider">
-          Thư Mục Gốc (Click chuột phải để thêm)
+          Thư Mục Gốc (Click chuột phải để thêm · kéo học liệu thả vào đây để đưa về gốc)
         </span>
         {selectedMaterialId && (
           <span className="text-[10px] text-ink-faint italic">
-            ✓ Đã chọn — Del: xóa · Ctrl+X: cắt · Ctrl+V: dán
+            ✓ Đã chọn — Del: xóa · Ctrl+C: chép · Ctrl+X: cắt · Ctrl+V: dán
           </span>
         )}
       </div>
 
-      {rootFolders.map(renderFolder)}
+      {rootFolders.map(f => <FolderRow key={f.id} folder={f} />)}
 
       {viewMode === 'list' ? (
         <div className="border border-line rounded-card overflow-hidden mt-3">
@@ -453,7 +482,7 @@ export function MaterialFolderTree({
             onClick={e => e.stopPropagation()}
           >
             <h3 className="text-base font-bold text-ink mb-3 flex items-center gap-2">
-              <Folder className="w-5 h-5 text-accent" /> Chọn Thư mục Đích
+              <Folder className="w-5 h-5 text-accent" /> {folderPickerFor.mode === 'copy' ? 'Chọn Thư mục Đích cho Bản sao' : 'Chọn Thư mục Đích'}
             </h3>
             <input
               autoFocus
@@ -463,17 +492,12 @@ export function MaterialFolderTree({
               onChange={e => setFolderPickerSearch(e.target.value)}
             />
             <div className="max-h-56 overflow-y-auto flex flex-col gap-0.5">
-              {/* Option: move to root workspace */}
+              {/* Option: move/copy to root workspace */}
               <button
                 className="w-full text-left px-3 py-2 text-sm text-ink-muted hover:bg-surface-hover rounded-lg flex items-center gap-2 italic"
-                onClick={() => {
-                  if (folderPickerFor !== null) {
-                    moveToFolderMutation.mutate({ id: folderPickerFor, folderId: null });
-                    setFolderPickerFor(null);
-                  }
-                }}
+                onClick={() => commitFolderPickerTarget(null)}
               >
-                <FolderOpen className="w-4 h-4 text-ink-faint" /> Workspace gốc (bỏ khỏi thư mục)
+                <FolderOpen className="w-4 h-4 text-ink-faint" /> Workspace gốc {folderPickerFor.mode === 'copy' ? '' : '(bỏ khỏi thư mục)'}
               </button>
               <div className="h-px bg-surface-hover my-1" />
               {buildPickerTree(undefined)}

@@ -43,6 +43,7 @@ export interface InstructorMaterial {
   materialId?: number;
   folderId?: number | null;
   questionCount?: number;
+  cardCount?: number;
   randomPickCount?: number | null;
   allowReview?: boolean;
   startTime?: string | null;
@@ -181,6 +182,13 @@ export const materialsApi = {
 
   moveToFolder: (materialId: number, folderId: number | null) =>
     api.put(`/api/v1/instructor/materials/${materialId}/move-to-folder`, { folderId }, { token: authToken() }),
+
+  duplicateMaterial: (materialId: number, targetFolderId: number | null) =>
+    api.post<{ id: number; materialId: number | null; title: string; message: string }>(
+      `/api/v1/instructor/materials/${materialId}/duplicate`,
+      { targetFolderId },
+      { token: authToken() },
+    ),
 
   attachMaterial: (id: number, target: { lessonId?: number | null; chapterId?: number | null }) =>
     api.put(`/api/v1/instructor/materials/${id}/attach-lesson`, target, { token: authToken() }),

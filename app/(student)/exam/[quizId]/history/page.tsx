@@ -4,6 +4,8 @@ import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect, Suspense } from 'react';
 import { useQuizHistory, useAttemptDetail } from '@/hooks/useQuizzes';
 import { ApiError } from '@/lib/api/client';
+import { Tooltip } from '@/components/ui/Tooltip';
+import { Hash, Calendar, Trophy, CheckCheck, CheckCircle2, XCircle, MinusCircle, type LucideIcon } from 'lucide-react';
 
 function AttemptHistoryContent() {
   const router = useRouter();
@@ -46,9 +48,20 @@ function AttemptHistoryContent() {
           <div>
             <h1 className="text-lg font-bold">Lịch sử làm bài thi</h1>
             {currentAttempt && (
-              <p className="text-xs text-ink-muted mt-0.5">
-                Lần {currentAttemptIndex} · {formatDate(currentAttempt.submittedAt)} · Điểm: <strong className="text-accent">{Number(currentAttempt.score).toFixed(2).replace(/\.?0+$/, '')}/10</strong> · Đúng: {currentAttempt.correctCount}/{currentAttempt.totalQuestions} câu
-              </p>
+              <div className="flex items-center gap-3 text-xs text-ink-muted mt-0.5">
+                <Tooltip label="Lần">
+                  <span className="flex items-center gap-1"><Hash className="w-3.5 h-3.5" /> {currentAttemptIndex}</span>
+                </Tooltip>
+                <Tooltip label="Ngày nộp">
+                  <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> {formatDate(currentAttempt.submittedAt)}</span>
+                </Tooltip>
+                <Tooltip label="Điểm">
+                  <span className="flex items-center gap-1 text-accent font-bold"><Trophy className="w-3.5 h-3.5" /> {Number(currentAttempt.score).toFixed(2).replace(/\.?0+$/, '')}/10</span>
+                </Tooltip>
+                <Tooltip label="Số câu đúng">
+                  <span className="flex items-center gap-1"><CheckCheck className="w-3.5 h-3.5" /> {currentAttempt.correctCount}/{currentAttempt.totalQuestions}</span>
+                </Tooltip>
+              </div>
             )}
           </div>
           <div className="flex items-center gap-3">
@@ -111,11 +124,11 @@ function AttemptHistoryContent() {
                             </span>
                             <span className="text-ink">{q.content}</span>
                             {q.isCorrect === true
-                              ? <span className="ml-auto text-green-600 text-[10px] font-bold whitespace-nowrap">✓ Đúng</span>
+                              ? <span className="ml-auto flex items-center gap-1 text-green-600 text-[10px] font-bold whitespace-nowrap"><CheckCircle2 className="w-3 h-3" /> Đúng</span>
                               : q.isCorrect === false && hasAnswer
-                                ? <span className="ml-auto text-red-600 text-[10px] font-bold whitespace-nowrap">✗ Sai</span>
+                                ? <span className="ml-auto flex items-center gap-1 text-red-600 text-[10px] font-bold whitespace-nowrap"><XCircle className="w-3 h-3" /> Sai</span>
                                 : q.isCorrect === false && !hasAnswer
-                                  ? <span className="ml-auto text-red-600 text-[10px] font-bold whitespace-nowrap">— Bỏ trống</span>
+                                  ? <span className="ml-auto flex items-center gap-1 text-red-600 text-[10px] font-bold whitespace-nowrap"><MinusCircle className="w-3 h-3" /> Bỏ trống</span>
                                   : <span className="ml-auto text-ink-muted text-[10px] font-bold whitespace-nowrap">{hasAnswer ? 'Đã trả lời' : 'Bỏ trống'}</span>
                             }
                           </h3>
@@ -126,33 +139,33 @@ function AttemptHistoryContent() {
                               const isCorrectAnswer = showCorrectness && q.correctOptionIds?.includes(opt.id);
 
                               let optClass = "bg-white border-line text-ink-muted";
-                              let icon: string | null = null;
+                              let Icon: LucideIcon | null = null;
 
                               if (showCorrectness) {
                                 if (isCorrectAnswer && isSelected) {
                                   // Picked correct
                                   optClass = "bg-green-50 border-green-300 text-green-800 font-medium";
-                                  icon = "✓";
+                                  Icon = CheckCircle2;
                                 } else if (isCorrectAnswer) {
                                   // Correct but not picked
                                   optClass = "bg-green-50 border-green-300 border-dashed text-green-700";
-                                  icon = "✓";
+                                  Icon = CheckCircle2;
                                 } else if (isSelected) {
                                   // Picked wrong
                                   optClass = "bg-red-50 border-red-300 text-red-800 font-medium";
-                                  icon = "✗";
+                                  Icon = XCircle;
                                 }
                               } else {
                                 if (isSelected) {
                                   optClass = "bg-accent/5 border-accent/20 text-accent-dark font-medium";
-                                  icon = "—";
+                                  Icon = MinusCircle;
                                 }
                               }
 
                               return (
                                 <div key={opt.id} className={`py-2 px-3 text-xs border rounded flex justify-between items-center ${optClass}`}>
                                   <span>{opt.content}</span>
-                                  {icon && <span className="text-[10px] font-bold ml-2">{icon}</span>}
+                                  {Icon && <Icon className="w-3 h-3 ml-2 flex-shrink-0" />}
                                 </div>
                               );
                             })}
@@ -204,7 +217,9 @@ function AttemptHistoryContent() {
                               {idx + 1}
                             </div>
                             <div className={`h-[30%] w-full flex items-center justify-center text-white text-[8px] ${isCorrect === null ? (q.selectedOptionIds?.length ? 'bg-accent/80' : 'bg-surface text-ink-muted') : (isCorrect ? 'bg-green-500' : 'bg-red-500')}`}>
-                              {isCorrect === null ? (q.selectedOptionIds?.length ? '✓' : '—') : (isCorrect ? '✓' : '✗')}
+                              {isCorrect === null
+                                ? (q.selectedOptionIds?.length ? <CheckCircle2 className="w-2.5 h-2.5" /> : <MinusCircle className="w-2.5 h-2.5" />)
+                                : (isCorrect ? <CheckCircle2 className="w-2.5 h-2.5" /> : <XCircle className="w-2.5 h-2.5" />)}
                             </div>
                           </button>
                         );
