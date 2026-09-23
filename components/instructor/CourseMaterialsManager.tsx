@@ -10,10 +10,12 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { MindmapEditor } from '@/components/materials/MindmapEditor';
+import { MermaidCodeEditor } from '@/components/materials/MermaidCodeEditor';
 import { MermaidViewer } from '@/components/materials/MermaidViewer';
 import { MaterialLanguagePicker } from '@/components/materials/MaterialLanguagePicker';
 import { MaterialFolderTree } from './MaterialFolderTree';
 import { getMaterialDistributionBadge, getMaterialProcessingBadge } from '@/lib/materialStatus';
+import { getAccessToken } from '@/lib/auth/token';
 import { CourseActivityPanel } from './CourseActivityPanel';
 import { StaticResourcesPanel } from './StaticResourcesPanel';
 import { MaterialBadge } from '@/components/materials/ui/MaterialBadge';
@@ -660,7 +662,31 @@ function MaterialWorkspaceViewer({
   });
 
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState<'VIEW' | 'RAW_CODE' | 'QUESTIONS' | 'SETTINGS' | 'DRAG_DROP'>('VIEW');
+  const [activeTab, setActiveTab] = useState<'VIEW' | 'RAW_CODE' | 'QUESTIONS' | 'SETTINGS' | 'DRAG_DROP' | 'CODE_EDITOR'>('VIEW');
+  const [isExportingPdf, setIsExportingPdf] = useState<'blank' | 'cheatsheet' | null>(null);
+
+  // A5 (UpComming_Plan.md) — export PDF đề trắng/cheatsheet, dùng endpoint instructor (quyền
+  // giảng viên trên khoá học), tải file qua fetch thô kèm Bearer token (giống CourseCard chứng chỉ).
+  const handleExportQuizPdf = async (quizId: number, mode: 'blank' | 'cheatsheet') => {
+    setIsExportingPdf(mode);
+    try {
+      const res = await fetch(`/api/v1/instructor/quizzes/${quizId}/export-pdf?mode=${mode}`, {
+        headers: { Authorization: `Bearer ${getAccessToken() ?? ''}` },
+      });
+      if (!res.ok) throw new Error('Không xuất được PDF');
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `quiz-${quizId}-${mode}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      toast.error('Có lỗi khi xuất PDF, vui lòng thử lại.');
+    } finally {
+      setIsExportingPdf(null);
+    }
+  };
 
   const updateMermaidMutation = useMutation({
     mutationFn: (variables: { id: number; mermaidCode: string }) => materialsApi.updateMaterial(variables.id, { mermaidCode: variables.mermaidCode }),
@@ -788,6 +814,24 @@ function MaterialWorkspaceViewer({
 
               {activeTab === 'QUESTIONS' && (
                 <div className="grid grid-cols-1 gap-4">
+                  {detail.quizQuestions.length > 0 && (
+                    <div className="flex justify-end items-center gap-2">
+                      <button
+                        onClick={() => handleExportQuizPdf(material!.materialId!, 'blank')}
+                        disabled={isExportingPdf !== null}
+                        className="px-3 py-1.5 text-xs font-bold rounded-card border bg-surface-raised text-ink-muted border-line hover:bg-surface-hover transition-colors disabled:opacity-50"
+                      >
+                        {isExportingPdf === 'blank' ? 'Đang xuất...' : 'Xuất Đề Trắng (PDF)'}
+                      </button>
+                      <button
+                        onClick={() => handleExportQuizPdf(material!.materialId!, 'cheatsheet')}
+                        disabled={isExportingPdf !== null}
+                        className="px-3 py-1.5 text-xs font-bold rounded-card border bg-surface-raised text-ink-muted border-line hover:bg-surface-hover transition-colors disabled:opacity-50"
+                      >
+                        {isExportingPdf === 'cheatsheet' ? 'Đang xuất...' : 'Xuất Cheatsheet (PDF)'}
+                      </button>
+                    </div>
+                  )}
                   {!readOnly && (
                     <div className="flex justify-end items-center gap-2 mb-2">
                       <CsvImportButton
@@ -851,10 +895,11 @@ function MaterialWorkspaceViewer({
                 </div>
                 <MaterialTabs
                   active={activeTab}
-                  onChange={(key) => setActiveTab(key as 'VIEW' | 'DRAG_DROP' | 'RAW_CODE')}
+                  onChange={(key) => setActiveTab(key as 'VIEW' | 'DRAG_DROP' | 'RAW_CODE' | 'CODE_EDITOR')}
                   tabs={[
                     { key: 'VIEW', label: 'Xem Tĩnh' },
                     ...(!readOnly ? [{ key: 'DRAG_DROP', label: 'Chỉnh Sửa', icon: <FileEdit className="w-3.5 h-3.5" /> }] : []),
+                    ...(!readOnly ? [{ key: 'CODE_EDITOR', label: 'Soạn Code', icon: <PencilLine className="w-3.5 h-3.5" /> }] : []),
                     { key: 'RAW_CODE', label: 'Mã Mermaid' },
                   ]}
                 />
@@ -882,6 +927,17 @@ function MaterialWorkspaceViewer({
               ) : activeTab === 'VIEW' ? (
                 <div className="w-full bg-surface-raised rounded-card shadow-sm border border-line">
                   <MermaidViewer chart={detail.mermaidCode} />
+                </div>
+              ) : activeTab === 'CODE_EDITOR' ? (
+                <div className="w-full min-h-[700px]">
+                  <MermaidCodeEditor
+                    initialCode={detail.mermaidCode || ''}
+                    isSaving={updateMermaidMutation.isPending}
+                    onSave={(code) => {
+                      updateMermaidMutation.mutate({ id: detail.id, mermaidCode: code });
+                      setActiveTab('VIEW');
+                    }}
+                  />
                 </div>
               ) : (
                 <div className="w-full h-[700px] border border-line rounded-card overflow-hidden bg-surface-hover shadow-inner">

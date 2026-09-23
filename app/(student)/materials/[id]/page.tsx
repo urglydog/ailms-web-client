@@ -13,6 +13,7 @@ import { FlashcardStudyMode } from '@/components/materials/FlashcardStudyMode';
 import { QuizPersonalEditor } from '@/components/materials/QuizPersonalEditor';
 import { flashcardsApi } from '@/lib/api/flashcards';
 import { ApiError } from '@/lib/api/client';
+import { getAccessToken } from '@/lib/auth/token';
 
 export default function MaterialDetailPage() {
   const router = useRouter();
@@ -30,7 +31,29 @@ export default function MaterialDetailPage() {
   const [flashcardMode, setFlashcardMode] = useState<'study' | 'browse'>('study');
   const [quizMode, setQuizMode] = useState<'study' | 'browse'>('study');
   const [isImportingTxt, setIsImportingTxt] = useState(false);
+  const [isExportingQuizPdf, setIsExportingQuizPdf] = useState<'blank' | 'cheatsheet' | null>(null);
   const queryClient = useQueryClient();
+
+  const handleExportQuizPdf = async (quizId: number, mode: 'blank' | 'cheatsheet') => {
+    setIsExportingQuizPdf(mode);
+    try {
+      const res = await fetch(`/api/v1/quizzes/${quizId}/export-pdf?mode=${mode}`, {
+        headers: { Authorization: `Bearer ${getAccessToken() ?? ''}` },
+      });
+      if (!res.ok) throw new Error('Không xuất được PDF');
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `quiz-${quizId}-${mode}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      toast.error('Có lỗi khi xuất PDF, vui lòng thử lại.');
+    } finally {
+      setIsExportingQuizPdf(null);
+    }
+  };
 
   const handleImportTxt = async (file: File) => {
     setIsImportingTxt(true);
@@ -143,21 +166,39 @@ export default function MaterialDetailPage() {
         ) : material.materialType === 'QUIZ' ? (
           <div className="py-4">
             {!isOfficial && material.quizQuestions && material.quizQuestions.length > 0 && (
-              <div className="flex items-center gap-4 mb-6 border-b border-line pb-3">
-                <button
-                  onClick={() => setQuizMode('study')}
-                  className={`pb-2 text-sm font-bold border-b-2 transition-colors ${quizMode === 'study' ? 'border-accent text-accent' : 'border-transparent text-ink-muted hover:text-ink'
-                    }`}
-                >
-                  📖 Làm Bài (Study Mode)
-                </button>
-                <button
-                  onClick={() => setQuizMode('browse')}
-                  className={`pb-2 text-sm font-bold border-b-2 transition-colors ${quizMode === 'browse' ? 'border-accent text-accent' : 'border-transparent text-ink-muted hover:text-ink'
-                    }`}
-                >
-                  📋 Chỉnh Sửa Câu Hỏi (Edit Mode)
-                </button>
+              <div className="flex items-center justify-between gap-4 mb-6 border-b border-line pb-3">
+                <div className="flex items-center gap-4">
+                  <button
+                    onClick={() => setQuizMode('study')}
+                    className={`pb-2 text-sm font-bold border-b-2 transition-colors ${quizMode === 'study' ? 'border-accent text-accent' : 'border-transparent text-ink-muted hover:text-ink'
+                      }`}
+                  >
+                    📖 Làm Bài (Study Mode)
+                  </button>
+                  <button
+                    onClick={() => setQuizMode('browse')}
+                    className={`pb-2 text-sm font-bold border-b-2 transition-colors ${quizMode === 'browse' ? 'border-accent text-accent' : 'border-transparent text-ink-muted hover:text-ink'
+                      }`}
+                  >
+                    📋 Chỉnh Sửa Câu Hỏi (Edit Mode)
+                  </button>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => handleExportQuizPdf(material.id, 'blank')}
+                    disabled={isExportingQuizPdf !== null}
+                    className="text-sm font-semibold text-accent hover:underline disabled:opacity-50"
+                  >
+                    {isExportingQuizPdf === 'blank' ? 'Đang xuất...' : '📄 Xuất đề trắng (PDF)'}
+                  </button>
+                  <button
+                    onClick={() => handleExportQuizPdf(material.id, 'cheatsheet')}
+                    disabled={isExportingQuizPdf !== null}
+                    className="text-sm font-semibold text-accent hover:underline disabled:opacity-50"
+                  >
+                    {isExportingQuizPdf === 'cheatsheet' ? 'Đang xuất...' : '📄 Xuất cheatsheet (PDF)'}
+                  </button>
+                </div>
               </div>
             )}
             
