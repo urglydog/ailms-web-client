@@ -39,9 +39,9 @@ export function MermaidCodeEditor({ initialCode, onSave, isSaving = false }: Mer
   const isDirty = code !== initialCode;
 
   return (
-    <div className="flex flex-col gap-3 h-full">
+    <div className="flex flex-col gap-3 h-full min-h-0">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1 min-h-0">
-        <div className="flex flex-col gap-1.5 min-h-[400px]">
+        <div className="flex flex-col gap-1.5 min-h-0">
           <div className="flex items-center justify-between">
             <label className="text-xs font-bold text-ink-muted uppercase tracking-wider">Mã Mermaid</label>
             <button
@@ -56,13 +56,13 @@ export function MermaidCodeEditor({ initialCode, onSave, isSaving = false }: Mer
             value={code}
             onChange={(e) => setCode(e.target.value)}
             spellCheck={false}
-            className="flex-1 w-full p-4 rounded-card bg-slate-900 text-cyan-300 font-mono text-xs leading-relaxed border border-slate-800 shadow-inner resize-none focus:outline-none focus:ring-2 focus:ring-accent/50"
+            className="flex-1 min-h-0 w-full p-4 rounded-card bg-slate-900 text-cyan-300 font-mono text-xs leading-relaxed border border-slate-800 shadow-inner resize-none focus:outline-none focus:ring-2 focus:ring-accent/50"
             placeholder="mindmap&#10;  root((Chủ đề))&#10;    Nhánh 1&#10;    Nhánh 2"
           />
         </div>
-        <div className="flex flex-col gap-1.5 min-h-[400px]">
+        <div className="flex flex-col gap-1.5 min-h-0">
           <label className="text-xs font-bold text-ink-muted uppercase tracking-wider">Xem trước trực tiếp</label>
-          <div className="flex-1 overflow-auto rounded-card border border-line bg-surface-raised">
+          <div className="flex-1 min-h-0 overflow-y-auto rounded-card border border-line bg-surface-raised">
             <MermaidViewer chart={debouncedCode} readOnly />
           </div>
         </div>

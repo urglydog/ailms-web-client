@@ -264,6 +264,83 @@ export function uploadFile<T>(
   return uploadFileCancelable<T>(path, file, options).promise;
 }
 
+/**
+ * Bản NHIỀU file cùng lúc dưới field `"files"` (số nhiều) — khớp
+ * `@RequestParam("files") MultipartFile[] files` phía backend (tài nguyên tĩnh toàn khoá học).
+ * `api.post` KHÔNG dùng được cho việc này vì nó luôn `JSON.stringify` body — làm rỗng mọi
+ * FormData; đây là lý do phải có helper XHR riêng, cùng khuôn với {@link uploadFileCancelable}.
+ */
+export function uploadFilesCancelable<T>(
+  path: string,
+  files: File[],
+  options: {
+    token?: string;
+    onProgress?: (percent: number) => void;
+    extraFields?: Record<string, string | number>;
+  } = {},
+): { promise: Promise<T>; abort: () => void } {
+  const xhr = new XMLHttpRequest();
+
+  const promise = new Promise<T>((resolve, reject) => {
+    xhr.open('POST', `${resolveBaseUrl()}${path}`);
+    if (options.token) {
+      xhr.setRequestHeader('Authorization', `Bearer ${options.token}`);
+    }
+
+    xhr.upload.onprogress = (e) => {
+      if (options.onProgress && e.lengthComputable) {
+        options.onProgress(Math.round((e.loaded / e.total) * 100));
+      }
+    };
+
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        resolve(xhr.status === 204 || !xhr.responseText ? (undefined as T) : (JSON.parse(xhr.responseText) as T));
+        return;
+      }
+      reject(new ApiError(parseProblemFromXhr(xhr)));
+    };
+    xhr.onerror = () => {
+      reject(
+        new ApiError({
+          type: 'about:blank',
+          title: 'Network Error',
+          status: 0,
+          detail: 'Không kết nối được máy chủ',
+          instance: path,
+          code: 'NETWORK_ERROR',
+          timestamp: new Date().toISOString(),
+        }),
+      );
+    };
+    xhr.onabort = () => reject(new UploadCancelledError());
+
+    const formData = new FormData();
+    files.forEach((file) => formData.append('files', file));
+    if (options.extraFields) {
+      Object.entries(options.extraFields).forEach(([key, value]) => {
+        formData.append(key, String(value));
+      });
+    }
+    xhr.send(formData);
+  });
+
+  return { promise, abort: () => xhr.abort() };
+}
+
+/** Bản không cần hủy giữa chừng — dựng trên {@link uploadFilesCancelable}. */
+export function uploadFiles<T>(
+  path: string,
+  files: File[],
+  options: {
+    token?: string;
+    onProgress?: (percent: number) => void;
+    extraFields?: Record<string, string | number>;
+  } = {},
+): Promise<T> {
+  return uploadFilesCancelable<T>(path, files, options).promise;
+}
+
 function parseProblemFromXhr(xhr: XMLHttpRequest): ProblemDetail {
   try {
     return JSON.parse(xhr.responseText) as ProblemDetail;
