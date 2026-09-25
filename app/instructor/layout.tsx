@@ -6,7 +6,7 @@ import { useEffect } from 'react';
 import { LogoutSidebarButton } from '@/components/auth/LogoutSidebarButton';
 import { UploadTray } from '@/components/instructor/UploadTray';
 import { InstructorChat } from '@/components/chat/InstructorChat';
-import { ArrowLeftIcon, BarChartIcon, MessageCircleIcon, PlayCircleIcon, WrenchIcon } from '@/components/instructor/SidebarIcons';
+import { ArrowLeftIcon, BarChartIcon, EyeIcon, MessageCircleIcon, PlayCircleIcon, WrenchIcon } from '@/components/instructor/SidebarIcons';
 import { getCurrentRole } from '@/lib/auth/token';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 
@@ -24,6 +24,10 @@ const SIDEBAR_ITEMS = [
   { id: 'courses', label: 'Khóa học của tôi', href: '/instructor/courses', icon: PlayCircleIcon },
   { id: 'communication', label: 'Giao tiếp', href: '/instructor/communication', icon: MessageCircleIcon },
   { id: 'revenue', label: 'Hiệu suất', href: '/instructor/revenue', icon: BarChartIcon },
+  // UC-ANTICHEAT (25/09/2026) — xem lại bằng chứng thi cử (video + cảnh báo AI). Xứng đáng 1 mục
+  // riêng ở sidebar (khác các trang đã gộp vào "Công cụ") vì đây là luồng theo dõi xuyên khoá
+  // học, không thuộc về quản lý 1 khoá cụ thể.
+  { id: 'proctoring', label: 'Giám sát thi', href: '/instructor/proctoring', icon: EyeIcon },
   { id: 'tools', label: 'Công cụ', href: '/instructor/tools', icon: WrenchIcon },
 ];
 
