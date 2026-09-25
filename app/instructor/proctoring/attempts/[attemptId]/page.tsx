@@ -27,6 +27,8 @@ const VIOLATION_LABEL: Record<string, string> = {
   IDLE_TOO_LONG: 'Không tương tác quá lâu',
 };
 
+const AI_ANALYZED_TYPES = new Set(['NO_FACE', 'MULTIPLE_FACES', 'HEAD_TURNED', 'GAZE_AWAY']);
+
 const RISK_STYLE: Record<string, string> = {
   LOW: 'text-success border-success/30 bg-success/5',
   MEDIUM: 'text-amber-600 border-amber-300 bg-amber-50',
@@ -53,9 +55,32 @@ export default function ProctoringAttemptDetailPage() {
   const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
 
   const seekTo = (sec: number) => {
-    if (videoRef.current) {
-      videoRef.current.currentTime = sec;
-      videoRef.current.play().catch(() => {});
+    if (!videoRef.current) return;
+    const video = videoRef.current;
+    
+    const doSeek = () => {
+      // Trick for MediaRecorder webm infinity duration:
+      // set currentTime to a huge number, wait for update, then set to actual sec
+      video.currentTime = 1e8;
+      
+      const onTimeUpdate = () => {
+        video.removeEventListener('timeupdate', onTimeUpdate);
+        video.removeEventListener('durationchange', onTimeUpdate);
+        video.currentTime = sec;
+        video.play().catch(() => {});
+      };
+      
+      video.addEventListener('timeupdate', onTimeUpdate);
+      video.addEventListener('durationchange', onTimeUpdate);
+    };
+
+    if (video.readyState < 1) { // 1 is HAVE_METADATA
+      video.addEventListener('loadedmetadata', function onLoaded() {
+        video.removeEventListener('loadedmetadata', onLoaded);
+        doSeek();
+      });
+    } else {
+      doSeek();
     }
   };
 
@@ -126,8 +151,9 @@ export default function ProctoringAttemptDetailPage() {
           {attempt.violations.length === 0 ? (
             <p className="text-sm text-ink-faint">Không có vi phạm.</p>
           ) : (
-            attempt.violations.map((v, idx) => {
+              attempt.violations.map((v, idx) => {
               const isExpanded = expandedIdx === idx;
+              const hasAiDetail = AI_ANALYZED_TYPES.has(v.type) && v.detail;
               return (
                 <div key={idx} className="rounded-lg border border-line overflow-hidden">
                   <button
@@ -137,10 +163,10 @@ export default function ProctoringAttemptDetailPage() {
                     <span className="font-medium text-ink">{VIOLATION_LABEL[v.type] || v.type}</span>
                     <span className="flex items-center gap-1.5 shrink-0">
                       {attempt.videoUrl && <span className="text-accent font-mono">{formatOffset(v.offsetSec)}</span>}
-                      {v.detail && <ChevronDown className={`w-3.5 h-3.5 text-ink-faint transition-transform ${isExpanded ? 'rotate-180' : ''}`} />}
+                      {hasAiDetail && <ChevronDown className={`w-3.5 h-3.5 text-ink-faint transition-transform ${isExpanded ? 'rotate-180' : ''}`} />}
                     </span>
                   </button>
-                  {isExpanded && v.detail && (
+                  {isExpanded && hasAiDetail && (
                     <div className="px-3 py-2 text-xs text-ink-muted leading-relaxed bg-surface-raised border-t border-line">
                       {v.detail}
                     </div>
