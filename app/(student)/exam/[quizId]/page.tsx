@@ -331,7 +331,15 @@ export default function AntiCheatExamPage() {
         // Lỗi upload không được chặn việc hiển thị kết quả bài thi — chỉ mất video bằng chứng.
         if (mediaRecorderRef.current) {
           try {
-            const recording = await stopCompositeRecording();
+            // Rủi ro phòng ngừa (26/09/2026): trên 1 số bản WebKit, MediaRecorder.onstop có tiền
+            // sử không bắn ra sau recorder.stop() — nếu xảy ra, await bên dưới sẽ treo vĩnh viễn,
+            // khiến dòng dừng track camera/mic ở cuối onSuccess không bao giờ chạy tới (camera/mic
+            // không bao giờ tắt). Giới hạn tối đa 5s, quá hạn coi như không có video (giống hệt
+            // hành vi khi stopCompositeRecording tự trả null) nhưng vẫn tiếp tục các bước còn lại.
+            const recording = await Promise.race([
+              stopCompositeRecording(),
+              new Promise<null>((resolve) => setTimeout(() => resolve(null), 5000)),
+            ]);
             if (recording) {
               // Đuôi file theo đúng mimeType thật đã ghi (Safari → mp4, Chrome/Firefox → webm) —
               // trước đây hardcode ".webm" dù Safari thực ra ghi ra mp4, sai định dạng file.
