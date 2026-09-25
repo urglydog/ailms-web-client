@@ -172,7 +172,7 @@ function DroppableNode({ id, title, type, children }: { id: string, title: strin
 
   return (
     <div ref={setNodeRef} className={`rounded-card transition-colors ${isOver ? 'bg-accent/5 border border-accent/30 border-dashed' : ''}`}>
-      <div className={`flex items-center gap-2 px-2 py-1.5 text-xs ${type === 'CHAPTER' ? 'font-bold text-ink bg-surface-hover rounded-card' : 'font-semibold text-ink-muted bg-surface-hover/50 mt-1 rounded-card'}`}>
+      <div className={`flex items-center gap-2 px-2 py-1.5 text-xs border rounded-card ${type === 'CHAPTER' ? 'font-bold text-ink bg-surface-hover border-line' : 'font-semibold text-ink border-line/60 bg-surface-hover/50 mt-1'}`}>
         {type === 'CHAPTER' ? <Folder className="w-3.5 h-3.5 flex-shrink-0" strokeWidth={1.75} /> : <File className="w-3.5 h-3.5 flex-shrink-0" strokeWidth={1.75} />}
         {type === 'CHAPTER' ? `Chương: ${title}` : title}
       </div>
@@ -208,6 +208,10 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchQuery, setSearchQuery] = useState('');
   const [showActivityPanel, setShowActivityPanel] = useState(false);
+  // (25/09/2026, fix nhanh) — Workspace trước đây không có cách nào lọc theo loại/trạng thái,
+  // mọi học liệu (Quiz/Flashcard/Mindmap, Draft/Official) nằm chung 1 lưới không phân biệt được.
+  const [typeFilter, setTypeFilter] = useState<'ALL' | 'QUIZ' | 'FLASHCARD' | 'MINDMAP'>('ALL');
+  const [statusFilter, setStatusFilter] = useState<'ALL' | 'DRAFT' | 'OFFICIAL'>('ALL');
 
   const overwriteMaterialVersionMutation = useMutation({
     mutationFn: (variables: { id: number, targetLessonId?: number, targetChapterId?: number }) =>
@@ -434,6 +438,18 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
 
   const displayedMaterials = materials || [];
 
+  // (25/09/2026, fix nhanh) — kết hợp lọc loại + trạng thái + tìm kiếm, thay cho việc chỉ có
+  // search-theo-tiêu-đề (không giúp được gì khi phần lớn học liệu chưa đặt tên, hiện "Học liệu
+  // không tên") và không hề có cách nào tách Quiz/Flashcard/Mindmap hay Draft/Official.
+  const filteredWorkspaceMaterials = displayedMaterials
+    .filter(m => typeFilter === 'ALL' || m.materialType === typeFilter)
+    .filter(m => {
+      if (statusFilter === 'ALL') return true;
+      const isDistributed = (m.assignments?.length ?? 0) > 0;
+      return statusFilter === 'OFFICIAL' ? isDistributed : !isDistributed;
+    })
+    .filter(m => !searchQuery || (m.title || '').toLowerCase().includes(searchQuery.toLowerCase()));
+
   const activeDragMaterial = activeDragId ? materials?.find(m => m.id === activeDragId) : null;
 
   return (
@@ -457,9 +473,9 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                     {chapterMaterials.map(mat => {
                       const assignment = mat.assignments?.find(a => a.chapterId === chapter.id);
                       return (
-                        <div key={`mat-${mat.id}`} onDoubleClick={() => setInspectGenerationId(mat.id, true)} onMouseDown={(e) => { if (e.detail > 1) e.preventDefault(); }} className="flex items-center justify-between px-2 py-1 text-xs text-ink-muted pl-6 hover:bg-accent/5 rounded-card cursor-pointer transition-colors group select-none" title="Nháy đúp để xem trước">
-                          <div className="flex items-center gap-2">
-                            <LinkIcon className="w-3 h-3 text-ink-faint flex-shrink-0" /> {mat.title || 'Học liệu'}
+                        <div key={`mat-${mat.id}`} onDoubleClick={() => setInspectGenerationId(mat.id, true)} onMouseDown={(e) => { if (e.detail > 1) e.preventDefault(); }} className="flex items-center justify-between ml-6 mt-1 px-2 py-1.5 text-xs text-ink border border-line bg-surface-raised rounded-card hover:border-accent hover:bg-accent/5 cursor-pointer transition-colors group select-none" title="Nháy đúp để xem trước">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <LinkIcon className="w-3 h-3 text-ink-faint flex-shrink-0" /> <span className="truncate">{mat.title || 'Học liệu'}</span>
                           </div>
                           <button onClick={(e) => {
                             e.stopPropagation();
@@ -470,7 +486,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                                 onConfirm: () => assignment?.id ? materialsApi.deleteAssignment(assignment.id).then(() => queryClient.invalidateQueries({ queryKey: ["instructor-materials", courseId] })) : undefined
                               });
                             }
-                          }} className="opacity-0 group-hover:opacity-100 p-0.5 text-ink-faint hover:text-danger transition-opacity">
+                          }} title="Gỡ" className="opacity-0 group-hover:opacity-100 p-0.5 text-ink-faint hover:text-danger transition-opacity shrink-0">
                             <Trash2 className="w-3 h-3" />
                           </button>
                         </div>
@@ -488,9 +504,9 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                             {lessonMaterials.map(mat => {
                               const assignment = mat.assignments?.find(a => a.lessonId === lesson.id);
                               return (
-                                <div key={`mat-${mat.id}`} onDoubleClick={() => setInspectGenerationId(mat.id, true)} onMouseDown={(e) => { if (e.detail > 1) e.preventDefault(); }} className="flex items-center justify-between px-2 py-1 text-[11px] text-ink-muted pl-6 hover:bg-accent/5 rounded-card cursor-pointer transition-colors group select-none" title="Nháy đúp để xem trước">
-                                  <div className="flex items-center gap-2">
-                                    <LinkIcon className="w-3 h-3 text-ink-faint flex-shrink-0" /> {mat.title || 'Học liệu'}
+                                <div key={`mat-${mat.id}`} onDoubleClick={() => setInspectGenerationId(mat.id, true)} onMouseDown={(e) => { if (e.detail > 1) e.preventDefault(); }} className="flex items-center justify-between ml-6 mt-1 px-2 py-1.5 text-[11px] text-ink border border-line bg-surface-raised rounded-card hover:border-accent hover:bg-accent/5 cursor-pointer transition-colors group select-none" title="Nháy đúp để xem trước">
+                                  <div className="flex items-center gap-2 min-w-0">
+                                    <LinkIcon className="w-3 h-3 text-ink-faint flex-shrink-0" /> <span className="truncate">{mat.title || 'Học liệu'}</span>
                                   </div>
                                   <button onClick={(e) => {
                                     e.stopPropagation();
@@ -501,7 +517,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                                         onConfirm: () => assignment?.id ? materialsApi.deleteAssignment(assignment.id).then(() => queryClient.invalidateQueries({ queryKey: ["instructor-materials", courseId] })) : undefined
                                       });
                                     }
-                                  }} className="opacity-0 group-hover:opacity-100 p-0.5 text-ink-faint hover:text-danger transition-opacity">
+                                  }} title="Gỡ" className="opacity-0 group-hover:opacity-100 p-0.5 text-ink-faint hover:text-danger transition-opacity shrink-0">
                                     <Trash2 className="w-3 h-3" />
                                   </button>
                                 </div>
@@ -587,11 +603,51 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
               ]}
             />
           </div>
-          
+
+          {/* Toolbar row 3: Filter theo loại + trạng thái (25/09/2026, fix nhanh — trước đây
+              không có cách nào lọc, mọi học liệu nằm chung 1 lưới). Icon lucide-react đơn sắc,
+              màu theo token có sẵn, không emoji/phối màu — đúng quy tắc Materials Workspace. */}
+          <div className="px-3 py-2 border-b border-line flex items-center gap-1.5 bg-surface-raised overflow-x-auto">
+            {([
+              { key: 'ALL', label: 'Tất cả', Icon: null },
+              { key: 'QUIZ', label: 'Quiz', Icon: FileQuestion },
+              { key: 'FLASHCARD', label: 'Flashcard', Icon: Layers },
+              { key: 'MINDMAP', label: 'Mindmap', Icon: Workflow },
+            ] as const).map(({ key, label, Icon }) => (
+              <button
+                key={key}
+                onClick={() => setTypeFilter(key)}
+                title={`Lọc theo loại: ${label}`}
+                className={`flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-card border transition-colors shrink-0 ${
+                  typeFilter === key ? 'bg-ink text-white border-ink' : 'bg-surface text-ink-muted border-line hover:bg-surface-hover'
+                }`}
+              >
+                {Icon && <Icon className="w-3.5 h-3.5" />} {label}
+              </button>
+            ))}
+            <span className="w-px h-4 bg-line mx-1 shrink-0" />
+            {([
+              { key: 'ALL', label: 'Mọi trạng thái' },
+              { key: 'DRAFT', label: 'Draft' },
+              { key: 'OFFICIAL', label: 'Official' },
+            ] as const).map(({ key, label }) => (
+              <button
+                key={key}
+                onClick={() => setStatusFilter(key)}
+                title={`Lọc theo trạng thái: ${label}`}
+                className={`px-2.5 py-1 text-xs font-semibold rounded-card border transition-colors shrink-0 ${
+                  statusFilter === key ? 'bg-ink text-white border-ink' : 'bg-surface text-ink-muted border-line hover:bg-surface-hover'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
           <MaterialFolderTree
             courseId={courseId}
             folders={folders}
-            materials={searchQuery ? displayedMaterials.filter(m => (m.title || '').toLowerCase().includes(searchQuery.toLowerCase())) : displayedMaterials}
+            materials={filteredWorkspaceMaterials}
             onInspect={setInspectGenerationId}
             setConfirmAction={setConfirmAction}
             DraggableCard={DraggableMaterialCard}

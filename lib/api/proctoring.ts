@@ -5,17 +5,10 @@ function authToken() {
   return getAccessToken() ?? undefined;
 }
 
-/** UC-ANTICHEAT — màn hình "Giám sát thi" cho giảng viên. */
-export interface ProctoredQuizSummary {
-  quizId: number;
-  title: string | null;
-  quizType: string;
-  attemptCount: number;
-  highRiskCount: number;
-}
-
+/** UC-ANTICHEAT — màn hình "Giám sát thi" cho giảng viên, trong context 1 khoá học. */
 export interface ProctoredAttemptSummary {
   attemptId: number;
+  quizTitle: string | null;
   studentName: string;
   studentEmail: string;
   submittedAt: string | number[];
@@ -44,11 +37,8 @@ export interface ProctoredAttemptDetail {
 }
 
 export const proctoringApi = {
-  getProctoredQuizzes: (courseId: number) =>
-    api.get<ProctoredQuizSummary[]>(`/api/v1/instructor/proctoring/courses/${courseId}/quizzes`, { token: authToken() }),
-
-  getAttempts: (quizId: number) =>
-    api.get<ProctoredAttemptSummary[]>(`/api/v1/instructor/proctoring/quizzes/${quizId}/attempts`, { token: authToken() }),
+  getAttempts: (courseId: number) =>
+    api.get<ProctoredAttemptSummary[]>(`/api/v1/instructor/proctoring/courses/${courseId}/attempts`, { token: authToken() }),
 
   getAttemptDetail: (attemptId: number) =>
     api.get<ProctoredAttemptDetail>(`/api/v1/instructor/proctoring/attempts/${attemptId}`, { token: authToken() }),

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { enrollmentsApi } from '@/lib/api/enrollments';
+import { ApiError } from '@/lib/api/client';
 import { toast } from 'sonner';
 import { useAddToCart, useCart } from '@/hooks/useCart';
 import { useAddToWishlist, useRemoveFromWishlist, useWishlist } from '@/hooks/useWishlist';
@@ -83,7 +84,9 @@ export function EnrollButton({
       toast.success('Ghi danh thành công!');
       router.refresh();
     } catch (err: unknown) {
-      toast.error((err as Record<string, string>)?.detail || 'Có lỗi xảy ra khi thực hiện');
+      // BUG THẬT (25/09/2026): `ApiError` không có field `.detail`, chỉ `.message` — cùng
+      // pattern lỗi với checkout/[slug]/page.tsx và checkout/cart/page.tsx.
+      toast.error(err instanceof ApiError ? err.message : 'Có lỗi xảy ra khi thực hiện');
     } finally {
       setLoading(false);
     }

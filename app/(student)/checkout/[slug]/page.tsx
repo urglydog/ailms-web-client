@@ -91,8 +91,10 @@ function CheckoutPageContent() {
       });
       window.location.href = res.paymentUrl;
     } catch (err: unknown) {
-      const errorMsg = (err as Record<string, string>)?.detail || 'Có lỗi xảy ra khi thực hiện thanh toán';
-      toast.error(errorMsg);
+      // BUG THẬT (25/09/2026): `ApiError` không có field `.detail` (chỉ có `.message`, xem
+      // `lib/api/client.ts`) — trước đây luôn rơi về thông báo chung chung, không hiện được lý
+      // do thật từ BE (vd "Phương thức thanh toán MOMO chưa hỗ trợ"). Sửa giống `applyCoupon` ở trên.
+      toast.error(err instanceof ApiError ? err.message : 'Có lỗi xảy ra khi thực hiện thanh toán');
       setPayingMethod(null);
     }
   };

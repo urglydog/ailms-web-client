@@ -33,6 +33,10 @@ const NAV_SECTIONS: NavSection[] = [
       { key: 'curriculum', label: 'Chương trình giảng dạy', href: (id) => `/instructor/courses/${id}/edit/curriculum` },
       { key: 'materials', label: 'Học liệu & Quiz thi cử', href: (id) => `/instructor/courses/${id}/edit/materials` },
       { key: 'resources', label: 'Tài nguyên tĩnh', href: (id) => `/instructor/courses/${id}/edit/resources` },
+      // UC-ANTICHEAT (26/09/2026) — dời từ mục riêng ở sidebar Giảng viên (yêu cầu chọn khoá →
+      // chọn quiz → mới thấy lượt thi, quá nhiều bước) vào ngay đây: khoá học đã ở trong context
+      // (courseId từ URL), chỉ còn đúng 1 bước để xem danh sách lượt thi có giám sát.
+      { key: 'proctoring', label: 'Giám sát thi', href: (id) => `/instructor/courses/${id}/edit/proctoring` },
     ],
   },
   {
