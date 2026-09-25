@@ -3,8 +3,8 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
-import { useStartQuiz, useSubmitQuiz, useExplainWrongAnswer, useQuizHistory } from '@/hooks/useQuizzes';
-import { StartRes, SubmitRes } from '@/lib/api/quizzes';
+import { useStartQuiz, useSubmitQuiz, useExplainWrongAnswer, useQuizHistory, useRecordViolation, useAnalyzeProctorFrame } from '@/hooks/useQuizzes';
+import { StartRes, SubmitRes, ViolationType } from '@/lib/api/quizzes';
 import Link from 'next/link';
 import { MarkdownRenderer } from '@/components/ui/MarkdownRenderer';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -38,14 +38,10 @@ export default function AntiCheatExamPage() {
   const [isStarted, setIsStarted] = useState(false);
   const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
 
-  useEffect(() => {
-    if (userId && quizId) {
-      try {
-        const saved = localStorage.getItem(`exam_violations_${userId}_${quizId}`);
-        if (saved) setViolationCount(parseInt(saved, 10) || 0);
-      } catch {}
-    }
-  }, [userId, quizId]);
+  // UC-ANTICHEAT (25/09/2026): violationCount giờ do BE ghi nhận (nguồn thật, xem
+  // recordViolation ở QuizService) — không còn đọc/ghi localStorage nữa. Nếu học viên tải lại
+  // trang giữa bài thi, số đếm hiển thị tạm về 0 và sẽ khớp lại đúng số thật ở lần vi phạm kế
+  // tiếp (server luôn cộng dồn đúng, chỉ UI hiển thị catch-up).
 
   // Trạng thái AI
   const [isModelLoaded, setIsModelLoaded] = useState(false);
@@ -57,10 +53,21 @@ export default function AntiCheatExamPage() {
 
   const lastViolationTime = useRef(0);
   const detectInterval = useRef<NodeJS.Timeout | null>(null);
+  // UC-ANTICHEAT: interval quét frame Gemini Vision thật (20-30s), idle tracking, audio RMS.
+  const proctorFrameInterval = useRef<NodeJS.Timeout | null>(null);
+  const devtoolsCheckInterval = useRef<NodeJS.Timeout | null>(null);
+  const lastActivityTime = useRef(Date.now());
+  const idleCheckInterval = useRef<NodeJS.Timeout | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const audioAnalyserRef = useRef<AnalyserNode | null>(null);
+  const audioCheckInterval = useRef<NodeJS.Timeout | null>(null);
+  const voiceStartTime = useRef<number | null>(null);
 
   const { mutate: startQuiz, isPending: isStarting } = useStartQuiz();
   const { mutate: submitQuiz } = useSubmitQuiz();
   const { mutate: explainWrongAnswer } = useExplainWrongAnswer();
+  const { mutate: recordViolationMutation } = useRecordViolation();
+  const { mutate: analyzeProctorFrameMutation } = useAnalyzeProctorFrame();
   const [attemptData, setAttemptData] = useState<StartRes | null>(null);
   const [answers, setAnswers] = useState<Record<number, number[]>>({});
   const [showReviewConfirm, setShowReviewConfirm] = useState(false);
@@ -230,77 +237,172 @@ export default function AntiCheatExamPage() {
     });
   }, [attemptData, answers, isSubmitting, submitQuiz, mediaStream, userId, quizId, router, returnUrl]);
 
-  // Anti-Cheat: Track tab switching
-  useEffect(() => {
-    if (!isStarted || isSubmitting || !!result || hasAutoSubmittedRef.current) return;
-
-    const handleVisibilityChange = () => {
-      if (document.hidden) {
-        setViolationCount(prev => {
-          const newCount = prev + 1;
-          const maxViolations = attemptData?.maxViolations || 3;
-          if (userId && quizId) {
-            try { localStorage.setItem(`exam_violations_${userId}_${quizId}`, newCount.toString()); } catch {}
-          }
-          if (newCount >= maxViolations) {
-            toast.error(`Phát hiện gian lận chuyển Tab quá ${maxViolations} lần. Hệ thống tự động nộp bài!`);
-            setTimeout(() => submitExam(true), 500);
-          } else {
-            toast.warning(`Cảnh báo gian lận (${newCount}/${maxViolations}): Bạn đã chuyển Tab. Hệ thống sẽ tự động nộp bài nếu vi phạm ${maxViolations} lần!`);
-          }
-          return newCount;
-        });
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, [isStarted, isSubmitting, result, submitExam, attemptData?.maxViolations, userId, quizId]);
-
-
-  // Hàm xử lý vi phạm với debounce (tránh trigger liên tục)
-  const handleViolation = useCallback((reason: string) => {
-    if (isSubmitting || result || hasAutoSubmittedRef.current) return;
+  // UC-ANTICHEAT (25/09/2026) — Composite Behavioral Risk Engine.
+  // Hàm xử lý vi phạm DUY NHẤT (đã gộp 2 bản trùng lặp cũ) — ghi nhận SERVER-SIDE qua
+  // recordViolation thay vì chỉ đếm ở localStorage (client-trust cũ, học viên có thể sửa JS để
+  // vô hiệu hoá hoàn toàn). Debounce 2 giây tránh trigger liên tục cho 1 hành vi.
+  const handleViolation = useCallback((type: ViolationType, reason: string) => {
+    if (isSubmitting || result || hasAutoSubmittedRef.current || !attemptData) return;
     const now = Date.now();
-    if (now - lastViolationTime.current < 2000) return; // Debounce 2 giây
+    if (now - lastViolationTime.current < 2000) return;
     lastViolationTime.current = now;
 
-    setViolationCount((prev) => {
-      const newCount = prev + 1;
-      const maxViolations = attemptData?.maxViolations || 3;
-      if (userId && quizId) {
-        try { localStorage.setItem(`exam_violations_${userId}_${quizId}`, newCount.toString()); } catch {}
-      }
-      if (newCount >= maxViolations) {
-        toast.error(`Bạn đã vi phạm quá ${maxViolations} lần. Hệ thống tự động nộp bài!`);
-        submitExam(true);
-      } else {
-        toast.warning(`Cảnh báo vi phạm (${newCount}/${maxViolations}): ${reason}`);
-      }
-      return newCount;
+    recordViolationMutation({ attemptId: attemptData.attemptId, data: { type, detail: reason } }, {
+      onSuccess: (res) => {
+        setViolationCount(res.violationCount);
+        const max = res.maxViolations || 3;
+        if (res.shouldAutoSubmit) {
+          toast.error(`Bạn đã vi phạm quá ${max} lần. Hệ thống tự động nộp bài!`);
+          submitExam(true);
+        } else {
+          toast.warning(`Cảnh báo vi phạm (${res.violationCount}/${max}): ${reason}`);
+        }
+      },
+      // Lỗi mạng lúc ghi nhận không được chặn học viên làm bài tiếp — chỉ bỏ qua lần này,
+      // server vẫn ghi được các lần vi phạm sau.
     });
-  }, [isSubmitting, result, submitExam, attemptData?.maxViolations, userId, quizId]);
+  }, [isSubmitting, result, attemptData, recordViolationMutation, submitExam]);
 
   // 1. Chống chuyển tab
   useEffect(() => {
     if (!isStarted || result || !isProctored) return;
-
     const handleVisibilityChange = () => {
-      if (document.hidden) {
-        handleViolation('Chuyển tab hoặc thu nhỏ trình duyệt');
+      if (document.hidden) handleViolation('TAB_SWITCH', 'Chuyển tab hoặc thu nhỏ trình duyệt');
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [isStarted, result, isProctored, handleViolation]);
+
+  // 1b. Window blur — bắt được chuyển sang app khác (vd cửa sổ xem remote-desktop) ở chế độ
+  // windowed mà visibilitychange có thể không kích hoạt (tab vẫn "visible" phía dưới).
+  useEffect(() => {
+    if (!isStarted || result || !isProctored) return;
+    const handleBlur = () => handleViolation('WINDOW_BLUR', 'Chuyển sang cửa sổ/ứng dụng khác');
+    window.addEventListener('blur', handleBlur);
+    return () => window.removeEventListener('blur', handleBlur);
+  }, [isStarted, result, isProctored, handleViolation]);
+
+  // 1c. Bắt buộc fullscreen — thoát fullscreen giữa chừng = vi phạm. Kết hợp window-blur ở
+  // trên, hầu hết kiểu chuyển-app-native đều lộ ra được ít nhất 1 trong 2 tín hiệu.
+  useEffect(() => {
+    if (!isStarted || result || !isProctored) return;
+    document.documentElement.requestFullscreen?.().catch(() => {});
+    const handleFullscreenChange = () => {
+      if (!document.fullscreenElement) {
+        handleViolation('FULLSCREEN_EXIT', 'Thoát chế độ toàn màn hình');
       }
     };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, [isStarted, result, isProctored, handleViolation]);
 
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
+  // 1d. Chặn copy/paste/chuột phải trên vùng đề.
+  useEffect(() => {
+    if (!isStarted || result || !isProctored) return;
+    const block = (e: Event) => {
+      e.preventDefault();
+      handleViolation('COPY_PASTE_BLOCKED', 'Cố gắng copy/paste hoặc mở menu chuột phải');
+    };
+    document.addEventListener('copy', block);
+    document.addEventListener('paste', block);
+    document.addEventListener('contextmenu', block);
     return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      document.removeEventListener('copy', block);
+      document.removeEventListener('paste', block);
+      document.removeEventListener('contextmenu', block);
     };
   }, [isStarted, result, isProctored, handleViolation]);
 
-  // 2. Face API Detection Loop
+  // 1e. Phát hiện DevTools mở (so lệch outerWidth/innerWidth — ngưỡng ~160px, pattern phổ biến).
+  useEffect(() => {
+    if (!isStarted || result || !isProctored) return;
+    devtoolsCheckInterval.current = setInterval(() => {
+      const widthDiff = window.outerWidth - window.innerWidth;
+      const heightDiff = window.outerHeight - window.innerHeight;
+      if (widthDiff > 160 || heightDiff > 160) {
+        handleViolation('DEVTOOLS_OPEN', 'Phát hiện DevTools đang mở');
+      }
+    }, 3000);
+    return () => { if (devtoolsCheckInterval.current) clearInterval(devtoolsCheckInterval.current); };
+  }, [isStarted, result, isProctored, handleViolation]);
+
+  // 1f. Idle bất thường — không tương tác (chuột/bàn phím/scroll) quá lâu trong lúc timer vẫn
+  // chạy, tín hiệu gián tiếp cho "đang thao tác ở thiết bị/màn hình khác".
+  useEffect(() => {
+    if (!isStarted || result || !isProctored) return;
+    const IDLE_THRESHOLD_MS = 90_000;
+    const resetActivity = () => { lastActivityTime.current = Date.now(); };
+    window.addEventListener('mousemove', resetActivity);
+    window.addEventListener('keydown', resetActivity);
+    window.addEventListener('scroll', resetActivity);
+    idleCheckInterval.current = setInterval(() => {
+      if (Date.now() - lastActivityTime.current > IDLE_THRESHOLD_MS) {
+        handleViolation('IDLE_TOO_LONG', `Không tương tác quá ${IDLE_THRESHOLD_MS / 1000}s`);
+        lastActivityTime.current = Date.now(); // tránh spam liên tục cùng 1 lần idle dài
+      }
+    }, 15_000);
+    return () => {
+      window.removeEventListener('mousemove', resetActivity);
+      window.removeEventListener('keydown', resetActivity);
+      window.removeEventListener('scroll', resetActivity);
+      if (idleCheckInterval.current) clearInterval(idleCheckInterval.current);
+    };
+  }, [isStarted, result, isProctored, handleViolation]);
+
+  // 1g. Âm thanh — 100% client-side (Web Audio API chuẩn), KHÔNG gọi Gemini. Phát hiện giọng
+  // nói kéo dài bất thường (vd đọc câu hỏi cho 1 AI agent bên ngoài nghe) bằng cách đo mức
+  // năng lượng (RMS) qua mic, không phân tích nội dung.
+  useEffect(() => {
+    if (!isStarted || result || !isProctored || !mediaStream) return;
+    const audioTracks = mediaStream.getAudioTracks();
+    if (audioTracks.length === 0) return;
+
+    try {
+      const audioCtx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+      const source = audioCtx.createMediaStreamSource(new MediaStream(audioTracks));
+      const analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 512;
+      source.connect(analyser);
+      audioContextRef.current = audioCtx;
+      audioAnalyserRef.current = analyser;
+
+      const dataArray = new Uint8Array(analyser.frequencyBinCount);
+      const VOICE_RMS_THRESHOLD = 25; // 0-255, ngưỡng thực nghiệm cho "có giọng nói"
+      const VOICE_DURATION_MS = 5000;
+
+      audioCheckInterval.current = setInterval(() => {
+        analyser.getByteTimeDomainData(dataArray);
+        let sumSquares = 0;
+        for (let i = 0; i < dataArray.length; i++) {
+          const v = (dataArray[i] ?? 128) - 128;
+          sumSquares += v * v;
+        }
+        const rms = Math.sqrt(sumSquares / dataArray.length);
+
+        if (rms > VOICE_RMS_THRESHOLD) {
+          if (voiceStartTime.current === null) voiceStartTime.current = Date.now();
+          else if (Date.now() - voiceStartTime.current > VOICE_DURATION_MS) {
+            handleViolation('AUDIO_VOICE_DETECTED', 'Phát hiện giọng nói kéo dài bất thường');
+            voiceStartTime.current = null;
+          }
+        } else {
+          voiceStartTime.current = null; // im lặng/tiếng ồn ngắn (ho...) reset, không cộng dồn
+        }
+      }, 500);
+    } catch {
+      // Trình duyệt không hỗ trợ AudioContext hoặc lỗi tạo — bỏ qua tín hiệu audio, không chặn thi.
+    }
+
+    return () => {
+      if (audioCheckInterval.current) clearInterval(audioCheckInterval.current);
+      audioContextRef.current?.close().catch(() => {});
+      audioContextRef.current = null;
+      audioAnalyserRef.current = null;
+    };
+  }, [isStarted, result, isProctored, mediaStream, handleViolation]);
+
+  // 2. Face API Detection Loop — CHỈ hiển thị badge UX tức thời (client-side, có thể bị bypass),
+  // KHÔNG tính vi phạm ở đây nữa. Nguồn vi phạm hình ảnh THẬT là mục 2b (Gemini Vision, server-verified).
   useEffect(() => {
     if (!isProctored || !isStarted || !videoRef.current || !isModelLoaded || result) return;
 
@@ -319,33 +421,10 @@ export default function AntiCheatExamPage() {
             new faceapi.TinyFaceDetectorOptions({ inputSize: 160, scoreThreshold: 0.3 })
           ).withFaceLandmarks();
 
-          if (detections.length === 0) {
+          if (detections.length === 0 || detections.length > 1) {
             setFaceStatus('NO_FACE');
-            handleViolation('Không phát hiện thấy khuôn mặt trong Camera');
-          } else if (detections.length > 1) {
-            setFaceStatus('NO_FACE');
-            handleViolation('Phát hiện có nhiều hơn 1 người trong khung hình');
           } else {
-            const detection = detections[0];
-            if (!detection) return;
-            const landmarks = detection.landmarks;
-            const noseTip = landmarks.getNose()[3];
-            const leftJaw = landmarks.getJawOutline()[0];
-            const rightJaw = landmarks.getJawOutline()[16];
-
-            if (!noseTip || !leftJaw || !rightJaw) return;
-
-            const leftDist = Math.abs(noseTip.x - leftJaw.x);
-            const rightDist = Math.abs(noseTip.x - rightJaw.x);
-            
-            // Nếu tỷ lệ lệch quá lớn, chứng tỏ đang quay mặt hẳn sang 1 bên
-            const ratio = leftDist / rightDist;
-            if (ratio > 2.5 || ratio < 0.4) {
-              setFaceStatus('NO_FACE');
-              handleViolation('Phát hiện đầu quay sang một bên quá lâu (Nghi ngờ xem tài liệu)');
-            } else {
-              setFaceStatus('FACE_FOUND');
-            }
+            setFaceStatus('FACE_FOUND');
           }
         } catch {
           // ignore detection error
@@ -358,7 +437,52 @@ export default function AntiCheatExamPage() {
       video.removeEventListener('play', startDetection);
       if (detectInterval.current) clearInterval(detectInterval.current);
     };
-  }, [isStarted, isProctored, isModelLoaded, result, handleViolation]);
+  }, [isStarted, isProctored, isModelLoaded, result]);
+
+  // 2b. Gemini Vision thật — chụp 1 khung hình mỗi 25s, gửi BE xác minh (đếm người + hướng
+  // nhìn). Đây là nguồn vi phạm hình ảnh được SERVER xác minh, khác hẳn face-api.js ở mục 2
+  // (chỉ để hiển thị badge, dễ bị can thiệp phía client).
+  useEffect(() => {
+    if (!isProctored || !isStarted || !videoRef.current || result || !attemptData) return;
+    const video = videoRef.current;
+
+    proctorFrameInterval.current = setInterval(() => {
+      if (video.paused || video.ended || !video.videoWidth) return;
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+        const base64 = dataUrl.split(',')[1];
+        if (!base64) return;
+
+        analyzeProctorFrameMutation(
+          { attemptId: attemptData.attemptId, data: { imageBase64: base64, mimeType: 'image/jpeg' } },
+          {
+            onSuccess: (res) => {
+              if (res.flagged) {
+                setViolationCount(res.violationCount);
+                const max = res.maxViolations || 3;
+                if (res.shouldAutoSubmit) {
+                  toast.error(`Bạn đã vi phạm quá ${max} lần. Hệ thống tự động nộp bài!`);
+                  submitExam(true);
+                } else {
+                  toast.warning(`Cảnh báo AI Vision (${res.violationCount}/${max}): bất thường camera`);
+                }
+              }
+            },
+          }
+        );
+      } catch {
+        // Lỗi chụp/gửi frame — bỏ qua lần quét này, không chặn thi.
+      }
+    }, 25_000);
+
+    return () => { if (proctorFrameInterval.current) clearInterval(proctorFrameInterval.current); };
+  }, [isStarted, isProctored, result, attemptData, analyzeProctorFrameMutation, submitExam]);
 
   // Yêu cầu bật Camera (nếu proctored)
   const startExam = useCallback(async () => {

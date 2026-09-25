@@ -13,6 +13,15 @@ interface User {
   createdAt: string;
 }
 
+/** Auto-ban bằng AI (25/09/2026) — đề xuất khoá đang chờ Admin duyệt, xem AiLockScanService. */
+interface AiLockProposal {
+  userId: number;
+  email: string;
+  fullName: string;
+  aiLockProposedAt: string;
+  aiLockProposedReason: string;
+}
+
 type SortField = 'id' | 'fullName' | 'email' | 'role' | 'createdAt';
 type SortOrder = 'asc' | 'desc';
 
@@ -32,6 +41,8 @@ export default function AdminUsersPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
+  const [aiLockProposals, setAiLockProposals] = useState<AiLockProposal[]>([]);
+
   const fetchUsers = async () => {
     try {
       setUsers(await api.get<User[]>('/api/v1/users'));
@@ -40,9 +51,38 @@ export default function AdminUsersPage() {
     }
   };
 
+  const fetchAiLockProposals = async () => {
+    try {
+      setAiLockProposals(await api.get<AiLockProposal[]>('/api/v1/admin/ai-lock-proposals'));
+    } catch {
+      // Không có gì nghiêm trọng nếu tab này lỗi — không chặn danh sách user chính.
+    }
+  };
+
   useEffect(() => {
-    fetchUsers().finally(() => setLoading(false));
+    Promise.all([fetchUsers(), fetchAiLockProposals()]).finally(() => setLoading(false));
   }, []);
+
+  const handleConfirmLockProposal = async (userId: number) => {
+    try {
+      await api.post(`/api/v1/admin/users/${userId}/confirm-lock-proposal`);
+      toast.success('Đã khoá AI cho người dùng theo đề xuất.');
+      fetchAiLockProposals();
+      fetchUsers();
+    } catch {
+      toast.error('Có lỗi khi xác nhận khoá.');
+    }
+  };
+
+  const handleDismissLockProposal = async (userId: number) => {
+    try {
+      await api.post(`/api/v1/admin/users/${userId}/dismiss-lock-proposal`);
+      toast.success('Đã bỏ qua đề xuất.');
+      fetchAiLockProposals();
+    } catch {
+      toast.error('Có lỗi khi bỏ qua đề xuất.');
+    }
+  };
 
   const handleToggleBlock = async (userId: number, currentStatus: boolean) => {
     try {
@@ -133,6 +173,37 @@ export default function AdminUsersPage() {
           </p>
         </div>
       </div>
+
+      {/* Auto-ban bằng AI (25/09/2026) — đề xuất khoá đang chờ duyệt, human-in-the-loop. */}
+      {aiLockProposals.length > 0 && (
+        <div className="card border border-amber-300 bg-amber-50 p-4 flex flex-col gap-3">
+          <h2 className="font-display font-bold text-amber-900 flex items-center gap-2">
+            ⚠ Đề xuất khoá AI ({aiLockProposals.length})
+          </h2>
+          {aiLockProposals.map((p) => (
+            <div key={p.userId} className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-amber-200 bg-white p-3">
+              <div>
+                <div className="font-semibold text-ink">{p.fullName} <span className="text-ink-muted font-normal">({p.email})</span></div>
+                <div className="text-sm text-amber-800 mt-0.5">{p.aiLockProposedReason}</div>
+              </div>
+              <div className="flex gap-2 shrink-0">
+                <button
+                  onClick={() => handleConfirmLockProposal(p.userId)}
+                  className="px-3 py-1.5 rounded-lg bg-danger text-white text-xs font-bold hover:opacity-90"
+                >
+                  Xác nhận khoá
+                </button>
+                <button
+                  onClick={() => handleDismissLockProposal(p.userId)}
+                  className="px-3 py-1.5 rounded-lg bg-surface-raised border border-line text-xs font-bold hover:bg-line/30"
+                >
+                  Bỏ qua
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Content */}
       <div className="flex flex-col gap-4">
