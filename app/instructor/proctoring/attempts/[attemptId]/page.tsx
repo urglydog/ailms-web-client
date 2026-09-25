@@ -1,8 +1,8 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { useRef } from 'react';
-import { ShieldAlert } from 'lucide-react';
+import { useRef, useState } from 'react';
+import { ShieldAlert, ChevronDown } from 'lucide-react';
 import { useProctoredAttemptDetail } from '@/hooks/useProctoring';
 import { ArrowLeftIcon } from '@/components/instructor/SidebarIcons';
 
@@ -39,20 +39,29 @@ const formatOffset = (sec: number) => {
   return `${m}:${s.toString().padStart(2, '0')}`;
 };
 
-/** UC-ANTICHEAT — chi tiết 1 lượt thi: video bằng chứng (màn hình+webcam ghép sẵn 1 file) +
- * danh sách marker vi phạm, click nhảy tới đúng thời điểm trên video. */
+/** UC-ANTICHEAT (26/09/2026, kế thừa UX Gia sư AI) — chi tiết 1 lượt thi: video bằng chứng bên
+ * trái luôn hiển thị (sticky, không mất khi cuộn danh sách dài), danh sách vi phạm bên phải kèm
+ * mốc thời gian — click 1 dòng vừa TUA video tới đúng thời điểm vừa XỔ RA phân tích chi tiết của
+ * AI cho đúng vi phạm đó (nếu có, vd Gemini Vision giải thích vì sao gắn cờ "ánh mắt rời màn
+ * hình"), giống hệt cách trích dẫn `[MM:SS]` của Gia sư AI tua video bài giảng. */
 export default function ProctoringAttemptDetailPage() {
   const params = useParams();
   const router = useRouter();
   const attemptId = Number(params.attemptId);
   const { data: attempt, isLoading } = useProctoredAttemptDetail(attemptId);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
 
   const seekTo = (sec: number) => {
     if (videoRef.current) {
       videoRef.current.currentTime = sec;
       videoRef.current.play().catch(() => {});
     }
+  };
+
+  const handleViolationClick = (idx: number, offsetSec: number) => {
+    seekTo(offsetSec);
+    setExpandedIdx((prev) => (prev === idx ? null : idx));
   };
 
   if (isLoading || !attempt) {
@@ -88,8 +97,10 @@ export default function ProctoringAttemptDetailPage() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+        {/* Video luôn hiển thị, dính lại khi cuộn danh sách vi phạm dài bên phải — giống Gia sư
+            AI luôn giữ player trên màn hình trong lúc đọc/trích dẫn transcript. */}
+        <div className="lg:col-span-2 lg:sticky lg:top-4">
           <div className="card overflow-hidden">
             {attempt.videoUrl ? (
               <video ref={videoRef} src={attempt.videoUrl} controls className="w-full aspect-video bg-black" />
@@ -101,24 +112,35 @@ export default function ProctoringAttemptDetailPage() {
           </div>
         </div>
 
-        <div className="card p-4 flex flex-col gap-2 max-h-[480px] overflow-y-auto">
+        <div className="card p-4 flex flex-col gap-2 max-h-[calc(100vh-160px)] overflow-y-auto">
           <div className="text-xs font-semibold uppercase text-ink-muted mb-1">
             Vi phạm ({attempt.violationCount})
           </div>
           {attempt.violations.length === 0 ? (
             <p className="text-sm text-ink-faint">Không có vi phạm.</p>
           ) : (
-            attempt.violations.map((v, idx) => (
-              <button
-                key={idx}
-                onClick={() => seekTo(v.offsetSec)}
-                disabled={!attempt.videoUrl}
-                className="flex items-center justify-between gap-2 rounded-lg border border-line px-3 py-2 text-left text-xs hover:border-accent hover:bg-surface-raised transition-colors disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                <span className="font-medium text-ink">{VIOLATION_LABEL[v.type] || v.type}</span>
-                {attempt.videoUrl && <span className="text-accent font-mono shrink-0">{formatOffset(v.offsetSec)}</span>}
-              </button>
-            ))
+            attempt.violations.map((v, idx) => {
+              const isExpanded = expandedIdx === idx;
+              return (
+                <div key={idx} className="rounded-lg border border-line overflow-hidden">
+                  <button
+                    onClick={() => handleViolationClick(idx, v.offsetSec)}
+                    className="w-full flex items-center justify-between gap-2 px-3 py-2 text-left text-xs hover:bg-surface-raised transition-colors"
+                  >
+                    <span className="font-medium text-ink">{VIOLATION_LABEL[v.type] || v.type}</span>
+                    <span className="flex items-center gap-1.5 shrink-0">
+                      {attempt.videoUrl && <span className="text-accent font-mono">{formatOffset(v.offsetSec)}</span>}
+                      {v.detail && <ChevronDown className={`w-3.5 h-3.5 text-ink-faint transition-transform ${isExpanded ? 'rotate-180' : ''}`} />}
+                    </span>
+                  </button>
+                  {isExpanded && v.detail && (
+                    <div className="px-3 py-2 text-xs text-ink-muted leading-relaxed bg-surface-raised border-t border-line">
+                      {v.detail}
+                    </div>
+                  )}
+                </div>
+              );
+            })
           )}
         </div>
       </div>
