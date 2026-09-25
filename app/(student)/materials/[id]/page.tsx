@@ -12,8 +12,7 @@ import { FlashcardViewer } from '@/components/materials/FlashcardViewer';
 import { FlashcardStudyMode } from '@/components/materials/FlashcardStudyMode';
 import { QuizPersonalEditor } from '@/components/materials/QuizPersonalEditor';
 import { flashcardsApi } from '@/lib/api/flashcards';
-import { ApiError, resolveBaseUrl } from '@/lib/api/client';
-import { getAccessToken } from '@/lib/auth/token';
+import { ApiError, apiBlob } from '@/lib/api/client';
 import { Download, Upload, FileText } from 'lucide-react';
 
 export default function MaterialDetailPage() {
@@ -38,11 +37,7 @@ export default function MaterialDetailPage() {
   const handleExportQuizPdf = async (quizId: number, mode: 'blank' | 'cheatsheet') => {
     setIsExportingQuizPdf(mode);
     try {
-      const res = await fetch(`${resolveBaseUrl()}/api/v1/quizzes/${quizId}/export-pdf?mode=${mode}`, {
-        headers: { Authorization: `Bearer ${getAccessToken() ?? ''}` },
-      });
-      if (!res.ok) throw new Error('Không xuất được PDF');
-      const blob = await res.blob();
+      const blob = await apiBlob(`/api/v1/quizzes/${quizId}/export-pdf?mode=${mode}`);
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;

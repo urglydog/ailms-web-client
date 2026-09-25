@@ -15,8 +15,7 @@ import { MermaidViewer } from '@/components/materials/MermaidViewer';
 import { MaterialLanguagePicker } from '@/components/materials/MaterialLanguagePicker';
 import { MaterialFolderTree } from './MaterialFolderTree';
 import { getMaterialDistributionBadge, getMaterialProcessingBadge } from '@/lib/materialStatus';
-import { getAccessToken } from '@/lib/auth/token';
-import { resolveBaseUrl } from '@/lib/api/client';
+import { apiBlob } from '@/lib/api/client';
 import { CourseActivityPanel } from './CourseActivityPanel';
 import { MaterialBadge } from '@/components/materials/ui/MaterialBadge';
 import { MaterialTabs } from '@/components/materials/ui/MaterialTabs';
@@ -684,15 +683,11 @@ function MaterialWorkspaceViewer({
   const [isExportingPdf, setIsExportingPdf] = useState<'blank' | 'cheatsheet' | null>(null);
 
   // A5 (UpComming_Plan.md) — export PDF đề trắng/cheatsheet, dùng endpoint instructor (quyền
-  // giảng viên trên khoá học), tải file qua fetch thô kèm Bearer token (giống CourseCard chứng chỉ).
+  // giảng viên trên khoá học), tải file qua apiBlob (tự refresh access token khi hết hạn).
   const handleExportQuizPdf = async (quizId: number, mode: 'blank' | 'cheatsheet') => {
     setIsExportingPdf(mode);
     try {
-      const res = await fetch(`${resolveBaseUrl()}/api/v1/instructor/quizzes/${quizId}/export-pdf?mode=${mode}`, {
-        headers: { Authorization: `Bearer ${getAccessToken() ?? ''}` },
-      });
-      if (!res.ok) throw new Error('Không xuất được PDF');
-      const blob = await res.blob();
+      const blob = await apiBlob(`/api/v1/instructor/quizzes/${quizId}/export-pdf?mode=${mode}`);
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;

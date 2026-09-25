@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { toast } from 'sonner';
+import { api } from '@/lib/api/client';
 
 interface User {
   id: number;
@@ -33,11 +34,7 @@ export default function AdminUsersPage() {
 
   const fetchUsers = async () => {
     try {
-      const token = localStorage.getItem('accessToken');
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/api/v1/users`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (res.ok) setUsers(await res.json());
+      setUsers(await api.get<User[]>('/api/v1/users'));
     } catch {
       toast.error('Lỗi khi tải danh sách người dùng');
     }
@@ -49,29 +46,17 @@ export default function AdminUsersPage() {
 
   const handleToggleBlock = async (userId: number, currentStatus: boolean) => {
     try {
-      const token = localStorage.getItem('accessToken');
       const userToUpdate = users.find(u => u.id === userId);
       if (!userToUpdate) return;
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/api/v1/users/${userId}`, {
-        method: 'PUT',
-        headers: { 
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          fullName: userToUpdate.fullName,
-          role: userToUpdate.role,
-          isActive: !currentStatus
-        })
+      await api.put(`/api/v1/users/${userId}`, {
+        fullName: userToUpdate.fullName,
+        role: userToUpdate.role,
+        isActive: !currentStatus
       });
-      if (res.ok) {
-        toast.success(`Đã ${currentStatus ? 'khóa' : 'mở khóa'} người dùng`);
-        fetchUsers();
-      } else {
-        toast.error('Có lỗi xảy ra khi cập nhật');
-      }
+      toast.success(`Đã ${currentStatus ? 'khóa' : 'mở khóa'} người dùng`);
+      fetchUsers();
     } catch {
-      toast.error('Có lỗi kết nối');
+      toast.error('Có lỗi xảy ra khi cập nhật');
     }
   };
 

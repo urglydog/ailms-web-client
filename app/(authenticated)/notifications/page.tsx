@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { api, ApiError } from '@/lib/api/client';
 
 interface Notification {
   id: number;
@@ -21,31 +22,20 @@ export default function NotificationsPage() {
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const token = localStorage.getItem('accessToken');
-        if (!token) {
+        if (!localStorage.getItem('accessToken')) {
           router.push('/login');
           return;
         }
 
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/api/v1/notifications`,
-          {
-            headers: { 'Authorization': `Bearer ${token}` }
-          }
-        );
-
-        if (res.status === 401) {
-          router.push('/login');
-          return;
-        }
-
-        if (!res.ok) {
-          throw new Error('Không thể tải thông báo');
-        }
-
-        const data = await res.json();
+        // api.get tự refresh access token hết hạn (401) trước khi coi là lỗi thật —
+        // trước đây fetch thô ở đây không refresh, chỉ đá thẳng về /login.
+        const data = await api.get<Notification[]>('/api/v1/notifications');
         setNotifications(data);
       } catch (e: unknown) {
+        if (e instanceof ApiError && e.status === 401) {
+          router.push('/login');
+          return;
+        }
         console.error(e);
         setError(e instanceof Error ? e.message : 'Không thể tải thông báo');
       } finally {

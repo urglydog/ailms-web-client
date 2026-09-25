@@ -1,4 +1,4 @@
-import { api, resolveBaseUrl, ApiError } from '@/lib/api/client';
+import { api, apiFormData } from '@/lib/api/client';
 import { getAccessToken } from '@/lib/auth/token';
 
 function authToken() {
@@ -166,20 +166,9 @@ async function submitAssignmentMultipart(
   if (data.textContent) formData.append('textContent', data.textContent);
   if (data.file) formData.append('file', data.file);
 
-  const token = authToken();
-  const res = await fetch(`${resolveBaseUrl()}/api/v1/assignments/${assignmentId}/submissions`, {
-    method: 'POST',
-    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-    body: formData,
-  });
-  if (!res.ok) {
-    const problem = await res.json().catch(() => ({
-      type: 'about:blank', title: res.statusText, status: res.status,
-      detail: 'Không nộp được bài tập', instance: '', code: 'SUBMIT_FAILED', timestamp: new Date().toISOString(),
-    }));
-    throw new ApiError(problem);
-  }
-  return res.json();
+  // apiFormData tự refresh access token hết hạn (401) trước khi coi là lỗi thật — trước đây
+  // fetch thô ở đây không refresh, học viên nộp bài fail cứng khi token hết hạn.
+  return apiFormData<AssignmentSubmissionItem>(`/api/v1/assignments/${assignmentId}/submissions`, formData);
 }
 
 export const assignmentApi = {
