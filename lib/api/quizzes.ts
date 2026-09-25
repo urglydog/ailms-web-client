@@ -1,4 +1,4 @@
-import { api } from '@/lib/api/client';
+import { api, uploadFile } from '@/lib/api/client';
 import { getAccessToken } from '@/lib/auth/token';
 
 function authToken() {
@@ -158,6 +158,16 @@ export const quizApi = {
 
   analyzeProctorFrame: (attemptId: number, data: ProctorFrameReq) => {
     return api.post<ProctorFrameRes>(`/api/v1/quizzes/attempts/${attemptId}/proctor-frame`, data, { token: authToken() });
+  },
+
+  /** UC-ANTICHEAT — upload video bằng chứng (màn hình+webcam ghép) lúc nộp bài xong. File nhị
+   * phân nên dùng `uploadFile` (multipart thật) thay vì `api.post` (luôn JSON.stringify body). */
+  uploadRecording: (attemptId: number, file: File, durationSec: number) => {
+    return uploadFile<void>(
+      `/api/v1/quizzes/attempts/${attemptId}/recording?durationSec=${durationSec}`,
+      file,
+      { token: authToken() },
+    );
   },
 
   updateQuestion: (questionId: number, data: UpdateQuestionReq) => {

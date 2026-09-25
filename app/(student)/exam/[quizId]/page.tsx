@@ -3,8 +3,9 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
+import { useMutation } from '@tanstack/react-query';
 import { useStartQuiz, useSubmitQuiz, useExplainWrongAnswer, useQuizHistory, useRecordViolation, useAnalyzeProctorFrame } from '@/hooks/useQuizzes';
-import { StartRes, SubmitRes, ViolationType } from '@/lib/api/quizzes';
+import { StartRes, SubmitRes, ViolationType, quizApi } from '@/lib/api/quizzes';
 import Link from 'next/link';
 import { MarkdownRenderer } from '@/components/ui/MarkdownRenderer';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -62,6 +63,20 @@ export default function AntiCheatExamPage() {
   const audioAnalyserRef = useRef<AnalyserNode | null>(null);
   const audioCheckInterval = useRef<NodeJS.Timeout | null>(null);
   const voiceStartTime = useRef<number | null>(null);
+
+  // UC-ANTICHEAT (1.7) — video bằng chứng: ghép màn hình (trái) + webcam (phải) qua canvas mỗi
+  // frame, MediaRecorder ghi lại stream ghép thành 1 file .webm duy nhất, upload lúc nộp bài.
+  const screenStreamRef = useRef<MediaStream | null>(null);
+  const screenVideoElRef = useRef<HTMLVideoElement | null>(null);
+  const compositeCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const compositeRafRef = useRef<number | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const recordedChunksRef = useRef<Blob[]>([]);
+  const recordingStartRef = useRef<number | null>(null);
+  const { mutate: uploadRecordingMutation } = useMutation({
+    mutationFn: ({ attemptId, file, durationSec }: { attemptId: number; file: File; durationSec: number }) =>
+      quizApi.uploadRecording(attemptId, file, durationSec),
+  });
 
   const { mutate: startQuiz, isPending: isStarting } = useStartQuiz();
   const { mutate: submitQuiz } = useSubmitQuiz();
@@ -175,6 +190,72 @@ export default function AntiCheatExamPage() {
   }, [history, userId, quizId]);
 
 
+  // UC-ANTICHEAT (1.7) — ghép màn hình + webcam vào 1 canvas mỗi frame, MediaRecorder ghi lại
+  // thành 1 file .webm duy nhất (luôn đồng bộ thời gian vì cùng 1 bản ghi). Bằng chứng bổ sung
+  // cho giảng viên xem lại — KHÔNG phải cơ chế enforcement chính (violations/risk-scoring đã
+  // hoạt động độc lập với video), nên nếu học viên từ chối chia sẻ màn hình, exam vẫn tiếp tục
+  // bình thường, chỉ là không có video để xem lại sau này.
+  const startCompositeRecording = useCallback((camStream: MediaStream, screenStream: MediaStream) => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1280;
+    canvas.height = 480;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    compositeCanvasRef.current = canvas;
+
+    const screenVideo = document.createElement('video');
+    screenVideo.srcObject = screenStream;
+    screenVideo.muted = true;
+    screenVideo.play().catch(() => {});
+    screenVideoElRef.current = screenVideo;
+
+    const camVideo = videoRef.current;
+
+    const drawFrame = () => {
+      if (ctx) {
+        ctx.fillStyle = '#111';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        if (screenVideo.readyState >= 2) ctx.drawImage(screenVideo, 0, 0, 853, 480);
+        if (camVideo && camVideo.readyState >= 2) ctx.drawImage(camVideo, 853, 0, 427, 480);
+      }
+      compositeRafRef.current = requestAnimationFrame(drawFrame);
+    };
+    drawFrame();
+
+    const composite = canvas.captureStream(15);
+    // Ghép luôn track audio từ mic (nếu có) vào stream ghi — cùng nguồn với tín hiệu AUDIO_VOICE_DETECTED.
+    camStream.getAudioTracks().forEach((t) => composite.addTrack(t));
+
+    try {
+      const recorder = new MediaRecorder(composite, { mimeType: 'video/webm;codecs=vp8,opus' });
+      recordedChunksRef.current = [];
+      recorder.ondataavailable = (e) => { if (e.data.size > 0) recordedChunksRef.current.push(e.data); };
+      recorder.start(1000);
+      mediaRecorderRef.current = recorder;
+      recordingStartRef.current = Date.now();
+    } catch {
+      // MediaRecorder/codec không hỗ trợ — bỏ qua ghi hình, không chặn thi.
+    }
+  }, []);
+
+  const stopCompositeRecording = useCallback((): Promise<{ blob: Blob; durationSec: number } | null> => {
+    return new Promise((resolve) => {
+      const recorder = mediaRecorderRef.current;
+      if (compositeRafRef.current) cancelAnimationFrame(compositeRafRef.current);
+      screenStreamRef.current?.getTracks().forEach((t) => t.stop());
+      if (!recorder || recorder.state === 'inactive') {
+        resolve(null);
+        return;
+      }
+      recorder.onstop = () => {
+        const durationSec = recordingStartRef.current ? Math.round((Date.now() - recordingStartRef.current) / 1000) : 0;
+        const blob = new Blob(recordedChunksRef.current, { type: 'video/webm' });
+        resolve(blob.size > 0 ? { blob, durationSec } : null);
+      };
+      recorder.stop();
+    });
+  }, []);
+
   // Hàm nộp bài
   const submitExam = useCallback((_isAuto = false) => {
     if (!attemptData || isSubmitting || hasAutoSubmittedRef.current) return;
@@ -189,9 +270,24 @@ export default function AntiCheatExamPage() {
     const elapsed = startTimeRef.current ? Math.floor((Date.now() - startTimeRef.current.getTime()) / 1000) : 0;
     setElapsedSeconds(elapsed);
     submitQuiz({ attemptId: attemptData.attemptId, data: { answers } }, {
-      onSuccess: (data: SubmitRes) => {
+      onSuccess: async (data: SubmitRes) => {
         setResult(data);
         setSubmitTime(new Date());
+
+        // UC-ANTICHEAT (1.7) — dừng ghi hình + upload video bằng chứng TRƯỚC khi điều hướng
+        // trang (router.replace bên dưới có thể unmount component, huỷ request đang bay).
+        // Lỗi upload không được chặn việc hiển thị kết quả bài thi — chỉ mất video bằng chứng.
+        if (mediaRecorderRef.current) {
+          try {
+            const recording = await stopCompositeRecording();
+            if (recording) {
+              const file = new File([recording.blob], `attempt-${attemptData.attemptId}.webm`, { type: 'video/webm' });
+              uploadRecordingMutation({ attemptId: attemptData.attemptId, file, durationSec: recording.durationSec });
+            }
+          } catch {
+            // Bỏ qua — không chặn hiển thị kết quả bài thi vì thiếu video bằng chứng.
+          }
+        }
         if (userId && quizId) {
           try {
             localStorage.removeItem(`exam_draft_${userId}_${quizId}`);
@@ -235,7 +331,7 @@ export default function AntiCheatExamPage() {
         setIsSubmitting(false);
       }
     });
-  }, [attemptData, answers, isSubmitting, submitQuiz, mediaStream, userId, quizId, router, returnUrl]);
+  }, [attemptData, answers, isSubmitting, submitQuiz, mediaStream, userId, quizId, router, returnUrl, stopCompositeRecording, uploadRecordingMutation]);
 
   // UC-ANTICHEAT (25/09/2026) — Composite Behavioral Risk Engine.
   // Hàm xử lý vi phạm DUY NHẤT (đã gộp 2 bản trùng lặp cũ) — ghi nhận SERVER-SIDE qua
@@ -484,14 +580,21 @@ export default function AntiCheatExamPage() {
     return () => { if (proctorFrameInterval.current) clearInterval(proctorFrameInterval.current); };
   }, [isStarted, isProctored, result, attemptData, analyzeProctorFrameMutation, submitExam]);
 
-  // Yêu cầu bật Camera (nếu proctored)
+  // Yêu cầu bật Camera + Micro (nếu proctored)
   const startExam = useCallback(async () => {
     if (isProctored) {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
         setMediaStream(stream);
+
+        try {
+          const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+          screenStreamRef.current = screenStream;
+        } catch {
+          toast.warning('Bạn đã bỏ qua chia sẻ màn hình — bài thi vẫn tiếp tục, nhưng sẽ không có video bằng chứng để xem lại sau này.');
+        }
       } catch {
-        toast.error('Bạn phải cấp quyền sử dụng Camera để làm bài thi này!');
+        toast.error('Bạn phải cấp quyền sử dụng Camera & Micro để làm bài thi này!');
         return;
       }
     }
@@ -591,6 +694,14 @@ export default function AntiCheatExamPage() {
       mediaStream.getTracks().forEach(t => t.stop());
     }
   }, [isStarted, mediaStream, result]);
+
+  // UC-ANTICHEAT (1.7) — bắt đầu ghi hình composite NGAY khi cả webcam lẫn màn hình đã sẵn
+  // sàng (webcam video đã gắn srcObject ở effect trên). Chỉ bắt đầu 1 lần cho mỗi lượt thi.
+  useEffect(() => {
+    if (isStarted && isProctored && mediaStream && screenStreamRef.current && !mediaRecorderRef.current && !result) {
+      startCompositeRecording(mediaStream, screenStreamRef.current);
+    }
+  }, [isStarted, isProctored, mediaStream, result, startCompositeRecording]);
 
   // Format thời gian mm:ss
   const formatTime = (seconds: number) => {
