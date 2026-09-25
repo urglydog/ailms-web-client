@@ -119,15 +119,18 @@ export function InstructorChat() {
         )}
       </button>
 
-      {/* Chat Window */}
-      <div 
-        className={`fixed bottom-24 right-6 z-50 w-96 max-w-[calc(100vw-3rem)] rounded-2xl bg-white shadow-2xl border border-gray-100 transition-all duration-300 transform flex flex-col ${
-          isOpen ? 'scale-100 opacity-100 translate-y-0' : 'scale-95 opacity-0 translate-y-4 pointer-events-none'
+      {/* Chat Window — cùng kích thước/animation với DiscoveryChat.tsx (khung học viên) để
+          nhất quán trải nghiệm giữa 2 vai trò; trước đây khung này dùng w-96/height 520px riêng,
+          thiếu overflow-hidden trên container ngoài khiến phần trên (bo góc rounded-t-2xl) bị
+          hở/che khi cửa sổ trình duyệt thấp, và animation mở/đóng khác hẳn (scale-95 thay vì
+          scale-0 + translate-y-20, duration-300 thay vì duration-500 + easing riêng). */}
+      <div
+        className={`fixed bottom-24 right-6 flex h-[500px] w-[400px] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl border border-line z-50 origin-bottom-right transition-all duration-500 ease-[cubic-bezier(0.2,1,0.2,1)] ${
+          isOpen ? 'scale-100 opacity-100 translate-y-0' : 'scale-0 opacity-0 translate-y-20 pointer-events-none'
         }`}
-        style={{ height: '520px' }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between bg-accent p-4 text-white rounded-t-2xl">
+        <div className="flex items-center justify-between bg-accent p-4 text-white rounded-t-2xl shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-sm">
               🤖
@@ -209,7 +212,7 @@ export function InstructorChat() {
         </div>
 
         {/* Input Footer */}
-        <div className="p-3 bg-white border-t border-gray-100">
+        <div className="p-3 bg-white border-t border-gray-100 shrink-0">
           <form 
             onSubmit={(e: React.FormEvent) => { e.preventDefault(); sendMessage(); }}
             className="flex items-center gap-2"
