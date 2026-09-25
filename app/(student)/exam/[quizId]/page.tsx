@@ -73,6 +73,7 @@ export default function AntiCheatExamPage() {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const recordedChunksRef = useRef<Blob[]>([]);
   const recordingStartRef = useRef<number | null>(null);
+  const recordingMimeTypeRef = useRef<string | null>(null);
   const { mutate: uploadRecordingMutation } = useMutation({
     mutationFn: ({ attemptId, file, durationSec }: { attemptId: number; file: File; durationSec: number }) =>
       quizApi.uploadRecording(attemptId, file, durationSec),
@@ -190,12 +191,33 @@ export default function AntiCheatExamPage() {
   }, [history, userId, quizId]);
 
 
-  // UC-ANTICHEAT (1.7) — ghép màn hình + webcam vào 1 canvas mỗi frame, MediaRecorder ghi lại
-  // thành 1 file .webm duy nhất (luôn đồng bộ thời gian vì cùng 1 bản ghi). Bằng chứng bổ sung
-  // cho giảng viên xem lại — KHÔNG phải cơ chế enforcement chính (violations/risk-scoring đã
-  // hoạt động độc lập với video), nên nếu học viên từ chối chia sẻ màn hình, exam vẫn tiếp tục
-  // bình thường, chỉ là không có video để xem lại sau này.
-  const startCompositeRecording = useCallback((camStream: MediaStream, screenStream: MediaStream) => {
+  // BUG THẬT (26/09/2026, phát hiện lúc test thật): Safari (cả macOS lẫn iOS) KHÔNG hỗ trợ
+  // `video/webm` cho MediaRecorder — trước đây hardcode đúng mimeType này khiến `new
+  // MediaRecorder(...)` NÉM LỖI NGAY LẬP TỨC trên Safari, rơi vào catch rỗng, ghi hình fail âm
+  // thầm hoàn toàn (không log, không toast) dù mọi quyền camera/mic đã cấp — đúng hiện tượng
+  // "vẫn thi được nhưng chưa có video" người dùng gặp phải. Dò mimeType thật sự được hỗ trợ tại
+  // runtime thay vì hardcode 1 loại duy nhất.
+  const pickSupportedMimeType = (): string | null => {
+    if (typeof MediaRecorder === 'undefined' || !MediaRecorder.isTypeSupported) return null;
+    const candidates = ['video/webm;codecs=vp8,opus', 'video/webm', 'video/mp4;codecs=h264,aac', 'video/mp4'];
+    return candidates.find((t) => MediaRecorder.isTypeSupported(t)) ?? null;
+  };
+
+  // UC-ANTICHEAT (1.7, mở rộng 26/09/2026) — ghép màn hình + webcam vào 1 canvas mỗi frame,
+  // MediaRecorder ghi lại thành 1 file duy nhất (luôn đồng bộ thời gian vì cùng 1 bản ghi). Bằng
+  // chứng bổ sung cho giảng viên xem lại — KHÔNG phải cơ chế enforcement chính (violations/risk-
+  // scoring đã hoạt động độc lập với video).
+  //
+  // BUG THẬT (26/09/2026): `screenStream` trước đây BẮT BUỘC phải có mới ghi hình — nhưng
+  // Safari trên iOS/iPadOS KHÔNG hỗ trợ `getDisplayMedia()` (Screen Capture API) chút nào, nên
+  // học viên thi trên điện thoại/iPad không bao giờ có video dù webcam vẫn ghi được bình thường.
+  // Giờ `screenStream` là optional — không có màn hình thì vẫn ghi ĐƠN webcam full-khung thay vì
+  // bỏ hẳn, còn hơn không có gì.
+  const startCompositeRecording = useCallback((camStream: MediaStream, screenStream: MediaStream | null) => {
+    const mimeType = pickSupportedMimeType();
+    if (!mimeType) return; // Trình duyệt không hỗ trợ ghi hình kiểu nào cả — bỏ qua, không chặn thi.
+    recordingMimeTypeRef.current = mimeType;
+
     const canvas = document.createElement('canvas');
     canvas.width = 1280;
     canvas.height = 480;
@@ -203,11 +225,14 @@ export default function AntiCheatExamPage() {
     if (!ctx) return;
     compositeCanvasRef.current = canvas;
 
-    const screenVideo = document.createElement('video');
-    screenVideo.srcObject = screenStream;
-    screenVideo.muted = true;
-    screenVideo.play().catch(() => {});
-    screenVideoElRef.current = screenVideo;
+    let screenVideo: HTMLVideoElement | null = null;
+    if (screenStream) {
+      screenVideo = document.createElement('video');
+      screenVideo.srcObject = screenStream;
+      screenVideo.muted = true;
+      screenVideo.play().catch(() => {});
+      screenVideoElRef.current = screenVideo;
+    }
 
     const camVideo = videoRef.current;
 
@@ -215,8 +240,14 @@ export default function AntiCheatExamPage() {
       if (ctx) {
         ctx.fillStyle = '#111';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        if (screenVideo.readyState >= 2) ctx.drawImage(screenVideo, 0, 0, 853, 480);
-        if (camVideo && camVideo.readyState >= 2) ctx.drawImage(camVideo, 853, 0, 427, 480);
+        if (screenVideo) {
+          // Có màn hình: ghép trái/phải như thiết kế gốc.
+          if (screenVideo.readyState >= 2) ctx.drawImage(screenVideo, 0, 0, 853, 480);
+          if (camVideo && camVideo.readyState >= 2) ctx.drawImage(camVideo, 853, 0, 427, 480);
+        } else if (camVideo && camVideo.readyState >= 2) {
+          // Không chia sẻ được màn hình (vd Safari iOS) — webcam chiếm full khung.
+          ctx.drawImage(camVideo, 340, 0, 600, 480);
+        }
       }
       compositeRafRef.current = requestAnimationFrame(drawFrame);
     };
@@ -227,14 +258,14 @@ export default function AntiCheatExamPage() {
     camStream.getAudioTracks().forEach((t) => composite.addTrack(t));
 
     try {
-      const recorder = new MediaRecorder(composite, { mimeType: 'video/webm;codecs=vp8,opus' });
+      const recorder = new MediaRecorder(composite, { mimeType });
       recordedChunksRef.current = [];
       recorder.ondataavailable = (e) => { if (e.data.size > 0) recordedChunksRef.current.push(e.data); };
       recorder.start(1000);
       mediaRecorderRef.current = recorder;
       recordingStartRef.current = Date.now();
     } catch {
-      // MediaRecorder/codec không hỗ trợ — bỏ qua ghi hình, không chặn thi.
+      // MediaRecorder tạo thất bại vì lý do khác (hiếm) — bỏ qua ghi hình, không chặn thi.
     }
   }, []);
 
@@ -249,7 +280,10 @@ export default function AntiCheatExamPage() {
       }
       recorder.onstop = () => {
         const durationSec = recordingStartRef.current ? Math.round((Date.now() - recordingStartRef.current) / 1000) : 0;
-        const blob = new Blob(recordedChunksRef.current, { type: 'video/webm' });
+        // Dùng đúng mimeType đã dò được lúc bắt đầu ghi (Safari ra mp4, Chrome/Firefox ra webm)
+        // — hardcode 'video/webm' ở đây trước đây làm sai type của Blob trên Safari dù bản thân
+        // recorder đã ghi đúng định dạng, khiến file tải lên có thể không phát được.
+        const blob = new Blob(recordedChunksRef.current, { type: recordingMimeTypeRef.current || 'video/webm' });
         resolve(blob.size > 0 ? { blob, durationSec } : null);
       };
       recorder.stop();
@@ -281,7 +315,10 @@ export default function AntiCheatExamPage() {
           try {
             const recording = await stopCompositeRecording();
             if (recording) {
-              const file = new File([recording.blob], `attempt-${attemptData.attemptId}.webm`, { type: 'video/webm' });
+              // Đuôi file theo đúng mimeType thật đã ghi (Safari → mp4, Chrome/Firefox → webm) —
+              // trước đây hardcode ".webm" dù Safari thực ra ghi ra mp4, sai định dạng file.
+              const ext = recording.blob.type.includes('mp4') ? 'mp4' : 'webm';
+              const file = new File([recording.blob], `attempt-${attemptData.attemptId}.${ext}`, { type: recording.blob.type });
               uploadRecordingMutation({ attemptId: attemptData.attemptId, file, durationSec: recording.durationSec });
             }
           } catch {
@@ -410,8 +447,15 @@ export default function AntiCheatExamPage() {
   }, [isStarted, result, isProctored, handleViolation]);
 
   // 1e. Phát hiện DevTools mở (so lệch outerWidth/innerWidth — ngưỡng ~160px, pattern phổ biến).
+  // BUG THẬT (26/09/2026, phát hiện lúc test thật trên iPhone Safari): heuristic này CHỈ đáng tin
+  // trên desktop — trên mobile, `outerHeight`/`innerHeight` thay đổi liên tục do thanh địa chỉ
+  // Safari tự thu/hiện khi cuộn, tạo ra false-positive "mở DevTools" dù người dùng không làm gì
+  // cả (không có DevTools nào để mở trên Safari di động theo cách này). Chặn hẳn trên thiết bị
+  // cảm ứng (`pointer: coarse`) — DevTools kiểu desktop không phải mối đe doạ thật trên điện
+  // thoại/máy tính bảng trong bối cảnh thi.
   useEffect(() => {
     if (!isStarted || result || !isProctored) return;
+    if (typeof window !== 'undefined' && window.matchMedia?.('(pointer: coarse)').matches) return;
     devtoolsCheckInterval.current = setInterval(() => {
       const widthDiff = window.outerWidth - window.innerWidth;
       const heightDiff = window.outerHeight - window.innerHeight;
@@ -695,10 +739,14 @@ export default function AntiCheatExamPage() {
     }
   }, [isStarted, mediaStream, result]);
 
-  // UC-ANTICHEAT (1.7) — bắt đầu ghi hình composite NGAY khi cả webcam lẫn màn hình đã sẵn
-  // sàng (webcam video đã gắn srcObject ở effect trên). Chỉ bắt đầu 1 lần cho mỗi lượt thi.
+  // UC-ANTICHEAT (1.7) — bắt đầu ghi hình NGAY khi webcam đã sẵn sàng (gắn srcObject ở effect
+  // trên). BUG THẬT (26/09/2026): trước đây BẮT BUỘC có `screenStreamRef.current` mới ghi —
+  // nhưng lúc tới đây, việc xin quyền chia sẻ màn hình ở `startExam` đã CHẮC CHẮN chạy xong
+  // (thành công hoặc bị từ chối/không hỗ trợ) vì nó `await` tuần tự TRƯỚC `startQuiz`/`isStarted`
+  // — nên `screenStreamRef.current` luôn đã ở trạng thái cuối cùng tại đây, không có race
+  // condition. Giờ chỉ cần `mediaStream` (webcam) là ghi được, màn hình chỉ là optional.
   useEffect(() => {
-    if (isStarted && isProctored && mediaStream && screenStreamRef.current && !mediaRecorderRef.current && !result) {
+    if (isStarted && isProctored && mediaStream && !mediaRecorderRef.current && !result) {
       startCompositeRecording(mediaStream, screenStreamRef.current);
     }
   }, [isStarted, isProctored, mediaStream, result, startCompositeRecording]);
