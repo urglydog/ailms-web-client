@@ -77,6 +77,12 @@ export default function AntiCheatExamPage() {
   const { mutate: uploadRecordingMutation } = useMutation({
     mutationFn: ({ attemptId, file, durationSec }: { attemptId: number; file: File; durationSec: number }) =>
       quizApi.uploadRecording(attemptId, file, durationSec),
+    onError: (err: unknown) => {
+      // Trước đây không có onError — upload thất bại (mạng, 413, token hết hạn...) hoàn toàn
+      // vô hình, không log không toast, không có cách nào debug được ngoài đoán mò.
+      console.error('Upload video giám sát thất bại:', err);
+      toast.warning('Không lưu được video giám sát (không ảnh hưởng điểm bài thi)');
+    },
   });
 
   const { mutate: startQuiz, isPending: isStarting } = useStartQuiz();
@@ -224,6 +230,10 @@ export default function AntiCheatExamPage() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     compositeCanvasRef.current = canvas;
+    // Gắn canvas vào DOM (ẩn, ngoài viewport) — canvas rời DOM có tiền sử bị Safari đứng hình
+    // khi captureStream(), gắn vào DOM giúp tăng độ tin cậy của track video ghi được.
+    canvas.style.cssText = 'position:fixed;left:-9999px;top:-9999px;opacity:0;pointer-events:none;';
+    document.body.appendChild(canvas);
 
     let screenVideo: HTMLVideoElement | null = null;
     if (screenStream) {
@@ -274,7 +284,14 @@ export default function AntiCheatExamPage() {
       const recorder = mediaRecorderRef.current;
       if (compositeRafRef.current) cancelAnimationFrame(compositeRafRef.current);
       screenStreamRef.current?.getTracks().forEach((t) => t.stop());
+      const removeCanvas = () => {
+        if (compositeCanvasRef.current?.parentNode) {
+          compositeCanvasRef.current.parentNode.removeChild(compositeCanvasRef.current);
+        }
+        compositeCanvasRef.current = null;
+      };
       if (!recorder || recorder.state === 'inactive') {
+        removeCanvas();
         resolve(null);
         return;
       }
@@ -284,6 +301,7 @@ export default function AntiCheatExamPage() {
         // — hardcode 'video/webm' ở đây trước đây làm sai type của Blob trên Safari dù bản thân
         // recorder đã ghi đúng định dạng, khiến file tải lên có thể không phát được.
         const blob = new Blob(recordedChunksRef.current, { type: recordingMimeTypeRef.current || 'video/webm' });
+        removeCanvas();
         resolve(blob.size > 0 ? { blob, durationSec } : null);
       };
       recorder.stop();
@@ -349,6 +367,12 @@ export default function AntiCheatExamPage() {
         router.replace(`/exam/${quizId}${returnUrl ? `?returnUrl=${returnUrl}` : ''}`);
       },
       onError: (err: unknown) => {
+        // Trước đây không có nhánh nào dừng camera/mic khi nộp bài lỗi — "ăn theo" hiệu ứng
+        // phụ của effect "Gắn stream" (dựa vào `result`), nhưng `result` không bao giờ được set
+        // ở nhánh lỗi nên camera/mic thực ra bị rò rỉ (đèn camera sáng treo). Effect đó đã bị bỏ
+        // vì gây race với video (xem comment ở effect "Gắn stream"), nên dừng tường minh ở đây.
+        mediaStream?.getTracks().forEach(t => t.stop());
+        screenStreamRef.current?.getTracks().forEach(t => t.stop());
         const error = err as { response?: { status?: number, data?: { code?: string, message?: string } } };
         if (error.response?.status === 410 || error.response?.data?.code === 'QUIZ_ARCHIVED') {
           setArchivedError({ show: true, message: error.response?.data?.message || 'Bài tập này đã được giảng viên thu hồi.' });
@@ -729,13 +753,17 @@ export default function AntiCheatExamPage() {
   }, [isStarted, duration, result, attemptData?.startedAt]);
 
   // Gắn stream
+  // BUG THẬT (26/09/2026, phát hiện lúc test camera/mic thật): trước đây có thêm 1 lệnh dừng
+  // track khi `result` truthy — nhưng `setResult(data)` trong `submitExam` được gọi TRƯỚC
+  // `await stopCompositeRecording()`, và `await` nhường quyền cho event loop khiến effect này
+  // chạy NGAY (dừng cứng track camera/mic) TRONG LÚC MediaRecorder còn đang đợi `onstop` flush
+  // chunk cuối — audio track bị dừng đột ngột (add trực tiếp, không clone) khiến recorder ra
+  // blob rỗng, video KHÔNG BAO GIỜ được upload. `submitExam` đã có sẵn 1 lệnh dừng track ĐÚNG
+  // CHỖ (sau khi upload xong) — lệnh ở đây hoàn toàn dư thừa và chính là nguồn gây race. Xoá
+  // hẳn, không thay thế.
   useEffect(() => {
     if (isStarted && videoRef.current && mediaStream && !result) {
       videoRef.current.srcObject = mediaStream;
-    }
-    // Dừng stream khi nộp bài
-    if (result && mediaStream) {
-      mediaStream.getTracks().forEach(t => t.stop());
     }
   }, [isStarted, mediaStream, result]);
 
