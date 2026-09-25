@@ -67,7 +67,7 @@ export default function ProctoringAttemptDetailPage() {
         video.removeEventListener('timeupdate', onTimeUpdate);
         video.removeEventListener('durationchange', onTimeUpdate);
         video.currentTime = sec;
-        video.play().catch(() => {});
+        video.pause();
       };
       
       video.addEventListener('timeupdate', onTimeUpdate);
