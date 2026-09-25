@@ -4,6 +4,7 @@ import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { useEffect, useRef, useState } from 'react';
 import { getAccessToken, decodeAccessToken } from '@/lib/auth/token';
+import { api } from '@/lib/api/client';
 
 export interface ChatMessage {
   /** Id THẬT của tin nhắn (server gán lúc lưu) — (20/09/2026, sửa lỗi) trước đây bị lẫn với id
@@ -27,18 +28,11 @@ export function useCommunitySocket(lessonId: number | null) {
   useEffect(() => {
     if (lessonId == null) return;
 
-    // Fetch history
+    // Fetch history — api.get tự refresh access token hết hạn (401) trước khi coi là lỗi thật,
+    // khác fetch thô trước đây (không refresh, âm thầm mất lịch sử chat khi token hết hạn).
     const fetchHistory = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080'}/api/v1/lessons/${lessonId}/chats`, {
-          headers: {
-            Authorization: `Bearer ${getAccessToken() ?? ''}`
-          }
-        });
-        if (res.ok) {
-          const data = await res.json();
-          setMessages(data);
-        }
+        setMessages(await api.get<ChatMessage[]>(`/api/v1/lessons/${lessonId}/chats`));
       } catch (err) {
         console.error("Failed to fetch chat history", err);
       }

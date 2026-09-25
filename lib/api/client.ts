@@ -77,23 +77,30 @@ function processQueue(error: Error | null, token: string | null = null) {
   failedQueue = [];
 }
 
-async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
-  const { body, token, headers, ...rest } = options;
-  
-  // Use provided token or fallback to localStorage if available (client-side only)
-  let currentToken = token;
-  if (!currentToken && typeof window !== 'undefined') {
+/**
+ * Fetch có tự refresh access token khi 401/403 — lõi dùng chung cho {@link request} (JSON) và
+ * {@link apiBlob} (tải file nhị phân, vd PDF). Tách riêng để 2 nơi không lặp lại y hệt logic
+ * refresh (đã từng có bug thật: các chỗ tải PDF/chứng chỉ dùng `fetch` thô riêng, không hề
+ * refresh khi access token hết hạn — khác hẳn mọi request JSON thường đi qua {@link request}).
+ */
+async function fetchWithRefresh(
+  path: string,
+  init: RequestInit,
+  extraAuthHeaders: (token: string) => HeadersInit,
+): Promise<Response> {
+  let currentToken: string | undefined;
+  if (typeof window !== 'undefined') {
     currentToken = localStorage.getItem('accessToken') || undefined;
   }
 
+  const buildHeaders = (token: string | undefined) => ({
+    ...init.headers,
+    ...(token ? extraAuthHeaders(token) : {}),
+  });
+
   let response = await fetch(`${resolveBaseUrl()}${path}`, {
-    ...rest,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(currentToken ? { Authorization: `Bearer ${currentToken}` } : {}),
-      ...headers,
-    },
-    ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
+    ...init,
+    headers: buildHeaders(currentToken),
   });
 
   if ((response.status === 401 || response.status === 403) && typeof window !== 'undefined') {
@@ -104,16 +111,7 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
           const newToken = await new Promise<string>((resolve, reject) => {
             failedQueue.push({ resolve, reject });
           });
-          // Retry with new token
-          response = await fetch(`${resolveBaseUrl()}${path}`, {
-            ...rest,
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${newToken}`,
-              ...headers,
-            },
-            ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
-          });
+          response = await fetch(`${resolveBaseUrl()}${path}`, { ...init, headers: buildHeaders(newToken) });
         } catch {
           throw new ApiError(await parseProblem(response));
         }
@@ -125,23 +123,14 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ refreshToken }),
           });
-          
+
           if (refreshRes.ok) {
             const data = await refreshRes.json();
             localStorage.setItem('accessToken', data.accessToken);
             localStorage.setItem('refreshToken', data.refreshToken);
             processQueue(null, data.accessToken);
-            
-            // Retry the original request
-            response = await fetch(`${resolveBaseUrl()}${path}`, {
-              ...rest,
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${data.accessToken}`,
-                ...headers,
-              },
-              ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
-            });
+
+            response = await fetch(`${resolveBaseUrl()}${path}`, { ...init, headers: buildHeaders(data.accessToken) });
           } else {
             processQueue(new Error('Refresh failed'));
             localStorage.removeItem('accessToken');
@@ -160,6 +149,22 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
     }
   }
 
+  return response;
+}
+
+async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
+  const { body, token, headers, ...rest } = options;
+
+  const response = await fetchWithRefresh(
+    path,
+    {
+      ...rest,
+      headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}), ...headers },
+      ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
+    },
+    (t) => ({ Authorization: `Bearer ${t}` }),
+  );
+
   if (!response.ok) {
     throw new ApiError(await parseProblem(response));
   }
@@ -173,6 +178,40 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
     return undefined as T;
   }
   return JSON.parse(text) as T;
+}
+
+/**
+ * POST `FormData` (nộp bài kèm file đính kèm) — CÙNG logic refresh-on-401 với {@link request}.
+ * `request`/`api.post` không dùng được ở đây vì nó luôn `JSON.stringify` body, làm rỗng mọi
+ * `FormData`; trước đây chỗ nộp bài tập tự viết `fetch` riêng kèm `Authorization` tay, không hề
+ * refresh access token hết hạn (cùng bug với {@link apiBlob}).
+ */
+export async function apiFormData<T>(path: string, formData: FormData): Promise<T> {
+  const response = await fetchWithRefresh(path, { method: 'POST', body: formData }, (t) => ({
+    Authorization: `Bearer ${t}`,
+  }));
+  if (!response.ok) {
+    throw new ApiError(await parseProblem(response));
+  }
+  if (response.status === 204) {
+    return undefined as T;
+  }
+  const text = await response.text();
+  return text ? (JSON.parse(text) as T) : (undefined as T);
+}
+
+/**
+ * Tải file nhị phân (PDF chứng chỉ, đề thi...) — CÙNG logic refresh-on-401 với {@link request},
+ * khác ở chỗ trả về {@link Blob} thay vì parse JSON. Thay cho việc mỗi màn hình tự viết `fetch`
+ * riêng kèm `Authorization: Bearer` tay (bug thật: các chỗ đó không hề tự refresh token hết hạn,
+ * người dùng phải tự đăng xuất/đăng nhập lại mới tải được).
+ */
+export async function apiBlob(path: string): Promise<Blob> {
+  const response = await fetchWithRefresh(path, {}, (t) => ({ Authorization: `Bearer ${t}` }));
+  if (!response.ok) {
+    throw new ApiError(await parseProblem(response));
+  }
+  return response.blob();
 }
 
 /** Cố gắng đọc ProblemDetail; nếu backend trả HTML/text thì tự dựng một cái tương đương. */
