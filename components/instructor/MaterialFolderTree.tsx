@@ -254,7 +254,7 @@ export function MaterialFolderTree({
         onContextMenu={e => handleContextMenu(e, 'MATERIAL', mat.id)}
         onClick={e => { e.stopPropagation(); setSelectedMaterialId(mat.id); }}
         onMouseDown={e => { if (e.detail > 1) e.preventDefault(); }}
-        className={`flex items-center gap-3 px-4 py-2.5 border-b border-gray-50 hover:bg-surface-hover cursor-pointer transition-colors group/row select-none ${
+        className={`flex items-center gap-3 px-4 py-2.5 border-b border-line hover:bg-surface-hover cursor-pointer transition-colors group/row select-none ${
           selectedMaterialId === mat.id ? 'bg-accent/10 ring-1 ring-inset ring-accent/40' : ''
         }`}
       >

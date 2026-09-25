@@ -1,19 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
 import { proctoringApi } from '@/lib/api/proctoring';
 
-export const useProctoredQuizzes = (courseId: number | undefined) => {
+export const useProctoredAttempts = (courseId: number | undefined) => {
   return useQuery({
-    queryKey: ['proctoring', 'quizzes', courseId],
-    queryFn: () => proctoringApi.getProctoredQuizzes(courseId as number),
+    queryKey: ['proctoring', 'attempts', courseId],
+    queryFn: () => proctoringApi.getAttempts(courseId as number),
     enabled: !!courseId,
-  });
-};
-
-export const useProctoredAttempts = (quizId: number | undefined) => {
-  return useQuery({
-    queryKey: ['proctoring', 'attempts', quizId],
-    queryFn: () => proctoringApi.getAttempts(quizId as number),
-    enabled: !!quizId,
   });
 };
 

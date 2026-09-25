@@ -172,7 +172,7 @@ function DroppableNode({ id, title, type, children }: { id: string, title: strin
 
   return (
     <div ref={setNodeRef} className={`rounded-card transition-colors ${isOver ? 'bg-accent/5 border border-accent/30 border-dashed' : ''}`}>
-      <div className={`flex items-center gap-2 px-2 py-1.5 text-xs ${type === 'CHAPTER' ? 'font-bold text-ink bg-surface-hover rounded-card' : 'font-semibold text-ink-muted bg-surface-hover/50 mt-1 rounded-card'}`}>
+      <div className={`flex items-center gap-2 px-2 py-1.5 text-xs border rounded-card ${type === 'CHAPTER' ? 'font-bold text-ink bg-surface-hover border-line' : 'font-semibold text-ink border-line/60 bg-surface-hover/50 mt-1'}`}>
         {type === 'CHAPTER' ? <Folder className="w-3.5 h-3.5 flex-shrink-0" strokeWidth={1.75} /> : <File className="w-3.5 h-3.5 flex-shrink-0" strokeWidth={1.75} />}
         {type === 'CHAPTER' ? `Chương: ${title}` : title}
       </div>
@@ -473,9 +473,9 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                     {chapterMaterials.map(mat => {
                       const assignment = mat.assignments?.find(a => a.chapterId === chapter.id);
                       return (
-                        <div key={`mat-${mat.id}`} onDoubleClick={() => setInspectGenerationId(mat.id, true)} onMouseDown={(e) => { if (e.detail > 1) e.preventDefault(); }} className="flex items-center justify-between px-2 py-1 text-xs text-ink-muted pl-6 hover:bg-accent/5 rounded-card cursor-pointer transition-colors group select-none" title="Nháy đúp để xem trước">
-                          <div className="flex items-center gap-2">
-                            <LinkIcon className="w-3 h-3 text-ink-faint flex-shrink-0" /> {mat.title || 'Học liệu'}
+                        <div key={`mat-${mat.id}`} onDoubleClick={() => setInspectGenerationId(mat.id, true)} onMouseDown={(e) => { if (e.detail > 1) e.preventDefault(); }} className="flex items-center justify-between ml-6 mt-1 px-2 py-1.5 text-xs text-ink border border-line bg-surface-raised rounded-card hover:border-accent hover:bg-accent/5 cursor-pointer transition-colors group select-none" title="Nháy đúp để xem trước">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <LinkIcon className="w-3 h-3 text-ink-faint flex-shrink-0" /> <span className="truncate">{mat.title || 'Học liệu'}</span>
                           </div>
                           <button onClick={(e) => {
                             e.stopPropagation();
@@ -486,7 +486,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                                 onConfirm: () => assignment?.id ? materialsApi.deleteAssignment(assignment.id).then(() => queryClient.invalidateQueries({ queryKey: ["instructor-materials", courseId] })) : undefined
                               });
                             }
-                          }} className="opacity-0 group-hover:opacity-100 p-0.5 text-ink-faint hover:text-danger transition-opacity">
+                          }} title="Gỡ" className="opacity-0 group-hover:opacity-100 p-0.5 text-ink-faint hover:text-danger transition-opacity shrink-0">
                             <Trash2 className="w-3 h-3" />
                           </button>
                         </div>
@@ -504,9 +504,9 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                             {lessonMaterials.map(mat => {
                               const assignment = mat.assignments?.find(a => a.lessonId === lesson.id);
                               return (
-                                <div key={`mat-${mat.id}`} onDoubleClick={() => setInspectGenerationId(mat.id, true)} onMouseDown={(e) => { if (e.detail > 1) e.preventDefault(); }} className="flex items-center justify-between px-2 py-1 text-[11px] text-ink-muted pl-6 hover:bg-accent/5 rounded-card cursor-pointer transition-colors group select-none" title="Nháy đúp để xem trước">
-                                  <div className="flex items-center gap-2">
-                                    <LinkIcon className="w-3 h-3 text-ink-faint flex-shrink-0" /> {mat.title || 'Học liệu'}
+                                <div key={`mat-${mat.id}`} onDoubleClick={() => setInspectGenerationId(mat.id, true)} onMouseDown={(e) => { if (e.detail > 1) e.preventDefault(); }} className="flex items-center justify-between ml-6 mt-1 px-2 py-1.5 text-[11px] text-ink border border-line bg-surface-raised rounded-card hover:border-accent hover:bg-accent/5 cursor-pointer transition-colors group select-none" title="Nháy đúp để xem trước">
+                                  <div className="flex items-center gap-2 min-w-0">
+                                    <LinkIcon className="w-3 h-3 text-ink-faint flex-shrink-0" /> <span className="truncate">{mat.title || 'Học liệu'}</span>
                                   </div>
                                   <button onClick={(e) => {
                                     e.stopPropagation();
@@ -517,7 +517,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                                         onConfirm: () => assignment?.id ? materialsApi.deleteAssignment(assignment.id).then(() => queryClient.invalidateQueries({ queryKey: ["instructor-materials", courseId] })) : undefined
                                       });
                                     }
-                                  }} className="opacity-0 group-hover:opacity-100 p-0.5 text-ink-faint hover:text-danger transition-opacity">
+                                  }} title="Gỡ" className="opacity-0 group-hover:opacity-100 p-0.5 text-ink-faint hover:text-danger transition-opacity shrink-0">
                                     <Trash2 className="w-3 h-3" />
                                   </button>
                                 </div>

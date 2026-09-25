@@ -2,6 +2,7 @@
 
 import { useParams, useRouter } from 'next/navigation';
 import { useRef } from 'react';
+import { ShieldAlert } from 'lucide-react';
 import { useProctoredAttemptDetail } from '@/hooks/useProctoring';
 import { ArrowLeftIcon } from '@/components/instructor/SidebarIcons';
 
@@ -62,19 +63,20 @@ export default function ProctoringAttemptDetailPage() {
     <>
       <button
         onClick={() => router.back()}
+        title="Quay lại"
         className="flex items-center gap-1.5 text-sm font-semibold text-accent hover:underline mb-4"
       >
-        <ArrowLeftIcon /> Danh sách lượt thi
+        <ArrowLeftIcon /> Quay lại
       </button>
 
       <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
         <div>
           <h1 className="font-display text-xl font-bold text-ink">{attempt.studentName}</h1>
-          <p className="text-sm text-ink-muted">{attempt.studentEmail} · Nộp lúc {parseDate(attempt.submittedAt).toLocaleString('vi-VN')}</p>
+          <p className="text-sm text-ink-muted">{attempt.studentEmail} · {parseDate(attempt.submittedAt).toLocaleString('vi-VN')}</p>
         </div>
         {attempt.aiRiskLevel && (
-          <span className={`badge border text-sm ${RISK_STYLE[attempt.aiRiskLevel] || ''}`}>
-            Mức rủi ro: {attempt.aiRiskLevel}
+          <span className={`badge border text-sm inline-flex items-center gap-1 ${RISK_STYLE[attempt.aiRiskLevel] || ''}`}>
+            <ShieldAlert className="w-3.5 h-3.5" /> {attempt.aiRiskLevel}
           </span>
         )}
       </div>
@@ -92,8 +94,8 @@ export default function ProctoringAttemptDetailPage() {
             {attempt.videoUrl ? (
               <video ref={videoRef} src={attempt.videoUrl} controls className="w-full aspect-video bg-black" />
             ) : (
-              <div className="aspect-video flex items-center justify-center text-sm text-ink-muted bg-surface-raised">
-                Không có video bằng chứng cho lượt thi này.
+              <div className="aspect-video flex items-center justify-center text-sm text-ink-faint bg-surface-raised">
+                Chưa có video
               </div>
             )}
           </div>
@@ -104,7 +106,7 @@ export default function ProctoringAttemptDetailPage() {
             Vi phạm ({attempt.violationCount})
           </div>
           {attempt.violations.length === 0 ? (
-            <p className="text-sm text-ink-muted">Không có vi phạm nào được ghi nhận.</p>
+            <p className="text-sm text-ink-faint">Không có vi phạm.</p>
           ) : (
             attempt.violations.map((v, idx) => (
               <button
