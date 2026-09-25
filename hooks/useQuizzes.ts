@@ -42,6 +42,22 @@ export const useExplainWrongAnswer = () => {
   });
 };
 
+/** UC-ANTICHEAT — ghi nhận 1 vi phạm rời rạc, server-side (thay cho localStorage trước đây). */
+export const useRecordViolation = () => {
+  return useMutation({
+    mutationFn: ({ attemptId, data }: { attemptId: number; data: import('@/lib/api/quizzes').ViolationReq }) =>
+      quizApi.recordViolation(attemptId, data),
+  });
+};
+
+/** UC-ANTICHEAT — gửi khung hình webcam cho Gemini Vision xác minh thật (đếm người + hướng nhìn). */
+export const useAnalyzeProctorFrame = () => {
+  return useMutation({
+    mutationFn: ({ attemptId, data }: { attemptId: number; data: import('@/lib/api/quizzes').ProctorFrameReq }) =>
+      quizApi.analyzeProctorFrame(attemptId, data),
+  });
+};
+
 export const useUpdatePersonalQuestion = () => {
   return useMutation({
     mutationFn: ({ questionId, data }: { questionId: number; data: import('@/lib/api/quizzes').UpdateQuestionReq }) => quizApi.updateQuestion(questionId, data),
