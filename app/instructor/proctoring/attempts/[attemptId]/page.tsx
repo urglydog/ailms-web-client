@@ -60,8 +60,15 @@ export default function ProctoringAttemptDetailPage() {
   };
 
   const handleViolationClick = (idx: number, offsetSec: number) => {
+    // Tua trước, đợi 1 nhịp ngắn rồi mới xổ chi tiết — trước đây 2 việc chạy cùng lúc trong 1
+    // tick, cảm giác đột ngột; tách ra để đọc phân tích AI sau khi video đã tua tới đúng chỗ.
     seekTo(offsetSec);
-    setExpandedIdx((prev) => (prev === idx ? null : idx));
+    if (expandedIdx === idx) {
+      setExpandedIdx(null);
+      return;
+    }
+    setExpandedIdx(null);
+    window.setTimeout(() => setExpandedIdx(idx), 300);
   };
 
   if (isLoading || !attempt) {
