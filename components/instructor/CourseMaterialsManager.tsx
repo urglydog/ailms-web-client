@@ -208,6 +208,10 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchQuery, setSearchQuery] = useState('');
   const [showActivityPanel, setShowActivityPanel] = useState(false);
+  // (25/09/2026, fix nhanh) — Workspace trước đây không có cách nào lọc theo loại/trạng thái,
+  // mọi học liệu (Quiz/Flashcard/Mindmap, Draft/Official) nằm chung 1 lưới không phân biệt được.
+  const [typeFilter, setTypeFilter] = useState<'ALL' | 'QUIZ' | 'FLASHCARD' | 'MINDMAP'>('ALL');
+  const [statusFilter, setStatusFilter] = useState<'ALL' | 'DRAFT' | 'OFFICIAL'>('ALL');
 
   const overwriteMaterialVersionMutation = useMutation({
     mutationFn: (variables: { id: number, targetLessonId?: number, targetChapterId?: number }) =>
@@ -434,6 +438,18 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
 
   const displayedMaterials = materials || [];
 
+  // (25/09/2026, fix nhanh) — kết hợp lọc loại + trạng thái + tìm kiếm, thay cho việc chỉ có
+  // search-theo-tiêu-đề (không giúp được gì khi phần lớn học liệu chưa đặt tên, hiện "Học liệu
+  // không tên") và không hề có cách nào tách Quiz/Flashcard/Mindmap hay Draft/Official.
+  const filteredWorkspaceMaterials = displayedMaterials
+    .filter(m => typeFilter === 'ALL' || m.materialType === typeFilter)
+    .filter(m => {
+      if (statusFilter === 'ALL') return true;
+      const isDistributed = (m.assignments?.length ?? 0) > 0;
+      return statusFilter === 'OFFICIAL' ? isDistributed : !isDistributed;
+    })
+    .filter(m => !searchQuery || (m.title || '').toLowerCase().includes(searchQuery.toLowerCase()));
+
   const activeDragMaterial = activeDragId ? materials?.find(m => m.id === activeDragId) : null;
 
   return (
@@ -587,11 +603,51 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
               ]}
             />
           </div>
-          
+
+          {/* Toolbar row 3: Filter theo loại + trạng thái (25/09/2026, fix nhanh — trước đây
+              không có cách nào lọc, mọi học liệu nằm chung 1 lưới). Icon lucide-react đơn sắc,
+              màu theo token có sẵn, không emoji/phối màu — đúng quy tắc Materials Workspace. */}
+          <div className="px-3 py-2 border-b border-line flex items-center gap-1.5 bg-surface-raised overflow-x-auto">
+            {([
+              { key: 'ALL', label: 'Tất cả', Icon: null },
+              { key: 'QUIZ', label: 'Quiz', Icon: FileQuestion },
+              { key: 'FLASHCARD', label: 'Flashcard', Icon: Layers },
+              { key: 'MINDMAP', label: 'Mindmap', Icon: Workflow },
+            ] as const).map(({ key, label, Icon }) => (
+              <button
+                key={key}
+                onClick={() => setTypeFilter(key)}
+                title={`Lọc theo loại: ${label}`}
+                className={`flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-card border transition-colors shrink-0 ${
+                  typeFilter === key ? 'bg-ink text-white border-ink' : 'bg-surface text-ink-muted border-line hover:bg-surface-hover'
+                }`}
+              >
+                {Icon && <Icon className="w-3.5 h-3.5" />} {label}
+              </button>
+            ))}
+            <span className="w-px h-4 bg-line mx-1 shrink-0" />
+            {([
+              { key: 'ALL', label: 'Mọi trạng thái' },
+              { key: 'DRAFT', label: 'Draft' },
+              { key: 'OFFICIAL', label: 'Official' },
+            ] as const).map(({ key, label }) => (
+              <button
+                key={key}
+                onClick={() => setStatusFilter(key)}
+                title={`Lọc theo trạng thái: ${label}`}
+                className={`px-2.5 py-1 text-xs font-semibold rounded-card border transition-colors shrink-0 ${
+                  statusFilter === key ? 'bg-ink text-white border-ink' : 'bg-surface text-ink-muted border-line hover:bg-surface-hover'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
           <MaterialFolderTree
             courseId={courseId}
             folders={folders}
-            materials={searchQuery ? displayedMaterials.filter(m => (m.title || '').toLowerCase().includes(searchQuery.toLowerCase())) : displayedMaterials}
+            materials={filteredWorkspaceMaterials}
             onInspect={setInspectGenerationId}
             setConfirmAction={setConfirmAction}
             DraggableCard={DraggableMaterialCard}

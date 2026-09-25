@@ -92,8 +92,8 @@ function CartCheckoutContent() {
       });
       window.location.href = res.paymentUrl;
     } catch (err: unknown) {
-      const errorMsg = (err as Record<string, string>)?.detail || 'Có lỗi xảy ra khi thực hiện thanh toán';
-      toast.error(errorMsg);
+      // Cùng bug với checkout/[slug]/page.tsx — `ApiError` không có field `.detail`, chỉ `.message`.
+      toast.error(err instanceof ApiError ? err.message : 'Có lỗi xảy ra khi thực hiện thanh toán');
       setPayingMethod(null);
     }
   };
