@@ -114,6 +114,17 @@ export default function AntiCheatExamPage() {
   const recordedChunksRef = useRef<Blob[]>([]);
   const recordingStartRef = useRef<number | null>(null);
   const recordingMimeTypeRef = useRef<string | null>(null);
+
+  // UC-ANTICHEAT (27/09/2026, sửa lỗi lệch ~5s) — offset của 1 vi phạm PHẢI tính ngay tại thời
+  // điểm phát hiện, dựa trên cùng đồng hồ (Date.now()) với lúc bắt đầu ghi hình
+  // (`recordingStartRef`). Trước đây BE suy ngược mốc "video bắt đầu" từ `submittedAt -
+  // durationSec`, nhưng `submittedAt` bị chốt SỚM HƠN thời điểm FE thật sự dừng ghi hình (video
+  // vẫn ghi tiếp trong lúc chờ round-trip API nộp bài) — mọi offset tính ra bị trễ hơn thật.
+  const getVideoOffsetSec = useCallback((): number | undefined => {
+    return recordingStartRef.current != null
+      ? Math.round((Date.now() - recordingStartRef.current) / 1000)
+      : undefined;
+  }, []);
   const { mutate: uploadRecordingMutation } = useMutation({
     mutationFn: ({ attemptId, file, durationSec }: { attemptId: number; file: File; durationSec: number }) =>
       quizApi.uploadRecording(attemptId, file, durationSec),
@@ -452,7 +463,7 @@ export default function AntiCheatExamPage() {
     if (now - lastViolationTime.current < 2000) return;
     lastViolationTime.current = now;
 
-    recordViolationMutation({ attemptId: attemptData.attemptId, data: { type, detail: reason } }, {
+    recordViolationMutation({ attemptId: attemptData.attemptId, data: { type, detail: reason, clientOffsetSec: getVideoOffsetSec() } }, {
       onSuccess: (res) => {
         setViolationCount(res.violationCount);
         const max = res.maxViolations || 3;
@@ -466,7 +477,7 @@ export default function AntiCheatExamPage() {
       // Lỗi mạng lúc ghi nhận không được chặn học viên làm bài tiếp — chỉ bỏ qua lần này,
       // server vẫn ghi được các lần vi phạm sau.
     });
-  }, [isSubmitting, result, attemptData, recordViolationMutation, submitExam]);
+  }, [isSubmitting, result, attemptData, recordViolationMutation, submitExam, getVideoOffsetSec]);
 
   // 1. Chống chuyển tab
   useEffect(() => {
@@ -635,7 +646,7 @@ export default function AntiCheatExamPage() {
 
       lastFrameSentAtRef.current = Date.now();
       analyzeProctorFrameMutation(
-        { attemptId: attemptData.attemptId, data: { imageBase64: base64, mimeType: 'image/jpeg' } },
+        { attemptId: attemptData.attemptId, data: { imageBase64: base64, mimeType: 'image/jpeg', clientOffsetSec: getVideoOffsetSec() } },
         {
           onSuccess: (res) => {
             if (res.flagged) {
@@ -656,7 +667,7 @@ export default function AntiCheatExamPage() {
       // Lỗi chụp/gửi frame — bỏ qua lần quét này, không chặn thi.
       return false;
     }
-  }, [attemptData, analyzeProctorFrameMutation, submitExam]);
+  }, [attemptData, analyzeProctorFrameMutation, submitExam, getVideoOffsetSec]);
 
   // 2. Face API Detection Loop — quét mỗi 2s (client-side, có thể bị bypass, chỉ để hiện badge
   // UX). Đồng thời làm "cò súng" sự kiện: nếu NO_FACE/MULTIPLE_FACES liên tục 3 chu kỳ (6s), lập
@@ -681,40 +692,52 @@ export default function AntiCheatExamPage() {
             new faceapi.TinyFaceDetectorOptions({ inputSize: 160, scoreThreshold: 0.3 })
           ).withFaceLandmarks();
 
+          let isAbnormal: boolean;
+
           if (detections.length === 0) {
             setFaceStatus('NO_FACE');
+            isAbnormal = true;
           } else if (detections.length > 1) {
             setFaceStatus('MULTIPLE_FACES');
+            isAbnormal = true;
           } else {
-            const [single] = detections;
-            if (!single) return;
-            const pose = estimateHeadPose(single.landmarks);
-            const baseline = headPoseBaselineRef.current;
+            // Head-pose (mục 2c) — CÔ LẬP riêng, lỗi ở đây tuyệt đối không được làm hỏng nhánh
+            // NO_FACE/MULTIPLE_FACES phía trên (bug thật 27/09/2026: dùng chung 1 try/catch khiến
+            // lỗi head-pose nuốt mất luôn cảnh báo rời khung hình). Fail-open về FACE_FOUND.
+            isAbnormal = false;
+            try {
+              const [single] = detections;
+              if (single) {
+                const pose = estimateHeadPose(single.landmarks);
+                const baseline = headPoseBaselineRef.current;
 
-            if (!baseline) {
-              // Đang gom mẫu hiệu chỉnh cá nhân (10s đầu, học viên nhìn thẳng bình thường) —
-              // chưa bật phát hiện quay đầu, coi như bình thường.
-              headPoseSamplesRef.current.push(pose);
-              if (headPoseSamplesRef.current.length >= HEAD_POSE_CALIBRATION_SAMPLES) {
-                const samples = headPoseSamplesRef.current;
-                headPoseBaselineRef.current = {
-                  yaw: samples.reduce((s, p) => s + p.yaw, 0) / samples.length,
-                  pitch: samples.reduce((s, p) => s + p.pitch, 0) / samples.length,
-                };
+                if (!baseline) {
+                  // Đang gom mẫu hiệu chỉnh cá nhân (10s đầu, học viên nhìn thẳng bình thường) —
+                  // chưa bật phát hiện quay đầu, coi như bình thường.
+                  headPoseSamplesRef.current.push(pose);
+                  if (headPoseSamplesRef.current.length >= HEAD_POSE_CALIBRATION_SAMPLES) {
+                    const samples = headPoseSamplesRef.current;
+                    headPoseBaselineRef.current = {
+                      yaw: samples.reduce((s, p) => s + p.yaw, 0) / samples.length,
+                      pitch: samples.reduce((s, p) => s + p.pitch, 0) / samples.length,
+                    };
+                  }
+                } else {
+                  const yawDeviation = Math.abs(pose.yaw - baseline.yaw);
+                  const pitchDeviation = Math.abs(pose.pitch - baseline.pitch);
+                  isAbnormal = yawDeviation > HEAD_POSE_YAW_THRESHOLD || pitchDeviation > HEAD_POSE_PITCH_THRESHOLD;
+                }
               }
-              setFaceStatus('FACE_FOUND');
-              abnormalStreakRef.current = 0;
-              return;
+            } catch (poseErr) {
+              console.error('[AntiCheat] head-pose estimation error (fail-open, bo qua):', poseErr);
+              isAbnormal = false;
             }
+            setFaceStatus(isAbnormal ? 'HEAD_TURNED' : 'FACE_FOUND');
+          }
 
-            const yawDeviation = Math.abs(pose.yaw - baseline.yaw);
-            const pitchDeviation = Math.abs(pose.pitch - baseline.pitch);
-            if (yawDeviation <= HEAD_POSE_YAW_THRESHOLD && pitchDeviation <= HEAD_POSE_PITCH_THRESHOLD) {
-              setFaceStatus('FACE_FOUND');
-              abnormalStreakRef.current = 0;
-              return;
-            }
-            setFaceStatus('HEAD_TURNED');
+          if (!isAbnormal) {
+            abnormalStreakRef.current = 0;
+            return;
           }
 
           abnormalStreakRef.current += 1;
@@ -722,8 +745,8 @@ export default function AntiCheatExamPage() {
             sendProctorFrame(15_000);
             abnormalStreakRef.current = 0;
           }
-        } catch {
-          // ignore detection error
+        } catch (err) {
+          console.error('[AntiCheat] face detection error:', err);
         }
       }, 2000); // Quét mỗi 2s
     };

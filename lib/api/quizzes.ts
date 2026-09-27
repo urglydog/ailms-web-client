@@ -84,6 +84,9 @@ export type ViolationType =
 export interface ViolationReq {
   type: ViolationType;
   detail?: string;
+  /** Offset tính theo đồng hồ client tại thời điểm phát hiện, cùng mốc t=0 với video ghi hình
+   * (xem `getVideoOffsetSec` ở exam page) — chính xác hơn suy ngược qua `submittedAt` phía BE. */
+  clientOffsetSec?: number;
 }
 
 export interface ViolationRes {
@@ -95,6 +98,7 @@ export interface ViolationRes {
 export interface ProctorFrameReq {
   imageBase64: string;
   mimeType: string;
+  clientOffsetSec?: number;
 }
 
 export interface ProctorFrameRes {
