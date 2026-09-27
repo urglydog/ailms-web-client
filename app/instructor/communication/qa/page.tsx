@@ -115,7 +115,10 @@ export default function InstructorQaPage() {
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-[minmax(0,1fr)_1.3fr] gap-4">
+        // (26/09/2026, sửa lỗi) — 2 cột cố định không co giãn dưới `lg`, quá hẹp để đọc câu hỏi
+        // lẫn chi tiết. Dưới `lg` xếp dọc (vẫn dùng được, chỉ không tối ưu bằng chế độ "1 cột"
+        // vốn đã có modal riêng — người dùng có thể tự chuyển).
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_1.3fr]">
           <div className="flex max-h-[calc(100vh-260px)] flex-col gap-2 overflow-y-auto pr-1">
             {questions.map((q) => (
               <QuestionRow

@@ -50,8 +50,13 @@ export function MessagesInbox({
   }, [conversations, search, sort]);
 
   return (
-    <div className="grid h-[calc(100vh-180px)] min-h-[480px] grid-cols-[300px_1fr] overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-      <div className="flex flex-col border-r border-gray-100">
+    // (26/09/2026, sửa lỗi) — trước đây `grid-cols-[300px_1fr]` áp dụng KHÔNG điều kiện, không
+    // co lại dưới `md`, cột 300px cố định chỉ chừa ~75px cho toàn bộ khung tin nhắn trên điện
+    // thoại — gần như không dùng được. Giờ 1 cột trên mobile, LUÔN chỉ hiện ĐÚNG 1 trong 2 khối
+    // (danh sách hoặc hội thoại đang chọn) tùy theo `selectedId`, có nút "← Quay lại" để đổi
+    // khối; từ `md:` trở lên giữ nguyên 2 cột luôn hiện song song như cũ.
+    <div className="grid h-[calc(100vh-180px)] min-h-[480px] grid-cols-1 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm md:grid-cols-[300px_1fr]">
+      <div className={`flex-col border-r border-gray-100 ${selectedId ? 'hidden md:flex' : 'flex'}`}>
         <div className="flex items-center justify-between gap-2 border-b border-gray-100 p-3">
           <span className="font-display text-[14px] font-bold text-gray-900">Hội thoại</span>
           {composeSlot}
@@ -130,7 +135,7 @@ export function MessagesInbox({
         </div>
       </div>
 
-      <div className="flex flex-col">
+      <div className={`flex-col ${selectedId ? 'flex' : 'hidden md:flex'}`}>
         {!selected ? (
           <div className="flex flex-1 items-center justify-center text-[13px] text-gray-400">
             Chọn 1 hội thoại để xem tin nhắn
@@ -140,6 +145,7 @@ export function MessagesInbox({
             conversationId={selected.id}
             otherUserName={selected.otherUserName}
             otherUserAvatarUrl={selected.otherUserAvatarUrl}
+            onBack={() => setSelectedId(null)}
           />
         )}
       </div>
@@ -148,9 +154,9 @@ export function MessagesInbox({
 }
 
 function ConversationThread({
-  conversationId, otherUserName, otherUserAvatarUrl,
+  conversationId, otherUserName, otherUserAvatarUrl, onBack,
 }: {
-  conversationId: number; otherUserName: string; otherUserAvatarUrl: string | null;
+  conversationId: number; otherUserName: string; otherUserAvatarUrl: string | null; onBack: () => void;
 }) {
   const { data: messages, isLoading } = useConversationMessages(conversationId);
   const sendMessage = useSendMessage();
@@ -164,6 +170,18 @@ function ConversationThread({
   return (
     <>
       <div className="flex items-center gap-2.5 border-b border-gray-100 px-4 py-3">
+        {/* Chỉ hiện dưới `md` — ở màn hình rộng cả 2 cột luôn hiện song song nên không cần "quay
+            lại" (xem `MessagesInbox`). */}
+        <button
+          type="button"
+          onClick={onBack}
+          aria-label="Quay lại danh sách hội thoại"
+          className="-ml-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 md:hidden"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round">
+            <path d="m15 18-6-6 6-6" />
+          </svg>
+        </button>
         <Avatar name={otherUserName} avatarUrl={otherUserAvatarUrl} size={30} />
         <span className="font-display text-[14px] font-bold text-gray-900">{otherUserName}</span>
       </div>

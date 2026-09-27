@@ -29,6 +29,8 @@ import { useLessonPlayer } from '@/hooks/usePublicCourses';
 import { useVoiceOptions } from '@/hooks/useVoiceOptions';
 import { api, ApiError } from '@/lib/api/client';
 import { lessonPlayerApi } from '@/lib/api/lessonPlayer';
+import type { CourseResource } from '@/lib/api/courseResourcesApi';
+import { PanelRightClose, PanelRightOpen } from 'lucide-react';
 import { LiveChatPanel } from '@/components/community/LiveChatPanel';
 import { MessageInstructorFloatingButton } from '@/components/course/MessageInstructorFloatingButton';
 import { useSetLearnTitle, useSetLearnProgress } from '@/components/layout/LearnTitleContext';
@@ -176,6 +178,16 @@ function LearnPageContent() {
   });
   const currentLessonMaterialCount = officialMaterials?.filter(m => m.assignments?.some(a => a.lessonId === lessonId)).length || 0;
 
+  // Tài liệu đính kèm theo từng bài (20/09/2026, tính năng mới) — gộp vào sidebar "Nội dung khóa
+  // học" thay vì chỉ nằm ở tab "Tài nguyên" tổng hợp riêng. Cùng endpoint `CourseResourcesTab`
+  // đã dùng, chỉ khác là fetch ở đây để truyền xuống `LessonSidebar` lọc theo từng bài.
+  const { data: courseResources } = useQuery({
+    queryKey: ['student-course-resources', lesson?.courseId],
+    queryFn: () => api.get<CourseResource[]>(`/api/v1/student/courses/${lesson!.courseId}/resources`),
+    enabled: !!lesson?.courseId && !!lesson?.enrolled,
+    staleTime: 0,
+  });
+
   // Dọn dẹp Draft rác của các Quiz đã bị xóa mềm (Graceful In-flight cleanup)
   useEffect(() => {
     if (lesson?.courseId && userId) {
@@ -232,6 +244,10 @@ function LearnPageContent() {
   };
 
   const [sidebarTab, setSidebarTab] = useState<SidebarTab>('content');
+  // (20/09/2026, tính năng mới) — thu gọn cột "Nội dung khóa học/AI Gia sư" để nhường thêm không
+  // gian ngang cho video, chỉ áp dụng ở màn hình rộng (`lg:`) — dưới `lg` layout đã tự xếp chồng
+  // dọc nên thu gọn không có ý nghĩa.
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   // Ẩn/hiện phụ đề gốc & phụ đề đã dịch — mặc định TẮT, học viên chủ động tích chọn.
   const [showOriginalSub, setShowOriginalSub] = useState(false);
   const [showTranslatedSub, setShowTranslatedSub] = useState(false);
@@ -608,7 +624,7 @@ function LearnPageContent() {
             bài nào (đánh dấu active) nên không cần lặp lại tên bài học ở đây nữa.
             Video lớn nhất, sidebar phải hẹp có tab, tab dưới video
             thay cho các khối CTA/card rời trước đây. */}
-        <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
+        <div className={`grid gap-6 ${sidebarCollapsed ? 'lg:grid-cols-[1fr_auto]' : 'lg:grid-cols-[1fr_380px]'}`}>
           {/* ── Cột phát bài giảng ── */}
           <div className="flex min-w-0 flex-col gap-4">
             {/* Video luôn hiển thị và phát được, bất kể mode — xem docblock đầu file.
@@ -761,8 +777,19 @@ function LearnPageContent() {
 
           {/* ── Cột sidebar: Nội dung khóa học / AI Gia sư ── */}
           <aside className="lg:sticky lg:top-6 lg:self-start">
+            {sidebarCollapsed ? (
+              <button
+                type="button"
+                onClick={() => setSidebarCollapsed(false)}
+                title="Mở rộng nội dung khóa học"
+                aria-label="Mở rộng nội dung khóa học"
+                className="hidden h-10 w-10 items-center justify-center rounded-xl border border-line bg-white text-ink-muted shadow-sm transition-colors hover:border-accent hover:text-accent lg:flex"
+              >
+                <PanelRightOpen className="h-5 w-5" strokeWidth={1.75} />
+              </button>
+            ) : (
             <div className="card flex h-[calc(100vh-140px)] min-h-[520px] flex-col overflow-hidden p-0">
-              <div className="flex shrink-0 border-b border-line">
+              <div className="flex shrink-0 items-center border-b border-line">
                 <button
                   type="button"
                   onClick={() => setSidebarTab('content')}
@@ -785,6 +812,15 @@ function LearnPageContent() {
                 >
                   AI Gia sư
                 </button>
+                <button
+                  type="button"
+                  onClick={() => setSidebarCollapsed(true)}
+                  title="Thu gọn — mở rộng không gian video"
+                  aria-label="Thu gọn nội dung khóa học"
+                  className="hidden shrink-0 border-b-2 border-transparent px-3 py-3 text-ink-muted transition-colors hover:text-ink lg:block"
+                >
+                  <PanelRightClose className="h-[18px] w-[18px]" strokeWidth={1.75} />
+                </button>
               </div>
 
               {sidebarTab === 'content' ? (
@@ -800,7 +836,12 @@ function LearnPageContent() {
                 ) : (
                   <div className="flex-1 overflow-y-auto p-4">
                     {lesson.chapters.length > 0 ? (
-                      <LessonSidebar chapters={lesson.chapters} currentLessonId={lesson.lessonId} officialMaterials={officialMaterials || []} />
+                      <LessonSidebar
+                        chapters={lesson.chapters}
+                        currentLessonId={lesson.lessonId}
+                        officialMaterials={officialMaterials || []}
+                        resources={courseResources || []}
+                      />
                     ) : (
                       <p className="text-sm text-ink-muted">
                         Đăng nhập để xem toàn bộ chương trình học và theo dõi tiến độ của khoá này.
@@ -821,6 +862,7 @@ function LearnPageContent() {
                 </div>
               )}
             </div>
+            )}
           </aside>
         </div>
       </div>

@@ -3,8 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState, type MouseEvent } from 'react';
-import { toast } from 'sonner';
+import { type MouseEvent } from 'react';
 import { Award } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import { StarRating } from '@/components/ui/StarRating';
@@ -12,7 +11,6 @@ import type { CourseSummary } from '@/types/domain';
 import { useMyEnrollments } from '@/hooks/useEnrollments';
 import { useAddToCart, useCart } from '@/hooks/useCart';
 import { useAddToWishlist, useRemoveFromWishlist, useWishlist } from '@/hooks/useWishlist';
-import { apiBlob } from '@/lib/api/client';
 
 /**
  * Thẻ khoá học — dịch từ `CourseCard.dc.html` của Claude Design.
@@ -82,26 +80,13 @@ export function CourseCard({ course }: { course: CourseSummary }) {
     ? `/learn/${enrollment.firstLessonId}`
     : `/courses/${course.slug}`;
 
-  // Task A1 (UpComming_Plan.md) — chứng chỉ PDF, chỉ tải được khi đã hoàn thành 100%.
-  const [isDownloadingCert, setIsDownloadingCert] = useState(false);
-  const handleDownloadCertificate = async (e: MouseEvent) => {
+  // doc/DacTa_ChucNangChungChi.md (26/09/2026, sửa lỗi) — trước đây bấm là tải PDF thẳng, không
+  // cho xem trước/chia sẻ LinkedIn/sao chép link xác thực. Giờ điều hướng tới trang chứng chỉ
+  // ("/certificates/{code}"), nơi có đủ các hành động đó — chỉ tải PDF là 1 trong số đó.
+  const handleGoToCertificate = (e: MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (isDownloadingCert) return;
-    setIsDownloadingCert(true);
-    try {
-      const blob = await apiBlob(`/api/v1/enrollments/${course.id}/certificate`);
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `chung-chi-${course.slug}.pdf`;
-      a.click();
-      URL.revokeObjectURL(url);
-    } catch {
-      toast.error('Có lỗi khi tải chứng chỉ, vui lòng thử lại.');
-    } finally {
-      setIsDownloadingCert(false);
-    }
+    if (enrollment?.certificateCode) router.push(`/certificates/${enrollment.certificateCode}`);
   };
 
   return (
@@ -200,15 +185,14 @@ export function CourseCard({ course }: { course: CourseSummary }) {
 
         <div className="mt-auto flex items-center justify-between gap-2 border-t border-line-soft pt-2">
           {isOwned ? (
-            enrollment.progressPct >= 100 ? (
+            enrollment.progressPct >= 100 && enrollment.certificateCode ? (
               <button
                 type="button"
-                onClick={handleDownloadCertificate}
-                disabled={isDownloadingCert}
-                className="flex items-center gap-1.5 font-display text-[13px] font-bold text-accent hover:text-accent-dark transition-colors disabled:opacity-50"
+                onClick={handleGoToCertificate}
+                className="flex items-center gap-1.5 font-display text-[13px] font-bold text-accent hover:text-accent-dark transition-colors"
               >
                 <Award className="w-3.5 h-3.5" strokeWidth={1.75} />
-                {isDownloadingCert ? 'Đang tải...' : 'Tải chứng chỉ'}
+                Xem chứng chỉ
               </button>
             ) : (
               <span className="font-display text-[15px] font-bold text-accent">Đã sở hữu</span>

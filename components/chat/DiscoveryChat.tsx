@@ -77,9 +77,11 @@ export function DiscoveryChat() {
         )}
       </button>
 
-      {/* Chat Window */}
-      <div 
-        className={`fixed bottom-24 right-6 flex h-[500px] w-[400px] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl border border-line z-50 origin-bottom-right transition-all duration-500 ease-[cubic-bezier(0.2,1,0.2,1)] ${
+      {/* Chat Window — (26/09/2026, sửa lỗi) trước đây `w-[400px]` cố định RỘNG HƠN cả màn hình
+          điện thoại (375–414px), lòi hẳn ra khỏi mép trái. Giờ co theo viewport, chỉ đạt đúng
+          400px từ `sm:` trở lên. */}
+      <div
+        className={`fixed bottom-24 right-6 flex h-[min(500px,70vh)] w-[calc(100vw-2rem)] max-w-[400px] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl border border-line z-50 origin-bottom-right transition-all duration-500 ease-[cubic-bezier(0.2,1,0.2,1)] ${
           isOpen ? 'scale-100 opacity-100 translate-y-0' : 'scale-0 opacity-0 translate-y-20 pointer-events-none'
         }`}
       >

@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
+import Link from 'next/link';
 import { publicCoursesApi } from '@/lib/api/publicCourses';
 import { couponsApi } from '@/lib/api/coupons';
 import { ApiError } from '@/lib/api/client';
@@ -269,7 +270,8 @@ function CheckoutPageContent() {
               </div>
               
               <p className="mt-4 text-center text-xs text-ink-muted">
-                Bằng việc thanh toán, bạn đồng ý với Điều khoản dịch vụ của LinguaLearn.
+                Bằng việc thanh toán, bạn đồng ý với{' '}
+                <Link href="/legal/terms" className="underline hover:text-accent">Điều khoản dịch vụ</Link> của LinguaLearn.
               </p>
             </div>
           </div>

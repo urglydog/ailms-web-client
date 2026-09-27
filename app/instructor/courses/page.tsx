@@ -195,8 +195,13 @@ export default function InstructorCoursesPage() {
         </div>
       )}
 
+      {/* (26/09/2026, sửa lỗi) — 6 cột cố định (~720px) không co giãn trên tablet/điện thoại,
+          trước đây bị bóp/tràn. Bọc `overflow-x-auto` + `min-w` trên từng hàng để cuộn ngang
+          thay vì vỡ layout — chưa làm bản "thẻ xếp dọc" riêng cho mobile (khối lượng lớn hơn),
+          xem đây là mức tối thiểu để KHÔNG BỂ giao diện. */}
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-        <div className="grid grid-cols-[36px_52px_1.6fr_120px_140px_90px] items-center gap-3 border-b border-gray-200 bg-gray-50 px-4 py-2.5 text-[11.5px] font-bold text-gray-500">
+        <div className="overflow-x-auto">
+        <div className="grid min-w-[720px] grid-cols-[36px_52px_1.6fr_120px_140px_90px] items-center gap-3 border-b border-gray-200 bg-gray-50 px-4 py-2.5 text-[11.5px] font-bold text-gray-500">
           <input type="checkbox" checked={allSelected} onChange={toggleSelectAll} className="accent-cyan-600" />
           <span></span>
           <span>Tên khóa học</span>
@@ -214,7 +219,7 @@ export default function InstructorCoursesPage() {
         {courses.map((course, idx) => (
           <div
             key={course.id}
-            className={`group grid grid-cols-[36px_52px_1.6fr_120px_140px_90px] items-center gap-3 px-4 py-2.5 ${
+            className={`group grid min-w-[720px] grid-cols-[36px_52px_1.6fr_120px_140px_90px] items-center gap-3 px-4 py-2.5 ${
               idx < courses.length - 1 ? 'border-b border-gray-100' : ''
             }`}
           >
@@ -273,6 +278,7 @@ export default function InstructorCoursesPage() {
             </div>
           </div>
         ))}
+        </div>
       </div>
 
       {deleteTarget && (

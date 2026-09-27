@@ -62,6 +62,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { id: 'voice-mappings', label: 'Giọng đọc lồng tiếng', href: '/admin/voice-mappings', badge: 0 },
     { id: 'transactions', label: 'Đối soát giao dịch', href: '/admin/transactions/payments', badge: 0 },
     { id: 'coupons', label: 'Mã giảm giá', href: '/admin/coupons', badge: 0 },
+    { id: 'announcements', label: 'Thông báo hệ thống', href: '/admin/announcements', badge: 0 },
+    { id: 'tutor-security', label: 'Bảo mật AI Tutor', href: '/admin/tutor-security', badge: 0 },
     { id: 'categories', label: 'Danh mục', href: '/admin/categories', badge: 0 },
     { id: 'reviews', label: 'Đánh giá', href: '/admin/reviews', badge: 0 },
     { id: 'settings', label: 'Cấu hình hệ thống', href: '/admin/settings', badge: 0 },

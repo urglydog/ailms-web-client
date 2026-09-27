@@ -188,7 +188,9 @@ export function EditCourseLayout({ courseId, children }: { courseId: number; chi
           </div>
         )}
 
-        <div className="grid grid-cols-[220px_1fr] gap-6">
+        {/* (26/09/2026, sửa lỗi) — cột nav 220px cố định không co giãn dưới `lg`. Dưới `lg` xếp
+            dọc (nav lên trên dạng khối, nội dung xuống dưới); từ `lg:` giữ nguyên 2 cột cũ. */}
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[220px_1fr]">
           <nav className="flex flex-col gap-5">
             {NAV_SECTIONS.map((section) => (
               <div key={section.heading} className="flex flex-col gap-1">
