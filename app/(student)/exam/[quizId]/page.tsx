@@ -46,7 +46,7 @@ export default function AntiCheatExamPage() {
 
   // Trạng thái AI
   const [isModelLoaded, setIsModelLoaded] = useState(false);
-  const [faceStatus, setFaceStatus] = useState<'DETECTING' | 'FACE_FOUND' | 'NO_FACE'>('DETECTING');
+  const [faceStatus, setFaceStatus] = useState<'DETECTING' | 'FACE_FOUND' | 'NO_FACE' | 'MULTIPLE_FACES'>('DETECTING');
 
   // Đồng hồ đếm ngược (giây)
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
@@ -54,8 +54,11 @@ export default function AntiCheatExamPage() {
 
   const lastViolationTime = useRef(0);
   const detectInterval = useRef<NodeJS.Timeout | null>(null);
-  // UC-ANTICHEAT: interval quét frame Gemini Vision thật (20-30s), idle tracking, audio RMS.
+  // UC-ANTICHEAT (event-driven, 27/09/2026): random polling 30-60s (gaze) + trigger khẩn khi
+  // face-api báo bất thường liên tục — xem effect "2b" bên dưới.
   const proctorFrameInterval = useRef<NodeJS.Timeout | null>(null);
+  const abnormalStreakRef = useRef(0);
+  const lastFrameSentAtRef = useRef(0);
   const devtoolsCheckInterval = useRef<NodeJS.Timeout | null>(null);
   const lastActivityTime = useRef(Date.now());
   const idleCheckInterval = useRef<NodeJS.Timeout | null>(null);
@@ -573,8 +576,56 @@ export default function AntiCheatExamPage() {
     };
   }, [isStarted, result, isProctored, mediaStream, handleViolation]);
 
-  // 2. Face API Detection Loop — CHỈ hiển thị badge UX tức thời (client-side, có thể bị bypass),
-  // KHÔNG tính vi phạm ở đây nữa. Nguồn vi phạm hình ảnh THẬT là mục 2b (Gemini Vision, server-verified).
+  // 2b. Gemini Vision thật — chụp 1 khung hình, gửi BE xác minh (đếm người + hướng nhìn). Đây là
+  // nguồn vi phạm hình ảnh được SERVER xác minh, khác hẳn face-api.js ở mục 2 (chỉ để hiển thị
+  // badge, dễ bị can thiệp phía client). Dùng chung cho cả nhánh khẩn cấp (mục 2) và nhánh random
+  // polling (mục 2b) — throttle chung qua `lastFrameSentAtRef`.
+  const sendProctorFrame = useCallback((minThrottleMs: number) => {
+    const video = videoRef.current;
+    if (!video || video.paused || video.ended || !video.videoWidth || !attemptData) return false;
+    if (Date.now() - lastFrameSentAtRef.current < minThrottleMs) return false;
+
+    try {
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return false;
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+      const base64 = dataUrl.split(',')[1];
+      if (!base64) return false;
+
+      lastFrameSentAtRef.current = Date.now();
+      analyzeProctorFrameMutation(
+        { attemptId: attemptData.attemptId, data: { imageBase64: base64, mimeType: 'image/jpeg' } },
+        {
+          onSuccess: (res) => {
+            if (res.flagged) {
+              setViolationCount(res.violationCount);
+              const max = res.maxViolations || 3;
+              if (res.shouldAutoSubmit) {
+                toast.error(`Bạn đã vi phạm quá ${max} lần. Hệ thống tự động nộp bài!`);
+                submitExam(true);
+              } else {
+                toast.warning(`Cảnh báo AI Vision (${res.violationCount}/${max}): bất thường camera`);
+              }
+            }
+          },
+        }
+      );
+      return true;
+    } catch {
+      // Lỗi chụp/gửi frame — bỏ qua lần quét này, không chặn thi.
+      return false;
+    }
+  }, [attemptData, analyzeProctorFrameMutation, submitExam]);
+
+  // 2. Face API Detection Loop — quét mỗi 2s (client-side, có thể bị bypass, chỉ để hiện badge
+  // UX). Đồng thời làm "cò súng" sự kiện: nếu NO_FACE/MULTIPLE_FACES liên tục 3 chu kỳ (6s), lập
+  // tức chụp 1 khung hình gửi khẩn lên Gemini xác minh (bypass chu kỳ random chờ ở mục 2b), thay
+  // vì chờ tới lượt polling định kỳ như trước — vẫn giữ throttle tối thiểu 15s giữa 2 lần gửi để
+  // chống spam nếu model FE bị nhiễu liên tục.
   useEffect(() => {
     if (!isProctored || !isStarted || !videoRef.current || !isModelLoaded || result) return;
 
@@ -593,10 +644,20 @@ export default function AntiCheatExamPage() {
             new faceapi.TinyFaceDetectorOptions({ inputSize: 160, scoreThreshold: 0.3 })
           ).withFaceLandmarks();
 
-          if (detections.length === 0 || detections.length > 1) {
+          if (detections.length === 0) {
             setFaceStatus('NO_FACE');
+          } else if (detections.length > 1) {
+            setFaceStatus('MULTIPLE_FACES');
           } else {
             setFaceStatus('FACE_FOUND');
+            abnormalStreakRef.current = 0;
+            return;
+          }
+
+          abnormalStreakRef.current += 1;
+          if (abnormalStreakRef.current >= 3) {
+            sendProctorFrame(15_000);
+            abnormalStreakRef.current = 0;
           }
         } catch {
           // ignore detection error
@@ -609,52 +670,24 @@ export default function AntiCheatExamPage() {
       video.removeEventListener('play', startDetection);
       if (detectInterval.current) clearInterval(detectInterval.current);
     };
-  }, [isStarted, isProctored, isModelLoaded, result]);
+  }, [isStarted, isProctored, isModelLoaded, result, sendProctorFrame]);
 
-  // 2b. Gemini Vision thật — chụp 1 khung hình mỗi 25s, gửi BE xác minh (đếm người + hướng
-  // nhìn). Đây là nguồn vi phạm hình ảnh được SERVER xác minh, khác hẳn face-api.js ở mục 2
-  // (chỉ để hiển thị badge, dễ bị can thiệp phía client).
+  // 2b. Random polling (gaze/head-turn) — face-api không bắt được hướng nhìn, nên vẫn cần 1 chu kỳ
+  // gửi ảnh ngẫu nhiên (30-60s, không cố định) để học viên không thể căn giờ gian lận.
   useEffect(() => {
     if (!isProctored || !isStarted || !videoRef.current || result || !attemptData) return;
-    const video = videoRef.current;
 
-    proctorFrameInterval.current = setInterval(() => {
-      if (video.paused || video.ended || !video.videoWidth) return;
-      try {
-        const canvas = document.createElement('canvas');
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return;
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
-        const base64 = dataUrl.split(',')[1];
-        if (!base64) return;
+    const scheduleNext = () => {
+      const delay = 30_000 + Math.random() * 30_000; // random 30s-60s
+      proctorFrameInterval.current = setTimeout(() => {
+        sendProctorFrame(0); // chu kỳ random tự thân đã cách nhau 30-60s, không cần throttle thêm
+        scheduleNext();
+      }, delay);
+    };
+    scheduleNext();
 
-        analyzeProctorFrameMutation(
-          { attemptId: attemptData.attemptId, data: { imageBase64: base64, mimeType: 'image/jpeg' } },
-          {
-            onSuccess: (res) => {
-              if (res.flagged) {
-                setViolationCount(res.violationCount);
-                const max = res.maxViolations || 3;
-                if (res.shouldAutoSubmit) {
-                  toast.error(`Bạn đã vi phạm quá ${max} lần. Hệ thống tự động nộp bài!`);
-                  submitExam(true);
-                } else {
-                  toast.warning(`Cảnh báo AI Vision (${res.violationCount}/${max}): bất thường camera`);
-                }
-              }
-            },
-          }
-        );
-      } catch {
-        // Lỗi chụp/gửi frame — bỏ qua lần quét này, không chặn thi.
-      }
-    }, 25_000);
-
-    return () => { if (proctorFrameInterval.current) clearInterval(proctorFrameInterval.current); };
-  }, [isStarted, isProctored, result, attemptData, analyzeProctorFrameMutation, submitExam]);
+    return () => { if (proctorFrameInterval.current) clearTimeout(proctorFrameInterval.current); };
+  }, [isStarted, isProctored, result, attemptData, sendProctorFrame]);
 
   // Yêu cầu bật Camera + Micro (nếu proctored)
   const startExam = useCallback(async () => {
@@ -1320,6 +1353,7 @@ export default function AntiCheatExamPage() {
                   {faceStatus === 'DETECTING' && 'Đang quét khuôn mặt...'}
                   {faceStatus === 'FACE_FOUND' && 'Camera Giám Sát AI (Bình thường)'}
                   {faceStatus === 'NO_FACE' && 'CẢNH BÁO: KHÔNG THẤY KHUÔN MẶT'}
+                  {faceStatus === 'MULTIPLE_FACES' && 'CẢNH BÁO: PHÁT HIỆN NHIỀU KHUÔN MẶT'}
                 </div>
                 <video
                   ref={videoRef}

@@ -247,48 +247,6 @@ function CartCheckoutContent() {
 
               <div className="mt-6 flex flex-col gap-3">
                 <button
-                  onClick={() => handlePay('VNPAY')}
-                  disabled={payingMethod !== null}
-                  className={`flex w-full items-center justify-between rounded-xl border-2 px-4 py-3 transition-colors ${
-                    payingMethod === 'VNPAY' ? 'border-accent bg-accent/5' : 'border-line bg-white hover:border-accent/40'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100 font-bold text-blue-700">V</div>
-                    <span className="font-semibold text-ink">VNPAY</span>
-                  </div>
-                  {payingMethod === 'VNPAY' && <div className="h-4 w-4 animate-spin rounded-full border-2 border-accent border-t-transparent" />}
-                </button>
-
-                <button
-                  onClick={() => handlePay('MOMO')}
-                  disabled={payingMethod !== null}
-                  className={`flex w-full items-center justify-between rounded-xl border-2 px-4 py-3 transition-colors ${
-                    payingMethod === 'MOMO' ? 'border-pink-600 bg-pink-50' : 'border-line bg-white hover:border-pink-300'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-pink-100 font-bold text-pink-700">M</div>
-                    <span className="font-semibold text-ink">Ví MoMo</span>
-                  </div>
-                  {payingMethod === 'MOMO' && <div className="h-4 w-4 animate-spin rounded-full border-2 border-pink-600 border-t-transparent" />}
-                </button>
-
-                <button
-                  onClick={() => handlePay('ZALOPAY')}
-                  disabled={payingMethod !== null}
-                  className={`flex w-full items-center justify-between rounded-xl border-2 px-4 py-3 transition-colors ${
-                    payingMethod === 'ZALOPAY' ? 'border-green-600 bg-green-50' : 'border-line bg-white hover:border-green-300'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-100 font-bold text-green-700">Z</div>
-                    <span className="font-semibold text-ink">ZaloPay</span>
-                  </div>
-                  {payingMethod === 'ZALOPAY' && <div className="h-4 w-4 animate-spin rounded-full border-2 border-green-600 border-t-transparent" />}
-                </button>
-
-                <button
                   onClick={() => handlePay('PAYOS')}
                   disabled={payingMethod !== null}
                   className={`flex w-full items-center justify-between rounded-xl border-2 px-4 py-3 transition-colors ${

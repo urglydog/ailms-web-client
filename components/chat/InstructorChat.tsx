@@ -222,6 +222,7 @@ export function InstructorChat() {
               value={input}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)}
               placeholder="Hỏi trợ lý (VD: Doanh thu tháng này?)..."
+              maxLength={1000}
               className="flex-1 bg-gray-50 border border-gray-200 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-gray-800"
               disabled={loading}
             />
