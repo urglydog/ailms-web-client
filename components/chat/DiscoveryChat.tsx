@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import { toast } from 'sonner';
 import { api } from '@/lib/api/client';
 import { getAccessToken } from '@/lib/auth/token';
 import { MarkdownRenderer } from '@/components/ui/MarkdownRenderer';
@@ -28,6 +29,21 @@ export function DiscoveryChat() {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const maxLengthToastShownRef = useRef(false);
+
+  const MAX_MESSAGE_LENGTH = 1000;
+
+  const handleInputChange = (value: string) => {
+    setInput(value);
+    if (value.length >= MAX_MESSAGE_LENGTH) {
+      if (!maxLengthToastShownRef.current) {
+        toast.warning(`Đã đạt giới hạn ${MAX_MESSAGE_LENGTH} ký tự cho 1 tin nhắn.`);
+        maxLengthToastShownRef.current = true;
+      }
+    } else {
+      maxLengthToastShownRef.current = false;
+    }
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -149,9 +165,9 @@ export function DiscoveryChat() {
               <div className="flex-1 rounded-2xl border border-line bg-surface-raised flex overflow-hidden focus-within:border-accent focus-within:bg-white transition-colors">
                 <textarea
                   value={input}
-                  onChange={e => setInput(e.target.value)}
+                  onChange={e => handleInputChange(e.target.value)}
                   placeholder="Ví dụ: Khoá học IT cho người mới..."
-                  maxLength={1000}
+                  maxLength={MAX_MESSAGE_LENGTH}
                   rows={1}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && !e.shiftKey) {
