@@ -52,8 +52,10 @@ export default function InstructorStudentsPage() {
         </div>
       </div>
 
+      {/* (26/09/2026, sửa lỗi) — cột cố định không co giãn dưới `lg`, bọc cuộn ngang thay vì bóp/vỡ. */}
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-        <div className="grid grid-cols-[1.4fr_1.4fr_1fr_140px_140px] gap-3 border-b border-gray-200 bg-gray-50 px-4 py-2.5 text-[11.5px] font-bold text-gray-500">
+        <div className="overflow-x-auto">
+        <div className="grid min-w-[680px] grid-cols-[1.4fr_1.4fr_1fr_140px_140px] gap-3 border-b border-gray-200 bg-gray-50 px-4 py-2.5 text-[11.5px] font-bold text-gray-500">
           <span>Học viên</span>
           <span>Email</span>
           <span>Khóa học</span>
@@ -69,7 +71,7 @@ export default function InstructorStudentsPage() {
         {students?.map((s, idx) => (
           <div
             key={idx}
-            className={`grid grid-cols-[1.4fr_1.4fr_1fr_140px_140px] items-center gap-3 px-4 py-2.5 text-[13px] ${
+            className={`grid min-w-[680px] grid-cols-[1.4fr_1.4fr_1fr_140px_140px] items-center gap-3 px-4 py-2.5 text-[13px] ${
               idx < students.length - 1 ? 'border-b border-gray-100' : ''
             }`}
           >
@@ -85,6 +87,7 @@ export default function InstructorStudentsPage() {
             </div>
           </div>
         ))}
+        </div>
       </div>
     </>
   );

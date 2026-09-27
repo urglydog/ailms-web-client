@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import type { PaymentRes } from '@/types/domain';
 import { format } from 'date-fns';
 
@@ -124,12 +125,12 @@ export default function PaymentDetailModal({ payment, onClose }: PaymentDetailMo
             >
               Báo cáo vấn đề
             </button>
-            <button
-              onClick={() => alert('Chi tiết chính sách hoàn tiền xin xem trong Điều khoản sử dụng. Tính năng tự động hoàn tiền đang được phát triển.')}
+            <Link
+              href="/legal/refund"
               className="text-sm font-semibold text-ink-muted hover:text-ink transition-colors"
             >
-              Yêu cầu hỗ trợ
-            </button>
+              Chính sách hoàn tiền
+            </Link>
           </div>
           <button
             onClick={onClose}

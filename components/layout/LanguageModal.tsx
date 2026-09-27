@@ -1,48 +1,30 @@
 'use client';
 
-import { useState } from 'react';
-import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
+import { LOCALE_NATIVE_NAMES, LOCALES, useLocaleStore, type Locale } from '@/lib/stores/localeStore';
 
 /**
- * Chọn ngôn ngữ giao diện (14/09/2026, mở rộng ngoài đặc tả gốc) — theo đúng yêu cầu: CHỈ hiện
- * danh sách giống Udemy, CHƯA có logic đổi ngôn ngữ UI thật (dự án chưa có i18n). Lựa chọn chỉ
- * lưu cosmetic vào `localStorage` để nút "Ngôn ngữ" ở dropdown tài khoản nhớ hiển thị đúng lần
- * chọn gần nhất — KHÔNG ảnh hưởng ngôn ngữ thật của bất kỳ trang nào trong site.
+ * Chọn ngôn ngữ giao diện (26/09/2026, thay thế placeholder cosmetic cũ) — giờ đổi chữ thật trên
+ * toàn Header/Footer thông qua `next-intl` (`LocaleProvider`), không còn chỉ lưu localStorage rồi
+ * không làm gì. Rút từ 19 ngôn ngữ (bắt chước danh sách Udemy) xuống còn 4: Việt/Anh/Trung/Nhật —
+ * theo đúng phạm vi đã thống nhất, vì không ai trong nhóm kiểm chứng được bản dịch của các thứ
+ * tiếng còn lại có đúng nghĩa hay không. Danh sách chỉ còn 4 mục nên bỏ luôn ô tìm kiếm cũ.
+ *
+ * Tên hiển thị của MỖI ngôn ngữ luôn ở CHÍNH ngôn ngữ đó ("English", "中文", "日本語", "Tiếng
+ * Việt") bất kể đang chọn ngôn ngữ nào — đúng quy ước phổ biến của các bộ chọn ngôn ngữ thật
+ * (Google, Udemy...), không dịch tên các ngôn ngữ khác sang ngôn ngữ đang hiển thị — xem
+ * `LOCALE_NATIVE_NAMES` (dùng chung với dòng "Ngôn ngữ" trong menu tài khoản ở `Header.tsx`).
  *
  * Khác `preferredLanguage` của `User` (đó là ngôn ngữ LỒNG TIẾNG mặc định, một khái niệm nghiệp
  * vụ hoàn toàn khác — xem `User.java` — cố tình KHÔNG dùng chung field để tránh nhầm 2 khái niệm).
  */
-export const UI_LANGUAGES = [
-  'English', 'Español', 'Français', 'Deutsch', 'Italiano', 'Română', '中文(繁體)',
-  'العربية', '日本語', 'Русский', '한국어', 'ภาษาไทย', 'Nederlands', 'Türkçe',
-  'Polski', 'Português', 'Bahasa Indonesia', 'Tiếng Việt', '中文(简体)',
-] as const;
+export function LanguageModal({ onClose }: { onClose: () => void }) {
+  const t = useTranslations('languageModal');
+  const locale = useLocaleStore((s) => s.locale);
+  const setLocale = useLocaleStore((s) => s.setLocale);
 
-const STORAGE_KEY = 'ui_language_cosmetic';
-
-export function getStoredUiLanguage(): string {
-  if (typeof window === 'undefined') return 'Tiếng Việt';
-  return localStorage.getItem(STORAGE_KEY) || 'Tiếng Việt';
-}
-
-export function LanguageModal({
-  currentLanguage,
-  onClose,
-  onSelect,
-}: {
-  currentLanguage: string;
-  onClose: () => void;
-  onSelect: (language: string) => void;
-}) {
-  const [search, setSearch] = useState('');
-  // (14/09/2026, sửa lỗi) — "Tiếng Việt" đã nằm sẵn trong UI_LANGUAGES, nối thêm 1 lần nữa ở
-  // đầu mảng làm nó xuất hiện 2 lần trong danh sách. Dùng thẳng UI_LANGUAGES, không nối gì thêm.
-  const filtered = UI_LANGUAGES.filter((l) => l.toLowerCase().includes(search.toLowerCase()));
-
-  const handlePick = (language: string) => {
-    if (typeof window !== 'undefined') localStorage.setItem(STORAGE_KEY, language);
-    onSelect(language);
-    toast.info('Ngôn ngữ hiển thị sẽ được hỗ trợ đầy đủ trong bản cập nhật tới — hiện tại nội dung site vẫn giữ tiếng Việt.');
+  const handlePick = (picked: Locale) => {
+    setLocale(picked);
     onClose();
   };
 
@@ -52,38 +34,27 @@ export function LanguageModal({
       onClick={onClose}
     >
       <div
-        className="max-h-[80vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-line bg-white p-6 shadow-xl"
+        className="w-full max-w-sm rounded-2xl border border-line bg-white p-6 shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-4 flex items-center justify-between">
-          <h3 className="font-display text-lg font-bold text-ink">Chọn ngôn ngữ</h3>
-          <button type="button" onClick={onClose} aria-label="Đóng" className="text-xl text-ink-faint hover:text-ink">
+          <h3 className="font-display text-lg font-bold text-ink">{t('title')}</h3>
+          <button type="button" onClick={onClose} aria-label={t('close')} className="text-xl text-ink-faint hover:text-ink">
             ×
           </button>
         </div>
 
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Tìm ngôn ngữ..."
-          className="mb-4 w-full rounded-lg border border-line px-3 py-2 text-sm text-ink focus:border-accent focus:outline-none"
-          autoFocus
-        />
-
-        <div className="grid grid-cols-2 gap-1 sm:grid-cols-3">
-          {filtered.map((language) => (
+        <div className="grid grid-cols-2 gap-1.5">
+          {LOCALES.map((l) => (
             <button
-              key={language}
+              key={l}
               type="button"
-              onClick={() => handlePick(language)}
-              className={`rounded-lg px-3 py-2 text-left text-sm transition-colors ${
-                language === currentLanguage
-                  ? 'bg-accent/10 font-semibold text-accent'
-                  : 'text-ink hover:bg-surface'
+              onClick={() => handlePick(l)}
+              className={`rounded-lg px-3 py-2.5 text-left text-sm transition-colors ${
+                l === locale ? 'bg-accent/10 font-semibold text-accent' : 'text-ink hover:bg-surface'
               }`}
             >
-              {language}
+              {LOCALE_NATIVE_NAMES[l]}
             </button>
           ))}
         </div>
