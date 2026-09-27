@@ -9,6 +9,37 @@ import { StartRes, SubmitRes, ViolationType, quizApi } from '@/lib/api/quizzes';
 import Link from 'next/link';
 import { MarkdownRenderer } from '@/components/ui/MarkdownRenderer';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import type { FaceLandmarks68 } from '@vladmandic/face-api';
+
+/**
+ * Ước lượng head-pose (yaw/pitch) từ 68 điểm mốc khuôn mặt (face-api.js) — kỹ thuật hình học kinh
+ * điển, không cần model/thư viện mới: so vị trí đầu mũi với trung điểm 2 mắt (yaw) và với đoạn
+ * mắt→cằm (pitch), chuẩn hoá theo khoảng cách 2 mắt/chiều cao mặt để không phụ thuộc khoảng cách
+ * tới camera. Dùng làm "cò súng" client-side, KHÔNG phải nguồn vi phạm chính thức — vi phạm thật
+ * vẫn do Gemini Vision xác minh server-side khi nhận khung hình khẩn (xem `sendProctorFrame`).
+ */
+function estimateHeadPose(landmarks: FaceLandmarks68): { yaw: number; pitch: number } {
+  const avg = (pts: { x: number; y: number }[]) => ({
+    x: pts.reduce((s, p) => s + p.x, 0) / pts.length,
+    y: pts.reduce((s, p) => s + p.y, 0) / pts.length,
+  });
+
+  const leftEyeCenter = avg(landmarks.getLeftEye());
+  const rightEyeCenter = avg(landmarks.getRightEye());
+  const eyeMidX = (leftEyeCenter.x + rightEyeCenter.x) / 2;
+  const eyeMidY = (leftEyeCenter.y + rightEyeCenter.y) / 2;
+  const eyeDist = Math.hypot(rightEyeCenter.x - leftEyeCenter.x, rightEyeCenter.y - leftEyeCenter.y) || 1;
+
+  const nosePoints = landmarks.getNose();
+  const noseTip = nosePoints[nosePoints.length - 1] ?? { x: eyeMidX, y: eyeMidY };
+  const chin = landmarks.getJawOutline()[8] ?? { x: eyeMidX, y: eyeMidY + eyeDist };
+  const faceHeight = chin.y - eyeMidY || 1;
+
+  return {
+    yaw: (noseTip.x - eyeMidX) / eyeDist,
+    pitch: (noseTip.y - eyeMidY) / faceHeight,
+  };
+}
 
 export default function AntiCheatExamPage() {
   const router = useRouter();
@@ -46,7 +77,7 @@ export default function AntiCheatExamPage() {
 
   // Trạng thái AI
   const [isModelLoaded, setIsModelLoaded] = useState(false);
-  const [faceStatus, setFaceStatus] = useState<'DETECTING' | 'FACE_FOUND' | 'NO_FACE' | 'MULTIPLE_FACES'>('DETECTING');
+  const [faceStatus, setFaceStatus] = useState<'DETECTING' | 'FACE_FOUND' | 'NO_FACE' | 'MULTIPLE_FACES' | 'HEAD_TURNED'>('DETECTING');
 
   // Đồng hồ đếm ngược (giây)
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
@@ -59,6 +90,12 @@ export default function AntiCheatExamPage() {
   const proctorFrameInterval = useRef<NodeJS.Timeout | null>(null);
   const abnormalStreakRef = useRef(0);
   const lastFrameSentAtRef = useRef(0);
+  // Head-pose (yaw/pitch) hiệu chỉnh cá nhân — xem `estimateHeadPose`. `null` = đang gom mẫu.
+  const headPoseBaselineRef = useRef<{ yaw: number; pitch: number } | null>(null);
+  const headPoseSamplesRef = useRef<{ yaw: number; pitch: number }[]>([]);
+  const HEAD_POSE_CALIBRATION_SAMPLES = 5;
+  const HEAD_POSE_YAW_THRESHOLD = 0.28;
+  const HEAD_POSE_PITCH_THRESHOLD = 0.22;
   const devtoolsCheckInterval = useRef<NodeJS.Timeout | null>(null);
   const lastActivityTime = useRef(Date.now());
   const idleCheckInterval = useRef<NodeJS.Timeout | null>(null);
@@ -649,9 +686,35 @@ export default function AntiCheatExamPage() {
           } else if (detections.length > 1) {
             setFaceStatus('MULTIPLE_FACES');
           } else {
-            setFaceStatus('FACE_FOUND');
-            abnormalStreakRef.current = 0;
-            return;
+            const [single] = detections;
+            if (!single) return;
+            const pose = estimateHeadPose(single.landmarks);
+            const baseline = headPoseBaselineRef.current;
+
+            if (!baseline) {
+              // Đang gom mẫu hiệu chỉnh cá nhân (10s đầu, học viên nhìn thẳng bình thường) —
+              // chưa bật phát hiện quay đầu, coi như bình thường.
+              headPoseSamplesRef.current.push(pose);
+              if (headPoseSamplesRef.current.length >= HEAD_POSE_CALIBRATION_SAMPLES) {
+                const samples = headPoseSamplesRef.current;
+                headPoseBaselineRef.current = {
+                  yaw: samples.reduce((s, p) => s + p.yaw, 0) / samples.length,
+                  pitch: samples.reduce((s, p) => s + p.pitch, 0) / samples.length,
+                };
+              }
+              setFaceStatus('FACE_FOUND');
+              abnormalStreakRef.current = 0;
+              return;
+            }
+
+            const yawDeviation = Math.abs(pose.yaw - baseline.yaw);
+            const pitchDeviation = Math.abs(pose.pitch - baseline.pitch);
+            if (yawDeviation <= HEAD_POSE_YAW_THRESHOLD && pitchDeviation <= HEAD_POSE_PITCH_THRESHOLD) {
+              setFaceStatus('FACE_FOUND');
+              abnormalStreakRef.current = 0;
+              return;
+            }
+            setFaceStatus('HEAD_TURNED');
           }
 
           abnormalStreakRef.current += 1;
@@ -1354,6 +1417,7 @@ export default function AntiCheatExamPage() {
                   {faceStatus === 'FACE_FOUND' && 'Camera Giám Sát AI (Bình thường)'}
                   {faceStatus === 'NO_FACE' && 'CẢNH BÁO: KHÔNG THẤY KHUÔN MẶT'}
                   {faceStatus === 'MULTIPLE_FACES' && 'CẢNH BÁO: PHÁT HIỆN NHIỀU KHUÔN MẶT'}
+                  {faceStatus === 'HEAD_TURNED' && 'CẢNH BÁO: QUAY ĐẦU/NHÌN RA NGOÀI MÀN HÌNH'}
                 </div>
                 <video
                   ref={videoRef}
