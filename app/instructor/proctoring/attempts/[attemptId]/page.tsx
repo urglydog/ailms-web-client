@@ -5,6 +5,7 @@ import { useRef, useState } from 'react';
 import { ShieldAlert, ChevronDown } from 'lucide-react';
 import { useProctoredAttemptDetail } from '@/hooks/useProctoring';
 import { ArrowLeftIcon } from '@/components/instructor/SidebarIcons';
+import { MarkdownRenderer } from '@/components/ui/MarkdownRenderer';
 
 const parseDate = (d: string | number[]) => {
   if (Array.isArray(d)) {
@@ -125,7 +126,9 @@ export default function ProctoringAttemptDetailPage() {
       {attempt.aiRiskExplanation && (
         <div className="card p-4 mb-6 border-l-4 border-l-accent">
           <div className="text-xs font-semibold uppercase text-ink-muted mb-1">Nhận định của AI</div>
-          <p className="text-sm text-ink leading-relaxed m-0">{attempt.aiRiskExplanation}</p>
+          <div className="text-sm text-ink leading-relaxed">
+            <MarkdownRenderer content={attempt.aiRiskExplanation} />
+          </div>
         </div>
       )}
 

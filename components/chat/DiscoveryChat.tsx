@@ -149,6 +149,7 @@ export function DiscoveryChat() {
                   value={input}
                   onChange={e => setInput(e.target.value)}
                   placeholder="Ví dụ: Khoá học IT cho người mới..."
+                  maxLength={1000}
                   rows={1}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && !e.shiftKey) {

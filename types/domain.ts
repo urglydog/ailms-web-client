@@ -665,7 +665,7 @@ export interface TutorSession {
 
 export interface CreatePaymentReq {
   courseId: number;
-  paymentMethod: string; // 'VNPAY' | 'MOMO'
+  paymentMethod: string; // 'PAYOS' | 'VNPAY'
   billingName?: string;
   billingPhone?: string;
   /** Mã giảm giá học viên tự nhập (15/09/2026, mở rộng) — bỏ trống nếu không dùng mã (coupon
