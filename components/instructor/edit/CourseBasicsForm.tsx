@@ -70,7 +70,9 @@ export function CourseBasicsForm({ courseId }: { courseId: number }) {
   if (!course) return null;
 
   return (
-    <div className="grid grid-cols-[1fr_320px] gap-5">
+    // (26/09/2026, sửa lỗi) — cột phải 320px cố định không co giãn dưới `lg`, bóp cả form chính.
+    // Dưới `lg` xếp dọc (form trước, cột phụ sau); từ `lg:` giữ nguyên 2 cột cũ.
+    <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_320px]">
       <form onSubmit={handleSave} className="flex flex-col gap-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
         {updateCourse.error instanceof ApiError && (
           <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-[12.5px] text-red-700">

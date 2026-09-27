@@ -1,0 +1,91 @@
+{
+  "header": {
+    "nav": {
+      "courses": "コース",
+      "myCourses": "マイコース",
+      "live": "ライブ",
+      "about": "私たちについて"
+    },
+    "search": {
+      "ariaLabel": "検索",
+      "placeholder": "コースを検索..."
+    },
+    "mobileMenu": {
+      "open": "メニューを開く",
+      "close": "メニューを閉じる"
+    },
+    "wishlist": {
+      "viewAll": "ウィッシュリストへ",
+      "empty": "ウィッシュリストは空です。",
+      "free": "無料",
+      "enrollFree": "無料で登録",
+      "addToCart": "カートに追加",
+      "inCart": "カートに追加済み",
+      "enrollSuccess": "登録が完了しました！",
+      "enrollError": "登録できませんでした。もう一度お試しください。"
+    },
+    "cart": {
+      "viewAll": "カートへ",
+      "empty": "カートは空です。",
+      "total": "合計"
+    },
+    "notifications": {
+      "title": "通知",
+      "markAllRead": "すべて既読にする",
+      "empty": "通知はありません",
+      "viewAll": "すべての通知を見る"
+    },
+    "account": {
+      "guestName": "ユーザー",
+      "adminPanel": "管理画面へ",
+      "wishlist": "ウィッシュリスト",
+      "publicProfile": "公開プロフィールを見る",
+      "certificates": "マイ証明書",
+      "paymentHistory": "取引履歴",
+      "profile": "プロフィール",
+      "instructorChannel": "講師チャンネル",
+      "becomeInstructor": "講師になる",
+      "language": "言語",
+      "logout": "ログアウト"
+    },
+    "auth": {
+      "login": "ログイン",
+      "register": "新規登録"
+    },
+    "logoutModal": {
+      "title": "ログアウトの確認",
+      "body": "本当にログアウトしますか？",
+      "cancel": "キャンセル",
+      "confirm": "ログアウト"
+    }
+  },
+  "footer": {
+    "tagline": "学術水準のオンライン学習・試験管理システムです。",
+    "discoverTitle": "探索",
+    "discover": {
+      "about": "私たちについて",
+      "teaching": "LinguaLearnで教える",
+      "courses": "コース",
+      "help": "ヘルプ・サポート"
+    },
+    "legalTitle": "法的事項・ポリシー",
+    "legal": {
+      "terms": "利用規約",
+      "privacy": "プライバシーポリシー",
+      "refund": "返金ポリシー",
+      "revenueShare": "講師の収益配分",
+      "contentModeration": "コンテンツ審査規定",
+      "cookies": "Cookieポリシー",
+      "accessibility": "アクセシビリティ声明"
+    },
+    "contactTitle": "お問い合わせ",
+    "phoneLabel": "電話番号",
+    "emailLabel": "メール",
+    "copyright": "© {year} LinguaLearn — ホーチミン市工業大学",
+    "sitemap": "サイトマップ"
+  },
+  "languageModal": {
+    "title": "言語を選択",
+    "close": "閉じる"
+  }
+}

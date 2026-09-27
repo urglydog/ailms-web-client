@@ -64,6 +64,7 @@ export default function NotificationsPage() {
     const labels: { [key: string]: string } = {
       NEW_MESSAGE: 'Tin nhắn',
       ANNOUNCEMENT: 'Thông báo khóa học',
+      COURSE_COMPLETED: 'Chứng chỉ',
       ASSIGNMENT_GRADED: 'Chấm bài tập',
       DUBBING_COMPLETED: 'Lồng tiếng xong',
       DUBBING_FAILED: 'Lồng tiếng lỗi',
@@ -71,16 +72,20 @@ export default function NotificationsPage() {
       NEW_OFFICIAL_MATERIAL: 'Học liệu mới',
       NEW_PERSONAL_MATERIAL: 'Học liệu cá nhân',
       SRS_REMINDER: 'Ôn tập Flashcard',
+      WISHLIST_PRICE_DROP: 'Giảm giá khóa học yêu thích',
+      SYSTEM_HIGH: 'Thông báo hệ thống',
+      SYSTEM_MEDIUM: 'Thông báo hệ thống',
+      SYSTEM_LOW: 'Thông báo hệ thống',
     };
     return labels[type] || type;
   };
 
   const getTypeColor = (type: string) => {
-    if (type === 'DUBBING_FAILED') return { bg: '#fee2e2', text: '#991b1b' };
-    if (type === 'ANNOUNCEMENT' || type === 'COURSE_APPROVED' || type === 'DUBBING_COMPLETED') {
+    if (type === 'DUBBING_FAILED' || type === 'SYSTEM_HIGH') return { bg: '#fee2e2', text: '#991b1b' };
+    if (type === 'ANNOUNCEMENT' || type === 'COURSE_APPROVED' || type === 'DUBBING_COMPLETED' || type === 'COURSE_COMPLETED') {
       return { bg: '#dcfce7', text: '#166534' };
     }
-    if (type === 'SRS_REMINDER') return { bg: '#fef3c7', text: '#b45309' };
+    if (type === 'SRS_REMINDER' || type === 'WISHLIST_PRICE_DROP' || type === 'SYSTEM_MEDIUM') return { bg: '#fef3c7', text: '#b45309' };
     return { bg: '#dbeafe', text: '#1e40af' };
   };
 

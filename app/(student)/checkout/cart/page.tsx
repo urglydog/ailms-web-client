@@ -262,7 +262,8 @@ function CartCheckoutContent() {
               </div>
 
               <p className="mt-4 text-center text-xs text-ink-muted">
-                Bằng việc thanh toán, bạn đồng ý với Điều khoản dịch vụ của LinguaLearn.
+                Bằng việc thanh toán, bạn đồng ý với{' '}
+                <Link href="/legal/terms" className="underline hover:text-accent">Điều khoản dịch vụ</Link> của LinguaLearn.
               </p>
             </div>
           </div>

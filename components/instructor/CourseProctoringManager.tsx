@@ -24,7 +24,10 @@ export function CourseProctoringManager({ courseId }: { courseId: number }) {
 
   return (
     <div className="card overflow-hidden">
-      <table className="w-full text-left text-sm">
+      {/* (26/09/2026, sửa lỗi) — bảng nhiều cột không cuộn ngang được trên điện thoại/tablet
+          hẹp, các cột bị bóp cực nhỏ. */}
+      <div className="overflow-x-auto">
+      <table className="w-full min-w-[640px] text-left text-sm">
         <thead className="bg-surface-raised text-xs uppercase text-ink-muted border-b border-line">
           <tr>
             <th className="px-4 py-3">Học viên</th>
@@ -81,6 +84,7 @@ export function CourseProctoringManager({ courseId }: { courseId: number }) {
           )}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }

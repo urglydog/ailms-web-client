@@ -141,7 +141,7 @@ export function InstructorChat() {
           hở/che khi cửa sổ trình duyệt thấp, và animation mở/đóng khác hẳn (scale-95 thay vì
           scale-0 + translate-y-20, duration-300 thay vì duration-500 + easing riêng). */}
       <div
-        className={`fixed bottom-24 right-6 flex h-[500px] w-[400px] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl border border-line z-50 origin-bottom-right transition-all duration-500 ease-[cubic-bezier(0.2,1,0.2,1)] ${
+        className={`fixed bottom-24 right-6 flex h-[min(500px,70vh)] w-[calc(100vw-2rem)] max-w-[400px] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl border border-line z-50 origin-bottom-right transition-all duration-500 ease-[cubic-bezier(0.2,1,0.2,1)] ${
           isOpen ? 'scale-100 opacity-100 translate-y-0' : 'scale-0 opacity-0 translate-y-20 pointer-events-none'
         }`}
       >

@@ -3,14 +3,40 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+import { format } from 'date-fns';
 import { ApiError } from '@/lib/api/client';
 import { usePublicProfile } from '@/hooks/usePublicProfile';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { StarRating } from '@/components/ui/StarRating';
-import type { PublicCourseSummary } from '@/types/domain';
+import { CertificatePreview } from '@/components/certificate/CertificatePreview';
+import type { PublicCertificate, PublicCourseSummary } from '@/types/domain';
 
-type Tab = 'courses' | 'wishlist';
+type Tab = 'courses' | 'wishlist' | 'certificates';
+
+type CertificateSortBy = 'newest' | 'oldest' | 'topic' | 'title';
+
+const CERTIFICATE_SORT_OPTIONS: Array<{ value: CertificateSortBy; label: string }> = [
+  { value: 'newest', label: 'Ngày nhận: Mới nhất' },
+  { value: 'oldest', label: 'Ngày nhận: Cũ nhất' },
+  { value: 'topic', label: 'Chủ đề khóa học' },
+  { value: 'title', label: 'Tên khóa học (A-Z)' },
+];
+
+function sortCertificates(certificates: PublicCertificate[], sortBy: CertificateSortBy): PublicCertificate[] {
+  const sorted = [...certificates];
+  switch (sortBy) {
+    case 'oldest':
+      return sorted.sort((a, b) => new Date(a.issuedAt).getTime() - new Date(b.issuedAt).getTime());
+    case 'topic':
+      return sorted.sort((a, b) => a.courseCategoryName.localeCompare(b.courseCategoryName, 'vi'));
+    case 'title':
+      return sorted.sort((a, b) => a.courseTitle.localeCompare(b.courseTitle, 'vi'));
+    case 'newest':
+    default:
+      return sorted.sort((a, b) => new Date(b.issuedAt).getTime() - new Date(a.issuedAt).getTime());
+  }
+}
 
 function formatPrice(price: number): string {
   return `${price.toLocaleString('vi-VN')}đ`;
@@ -33,6 +59,11 @@ export default function PublicProfilePage() {
   const { data: profile, isLoading, error } = usePublicProfile(userId);
   const { data: currentUser } = useCurrentUser();
   const [tab, setTab] = useState<Tab>('courses');
+  const [certificateSort, setCertificateSort] = useState<CertificateSortBy>('newest');
+  const sortedCertificates = useMemo(
+    () => sortCertificates(profile?.certificates ?? [], certificateSort),
+    [profile?.certificates, certificateSort],
+  );
 
   if (isLoading) return <div className="shell py-10 text-center text-sm text-ink-muted">Đang tải...</div>;
 
@@ -66,9 +97,43 @@ export default function PublicProfilePage() {
           <div className="mb-6 flex gap-6 border-b border-line-soft">
             <TabButton label="Đã học" active={tab === 'courses'} onClick={() => setTab('courses')} />
             <TabButton label="Yêu thích" active={tab === 'wishlist'} onClick={() => setTab('wishlist')} />
+            <TabButton
+              label={`Chứng chỉ${profile.certificates.length > 0 ? ` (${profile.certificates.length})` : ''}`}
+              active={tab === 'certificates'}
+              onClick={() => setTab('certificates')}
+            />
           </div>
 
-          {activeCourses === null ? (
+          {tab === 'certificates' ? (
+            profile.certificates.length === 0 ? (
+              <p className="text-sm text-ink-muted">Chưa có chứng chỉ nào.</p>
+            ) : (
+              <>
+                <div className="mb-4 flex justify-end">
+                  <label className="flex items-center gap-2 text-sm text-ink-muted">
+                    Sắp xếp:
+                    <select
+                      value={certificateSort}
+                      onChange={(e) => setCertificateSort(e.target.value as CertificateSortBy)}
+                      className="rounded-lg border border-line bg-surface-raised px-3 py-1.5 text-sm
+                                 text-ink focus:border-accent focus:outline-none"
+                    >
+                      {CERTIFICATE_SORT_OPTIONS.map((opt) => (
+                        <option key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
+                <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                  {sortedCertificates.map((cert) => (
+                    <PublicCertificateCard key={cert.certificateCode} certificate={cert} />
+                  ))}
+                </div>
+              </>
+            )
+          ) : activeCourses === null ? (
             <p className="text-sm text-ink-muted">Học viên này đã ẩn mục này.</p>
           ) : activeCourses.length === 0 ? (
             <p className="text-sm text-ink-muted">
@@ -154,6 +219,34 @@ function PublicCourseCard({ course }: { course: PublicCourseSummary }) {
         <StarRating rating={course.avgRating} reviewCount={course.reviewCount} />
         <span className="mt-1 font-display text-[15px] font-bold text-ink">
           {course.isFree ? 'Miễn phí' : formatPrice(course.price)}
+        </span>
+      </div>
+    </Link>
+  );
+}
+
+/** Thẻ chứng chỉ ở trang hồ sơ công khai — trỏ tới trang XÁC THỰC công khai (`/verify/{code}`),
+ * không phải trang chi tiết riêng tư (`/certificates/{code}`), vì người xem có thể không phải
+ * chủ sở hữu (doc/DacTa_ChucNangChungChi.md, BR-CERT-06). Ảnh đại diện của thẻ là chính hình
+ * chứng chỉ (`CertificatePreview`), KHÔNG phải ảnh bìa khóa học (26/09/2026, sửa lỗi) — chứng chỉ
+ * mới là thứ đang được khoe ở đây. */
+function PublicCertificateCard({ certificate }: { certificate: PublicCertificate }) {
+  return (
+    <Link
+      href={`/verify/${certificate.certificateCode}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="card-interactive flex flex-col overflow-hidden no-underline hover:no-underline"
+    >
+      <CertificatePreview certificate={certificate} interactive={false} />
+
+      <div className="flex flex-1 flex-col gap-1.5 p-3">
+        <span className="line-clamp-2 min-h-[38px] font-display text-sm font-semibold leading-snug text-ink">
+          {certificate.courseTitle}
+        </span>
+        <span className="text-xs text-ink-muted">{certificate.courseCategoryName}</span>
+        <span className="mt-1 text-[12.5px] font-semibold text-ink-muted">
+          Cấp ngày {format(new Date(certificate.issuedAt), 'dd/MM/yyyy')}
         </span>
       </div>
     </Link>

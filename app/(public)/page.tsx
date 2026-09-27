@@ -43,7 +43,7 @@ export default async function HomePage() {
   return (
     <>
       {/* ── Hero chia đôi ── */}
-      <section className="mx-auto w-full max-w-7xl px-8 pt-10">
+      <section className="shell pt-10">
         <div className="grid items-center gap-14 lg:grid-cols-[1.05fr_0.95fr]">
           <div className="flex flex-col gap-4">
             <h1 className="m-0 font-display text-[32px] font-bold leading-[1.2] tracking-[-0.01em] text-ink">
@@ -105,7 +105,7 @@ export default async function HomePage() {
       </section>
 
       {/* ── Khoá học nổi bật ── */}
-      <section className="mx-auto w-full max-w-7xl px-8 pb-2 pt-14">
+      <section className="shell pb-2 pt-14">
         <div className="mb-6 flex flex-col gap-1.5">
           <h2 className="m-0 font-display text-[21px] font-bold text-ink">Khóa học nổi bật</h2>
           <p className="m-0 text-[14px] text-ink-muted">Mỗi khóa học đều hỗ trợ lồng tiếng AI đa ngôn ngữ.</p>
@@ -115,7 +115,7 @@ export default async function HomePage() {
       </section>
 
       {/* ── Quy trình 3 bước ── */}
-      <section id="how-it-works" className="mx-auto w-full max-w-7xl px-8 py-14">
+      <section id="how-it-works" className="shell py-14">
         <div className="grid gap-9 rounded-card bg-ink px-12 py-12 md:grid-cols-3">
           {HOW_IT_WORKS.map((item) => (
             <div key={item.num} className="flex flex-col gap-3">

@@ -44,6 +44,11 @@ const config: Config = {
         danger: '#DC2626', // Nhiều file đã dùng `bg-danger`/`border-danger` nhưng token này
                             // chưa từng được khai báo — các class đó trước đây không sinh CSS gì
                             // (giống lỗi `accent-glow` cũ), phần tử liên quan mất màu/viền.
+        // (26/09/2026) — cùng lỗi y hệt `danger` ở trên: `bg-warning`/`text-warning` đã được dùng
+        // ở vài nơi (vd trang lịch sử giao dịch) nhưng token chưa từng khai báo, KHÔNG sinh CSS
+        // gì cả — khai báo bù ở đây khắc phục luôn các chỗ đó, không chỉ riêng SystemBanner mới
+        // thêm. Amber 600, khác `star` (Amber 500) để 2 mục đích sử dụng không lẫn màu nhau.
+        warning: '#D97706',
         star: '#F59E0B',
       },
       fontFamily: {
