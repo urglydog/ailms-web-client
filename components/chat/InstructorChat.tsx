@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import { toast } from 'sonner';
 import { api } from '@/lib/api/client';
 import { getAccessToken } from '@/lib/auth/token';
 
@@ -69,6 +70,21 @@ export function InstructorChat() {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const maxLengthToastShownRef = useRef(false);
+
+  const MAX_MESSAGE_LENGTH = 1000;
+
+  const handleInputChange = (value: string) => {
+    setInput(value);
+    if (value.length >= MAX_MESSAGE_LENGTH) {
+      if (!maxLengthToastShownRef.current) {
+        toast.warning(`Đã đạt giới hạn ${MAX_MESSAGE_LENGTH} ký tự cho 1 tin nhắn.`);
+        maxLengthToastShownRef.current = true;
+      }
+    } else {
+      maxLengthToastShownRef.current = false;
+    }
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -220,9 +236,9 @@ export function InstructorChat() {
             <input
               type="text"
               value={input}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange(e.target.value)}
               placeholder="Hỏi trợ lý (VD: Doanh thu tháng này?)..."
-              maxLength={1000}
+              maxLength={MAX_MESSAGE_LENGTH}
               className="flex-1 bg-gray-50 border border-gray-200 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-gray-800"
               disabled={loading}
             />
