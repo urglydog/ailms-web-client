@@ -32,8 +32,10 @@ export default function InstructorLivePage() {
         </div>
       )}
 
+      {/* (26/09/2026, sửa lỗi) — cột cố định không co giãn dưới `sm`, bọc cuộn ngang thay vì bóp/vỡ. */}
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-        <div className="grid grid-cols-[1.8fr_1fr_120px_150px] gap-3 border-b border-gray-200 bg-gray-50 px-4 py-2.5 text-[11.5px] font-bold text-gray-500">
+        <div className="overflow-x-auto">
+        <div className="grid min-w-[560px] grid-cols-[1.8fr_1fr_120px_150px] gap-3 border-b border-gray-200 bg-gray-50 px-4 py-2.5 text-[11.5px] font-bold text-gray-500">
           <span>Tiêu đề</span>
           <span>Khóa học</span>
           <span>Trạng thái</span>
@@ -53,7 +55,7 @@ export default function InstructorLivePage() {
           return (
             <div
               key={session.id}
-              className={`grid grid-cols-[1.8fr_1fr_120px_150px] items-center gap-3 px-4 py-2.5 ${
+              className={`grid min-w-[560px] grid-cols-[1.8fr_1fr_120px_150px] items-center gap-3 px-4 py-2.5 ${
                 idx < sessions.length - 1 ? 'border-b border-gray-100' : ''
               }`}
             >
@@ -79,6 +81,7 @@ export default function InstructorLivePage() {
             </div>
           );
         })}
+        </div>
       </div>
     </>
   );

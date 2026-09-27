@@ -1,0 +1,91 @@
+{
+  "header": {
+    "nav": {
+      "courses": "Khóa học",
+      "myCourses": "Khóa học của tôi",
+      "live": "Live",
+      "about": "Về chúng tôi"
+    },
+    "search": {
+      "ariaLabel": "Tìm kiếm",
+      "placeholder": "Tìm khóa học..."
+    },
+    "mobileMenu": {
+      "open": "Mở menu",
+      "close": "Đóng menu"
+    },
+    "wishlist": {
+      "viewAll": "Đi đến danh sách yêu thích",
+      "empty": "Danh sách yêu thích trống.",
+      "free": "Miễn phí",
+      "enrollFree": "Ghi danh miễn phí",
+      "addToCart": "Thêm vào giỏ hàng",
+      "inCart": "Đã có trong giỏ",
+      "enrollSuccess": "Ghi danh thành công!",
+      "enrollError": "Không ghi danh được, thử lại sau."
+    },
+    "cart": {
+      "viewAll": "Đi đến giỏ hàng",
+      "empty": "Giỏ hàng trống.",
+      "total": "Tổng cộng"
+    },
+    "notifications": {
+      "title": "Thông báo",
+      "markAllRead": "Đánh dấu đã đọc",
+      "empty": "Không có thông báo nào",
+      "viewAll": "Xem tất cả thông báo"
+    },
+    "account": {
+      "guestName": "Người dùng",
+      "adminPanel": "Truy cập trang Quản trị",
+      "wishlist": "Danh sách yêu thích",
+      "publicProfile": "Xem hồ sơ công khai",
+      "certificates": "Chứng chỉ của tôi",
+      "paymentHistory": "Lịch sử giao dịch",
+      "profile": "Hồ sơ cá nhân",
+      "instructorChannel": "Kênh Giảng viên",
+      "becomeInstructor": "Trở thành Giảng viên",
+      "language": "Ngôn ngữ",
+      "logout": "Đăng xuất"
+    },
+    "auth": {
+      "login": "Đăng nhập",
+      "register": "Đăng ký"
+    },
+    "logoutModal": {
+      "title": "Xác nhận đăng xuất",
+      "body": "Bạn có chắc chắn muốn đăng xuất khỏi hệ thống không?",
+      "cancel": "Hủy bỏ",
+      "confirm": "Đăng xuất"
+    }
+  },
+  "footer": {
+    "tagline": "Hệ thống quản lý học tập và thi cử trực tuyến chuẩn học thuật.",
+    "discoverTitle": "Khám phá",
+    "discover": {
+      "about": "Về chúng tôi",
+      "teaching": "Giảng dạy trên LinguaLearn",
+      "courses": "Khóa học",
+      "help": "Trợ giúp & Hỗ trợ"
+    },
+    "legalTitle": "Pháp lý & Chính sách",
+    "legal": {
+      "terms": "Điều khoản dịch vụ",
+      "privacy": "Chính sách quyền riêng tư",
+      "refund": "Chính sách hoàn tiền",
+      "revenueShare": "Chia sẻ doanh thu Giảng viên",
+      "contentModeration": "Quy định kiểm duyệt nội dung",
+      "cookies": "Chính sách Cookie",
+      "accessibility": "Khả năng tiếp cận"
+    },
+    "contactTitle": "Liên hệ",
+    "phoneLabel": "Điện thoại",
+    "emailLabel": "Email",
+    "copyright": "© {year} LinguaLearn — Trường Đại học Công nghiệp TP. Hồ Chí Minh",
+    "sitemap": "Sơ đồ trang"
+  },
+  "languageModal": {
+    "title": "Chọn ngôn ngữ",
+    "close": "Đóng"
+  }
+}

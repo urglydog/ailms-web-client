@@ -3,6 +3,8 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState } from 'react';
 import { NotificationProvider } from '@/components/providers/NotificationProvider';
+import { LocaleProvider } from '@/components/providers/LocaleProvider';
+import { SystemBanner } from '@/components/layout/SystemBanner';
 import { Toaster } from 'sonner';
 
 /**
@@ -41,10 +43,13 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <NotificationProvider>
-        {children}
-        <Toaster position="top-center" richColors />
-      </NotificationProvider>
+      <LocaleProvider>
+        <NotificationProvider>
+          <SystemBanner />
+          {children}
+          <Toaster position="top-center" richColors />
+        </NotificationProvider>
+      </LocaleProvider>
     </QueryClientProvider>
   );
 }

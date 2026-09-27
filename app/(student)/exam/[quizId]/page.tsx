@@ -1061,6 +1061,9 @@ export default function AntiCheatExamPage() {
 
             <h3 className="text-xl font-bold text-ink mb-4">Tổng quan các lần làm bài trước của bạn</h3>
             <div className="overflow-hidden border border-line rounded-xl shadow-sm bg-surface">
+              {/* (26/09/2026, sửa lỗi) — `overflow-x-auto` ở đây (thay vì chỉ `overflow-hidden`
+                  ở khung ngoài) để bảng cuộn ngang được trên điện thoại thay vì bị bóp cột. */}
+              <div className="overflow-x-auto">
               <table className="w-full text-sm text-left">
                 <thead className="bg-surface-hover text-ink font-semibold border-b border-line">
                   <tr>
@@ -1114,6 +1117,7 @@ export default function AntiCheatExamPage() {
                   )}
                 </tbody>
               </table>
+              </div>
             </div>
           </div>
 

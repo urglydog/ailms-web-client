@@ -188,9 +188,14 @@ export function PlayerControls({
         />
       </div>
 
-      <div className="flex items-center justify-between gap-2 px-3">
+      {/* (26/09/2026, sửa lỗi) — 11 nút điều khiển trên CÙNG 1 hàng không co giãn tràn hẳn ra
+          khỏi màn hình điện thoại (~440px cần trong khi video chỉ còn ~320px sau padding trang).
+          Thêm `flex-wrap` để cụm phải (phụ đề/transcript/cài đặt/toàn màn hình) tự rớt xuống
+          hàng dưới khi không đủ chỗ, thay vì bị cắt/tràn — không ẩn bớt chức năng nào (phụ
+          đề song ngữ là tính năng lõi của dự án, không nên giấu trên di động). */}
+      <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1.5 px-2 sm:px-3">
         {/* ── Cụm trái: play/pause · lùi 5s · tốc độ · tua 5s · thời lượng ── */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <button type="button" onClick={onTogglePlay} aria-label={isPlaying ? 'Tạm dừng' : 'Phát'} className="hover:text-accent">
             {isPlaying ? <PauseIcon /> : <PlayIcon />}
           </button>
@@ -251,7 +256,7 @@ export function PlayerControls({
         </div>
 
         {/* ── Cụm phải: âm lượng · phụ đề gốc/dịch · transcript · cài đặt · toàn màn hình ── */}
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-1.5 sm:gap-2.5">
           {/* Mặc định CHỈ hiện icon loa — giữ chuột/focus vào loa mới lộ thanh kéo âm lượng.
               Bọc `<input>` trong 1 div `overflow-hidden` riêng (thay vì tự co width chính nó)
               vì con trượt (thumb) của `<input type="range">` không bị cắt theo width của

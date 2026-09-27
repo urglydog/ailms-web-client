@@ -1,0 +1,91 @@
+{
+  "header": {
+    "nav": {
+      "courses": "课程",
+      "myCourses": "我的课程",
+      "live": "直播",
+      "about": "关于我们"
+    },
+    "search": {
+      "ariaLabel": "搜索",
+      "placeholder": "搜索课程..."
+    },
+    "mobileMenu": {
+      "open": "打开菜单",
+      "close": "关闭菜单"
+    },
+    "wishlist": {
+      "viewAll": "前往收藏夹",
+      "empty": "收藏夹是空的。",
+      "free": "免费",
+      "enrollFree": "免费报名",
+      "addToCart": "加入购物车",
+      "inCart": "已在购物车中",
+      "enrollSuccess": "报名成功！",
+      "enrollError": "报名失败，请稍后再试。"
+    },
+    "cart": {
+      "viewAll": "前往购物车",
+      "empty": "购物车是空的。",
+      "total": "总计"
+    },
+    "notifications": {
+      "title": "通知",
+      "markAllRead": "全部标记为已读",
+      "empty": "暂无通知",
+      "viewAll": "查看全部通知"
+    },
+    "account": {
+      "guestName": "用户",
+      "adminPanel": "前往管理后台",
+      "wishlist": "收藏夹",
+      "publicProfile": "查看公开资料",
+      "certificates": "我的证书",
+      "paymentHistory": "交易记录",
+      "profile": "个人资料",
+      "instructorChannel": "讲师频道",
+      "becomeInstructor": "成为讲师",
+      "language": "语言",
+      "logout": "退出登录"
+    },
+    "auth": {
+      "login": "登录",
+      "register": "注册"
+    },
+    "logoutModal": {
+      "title": "确认退出登录",
+      "body": "您确定要退出登录吗？",
+      "cancel": "取消",
+      "confirm": "退出登录"
+    }
+  },
+  "footer": {
+    "tagline": "学术级在线学习与考试管理系统。",
+    "discoverTitle": "探索",
+    "discover": {
+      "about": "关于我们",
+      "teaching": "在 LinguaLearn 授课",
+      "courses": "课程",
+      "help": "帮助与支持"
+    },
+    "legalTitle": "法律与政策",
+    "legal": {
+      "terms": "服务条款",
+      "privacy": "隐私政策",
+      "refund": "退款政策",
+      "revenueShare": "讲师收益分成",
+      "contentModeration": "内容审核规定",
+      "cookies": "Cookie 政策",
+      "accessibility": "无障碍声明"
+    },
+    "contactTitle": "联系我们",
+    "phoneLabel": "电话",
+    "emailLabel": "邮箱",
+    "copyright": "© {year} LinguaLearn — 胡志明市工业大学",
+    "sitemap": "网站地图"
+  },
+  "languageModal": {
+    "title": "选择语言",
+    "close": "关闭"
+  }
+}

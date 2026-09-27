@@ -75,6 +75,9 @@ export interface PublicProfile {
   memberSince: string;
   courses: PublicCourseSummary[] | null;
   wishlist: PublicCourseSummary[] | null;
+  /** doc/DacTa_ChucNangChungChi.md — LUÔN công khai (không có cờ ẩn/hiện riêng như courses/
+   * wishlist), không bao giờ null — chỉ có thể là mảng rỗng. */
+  certificates: PublicCertificate[];
 }
 
 // ── Khoá học ────────────────────────────────────────────────────
@@ -584,6 +587,9 @@ export interface EnrolledCourse {
   enrolledAt: string;
   /** Lần gần nhất xem 1 bài bất kỳ trong khóa — dùng cho sort "Recently Accessed"; null nếu chưa xem bài nào. */
   lastAccessedAt: string | null;
+  /** doc/DacTa_ChucNangChungChi.md — chỉ có giá trị khi đã hoàn thành 100% VÀ chứng chỉ đã được
+   * cấp; dùng để điều hướng "Xem chứng chỉ" tới `/certificates/{code}` thay vì tải PDF thẳng. */
+  certificateCode: string | null;
 }
 
 // ── F6.2: Tiến độ học tập (UC21, UC22) ───────────────────────────
@@ -919,4 +925,108 @@ export interface ActivateLiveLanguageTrackInput {
   targetLanguage: string;
   /** Chỉ có tác dụng khi đây là ngôn ngữ CHƯA có track ACTIVE nào (BR-LIVE-05). */
   voiceName?: string;
+}
+
+// ── Chứng chỉ hoàn thành khóa học (doc/DacTa_ChucNangChungChi.md, BR-CERT-01..10) ────────
+
+export type CertificateStatus = 'ACTIVE' | 'REVOKED';
+
+/** Đúng 7 field `CertificatePreview` cần để vẽ lại NGUYÊN hình chứng chỉ — `Certificate`/
+ * `PublicCertificate`/`CertificateVerification` (khi tìm thấy) đều thoả interface này, nên cả 3
+ * chỗ (trang riêng tư, thẻ hồ sơ công khai, trang xác thực công khai) dùng CHUNG 1 component xem
+ * trước, không phải 3 bản khác nhau (26/09/2026, mở rộng). */
+export interface CertificateVisual {
+  certificateCode: string;
+  courseTitle: string;
+  studentName: string;
+  courseHours: number;
+  instructorName: string;
+  completedAt: string;
+  verifyUrl: string;
+}
+
+/** "Chứng chỉ của tôi" (danh sách + chi tiết) — chủ sở hữu xem/tải/chia sẻ. Mọi field ở đây là
+ * SNAPSHOT tại thời điểm cấp (BR-CERT-04), không đổi dù hồ sơ/khóa học gốc đổi sau này. */
+export interface Certificate extends CertificateVisual {
+  courseId: number;
+  courseSlug: string;
+  issuedAt: string;
+  status: CertificateStatus;
+}
+
+/** Trang xác thực công khai `/verify/{certificateCode}` (BR-CERT-06) — KHÔNG có email, không có
+ * link tải PDF. `found=false` nghĩa là mã không tồn tại (khác REVOKED — REVOKED vẫn "found"). Các
+ * field snapshot vốn đã in công khai ngay trên mặt chứng chỉ nên không phát sinh rò rỉ riêng tư
+ * mới khi trả đủ để FE vẽ lại nguyên hình (26/09/2026, mở rộng — trước đây chỉ trả đủ cho 1 câu
+ * xác nhận dạng chữ). */
+export interface CertificateVerification extends Partial<CertificateVisual> {
+  found: boolean;
+  status: CertificateStatus | null;
+}
+
+/** Hiển thị ở trang hồ sơ công khai (`/u/{userId}`) — chỉ chứng chỉ ACTIVE. (26/09/2026, sửa lỗi)
+ * — trước đây có `courseThumbnailUrl` để hiện ảnh bìa khóa học ở thẻ, nay đổi sang hiện NGUYÊN
+ * hình chứng chỉ (`CertificatePreview`) nên bỏ field đó. */
+export interface PublicCertificate extends CertificateVisual {
+  courseCategoryName: string;
+  issuedAt: string;
+  status: CertificateStatus;
+}
+
+// ── Thông báo hệ thống từ Admin (26/09/2026, tính năng mới) ──────────────
+
+export type AnnouncementSeverity = 'HIGH' | 'MEDIUM' | 'LOW';
+export type AnnouncementAudience = 'ALL' | 'INSTRUCTOR' | 'STUDENT' | 'SPECIFIC_USER';
+export type AnnouncementDispatchStatus = 'PENDING' | 'PROCESSING' | 'DONE' | 'FAILED';
+
+export interface CreateSystemAnnouncementReq {
+  title: string;
+  content: string;
+  severity: AnnouncementSeverity;
+  audience: AnnouncementAudience;
+  /** Bắt buộc khi `audience = 'SPECIFIC_USER'`. */
+  targetUserId: number | null;
+  /** Chỉ có ý nghĩa khi `severity = 'HIGH'` (thời điểm banner tự ẩn) — null = vô thời hạn. */
+  expiresAt: string | null;
+}
+
+/** Lịch sử thông báo hệ thống đã gửi — trang Admin xem lại tiến độ phát tán (job nền Redis, xem
+ * `SystemAnnouncementService` phía backend). */
+export interface SystemAnnouncement {
+  id: number;
+  title: string;
+  content: string;
+  severity: AnnouncementSeverity;
+  audience: AnnouncementAudience;
+  targetUserId: number | null;
+  expiresAt: string | null;
+  dispatchStatus: AnnouncementDispatchStatus;
+  totalRecipients: number | null;
+  sentCount: number;
+  createdByAdminName: string;
+  createdAt: string;
+}
+
+/** Banner cố định đầu trang khi có thông báo `severity = 'HIGH'` đang hoạt động — public, không
+ * cần đăng nhập. */
+export interface SystemAnnouncementBanner {
+  id: number;
+  title: string;
+  content: string;
+  severity: AnnouncementSeverity;
+}
+
+/** BR-TUTOR-SEC-06 (doc/feat/injection/DacTa_ChongPromptInjection_TutorAgent.md) — 1 tin nhắn học
+ * viên gửi vào Socratic Tutor Agent khớp 1 pattern nghi vấn (pre-check heuristic). CHỈ để Admin
+ * xem lại/theo dõi, KHÔNG có hành động khóa/chặn nào gắn với dòng này ở v1. */
+export interface TutorSecurityFlag {
+  id: number;
+  studentId: number;
+  studentName: string;
+  studentEmail: string;
+  courseId: number;
+  courseTitle: string;
+  matchedPattern: string;
+  messageSnapshot: string;
+  createdAt: string;
 }

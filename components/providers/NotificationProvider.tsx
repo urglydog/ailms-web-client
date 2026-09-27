@@ -122,12 +122,17 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
 
   const unreadCount = notifications.filter(n => !n.isRead).length;
 
+  /** (26/09/2026, sửa lỗi) — trước đây chỉ đổi state ở FE, không gọi API lưu DB nên tải lại
+   * trang là mất trạng thái "đã đọc", badge số chưa đọc không giảm. Cập nhật state ngay (phản
+   * hồi tức thời) rồi gọi API best-effort — lỗi mạng không nên chặn UI. */
   const markAsRead = (id: number) => {
     setNotifications(prev => prev.map(n => n.id === id ? { ...n, isRead: true } : n));
+    notificationApi.markAsRead(id).catch(() => {});
   };
 
   const markAllAsRead = () => {
     setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+    notificationApi.markAllAsRead().catch(() => {});
   };
 
   return (

@@ -1,0 +1,91 @@
+{
+  "header": {
+    "nav": {
+      "courses": "Courses",
+      "myCourses": "My Courses",
+      "live": "Live",
+      "about": "About Us"
+    },
+    "search": {
+      "ariaLabel": "Search",
+      "placeholder": "Search courses..."
+    },
+    "mobileMenu": {
+      "open": "Open menu",
+      "close": "Close menu"
+    },
+    "wishlist": {
+      "viewAll": "Go to wishlist",
+      "empty": "Your wishlist is empty.",
+      "free": "Free",
+      "enrollFree": "Enroll for free",
+      "addToCart": "Add to cart",
+      "inCart": "Already in cart",
+      "enrollSuccess": "Enrolled successfully!",
+      "enrollError": "Couldn't enroll, please try again."
+    },
+    "cart": {
+      "viewAll": "Go to cart",
+      "empty": "Your cart is empty.",
+      "total": "Total"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "markAllRead": "Mark all as read",
+      "empty": "No notifications yet",
+      "viewAll": "View all notifications"
+    },
+    "account": {
+      "guestName": "User",
+      "adminPanel": "Go to Admin Panel",
+      "wishlist": "Wishlist",
+      "publicProfile": "View public profile",
+      "certificates": "My Certificates",
+      "paymentHistory": "Payment history",
+      "profile": "My profile",
+      "instructorChannel": "Instructor Channel",
+      "becomeInstructor": "Become an Instructor",
+      "language": "Language",
+      "logout": "Log out"
+    },
+    "auth": {
+      "login": "Log in",
+      "register": "Sign up"
+    },
+    "logoutModal": {
+      "title": "Confirm log out",
+      "body": "Are you sure you want to log out?",
+      "cancel": "Cancel",
+      "confirm": "Log out"
+    }
+  },
+  "footer": {
+    "tagline": "An academic-grade online learning and examination management system.",
+    "discoverTitle": "Discover",
+    "discover": {
+      "about": "About Us",
+      "teaching": "Teach on LinguaLearn",
+      "courses": "Courses",
+      "help": "Help & Support"
+    },
+    "legalTitle": "Legal & Policies",
+    "legal": {
+      "terms": "Terms of Service",
+      "privacy": "Privacy Policy",
+      "refund": "Refund Policy",
+      "revenueShare": "Instructor Revenue Share",
+      "contentModeration": "Content Moderation Policy",
+      "cookies": "Cookie Policy",
+      "accessibility": "Accessibility"
+    },
+    "contactTitle": "Contact",
+    "phoneLabel": "Phone",
+    "emailLabel": "Email",
+    "copyright": "© {year} LinguaLearn — Ho Chi Minh City University of Industry",
+    "sitemap": "Sitemap"
+  },
+  "languageModal": {
+    "title": "Choose language",
+    "close": "Close"
+  }
+}

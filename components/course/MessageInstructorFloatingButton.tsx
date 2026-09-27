@@ -76,7 +76,7 @@ export function MessageInstructorFloatingButton({ courseId }: { courseId: number
   return (
     <>
       {open && conversationId && (
-        <div className="fixed bottom-24 right-6 z-40 flex h-[440px] w-[340px] flex-col overflow-hidden rounded-2xl border border-line bg-white shadow-2xl">
+        <div className="fixed bottom-24 right-6 z-40 flex h-[min(440px,70vh)] w-[calc(100vw-2rem)] max-w-[340px] flex-col overflow-hidden rounded-2xl border border-line bg-white shadow-2xl">
           <div className="flex items-center gap-2.5 border-b border-line px-4 py-3">
             {conversation && <Avatar name={conversation.otherUserName} avatarUrl={conversation.otherUserAvatarUrl} size={28} />}
             <span className="flex-1 truncate font-display text-[14px] font-bold text-ink">
