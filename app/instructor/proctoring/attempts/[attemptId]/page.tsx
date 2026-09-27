@@ -1,7 +1,7 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ShieldAlert, ChevronDown } from 'lucide-react';
 import { useProctoredAttemptDetail } from '@/hooks/useProctoring';
 import { ArrowLeftIcon } from '@/components/instructor/SidebarIcons';
@@ -55,40 +55,55 @@ export default function ProctoringAttemptDetailPage() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
 
+  // Trick cho lỗi kinh điển của MediaRecorder → webm không ghi `duration` hợp lệ trong metadata
+  // (Infinity) — seek tới 1 số cực lớn rồi mới set về giây thật để buộc trình duyệt tính lại
+  // duration. Dùng chung cho cả lúc video vừa load xong (sửa hiển thị thanh điều khiển native
+  // NGAY, không cần đợi user bấm marker) lẫn lúc tua tới 1 vi phạm cụ thể.
+  const fixDurationThenSeek = (video: HTMLVideoElement, sec: number, pauseAfter: boolean) => {
+    video.currentTime = 1e8;
+
+    const onTimeUpdate = () => {
+      video.removeEventListener('timeupdate', onTimeUpdate);
+      video.removeEventListener('durationchange', onTimeUpdate);
+      video.currentTime = sec;
+      if (pauseAfter) video.pause();
+    };
+
+    video.addEventListener('timeupdate', onTimeUpdate);
+    video.addEventListener('durationchange', onTimeUpdate);
+  };
+
   const seekTo = (sec: number) => {
     if (!videoRef.current) return;
     const video = videoRef.current;
-    
-    const doSeek = () => {
-      // Trick for MediaRecorder webm infinity duration:
-      // set currentTime to a huge number, wait for update, then set to actual sec
-      video.currentTime = 1e8;
-      
-      const onTimeUpdate = () => {
-        video.removeEventListener('timeupdate', onTimeUpdate);
-        video.removeEventListener('durationchange', onTimeUpdate);
-        video.currentTime = sec;
-        video.pause();
-      };
-      
-      video.addEventListener('timeupdate', onTimeUpdate);
-      video.addEventListener('durationchange', onTimeUpdate);
-    };
 
     if (video.readyState < 1) { // 1 is HAVE_METADATA
       video.addEventListener('loadedmetadata', function onLoaded() {
         video.removeEventListener('loadedmetadata', onLoaded);
-        doSeek();
+        fixDurationThenSeek(video, sec, true);
       });
     } else {
-      doSeek();
+      fixDurationThenSeek(video, sec, true);
     }
   };
+
+  // (27/09/2026, sửa lỗi thời lượng ảo) — sửa duration NGAY khi video vừa load xong metadata, kể
+  // cả khi user chưa bấm marker vi phạm nào — trước đây chỉ chạy trick ở `seekTo`, nên nếu user
+  // nhìn video trước khi bấm marker, thanh điều khiển native vẫn hiện số thời lượng vô nghĩa.
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !attempt?.videoUrl) return;
+    const onLoadedMetadata = () => fixDurationThenSeek(video, 0, true);
+    video.addEventListener('loadedmetadata', onLoadedMetadata);
+    return () => video.removeEventListener('loadedmetadata', onLoadedMetadata);
+  }, [attempt?.videoUrl]);
 
   const handleViolationClick = (idx: number, offsetSec: number) => {
     // Tua trước, đợi 1 nhịp ngắn rồi mới xổ chi tiết — trước đây 2 việc chạy cùng lúc trong 1
     // tick, cảm giác đột ngột; tách ra để đọc phân tích AI sau khi video đã tua tới đúng chỗ.
-    seekTo(offsetSec);
+    // Lùi 1s so với mốc ghi nhận (27/09/2026) — hành vi vi phạm có thể diễn ra rất nhanh, lùi lại
+    // để bấm play là thấy trọn khoảnh khắc thay vì nó đã trôi qua.
+    seekTo(Math.max(0, offsetSec - 1));
     if (expandedIdx === idx) {
       setExpandedIdx(null);
       return;
@@ -138,7 +153,7 @@ export default function ProctoringAttemptDetailPage() {
         <div className="lg:col-span-2 lg:sticky lg:top-4">
           <div className="card overflow-hidden">
             {attempt.videoUrl ? (
-              <video ref={videoRef} src={attempt.videoUrl} controls className="w-full aspect-video bg-black" />
+              <video ref={videoRef} src={attempt.videoUrl} controls preload="metadata" className="w-full aspect-video bg-black" />
             ) : (
               <div className="aspect-video flex items-center justify-center text-sm text-ink-faint bg-surface-raised">
                 Chưa có video
