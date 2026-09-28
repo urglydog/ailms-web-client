@@ -1,14 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { createPortal } from 'react-dom';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api/client';
 import { Spinner } from '@/components/ui/Spinner';
 import Link from 'next/link';
-import { Trophy, AlertTriangle, X, Hash, Calendar, CheckCheck } from 'lucide-react';
+import { Trophy, AlertTriangle } from 'lucide-react';
 import { MaterialBadge } from '@/components/materials/ui/MaterialBadge';
-import { Tooltip } from '@/components/ui/Tooltip';
 
 interface GradebookResponse {
   courseId: number;
@@ -41,17 +38,6 @@ interface AttemptDto {
 }
 
 export function CourseGradebookTab({ courseId }: { courseId: number }) {
-  const [historyQuiz, setHistoryQuiz] = useState<QuizGradeDto | null>(null);
-  const [modalEntered, setModalEntered] = useState(false);
-
-  useEffect(() => {
-    if (historyQuiz) {
-      const id = requestAnimationFrame(() => setModalEntered(true));
-      return () => cancelAnimationFrame(id);
-    }
-    setModalEntered(false);
-  }, [historyQuiz]);
-
   const { data, isLoading, error } = useQuery<GradebookResponse>({
     queryKey: ['student', 'gradebook', courseId],
     queryFn: async () => {
@@ -95,7 +81,7 @@ export function CourseGradebookTab({ courseId }: { courseId: number }) {
               <th className="py-3 px-4 font-semibold text-right">Hành động</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-line/50">
+          <tbody className="divide-y divide-line">
             {quizzes.map((quiz) => {
               return (
                 <tr key={quiz.quizId} className="hover:bg-surface-hover transition-colors">
@@ -136,12 +122,12 @@ export function CourseGradebookTab({ courseId }: { courseId: number }) {
                     }) : 'Đang làm'}
                   </td>
                   <td className="py-4 px-4 text-right">
-                    <button 
-                      onClick={() => setHistoryQuiz(quiz)} 
+                    <Link
+                      href={`/exam/${quiz.quizId}/history?attemptId=${quiz.latestAttemptId}`}
                       className="text-accent font-semibold text-sm hover:underline"
                     >
                       Xem lịch sử ({quiz.attemptCount} lần)
-                    </button>
+                    </Link>
                   </td>
                 </tr>
               );
@@ -149,70 +135,6 @@ export function CourseGradebookTab({ courseId }: { courseId: number }) {
           </tbody>
         </table>
       </div>
-      
-      {/* Lịch sử Modal */}
-      {historyQuiz && typeof window !== 'undefined' && createPortal(
-        <div
-          className={`fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-ink/50 backdrop-blur-sm transition-opacity duration-200 ${modalEntered ? 'opacity-100' : 'opacity-0'}`}
-          onClick={() => setHistoryQuiz(null)}
-        >
-          <div
-            className={`bg-surface-raised rounded-card w-full max-w-3xl flex flex-col max-h-[90vh] shadow-card-hover border border-line overflow-hidden transition-all duration-200 ${modalEntered ? 'scale-100 opacity-100' : 'scale-95 opacity-0'}`}
-            onClick={e => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between p-6 border-b border-line bg-surface">
-              <div>
-                <h3 className="text-xl font-bold text-ink">Lịch sử bài làm</h3>
-                <p className="text-sm text-ink-muted mt-1">{historyQuiz.quizTitle}</p>
-              </div>
-              <button
-                onClick={() => setHistoryQuiz(null)}
-                className="p-2 hover:bg-surface-hover rounded-card text-ink-muted hover:text-ink transition-colors"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-            <div className="p-6 overflow-y-auto">
-              {(!historyQuiz.attempts || historyQuiz.attempts.length === 0) ? (
-                <p className="py-8 text-center text-ink-muted">Bạn chưa có lượt làm bài nào cho bài thi này.</p>
-              ) : (
-                <div className="flex flex-col divide-y divide-line">
-                  {historyQuiz.attempts.map((h, index) => (
-                    <div key={h.id} className="flex items-center justify-between gap-4 py-3 hover:bg-surface-hover transition-colors">
-                      <div className="flex items-center gap-4 text-[13px]">
-                        <Tooltip label="Lần">
-                          <span className="flex items-center gap-1 font-bold text-ink">
-                            <Hash className="w-3.5 h-3.5 text-ink-faint" /> {index + 1}
-                          </span>
-                        </Tooltip>
-                        <Tooltip label="Ngày nộp">
-                          <span className="flex items-center gap-1 text-ink-muted">
-                            <Calendar className="w-3.5 h-3.5" /> {new Date(h.submittedAt).toLocaleDateString('vi-VN')}
-                          </span>
-                        </Tooltip>
-                        <Tooltip label="Điểm">
-                          <span className="flex items-center gap-1 font-bold text-accent">
-                            <Trophy className="w-3.5 h-3.5" /> {Number(h.score).toFixed(2).replace(/\.?0+$/, '')}/10
-                          </span>
-                        </Tooltip>
-                        <Tooltip label="Số câu đúng">
-                          <span className="flex items-center gap-1 text-ink-muted">
-                            <CheckCheck className="w-3.5 h-3.5" /> {h.correctCount}/{h.totalQuestions}
-                          </span>
-                        </Tooltip>
-                      </div>
-                      <Link href={`/exam/${historyQuiz.quizId}/history?attemptId=${h.id}`} className="text-accent font-semibold text-sm hover:underline shrink-0">
-                        Xem chi tiết
-                      </Link>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>,
-        document.body
-      )}
     </div>
   );
 }
