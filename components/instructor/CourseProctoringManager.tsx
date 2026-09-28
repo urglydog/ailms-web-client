@@ -1,9 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Eye, Video, ShieldAlert, Search, X } from 'lucide-react';
 import { useProctoredAttempts } from '@/hooks/useProctoring';
+import { Pagination } from '@/components/ui/Pagination';
+
+const ITEMS_PER_PAGE = 10;
 
 const parseDate = (d: string | number[]) => {
   if (Array.isArray(d)) {
@@ -26,6 +29,7 @@ export function CourseProctoringManager({ courseId }: { courseId: number }) {
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [riskFilter, setRiskFilter] = useState<'ALL' | 'HIGH' | 'MEDIUM'>('ALL');
+  const [currentPage, setCurrentPage] = useState(1);
 
   // (28/09/2026) — trước đây liệt kê phẳng toàn bộ lượt thi, không có cách nào tách theo ngày
   // hay theo bài thi. Lọc thuần phía client trên dữ liệu đã fetch — DTO ProctoredAttemptSummary
@@ -43,6 +47,11 @@ export function CourseProctoringManager({ courseId }: { courseId: number }) {
       return true;
     });
   }, [attempts, search, dateFrom, dateTo, riskFilter]);
+
+  useEffect(() => { setCurrentPage(1); }, [search, dateFrom, dateTo, riskFilter]);
+
+  const totalPages = Math.ceil((filteredAttempts?.length || 0) / ITEMS_PER_PAGE);
+  const pagedAttempts = filteredAttempts?.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   return (
     <div className="card overflow-hidden">
@@ -113,10 +122,10 @@ export function CourseProctoringManager({ courseId }: { courseId: number }) {
             <tr><td colSpan={7} className="px-4 py-8 text-center text-ink-muted">Đang tải...</td></tr>
           ) : !attempts || attempts.length === 0 ? (
             <tr><td colSpan={7} className="px-4 py-8 text-center text-ink-muted">Chưa có lượt thi nào ở các bài thi bật giám sát.</td></tr>
-          ) : !filteredAttempts || filteredAttempts.length === 0 ? (
+          ) : !pagedAttempts || pagedAttempts.length === 0 ? (
             <tr><td colSpan={7} className="px-4 py-8 text-center text-ink-muted">Không có lượt thi nào khớp bộ lọc.</td></tr>
           ) : (
-            filteredAttempts.map((a) => (
+            pagedAttempts.map((a) => (
               <tr key={a.attemptId} className="hover:bg-surface-raised transition-colors">
                 <td className="px-4 py-3">
                   <div className="font-semibold text-ink">{a.studentName}</div>
@@ -153,6 +162,9 @@ export function CourseProctoringManager({ courseId }: { courseId: number }) {
           )}
         </tbody>
       </table>
+      </div>
+      <div className="px-4 border-t border-line">
+        <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
       </div>
     </div>
   );

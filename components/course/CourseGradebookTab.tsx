@@ -1,11 +1,15 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api/client';
 import { Spinner } from '@/components/ui/Spinner';
 import Link from 'next/link';
 import { Trophy, AlertTriangle } from 'lucide-react';
 import { MaterialBadge } from '@/components/materials/ui/MaterialBadge';
+import { Pagination } from '@/components/ui/Pagination';
+
+const ITEMS_PER_PAGE = 10;
 
 interface GradebookResponse {
   courseId: number;
@@ -38,6 +42,8 @@ interface AttemptDto {
 }
 
 export function CourseGradebookTab({ courseId }: { courseId: number }) {
+  const [currentPage, setCurrentPage] = useState(1);
+
   const { data, isLoading, error } = useQuery<GradebookResponse>({
     queryKey: ['student', 'gradebook', courseId],
     queryFn: async () => {
@@ -45,15 +51,19 @@ export function CourseGradebookTab({ courseId }: { courseId: number }) {
     }
   });
 
-  if (isLoading) return <div className="py-10 text-center"><Spinner className="mx-auto" /></div>;
-  if (error) return <div className="py-10 text-center text-danger">Lỗi khi tải bảng điểm.</div>;
-
   // B1 — bài làm gần nhất lên đầu; quiz chưa làm lần nào (không có latestSubmittedAt) xuống cuối.
   const quizzes = [...(data?.quizzes || [])].sort((a, b) => {
     if (!a.latestSubmittedAt) return 1;
     if (!b.latestSubmittedAt) return -1;
     return new Date(b.latestSubmittedAt).getTime() - new Date(a.latestSubmittedAt).getTime();
   });
+
+  const totalPages = Math.ceil(quizzes.length / ITEMS_PER_PAGE);
+  useEffect(() => { setCurrentPage(1); }, [quizzes.length]);
+  const pagedQuizzes = quizzes.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+
+  if (isLoading) return <div className="py-10 text-center"><Spinner className="mx-auto" /></div>;
+  if (error) return <div className="py-10 text-center text-danger">Lỗi khi tải bảng điểm.</div>;
 
   if (quizzes.length === 0) {
     return (
@@ -82,7 +92,7 @@ export function CourseGradebookTab({ courseId }: { courseId: number }) {
             </tr>
           </thead>
           <tbody className="divide-y divide-line">
-            {quizzes.map((quiz) => {
+            {pagedQuizzes.map((quiz) => {
               return (
                 <tr key={quiz.quizId} className="hover:bg-surface-hover transition-colors">
                   <td className="py-4 px-4">
@@ -135,6 +145,7 @@ export function CourseGradebookTab({ courseId }: { courseId: number }) {
           </tbody>
         </table>
       </div>
+      <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
     </div>
   );
 }

@@ -7,6 +7,8 @@ import { ApiError } from '@/lib/api/client';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { Hash, Calendar, Trophy, CheckCheck, CheckCircle2, XCircle, MinusCircle, type LucideIcon } from 'lucide-react';
 
+const ATTEMPTS_PER_PAGE = 20;
+
 function AttemptHistoryContent() {
   const router = useRouter();
   const params = useParams();
@@ -17,6 +19,7 @@ function AttemptHistoryContent() {
   const [selectedAttemptId, setSelectedAttemptId] = useState<number | null>(initialAttemptId);
   const [historyPage, setHistoryPage] = useState(1);
   const historyPerPage = 5;
+  const [attemptListPage, setAttemptListPage] = useState(1);
 
   const { data: history, isLoading: isLoadingHistory, error: historyError } = useQuizHistory(quizId);
   const { data: attemptDetail, isLoading: isLoadingDetail } = useAttemptDetail(selectedAttemptId || 0);
@@ -64,21 +67,50 @@ function AttemptHistoryContent() {
               </div>
             )}
           </div>
-          <div className="flex items-center gap-3">
-            {/* Attempt selector dropdown */}
-            {history && history.length > 1 && (
-              <select
-                value={selectedAttemptId || ''}
-                onChange={e => setSelectedAttemptId(Number(e.target.value))}
-                className="text-xs border border-line rounded-lg px-3 py-1.5 bg-white font-semibold focus:outline-none focus:ring-2 focus:ring-accent/30"
-              >
-                {history.map((h, idx) => (
-                  <option key={h.id} value={h.id}>
-                    Lần {history.length - idx} — {Number(h.score).toFixed(1)}/10 ({h.correctCount}/{h.totalQuestions} câu)
-                  </option>
-                ))}
-              </select>
-            )}
+          <div className="flex items-center gap-2">
+            {/* Attempt selector dropdown — chia trang 20 lượt/trang vì quiz không giới hạn số
+                lượt làm có thể khiến dropdown quá dài. */}
+            {history && history.length > 1 && (() => {
+              const attemptTotalPages = Math.ceil(history.length / ATTEMPTS_PER_PAGE);
+              const start = (attemptListPage - 1) * ATTEMPTS_PER_PAGE;
+              const pagedHistory = history.slice(start, start + ATTEMPTS_PER_PAGE);
+              return (
+                <div className="flex items-center gap-2">
+                  <select
+                    value={selectedAttemptId || ''}
+                    onChange={e => setSelectedAttemptId(Number(e.target.value))}
+                    className="text-xs border border-line rounded-lg px-3 py-1.5 bg-white font-semibold focus:outline-none focus:ring-2 focus:ring-accent/30"
+                  >
+                    {pagedHistory.map((h, idx) => (
+                      <option key={h.id} value={h.id}>
+                        Lần {history.length - (start + idx)} — {Number(h.score).toFixed(1)}/10 ({h.correctCount}/{h.totalQuestions} câu)
+                      </option>
+                    ))}
+                  </select>
+                  {attemptTotalPages > 1 && (
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        disabled={attemptListPage === 1}
+                        onClick={() => setAttemptListPage(p => p - 1)}
+                        className="px-2 py-1 border border-line rounded text-[11px] font-semibold disabled:opacity-40 disabled:cursor-not-allowed"
+                      >
+                        ‹
+                      </button>
+                      <span className="text-[11px] text-ink-muted whitespace-nowrap">{attemptListPage}/{attemptTotalPages}</span>
+                      <button
+                        type="button"
+                        disabled={attemptListPage === attemptTotalPages}
+                        onClick={() => setAttemptListPage(p => p + 1)}
+                        className="px-2 py-1 border border-line rounded text-[11px] font-semibold disabled:opacity-40 disabled:cursor-not-allowed"
+                      >
+                        ›
+                      </button>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
             <button onClick={() => router.back()} className="text-xs font-semibold text-accent hover:underline whitespace-nowrap">
               ← Quay lại
             </button>

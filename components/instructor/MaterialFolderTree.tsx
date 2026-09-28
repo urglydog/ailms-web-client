@@ -9,6 +9,9 @@ import { toast } from 'sonner';
 import { createPortal } from 'react-dom';
 import { VersionHistoryModal } from './VersionHistoryModal';
 import { MaterialBadge } from '@/components/materials/ui/MaterialBadge';
+import { Pagination } from '@/components/ui/Pagination';
+
+const ROOT_MATERIALS_PER_PAGE = 12;
 
 type FolderItem = { id: number; name: string; parentId?: number };
 type MaterialItem = InstructorMaterial;
@@ -70,6 +73,10 @@ export function MaterialFolderTree({
   // Keyboard clipboard state (Issue 4)
   const [selectedMaterialId, setSelectedMaterialId] = useState<number | null>(null);
   const [clipboard, setClipboard] = useState<{ id: number; mode: 'copy' | 'cut' } | null>(null);
+
+  // Học liệu chưa gán thư mục ("Thư Mục Gốc") trước đây hiện hết 1 lần, kéo dài không giới hạn —
+  // phân trang client-side vì `materials` đã fetch hết qua React Query ở component cha.
+  const [rootMaterialsPage, setRootMaterialsPage] = useState(1);
 
   // A5 — vùng thả "về Workspace gốc" khi kéo học liệu ra khỏi thư mục.
   const { isOver: rootDropOver, setNodeRef: setRootDropRef } = useDroppable({ id: 'folder-root', data: { type: 'folder' } });
@@ -234,6 +241,13 @@ export function MaterialFolderTree({
   // Build recursive tree
   const rootFolders = folders.filter(f => !f.parentId);
   const rootMaterials = materials.filter(m => !m.folderId);
+  const rootMaterialsTotalPages = Math.ceil(rootMaterials.length / ROOT_MATERIALS_PER_PAGE);
+  const pagedRootMaterials = rootMaterials.slice(
+    (rootMaterialsPage - 1) * ROOT_MATERIALS_PER_PAGE,
+    rootMaterialsPage * ROOT_MATERIALS_PER_PAGE,
+  );
+
+  useEffect(() => { setRootMaterialsPage(1); }, [rootMaterials.length]);
 
   const renderMaterialCard = (mat: MaterialItem) => (
     <div
@@ -379,12 +393,21 @@ export function MaterialFolderTree({
 
       {viewMode === 'list' ? (
         <div className="border border-line rounded-card overflow-hidden mt-3">
-          {rootMaterials.length === 0 ? null : rootMaterials.map(renderMaterialRow)}
+          {pagedRootMaterials.length === 0 ? null : pagedRootMaterials.map(renderMaterialRow)}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mt-4">
-          {rootMaterials.map(renderMaterialCard)}
+          {pagedRootMaterials.map(renderMaterialCard)}
         </div>
+      )}
+
+      {rootMaterials.length > 0 && (
+        <Pagination
+          currentPage={rootMaterialsPage}
+          totalPages={rootMaterialsTotalPages}
+          onPageChange={setRootMaterialsPage}
+          className="mt-2"
+        />
       )}
 
       {rootFolders.length === 0 && rootMaterials.length === 0 && (
