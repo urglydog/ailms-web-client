@@ -27,13 +27,13 @@ const config: Config = {
         },
         ink: {
           DEFAULT: '#0F172A', // Slate 900 (Đen ngả xám thép)
-          muted: '#64748B',   // Slate 500
-          faint: '#94A3B8',   // Slate 400
+          muted: '#475569',   // Slate 600 (đậm hơn Slate 500 cũ — text phụ từng quá nhạt trên nền trắng)
+          faint: '#64748B',   // Slate 500 (đậm hơn Slate 400 cũ)
         },
         line: {
-          DEFAULT: '#E2E8F0', // Viền mỏng, nhạt
-          soft: '#F1F5F9',    // Đường phân cách mờ
-          dot: '#CBD5E1',
+          DEFAULT: '#CBD5E1', // Slate 300 (đậm hơn Slate 200 cũ — border từng gần như vô hình trên nền trắng)
+          soft: '#E2E8F0',    // Slate 200 — đường phân cách mờ, đậm hơn Slate 100 cũ
+          dot: '#94A3B8',
         },
         surface: {
           DEFAULT: '#F8FAFC', // Slate 50 (Nền trang rất nhẹ)

@@ -40,9 +40,9 @@ function DraggableMaterialCard({ mat, onClick, isLoading: isPending }: { mat: In
   const processingBadge = getMaterialProcessingBadge(mat.status);
 
   const typeConfig: Record<string, { Icon: typeof FileQuestion; label: string; band: string; iconTone: string }> = {
-    QUIZ:      { Icon: FileQuestion, label: 'Quiz',      band: 'bg-accent/5',  iconTone: 'text-accent/70' },
-    FLASHCARD: { Icon: Layers,       label: 'Flashcard', band: 'bg-success/5', iconTone: 'text-success/70' },
-    MINDMAP:   { Icon: Workflow,     label: 'Mindmap',   band: 'bg-star/5',    iconTone: 'text-star/70' },
+    QUIZ:      { Icon: FileQuestion, label: 'Quiz',      band: 'bg-accent/10',  iconTone: 'text-accent' },
+    FLASHCARD: { Icon: Layers,       label: 'Flashcard', band: 'bg-success/10', iconTone: 'text-success' },
+    MINDMAP:   { Icon: Workflow,     label: 'Mindmap',   band: 'bg-star/10',    iconTone: 'text-star' },
   };
   const cfg = typeConfig[mat.materialType] ?? { Icon: File, label: mat.materialType, band: 'bg-line-soft', iconTone: 'text-ink-faint' };
   const statLabel =
@@ -59,7 +59,7 @@ function DraggableMaterialCard({ mat, onClick, isLoading: isPending }: { mat: In
       className={`relative border rounded-card flex flex-col overflow-hidden group transition-all duration-200 select-none ${
         isDragging ? 'opacity-40 scale-95 border-accent border-dashed shadow-card-hover' :
         isPending  ? 'opacity-60 pointer-events-none' :
-        'bg-surface-raised border-line hover:shadow-card-hover hover:border-accent/40'
+        'bg-surface-raised border-line shadow-card hover:shadow-card-hover hover:border-accent/40'
       }`}
     >
       {/* Loading overlay */}
@@ -537,7 +537,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
         {/* RIGHT PANE: Master Vault */}
         <div className="flex-1 min-w-0 bg-surface-raised border border-line rounded-card overflow-hidden flex flex-col shadow-sm">
           {/* Toolbar row 1: Breadcrumb + Create Dropdown */}
-          <div className="px-3 pt-3 pb-2 border-b border-line flex items-center justify-between bg-surface-hover">
+          <div className="px-3 pt-3 pb-2.5 border-b border-line flex items-center justify-between bg-surface-hover flex-shrink-0">
             <div className="flex items-center gap-2 text-xs font-medium text-ink-muted">
               {breadcrumbs.map((bc, idx) => (
                 <React.Fragment key={idx}>
@@ -577,7 +577,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
           </div>
 
           {/* Toolbar row 2: Search + View Toggle */}
-          <div className="px-3 py-2 border-b border-line flex items-center gap-2 bg-surface-raised">
+          <div className="px-3 py-2.5 border-b border-line flex items-center gap-2 bg-surface-raised flex-shrink-0">
             <div className="relative flex-1">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-ink-faint" />
               <input
@@ -607,7 +607,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
           {/* Toolbar row 3: Filter theo loại + trạng thái (25/09/2026, fix nhanh — trước đây
               không có cách nào lọc, mọi học liệu nằm chung 1 lưới). Icon lucide-react đơn sắc,
               màu theo token có sẵn, không emoji/phối màu — đúng quy tắc Materials Workspace. */}
-          <div className="px-3 py-2 border-b border-line flex items-center gap-1.5 bg-surface-raised overflow-x-auto">
+          <div className="px-3 py-2.5 border-b border-line flex items-center gap-1.5 bg-surface-raised overflow-x-auto flex-shrink-0">
             {([
               { key: 'ALL', label: 'Tất cả', Icon: null },
               { key: 'QUIZ', label: 'Quiz', Icon: FileQuestion },
@@ -618,14 +618,14 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                 key={key}
                 onClick={() => setTypeFilter(key)}
                 title={`Lọc theo loại: ${label}`}
-                className={`flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-card border transition-colors shrink-0 ${
+                className={`flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-card border transition-colors shrink-0 ${
                   typeFilter === key ? 'bg-ink text-white border-ink' : 'bg-surface text-ink-muted border-line hover:bg-surface-hover'
                 }`}
               >
                 {Icon && <Icon className="w-3.5 h-3.5" />} {label}
               </button>
             ))}
-            <span className="w-px h-4 bg-line mx-1 shrink-0" />
+            <span className="w-px h-5 bg-line mx-1 shrink-0" />
             {([
               { key: 'ALL', label: 'Mọi trạng thái' },
               { key: 'DRAFT', label: 'Draft' },
@@ -635,7 +635,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                 key={key}
                 onClick={() => setStatusFilter(key)}
                 title={`Lọc theo trạng thái: ${label}`}
-                className={`px-2.5 py-1 text-xs font-semibold rounded-card border transition-colors shrink-0 ${
+                className={`px-3 py-1.5 text-xs font-semibold rounded-card border transition-colors shrink-0 ${
                   statusFilter === key ? 'bg-ink text-white border-ink' : 'bg-surface text-ink-muted border-line hover:bg-surface-hover'
                 }`}
               >

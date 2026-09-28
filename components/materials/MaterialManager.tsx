@@ -304,7 +304,7 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
         ) : materials && materials.length > 0 ? (
           <div className="flex flex-col gap-3">
             {getFilteredAndSortedMaterials().map((m) => (
-              <div key={m.id} className="flex items-center justify-between border border-line-soft rounded-lg p-4 group">
+              <div key={m.id} className="flex items-center justify-between border border-line rounded-lg p-4 bg-surface-raised hover:border-accent hover:shadow-card-hover transition-all group">
                 <div className="flex-1 mr-4">
                   {editingId === m.id ? (
                     <div className="flex flex-wrap items-center gap-2 mb-1">

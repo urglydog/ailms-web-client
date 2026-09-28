@@ -254,7 +254,7 @@ function parseMermaidToFlow(code: string, theme: string) {
       if (source && target) {
         const edgeId = `e-${source}-${target}`;
         if (!edges.find(e => e.id === edgeId)) {
-          edges.push({ id: edgeId, source, target, animated: true });
+          edges.push({ id: edgeId, source, target, animated: false });
         }
       }
     }
@@ -608,7 +608,7 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
 
   const onConnect = useCallback((params: Connection) => {
       setEdges((eds) => {
-          const newEdges = addEdge({ ...params, animated: true }, eds);
+          const newEdges = addEdge({ ...params, animated: false }, eds);
           setTimeout(() => applyLayout(nodes, newEdges), 0);
           return newEdges;
       });
@@ -675,7 +675,7 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
 
       if (action === 'TAB') {
         const nextNodes = [...nodes, newNode];
-        const newEdge: Edge = { id: `e-${selectedNode.id}-${newId}`, source: selectedNode.id, target: newId, animated: true };
+        const newEdge: Edge = { id: `e-${selectedNode.id}-${newId}`, source: selectedNode.id, target: newId, animated: false };
         setNodes(nextNodes);
         setEdges(eds => {
             const nextEds = [...eds, newEdge];
@@ -692,7 +692,7 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
         setNodes(nextNodes);
         
         if (parentEdge) {
-            const newEdge: Edge = { id: `e-${parentEdge.source}-${newId}`, source: parentEdge.source, target: newId, animated: true };
+            const newEdge: Edge = { id: `e-${parentEdge.source}-${newId}`, source: parentEdge.source, target: newId, animated: false };
             setEdges(eds => {
                 const nextEds = [...eds, newEdge];
                 setTimeout(() => applyLayout(nextNodes, nextEds), 0);
