@@ -30,6 +30,10 @@ function AttemptHistoryContent() {
     }
   }, [history, selectedAttemptId]);
 
+  useEffect(() => {
+    setHistoryPage(1);
+  }, [selectedAttemptId]);
+
   if (!quizId) return <div className="p-8 text-center">Mã bài thi không hợp lệ</div>;
 
   const formatDate = (d: string | number[]) => {
