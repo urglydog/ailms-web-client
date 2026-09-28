@@ -156,6 +156,7 @@ export default function AntiCheatExamPage() {
   const [flagged, setFlagged] = useState<Record<number, boolean>>({});
 
   const [currentPage, setCurrentPage] = useState(1);
+  const [reviewPage, setReviewPage] = useState(1);
   const [resultPage, setResultPage] = useState(1);
   const questionsPerPage = 5;
 
@@ -1291,6 +1292,7 @@ export default function AntiCheatExamPage() {
     if (answeredCount < attemptData.questions.length) {
       toast.warning('Vui lòng hoàn thành toàn bộ câu hỏi trước khi nộp');
     }
+    setReviewPage(1);
     setShowReviewConfirm(true);
   };
 
@@ -1320,8 +1322,8 @@ export default function AntiCheatExamPage() {
           const reviewPerPage = 10;
           const totalQ = attemptData?.questions.length || 0;
           const totalReviewPages = Math.ceil(totalQ / reviewPerPage);
-          const reviewStart = (currentPage - 1) * reviewPerPage;
-          const reviewEnd = currentPage * reviewPerPage;
+          const reviewStart = (reviewPage - 1) * reviewPerPage;
+          const reviewEnd = reviewPage * reviewPerPage;
           const answeredTotal = attemptData?.questions.filter(q => answers[q.id] && (answers[q.id]?.length || 0) > 0).length || 0;
           return (
           <div className="card p-5 max-w-2xl mx-auto w-full">
@@ -1340,9 +1342,9 @@ export default function AntiCheatExamPage() {
             </div>
             {totalReviewPages > 1 && (
               <div className="flex justify-between items-center mb-4">
-                <button disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)} className="px-3 py-1 border border-line rounded text-xs font-semibold disabled:opacity-50">Trước</button>
-                <span className="text-xs text-ink-muted">Trang {currentPage}/{totalReviewPages}</span>
-                <button disabled={currentPage === totalReviewPages} onClick={() => setCurrentPage(p => p + 1)} className="px-3 py-1 border border-line rounded text-xs font-semibold disabled:opacity-50">Sau</button>
+                <button disabled={reviewPage === 1} onClick={() => setReviewPage(p => p - 1)} className="px-3 py-1 border border-line rounded text-xs font-semibold disabled:opacity-50">Trước</button>
+                <span className="text-xs text-ink-muted">Trang {reviewPage}/{totalReviewPages}</span>
+                <button disabled={reviewPage === totalReviewPages} onClick={() => setReviewPage(p => p + 1)} className="px-3 py-1 border border-line rounded text-xs font-semibold disabled:opacity-50">Sau</button>
               </div>
             )}
             <div className="flex flex-col gap-2 pt-3 border-t border-line">
