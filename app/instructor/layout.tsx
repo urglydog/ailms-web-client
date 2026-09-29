@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { LogoutSidebarButton } from '@/components/auth/LogoutSidebarButton';
 import { UploadTray } from '@/components/instructor/UploadTray';
 import { InstructorChat } from '@/components/chat/InstructorChat';
-import { ArrowLeftIcon, BarChartIcon, MessageCircleIcon, PlayCircleIcon, WrenchIcon } from '@/components/instructor/SidebarIcons';
+import { ArrowLeftIcon, BarChartIcon, MessageCircleIcon, PackageIcon, PlayCircleIcon, WrenchIcon } from '@/components/instructor/SidebarIcons';
 import { getCurrentRole } from '@/lib/auth/token';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 
@@ -22,6 +22,7 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
  * đáp/Tin nhắn/Bài tập/Thông báo, xem `app/instructor/communication/`. */
 const SIDEBAR_ITEMS = [
   { id: 'courses', label: 'Khóa học của tôi', href: '/instructor/courses', icon: PlayCircleIcon },
+  { id: 'bundles', label: 'Gói Khóa Học', href: '/instructor/bundles', icon: PackageIcon },
   { id: 'communication', label: 'Giao tiếp', href: '/instructor/communication', icon: MessageCircleIcon },
   { id: 'revenue', label: 'Hiệu suất', href: '/instructor/revenue', icon: BarChartIcon },
   { id: 'tools', label: 'Công cụ', href: '/instructor/tools', icon: WrenchIcon },
