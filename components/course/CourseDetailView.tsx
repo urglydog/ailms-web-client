@@ -4,6 +4,7 @@ import { CoursePreview } from '@/components/course/CoursePreview';
 import { EnrollButton } from '@/components/course/EnrollButton';
 import { ReferralCapture } from '@/components/course/ReferralCapture';
 import { ReviewsSection } from '@/components/course/ReviewsSection';
+import { BundleUpsellWidget } from '@/components/bundles/BundleUpsellWidget';
 import { CourseLiveBanner } from '@/components/live/CourseLiveBanner';
 import { Badge } from '@/components/ui/Badge';
 import type { CourseDetail } from '@/types/domain';
@@ -176,6 +177,9 @@ export function CourseDetailView({ course }: { course: CourseDetail }) {
                   <li>✓ Sơ đồ tư duy, Thẻ ghi nhớ, Quiz tự sinh</li>
                   <li>✓ Truy cập vĩnh viễn sau khi sở hữu</li>
                 </ul>
+
+                {/* Bundle Upsell (29/09/2026) — hiển thị gói combo nếu khóa học có trong gói */}
+                <BundleUpsellWidget courseId={course.id} />
               </div>
             </div>
           </aside>

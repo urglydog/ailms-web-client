@@ -1031,3 +1031,41 @@ export interface TutorSecurityFlag {
   messageSnapshot: string;
   createdAt: string;
 }
+
+// ── Course Bundles (29/09/2026) ─────────────────────────────────
+
+export interface BundleCourseItem {
+  id: number;
+  title: string;
+  thumbnail: string | null;
+  price: number;
+}
+
+export interface CourseBundle {
+  id: number;
+  title: string;
+  description: string | null;
+  discountPercent: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  courses: BundleCourseItem[];
+  originalPrice: number;
+  discountAmount: number;
+  finalPrice: number;
+}
+
+export interface CreateBundleReq {
+  title: string;
+  description?: string;
+  discountPercent: number;
+  courseIds: number[];
+}
+
+export interface UpdateBundleReq {
+  title?: string;
+  description?: string;
+  discountPercent?: number;
+  isActive?: boolean;
+  courseIds?: number[];
+}
