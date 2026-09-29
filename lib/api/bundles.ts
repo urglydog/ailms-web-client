@@ -20,4 +20,9 @@ export const bundlesApi = {
   /** Lấy danh sách gói có chứa khóa học này (Public — dùng ở trang chi tiết). */
   getForCourse: (courseId: number) =>
     api.get<CourseBundle[]>(`/api/v1/courses/${courseId}/bundles`),
+
+  /** Gộp tra bundle cho nhiều courseId trong 1 request (Public — dùng ở giỏ hàng, tránh bắn
+   * N request song song khi giỏ có nhiều khóa). */
+  getForCourses: (courseIds: number[]) =>
+    api.get<CourseBundle[]>(`/api/v1/courses/bundles/active?courseIds=${courseIds.join(',')}`),
 };

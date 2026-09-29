@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useCart } from '@/hooks/useCart';
+import { useCartBundleMatches } from '@/hooks/useCartBundleMatches';
 import { paymentsApi } from '@/lib/api/payments';
 import { getReferralCodesFor } from '@/lib/referral';
 import { couponsApi } from '@/lib/api/coupons';
@@ -37,6 +38,12 @@ function CartCheckoutContent() {
   }, [searchParams]);
 
   const items = (cartItems ?? []).filter((item) => courseIds.includes(item.courseId));
+
+  // Gói khóa học (29/09/2026) — chạy lại CÙNG 1 thuật toán `matchCartBundles` với `cart/page.tsx`
+  // trên đúng tập khóa đang thanh toán, đảm bảo giá hiển thị ở đây khớp tuyệt đối với giá đã
+  // thấy ở trang giỏ hàng và với giá BE sẽ chốt lúc `createBatchPayment` (xem
+  // `PaymentService.createBatchPayment` — cùng công thức pro-rated + rounding absorption).
+  const bundleMatch = useCartBundleMatches(items.map((item) => item.courseId));
 
   // Mã giảm giá (15/09/2026, mở rộng) — mã có thể đã được áp ở trang giỏ hàng (truyền qua
   // query `coupon`) hoặc nhập lại ở đây; mỗi khóa tự resolve coupon TỐT NHẤT (BR-COUPON-05).
@@ -74,7 +81,8 @@ function CartCheckoutContent() {
     }
   };
 
-  const finalPriceFor = (item: (typeof items)[number]) => priceMap.get(item.courseId)?.finalPrice ?? item.finalPrice;
+  const finalPriceFor = (item: (typeof items)[number]) =>
+    bundleMatch.priceByCartCourseId.get(item.courseId) ?? priceMap.get(item.courseId)?.finalPrice ?? item.finalPrice;
   const total = items.reduce((sum, item) => sum + finalPriceFor(item), 0);
   const totalOriginal = items.reduce((sum, item) => sum + item.price, 0);
 
@@ -82,6 +90,7 @@ function CartCheckoutContent() {
     if (items.length === 0) return;
     try {
       setPayingMethod(method);
+      const bundleIds = bundleMatch.matchedBundles.map((m) => m.bundle.id);
       const res = await paymentsApi.createBatch({
         courseIds: items.map((item) => item.courseId),
         paymentMethod: method,
@@ -89,6 +98,7 @@ function CartCheckoutContent() {
         billingPhone,
         couponCode: appliedCode ?? undefined,
         referralCodes: getReferralCodesFor(items.map((item) => item.courseId)),
+        bundleIds: bundleIds.length > 0 ? bundleIds : undefined,
       });
       window.location.href = res.paymentUrl;
     } catch (err: unknown) {
@@ -147,7 +157,14 @@ function CartCheckoutContent() {
                       )}
                     </div>
                     <div className="flex flex-1 flex-col justify-center">
-                      <h3 className="font-display text-base font-bold text-ink">{item.courseTitle}</h3>
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-display text-base font-bold text-ink">{item.courseTitle}</h3>
+                        {bundleMatch.bundleByCartCourseId.has(item.courseId) && (
+                          <span className="shrink-0 rounded-full bg-cyan-600 px-2 py-0.5 text-[10px] font-bold text-white">
+                            🎁 Gói combo -{bundleMatch.bundleByCartCourseId.get(item.courseId)?.discountPercent}%
+                          </span>
+                        )}
+                      </div>
                       <p className="mt-1 text-sm text-ink-muted">GV. {item.instructorName}</p>
                     </div>
                     <div className="flex shrink-0 flex-col items-end justify-center font-display text-base font-bold text-ink">

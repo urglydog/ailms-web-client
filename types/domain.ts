@@ -722,6 +722,10 @@ export interface CreateBatchPaymentReq {
   /** Chia doanh thu 2 mức (20/09/2026) — mã giới thiệu RIÊNG cho từng khóa trong giỏ, khoá
    * theo `courseId` (xem `lib/referral.ts`). Khóa nào không có entry ở đây tính ORGANIC. */
   referralCodes?: Record<number, string>;
+  /** Gói khóa học (29/09/2026) — các bundle mà giỏ hàng đã khớp ĐỦ khóa (xem
+   * `matchCartBundles`). BE tự lấy khóa của bundle từ `CourseBundle`, không cần lặp lại trong
+   * `courseIds` — chỉ cần đúng `bundleId`, xem `PaymentDto.CreateBatchReq.bundleIds`. */
+  bundleIds?: number[];
 }
 
 /** 1 dòng trong giỏ hàng — đủ dữ liệu để hiển thị trực tiếp, không cần gọi thêm API chi tiết

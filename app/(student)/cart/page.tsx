@@ -6,7 +6,8 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { StarRating } from '@/components/ui/StarRating';
-import { useCart, useRemoveFromCart } from '@/hooks/useCart';
+import { useAddToCart, useCart, useRemoveFromCart } from '@/hooks/useCart';
+import { useCartBundleMatches } from '@/hooks/useCartBundleMatches';
 import { couponsApi } from '@/lib/api/coupons';
 import { ApiError } from '@/lib/api/client';
 import type { CouponPriceRes, CourseLevel } from '@/types/domain';
@@ -40,6 +41,7 @@ export default function CartPage() {
   const router = useRouter();
   const { data: cartItems, isLoading } = useCart();
   const removeFromCart = useRemoveFromCart();
+  const addToCart = useAddToCart();
   const [uncheckedIds, setUncheckedIds] = useState<Set<number>>(new Set());
   const [couponCode, setCouponCode] = useState('');
   const [appliedCode, setAppliedCode] = useState<string | null>(null);
@@ -60,15 +62,26 @@ export default function CartPage() {
   const toggleAll = () => setUncheckedIds(allChecked ? new Set(items.map((i) => i.courseId)) : new Set());
 
   const selectedItems = items.filter((item) => isChecked(item.courseId));
+  // Gói khóa học (29/09/2026) — khớp combo CHỈ theo các khóa đang được TICK CHỌN: bỏ chọn 1
+  // khóa trong combo thì combo đó không còn đủ điều kiện giảm giá nữa (khớp đúng những gì sẽ
+  // thực sự được thanh toán), giá hiển thị và `bundleIds` gửi đi khi checkout luôn nhất quán.
+  const bundleMatch = useCartBundleMatches(selectedItems.map((item) => item.courseId));
+
   // Mã giảm giá (15/09/2026, mở rộng) — mỗi khóa tự resolve coupon TỐT NHẤT của riêng nó
   // (BR-COUPON-05): dùng giá đã preview theo mã học viên nhập nếu có, không thì rơi về giá
   // hiển thị mặc định của giỏ hàng (đã tính coupon autoApply, xem `CartService.toRes`).
-  const finalPriceFor = (item: (typeof items)[number]) => priceMap.get(item.courseId)?.finalPrice ?? item.finalPrice;
+  // Gói khóa học được ưu tiên TUYỆT ĐỐI hơn coupon — khóa nào đã khớp combo bỏ qua mọi coupon
+  // (khớp rule BE: coupon cấp khóa KHÔNG áp dụng cho khóa đang nằm trong bundle).
+  const finalPriceFor = (item: (typeof items)[number]) =>
+    bundleMatch.priceByCartCourseId.get(item.courseId) ?? priceMap.get(item.courseId)?.finalPrice ?? item.finalPrice;
   const total = selectedItems.reduce((sum, item) => sum + finalPriceFor(item), 0);
   const totalOriginal = selectedItems.reduce((sum, item) => sum + item.price, 0);
 
   const handleCheckout = () => {
     if (selectedItems.length === 0) return;
+    // Không cần truyền bundleIds qua query — checkout/cart tự chạy lại CÙNG 1 thuật toán
+    // `useCartBundleMatches` trên đúng `courseIds` này nên luôn ra kết quả khớp, tránh trường
+    // hợp query param cũ (lệch) nếu giỏ hàng đổi giữa lúc rời trang cart và lúc vào checkout.
     const courseIds = selectedItems.map((item) => item.courseId).join(',');
     const couponParam = appliedCode ? `&coupon=${encodeURIComponent(appliedCode)}` : '';
     router.push(`/checkout/cart?courseIds=${courseIds}${couponParam}`);
@@ -155,9 +168,16 @@ export default function CartPage() {
                   )}
                 </Link>
                 <div className="min-w-0 flex-1">
-                  <Link href={`/courses/${item.courseSlug}`} className="line-clamp-2 font-display text-[15px] font-semibold text-ink no-underline hover:text-accent">
-                    {item.courseTitle}
-                  </Link>
+                  <div className="flex items-center gap-2">
+                    <Link href={`/courses/${item.courseSlug}`} className="line-clamp-2 font-display text-[15px] font-semibold text-ink no-underline hover:text-accent">
+                      {item.courseTitle}
+                    </Link>
+                    {bundleMatch.bundleByCartCourseId.has(item.courseId) && (
+                      <span className="shrink-0 rounded-full bg-cyan-600 px-2 py-0.5 text-[10px] font-bold text-white">
+                        🎁 Gói combo -{bundleMatch.bundleByCartCourseId.get(item.courseId)?.discountPercent}%
+                      </span>
+                    )}
+                  </div>
                   <p className="mt-1 text-[13px] text-ink-muted">GV. {item.instructorName}</p>
                   <div className="mt-1.5">
                     <StarRating rating={item.avgRating} reviewCount={item.reviewCount} />
@@ -168,10 +188,11 @@ export default function CartPage() {
                 </div>
                 <div className="flex shrink-0 flex-col items-end gap-2">
                   {(() => {
+                    const bundlePrice = bundleMatch.priceByCartCourseId.get(item.courseId);
                     const applied = priceMap.get(item.courseId);
-                    const finalPrice = applied?.finalPrice ?? item.finalPrice;
-                    const discountPercent = applied?.discountPercent ?? item.discountPercent;
-                    return discountPercent ? (
+                    const finalPrice = bundlePrice ?? applied?.finalPrice ?? item.finalPrice;
+                    const hasDiscount = bundlePrice !== undefined || !!(applied?.discountPercent ?? item.discountPercent);
+                    return hasDiscount ? (
                       <div className="flex flex-col items-end">
                         <span className="font-display text-[15px] font-bold text-ink">{formatPrice(finalPrice)}</span>
                         <span className="text-xs text-ink-faint line-through">{formatPrice(item.price)}</span>
@@ -188,6 +209,28 @@ export default function CartPage() {
                     Xoá
                   </button>
                 </div>
+              </div>
+            ))}
+
+            {/* Gói khóa học (29/09/2026) — gợi ý mua thêm khóa còn thiếu để kích hoạt giảm giá
+                combo, hiện ngay khi giỏ hàng đã có sẵn 1 khóa thuộc gói nhưng chưa đủ bộ. */}
+            {bundleMatch.partialSuggestions.map(({ bundle, missingCourse }) => (
+              <div
+                key={`${bundle.id}-${missingCourse.id}`}
+                className="flex items-center justify-between gap-3 rounded-xl border border-dashed border-cyan-300 bg-cyan-50 px-4 py-3"
+              >
+                <p className="text-sm text-ink">
+                  💡 Thêm <span className="font-semibold">{missingCourse.title}</span> (+{formatPrice(missingCourse.price)}) để được giảm{' '}
+                  <span className="font-semibold text-cyan-700">{bundle.discountPercent}%</span> theo gói &quot;{bundle.title}&quot;
+                </p>
+                <button
+                  type="button"
+                  onClick={() => addToCart.mutate(missingCourse.id)}
+                  disabled={addToCart.isPending}
+                  className="shrink-0 rounded-full bg-cyan-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-cyan-700 disabled:opacity-60"
+                >
+                  Thêm vào giỏ
+                </button>
               </div>
             ))}
           </div>
