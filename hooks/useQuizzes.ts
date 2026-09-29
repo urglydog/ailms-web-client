@@ -16,6 +16,7 @@ export const useSubmitQuiz = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['quizHistory'] });
       queryClient.invalidateQueries({ queryKey: ['course-materials'] });
+      queryClient.invalidateQueries({ queryKey: ['streak', 'me'] });
     }
   });
 };
