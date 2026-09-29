@@ -10,6 +10,7 @@ import { useNotification } from '@/components/providers/NotificationProvider';
 import { useAddToCart, useCart } from '@/hooks/useCart';
 import { useWishlist } from '@/hooks/useWishlist';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useStreak } from '@/hooks/useStreak';
 import { authApi } from '@/lib/api/auth';
 import { enrollmentsApi } from '@/lib/api/enrollments';
 import { ApiError } from '@/lib/api/client';
@@ -21,7 +22,7 @@ function formatPrice(price: number): string {
   return `${price.toLocaleString('vi-VN')}đ`;
 }
 
-type HeaderDropdownId = 'wishlist' | 'cart' | 'notifications' | 'account';
+type HeaderDropdownId = 'wishlist' | 'cart' | 'notifications' | 'account' | 'streak';
 
 /**
  * Hover mở dropdown + đóng có độ trễ ngắn (kiểu Udemy) — dùng chung cho 4 icon ở Header (yêu
@@ -93,6 +94,20 @@ export function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showLanguageModal, setShowLanguageModal] = useState(false);
+
+  const { data: streakData } = useStreak();
+  const [prevStreak, setPrevStreak] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (streakData && prevStreak !== null && streakData.currentStreak > prevStreak) {
+      toast.success(`🔥 Chúc mừng! Chuỗi ngày học của bạn đã lên ${streakData.currentStreak} ngày!`, {
+        duration: 5000,
+      });
+    }
+    if (streakData) {
+      setPrevStreak(streakData.currentStreak);
+    }
+  }, [streakData?.currentStreak]);
 
   const accountMenuRef = useRef<HTMLDivElement>(null);
 
@@ -265,6 +280,67 @@ export function Header() {
                 </svg>
               )}
             </button>
+
+            {/* Streak Icon + dropdown (chỉ hiện khi đăng nhập) */}
+            {isLoggedIn && (
+              <div
+                className="relative"
+                onMouseEnter={() => headerDropdown.openNow('streak')}
+                onMouseLeave={() => headerDropdown.closeWithDelay('streak')}
+              >
+                <div className="relative flex h-9 cursor-pointer items-center justify-center rounded-full bg-surface hover:bg-surface-hover px-3 gap-1">
+                  <span className={streakData?.hasStudiedToday ? "text-orange-500" : "text-ink-muted"}>
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M8.5 14.5A2.5 2.5 0 0011 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 11-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 002.5 2.5z"></path>
+                    </svg>
+                  </span>
+                  <span className={`text-[13px] font-bold ${streakData?.hasStudiedToday ? "text-orange-500" : "text-ink-muted"}`}>
+                    {streakData?.currentStreak || 0}
+                  </span>
+                </div>
+
+                {headerDropdown.activeId === 'streak' && streakData && (
+                  <div className="absolute right-0 top-12 z-[200] w-72 rounded-2xl border border-line bg-white p-4 shadow-[0_20px_50px_rgba(19,22,32,0.15)]">
+                    <div className="flex items-center gap-3 mb-4">
+                      <span className="text-3xl">🔥</span>
+                      <div>
+                        <h4 className="font-bold text-ink text-[15px]">Chuỗi {streakData.currentStreak} ngày</h4>
+                        <p className="text-[12px] text-ink-muted">Kỷ lục: {streakData.longestStreak} ngày</p>
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center mt-2">
+                      {Array.from({ length: 7 }).map((_, i) => {
+                        const d = new Date();
+                        d.setDate(d.getDate() - (6 - i));
+                        const year = d.getFullYear();
+                        const month = String(d.getMonth() + 1).padStart(2, '0');
+                        const day = String(d.getDate()).padStart(2, '0');
+                        const dateStr = `${year}-${month}-${day}`;
+                        const isStudied = streakData.learningDays.includes(dateStr);
+                        const isToday = i === 6;
+                        
+                        return (
+                          <div key={i} className="flex flex-col items-center gap-1.5">
+                            <div className="text-[11px] font-semibold text-ink-muted">
+                              {['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'][d.getDay()]}
+                            </div>
+                            <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[12px] ${
+                              isStudied ? 'bg-orange-500 text-white font-bold' : 
+                              isToday ? 'border-2 border-orange-200 text-ink-muted' : 'bg-surface text-ink-muted'
+                            }`}>
+                              {isStudied ? '✓' : ''}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <p className="text-[12px] text-center text-ink-muted mt-4">
+                      {streakData.hasStudiedToday ? 'Bạn đã hoàn thành mục tiêu hôm nay!' : 'Học 1 bài học hoặc làm 1 bài quiz để giữ chuỗi!'}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Wishlist Icon + dropdown xem nhanh (14/09/2026, mở rộng ngoài đặc tả gốc) */}
             <div

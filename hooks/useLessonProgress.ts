@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { lessonProgressApi } from '@/lib/api/lessonProgress';
 import { getAccessToken } from '@/lib/auth/token';
 
@@ -35,6 +36,7 @@ export function useLessonProgress(
   const watchedSecRef = useRef(0);
   const lastPositionRef = useRef(initialPositionSec);
   const hasSeekedToInitialRef = useRef(false);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     hasSeekedToInitialRef.current = false;
@@ -54,6 +56,11 @@ export function useLessonProgress(
         .record(lessonId, {
           watchedSec: Math.round(watchedSecRef.current),
           lastPositionSec: Math.round(lastPositionRef.current),
+        })
+        .then((res) => {
+          if (res.isCompleted) {
+            void queryClient.invalidateQueries({ queryKey: ['streak', 'me'] });
+          }
         })
         .catch(() => {
           // Mất mạng tạm thời — lần gửi định kỳ tiếp theo sẽ tự bù (watchedSec là tích lũy).
