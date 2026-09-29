@@ -41,3 +41,28 @@ export function useInstructorCourseOptions() {
     enabled: !!getAccessToken(),
   });
 }
+
+/** Sprint 3 mục 10 — chỉ fetch khi có đủ `from`/`to` (chọn xong cả 2 ngày). */
+export function useRevenueSummary(from: string, to: string) {
+  return useQuery({
+    queryKey: ['dashboard', 'instructor', 'revenue-summary', from, to],
+    queryFn: () => dashboardApi.getRevenueSummary(from, to),
+    enabled: !!getAccessToken() && !!from && !!to,
+  });
+}
+
+export function useHardQuestions() {
+  return useQuery({
+    queryKey: ['dashboard', 'instructor', 'hard-questions'],
+    queryFn: () => dashboardApi.getHardQuestions(),
+    enabled: !!getAccessToken(),
+  });
+}
+
+export function useLessonRetention(lessonId: number | undefined) {
+  return useQuery({
+    queryKey: ['dashboard', 'instructor', 'retention', lessonId],
+    queryFn: () => dashboardApi.getLessonRetention(lessonId!),
+    enabled: !!getAccessToken() && !!lessonId,
+  });
+}

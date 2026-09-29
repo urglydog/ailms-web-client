@@ -6,8 +6,11 @@ import { usePathname } from 'next/navigation';
 const NAV_ITEMS = [
   { key: 'overview', label: 'Tổng quan', href: '/instructor/revenue' },
   { key: 'revenue', label: 'Doanh thu', href: '/instructor/revenue/list' },
+  { key: 'revenue-summary', label: 'Báo cáo doanh thu', href: '/instructor/revenue/summary' },
   { key: 'students', label: 'Sinh viên', href: '/instructor/revenue/students' },
   { key: 'reviews', label: 'Đánh giá', href: '/instructor/revenue/reviews' },
+  { key: 'hard-questions', label: 'Câu hỏi khó', href: '/instructor/revenue/hard-questions' },
+  { key: 'retention', label: 'Giữ chân', href: '/instructor/revenue/retention' },
 ];
 
 /** "Hiệu suất" — giao diện tham khảo Udemy "Performance" (19/09/2026, xây mới hoàn toàn — trước
