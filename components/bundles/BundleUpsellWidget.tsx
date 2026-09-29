@@ -1,7 +1,10 @@
 'use client';
 
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { useBundlesForCourse } from '@/hooks/useBundles';
+import { useAddToCart, useCart } from '@/hooks/useCart';
+import { useMyEnrollments } from '@/hooks/useCartBundleMatches';
 import type { CourseBundle } from '@/types/domain';
 
 function fmt(amount: number) {
@@ -10,6 +13,31 @@ function fmt(amount: number) {
 
 function BundleUpsellCard({ bundle, currentCourseId }: { bundle: CourseBundle; currentCourseId: number }) {
   const otherCourses = bundle.courses.filter((c) => c.id !== currentCourseId);
+  const router = useRouter();
+  const { data: cartItems } = useCart();
+  const { data: enrolled } = useMyEnrollments();
+  const addToCart = useAddToCart();
+  const [addingBundle, setAddingBundle] = useState(false);
+
+  const handleAddBundle = async () => {
+    const cartCourseIds = new Set((cartItems ?? []).map((i) => i.courseId));
+    const enrolledCourseIds = new Set((enrolled ?? []).map((e) => e.courseId));
+    // KHÔNG loại trừ currentCourseId — học viên có thể bấm nút này TRƯỚC KHI tự thêm chính
+    // khóa đang xem vào giỏ, nên khóa đó cũng có thể đang thiếu. Chỉ bỏ qua khóa đã THỰC SỰ có
+    // trong giỏ hoặc đã sở hữu rồi.
+    const missing = bundle.courses.filter((c) => !cartCourseIds.has(c.id) && !enrolledCourseIds.has(c.id));
+    setAddingBundle(true);
+    try {
+      // Tuần tự — không Promise.all — tránh race condition ghi giỏ hàng nếu nhiều request thêm
+      // khóa cùng lúc đụng nhau ở tầng lưu trữ giỏ hàng.
+      for (const c of missing) {
+        await addToCart.mutateAsync(c.id);
+      }
+      router.push('/cart');
+    } finally {
+      setAddingBundle(false);
+    }
+  };
 
   return (
     <div className="rounded-2xl border border-cyan-100 bg-gradient-to-br from-cyan-50 to-blue-50 overflow-hidden">
@@ -53,13 +81,16 @@ function BundleUpsellCard({ bundle, currentCourseId }: { bundle: CourseBundle; c
           <span className="text-base font-extrabold text-cyan-700">{fmt(bundle.finalPrice)}</span>
         </div>
 
-        {/* CTA — links to cart with bundle pre-selected */}
-        <Link
-          href={`/cart?bundle=${bundle.id}`}
-          className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 py-2.5 text-sm font-bold text-white shadow hover:from-cyan-700 hover:to-blue-700 transition-all active:scale-95 no-underline"
+        {/* CTA — thêm mọi khóa còn thiếu của gói vào giỏ hàng rồi chuyển tới /cart. Giỏ hàng tự
+            phát hiện đủ bộ combo (xem useCartBundleMatches), không cần truyền `?bundle=id` nữa. */}
+        <button
+          type="button"
+          onClick={() => void handleAddBundle()}
+          disabled={addingBundle}
+          className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 py-2.5 text-sm font-bold text-white shadow hover:from-cyan-700 hover:to-blue-700 transition-all active:scale-95 disabled:opacity-60"
         >
-          Mua gói để tiết kiệm thêm →
-        </Link>
+          {addingBundle ? 'Đang thêm...' : 'Mua gói để tiết kiệm thêm →'}
+        </button>
       </div>
     </div>
   );
