@@ -181,6 +181,7 @@ export interface CourseReview {
   comment: string | null;
   /** Admin ẩn nếu vi phạm tiêu chuẩn cộng đồng (UC44) — review ẩn không hiện ở trang công khai. */
   isHidden: boolean;
+  moderationReason: string | null;
   createdAt: string;
 }
 
