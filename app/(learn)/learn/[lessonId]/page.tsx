@@ -176,8 +176,6 @@ function LearnPageContent() {
     enabled: !!lesson?.courseId,
     staleTime: 0, // Cập nhật ngay khi tab mount (Test 2.1)
   });
-  const currentLessonMaterialCount = officialMaterials?.filter(m => m.assignments?.some(a => a.lessonId === lessonId)).length || 0;
-
   // Tài liệu đính kèm theo từng bài (20/09/2026, tính năng mới) — gộp vào sidebar "Nội dung khóa
   // học" thay vì chỉ nằm ở tab "Tài nguyên" tổng hợp riêng. Cùng endpoint `CourseResourcesTab`
   // đã dùng, chỉ khác là fetch ở đây để truyền xuống `LessonSidebar` lọc theo từng bài.
@@ -187,6 +185,17 @@ function LearnPageContent() {
     enabled: !!lesson?.courseId && !!lesson?.enrolled,
     staleTime: 0,
   });
+
+  const currentLessonChapter = lesson?.chapters.find(c => c.lessons.some(l => l.lessonId === lessonId));
+  const currentLessonMaterialCount = (officialMaterials?.filter(m => {
+    if (m.assignments?.some(a => a.lessonId === lessonId)) return true;
+    if (currentLessonChapter && m.assignments?.some(a => a.chapterId === currentLessonChapter.chapterId)) return true;
+    return false;
+  }).length || 0) + (courseResources?.filter(r => {
+    if (r.lessonId === lessonId) return true;
+    if (currentLessonChapter && r.chapterId === currentLessonChapter.chapterId) return true;
+    return false;
+  }).length || 0);
 
   // Dọn dẹp Draft rác của các Quiz đã bị xóa mềm (Graceful In-flight cleanup)
   useEffect(() => {
