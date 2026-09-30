@@ -21,6 +21,27 @@ export function fillMissingDays(
   return result;
 }
 
+/** Như {@link fillMissingDays} nhưng cho NHIỀU cột số cùng lúc (vd doanh thu Tự tìm thấy/Giới
+ * thiệu xếp chồng theo ngày) — dùng chung 1 vòng lặp ngày thay vì gọi `fillMissingDays` nhiều lần
+ * cho từng cột (mỗi lần gọi lại tạo mảng ngày riêng, dễ lệch thứ tự giữa các cột). */
+export function fillMissingDaysMulti<K extends string>(
+  valuesByDay: Map<string, Record<K, number>>,
+  keys: K[],
+  from: string,
+  to: string,
+): ({ day: string } & Record<K, number>)[] {
+  const zero = Object.fromEntries(keys.map((k) => [k, 0])) as Record<K, number>;
+  const result: ({ day: string } & Record<K, number>)[] = [];
+  const cursor = new Date(`${from}T00:00:00`);
+  const end = new Date(`${to}T00:00:00`);
+  while (cursor <= end) {
+    const day = cursor.toISOString().slice(0, 10);
+    result.push({ day, ...(valuesByDay.get(day) ?? zero) });
+    cursor.setDate(cursor.getDate() + 1);
+  }
+  return result;
+}
+
 /** "2026-09-30" -> "30/09" — nhãn trục X gọn cho chart, tránh hiện nguyên chuỗi ISO. */
 export function formatShortDate(isoDay: string): string {
   const [, month, day] = isoDay.split('-');
