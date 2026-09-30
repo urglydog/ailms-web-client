@@ -100,7 +100,7 @@ export function CourseStudyPlanTab({ courseId }: { courseId: number }) {
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
       
-    } catch (e) {
+    } catch {
       toast.error('Lỗi khi xuất file Calendar');
     }
   };

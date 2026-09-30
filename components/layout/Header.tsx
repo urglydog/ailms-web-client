@@ -107,6 +107,7 @@ export function Header() {
     if (streakData) {
       setPrevStreak(streakData.currentStreak);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [streakData?.currentStreak]);
 
   const accountMenuRef = useRef<HTMLDivElement>(null);
