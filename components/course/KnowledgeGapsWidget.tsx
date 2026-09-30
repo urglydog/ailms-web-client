@@ -147,7 +147,7 @@ export function KnowledgeGapsWidget({ courseId }: { courseId: number }) {
                 </a>
               ) : (
                 <a
-                  href={`/learn/${courseId}?tab=materials`}
+                  href="?tab=materials"
                   className="shrink-0 flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-surface border border-line shadow-sm text-ink font-semibold text-sm hover:bg-surface-hover transition-all"
                   title="Chủ đề này thuộc bài đánh giá tổng hợp. Hãy xem lại toàn bộ học liệu."
                 >
