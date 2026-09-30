@@ -54,6 +54,9 @@ export interface AnswerDetailDto {
   correctOptionIds: number[] | null;
   isCorrect: boolean | null;
   options: OptionDto[];
+  topicTag?: string;
+  videoTimestamp?: number;
+  referenceLessonId?: number;
 }
 
 export interface SubmitRes {

@@ -419,6 +419,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
         <MaterialWorkspaceViewer
           generationId={inspectGenerationId}
           material={activeMat}
+          chapters={chapters}
           onBack={() => setInspectGenerationId(null)}
           onDelete={() => setConfirmDeleteId(inspectGenerationId)}
           readOnly={inspectReadOnly}
@@ -718,12 +719,15 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
 function MaterialWorkspaceViewer({
   generationId,
   material,
+  chapters,
   onBack,
   onDelete,
   readOnly = false,
 }: {
   generationId: number;
   material?: InstructorMaterial;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  chapters?: any[];
   onBack: () => void;
   onDelete?: () => void;
   readOnly?: boolean;
@@ -1087,6 +1091,7 @@ function MaterialWorkspaceViewer({
       {editingQuestion && (
         <QuizQuestionEditorModal
           question={{...editingQuestion, usageCount: detail?.usageCount}}
+          chapters={chapters}
           onClose={() => setEditingQuestion(null)}
           onSuccess={() => {
             setEditingQuestion(null);
@@ -1097,6 +1102,7 @@ function MaterialWorkspaceViewer({
       {isAddingQuestion && detail?.quizQuestions && material && (
         <NewQuizQuestionEditorModal
           quizId={material.materialId!}
+          chapters={chapters}
           onClose={() => setIsAddingQuestion(false)}
           onSuccess={() => {
             setIsAddingQuestion(false);
@@ -1860,14 +1866,22 @@ interface QuizQuestionEditorProps {
     displayOrder: number;
     options: { id: number; content: string; isCorrect: boolean }[];
     usageCount?: number;
+    topicTag?: string;
+    videoTimestamp?: number;
+    referenceLessonId?: number;
   };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  chapters?: any[];
   onClose: () => void;
   onSuccess: () => void;
 }
 
-function QuizQuestionEditorModal({ question, onClose, onSuccess }: QuizQuestionEditorProps) {
+function QuizQuestionEditorModal({ question, chapters, onClose, onSuccess }: QuizQuestionEditorProps) {
   const [content, setContent] = useState(question.content);
   const [isMultipleChoice, setIsMultipleChoice] = useState(question.isMultipleChoice || false);
+  const [topicTag, setTopicTag] = useState(question.topicTag || '');
+  const [videoTimestamp, setVideoTimestamp] = useState<number | ''>(question.videoTimestamp ?? '');
+  const [referenceLessonId, setReferenceLessonId] = useState<number | ''>(question.referenceLessonId ?? '');
   const [options, setOptions] = useState<{ id: number; content: string; isCorrect: boolean }[]>(
     JSON.parse(JSON.stringify(question.options))
   );
@@ -1875,7 +1889,14 @@ function QuizQuestionEditorModal({ question, onClose, onSuccess }: QuizQuestionE
   const updateMutation = useMutation({
     mutationFn: () => {
       const validOptions = options.filter(o => o.content.trim() !== '');
-      return materialsApi.updateQuizQuestion(question.id, { content, isMultipleChoice, options: validOptions });
+      return materialsApi.updateQuizQuestion(question.id, { 
+        content, 
+        isMultipleChoice, 
+        topicTag: topicTag || null,
+        videoTimestamp: videoTimestamp === '' ? null : videoTimestamp,
+        referenceLessonId: referenceLessonId === '' ? null : referenceLessonId,
+        options: validOptions 
+      });
     },
     onSuccess: () => {
       toast.success('Đã lưu thay đổi câu hỏi');
@@ -1923,6 +1944,26 @@ function QuizQuestionEditorModal({ question, onClose, onSuccess }: QuizQuestionE
           <label className="flex items-center gap-2 text-sm cursor-pointer">
             <input type="radio" checked={isMultipleChoice} onChange={() => setIsMultipleChoice(true)} className="w-4 h-4 text-accent focus:ring-accent" />
             Multiple Choice (Nhiều đáp án đúng)
+          </label>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5 p-4 bg-surface-hover rounded-card border border-line">
+          <label className="block text-sm font-semibold text-ink">
+            Topic Tag (Chủ đề)
+            <input type="text" value={topicTag} onChange={e => setTopicTag(e.target.value)} placeholder="VD: Toán tử Logic" className="w-full border border-line p-2 mt-1 rounded-md focus:border-accent focus:outline-none bg-surface-raised" />
+          </label>
+          <label className="block text-sm font-semibold text-ink">
+            Mốc TG Video (giây)
+            <input type="number" value={videoTimestamp} onChange={e => setVideoTimestamp(e.target.value ? Number(e.target.value) : '')} placeholder="VD: 120" className="w-full border border-line p-2 mt-1 rounded-md focus:border-accent focus:outline-none bg-surface-raised" />
+          </label>
+          <label className="block text-sm font-semibold text-ink">
+            Bài giảng gốc
+            <select value={referenceLessonId} onChange={e => setReferenceLessonId(e.target.value ? Number(e.target.value) : '')} className="w-full border border-line p-2 mt-1 rounded-md focus:border-accent focus:outline-none bg-surface-raised">
+              <option value="">-- Bỏ trống --</option>
+              {chapters?.flatMap(ch => ch.lessons).map(l => (
+                <option key={l.id} value={l.id}>{l.title}</option>
+              ))}
+            </select>
           </label>
         </div>
 
@@ -2008,9 +2049,13 @@ function QuizQuestionEditorModal({ question, onClose, onSuccess }: QuizQuestionE
   );
 }
 
-function NewQuizQuestionEditorModal({ quizId, onClose, onSuccess }: { quizId: number; onClose: () => void; onSuccess: () => void; }) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function NewQuizQuestionEditorModal({ quizId, chapters, onClose, onSuccess }: { quizId: number; chapters?: any[]; onClose: () => void; onSuccess: () => void; }) {
   const [content, setContent] = useState('');
   const [isMultipleChoice, setIsMultipleChoice] = useState(false);
+  const [topicTag, setTopicTag] = useState('');
+  const [videoTimestamp, setVideoTimestamp] = useState<number | ''>('');
+  const [referenceLessonId, setReferenceLessonId] = useState<number | ''>('');
   const [options, setOptions] = useState<{ id: number; content: string; isCorrect: boolean }[]>([
     { id: -1, content: 'Đáp án A', isCorrect: true },
     { id: -2, content: 'Đáp án B', isCorrect: false },
@@ -2021,7 +2066,14 @@ function NewQuizQuestionEditorModal({ quizId, onClose, onSuccess }: { quizId: nu
   const addMutation = useMutation({
     mutationFn: () => {
       const validOptions = options.filter(o => o.content.trim() !== '');
-      return materialsApi.addQuizQuestion(quizId, { content, isMultipleChoice, options: validOptions });
+      return materialsApi.addQuizQuestion(quizId, { 
+        content, 
+        isMultipleChoice, 
+        topicTag: topicTag || null,
+        videoTimestamp: videoTimestamp === '' ? null : videoTimestamp,
+        referenceLessonId: referenceLessonId === '' ? null : referenceLessonId,
+        options: validOptions 
+      });
     },
     onSuccess: () => {
       toast.success('Đã thêm câu hỏi mới');
@@ -2063,6 +2115,26 @@ function NewQuizQuestionEditorModal({ quizId, onClose, onSuccess }: { quizId: nu
           <label className="flex items-center gap-2 text-sm cursor-pointer">
             <input type="radio" checked={isMultipleChoice} onChange={() => setIsMultipleChoice(true)} className="w-4 h-4 text-accent focus:ring-accent" />
             Multiple Choice (Nhiều đáp án đúng)
+          </label>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5 p-4 bg-surface-hover rounded-card border border-line">
+          <label className="block text-sm font-semibold text-ink">
+            Topic Tag (Chủ đề)
+            <input type="text" value={topicTag} onChange={e => setTopicTag(e.target.value)} placeholder="VD: Toán tử Logic" className="w-full border border-line p-2 mt-1 rounded-md focus:border-accent focus:outline-none bg-surface-raised" />
+          </label>
+          <label className="block text-sm font-semibold text-ink">
+            Mốc TG Video (giây)
+            <input type="number" value={videoTimestamp} onChange={e => setVideoTimestamp(e.target.value ? Number(e.target.value) : '')} placeholder="VD: 120" className="w-full border border-line p-2 mt-1 rounded-md focus:border-accent focus:outline-none bg-surface-raised" />
+          </label>
+          <label className="block text-sm font-semibold text-ink">
+            Bài giảng gốc
+            <select value={referenceLessonId} onChange={e => setReferenceLessonId(e.target.value ? Number(e.target.value) : '')} className="w-full border border-line p-2 mt-1 rounded-md focus:border-accent focus:outline-none bg-surface-raised">
+              <option value="">-- Bỏ trống --</option>
+              {chapters?.flatMap(ch => ch.lessons).map(l => (
+                <option key={l.id} value={l.id}>{l.title}</option>
+              ))}
+            </select>
           </label>
         </div>
 

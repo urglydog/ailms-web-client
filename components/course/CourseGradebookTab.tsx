@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { Trophy, AlertTriangle } from 'lucide-react';
 import { MaterialBadge } from '@/components/materials/ui/MaterialBadge';
 import { Pagination } from '@/components/ui/Pagination';
+import { KnowledgeGapsWidget } from '@/components/course/KnowledgeGapsWidget';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -77,6 +78,7 @@ export function CourseGradebookTab({ courseId }: { courseId: number }) {
 
   return (
     <div className="space-y-6">
+      <KnowledgeGapsWidget courseId={courseId} />
       <h3 className="text-lg font-bold">Lịch sử làm bài thi & bài tập</h3>
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
