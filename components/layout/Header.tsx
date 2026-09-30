@@ -98,6 +98,7 @@ export function Header() {
   const { data: streakData } = useStreak();
   const [prevStreak, setPrevStreak] = useState<number | null>(null);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (streakData && prevStreak !== null && streakData.currentStreak > prevStreak) {
       toast.success(`🔥 Chúc mừng! Chuỗi ngày học của bạn đã lên ${streakData.currentStreak} ngày!`, {
@@ -107,7 +108,6 @@ export function Header() {
     if (streakData) {
       setPrevStreak(streakData.currentStreak);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [streakData?.currentStreak]);
 
   const accountMenuRef = useRef<HTMLDivElement>(null);

@@ -109,8 +109,8 @@ export function CourseStudyPlanTab({ courseId }: { courseId: number }) {
   if (plan && plan.planData) {
     try {
       planDays = JSON.parse(plan.planData);
-    } catch (e) {
-      console.error('Invalid JSON planData', e);
+    } catch {
+      console.error('Invalid JSON planData');
     }
   }
 
