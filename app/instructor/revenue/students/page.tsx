@@ -1,9 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+import { InsightCallout } from '@/components/instructor/InsightCallout';
 import { DownloadIcon } from '@/components/instructor/SidebarIcons';
 import { useInstructorCourseOptions, useInstructorStudents } from '@/hooks/useDashboard';
 import { exportToCsv } from '@/lib/exportCsv';
+
+const AT_RISK_THRESHOLD_PCT = 20;
+const AT_RISK_WARNING_RATIO = 0.3;
 
 /** "Hiệu suất" > Sinh viên — danh sách học viên đã ghi danh trên các khóa của giảng viên
  * (19/09/2026, xây mới — trước đây `/instructor/students` chỉ là placeholder). */
@@ -11,6 +15,13 @@ export default function InstructorStudentsPage() {
   const [courseId, setCourseId] = useState<number | ''>('');
   const { data: courses } = useInstructorCourseOptions();
   const { data: students, isLoading } = useInstructorStudents(courseId || undefined);
+
+  const stats = useMemo(() => {
+    if (!students || students.length === 0) return null;
+    const avgProgress = students.reduce((sum, s) => sum + s.progressPct, 0) / students.length;
+    const atRiskCount = students.filter((s) => s.progressPct < AT_RISK_THRESHOLD_PCT).length;
+    return { total: students.length, avgProgress, atRiskCount, atRiskRatio: atRiskCount / students.length };
+  }, [students]);
 
   const handleExport = () => {
     if (!students || students.length === 0) return;
@@ -52,6 +63,24 @@ export default function InstructorStudentsPage() {
         </div>
       </div>
 
+      {stats && (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <StatCard label="Tổng học viên" value={String(stats.total)} />
+          <StatCard label="Tiến độ trung bình" value={`${stats.avgProgress.toFixed(0)}%`} />
+          <StatCard
+            label={`Học viên < ${AT_RISK_THRESHOLD_PCT}% tiến độ`}
+            value={String(stats.atRiskCount)}
+            tone={stats.atRiskCount > 0 ? 'text-red-600' : 'text-gray-900'}
+          />
+        </div>
+      )}
+
+      {stats && stats.atRiskRatio > AT_RISK_WARNING_RATIO && (
+        <InsightCallout tone="warning">
+          {(stats.atRiskRatio * 100).toFixed(0)}% học viên chưa xem quá {AT_RISK_THRESHOLD_PCT}% khóa học — cân nhắc gửi email nhắc nhở hoặc xem lại bài mở đầu có đủ hấp dẫn không.
+        </InsightCallout>
+      )}
+
       {/* (26/09/2026, sửa lỗi) — cột cố định không co giãn dưới `lg`, bọc cuộn ngang thay vì bóp/vỡ. */}
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
         <div className="overflow-x-auto">
@@ -90,5 +119,14 @@ export default function InstructorStudentsPage() {
         </div>
       </div>
     </>
+  );
+}
+
+function StatCard({ label, value, tone = 'text-gray-900' }: { label: string; value: string; tone?: string }) {
+  return (
+    <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+      <span className="text-[11.5px] font-semibold text-gray-500">{label}</span>
+      <div className={`mt-1 font-display text-[22px] font-extrabold ${tone}`}>{value}</div>
+    </div>
   );
 }

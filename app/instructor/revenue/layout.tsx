@@ -3,10 +3,14 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
+// (29/09/2026, sửa lỗi) — trước đây "Tổng quan"/"Doanh thu"/"Báo cáo doanh thu" là 3 tab riêng
+// nhưng cùng 1 chủ đề (Tổng quan chỉ là bản rút gọn của bảng ở Doanh thu, Báo cáo doanh thu là
+// cùng số liệu doanh thu nhưng theo khoảng ngày tự chọn) — gộp lại còn đúng 1 tab "Doanh thu"
+// (preset + tự chọn ngày trong cùng 1 trang), "Tổng quan" đổi vai trò thành dashboard tóm tắt
+// thật (KPI + insight trỏ sang các tab khác) thay vì lặp lại bảng giao dịch.
 const NAV_ITEMS = [
   { key: 'overview', label: 'Tổng quan', href: '/instructor/revenue' },
   { key: 'revenue', label: 'Doanh thu', href: '/instructor/revenue/list' },
-  { key: 'revenue-summary', label: 'Báo cáo doanh thu', href: '/instructor/revenue/summary' },
   { key: 'students', label: 'Sinh viên', href: '/instructor/revenue/students' },
   { key: 'reviews', label: 'Đánh giá', href: '/instructor/revenue/reviews' },
   { key: 'hard-questions', label: 'Câu hỏi khó', href: '/instructor/revenue/hard-questions' },
