@@ -1,15 +1,18 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { AreaChart, Area, Bar, BarChart, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { DateRangeSelector } from '@/components/instructor/DateRangeSelector';
 import { InsightCallout } from '@/components/instructor/InsightCallout';
 import { DownloadIcon } from '@/components/instructor/SidebarIcons';
 import { useRevenueList, useRevenueSummary } from '@/hooks/useDashboard';
 import { exportToCsv } from '@/lib/exportCsv';
-import { fillMissingDays, formatShortDate } from '@/lib/instructorInsights';
+import { fillMissingDaysMulti, formatShortDate } from '@/lib/instructorInsights';
 import { formatMoney } from '@/lib/format';
 import type { PerformanceRange } from '@/lib/api/dashboard';
+
+const COLOR_ORGANIC = '#059669';
+const COLOR_REFERRAL = '#0891b2';
 
 type Mode = 'preset' | 'custom';
 
@@ -42,20 +45,58 @@ export default function RevenuePage() {
   const total = (rows ?? []).reduce((sum, r) => sum + r.instructorEarning, 0);
 
   // Gộp theo NGÀY (paidAt là LocalDateTime giờ Việt Nam, không phải UTC — cắt chuỗi trực tiếp an
-  // toàn múi giờ, không qua `new Date()`) rồi điền 0 cho ngày trống để biểu đồ không bị nối chéo
-  // sai giữa 2 ngày có giao dịch cách xa nhau.
+  // toàn múi giờ, không qua `new Date()`), TÁCH RIÊNG theo nguồn doanh thu (Tự tìm thấy/Giới
+  // thiệu) để vẽ cột xếp chồng — đúng bản chất "có đơn thì cột dựng lên, không có thì rỗng", thay
+  // vì đường cong AreaChart cũ làm sai lệch cảm giác về những ngày không bán được gì. Điền 0 cho
+  // ngày trống để không bị nối chéo/thiếu cột.
   const chartData = useMemo(() => {
     if (!rows || rows.length === 0) return [];
-    const byDay = new Map<string, number>();
+    const byDay = new Map<string, { organic: number; referral: number }>();
     for (const r of rows) {
       const day = r.paidAt.slice(0, 10);
-      byDay.set(day, (byDay.get(day) ?? 0) + r.instructorEarning);
+      const entry = byDay.get(day) ?? { organic: 0, referral: 0 };
+      if (r.revenueSource === 'INSTRUCTOR_REFERRAL') entry.referral += r.instructorEarning;
+      else entry.organic += r.instructorEarning;
+      byDay.set(day, entry);
     }
     const days = [...byDay.keys()].sort();
     const firstDay = days[0];
     const lastDay = days[days.length - 1];
     if (!firstDay || !lastDay) return [];
-    return fillMissingDays(byDay, firstDay, lastDay);
+    return fillMissingDaysMulti(byDay, ['organic', 'referral'], firstDay, lastDay);
+  }, [rows]);
+
+  // Đường lũy kế — tách thành biểu đồ RIÊNG (không dùng trục Y thứ 2 trên cùng 1 chart: 2 trục Y
+  // trên 1 biểu đồ là kiểu vẽ dễ gây hiểu lầm vì thang đo tùy tiện co giãn để khớp nhau, xem thêm
+  // `dataviz` skill — "One axis. Never a dual-axis chart"). Cột theo ngày + đường lũy kế là 2 câu
+  // hỏi khác nhau ("hôm nay thế nào" vs "đà tăng trưởng ra sao"), tách 2 panel rõ ràng hơn là gộp
+  // cưỡng ép vào 1 chart.
+  const cumulativeData = useMemo(() => {
+    let running = 0;
+    return chartData.map((d) => {
+      running += d.organic + d.referral;
+      return { day: d.day, total: running };
+    });
+  }, [chartData]);
+
+  // Mini analytics: Gói combo vs Bán lẻ, và Có mã giảm giá vs Giá gốc — cả 2 tính thẳng từ dữ
+  // liệu đã fetch, không cần endpoint mới (bundleId/couponCode đã có sẵn trên mỗi giao dịch).
+  const splitStats = useMemo(() => {
+    if (!rows || rows.length === 0) return null;
+    let bundleAmount = 0;
+    let retailAmount = 0;
+    let couponAmount = 0;
+    for (const r of rows) {
+      if (r.bundleId) bundleAmount += r.instructorEarning;
+      else retailAmount += r.instructorEarning;
+      if (r.couponCode) couponAmount += r.instructorEarning;
+    }
+    const totalAmount = bundleAmount + retailAmount;
+    if (totalAmount === 0) return null;
+    return {
+      bundlePercent: (bundleAmount / totalAmount) * 100,
+      couponPercent: (couponAmount / totalAmount) * 100,
+    };
   }, [rows]);
 
   // Insight: khóa học đóng góp doanh thu nhiều nhất trong kỳ đang xem.
@@ -162,27 +203,59 @@ export default function RevenuePage() {
             </InsightCallout>
           )}
 
+          {splitStats && (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <SplitBar label="Gói combo vs Bán lẻ" percent={splitStats.bundlePercent} leftLabel="Gói combo" rightLabel="Bán lẻ" />
+              <SplitBar label="Có mã giảm giá vs Giá gốc" percent={splitStats.couponPercent} leftLabel="Có mã giảm giá" rightLabel="Giá gốc" />
+            </div>
+          )}
+
           <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-            <h2 className="mb-3 font-display text-[15px] font-bold text-gray-900">Xu hướng doanh thu theo ngày</h2>
+            <h2 className="mb-1 font-display text-[15px] font-bold text-gray-900">Doanh thu theo ngày</h2>
+            <div className="mb-3 flex items-center gap-4 text-[12px] text-gray-500">
+              <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full" style={{ background: COLOR_ORGANIC }} /> Tự tìm thấy</span>
+              <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full" style={{ background: COLOR_REFERRAL }} /> Giới thiệu</span>
+            </div>
             {chartData.length > 0 ? (
               <div className="h-72 w-full min-w-0">
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={chartData}>
+                  <BarChart data={chartData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                     <XAxis dataKey="day" tick={{ fontSize: 11 }} tickFormatter={formatShortDate} />
                     <YAxis tick={{ fontSize: 11 }} tickFormatter={(v: number) => (v >= 1000 ? `${(v / 1000).toFixed(0)}k` : String(v))} />
                     <Tooltip
-                      formatter={(value) => [formatMoney(Number(value ?? 0)), 'Thực nhận']}
+                      formatter={(value, name) => [formatMoney(Number(value ?? 0)), name === 'organic' ? 'Tự tìm thấy' : 'Giới thiệu']}
                       labelFormatter={(label) => `Ngày ${formatShortDate(String(label ?? ''))}`}
                     />
-                    <Area type="monotone" dataKey="value" stroke="#0891b2" fill="#0891b2" fillOpacity={0.15} />
-                  </AreaChart>
+                    <Bar dataKey="organic" stackId="revenue" fill={COLOR_ORGANIC} />
+                    <Bar dataKey="referral" stackId="revenue" fill={COLOR_REFERRAL} radius={[4, 4, 0, 0]} />
+                  </BarChart>
                 </ResponsiveContainer>
               </div>
             ) : (
               <div className="py-8 text-center text-sm text-gray-500">Chưa có dữ liệu để vẽ biểu đồ.</div>
             )}
           </div>
+
+          {cumulativeData.length > 0 && (
+            <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+              <h2 className="mb-3 font-display text-[15px] font-bold text-gray-900">Doanh thu lũy kế trong kỳ</h2>
+              <div className="h-40 w-full min-w-0">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={cumulativeData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                    <XAxis dataKey="day" tick={{ fontSize: 11 }} tickFormatter={formatShortDate} />
+                    <YAxis tick={{ fontSize: 11 }} tickFormatter={(v: number) => (v >= 1000 ? `${(v / 1000).toFixed(0)}k` : String(v))} />
+                    <Tooltip
+                      formatter={(value) => [formatMoney(Number(value ?? 0)), 'Lũy kế']}
+                      labelFormatter={(label) => `Ngày ${formatShortDate(String(label ?? ''))}`}
+                    />
+                    <Area type="monotone" dataKey="total" stroke="#7c3aed" fill="#7c3aed" fillOpacity={0.12} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          )}
 
           <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
             <div className="overflow-x-auto">
@@ -234,6 +307,24 @@ function StatCard({ label, value, tone = 'text-gray-900' }: { label: string; val
     <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
       <span className="text-[11.5px] font-semibold text-gray-500">{label}</span>
       <div className={`mt-1 font-display text-[22px] font-extrabold ${tone}`}>{value}</div>
+    </div>
+  );
+}
+
+/** Thẻ tỷ lệ 2 phần (Gói combo/Bán lẻ, Có mã/Giá gốc) — thanh 2 màu xếp ngang thay vì số liệu
+ * khô khan, tính từ `instructorEarning` (thực nhận), không cần endpoint mới. */
+function SplitBar({ label, percent, leftLabel, rightLabel }: { label: string; percent: number; leftLabel: string; rightLabel: string }) {
+  return (
+    <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+      <span className="text-[11.5px] font-semibold text-gray-500">{label}</span>
+      <div className="mt-2 flex h-3 w-full overflow-hidden rounded-full bg-gray-100">
+        <div className="h-full bg-cyan-500" style={{ width: `${percent}%` }} />
+        <div className="h-full bg-gray-300" style={{ width: `${100 - percent}%` }} />
+      </div>
+      <div className="mt-1.5 flex justify-between text-[11.5px] text-gray-500">
+        <span>{leftLabel} ({percent.toFixed(0)}%)</span>
+        <span>{rightLabel} ({(100 - percent).toFixed(0)}%)</span>
+      </div>
     </div>
   );
 }

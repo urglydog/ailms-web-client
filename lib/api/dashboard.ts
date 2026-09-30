@@ -22,6 +22,9 @@ export interface RevenueRow {
   /** Chia doanh thu 2 mức (20/09/2026) — ORGANIC (37%) hoặc INSTRUCTOR_REFERRAL (97%, mua qua
    * liên kết giới thiệu riêng của Giảng viên). */
   revenueSource: 'ORGANIC' | 'INSTRUCTOR_REFERRAL';
+  /** Gói combo (30/09/2026) — có giá trị nếu giao dịch này thuộc 1 Bundle, `null`/vắng mặt nếu
+   * mua lẻ. Chỉ cần biết có/không, không cần thêm chi tiết gói ở đây. */
+  bundleId?: number | null;
 }
 
 export interface StudentRow {
@@ -61,8 +64,12 @@ export interface RevenueSummary {
 export interface HardQuestionRow {
   questionId: number;
   content: string;
+  courseId: number;
   courseTitle: string;
   lessonTitle: string | null;
+  /** Deep-link tới ô "inspect" có sẵn ở trang Quản lý học liệu (30/09/2026) — xem
+   * `CourseMaterialsManager.tsx`, query `?inspect={materialGenerationId}` mở thẳng quiz để sửa. */
+  materialGenerationId: number;
   totalAnswers: number;
   wrongRatePercent: number;
 }
