@@ -7,6 +7,7 @@ import { useCallback, useEffect, useRef, useState, Suspense } from 'react';
 import { toast } from 'sonner';
 import { CourseOverviewTab } from '@/components/course/CourseOverviewTab';
 import { CourseGradebookTab } from '@/components/course/CourseGradebookTab';
+import { CourseStudyPlanTab } from '@/components/course/CourseStudyPlanTab';
 import { LessonAssignmentsList } from '@/components/course/LessonAssignmentsList';
 import { CourseResourcesTab } from '@/components/course/CourseResourcesTab';
 import { ReviewsSection } from '@/components/course/ReviewsSection';
@@ -37,11 +38,12 @@ import { useSetLearnTitle, useSetLearnProgress } from '@/components/layout/Learn
 import { getAccessToken } from '@/lib/auth/token';
 import type { PipelineStep } from '@/types/domain';
 
-type MainTab = 'overview' | 'qna' | 'reviews' | 'materials' | 'gradebook' | 'resources';
+type MainTab = 'overview' | 'qna' | 'reviews' | 'materials' | 'gradebook' | 'resources' | 'study-plan';
 type SidebarTab = 'content' | 'tutor';
 
 const MAIN_TABS: Array<{ key: MainTab; label: string }> = [
   { key: 'overview', label: 'Tổng quan' },
+  { key: 'study-plan', label: 'Lộ trình AI' },
   { key: 'qna', label: 'Hỏi đáp' },
   { key: 'materials', label: 'Học liệu' },
   { key: 'gradebook', label: 'Bảng điểm' },
@@ -753,6 +755,14 @@ function LearnPageContent() {
               <div className="p-5">
                 {mainTab === 'overview' && (
                   <CourseOverviewTab courseSlug={lesson.courseSlug} courseId={lesson.courseId} enrolled={lesson.enrolled} />
+                )}
+
+                {mainTab === 'study-plan' && (
+                  lesson.enrolled ? (
+                    <CourseStudyPlanTab courseId={lesson.courseId} />
+                  ) : (
+                    <LockedFeatureNotice feature="Lộ trình học cá nhân hóa" courseSlug={lesson.courseSlug} />
+                  )
                 )}
 
                 {mainTab === 'qna' && (
