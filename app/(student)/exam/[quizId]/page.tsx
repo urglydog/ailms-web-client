@@ -1005,6 +1005,12 @@ export default function AntiCheatExamPage() {
                     <span className="text-ink-muted font-bold bg-surface-hover px-2 py-0.5 rounded border border-line text-xs">{detail.selectedOptionIds?.length ? 'Đã ghi nhận' : 'Bỏ trống'}</span>
                   )}
                 </div>
+                
+                {detail.topicTag && (
+                  <div className="mb-2 inline-block bg-accent/10 text-accent font-semibold text-xs px-2 py-1 rounded-md">
+                    Chủ đề: {detail.topicTag}
+                  </div>
+                )}
                 <p className="mb-3 text-sm">{detail.content}</p>
 
                 <div className="space-y-1.5 mb-4">
@@ -1026,14 +1032,27 @@ export default function AntiCheatExamPage() {
 
                 {detail.isCorrect === false && (
                   <div className="mt-4 pt-4 border-t border-line">
-                    {!explanations[detail.questionId] ? (
-                      <button
-                        onClick={() => handleExplain(detail.questionId, detail.selectedOptionIds?.[0] || null)}
-                        className="text-accent text-sm font-semibold hover:underline flex items-center gap-1"
-                      >
-                        Hỏi Gia sư AI tại sao sai?
-                      </button>
-                    ) : (
+                    <div className="flex flex-wrap gap-4 mb-3">
+                      {!explanations[detail.questionId] && (
+                        <button
+                          onClick={() => handleExplain(detail.questionId, detail.selectedOptionIds?.[0] || null)}
+                          className="text-accent text-sm font-semibold hover:underline flex items-center gap-1"
+                        >
+                          Hỏi Gia sư AI tại sao sai?
+                        </button>
+                      )}
+                      {detail.referenceLessonId && (
+                        <a 
+                          href={`/learn/${detail.referenceLessonId}${detail.videoTimestamp ? `?seek=${detail.videoTimestamp}` : ''}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-500 text-sm font-semibold hover:underline flex items-center gap-1"
+                        >
+                          Ôn tập lại lý thuyết ↗
+                        </a>
+                      )}
+                    </div>
+                    {explanations[detail.questionId] && (
                       <div className="bg-accent/5 p-4 rounded-lg border border-accent/15">
                         <div className="flex items-center gap-2 font-bold text-accent-dark mb-2">
                           <span>Gia sư AI giải thích:</span>
