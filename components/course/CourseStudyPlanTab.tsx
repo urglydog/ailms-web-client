@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api, ApiError } from '@/lib/api/client';
 import { toast } from 'sonner';
@@ -205,7 +206,7 @@ export function CourseStudyPlanTab({ courseId }: { courseId: number }) {
       )}
 
       {/* Modal Cấu hình Lộ trình */}
-      {showModal && (
+      {showModal && typeof window !== 'undefined' && createPortal(
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
           <div className="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl">
             <div className="border-b border-line p-4">
@@ -266,7 +267,8 @@ export function CourseStudyPlanTab({ courseId }: { courseId: number }) {
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
