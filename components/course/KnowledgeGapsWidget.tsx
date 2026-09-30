@@ -9,22 +9,27 @@ import { Spinner } from '@/components/ui/Spinner';
 interface KnowledgeGapDto {
   topic: string;
   errorRate: number;
-  recentFails: number;
-  recentAttempts: number;
-  representativeQuestionId: number | null;
-  referenceLessonId: number | null;
   videoTimestamp: number | null;
+  referenceLessonId: number | null;
+  incorrectCount: number;
+  totalCount: number;
+}
+
+interface KnowledgeGapsRes {
+  gaps: KnowledgeGapDto[];
 }
 
 export function KnowledgeGapsWidget({ courseId }: { courseId: number }) {
-  const { data: gaps, isLoading, error } = useQuery<KnowledgeGapDto[]>({
+  const { data, isLoading, error } = useQuery<KnowledgeGapsRes>({
     queryKey: ['knowledge-gaps', courseId],
     queryFn: async () => {
-      return await api.get<KnowledgeGapDto[]>(`/api/v1/student/courses/${courseId}/knowledge-gaps`, {
+      return await api.get<KnowledgeGapsRes>(`/api/v1/student/courses/${courseId}/knowledge-gaps`, {
         token: getAccessToken() ?? undefined,
       });
     }
   });
+
+  const gaps = data?.gaps;
 
   if (isLoading) return <div className="py-4 text-center"><Spinner className="mx-auto" /></div>;
   if (error || !gaps) return null;
@@ -61,8 +66,8 @@ export function KnowledgeGapsWidget({ courseId }: { courseId: number }) {
             <div>
               <h4 className="font-bold text-ink mb-1">{gap.topic}</h4>
               <div className="flex gap-4 text-xs text-ink-muted font-medium">
-                <span className="text-danger font-semibold">Sai {gap.recentFails}/{gap.recentAttempts} lần</span>
-                <span>Tỷ lệ lỗi: {Math.round(gap.errorRate)}%</span>
+                <span className="text-danger font-semibold">Sai {gap.incorrectCount}/{gap.totalCount} lần</span>
+                <span>Tỷ lệ lỗi: {Math.round(gap.errorRate * 100)}%</span>
               </div>
             </div>
             {gap.referenceLessonId && (
