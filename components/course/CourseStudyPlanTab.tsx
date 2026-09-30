@@ -42,9 +42,7 @@ export function CourseStudyPlanTab({ courseId }: { courseId: number }) {
 
   const generatePlan = useMutation({
     mutationFn: (data: { targetDate: string; hoursPerWeek: number }) =>
-      api.post<StudyPlanDto>(`/api/v1/student/courses/${courseId}/study-plan/generate`, {
-        body: data,
-      }),
+      api.post<StudyPlanDto>(`/api/v1/student/courses/${courseId}/study-plan/generate`, data),
     onSuccess: (data) => {
       queryClient.setQueryData(['study-plan', courseId], data);
       setShowModal(false);
