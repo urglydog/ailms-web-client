@@ -11,3 +11,9 @@ export function formatFileSize(bytes: number): string {
   if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
+
+/** Tiền VNĐ kiểu "1.500.000đ" — dùng chung cho khu "Hiệu suất" Giảng viên (29/09/2026, tách ra
+ * từ chỗ mỗi trang tự định nghĩa lại giống hệt nhau ở `revenue/page.tsx`/`revenue/list/page.tsx`). */
+export function formatMoney(value: number): string {
+  return `${value.toLocaleString('vi-VN')}đ`;
+}
