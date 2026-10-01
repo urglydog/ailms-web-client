@@ -5,9 +5,15 @@ import { createPortal } from 'react-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api, ApiError } from '@/lib/api/client';
 import { toast } from 'sonner';
-import { Sparkles, Calendar as CalendarIcon, Clock, Download, Plus } from 'lucide-react';
+import { Sparkles, Calendar as CalendarIcon, Clock, Download, Plus, CheckCircle2 } from 'lucide-react';
 import { format, addDays } from 'date-fns';
 import { vi } from 'date-fns/locale';
+import Link from 'next/link';
+
+interface CourseStudyPlanTabProps {
+  courseId: number;
+  completedLessonIds?: number[];
+}
 
 interface StudyLesson {
   lesson_id: number;
@@ -28,7 +34,7 @@ interface StudyPlanDto {
   planData: string; // JSON string
 }
 
-export function CourseStudyPlanTab({ courseId }: { courseId: number }) {
+export function CourseStudyPlanTab({ courseId, completedLessonIds = [] }: CourseStudyPlanTabProps) {
   const queryClient = useQueryClient();
   const [showModal, setShowModal] = useState(false);
   const [targetDate, setTargetDate] = useState<string>(() => {
@@ -72,16 +78,17 @@ export function CourseStudyPlanTab({ courseId }: { courseId: number }) {
       days.forEach(day => {
         if (!day.lessons || day.lessons.length === 0) return;
         const [year, month, dayStr] = day.date.split('-');
-        // Generate an event for 8:00 AM on the given date
-        const dtstart = `${year}${month}${dayStr}T080000Z`;
-        const dtend = `${year}${month}${dayStr}T090000Z`; // Default 1 hour slot in calendar
+        const dtstart = `${year}${month}${dayStr}`;
+        const nextDay = new Date(day.date);
+        nextDay.setDate(nextDay.getDate() + 1);
+        const dtend = `${nextDay.getFullYear()}${String(nextDay.getMonth() + 1).padStart(2, '0')}${String(nextDay.getDate()).padStart(2, '0')}`;
         
         const description = `Mục tiêu: ${day.objective}\\n\\nBài giảng:\\n` + 
           day.lessons.map(l => `- ${l.title} (${l.duration_minutes} phút)`).join('\\n');
         
         icsContent += 'BEGIN:VEVENT\n';
-        icsContent += `DTSTART:${dtstart}\n`;
-        icsContent += `DTEND:${dtend}\n`;
+        icsContent += `DTSTART;VALUE=DATE:${dtstart}\n`;
+        icsContent += `DTEND;VALUE=DATE:${dtend}\n`;
         icsContent += `SUMMARY:Học LMS - ${day.lessons[0]?.title ?? 'Bài học'}...\n`;
         icsContent += `DESCRIPTION:${description}\n`;
         icsContent += 'END:VEVENT\n';
@@ -190,14 +197,30 @@ export function CourseStudyPlanTab({ courseId }: { courseId: number }) {
                 <p className="text-sm font-medium text-accent mt-1">{day.objective}</p>
                 
                 <div className="mt-4 grid gap-3">
-                  {day.lessons.map((lesson, j) => (
-                    <div key={j} className="flex items-center justify-between rounded-lg border border-line-soft bg-white p-3 shadow-sm">
-                      <span className="font-medium text-ink text-sm">{lesson.title}</span>
-                      <span className="text-xs text-ink-muted rounded-full bg-surface-hover px-2 py-1">
-                        {lesson.duration_minutes} phút
-                      </span>
-                    </div>
-                  ))}
+                  {day.lessons.map((lesson, j) => {
+                    const isCompleted = completedLessonIds.includes(lesson.lesson_id);
+                    return (
+                      <Link 
+                        key={j} 
+                        href={`/learn/${courseId}?lesson=${lesson.lesson_id}`}
+                        className={`group flex items-center justify-between rounded-lg border bg-white p-3 shadow-sm transition-all hover:border-accent hover:shadow-md ${isCompleted ? 'border-green-200 bg-green-50/30' : 'border-line-soft'}`}
+                      >
+                        <div className="flex items-center gap-3">
+                          {isCompleted ? (
+                            <CheckCircle2 className="h-5 w-5 text-green-500 flex-shrink-0" />
+                          ) : (
+                            <div className="h-2 w-2 rounded-full bg-line ml-1.5 flex-shrink-0 group-hover:bg-accent" />
+                          )}
+                          <span className={`font-medium text-sm transition-colors group-hover:text-accent ${isCompleted ? 'text-ink line-through opacity-70' : 'text-ink'}`}>
+                            {lesson.title}
+                          </span>
+                        </div>
+                        <span className="text-xs text-ink-muted rounded-full bg-surface-hover px-2 py-1">
+                          {lesson.duration_minutes} phút
+                        </span>
+                      </Link>
+                    );
+                  })}
                 </div>
               </div>
             ))}

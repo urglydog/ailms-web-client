@@ -759,7 +759,7 @@ function LearnPageContent() {
 
                 {mainTab === 'study-plan' && (
                   lesson.enrolled ? (
-                    <CourseStudyPlanTab courseId={lesson.courseId} />
+                    <CourseStudyPlanTab courseId={lesson.courseId} completedLessonIds={lesson.chapters.flatMap(c => c.lessons).filter(l => l.isCompleted).map(l => l.lessonId)} />
                   ) : (
                     <LockedFeatureNotice feature="Lộ trình học cá nhân hóa" courseSlug={lesson.courseSlug} />
                   )
