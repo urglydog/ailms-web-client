@@ -6,7 +6,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api, ApiError } from '@/lib/api/client';
 import { toast } from 'sonner';
 import { Sparkles, Calendar as CalendarIcon, Clock, Download, Plus, CheckCircle2, Trash2, AlertTriangle } from 'lucide-react';
-import { format, addDays } from 'date-fns';
+import { format, addDays, startOfDay, isBefore, differenceInCalendarDays } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import Link from 'next/link';
 
@@ -43,6 +43,8 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [] }: Course
   const [hoursPerWeek, setHoursPerWeek] = useState<number>(5);
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showRescheduleModal, setShowRescheduleModal] = useState(false);
+  const [rescheduleTargetDate, setRescheduleTargetDate] = useState('');
 
   const { data: plan, isLoading } = useQuery({
     queryKey: ['study-plan', courseId],
@@ -98,6 +100,25 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [] }: Course
     },
     onError: () => {
       toast.error('Có lỗi xảy ra khi xóa lộ trình.');
+    },
+  });
+
+  const reschedulePlan = useMutation({
+    mutationFn: () =>
+      api.put<StudyPlanDto>(
+        `/api/v1/student/courses/${courseId}/study-plan/reschedule`,
+        // ⚠️ Gửi undefined thay vì "" để tránh Jackson DateTimeParseException
+        rescheduleTargetDate ? { targetDate: rescheduleTargetDate } : {}
+      ),
+    onSuccess: (data) => {
+      queryClient.setQueryData(['study-plan', courseId], data);
+      setShowRescheduleModal(false);
+      setRescheduleTargetDate('');
+      toast.success('Đã cập nhật tiến độ thành công!');
+    },
+    onError: (err) => {
+      if (err instanceof ApiError) toast.error(err.message);
+      else toast.error('Có lỗi xảy ra.');
     },
   });
 
@@ -172,6 +193,39 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [] }: Course
     });
   }
 
+  // === RESCHEDULE PREVIEW STATS ===
+  // effectiveTarget thay đổi live khi user chỉnh date trong modal
+  const effectiveTarget = rescheduleTargetDate || plan?.targetDate || '';
+
+  // Guard clause: phòng NaN khi effectiveTarget rỗng hoặc invalid
+  const isValidTarget = Boolean(effectiveTarget) && !isNaN(Date.parse(effectiveTarget));
+
+  const uncompletedInPlan = planDays
+    .flatMap(d => d.lessons)
+    .filter(l => !completedLessonIds.includes(l.lesson_id));
+
+  // Deduplicate (1 bài có thể xuất hiện ở nhiều ngày nếu plan cũ bị lỗi)
+  const seenIds = new Set<number>();
+  const uniqueUncompleted = uncompletedInPlan.filter(l => {
+    if (seenIds.has(l.lesson_id)) return false;
+    seenIds.add(l.lesson_id);
+    return true;
+  });
+
+  const totalMinutes = uniqueUncompleted.reduce((s, l) => s + l.duration_minutes, 0);
+
+  // So sánh DATE thuần, không lẫn giờ/phút
+  const todayStart = startOfDay(new Date());
+  const targetStart = isValidTarget ? startOfDay(new Date(effectiveTarget)) : todayStart;
+  const isDeadlinePassed = isValidTarget ? isBefore(targetStart, todayStart) : true;
+
+  const daysRemaining = (!isValidTarget || isDeadlinePassed)
+    ? 0
+    : Math.max(1, differenceInCalendarDays(targetStart, todayStart) + 1);
+
+  const avgMinPerDay = daysRemaining > 0 ? Math.ceil(totalMinutes / daysRemaining) : Infinity;
+  const isOverloaded = avgMinPerDay > 120;
+
   if (isLoading) {
     return <div className="p-8 text-center text-ink-muted">Đang tải...</div>;
   }
@@ -195,7 +249,7 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [] }: Course
             </button>
           )}
           <button
-            onClick={() => setShowModal(true)}
+            onClick={() => isBehindSchedule ? setShowRescheduleModal(true) : setShowModal(true)}
             className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors ${
               isBehindSchedule ? 'bg-orange-500 hover:bg-orange-600' : 'bg-accent hover:bg-accent-dark'
             }`}
@@ -205,7 +259,7 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [] }: Course
             ) : (
               <Sparkles className="h-4 w-4" />
             )}
-            {hasPlan ? (isBehindSchedule ? 'Bắt kịp tiến độ' : 'Điều chỉnh lộ trình') : 'Tạo lộ trình ngay'}
+            {hasPlan ? (isBehindSchedule ? 'Cập nhật tiến độ' : 'Điều chỉnh lộ trình') : 'Tạo lộ trình ngay'}
           </button>
           
           {hasPlan && (
@@ -228,7 +282,7 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [] }: Course
           <div>
             <h4 className="font-semibold text-orange-800 text-sm">Bạn đang trễ tiến độ!</h4>
             <p className="text-orange-700 text-sm mt-1">
-              Bạn có một số bài học trong quá khứ chưa hoàn thành. Hãy bấm <strong>Bắt kịp tiến độ</strong> để hệ thống tự động phân bổ lại lịch học.
+              Bạn có một số bài học trong quá khứ chưa hoàn thành. Hãy bấm <strong>Cập nhật tiến độ</strong> để hệ thống tự động dời các bài chưa học vào lịch còn lại.
             </p>
           </div>
         </div>
@@ -413,6 +467,80 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [] }: Course
                 {deletePlan.isPending ? 'Đang xóa...' : 'Xóa lộ trình'}
               </button>
             </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* Modal Reschedule Preview */}
+      {showRescheduleModal && typeof window !== 'undefined' && createPortal(
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl">
+            <div className="border-b border-line p-4">
+              <h3 className="font-semibold text-ink flex items-center gap-2">
+                <Clock className="h-5 w-5 text-orange-500" />
+                Cập nhật tiến độ
+              </h3>
+            </div>
+            <form onSubmit={(e) => { e.preventDefault(); reschedulePlan.mutate(); }} className="p-6">
+              <div className="space-y-4 text-sm text-ink mb-6">
+                <div className="flex justify-between py-2 border-b border-line-soft">
+                  <span className="text-ink-muted">Còn lại:</span>
+                  <span className="font-medium">{uniqueUncompleted.length} bài ({totalMinutes} phút)</span>
+                </div>
+                <div className="flex justify-between py-2 border-b border-line-soft">
+                  <span className="text-ink-muted">Đến hạn:</span>
+                  <span className="font-medium">{isValidTarget ? format(new Date(effectiveTarget), 'dd/MM/yyyy') : '--'} ({daysRemaining} ngày)</span>
+                </div>
+                <div className="flex justify-between py-2 border-b border-line-soft">
+                  <span className="text-ink-muted">Tốc độ cần thiết:</span>
+                  <span className={`font-medium flex items-center gap-1 ${isOverloaded ? 'text-red-600' : 'text-green-600'}`}>
+                    ~{avgMinPerDay === Infinity ? '--' : avgMinPerDay} phút / ngày
+                    {isOverloaded ? <AlertTriangle className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4" />}
+                  </span>
+                </div>
+              </div>
+
+              {(isOverloaded || isDeadlinePassed || !isValidTarget) && (
+                <div className="mb-6 space-y-2">
+                  <label className="block text-sm font-medium text-ink">
+                    Chọn ngày hoàn thành mới { (isDeadlinePassed || !isValidTarget) && <span className="text-red-500">*</span> }
+                  </label>
+                  <input
+                    type="date"
+                    required={isDeadlinePassed || !isValidTarget}
+                    min={format(addDays(new Date(), 1), 'yyyy-MM-dd')}
+                    value={rescheduleTargetDate}
+                    onChange={(e) => setRescheduleTargetDate(e.target.value)}
+                    className="w-full rounded-lg border border-line px-3 py-2 text-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                  />
+                  {isOverloaded && !isDeadlinePassed && isValidTarget && (
+                    <p className="text-xs text-orange-600">Khối lượng bài học quá nặng. Vui lòng dời deadline để giảm tải.</p>
+                  )}
+                  {(isDeadlinePassed || !isValidTarget) && (
+                    <p className="text-xs text-red-600">Deadline đã qua hoặc không hợp lệ. Bạn bắt buộc phải chọn ngày mới.</p>
+                  )}
+                </div>
+              )}
+
+              <div className="flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowRescheduleModal(false)}
+                  className="rounded-lg px-4 py-2 text-sm font-semibold text-ink-muted hover:bg-surface-hover"
+                  disabled={reschedulePlan.isPending}
+                >
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  disabled={reschedulePlan.isPending || !isValidTarget || isDeadlinePassed}
+                  className="flex items-center justify-center rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-600 disabled:opacity-50"
+                >
+                  {reschedulePlan.isPending ? 'Đang cập nhật...' : 'Xác nhận cập nhật'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>,
         document.body
