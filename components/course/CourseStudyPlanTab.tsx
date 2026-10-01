@@ -13,6 +13,7 @@ import Link from 'next/link';
 interface CourseStudyPlanTabProps {
   courseId: number;
   completedLessonIds?: number[];
+  allLessons?: { lessonId: number; durationSec?: number }[];
 }
 
 interface StudyLesson {
@@ -34,7 +35,7 @@ interface StudyPlanDto {
   planData: string; // JSON string
 }
 
-export function CourseStudyPlanTab({ courseId, completedLessonIds = [] }: CourseStudyPlanTabProps) {
+export function CourseStudyPlanTab({ courseId, completedLessonIds = [], allLessons = [] }: CourseStudyPlanTabProps) {
   const queryClient = useQueryClient();
   const [showModal, setShowModal] = useState(false);
   const [targetDate, setTargetDate] = useState<string>(() => {
@@ -349,9 +350,19 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [] }: Course
                             {lesson.title}
                           </span>
                         </div>
-                        <span className="text-xs text-ink-muted rounded-full bg-surface-hover px-2 py-1">
-                          {lesson.duration_minutes} phút
-                        </span>
+                        {(() => {
+                          const realLesson = allLessons.find(l => l.lessonId === lesson.lesson_id);
+                          const hasVideo = realLesson && realLesson.durationSec && realLesson.durationSec > 0;
+                          return hasVideo ? (
+                            <span className="text-xs text-ink-muted rounded-full bg-surface-hover px-2 py-1">
+                              {lesson.duration_minutes} phút
+                            </span>
+                          ) : (
+                            <span className="text-[11px] text-ink-faint rounded-full border border-line-soft px-2 py-0.5">
+                              Không có video
+                            </span>
+                          );
+                        })()}
                       </Link>
                     );
                   })}

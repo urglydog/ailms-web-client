@@ -759,7 +759,11 @@ function LearnPageContent() {
 
                 {mainTab === 'study-plan' && (
                   lesson.enrolled ? (
-                    <CourseStudyPlanTab courseId={lesson.courseId} completedLessonIds={lesson.chapters.flatMap(c => c.lessons).filter(l => l.isCompleted).map(l => l.lessonId)} />
+                    <CourseStudyPlanTab 
+                      courseId={lesson.courseId} 
+                      completedLessonIds={lesson.chapters.flatMap(c => c.lessons).filter(l => l.isCompleted).map(l => l.lessonId)} 
+                      allLessons={lesson.chapters.flatMap(c => c.lessons).map(l => ({ lessonId: l.lessonId, durationSec: l.durationSec }))}
+                    />
                   ) : (
                     <LockedFeatureNotice feature="Lộ trình học cá nhân hóa" courseSlug={lesson.courseSlug} />
                   )
