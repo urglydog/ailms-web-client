@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api, ApiError } from '@/lib/api/client';
 import { toast } from 'sonner';
-import { Sparkles, Calendar as CalendarIcon, Clock, Download, Plus, CheckCircle2 } from 'lucide-react';
+import { Sparkles, Calendar as CalendarIcon, Clock, Download, Plus, CheckCircle2, Trash2, AlertTriangle } from 'lucide-react';
 import { format, addDays } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import Link from 'next/link';
@@ -42,9 +42,21 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [] }: Course
   });
   const [hoursPerWeek, setHoursPerWeek] = useState<number>(5);
 
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
   const { data: plan, isLoading } = useQuery({
     queryKey: ['study-plan', courseId],
-    queryFn: () => api.get<StudyPlanDto | null>(`/api/v1/student/courses/${courseId}/study-plan`),
+    queryFn: async () => {
+      try {
+        const res = await api.get<StudyPlanDto | null>(`/api/v1/student/courses/${courseId}/study-plan`);
+        return res;
+      } catch (err: unknown) {
+        if (err instanceof ApiError && err.status === 404) {
+          return null;
+        }
+        throw err;
+      }
+    },
   });
 
   useEffect(() => {
@@ -74,6 +86,18 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [] }: Course
       } else {
         toast.error('Có lỗi xảy ra khi tạo lộ trình.');
       }
+    },
+  });
+
+  const deletePlan = useMutation({
+    mutationFn: () => api.delete(`/api/v1/student/courses/${courseId}/study-plan`),
+    onSuccess: () => {
+      queryClient.setQueryData(['study-plan', courseId], null);
+      setShowDeleteModal(false);
+      toast.success('Đã xóa lộ trình thành công!');
+    },
+    onError: () => {
+      toast.error('Có lỗi xảy ra khi xóa lộ trình.');
     },
   });
 
@@ -183,6 +207,16 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [] }: Course
             )}
             {hasPlan ? (isBehindSchedule ? 'Bắt kịp tiến độ' : 'Điều chỉnh lộ trình') : 'Tạo lộ trình ngay'}
           </button>
+          
+          {hasPlan && (
+            <button
+              onClick={() => setShowDeleteModal(true)}
+              className="flex items-center justify-center rounded-lg p-2 text-red-500 hover:bg-red-50 hover:text-red-600 transition-colors"
+              title="Xóa lộ trình"
+            >
+              <Trash2 className="h-5 w-5" />
+            </button>
+          )}
         </div>
       </div>
 
@@ -342,6 +376,43 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [] }: Course
                 </button>
               </div>
             </form>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* Modal Xác nhận Xóa Lộ trình */}
+      {showDeleteModal && typeof window !== 'undefined' && createPortal(
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-sm overflow-hidden rounded-2xl bg-white shadow-2xl">
+            <div className="p-6 text-center">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
+                <AlertTriangle className="h-6 w-6 text-red-600" />
+              </div>
+              <h3 className="mt-4 text-lg font-semibold text-ink">Xóa lộ trình hiện tại?</h3>
+              <p className="mt-2 text-sm text-ink-muted">
+                Bạn có chắc chắn muốn xóa lộ trình này không? Bạn sẽ phải cấu hình lại từ đầu.
+              </p>
+            </div>
+            <div className="flex border-t border-line">
+              <button
+                type="button"
+                onClick={() => setShowDeleteModal(false)}
+                className="flex-1 py-3 text-sm font-semibold text-ink-muted hover:bg-surface-hover"
+                disabled={deletePlan.isPending}
+              >
+                Hủy bỏ
+              </button>
+              <div className="w-px bg-line" />
+              <button
+                type="button"
+                onClick={() => deletePlan.mutate()}
+                className="flex-1 py-3 text-sm font-semibold text-red-600 hover:bg-red-50 disabled:opacity-50"
+                disabled={deletePlan.isPending}
+              >
+                {deletePlan.isPending ? 'Đang xóa...' : 'Xóa lộ trình'}
+              </button>
+            </div>
           </div>
         </div>,
         document.body
