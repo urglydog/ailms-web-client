@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api, ApiError } from '@/lib/api/client';
@@ -46,6 +46,19 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [] }: Course
     queryKey: ['study-plan', courseId],
     queryFn: () => api.get<StudyPlanDto | null>(`/api/v1/student/courses/${courseId}/study-plan`),
   });
+
+  useEffect(() => {
+    if (plan) {
+      setHoursPerWeek(plan.hoursPerWeek);
+      const minDate = format(addDays(new Date(), 2), 'yyyy-MM-dd');
+      // If plan target date is too soon, default to +7 days to avoid 400 Bad Request
+      if (plan.targetDate < minDate) {
+        setTargetDate(format(addDays(new Date(), 7), 'yyyy-MM-dd'));
+      } else {
+        setTargetDate(plan.targetDate);
+      }
+    }
+  }, [plan]);
 
   const generatePlan = useMutation({
     mutationFn: (data: { targetDate: string; hoursPerWeek: number }) =>
@@ -120,6 +133,21 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [] }: Course
     }
   }
 
+  const hasPlan = planDays.length > 0;
+  
+  let isBehindSchedule = false;
+  if (hasPlan) {
+    const todayStr = format(new Date(), 'yyyy-MM-dd');
+    planDays.forEach(day => {
+      if (day.date < todayStr) {
+        const hasUncompleted = day.lessons.some(l => !completedLessonIds.includes(l.lesson_id));
+        if (hasUncompleted) {
+          isBehindSchedule = true;
+        }
+      }
+    });
+  }
+
   if (isLoading) {
     return <div className="p-8 text-center text-ink-muted">Đang tải...</div>;
   }
@@ -146,13 +174,33 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [] }: Course
           )}
           <button
             onClick={() => setShowModal(true)}
-            className="flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent-dark"
+            className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors ${
+              isBehindSchedule ? 'bg-orange-500 hover:bg-orange-600' : 'bg-accent hover:bg-accent-dark'
+            }`}
           >
-            {hasPlan ? <Plus className="h-4 w-4" /> : <Sparkles className="h-4 w-4" />}
-            {hasPlan ? 'Tạo lộ trình mới' : 'Tạo lộ trình ngay'}
+            {hasPlan ? (
+              isBehindSchedule ? <Clock className="h-4 w-4" /> : <Plus className="h-4 w-4" />
+            ) : (
+              <Sparkles className="h-4 w-4" />
+            )}
+            {hasPlan ? (isBehindSchedule ? 'Bắt kịp tiến độ' : 'Điều chỉnh lộ trình') : 'Tạo lộ trình ngay'}
           </button>
         </div>
       </div>
+
+      {isBehindSchedule && !showModal && (
+        <div className="rounded-lg bg-orange-50 border border-orange-200 p-4 flex gap-3 items-start">
+          <div className="mt-0.5">
+            <span className="text-xl">⚠️</span>
+          </div>
+          <div>
+            <h4 className="font-semibold text-orange-800 text-sm">Bạn đang trễ tiến độ!</h4>
+            <p className="text-orange-700 text-sm mt-1">
+              Bạn có một số bài học trong quá khứ chưa hoàn thành. Hãy bấm <strong>Bắt kịp tiến độ</strong> để hệ thống tự động phân bổ lại lịch học.
+            </p>
+          </div>
+        </div>
+      )}
 
       {!hasPlan && !showModal && (
         <div className="rounded-xl border border-dashed border-line-soft bg-surface py-12 text-center">
@@ -202,7 +250,7 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [] }: Course
                     return (
                       <Link 
                         key={j} 
-                        href={`/learn/${courseId}?lesson=${lesson.lesson_id}`}
+                        href={`/learn/${lesson.lesson_id}`}
                         className={`group flex items-center justify-between rounded-lg border bg-white p-3 shadow-sm transition-all hover:border-accent hover:shadow-md ${isCompleted ? 'border-green-200 bg-green-50/30' : 'border-line-soft'}`}
                       >
                         <div className="flex items-center gap-3">
@@ -270,6 +318,13 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [] }: Course
                   <p className="mt-1 text-xs text-ink-muted">AI sẽ phân bổ sao cho không vượt quá giới hạn này.</p>
                 </div>
               </div>
+
+              {isBehindSchedule && (
+                <div className="mt-4 rounded border border-orange-200 bg-orange-50 p-3 text-xs text-orange-800">
+                  <p className="font-semibold mb-1">Gợi ý bắt kịp tiến độ:</p>
+                  <p>Vì khối lượng bài dồn lại nhiều hơn, bạn có thể cần <strong>tăng số giờ học mỗi tuần</strong> hoặc <strong>lùi ngày hoàn thành</strong> để lộ trình khả thi hơn.</p>
+                </div>
+              )}
 
               <div className="mt-8 flex justify-end gap-3">
                 <button
