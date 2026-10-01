@@ -50,8 +50,8 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [] }: Course
       try {
         const res = await api.get<StudyPlanDto | null>(`/api/v1/student/courses/${courseId}/study-plan`);
         return res;
-      } catch (err: any) {
-        if (err?.status === 404) {
+      } catch (err: unknown) {
+        if (err instanceof ApiError && err.status === 404) {
           return null;
         }
         throw err;
