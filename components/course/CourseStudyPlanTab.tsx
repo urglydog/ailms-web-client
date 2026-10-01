@@ -152,8 +152,6 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [] }: Course
     return <div className="p-8 text-center text-ink-muted">Đang tải...</div>;
   }
 
-  const hasPlan = planDays.length > 0;
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
