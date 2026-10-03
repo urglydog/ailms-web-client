@@ -151,3 +151,94 @@ export function useLessonProgress(
     };
   }, [videoRef, lessonId, enabled, initialPositionSec]);
 }
+
+/**
+ * BUG THẬT (03/10/2026) — biến thể của {@link useLessonProgress} cho nguồn YOUTUBE: không có
+ * thẻ `<video>` để gắn sự kiện `play`/`pause`/`timeupdate` như UPLOAD (IFrame Player API không
+ * expose DOM event tương đương), nên trước đây tiến độ xem KHÔNG BAO GIỜ được gửi cho bài giảng
+ * YouTube — xem hết video vẫn không được đánh dấu hoàn thành, không tính streak.
+ *
+ * Nhận `currentSec`/`isPlaying` dạng React state (được `DualPlayer` polling mỗi 250ms từ
+ * `player.getCurrentTime()`/`getPlayerState()` rồi đẩy lên qua `onTimeUpdate`/`onPlayingChange`)
+ * thay vì gắn listener DOM trực tiếp. Đọc giá trị mới nhất qua ref cập nhật ngay lúc render (KHÔNG
+ * phải qua effect riêng) để vòng accumulate/gửi (đặt 1 lần, chỉ phụ thuộc `enabled`/`lessonId`)
+ * không phải huỷ/tạo lại mỗi khi `currentSec` đổi (~250ms/lần) — nếu không sẽ gửi API liên tục.
+ */
+export function useLessonProgressFromState(
+  lessonId: number,
+  currentSec: number,
+  isPlaying: boolean,
+  { initialPositionSec = 0, enabled = true }: UseLessonProgressOptions = {},
+): void {
+  const watchedSecRef = useRef(0);
+  const lastPositionRef = useRef(initialPositionSec);
+  const currentSecRef = useRef(currentSec);
+  const isPlayingRef = useRef(isPlaying);
+  const queryClient = useQueryClient();
+
+  // Gán tham chiếu ngay lúc render — an toàn vì chỉ interval bên dưới đọc lại, không dùng để
+  // quyết định JSX render ra gì (xem docblock ở trên).
+  currentSecRef.current = currentSec;
+  lastPositionRef.current = currentSec;
+  isPlayingRef.current = isPlaying;
+
+  useEffect(() => {
+    watchedSecRef.current = 0;
+    lastPositionRef.current = initialPositionSec;
+  }, [lessonId, initialPositionSec]);
+
+  useEffect(() => {
+    if (!enabled || !getAccessToken()) {
+      return;
+    }
+
+    const send = () => {
+      lessonProgressApi
+        .record(lessonId, {
+          watchedSec: Math.round(watchedSecRef.current),
+          lastPositionSec: Math.round(lastPositionRef.current),
+        })
+        .then((res) => {
+          if (res.isCompleted) {
+            void queryClient.invalidateQueries({ queryKey: ['streak', 'me'] });
+          }
+        })
+        .catch(() => {
+          // Mất mạng tạm thời — lần gửi định kỳ tiếp theo sẽ tự bù (watchedSec là tích lũy).
+        });
+    };
+
+    let wasPlaying = isPlayingRef.current;
+    const accumulateTimer = setInterval(() => {
+      if (isPlayingRef.current) {
+        watchedSecRef.current += ACCUMULATE_INTERVAL_MS / 1000;
+      }
+      // YouTube không có sự kiện `pause` riêng để lắng nghe — polling cờ `isPlaying` mỗi giây
+      // là cách duy nhất khả thi với IFrame Player API để phát hiện chuyển sang dừng và gửi ngay.
+      if (wasPlaying && !isPlayingRef.current) {
+        send();
+      }
+      wasPlaying = isPlayingRef.current;
+    }, ACCUMULATE_INTERVAL_MS);
+
+    const sendIntervalId = setInterval(send, SEND_INTERVAL_MS);
+
+    const handlePageHide = () => {
+      lessonProgressApi.recordOnUnload(lessonId, {
+        watchedSec: Math.round(watchedSecRef.current),
+        lastPositionSec: Math.round(lastPositionRef.current),
+      });
+    };
+    window.addEventListener('pagehide', handlePageHide);
+
+    return () => {
+      clearInterval(accumulateTimer);
+      clearInterval(sendIntervalId);
+      window.removeEventListener('pagehide', handlePageHide);
+      // Rời bài học (chuyển route) cũng phải gửi nốt phần chưa kịp gửi, giống UPLOAD.
+      if (isPlayingRef.current) {
+        send();
+      }
+    };
+  }, [lessonId, enabled, queryClient]);
+}
