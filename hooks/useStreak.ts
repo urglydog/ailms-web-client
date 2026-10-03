@@ -6,6 +6,8 @@ export interface StreakResponse {
   longestStreak: number;
   hasStudiedToday: boolean;
   learningDays: string[]; // ISO date strings
+  freezesRemaining: number;
+  justFrozen: boolean;
 }
 
 export function useStreak() {

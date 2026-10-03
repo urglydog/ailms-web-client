@@ -183,6 +183,8 @@ export interface CourseReview {
   isHidden: boolean;
   moderationReason: string | null;
   createdAt: string;
+  /** 03/10/2026, mở rộng — "VISIBLE" | "HIDDEN" | "PENDING_REPORT" (Giảng viên report, chờ Admin duyệt). */
+  moderationStatus: 'VISIBLE' | 'HIDDEN' | 'PENDING_REPORT';
 }
 
 /** UC09 — bộ lọc duyệt khóa học công khai. Không có field ngôn ngữ lồng tiếng: chưa có dữ liệu

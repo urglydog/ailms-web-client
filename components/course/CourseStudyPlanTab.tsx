@@ -132,29 +132,49 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [], allLesso
     if (!plan || !plan.planData) return;
     try {
       const days: StudyDay[] = JSON.parse(plan.planData);
+      // RFC 5545 TEXT escaping — thiếu bước này thì tiêu đề bài học/mục tiêu có chứa dấu
+      // phẩy/chấm phẩy sẽ phá cấu trúc file .ics (BUG THẬT 03/10/2026).
+      const icsEscape = (text: string) =>
+        text.replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,');
+      // Cộng ngày bằng UTC thuần (không qua Date local) để tránh lệch ngày khi trình duyệt
+      // ở múi giờ âm UTC — new Date('yyyy-MM-dd') cũ đọc lại bằng getDate() local có thể lùi 1
+      // ngày (BUG THẬT 03/10/2026, cùng dạng với các lỗi timezone đã gặp trong dự án).
+      const addDaysUtc = (dateStr: string, add: number) => {
+        const parts = dateStr.split('-');
+        const y = Number(parts[0]);
+        const m = Number(parts[1]);
+        const d = Number(parts[2]);
+        const dt = new Date(Date.UTC(y, m - 1, d));
+        dt.setUTCDate(dt.getUTCDate() + add);
+        return `${dt.getUTCFullYear()}${String(dt.getUTCMonth() + 1).padStart(2, '0')}${String(dt.getUTCDate()).padStart(2, '0')}`;
+      };
+      const dtstamp = `${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]}Z`;
+
       let icsContent = 'BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//LMS//Study Plan//EN\n';
-      
+
       days.forEach(day => {
         if (!day.lessons || day.lessons.length === 0) return;
-        const [year, month, dayStr] = day.date.split('-');
-        const dtstart = `${year}${month}${dayStr}`;
-        const nextDay = new Date(day.date);
-        nextDay.setDate(nextDay.getDate() + 1);
-        const dtend = `${nextDay.getFullYear()}${String(nextDay.getMonth() + 1).padStart(2, '0')}${String(nextDay.getDate()).padStart(2, '0')}`;
-        
-        const description = `Mục tiêu: ${day.objective}\\n\\nBài giảng:\\n` + 
-          day.lessons.map(l => `- ${l.title} (${l.duration_minutes} phút)`).join('\\n');
-        
+        const dtstart = day.date.replace(/-/g, '');
+        const dtend = addDaysUtc(day.date, 1);
+
+        const description = `Mục tiêu: ${icsEscape(day.objective)}\\n\\nBài giảng:\\n` +
+          day.lessons.map(l => `- ${icsEscape(l.title)} (${l.duration_minutes} phút)`).join('\\n');
+
         icsContent += 'BEGIN:VEVENT\n';
+        // UID ổn định theo courseId+ngày — bắt buộc theo RFC 5545, và giúp app lịch NHẬN RA
+        // đây là cùng 1 sự kiện khi export lại sau reschedule (update) thay vì tạo bản trùng
+        // (BUG THẬT 03/10/2026: thiếu UID/DTSTAMP khiến mỗi lần export lại là 1 bộ event mới).
+        icsContent += `UID:lms-studyplan-${courseId}-${day.date}@lms\n`;
+        icsContent += `DTSTAMP:${dtstamp}\n`;
         icsContent += `DTSTART;VALUE=DATE:${dtstart}\n`;
         icsContent += `DTEND;VALUE=DATE:${dtend}\n`;
-        icsContent += `SUMMARY:Học LMS - ${day.lessons[0]?.title ?? 'Bài học'}...\n`;
+        icsContent += `SUMMARY:Học LMS - ${icsEscape(day.lessons[0]?.title ?? 'Bài học')}...\n`;
         icsContent += `DESCRIPTION:${description}\n`;
         icsContent += 'END:VEVENT\n';
       });
-      
+
       icsContent += 'END:VCALENDAR';
-      
+
       const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -164,7 +184,7 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [], allLesso
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
-      
+
     } catch {
       toast.error('Lỗi khi xuất file Calendar');
     }

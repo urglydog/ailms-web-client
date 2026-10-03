@@ -38,6 +38,7 @@ export interface StudentRow {
 }
 
 export interface ReviewRow {
+  id: number;
   studentName: string;
   courseId: number;
   courseTitle: string;

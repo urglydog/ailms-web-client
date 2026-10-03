@@ -2,8 +2,13 @@
 
 import { useMemo, useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { Flag } from 'lucide-react';
+import { toast } from 'sonner';
 import { InsightCallout } from '@/components/instructor/InsightCallout';
 import { useInstructorCourseOptions, useInstructorReviews } from '@/hooks/useDashboard';
+import { reviewsApi } from '@/lib/api/reviews';
+import { ApiError } from '@/lib/api/client';
+import { useQueryClient } from '@tanstack/react-query';
 
 const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
 const LOW_RATING_ALERT_THRESHOLD = 2;
@@ -14,6 +19,24 @@ export default function InstructorReviewsPage() {
   const [courseId, setCourseId] = useState<number | ''>('');
   const { data: courses } = useInstructorCourseOptions();
   const { data: reviews, isLoading } = useInstructorReviews(courseId || undefined);
+  const queryClient = useQueryClient();
+  const [reportingId, setReportingId] = useState<number | null>(null);
+
+  // Refined AC (03/10/2026) — Giảng viên report review vi phạm trên khóa của mình, review ẩn
+  // ngay + vào hàng chờ Admin duyệt (xem ReviewManager.tsx bên Admin).
+  const handleReport = async (reviewId: number) => {
+    const reason = window.prompt('Lý do report review này (vi phạm tiêu chuẩn cộng đồng, spam...):') ?? '';
+    setReportingId(reviewId);
+    try {
+      await reviewsApi.report(reviewId, reason);
+      toast.success('Đã report — review bị ẩn tạm thời, chờ Admin duyệt.');
+      queryClient.invalidateQueries({ queryKey: ['dashboard', 'instructor', 'reviews'] });
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : 'Có lỗi xảy ra khi report review.');
+    } finally {
+      setReportingId(null);
+    }
+  };
 
   const stats = useMemo(() => {
     if (!reviews || reviews.length === 0) return null;
@@ -89,11 +112,22 @@ export default function InstructorReviewsPage() {
       )}
 
       <div className="flex flex-col gap-3">
-        {reviews?.map((r, idx) => (
-          <div key={idx} className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+        {reviews?.map((r) => (
+          <div key={r.id} className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
             <div className="mb-1.5 flex items-center justify-between gap-3">
               <span className="font-semibold text-gray-900">{r.studentName}</span>
-              <span className="text-[12px] text-gray-400">{new Date(r.createdAt).toLocaleDateString('vi-VN')}</span>
+              <div className="flex items-center gap-3">
+                <span className="text-[12px] text-gray-400">{new Date(r.createdAt).toLocaleDateString('vi-VN')}</span>
+                <button
+                  type="button"
+                  onClick={() => handleReport(r.id)}
+                  disabled={reportingId === r.id}
+                  title="Report review này (vi phạm tiêu chuẩn cộng đồng)"
+                  className="flex items-center gap-1 text-[11px] font-semibold text-gray-400 hover:text-red-500 disabled:opacity-50"
+                >
+                  <Flag size={13} />
+                </button>
+              </div>
             </div>
             <div className="mb-2 flex items-center gap-2">
               <span className="text-amber-500">{'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)}</span>

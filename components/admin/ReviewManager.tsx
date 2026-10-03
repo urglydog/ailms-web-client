@@ -88,6 +88,7 @@ export function ReviewManager() {
           <option value="ALL">Tất cả trạng thái</option>
           <option value="VISIBLE">Đang hiện</option>
           <option value="HIDDEN">Bị ẩn</option>
+          <option value="PENDING_REPORT">Chờ duyệt (Giảng viên report)</option>
         </select>
       </div>
 
@@ -130,7 +131,11 @@ export function ReviewManager() {
                 <td className="px-6 py-3 text-gray-400">{formatDate(review.createdAt)}</td>
                 <td className="px-6 py-3">
                   <div className="flex flex-col items-start gap-1">
-                    {review.isHidden ? (
+                    {review.moderationStatus === 'PENDING_REPORT' ? (
+                      <span className="rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-bold text-amber-600 border border-amber-100">
+                        Chờ duyệt report
+                      </span>
+                    ) : review.isHidden ? (
                       <span className="rounded-full bg-red-50 px-2.5 py-1 text-[11px] font-bold text-red-600 border border-red-100">
                         Đã ẩn
                       </span>
@@ -147,7 +152,24 @@ export function ReviewManager() {
                   </div>
                 </td>
                 <td className="px-6 py-3 text-right">
-                  {review.isHidden ? (
+                  {review.moderationStatus === 'PENDING_REPORT' ? (
+                    <div className="flex items-center justify-end gap-3">
+                      <button
+                        onClick={() => handleUnhide(review.id)}
+                        title="Từ chối report, hiện lại review"
+                        className="text-xs font-bold text-cyan-600 hover:text-cyan-800"
+                      >
+                        Hiện lại
+                      </button>
+                      <button
+                        onClick={() => handleHide(review.id)}
+                        title="Xác nhận report, giữ ẩn"
+                        className="text-xs font-bold text-red-500 hover:text-red-700"
+                      >
+                        Giữ ẩn
+                      </button>
+                    </div>
+                  ) : review.isHidden ? (
                     <button
                       onClick={() => handleUnhide(review.id)}
                       className="text-xs font-bold text-cyan-600 hover:text-cyan-800"

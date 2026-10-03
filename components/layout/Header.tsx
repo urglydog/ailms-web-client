@@ -104,6 +104,11 @@ export function Header() {
         duration: 5000,
       });
     }
+    if (streakData?.justFrozen) {
+      toast.info(`🧊 Bạn đã lỡ 1 ngày — hệ thống tự động "đóng băng" để giữ chuỗi ${streakData.currentStreak} ngày của bạn! Còn ${streakData.freezesRemaining} lần đóng băng trong tháng này.`, {
+        duration: 7000,
+      });
+    }
     if (streakData) {
       setPrevStreak(streakData.currentStreak);
     }
@@ -336,6 +341,9 @@ export function Header() {
                     </div>
                     <p className="text-[12px] text-center text-ink-muted mt-4">
                       {streakData.hasStudiedToday ? 'Bạn đã hoàn thành mục tiêu hôm nay!' : 'Học 1 bài học hoặc làm 1 bài quiz để giữ chuỗi!'}
+                    </p>
+                    <p className="text-[11px] text-center text-ink-faint mt-1.5">
+                      🧊 Còn {streakData.freezesRemaining} lần đóng băng streak trong tháng này (tự động áp dụng nếu bạn lỡ 1 ngày)
                     </p>
                   </div>
                 )}
