@@ -13,6 +13,7 @@ interface RawReview {
   isHidden: boolean;
   moderationReason: string | null;
   createdAt: string;
+  moderationStatus: 'VISIBLE' | 'HIDDEN' | 'PENDING_REPORT';
 }
 
 function toReview(raw: RawReview): CourseReview {
@@ -27,6 +28,7 @@ function toReview(raw: RawReview): CourseReview {
     isHidden: raw.isHidden,
     moderationReason: raw.moderationReason,
     createdAt: raw.createdAt,
+    moderationStatus: raw.moderationStatus,
   };
 }
 
@@ -73,4 +75,8 @@ export const reviewsApi = {
   hide: (id: number) => api.post<void>(`/api/v1/reviews/${id}/hide`, undefined, { token: authToken() }),
 
   unhide: (id: number) => api.post<void>(`/api/v1/reviews/${id}/unhide`, undefined, { token: authToken() }),
+
+  // ── Instructor (Refined AC Sprint 2 mục 6, 03/10/2026) ──
+  report: (id: number, reason?: string) =>
+    api.post<void>(`/api/v1/reviews/${id}/report`, { reason }, { token: authToken() }),
 };

@@ -185,15 +185,31 @@ export function CouponManager({ role }: CouponManagerProps) {
                     {coupon.maxUsageCount != null ? ` / ${coupon.maxUsageCount}` : ''}
                   </td>
                   <td className="px-6 py-4">
-                    <span
-                      className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${
-                        coupon.isActive
-                          ? 'bg-success/10 text-success border border-success/20'
-                          : 'bg-surface-raised text-ink-muted border border-line'
-                      }`}
-                    >
-                      {coupon.isActive ? 'Đang bật' : 'Đã tắt'}
-                    </span>
+                    {(() => {
+                      const isExpired = new Date(coupon.endAt).getTime() < Date.now();
+                      if (!coupon.isActive) {
+                        return (
+                          <span className="rounded-full px-2.5 py-1 text-[11px] font-bold bg-surface-raised text-ink-muted border border-line">
+                            Đã tắt
+                          </span>
+                        );
+                      }
+                      if (isExpired) {
+                        return (
+                          <span
+                            className="rounded-full px-2.5 py-1 text-[11px] font-bold bg-warning/10 text-warning border border-warning/20"
+                            title="Mã đã hết hạn, học viên không áp dụng được dù vẫn đang bật"
+                          >
+                            Hết hạn
+                          </span>
+                        );
+                      }
+                      return (
+                        <span className="rounded-full px-2.5 py-1 text-[11px] font-bold bg-success/10 text-success border border-success/20">
+                          Đang bật
+                        </span>
+                      );
+                    })()}
                   </td>
                   <td className="px-6 py-4 text-right whitespace-nowrap">
                     <button
