@@ -97,8 +97,19 @@ export function Header() {
 
   const { data: streakData } = useStreak();
   const [prevStreak, setPrevStreak] = useState<number | null>(null);
+  // BUG THẬT (03/10/2026) — `reactStrictMode: true` (next.config) khiến React tự gọi LẠI effect
+  // này 2 lần liên tiếp cho ĐÚNG 1 lần `streakData` đổi (hành vi cố ý của dev mode, không phải
+  // production), nên 2 toast dưới đây hiện 2 lần cho 1 sự kiện thật. Dùng ref giữ THAM CHIẾU
+  // `streakData` đã xử lý để lần gọi lặp (cùng tham chiếu, StrictMode không render lại giữa 2 lần
+  // gọi) tự bỏ qua — không dùng state vì state cũng bị double-set, không chặn được.
+  const toastedStreakDataRef = useRef<typeof streakData>(undefined);
 
   useEffect(() => {
+    if (streakData && streakData === toastedStreakDataRef.current) {
+      return;
+    }
+    toastedStreakDataRef.current = streakData;
+
     if (streakData && prevStreak !== null && streakData.currentStreak > prevStreak) {
       toast.success(`🔥 Chúc mừng! Chuỗi ngày học của bạn đã lên ${streakData.currentStreak} ngày!`, {
         duration: 5000,

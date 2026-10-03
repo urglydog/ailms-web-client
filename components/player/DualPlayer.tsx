@@ -73,6 +73,12 @@ interface DualPlayerProps {
   onEnded?: () => void;
   /** Chỉ gọi khi `showTranscript` đang bật, tránh re-render trang cha liên tục lúc panel ẩn. */
   onTimeUpdate?: (sec: number) => void;
+  /** BUG THẬT (03/10/2026) — nguồn YOUTUBE không có thẻ `<video>` để trang cha tự gắn listener
+   * `play`/`pause` như `useLessonProgress` làm cho UPLOAD, nên tiến độ xem KHÔNG BAO GIỜ được ghi
+   * nhận cho bài giảng YouTube (học hết video cũng không đánh dấu hoàn thành, không tính streak).
+   * Forward trạng thái phát ra trang cha để dùng `useLessonProgressFromState` (polling theo
+   * `currentSec`/`isPlaying` thay vì sự kiện DOM) — xem `hooks/useLessonProgress.ts`. */
+  onPlayingChange?: (isPlaying: boolean) => void;
   showTranscript: boolean;
   onToggleTranscript: () => void;
   autoNextEnabled: boolean;
@@ -134,6 +140,7 @@ export const DualPlayer = forwardRef<DualPlayerHandle, DualPlayerProps>(function
   onToggleShowTranslatedSub,
   onEnded,
   onTimeUpdate,
+  onPlayingChange,
   showTranscript,
   onToggleTranscript,
   autoNextEnabled,
@@ -284,6 +291,10 @@ export const DualPlayer = forwardRef<DualPlayerHandle, DualPlayerProps>(function
   const playbackRate = isYoutube ? youtube.playbackRate : uploadPlaybackRate;
   const volume = isYoutube ? youtube.volume : uploadVolume;
   const muted = isYoutube ? youtube.muted : uploadMuted;
+
+  useEffect(() => {
+    onPlayingChange?.(isPlaying);
+  }, [isPlaying, onPlayingChange]);
 
   // BUG THẬT (06/09/2026): đổi ngôn ngữ lồng tiếng (hoặc bật lồng tiếng lần đầu) GIỮA LÚC đang
   // phát không tự nghe được — phải bấm dừng/phát lại mới có tiếng. Nguyên nhân: đổi `src` của

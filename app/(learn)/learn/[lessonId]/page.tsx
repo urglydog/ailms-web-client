@@ -24,7 +24,7 @@ import { useActivateDubbing, useCancelDubbing } from '@/hooks/useDubbing';
 import { useDubbingSocket } from '@/hooks/useDubbingSocket';
 import { useEnrolledLessonPlayer } from '@/hooks/useEnrolledLessonPlayer';
 import { useMyEnrollments } from '@/hooks/useEnrollments';
-import { useLessonProgress } from '@/hooks/useLessonProgress';
+import { useLessonProgress, useLessonProgressFromState } from '@/hooks/useLessonProgress';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useLessonPlayer } from '@/hooks/usePublicCourses';
 import { useVoiceOptions } from '@/hooks/useVoiceOptions';
@@ -268,6 +268,9 @@ function LearnPageContent() {
   // `showTranscript` đang bật (tránh re-render trang liên tục lúc panel ẩn, mặc định).
   const [showTranscript, setShowTranscript] = useState(false);
   const [playerCurrentSec, setPlayerCurrentSec] = useState(0);
+  // BUG THẬT (03/10/2026) — nguồn để `useLessonProgressFromState` biết video YouTube đang phát
+  // hay không (xem `onPlayingChange` của `DualPlayer`).
+  const [playerIsPlaying, setPlayerIsPlaying] = useState(false);
 
   // Chuyển bài học (`lessonId` đổi) giờ KHÔNG unmount lại component này nữa (nhờ
   // `placeholderData: keepPreviousData` ở 2 hook trên — xem đó để biết lý do), nên các state
@@ -485,6 +488,14 @@ function LearnPageContent() {
     initialPositionSec: lesson?.lastPositionSec ?? 0,
     enabled: hasToken && lesson?.videoSource === 'UPLOAD',
   });
+  // BUG THẬT (03/10/2026) — nguồn YOUTUBE không có thẻ <video> để gắn listener như trên, nên
+  // trước đây tiến độ xem KHÔNG BAO GIỜ được ghi nhận (học hết video YouTube vẫn không được đánh
+  // dấu hoàn thành, không tính streak). Dùng `playerCurrentSec`/`playerIsPlaying` (DualPlayer tự
+  // polling IFrame Player API rồi đẩy lên qua onTimeUpdate/onPlayingChange) thay cho videoRef.
+  useLessonProgressFromState(lessonId, playerCurrentSec, playerIsPlaying, {
+    initialPositionSec: lesson?.lastPositionSec ?? 0,
+    enabled: hasToken && lesson?.videoSource === 'YOUTUBE',
+  });
 
   // Gửi heartbeat kiểm tra conflict (Task 10)
   useEffect(() => {
@@ -670,6 +681,7 @@ function LearnPageContent() {
                 onToggleShowTranslatedSub={() => setShowTranslatedSub((v) => !v)}
                 onEnded={handleVideoEnded}
                 onTimeUpdate={setPlayerCurrentSec}
+                onPlayingChange={setPlayerIsPlaying}
                 showTranscript={showTranscript}
                 onToggleTranscript={handleToggleTranscript}
                 autoNextEnabled={autoNextEnabled}
