@@ -1068,6 +1068,21 @@ export interface CreateBundleReq {
   courseIds: number[];
 }
 
+/** Ranking cộng đồng theo XP (UpComming_Plan.md) — 1 dòng trong Top N ở banner trang chủ. */
+export interface LeaderboardEntry {
+  rank: number;
+  userId: number;
+  fullName: string;
+  avatarUrl: string | null;
+  totalXp: number;
+}
+
+/** Hạng + XP của chính người đang đăng nhập — dùng khi không nằm trong Top N hiển thị. */
+export interface MyRanking {
+  rank: number;
+  totalXp: number;
+}
+
 export interface UpdateBundleReq {
   title?: string;
   description?: string;

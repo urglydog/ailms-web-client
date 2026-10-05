@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { FeaturedCourseGrid } from '@/components/course/FeaturedCourseGrid';
+import { RankingBanner } from '@/components/ranking/RankingBanner';
 import { publicCoursesApi, EMPTY_FILTERS } from '@/lib/api/publicCourses';
 
 /**
@@ -42,6 +43,8 @@ export default async function HomePage() {
 
   return (
     <>
+      <RankingBanner />
+
       {/* ── Hero chia đôi ── */}
       <section className="shell pt-10">
         <div className="grid items-center gap-14 lg:grid-cols-[1.05fr_0.95fr]">
