@@ -73,7 +73,7 @@ function ProfilePageContent() {
 
   return (
     <div className="mx-auto max-w-4xl p-6 md:p-10">
-      <h1 className="mb-6 font-display text-3xl font-bold text-ink">Hồ sơ cá nhân</h1>
+      <h1 className="mb-6 font-display text-3xl font-bold text-ink">Cài đặt tài khoản</h1>
 
       <div className="grid gap-8 md:grid-cols-2">
         {/* Cột 1: Thông tin cá nhân */}

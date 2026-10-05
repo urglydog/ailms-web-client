@@ -563,17 +563,18 @@ export function Header() {
                     <Link href="/wishlist" className="rounded-lg px-3 py-2.5 text-[13.5px] text-ink hover:bg-surface">
                       {t('account.wishlist')}
                     </Link>
-                    {/* "View public profile" (14/09/2026, mở rộng) — xem hồ sơ của CHÍNH MÌNH
-                        đúng như người khác sẽ thấy (theo BR quyền riêng tư đã bật/tắt ở trang
-                        Hồ sơ cá nhân). */}
+                    {/* "View public profile" (14/09/2026, mở rộng; 05/10/2026, gộp Chứng chỉ
+                        vào đây) — xem hồ sơ của CHÍNH MÌNH đúng như người khác sẽ thấy (theo BR
+                        quyền riêng tư đã bật/tắt ở trang Cài đặt tài khoản). Trang này giờ là nơi
+                        duy nhất trưng thành tích (streak + chứng chỉ, tab "Chứng chỉ" có sẵn),
+                        nên mục "Chứng chỉ của tôi" tách riêng trước đây đã bỏ khỏi menu — route
+                        `/certificates` vẫn giữ nguyên để không vỡ link cũ, chỉ không còn là lối
+                        vào chính. */}
                     {currentUser?.id != null && (
                       <Link href={`/u/${currentUser.id}`} className="rounded-lg px-3 py-2.5 text-[13.5px] text-ink hover:bg-surface">
                         {t('account.publicProfile')}
                       </Link>
                     )}
-                    <Link href="/certificates" className="rounded-lg px-3 py-2.5 text-[13.5px] text-ink hover:bg-surface">
-                      {t('account.certificates')}
-                    </Link>
                     <Link href="/payments" className="rounded-lg px-3 py-2.5 text-[13.5px] text-ink hover:bg-surface">
                       {t('account.paymentHistory')}
                     </Link>

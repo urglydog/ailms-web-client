@@ -10,14 +10,15 @@ export interface StreakResponse {
   justFrozen: boolean;
 }
 
-export function useStreak() {
+export function useStreak(enabled: boolean = true) {
   return useQuery({
     queryKey: ['streak', 'me'],
+    enabled,
     queryFn: () => {
       let timezone = 'Asia/Ho_Chi_Minh';
       try {
         timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      } catch (e) {
+      } catch {
         // Fallback
       }
       return api.get<StreakResponse>('/api/v1/streak/me', {
