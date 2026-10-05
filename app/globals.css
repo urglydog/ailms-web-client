@@ -74,6 +74,23 @@
     stroke-dashoffset: 48;
     animation: success-check-draw 0.4s ease-out 0.35s forwards;
   }
+
+  /* Banner "Bảng xếp hạng cộng đồng" ở trang chủ (05/10/2026) — trượt vào nhẹ khi trang vừa
+   * tải, thu hút chú ý mà không chạy lặp lại gây rối mắt. */
+  .ranking-banner-enter {
+    animation: ranking-banner-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}
+
+@keyframes ranking-banner-in {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 @keyframes success-circle-pop {
