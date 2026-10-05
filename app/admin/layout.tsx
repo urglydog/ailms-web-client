@@ -3,15 +3,45 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { ChevronDown } from 'lucide-react';
 import { LogoutSidebarButton } from '@/components/auth/LogoutSidebarButton';
 import { useModerationQueue } from '@/hooks/useCourses';
 import { getAccessToken, getCurrentRole } from '@/lib/auth/token';
+
+type SidebarItem = { id: string; label: string; href: string; badge: number };
+type SidebarGroup = { groupId: string; groupLabel: string; items: SidebarItem[] };
+
+const COLLAPSED_GROUPS_STORAGE_KEY = 'admin-sidebar-collapsed-groups';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
 
   const [userInfo, setUserInfo] = useState<{name: string, role: string, initials: string} | null>(null);
+  const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
+
+  // Nhớ nhóm nào admin đã thu gọn, chỉ riêng trình duyệt này (tiện cho cá nhân, không cần đồng
+  // bộ giữa các admin khác).
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem(COLLAPSED_GROUPS_STORAGE_KEY);
+      if (raw) setCollapsedGroups(JSON.parse(raw));
+    } catch {
+      // bỏ qua — vẫn hiện mặc định mở hết nếu đọc localStorage lỗi
+    }
+  }, []);
+
+  const toggleGroup = (groupId: string) => {
+    setCollapsedGroups((prev) => {
+      const next = { ...prev, [groupId]: !prev[groupId] };
+      try {
+        window.localStorage.setItem(COLLAPSED_GROUPS_STORAGE_KEY, JSON.stringify(next));
+      } catch {
+        // bỏ qua — chỉ mất nhớ trạng thái thu gọn, không ảnh hưởng chức năng
+      }
+      return next;
+    });
+  };
 
   useEffect(() => {
     const role = getCurrentRole();
@@ -53,20 +83,51 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const pendingCoursesCount = pendingCoursesPage?.totalElements ?? 0;
 
-    const sidebarItems = [
+  // Tổng quan + Quản lý người dùng đứng riêng (dùng hàng ngày nhất); các tab còn lại gom theo
+  // nhóm cha-con vì trước đây 13 tab phẳng có nhiều cặp cùng mảng nhưng tách rời (AI Analytics/
+  // Giám sát AI Queue/Giọng đọc lồng tiếng/Bảo mật AI Tutor đều là AI; Đối soát giao dịch/Mã
+  // giảm giá đều là tài chính...). Không đổi href nào để không vỡ link cũ.
+  const topLevelItems: SidebarItem[] = [
     { id: 'overview', label: 'Tổng quan', href: '/admin', badge: 0 },
-    { id: 'moderation', label: 'Kiểm duyệt khóa học', href: '/admin/moderation', badge: pendingCoursesCount },
     { id: 'users', label: 'Quản lý người dùng', href: '/admin/users', badge: 0 },
-    { id: 'aianalytics', label: 'AI Analytics', href: '/admin/ai-analytics', badge: 0 },
-    { id: 'aiqueue', label: 'Giám sát AI Queue', href: '/admin/ai-queue', badge: 0 },
-    { id: 'voice-mappings', label: 'Giọng đọc lồng tiếng', href: '/admin/voice-mappings', badge: 0 },
-    { id: 'transactions', label: 'Đối soát giao dịch', href: '/admin/transactions/payments', badge: 0 },
-    { id: 'coupons', label: 'Mã giảm giá', href: '/admin/coupons', badge: 0 },
-    { id: 'announcements', label: 'Thông báo hệ thống', href: '/admin/announcements', badge: 0 },
-    { id: 'tutor-security', label: 'Bảo mật AI Tutor', href: '/admin/tutor-security', badge: 0 },
-    { id: 'categories', label: 'Danh mục', href: '/admin/categories', badge: 0 },
-    { id: 'reviews', label: 'Đánh giá', href: '/admin/reviews', badge: 0 },
-    { id: 'settings', label: 'Cấu hình hệ thống', href: '/admin/settings', badge: 0 },
+  ];
+
+  const sidebarGroups: SidebarGroup[] = [
+    {
+      groupId: 'content',
+      groupLabel: 'Nội dung khóa học',
+      items: [
+        { id: 'moderation', label: 'Kiểm duyệt khóa học', href: '/admin/moderation', badge: pendingCoursesCount },
+        { id: 'categories', label: 'Danh mục', href: '/admin/categories', badge: 0 },
+        { id: 'reviews', label: 'Đánh giá', href: '/admin/reviews', badge: 0 },
+      ],
+    },
+    {
+      groupId: 'ai',
+      groupLabel: 'AI & Tự động hoá',
+      items: [
+        { id: 'aianalytics', label: 'AI Analytics', href: '/admin/ai-analytics', badge: 0 },
+        { id: 'aiqueue', label: 'Giám sát AI Queue', href: '/admin/ai-queue', badge: 0 },
+        { id: 'voice-mappings', label: 'Giọng đọc lồng tiếng', href: '/admin/voice-mappings', badge: 0 },
+        { id: 'tutor-security', label: 'Bảo mật AI Tutor', href: '/admin/tutor-security', badge: 0 },
+      ],
+    },
+    {
+      groupId: 'finance',
+      groupLabel: 'Tài chính',
+      items: [
+        { id: 'transactions', label: 'Đối soát giao dịch', href: '/admin/transactions/payments', badge: 0 },
+        { id: 'coupons', label: 'Mã giảm giá', href: '/admin/coupons', badge: 0 },
+      ],
+    },
+    {
+      groupId: 'system',
+      groupLabel: 'Hệ thống',
+      items: [
+        { id: 'announcements', label: 'Thông báo hệ thống', href: '/admin/announcements', badge: 0 },
+        { id: 'settings', label: 'Cấu hình hệ thống', href: '/admin/settings', badge: 0 },
+      ],
+    },
   ];
 
   return (
@@ -84,23 +145,35 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
         
         <nav className="flex flex-col gap-1">
-          {sidebarItems.map((item) => {
-            const isActive = pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href));
+          {topLevelItems.map((item) => (
+            <SidebarLink key={item.id} item={item} pathname={pathname} />
+          ))}
+
+          {sidebarGroups.map((group) => {
+            const isGroupActive = group.items.some(
+              (item) => pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href)),
+            );
+            // Nhóm chứa trang đang xem thì luôn mở, bất kể admin đã thu gọn trước đó —
+            // không để admin "lạc mất" trang mình đang ở vì nhóm bị gập.
+            const isExpanded = isGroupActive || !collapsedGroups[group.groupId];
             return (
-              <Link
-                key={item.id}
-                href={item.href}
-                className={`flex items-center justify-between rounded-lg px-3.5 py-2.5 text-[13.5px] font-semibold no-underline ${
-                  isActive ? 'bg-cyan-400/15 text-cyan-300' : 'text-slate-300 hover:bg-slate-800'
-                }`}
-              >
-                <span>{item.label}</span>
-                {item.badge > 0 && (
-                  <span className="flex min-w-[18px] h-[18px] items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold text-white">
-                    {item.badge}
-                  </span>
+              <div key={group.groupId} className="mt-1.5 first:mt-0">
+                <button
+                  type="button"
+                  onClick={() => toggleGroup(group.groupId)}
+                  className="flex w-full items-center justify-between rounded-lg px-3.5 py-2 text-[11.5px] font-bold uppercase tracking-wide text-slate-500 hover:text-slate-300"
+                >
+                  <span>{group.groupLabel}</span>
+                  <ChevronDown className={`h-3.5 w-3.5 transition-transform ${isExpanded ? '' : '-rotate-90'}`} strokeWidth={2} />
+                </button>
+                {isExpanded && (
+                  <div className="flex flex-col gap-1">
+                    {group.items.map((item) => (
+                      <SidebarLink key={item.id} item={item} pathname={pathname} />
+                    ))}
+                  </div>
                 )}
-              </Link>
+              </div>
             );
           })}
         </nav>
@@ -128,5 +201,24 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         {children}
       </main>
     </div>
+  );
+}
+
+function SidebarLink({ item, pathname }: { item: SidebarItem; pathname: string }) {
+  const isActive = pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href));
+  return (
+    <Link
+      href={item.href}
+      className={`flex items-center justify-between rounded-lg px-3.5 py-2.5 text-[13.5px] font-semibold no-underline ${
+        isActive ? 'bg-cyan-400/15 text-cyan-300' : 'text-slate-300 hover:bg-slate-800'
+      }`}
+    >
+      <span>{item.label}</span>
+      {item.badge > 0 && (
+        <span className="flex min-w-[18px] h-[18px] items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold text-white">
+          {item.badge}
+        </span>
+      )}
+    </Link>
   );
 }

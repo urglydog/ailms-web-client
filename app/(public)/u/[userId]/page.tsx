@@ -8,6 +8,7 @@ import { format } from 'date-fns';
 import { ApiError } from '@/lib/api/client';
 import { usePublicProfile } from '@/hooks/usePublicProfile';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useStreak } from '@/hooks/useStreak';
 import { StarRating } from '@/components/ui/StarRating';
 import { CertificatePreview } from '@/components/certificate/CertificatePreview';
 import type { PublicCertificate, PublicCourseSummary } from '@/types/domain';
@@ -58,6 +59,10 @@ export default function PublicProfilePage() {
   const userId = Number(params.userId);
   const { data: profile, isLoading, error } = usePublicProfile(userId);
   const { data: currentUser } = useCurrentUser();
+  const isOwnProfile = currentUser?.id === userId;
+  // Streak là dữ liệu riêng tư của người đang đăng nhập (BE chỉ có endpoint "/streak/me"),
+  // nên chỉ fetch/hiện khi tự xem hồ sơ của chính mình — xem người khác sẽ không có mục này.
+  const { data: streakData } = useStreak(isOwnProfile);
   const [tab, setTab] = useState<Tab>('courses');
   const [certificateSort, setCertificateSort] = useState<CertificateSortBy>('newest');
   const sortedCertificates = useMemo(
@@ -77,7 +82,6 @@ export default function PublicProfilePage() {
   }
   if (!profile) return null;
 
-  const isOwnProfile = currentUser?.id === profile.id;
   const activeCourses = tab === 'courses' ? profile.courses : profile.wishlist;
 
   return (
@@ -128,7 +132,7 @@ export default function PublicProfilePage() {
                 </div>
                 <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
                   {sortedCertificates.map((cert) => (
-                    <PublicCertificateCard key={cert.certificateCode} certificate={cert} />
+                    <PublicCertificateCard key={cert.certificateCode} certificate={cert} isOwnProfile={isOwnProfile} />
                   ))}
                 </div>
               </>
@@ -167,13 +171,30 @@ export default function PublicProfilePage() {
                 href="/profile"
                 className="w-full rounded-full border border-accent px-4 py-2.5 text-sm font-semibold text-accent hover:bg-accent/5 no-underline"
               >
-                Hồ sơ cá nhân
+                Cài đặt tài khoản
               </Link>
             )}
             <p className="text-xs text-ink-muted">
               Thành viên từ {new Date(profile.memberSince).toLocaleDateString('vi-VN')}
             </p>
           </div>
+
+          {/* Streak — chỉ của chính mình (05/10/2026), đặt cạnh Chứng chỉ để hồ sơ công khai
+              là nơi duy nhất trưng thành tích, thay vì tách rời ở icon avatar như trước. */}
+          {isOwnProfile && streakData && (
+            <div className="card mt-4 flex flex-col gap-3 p-5">
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">🔥</span>
+                <div>
+                  <h3 className="font-display text-sm font-bold text-ink">Chuỗi {streakData.currentStreak} ngày</h3>
+                  <p className="text-xs text-ink-muted">Kỷ lục: {streakData.longestStreak} ngày</p>
+                </div>
+              </div>
+              <p className="text-xs text-ink-muted">
+                🧊 Còn {streakData.freezesRemaining} lần đóng băng streak trong tháng này
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -230,12 +251,21 @@ function PublicCourseCard({ course }: { course: PublicCourseSummary }) {
  * chủ sở hữu (doc/DacTa_ChucNangChungChi.md, BR-CERT-06). Ảnh đại diện của thẻ là chính hình
  * chứng chỉ (`CertificatePreview`), KHÔNG phải ảnh bìa khóa học (26/09/2026, sửa lỗi) — chứng chỉ
  * mới là thứ đang được khoe ở đây. */
-function PublicCertificateCard({ certificate }: { certificate: PublicCertificate }) {
+function PublicCertificateCard({
+  certificate,
+  isOwnProfile,
+}: {
+  certificate: PublicCertificate;
+  isOwnProfile: boolean;
+}) {
+  // Tự xem hồ sơ của mình → vào trang chi tiết có nút tải PDF/thêm LinkedIn
+  // (`/certificates/{code}`); người khác xem → chỉ trang xác thực công khai (`/verify/{code}`).
+  const href = isOwnProfile ? `/certificates/${certificate.certificateCode}` : `/verify/${certificate.certificateCode}`;
   return (
     <Link
-      href={`/verify/${certificate.certificateCode}`}
-      target="_blank"
-      rel="noopener noreferrer"
+      href={href}
+      target={isOwnProfile ? undefined : '_blank'}
+      rel={isOwnProfile ? undefined : 'noopener noreferrer'}
       className="card-interactive flex flex-col overflow-hidden no-underline hover:no-underline"
     >
       <CertificatePreview certificate={certificate} interactive={false} />
