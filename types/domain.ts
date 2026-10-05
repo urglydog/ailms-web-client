@@ -1077,8 +1077,10 @@ export interface LeaderboardEntry {
   totalXp: number;
 }
 
-/** Hạng + XP của chính người đang đăng nhập — dùng khi không nằm trong Top N hiển thị. */
+/** Hạng + XP của chính người đang đăng nhập — dùng khi không nằm trong Top N hiển thị.
+ * `ranked=false` khi chưa có XP nào, "hạng" lúc đó không có ý nghĩa, không nên hiển thị. */
 export interface MyRanking {
+  ranked: boolean;
   rank: number;
   totalXp: number;
 }
