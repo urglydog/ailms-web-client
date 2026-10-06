@@ -216,6 +216,7 @@ export default function AntiCheatExamPage() {
         await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
         await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
         setIsModelLoaded(true);
+        console.info('[Proctoring] face-api models loaded');
       } catch (err) {
         console.error("Failed to load face-api models", err);
         // Fallback for demo
@@ -273,7 +274,10 @@ export default function AntiCheatExamPage() {
   // bỏ hẳn, còn hơn không có gì.
   const startCompositeRecording = useCallback((camStream: MediaStream, screenStream: MediaStream | null) => {
     const mimeType = pickSupportedMimeType();
-    if (!mimeType) return; // Trình duyệt không hỗ trợ ghi hình kiểu nào cả — bỏ qua, không chặn thi.
+    if (!mimeType) {
+      console.warn('[Proctoring] no supported mimeType found, skipping video recording');
+      return; // Trình duyệt không hỗ trợ ghi hình kiểu nào cả — bỏ qua, không chặn thi.
+    }
     recordingMimeTypeRef.current = mimeType;
 
     const canvas = document.createElement('canvas');
@@ -323,11 +327,18 @@ export default function AntiCheatExamPage() {
       const recorder = new MediaRecorder(composite, { mimeType });
       recordedChunksRef.current = [];
       recorder.ondataavailable = (e) => { if (e.data.size > 0) recordedChunksRef.current.push(e.data); };
+      recorder.onerror = (e) => console.error('[Proctoring] MediaRecorder error', e);
       recorder.start(1000);
       mediaRecorderRef.current = recorder;
       recordingStartRef.current = Date.now();
-    } catch {
+      console.info('[Proctoring] recording started', {
+        mimeType,
+        videoTracks: composite.getVideoTracks().length,
+        audioTracks: composite.getAudioTracks().length,
+      });
+    } catch (err) {
       // MediaRecorder tạo thất bại vì lý do khác (hiếm) — bỏ qua ghi hình, không chặn thi.
+      console.error('[Proctoring] MediaRecorder construction failed', err);
     }
   }, []);
 
@@ -692,6 +703,8 @@ export default function AntiCheatExamPage() {
             video,
             new faceapi.TinyFaceDetectorOptions({ inputSize: 160, scoreThreshold: 0.3 })
           ).withFaceLandmarks();
+
+          console.info('[Proctoring] detect tick', { facesFound: detections.length });
 
           let isAbnormal: boolean;
 
