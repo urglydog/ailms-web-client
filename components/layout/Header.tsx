@@ -186,7 +186,10 @@ export function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-30 bg-white border-b border-line">
+      <header
+        className="sticky top-0 z-30 bg-white border-b border-line"
+        style={{ paddingTop: 'env(safe-area-inset-top)' }}
+      >
         <div className="mx-auto flex h-[72px] max-w-7xl items-center justify-between gap-2 px-4 sm:gap-3.5 md:px-8">
           
           {/* Logo & Nav */}
