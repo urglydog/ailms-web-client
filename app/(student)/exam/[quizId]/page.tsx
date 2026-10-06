@@ -385,34 +385,33 @@ export default function AntiCheatExamPage() {
     const elapsed = startTimeRef.current ? Math.floor((Date.now() - startTimeRef.current.getTime()) / 1000) : 0;
     setElapsedSeconds(elapsed);
     submitQuiz({ attemptId: attemptData.attemptId, data: { answers } }, {
-      onSuccess: async (data: SubmitRes) => {
+      onSuccess: (data: SubmitRes) => {
         setResult(data);
         setSubmitTime(new Date());
 
-        // UC-ANTICHEAT (1.7) — dừng ghi hình + upload video bằng chứng TRƯỚC khi điều hướng
-        // trang (router.replace bên dưới có thể unmount component, huỷ request đang bay).
-        // Lỗi upload không được chặn việc hiển thị kết quả bài thi — chỉ mất video bằng chứng.
+        // BUG THẬT (06/10/2026, test thật trên Safari iPhone): trước đây `await
+        // stopCompositeRecording()` (gọi recorder.stop() bên trong) chặn luồng chính rất lâu
+        // trên WebKit khi ghi từ canvas.captureStream() — màn hình "đang nộp" bị đứng, học viên
+        // phải tự bấm vào Dynamic Island để tắt ghi hình rồi back lại mới nộp được, không tự
+        // động như trên desktop. Dừng track camera/mic NGAY (đồng bộ, không chờ gì) để hệ điều
+        // hành nhả chỉ báo ghi hình sớm nhất — việc dừng recorder + upload video bằng chứng chạy
+        // nền (fire-and-forget), không chặn điều hướng trang nữa. Video bằng chứng chỉ là bổ
+        // sung (xem comment UC-ANTICHEAT 1.7 ở stopCompositeRecording), mất vài giây cuối không
+        // sao, nhưng để học viên đứng hình máy mới là vấn đề thật.
+        mediaStream?.getTracks().forEach(t => t.stop());
+        screenStreamRef.current?.getTracks().forEach(t => t.stop());
+
         if (mediaRecorderRef.current) {
-          try {
-            // Rủi ro phòng ngừa (26/09/2026): trên 1 số bản WebKit, MediaRecorder.onstop có tiền
-            // sử không bắn ra sau recorder.stop() — nếu xảy ra, await bên dưới sẽ treo vĩnh viễn,
-            // khiến dòng dừng track camera/mic ở cuối onSuccess không bao giờ chạy tới (camera/mic
-            // không bao giờ tắt). Giới hạn tối đa 5s, quá hạn coi như không có video (giống hệt
-            // hành vi khi stopCompositeRecording tự trả null) nhưng vẫn tiếp tục các bước còn lại.
-            const recording = await Promise.race([
-              stopCompositeRecording(),
-              new Promise<null>((resolve) => setTimeout(() => resolve(null), 5000)),
-            ]);
-            if (recording) {
+          stopCompositeRecording()
+            .then((recording) => {
+              if (!recording) return;
               // Đuôi file theo đúng mimeType thật đã ghi (Safari → mp4, Chrome/Firefox → webm) —
               // trước đây hardcode ".webm" dù Safari thực ra ghi ra mp4, sai định dạng file.
               const ext = recording.blob.type.includes('mp4') ? 'mp4' : 'webm';
               const file = new File([recording.blob], `attempt-${attemptData.attemptId}.${ext}`, { type: recording.blob.type });
               uploadRecordingMutation({ attemptId: attemptData.attemptId, file, durationSec: recording.durationSec });
-            }
-          } catch {
-            // Bỏ qua — không chặn hiển thị kết quả bài thi vì thiếu video bằng chứng.
-          }
+            })
+            .catch((err) => console.error('[Proctoring] stopCompositeRecording failed', err));
         }
         if (userId && quizId) {
           try {
@@ -429,9 +428,6 @@ export default function AntiCheatExamPage() {
             }
           } catch {}
         }
-        // Dừng stream
-        if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
-        
         if (data && data.isArchived) {
           setArchivedError({ show: true, message: 'Bài nộp đã được lưu vào Bảng điểm. Bài thi này hiện đã được giảng viên lưu trữ.' });
         }
