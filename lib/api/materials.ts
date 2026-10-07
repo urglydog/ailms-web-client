@@ -78,6 +78,8 @@ export interface MaterialGenerationRes {
   status: GenStatus;
   createdAt: string;
   usageCount?: number;
+  /** Chỉ có giá trị khi materialType='QUIZ' ('LECTURE_QUIZ'/'OFFICIAL_EXAM') — null với các loại khác. */
+  quizType?: 'LECTURE_QUIZ' | 'OFFICIAL_EXAM' | null;
 }
 
 /** Cùng nguồn `voice_mappings.is_active` với dropdown lồng tiếng (BR-DUB-07) — `available` ở đây
