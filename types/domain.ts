@@ -691,6 +691,8 @@ export interface CreatePaymentReq {
 
 export interface PaymentUrlRes {
   paymentUrl: string;
+  /** Chỉ app mobile dùng (poll `/payments/mine` theo field này) — web không cần. */
+  txnRef: string;
 }
 
 export interface PaymentRes {
