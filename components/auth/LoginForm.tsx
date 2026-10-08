@@ -67,7 +67,7 @@ export function LoginForm() {
       },
       onError: (err: unknown) => {
         const error = err as { response?: { data?: { detail?: string, message?: string } } };
-        alert(error.response?.data?.message || error.response?.data?.detail || 'Đăng nhập thất bại');
+        toast.error(error.response?.data?.message || error.response?.data?.detail || 'Đăng nhập thất bại');
       }
     });
   };

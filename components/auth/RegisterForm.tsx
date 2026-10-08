@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { useRegister, useVerifyOtp } from '@/hooks/useAuthMutations';
 import { useRouter } from 'next/navigation';
 import { Check, X, Mail } from 'lucide-react';
+import { toast } from 'sonner';
 
 function getPasswordStrength(password: string) {
   if (!password) return { score: 0, label: '', color: 'bg-line', textColor: 'text-ink-muted' };
@@ -93,7 +94,7 @@ export function RegisterForm() {
       onSuccess: () => setStep('otp'),
       onError: (err: unknown) => {
         const error = err as { response?: { data?: { detail?: string, message?: string } } };
-        alert(error.response?.data?.detail || error.response?.data?.message || 'Lỗi đăng ký từ máy chủ');
+        toast.error(error.response?.data?.detail || error.response?.data?.message || 'Lỗi đăng ký từ máy chủ');
       }
     });
   };
@@ -107,7 +108,7 @@ export function RegisterForm() {
       },
       onError: (err: unknown) => {
         const error = err as { response?: { data?: { detail?: string, message?: string } } };
-        alert(error.response?.data?.detail || error.response?.data?.message || 'OTP không hợp lệ');
+        toast.error(error.response?.data?.detail || error.response?.data?.message || 'OTP không hợp lệ');
       }
     });
   };
