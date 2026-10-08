@@ -167,9 +167,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   <ChevronDown className={`h-3.5 w-3.5 transition-transform ${isExpanded ? '' : '-rotate-90'}`} strokeWidth={2} />
                 </button>
                 {isExpanded && (
-                  <div className="flex flex-col gap-1">
+                  // (08/10/2026, theo phản hồi) — thụt lề + viền trái để phân biệt rõ menu con
+                  // với menu cha/menu không nhóm (trước đây cùng cỡ chữ/màu/khoảng cách hệt
+                  // nhau, nhìn không biết đâu là cha đâu là con).
+                  <div className="ml-3 flex flex-col gap-1 border-l border-white/10 pl-2">
                     {group.items.map((item) => (
-                      <SidebarLink key={item.id} item={item} pathname={pathname} />
+                      <SidebarLink key={item.id} item={item} pathname={pathname} isChild />
                     ))}
                   </div>
                 )}
@@ -204,14 +207,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   );
 }
 
-function SidebarLink({ item, pathname }: { item: SidebarItem; pathname: string }) {
+function SidebarLink({ item, pathname, isChild = false }: { item: SidebarItem; pathname: string; isChild?: boolean }) {
   const isActive = pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href));
   return (
     <Link
       href={item.href}
-      className={`flex items-center justify-between rounded-lg px-3.5 py-2.5 text-[13.5px] font-semibold no-underline ${
-        isActive ? 'bg-cyan-400/15 text-cyan-300' : 'text-slate-300 hover:bg-slate-800'
-      }`}
+      className={`flex items-center justify-between rounded-lg no-underline ${
+        isChild ? 'px-3 py-2 text-[12.5px] font-medium' : 'px-3.5 py-2.5 text-[13.5px] font-semibold'
+      } ${isActive ? 'bg-cyan-400/15 text-cyan-300' : isChild ? 'text-slate-400 hover:bg-slate-800 hover:text-slate-200' : 'text-slate-300 hover:bg-slate-800'}`}
     >
       <span>{item.label}</span>
       {item.badge > 0 && (
