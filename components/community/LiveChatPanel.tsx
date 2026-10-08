@@ -64,7 +64,6 @@ export function LiveChatPanel({ lessonId, userName, currentUserId }: LiveChatPan
     setVisibleCounts(prev => ({ ...prev, [rootId]: (prev[rootId] ?? 0) + REPLIES_PAGE_SIZE }));
   };
 
-  const rootMessages = messages.filter(m => !m.parentId);
   const repliesByParent = messages.reduce<Record<string, ChatMessage[]>>((acc, msg) => {
     if (msg.parentId) {
       const arr = acc[msg.parentId] || [];
@@ -74,15 +73,15 @@ export function LiveChatPanel({ lessonId, userName, currentUserId }: LiveChatPan
     return acc;
   }, {});
 
-  /** Ghim câu trả lời ĐẦU TIÊN của giảng viên lên đầu, phần còn lại mới nhất lên trên. */
+  /** Câu trả lời (replies) xếp CŨ NHẤT lên trên để đọc hội thoại xuôi dòng. */
   const orderReplies = (replies: ChatMessage[]): ChatMessage[] => {
-    const firstInstructorReply = replies.find(r => r.isInstructor);
-    const rest = replies
-      .filter(r => r.id !== firstInstructorReply?.id)
-      .slice()
-      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-    return firstInstructorReply ? [firstInstructorReply, ...rest] : rest;
+    return replies.slice().sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
   };
+
+  /** Câu hỏi gốc (root) xếp MỚI NHẤT lên trên. */
+  const rootMessages = messages
+    .filter(m => !m.parentId)
+    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
   const renderMessage = (msg: ChatMessage, isReply: boolean = false) => (
     <div key={msg.id} className={`flex items-start gap-3 ${isReply ? 'mt-4' : 'border-b border-line-soft pb-4'}`}>
