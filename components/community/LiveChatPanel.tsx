@@ -29,7 +29,7 @@ export function LiveChatPanel({ lessonId, userName, currentUserId }: LiveChatPan
   const [replyingTo, setReplyingTo] = useState<ChatMessage | null>(null);
   const [visibleCounts, setVisibleCounts] = useState<Record<string, number>>({});
   const scrollRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -133,7 +133,7 @@ export function LiveChatPanel({ lessonId, userName, currentUserId }: LiveChatPan
             </div>
           )}
           <textarea
-            ref={inputRef as any}
+            ref={inputRef}
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             placeholder={replyingTo ? "Nhập câu trả lời..." : "Chia sẻ cảm nghĩ của bạn ..."}
