@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, type DragEvent } from 'react';
-import { PencilIcon, TrashIcon, DragHandleIcon } from '@/components/instructor/CurriculumIcons';
+import { ChevronDownIcon, PencilIcon, TrashIcon, DragHandleIcon } from '@/components/instructor/CurriculumIcons';
 import { LessonEditorRow } from '@/components/instructor/LessonEditorRow';
 import { LessonMediaModal } from '@/components/instructor/LessonMediaModal';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
@@ -47,6 +47,9 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
   const [dropTargetLessonId, setDropTargetLessonId] = useState<number | null>(null);
   const [manageVideoLessonId, setManageVideoLessonId] = useState<number | null>(null);
   const [confirmDeleteChapterId, setConfirmDeleteChapterId] = useState<number | null>(null);
+  // (08/10/2026) — danh sách bài giảng trước đây LUÔN hiện hết, không có khái niệm thu gọn. Mặc
+  // định đóng (object rỗng = mọi chương đều đóng), chỉ mở khi bấm chevron.
+  const [expandedChapters, setExpandedChapters] = useState<Record<number, boolean>>({});
 
   const createChapter = useCreateChapter(courseId);
   const updateChapter = useUpdateChapter(courseId);
@@ -136,6 +139,7 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
       {sortedChapters.map((chapter, chapterIndex) => {
         const lessons = [...chapter.lessons].sort((a, b) => a.displayOrder - b.displayOrder);
         const isEditing = editingChapterId === chapter.id;
+        const isExpanded = !!expandedChapters[chapter.id];
         return (
           <div
             key={chapter.id}
@@ -216,9 +220,23 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
               // của Phần cha (trước đây `group` đặt trên cả thẻ nên bị "leo" lên do hover con luôn
               // kéo theo :hover của mọi phần tử cha trong CSS).
               <div className="group mb-1 flex items-center gap-2.5">
+                <button
+                  type="button"
+                  draggable={false}
+                  onClick={() =>
+                    setExpandedChapters((prev) => ({ ...prev, [chapter.id]: !prev[chapter.id] }))
+                  }
+                  title={isExpanded ? 'Thu gọn phần' : 'Mở rộng phần'}
+                  className="shrink-0 text-ink-faint hover:text-ink"
+                >
+                  <ChevronDownIcon expanded={isExpanded} />
+                </button>
                 <div className="flex min-w-0 flex-1 items-center gap-1.5">
                   <span className="truncate font-display text-[14.5px] font-bold text-gray-900">
                     Phần {chapterIndex + 1}: {chapter.title}
+                  </span>
+                  <span className="shrink-0 text-[11px] font-semibold text-ink-faint">
+                    ({lessons.length} bài giảng)
                   </span>
                   <button
                     type="button"
@@ -253,109 +271,123 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
             )}
             {!isEditing && !chapter.description && <div className="mb-3" />}
 
-            <div className="flex flex-col gap-2">
-              {lessons.map((lesson, lessonIndex) => (
-                <div
-                  key={lesson.id}
-                  onDragOver={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    if (draggedLesson?.chapterId === chapter.id) setDropTargetLessonId(lesson.id);
-                  }}
-                  onDragLeave={() => setDropTargetLessonId((prev) => (prev === lesson.id ? null : prev))}
-                  onDrop={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handleLessonDrop(chapter, lesson.id);
-                  }}
-                >
-                  <LessonEditorRow
-                    lesson={lesson}
-                    index={lessonIndex}
-                    courseSlug={courseSlug}
-                    isDropTarget={dropTargetLessonId === lesson.id && draggedLesson?.lessonId !== lesson.id}
-                    onDragStart={() => setDraggedLesson({ chapterId: chapter.id, lessonId: lesson.id })}
-                    onDragEnd={() => {
-                      setDraggedLesson(null);
-                      setDropTargetLessonId(null);
-                    }}
-                    onRename={(title) =>
-                      updateLesson.mutate({ id: lesson.id, input: { title, isPreview: lesson.isPreview, description: lesson.description } })
-                    }
-                    onUpdateDescription={(description) =>
-                      updateLesson.mutate({ id: lesson.id, input: { title: lesson.title, isPreview: lesson.isPreview, description: description || null } })
-                    }
-                    onTogglePreview={(isPreview) =>
-                      updateLesson.mutate({ id: lesson.id, input: { title: lesson.title, isPreview, description: lesson.description } })
-                    }
-                    onDelete={() => {
-                      deleteLesson.mutate(lesson.id);
-                    }}
-                    onManageVideo={() => setManageVideoLessonId(lesson.id)}
-                  />
+            {/* (08/10/2026) — khối bài giảng mặc định ĐÓNG, chỉ mở khi bấm chevron ở header.
+                Dùng CSS Grid trick (`grid-rows-[0fr]`→`[1fr]` + `overflow-hidden`) để animate
+                tới chiều cao "auto" mượt mà không cần đo `scrollHeight` bằng JS — không cần
+                thêm thư viện animation (dự án chưa có Framer Motion/Radix). */}
+            <div
+              className={`grid transition-[grid-template-rows] duration-500 ease-in-out ${
+                isExpanded ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+              }`}
+            >
+              <div className="overflow-hidden">
+                {/* Thụt lề + viền trái nhạt hơn để tách biệt rõ cấp con (bài giảng) khỏi cấp cha
+                    (phần) — cùng pattern đã dùng đúng ở MaterialFolderTree.tsx. */}
+                <div className="ml-1 flex flex-col gap-2 border-l-2 border-line-soft pl-3 pt-1">
+                  {lessons.map((lesson, lessonIndex) => (
+                    <div
+                      key={lesson.id}
+                      onDragOver={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (draggedLesson?.chapterId === chapter.id) setDropTargetLessonId(lesson.id);
+                      }}
+                      onDragLeave={() => setDropTargetLessonId((prev) => (prev === lesson.id ? null : prev))}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleLessonDrop(chapter, lesson.id);
+                      }}
+                    >
+                      <LessonEditorRow
+                        lesson={lesson}
+                        index={lessonIndex}
+                        courseSlug={courseSlug}
+                        isDropTarget={dropTargetLessonId === lesson.id && draggedLesson?.lessonId !== lesson.id}
+                        onDragStart={() => setDraggedLesson({ chapterId: chapter.id, lessonId: lesson.id })}
+                        onDragEnd={() => {
+                          setDraggedLesson(null);
+                          setDropTargetLessonId(null);
+                        }}
+                        onRename={(title) =>
+                          updateLesson.mutate({ id: lesson.id, input: { title, isPreview: lesson.isPreview, description: lesson.description } })
+                        }
+                        onUpdateDescription={(description) =>
+                          updateLesson.mutate({ id: lesson.id, input: { title: lesson.title, isPreview: lesson.isPreview, description: description || null } })
+                        }
+                        onTogglePreview={(isPreview) =>
+                          updateLesson.mutate({ id: lesson.id, input: { title: lesson.title, isPreview, description: lesson.description } })
+                        }
+                        onDelete={() => {
+                          deleteLesson.mutate(lesson.id);
+                        }}
+                        onManageVideo={() => setManageVideoLessonId(lesson.id)}
+                      />
+                    </div>
+                  ))}
+                  {lessons.length === 0 && (
+                    <p className="px-1 text-[12.5px] text-gray-400">Chương này chưa có bài học nào.</p>
+                  )}
                 </div>
-              ))}
-              {lessons.length === 0 && (
-                <p className="px-1 text-[12.5px] text-gray-400">Chương này chưa có bài học nào.</p>
-              )}
-            </div>
 
-            {addLessonFormOpenFor === chapter.id ? (
-              <form
-                className="mt-3 flex flex-col gap-2 rounded-lg border border-gray-200 bg-gray-50/60 p-3"
-                draggable={false}
-                onDragStart={(e) => e.preventDefault()}
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  const title = (newLessonTitleByChapter[chapter.id] ?? '').trim();
-                  if (!title) return;
-                  createLesson.mutate({ chapterId: chapter.id, input: { title } });
-                  setNewLessonTitleByChapter((prev) => ({ ...prev, [chapter.id]: '' }));
-                  setAddLessonFormOpenFor(null);
-                }}
-              >
-                <span className="text-[11.5px] font-bold text-gray-500">Bài giảng {lessons.length + 1}:</span>
-                <input
-                  autoFocus
-                  value={newLessonTitleByChapter[chapter.id] ?? ''}
-                  onChange={(e) =>
-                    setNewLessonTitleByChapter((prev) => ({ ...prev, [chapter.id]: e.target.value }))
-                  }
-                  placeholder="Nhập tiêu đề bài giảng"
-                  draggable={false}
-                  className="rounded-lg border border-gray-200 px-3 py-1.5 text-[13px] focus:border-cyan-400 focus:outline-none"
-                />
-                <p className="text-[11px] text-gray-400">
-                  Sau khi thêm, bấm &quot;+ Nội dung&quot; ở hàng bài giảng để tải video hoặc dán link YouTube.
-                </p>
-                <div className="flex justify-end gap-2">
+                {addLessonFormOpenFor === chapter.id ? (
+                  <form
+                    className="ml-1 mt-3 flex flex-col gap-2 rounded-lg border border-gray-200 bg-gray-50/60 p-3"
+                    draggable={false}
+                    onDragStart={(e) => e.preventDefault()}
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      const title = (newLessonTitleByChapter[chapter.id] ?? '').trim();
+                      if (!title) return;
+                      createLesson.mutate({ chapterId: chapter.id, input: { title } });
+                      setNewLessonTitleByChapter((prev) => ({ ...prev, [chapter.id]: '' }));
+                      setAddLessonFormOpenFor(null);
+                    }}
+                  >
+                    <span className="text-[11.5px] font-bold text-gray-500">Bài giảng {lessons.length + 1}:</span>
+                    <input
+                      autoFocus
+                      value={newLessonTitleByChapter[chapter.id] ?? ''}
+                      onChange={(e) =>
+                        setNewLessonTitleByChapter((prev) => ({ ...prev, [chapter.id]: e.target.value }))
+                      }
+                      placeholder="Nhập tiêu đề bài giảng"
+                      draggable={false}
+                      className="rounded-lg border border-gray-200 px-3 py-1.5 text-[13px] focus:border-cyan-400 focus:outline-none"
+                    />
+                    <p className="text-[11px] text-gray-400">
+                      Sau khi thêm, bấm &quot;+ Nội dung&quot; ở hàng bài giảng để tải video hoặc dán link YouTube.
+                    </p>
+                    <div className="flex justify-end gap-2">
+                      <button
+                        type="button"
+                        draggable={false}
+                        onClick={() => setAddLessonFormOpenFor(null)}
+                        className="rounded-lg px-3 py-1.5 text-[12px] font-semibold text-gray-500 hover:bg-gray-100"
+                      >
+                        Hủy bỏ
+                      </button>
+                      <button
+                        type="submit"
+                        draggable={false}
+                        className="rounded-lg bg-cyan-600 px-3 py-1.5 text-[12px] font-bold text-white hover:bg-cyan-700"
+                      >
+                        Thêm bài giảng
+                      </button>
+                    </div>
+                  </form>
+                ) : (
                   <button
                     type="button"
                     draggable={false}
-                    onClick={() => setAddLessonFormOpenFor(null)}
-                    className="rounded-lg px-3 py-1.5 text-[12px] font-semibold text-gray-500 hover:bg-gray-100"
+                    onClick={() => setAddLessonFormOpenFor(chapter.id)}
+                    className="ml-1 mt-3 flex w-[calc(100%-0.25rem)] items-center justify-center gap-1.5 rounded-lg border border-dashed border-gray-300 py-2 text-[12.5px] font-bold text-gray-600 hover:border-cyan-300 hover:text-cyan-700"
                   >
-                    Hủy bỏ
+                    + Mục trong chương trình giảng dạy
                   </button>
-                  <button
-                    type="submit"
-                    draggable={false}
-                    className="rounded-lg bg-cyan-600 px-3 py-1.5 text-[12px] font-bold text-white hover:bg-cyan-700"
-                  >
-                    Thêm bài giảng
-                  </button>
-                </div>
-              </form>
-            ) : (
-              <button
-                type="button"
-                draggable={false}
-                onClick={() => setAddLessonFormOpenFor(chapter.id)}
-                className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-lg border border-dashed border-gray-300 py-2 text-[12.5px] font-bold text-gray-600 hover:border-cyan-300 hover:text-cyan-700"
-              >
-                + Mục trong chương trình giảng dạy
-              </button>
-            )}
+                )}
+              </div>
+            </div>
           </div>
         );
       })}
