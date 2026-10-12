@@ -95,6 +95,10 @@ export interface MaterialDetailRes extends MaterialGenerationRes {
   /** ID entity Quiz thật (khác `id` = MaterialGeneration) — chỉ có khi materialType=QUIZ. Dùng
    * cho các endpoint /api/v1/quizzes/{quizId}/... (export-pdf...), KHÔNG dùng `id` ở đây. */
   quizId?: number;
+  /** (12/10/2026, BE thêm field) — trang web hiện đang tự xác định qua query `?isOfficial=` của
+   * URL (xem `app/(student)/materials/[id]/page.tsx`), KHÔNG đọc field này. Thêm vào type cho
+   * đồng bộ response shape 2 phía, mobile dùng field này thay vì query param. */
+  isOfficial?: boolean;
   mermaidCode?: string;
   flashcards?: {
     id: number;
