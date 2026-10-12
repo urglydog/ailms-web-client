@@ -245,6 +245,16 @@ export function Header() {
                 {t('nav.live')}
               </Link>
               <Link
+                href="/community"
+                className={`rounded-lg px-2.5 py-2 text-sm font-semibold no-underline ${
+                  isNavItemActive(pathname, '/community')
+                    ? 'bg-accent/10 text-accent'
+                    : 'text-ink hover:bg-surface'
+                }`}
+              >
+                {t('nav.community')}
+              </Link>
+              <Link
                 href="/about"
                 className={`rounded-lg px-2.5 py-2 text-sm font-medium no-underline ${
                   isNavItemActive(pathname, '/about')
@@ -724,6 +734,15 @@ export function Header() {
                 }`}
               >
                 {t('nav.live')}
+              </Link>
+              <Link
+                href="/community"
+                onClick={() => setMobileMenuOpen(false)}
+                className={`rounded-lg px-3 py-2.5 text-sm font-semibold no-underline ${
+                  isNavItemActive(pathname, '/community') ? 'bg-accent/10 text-accent' : 'text-ink hover:bg-surface'
+                }`}
+              >
+                {t('nav.community')}
               </Link>
               <Link
                 href="/about"
