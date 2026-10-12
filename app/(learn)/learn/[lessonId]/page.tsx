@@ -28,7 +28,7 @@ import { useLessonProgress, useLessonProgressFromState } from '@/hooks/useLesson
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useLessonPlayer } from '@/hooks/usePublicCourses';
 import { useVoiceOptions } from '@/hooks/useVoiceOptions';
-import { api, ApiError } from '@/lib/api/client';
+import { api, ApiError, getOrCreateStreamSessionId } from '@/lib/api/client';
 import { lessonPlayerApi } from '@/lib/api/lessonPlayer';
 import type { CourseResource } from '@/lib/api/courseResourcesApi';
 import { PanelRightClose, PanelRightOpen } from 'lucide-react';
@@ -166,9 +166,15 @@ function LearnPageContent() {
   const [streamConflict, setStreamConflict] = useState(false);
 
   useEffect(() => {
-    // Chỉ tạo sessionId duy nhất cho mỗi phiên mount trang (hoặc mỗi bài học mới)
+    // BUG THẬT (12/10/2026, phát hiện khi vá lỗi tương tự bên mobile) — trước đây tạo sessionId
+    // MỚI mỗi lần mount trang (`crypto.randomUUID()` ngay tại đây), rồi gửi heartbeat đầu tiên
+    // với `force=true`. Hệ quả: chỉ cần MỞ trang bài học (chưa hề bấm play) là đã cưỡng chế giành
+    // khoá "đang phát" từ bất kỳ thiết bị nào khác đang thật sự xem (xem
+    // `PlayerHeartbeatService.processHeartbeat` — `force=true` LUÔN ghi đè session, không throw).
+    // Giờ dùng `getOrCreateStreamSessionId()` — ID bền theo TRÌNH DUYỆT (localStorage), không đổi
+    // mỗi lần vào bài học — và heartbeat đầu tiên đổi sang `force=false` (xem effect dưới).
     if (!sessionIdRef.current) {
-      sessionIdRef.current = crypto.randomUUID();
+      sessionIdRef.current = getOrCreateStreamSessionId();
     }
   }, [lessonId]);
 
@@ -514,7 +520,10 @@ function LearnPageContent() {
       }
     };
 
-    void sendPing(true);
+    // `force=false` — chỉ CLAIM khoá nếu chưa ai giữ, hoặc chính thiết bị này (cùng sessionId bền
+    // ở trên) đang giữ; thiết bị KHÁC thật sự đang giữ thì BE trả 409, hiện đúng modal xung đột
+    // cho người VỪA MỞ trang này thay vì âm thầm cướp quyền của người đang xem thật.
+    void sendPing(false);
 
     const intervalId = setInterval(() => {
       void sendPing(false);
