@@ -54,6 +54,22 @@ export function resolveBaseUrl(): string {
   return process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
 }
 
+const STREAM_SESSION_ID_KEY = 'streamSessionId';
+
+/** ID định danh THIẾT BỊ/TRÌNH DUYỆT (không phải mỗi lần mount trang bài học) cho cơ chế giới
+ * hạn 1 phiên xem đồng thời (`PlayerHeartbeatService` ở BE, key Redis theo user). Lưu bền
+ * `localStorage` thay vì tạo mới mỗi lần vào bài học — nếu tạo mới mỗi lần mount, chuyển sang
+ * bài học khác trên CHÍNH thiết bị trong vòng 30s (TTL Redis) sẽ bị chính BE coi là "thiết bị
+ * khác" phát hiện, dù chỉ là 1 người dùng điều hướng bình thường (bug thật 12/10/2026, phát hiện
+ * khi vá lỗi tương tự bên mobile — xem `fix: mở lesson player trên mobile cướp quyền phát video`). */
+export function getOrCreateStreamSessionId(): string {
+  const existing = localStorage.getItem(STREAM_SESSION_ID_KEY);
+  if (existing) return existing;
+  const id = crypto.randomUUID();
+  localStorage.setItem(STREAM_SESSION_ID_KEY, id);
+  return id;
+}
+
 interface RequestOptions extends Omit<RequestInit, 'body'> {
   body?: unknown;
   /** Access token JWT. Giai đoạn 1 sẽ lấy tự động từ store thay vì truyền tay. */
