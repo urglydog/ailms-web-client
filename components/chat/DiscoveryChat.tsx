@@ -2,10 +2,18 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { toast } from 'sonner';
 import { api } from '@/lib/api/client';
 import { getAccessToken } from '@/lib/auth/token';
 import { MarkdownRenderer } from '@/components/ui/MarkdownRenderer';
+
+/** Ẩn chatbot khi đang làm bài thi chính thức (`/exam/{quizId}`, KHÔNG phải `/exam/{quizId}/history`
+ * — lịch sử làm bài không phải lúc đang thi) — sót lại trước đây vì layout `(student)` mount
+ * `DiscoveryChat` cho MỌI trang trong nhóm, kể cả trang thi, cho học viên hỏi AI khi đang làm
+ * bài (gian lận). Trang thi không có layout riêng để tách component này ra cấp layout, nên check
+ * trực tiếp theo pathname ở đây. */
+const EXAM_TAKING_PATH = /^\/exam\/[^/]+\/?$/;
 
 interface DiscoveryCourseCard {
   id: number;
@@ -24,6 +32,7 @@ interface DiscoveryChatResponse {
 }
 
 export function DiscoveryChat() {
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<{role: 'user' | 'assistant', text: string, courses?: DiscoveryCourseCard[]}[]>([]);
   const [input, setInput] = useState('');
@@ -52,6 +61,8 @@ export function DiscoveryChat() {
   useEffect(() => {
     scrollToBottom();
   }, [messages, loading]);
+
+  if (EXAM_TAKING_PATH.test(pathname)) return null;
 
   const sendMessage = async () => {
     if (!input.trim() || loading) return;
