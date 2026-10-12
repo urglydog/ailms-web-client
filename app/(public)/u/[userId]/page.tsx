@@ -2,8 +2,8 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
-import { useMemo, useState } from 'react';
+import { useParams, useSearchParams } from 'next/navigation';
+import { Suspense, useMemo, useState } from 'react';
 import { format } from 'date-fns';
 import { ApiError } from '@/lib/api/client';
 import { usePublicProfile } from '@/hooks/usePublicProfile';
@@ -11,6 +11,7 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useStreak } from '@/hooks/useStreak';
 import { StarRating } from '@/components/ui/StarRating';
 import { CertificatePreview } from '@/components/certificate/CertificatePreview';
+import { StreakCard } from '@/components/streak/StreakCard';
 import type { PublicCertificate, PublicCourseSummary } from '@/types/domain';
 
 type Tab = 'courses' | 'wishlist' | 'certificates';
@@ -55,7 +56,16 @@ function formatPrice(price: number): string {
  * trạng thái RIÊNG cần phân biệt: "đã ẩn" khác "công khai nhưng chưa có gì".
  */
 export default function PublicProfilePage() {
+  return (
+    <Suspense fallback={<div className="shell py-10 text-center text-sm text-ink-muted">Đang tải...</div>}>
+      <PublicProfileContent />
+    </Suspense>
+  );
+}
+
+function PublicProfileContent() {
   const params = useParams<{ userId: string }>();
+  const searchParams = useSearchParams();
   const userId = Number(params.userId);
   const { data: profile, isLoading, error } = usePublicProfile(userId);
   const { data: currentUser } = useCurrentUser();
@@ -63,7 +73,8 @@ export default function PublicProfilePage() {
   // Streak là dữ liệu riêng tư của người đang đăng nhập (BE chỉ có endpoint "/streak/me"),
   // nên chỉ fetch/hiện khi tự xem hồ sơ của chính mình — xem người khác sẽ không có mục này.
   const { data: streakData } = useStreak(isOwnProfile);
-  const [tab, setTab] = useState<Tab>('courses');
+  // Cho phép link từ bên ngoài (banner/trang /community) mở sẵn tab Chứng chỉ qua `?tab=certificates`.
+  const [tab, setTab] = useState<Tab>(searchParams.get('tab') === 'certificates' ? 'certificates' : 'courses');
   const [certificateSort, setCertificateSort] = useState<CertificateSortBy>('newest');
   const sortedCertificates = useMemo(
     () => sortCertificates(profile?.certificates ?? [], certificateSort),
@@ -182,17 +193,8 @@ export default function PublicProfilePage() {
           {/* Streak — chỉ của chính mình (05/10/2026), đặt cạnh Chứng chỉ để hồ sơ công khai
               là nơi duy nhất trưng thành tích, thay vì tách rời ở icon avatar như trước. */}
           {isOwnProfile && streakData && (
-            <div className="card mt-4 flex flex-col gap-3 p-5">
-              <div className="flex items-center gap-3">
-                <span className="text-2xl">🔥</span>
-                <div>
-                  <h3 className="font-display text-sm font-bold text-ink">Chuỗi {streakData.currentStreak} ngày</h3>
-                  <p className="text-xs text-ink-muted">Kỷ lục: {streakData.longestStreak} ngày</p>
-                </div>
-              </div>
-              <p className="text-xs text-ink-muted">
-                🧊 Còn {streakData.freezesRemaining} lần đóng băng streak trong tháng này
-              </p>
+            <div className="mt-4">
+              <StreakCard streak={streakData} />
             </div>
           )}
         </div>

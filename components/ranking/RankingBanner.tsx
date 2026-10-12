@@ -20,9 +20,13 @@ import type { LeaderboardEntry } from '@/types/domain';
  * 2. Bảng màu đổi từ accent xanh đơn sắc (lạnh, nhạt, không tương phản) sang điểm nhấn vàng/hổ
  *    phách (token `star`/`warning` có sẵn trong tailwind.config.ts) cho đúng cảm giác "huy
  *    chương" — ấm hơn, tương phản rõ hơn trên nền trắng-xanh lạnh của phần còn lại trang chủ.
+ *
+ * (12/10/2026, thu nhỏ) — rút về top 3 + nút "Xem toàn bộ" trỏ `/community` (trang đầy đủ, có
+ * animation/streak riêng) thay vì chiếm nguyên băng ngang trang chủ như trước. Icon hạng giờ
+ * trỏ `/u/{userId}?tab=certificates` — bấm vào 1 hạng dẫn thẳng tới chứng chỉ của người đó.
  */
 export function RankingBanner() {
-  const { data: leaderboard, isLoading } = useLeaderboard(5);
+  const { data: leaderboard, isLoading } = useLeaderboard(3);
   const { data: currentUser } = useCurrentUser();
   const { data: myRanking } = useMyRanking(!!currentUser);
 
@@ -34,12 +38,15 @@ export function RankingBanner() {
   return (
     <section className="shell pt-6">
       <div className="ranking-banner-enter card flex flex-col gap-4 border-star/30 bg-gradient-to-r from-star/10 via-surface-raised to-surface-raised p-5 sm:flex-row sm:items-center sm:gap-6">
-        <div className="flex shrink-0 items-center gap-2.5">
+        <Link
+          href="/community"
+          className="flex shrink-0 items-center gap-2.5 no-underline hover:no-underline"
+        >
           <span className="flex h-9 w-9 items-center justify-center rounded-full bg-star/15">
             <Trophy className="h-[18px] w-[18px] text-star" strokeWidth={2.25} />
           </span>
           <span className="font-display text-[15px] font-bold text-ink">Bảng xếp hạng cộng đồng</span>
-        </div>
+        </Link>
 
         <div className="flex flex-1 flex-wrap items-center gap-3 overflow-x-auto">
           {leaderboard.map((entry, idx) => (
@@ -57,6 +64,13 @@ export function RankingBanner() {
             </span>
           )}
         </div>
+
+        <Link
+          href="/community"
+          className="shrink-0 whitespace-nowrap text-[13px] font-semibold text-accent no-underline hover:text-accent-dark"
+        >
+          Xem toàn bộ →
+        </Link>
       </div>
     </section>
   );
@@ -75,7 +89,7 @@ function RankPill({ entry, index, isMe }: { entry: LeaderboardEntry; index: numb
   const style = rankStyle(entry.rank);
   return (
     <Link
-      href={`/u/${entry.userId}`}
+      href={`/u/${entry.userId}?tab=certificates`}
       style={{ '--i': index } as CSSProperties}
       className={`ranking-item-enter flex shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 no-underline hover:no-underline ${style.border} ${style.bg} ${
         entry.rank === 1 ? 'ranking-rank-1-glow' : ''
