@@ -1,27 +1,24 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
-import { ChevronDown, Download, Play } from 'lucide-react';
+import { Circle, CircleCheck, CirclePlay, Paperclip } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { formatDuration } from '@/lib/format';
-import { getFileVisual } from '@/lib/resourceFileVisual';
 import type { ChapterNav } from '@/types/domain';
 import type { InstructorMaterial } from '@/lib/api/materials';
 import type { CourseResource } from '@/lib/api/courseResourcesApi';
 
 /**
- * "Trong khoá học này" — UC21/22. Chỉ hiển thị khi đã đăng nhập (đã ghi danh, hoặc bài Preview
+ * "Nội dung khóa học" — UC21/22. Chỉ hiển thị khi đã đăng nhập (đã ghi danh, hoặc bài Preview
  * — {@link ChapterNav} rỗng ở luồng ẩn danh, xem `learn/[lessonId]/page.tsx`).
  *
  * Không cần khoá bài như `ChapterAccordion` (trang chi tiết khoá học): học viên đang ở đây tức
  * đã qua {@code EnrollmentSecurity.canAccessLesson}, nên mọi bài trong danh sách đều xem được.
  *
- * (20/09/2026, thiết kế lại — giao diện tham khảo Udemy) — trước đây mỗi dòng chỉ có tên bài +
- * thời lượng nằm cùng 1 hàng, KHÔNG hiển thị tài liệu đính kèm mà Giảng viên đã gắn riêng cho
- * từng bài (đã có sẵn ở trang tạo khóa học, chỉ chưa lộ ra phía học viên). Giờ mỗi dòng: tên bài
- * ở trên, thời lượng góc trái bên dưới; nếu bài có tài liệu đính kèm thì thêm nút "Tài nguyên ▾"
- * bên phải, bấm vào xổ ra danh sách tải xuống ngay tại chỗ — không cần rời sang tab "Tài nguyên"
- * riêng (tab đó vẫn giữ, gộp tài liệu của CẢ khóa cho ai muốn xem tổng hợp).
+ * (17/10/2026, thiết kế lại theo spec UI/UX học viên, mục 7) — bỏ nút "Tài nguyên ▾" lặp lại ở từng
+ * bài: tài nguyên của khóa đã gộp vào tab "Học liệu" dưới video. Mỗi bài giờ chỉ gồm biểu tượng trạng
+ * thái (đã xong / đang học / chưa học), tên bài, thời lượng, và một biểu tượng kẹp giấy nếu bài có tài
+ * liệu đính kèm.
  */
 
 interface LessonSidebarProps {
@@ -33,93 +30,50 @@ interface LessonSidebarProps {
 }
 
 export function LessonSidebar({ chapters, currentLessonId, officialMaterials = [], resources = [] }: LessonSidebarProps) {
-  const [openResourcesForLessonId, setOpenResourcesForLessonId] = useState<number | null>(null);
+  const t = useTranslations('learn.sidebar');
 
   return (
     <div className="flex flex-col gap-4">
       {chapters.map((chapter) => (
         <div key={chapter.chapterId}>
-          <h3 className="mb-2 text-[13px] font-semibold text-ink-muted">{chapter.chapterTitle}</h3>
-          <ul className="flex flex-col gap-1">
+          <h3 className="m-0 mb-1.5 text-xs font-semibold tracking-wide text-ink-muted">{chapter.chapterTitle}</h3>
+          <ul className="m-0 flex list-none flex-col gap-0.5 p-0">
             {chapter.lessons.map((lesson) => {
               const isActive = lesson.lessonId === currentLessonId;
-              const lessonResources = resources.filter((r) => r.lessonId === lesson.lessonId);
-              const isResourcesOpen = openResourcesForLessonId === lesson.lessonId;
+              const hasAttachments =
+                resources.some((r) => r.lessonId === lesson.lessonId) ||
+                officialMaterials.some((m) =>
+                  m.assignments?.some((a) => a.lessonId === lesson.lessonId || a.chapterId === chapter.chapterId),
+                );
 
               return (
-                <li key={lesson.lessonId} className="flex flex-col">
-                  <div className={`flex items-center gap-1.5 rounded-lg px-2.5 py-2 ${isActive ? 'bg-accent/10' : 'hover:bg-surface-raised'}`}>
-                    <Link
-                      href={`/learn/${lesson.lessonId}`}
-                      className="flex min-w-0 flex-1 items-start gap-2.5 no-underline hover:no-underline"
-                    >
-                      <span
-                        aria-hidden
-                        className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] ${
-                          lesson.isCompleted
-                            ? 'bg-success text-white'
-                            : isActive
-                              ? 'bg-accent text-white'
-                              : 'bg-line-soft text-ink-faint'
-                        }`}
-                      >
-                        {lesson.isCompleted ? '✓' : ''}
+                <li key={lesson.lessonId}>
+                  <Link
+                    href={`/learn/${lesson.lessonId}`}
+                    aria-current={isActive ? 'true' : undefined}
+                    className={`flex items-start gap-2.5 rounded-lg px-2.5 py-2 no-underline transition-colors duration-150 hover:no-underline ${
+                      isActive ? 'bg-tint' : 'hover:bg-tint'
+                    }`}
+                  >
+                    {lesson.isCompleted ? (
+                      <CircleCheck size={18} aria-label={t('completed')} className="mt-0.5 shrink-0 text-success" />
+                    ) : isActive ? (
+                      <CirclePlay size={18} aria-label={t('current')} className="mt-0.5 shrink-0 text-accent" />
+                    ) : (
+                      <Circle size={18} aria-label={t('notStarted')} className="mt-0.5 shrink-0 text-ink-faint" />
+                    )}
+                    <span className="min-w-0 flex-1">
+                      <span className={`block truncate text-[13px] ${isActive ? 'font-semibold text-accent-dark' : 'text-ink'}`}>
+                        {lesson.lessonTitle}
                       </span>
-                      <span className="min-w-0 flex-1">
-                        <span className={`block truncate text-sm ${isActive ? 'font-semibold text-accent' : 'text-ink'}`}>
-                          {lesson.lessonTitle}
-
-                          {officialMaterials.some(m => m.assignments?.some(a => a.lessonId === lesson.lessonId || a.chapterId === chapter.chapterId)) && (
-                            <span title="Có bài tập/học liệu đính kèm" className="ml-1.5 text-[10px] text-ink-muted">📎</span>
-                          )}
-                        </span>
-                        <span className="mt-0.5 flex items-center gap-1 text-xs text-ink-faint">
-                          <Play className="h-3 w-3 shrink-0" fill="currentColor" strokeWidth={0} />
-                          {formatDuration(lesson.durationSec)}
-                        </span>
+                      <span className="mt-0.5 flex items-center gap-1.5 text-[11px] text-ink-muted">
+                        {formatDuration(lesson.durationSec)}
+                        {hasAttachments && (
+                          <Paperclip size={11} aria-label={t('hasAttachments')} className="shrink-0 text-ink-muted" />
+                        )}
                       </span>
-                    </Link>
-
-                    <button
-                      type="button"
-                      onClick={() => setOpenResourcesForLessonId(isResourcesOpen ? null : lesson.lessonId)}
-                      className={`flex shrink-0 items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-semibold transition-colors ${
-                        isResourcesOpen
-                          ? 'border-accent bg-accent/5 text-accent'
-                          : 'border-line text-ink-muted hover:border-accent hover:text-accent'
-                      }`}
-                    >
-                      Tài nguyên
-                      <ChevronDown className={`h-3 w-3 shrink-0 transition-transform ${isResourcesOpen ? 'rotate-180' : ''}`} />
-                    </button>
-                  </div>
-
-                  {isResourcesOpen && (
-                    <div className="mb-1 ml-8 mt-1 flex flex-col gap-1 rounded-lg border border-line-soft bg-surface-hover p-1.5">
-                      {lessonResources.length === 0 ? (
-                        <p className="px-2 py-1.5 text-[12px] text-ink-faint">Chưa có tài liệu đính kèm cho bài này.</p>
-                      ) : (
-                        lessonResources.map((res) => {
-                          const { Icon, bg, text } = getFileVisual(res.fileType);
-                          return (
-                            <a
-                              key={res.id}
-                              href={res.fileUrl}
-                              target="_blank"
-                              rel="noreferrer noopener"
-                              className="flex items-center gap-2 rounded-md px-2 py-1.5 text-[12px] no-underline hover:bg-white hover:no-underline"
-                            >
-                              <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded ${bg} ${text}`}>
-                                <Icon className="h-3.5 w-3.5" strokeWidth={1.75} />
-                              </span>
-                              <span className="min-w-0 flex-1 truncate text-ink" title={res.title}>{res.title}</span>
-                              <Download className="h-3.5 w-3.5 shrink-0 text-ink-faint" strokeWidth={1.75} />
-                            </a>
-                          );
-                        })
-                      )}
-                    </div>
-                  )}
+                    </span>
+                  </Link>
                 </li>
               );
             })}
