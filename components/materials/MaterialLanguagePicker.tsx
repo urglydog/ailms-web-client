@@ -8,7 +8,7 @@ import type { LanguageAvailability } from '@/lib/api/materials';
  * `components/player/LanguageDropdown.tsx` (dropdown lồng tiếng) theo đúng yêu cầu "cho chọn
  * full ngôn ngữ giống dubbing, ngôn ngữ nào có dịch sẵn thì dấu tích, chưa thì dấu chấm".
  *
- * Khác `LanguageDropdown`: KHÔNG có ngôn ngữ nào bị vô hiệu hoá (BR-DUB-09 chỉ áp dụng cho lồng
+ * Khác `DubbingBar`: KHÔNG có ngôn ngữ nào bị vô hiệu hoá (BR-DUB-09 chỉ áp dụng cho lồng
  * tiếng) — BR-MAT-01 cho chọn ngôn ngữ đầu ra hoàn toàn tự do, kể cả trùng ngôn ngữ gốc của bài
  * giảng. Dấu tích/chấm ở đây chỉ là gợi ý "đã có bản dịch sẵn hay chưa" (nhanh hơn hay chậm hơn
  * một chút), không giới hạn lựa chọn.

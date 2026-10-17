@@ -37,7 +37,7 @@ interface LiveLanguagePickerProps {
 }
 
 /**
- * UC52 — chọn ngôn ngữ lồng tiếng live. KHÔNG tái dùng nguyên `LanguageDropdown` (component đó
+ * UC52 — chọn ngôn ngữ lồng tiếng live. KHÔNG tái dùng nguyên `DubbingBar` (component đó
  * gắn chặt với kiểu `DubLanguage` — `available`/`track`/`subtitles` là khái niệm của lồng tiếng
  * VIDEO theo lô, không khớp ngữ nghĩa "đang có track ACTIVE + bao nhiêu người nghe" của live) —
  * dựng combobox tìm-kiếm-được mới cùng UX, còn `VoicePicker` (thuần, không phụ thuộc ngữ cảnh

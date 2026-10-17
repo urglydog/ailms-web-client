@@ -80,7 +80,7 @@ function formatTime(rawSec: number): string {
   return `${m}:${ss}`;
 }
 
-/** Đóng popover khi click ra ngoài hoặc nhấn Esc — cùng khuôn với `LanguageDropdown.tsx`. */
+/** Đóng popover khi click ra ngoài hoặc nhấn Esc — cùng khuôn với `DubbingBar.tsx`. */
 function useClosePopover(open: boolean, onClose: () => void, ref: React.RefObject<HTMLElement | null>) {
   useEffect(() => {
     if (!open) return;
