@@ -11,6 +11,11 @@ import { useAddToCart, useCart } from '@/hooks/useCart';
 import { useWishlist } from '@/hooks/useWishlist';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useStreak } from '@/hooks/useStreak';
+import { useCategories } from '@/hooks/useCategories';
+import { usePublicLiveFeed } from '@/hooks/useLiveView';
+import { AccountMenu } from '@/components/layout/header/AccountMenu';
+import { ExploreMenu } from '@/components/layout/header/ExploreMenu';
+import { isNavItemActive } from '@/components/layout/header/navModel';
 import { authApi } from '@/lib/api/auth';
 import { enrollmentsApi } from '@/lib/api/enrollments';
 import { ApiError } from '@/lib/api/client';
@@ -59,16 +64,6 @@ function useExclusiveHoverDropdown() {
   return { activeId, openNow, closeWithDelay, closeNow };
 }
 
-/** So khớp mục nav đang active — trùng chính xác HOẶC là trang con của mục đó (VD: đang ở
- * `/courses/react-co-ban` thì mục "Khóa học" (`/courses`) vẫn phải sáng), cùng quy ước đã dùng
- * ở sidebar `admin/layout.tsx`/`instructor/layout.tsx`. Không dùng `startsWith` trần cho `/` vì
- * MỌI đường dẫn đều bắt đầu bằng `/`, sẽ luôn khớp — không áp dụng cho mục Trang chủ (không có
- * trong nav này, xử lý riêng ở logo).
- */
-function isNavItemActive(pathname: string, href: string): boolean {
-  return pathname === href || pathname.startsWith(`${href}/`);
-}
-
 export function Header() {
   const router = useRouter();
   const pathname = usePathname();
@@ -101,6 +96,9 @@ export function Header() {
   const [showLanguageModal, setShowLanguageModal] = useState(false);
 
   const { data: streakData } = useStreak();
+  const { data: categories } = useCategories();
+  const { data: liveFeed } = usePublicLiveFeed();
+  const liveNow = (liveFeed ?? []).some((s) => s.status === 'LIVE');
   const [prevStreak, setPrevStreak] = useState<number | null>(null);
   // BUG THẬT (03/10/2026) — `reactStrictMode: true` (next.config) khiến React tự gọi LẠI effect
   // này 2 lần liên tiếp cho ĐÚNG 1 lần `streakData` đổi (hành vi cố ý của dev mode, không phải
@@ -208,67 +206,12 @@ export function Header() {
               </span>
             </Link>
             <nav className="hidden items-center gap-1 md:flex">
-              {/* (19/09/2026, sửa lỗi) — trước đây không mục nào đánh dấu đang ở trang nào, học
-                  viên không biết đang xem "Khóa học" hay "Live" chỉ nhìn vào thanh nav. */}
-              <Link
-                href="/courses"
-                className={`rounded-lg px-2.5 py-2 text-sm font-semibold no-underline ${
-                  isNavItemActive(pathname, '/courses')
-                    ? 'bg-accent/10 text-accent'
-                    : 'text-ink hover:bg-surface'
-                }`}
-              >
-                {t('nav.courses')}
-              </Link>
-              {isLoggedIn && (
-                <Link
-                  href="/my-courses"
-                  className={`rounded-lg px-2.5 py-2 text-sm font-semibold no-underline ${
-                    isNavItemActive(pathname, '/my-courses')
-                      ? 'bg-accent/10 text-accent'
-                      : 'text-ink hover:bg-surface'
-                  }`}
-                >
-                  {t('nav.myCourses')}
-                </Link>
-              )}
-              {/* F11.9 — lối vào mới cho trang khám phá buổi live, không gate theo đăng nhập
-                  (Guest vẫn xem được buổi Public — BR-LIVE-01). */}
-              <Link
-                href="/live"
-                className={`rounded-lg px-2.5 py-2 text-sm font-semibold no-underline ${
-                  isNavItemActive(pathname, '/live')
-                    ? 'bg-accent/10 text-accent'
-                    : 'text-ink hover:bg-surface'
-                }`}
-              >
-                {t('nav.live')}
-              </Link>
-              <Link
-                href="/community"
-                className={`rounded-lg px-2.5 py-2 text-sm font-semibold no-underline ${
-                  isNavItemActive(pathname, '/community')
-                    ? 'bg-accent/10 text-accent'
-                    : 'text-ink hover:bg-surface'
-                }`}
-              >
-                {t('nav.community')}
-              </Link>
-              <Link
-                href="/about"
-                className={`rounded-lg px-2.5 py-2 text-sm font-medium no-underline ${
-                  isNavItemActive(pathname, '/about')
-                    ? 'bg-accent/10 text-accent'
-                    : 'text-ink-muted hover:bg-surface'
-                }`}
-              >
-                {t('nav.about')}
-              </Link>
+              <ExploreMenu categories={categories ?? []} liveNow={liveNow} />
             </nav>
           </div>
 
           {/* Search Bar — tìm khi Enter hoặc click icon, không theo từng ký tự gõ */}
-          <div className="hidden flex-1 items-center gap-2 rounded-xl border border-line bg-surface px-3.5 py-2.5 md:flex max-w-[340px]">
+          <div className="hidden flex-1 items-center gap-2 rounded-full border border-line bg-surface px-4 py-2 md:flex max-w-[460px]">
             <button
               type="button"
               onClick={submitSearch}
@@ -315,6 +258,17 @@ export function Header() {
               )}
             </button>
 
+            {isLoggedIn && (
+              <Link
+                href="/my-courses"
+                className={`hidden whitespace-nowrap rounded-md px-2.5 py-2 text-sm font-semibold no-underline md:block ${
+                  isNavItemActive(pathname, '/my-courses') ? 'bg-tint text-accent-dark' : 'text-ink hover:bg-tint'
+                }`}
+              >
+                {t('nav.myCourses')}
+              </Link>
+            )}
+
             {/* Streak Icon + dropdown (chỉ hiện khi đăng nhập) */}
             {isLoggedIn && (
               <div
@@ -322,15 +276,15 @@ export function Header() {
                 onMouseEnter={() => headerDropdown.openNow('streak')}
                 onMouseLeave={() => headerDropdown.closeWithDelay('streak')}
               >
-                <div className="relative flex h-9 cursor-pointer items-center justify-center rounded-full bg-surface hover:bg-surface-hover px-3 gap-1.5">
-                  <span className={streakData?.hasStudiedToday ? "text-red-500 animate-pulse" : "text-ink-muted"}>
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M8.5 14.5A2.5 2.5 0 0011 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 11-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 002.5 2.5z"></path>
-                    </svg>
-                  </span>
-                  <span className={`text-[14px] font-bold ${streakData?.hasStudiedToday ? "text-red-500" : "text-ink-muted"}`}>
-                    {streakData?.currentStreak || 0}
-                  </span>
+                <div
+                  className={`relative flex h-9 cursor-pointer items-center justify-center gap-1.5 rounded-full px-3 ${
+                    streakData?.hasStudiedToday ? 'bg-streak-bg text-streak-ink' : 'bg-surface text-ink-muted'
+                  }`}
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                    <path d="M8.5 14.5A2.5 2.5 0 0011 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 11-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 002.5 2.5z"></path>
+                  </svg>
+                  <span className="text-[13px] font-bold">{streakData?.currentStreak || 0}</span>
                 </div>
 
                 {headerDropdown.activeId === 'streak' && streakData && (
@@ -429,7 +383,7 @@ export function Header() {
                   <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
                 </svg>
                 {cartCount > 0 && (
-                  <span className="absolute -right-1 -top-1 flex min-w-[18px] h-[18px] items-center justify-center rounded-full bg-accent px-1 text-[10.5px] font-bold text-white">
+                  <span className="absolute -right-1 -top-1 flex min-w-[18px] h-[18px] items-center justify-center rounded-full bg-danger px-1 text-[10.5px] font-bold text-white">
                     {cartCount}
                   </span>
                 )}
@@ -484,7 +438,7 @@ export function Header() {
                     <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
                   </svg>
                   {unreadCount > 0 && (
-                    <span className="absolute -right-1 -top-1 flex min-w-[18px] h-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-[10.5px] font-bold text-white">
+                    <span className="absolute -right-1 -top-1 flex min-w-[18px] h-[18px] items-center justify-center rounded-full bg-danger px-1 text-[10.5px] font-bold text-white">
                       {unreadCount}
                     </span>
                   )}
@@ -558,106 +512,35 @@ export function Header() {
                 onMouseLeave={() => headerDropdown.closeWithDelay('account')}
               >
                 <button
+                  type="button"
                   onClick={() =>
                     headerDropdown.activeId === 'account' ? headerDropdown.closeNow('account') : headerDropdown.openNow('account')
                   }
-                  className="flex h-9 w-9 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-accent font-display text-[13px] font-bold text-white uppercase"
-                  title={currentUser?.fullName}
+                  aria-expanded={headerDropdown.activeId === 'account'}
+                  aria-label={currentUser?.fullName ?? t('account.guestName')}
+                  className="flex h-9 w-9 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-accent font-display text-[13px] font-bold uppercase text-white"
                 >
                   {currentUser?.avatarUrl ? (
-                    <Image src={currentUser.avatarUrl} alt={currentUser.fullName} width={36} height={36} className="h-full w-full object-cover" />
+                    <Image src={currentUser.avatarUrl} alt="" width={36} height={36} className="h-full w-full object-cover" />
                   ) : (
                     currentUser?.fullName ? currentUser.fullName.charAt(0) : 'U'
                   )}
                 </button>
                 {headerDropdown.activeId === 'account' && (
-                  <div className="absolute right-0 top-12 z-[200] flex w-64 flex-col rounded-2xl border border-line bg-white p-2 shadow-[0_20px_50px_rgba(19,22,32,0.15)]">
-                    <div className="flex items-center gap-3 border-b border-line-soft px-3 py-3 mb-1">
-                      <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-accent font-display text-base font-bold text-white uppercase">
-                        {currentUser?.avatarUrl ? (
-                          <Image src={currentUser.avatarUrl} alt={currentUser.fullName} width={44} height={44} className="h-full w-full object-cover" />
-                        ) : (
-                          currentUser?.fullName ? currentUser.fullName.charAt(0) : 'U'
-                        )}
-                      </div>
-                      <div className="min-w-0">
-                        <Link
-                          href="/profile?edit=1"
-                          onClick={() => headerDropdown.closeNow('account')}
-                          className="block truncate text-sm font-bold text-ink hover:text-accent hover:underline"
-                        >
-                          {currentUser?.fullName || t('account.guestName')}
-                        </Link>
-                        <p className="truncate text-xs text-ink-muted">{currentUser?.email}</p>
-                      </div>
-                    </div>
-
-                    {/* Admin links */}
-                    {currentUser?.role === 'ADMIN' && (
-                      <Link href="/admin" className="rounded-lg px-3 py-2.5 text-[13.5px] font-semibold text-accent-dark bg-accent/10 hover:bg-accent/20 mb-1">
-                        {t('account.adminPanel')}
-                      </Link>
-                    )}
-
-                    {/* Default student links */}
-                    <Link href="/my-courses" className="rounded-lg px-3 py-2.5 text-[13.5px] text-ink hover:bg-surface">
-                      {t('nav.myCourses')}
-                    </Link>
-                    <Link href="/wishlist" className="rounded-lg px-3 py-2.5 text-[13.5px] text-ink hover:bg-surface">
-                      {t('account.wishlist')}
-                    </Link>
-                    {/* "View public profile" (14/09/2026, mở rộng; 05/10/2026, gộp Chứng chỉ
-                        vào đây) — xem hồ sơ của CHÍNH MÌNH đúng như người khác sẽ thấy (theo BR
-                        quyền riêng tư đã bật/tắt ở trang Cài đặt tài khoản). Trang này giờ là nơi
-                        duy nhất trưng thành tích (streak + chứng chỉ, tab "Chứng chỉ" có sẵn),
-                        nên mục "Chứng chỉ của tôi" tách riêng trước đây đã bỏ khỏi menu — route
-                        `/certificates` vẫn giữ nguyên để không vỡ link cũ, chỉ không còn là lối
-                        vào chính. */}
-                    {currentUser?.id != null && (
-                      <Link href={`/u/${currentUser.id}`} className="rounded-lg px-3 py-2.5 text-[13.5px] text-ink hover:bg-surface">
-                        {t('account.publicProfile')}
-                      </Link>
-                    )}
-                    <Link href="/payments" className="rounded-lg px-3 py-2.5 text-[13.5px] text-ink hover:bg-surface">
-                      {t('account.paymentHistory')}
-                    </Link>
-                    <div className="my-1.5 h-px bg-line-soft"></div>
-                    <Link href="/profile" className="rounded-lg px-3 py-2.5 text-[13.5px] text-ink hover:bg-surface">
-                      {t('account.profile')}
-                    </Link>
-                    {/* "Trở thành Giảng viên" (19/09/2026, sửa lỗi) — trước đây mục này LUÔN
-                        hiện "Kênh quản lý" trỏ thẳng `/instructor/courses` cho MỌI vai trò, kể
-                        cả Học viên chưa từng là Giảng viên (bấm vào sẽ thấy trang trống/lỗi vì
-                        chưa có quyền). Giờ đổi nhãn + đích đến theo đúng vai trò hiện tại. */}
-                    {currentUser?.role === 'INSTRUCTOR' ? (
-                      <Link href="/instructor/courses" className="rounded-lg px-3 py-2.5 text-[13.5px] text-ink hover:bg-surface">
-                        {t('account.instructorChannel')}
-                      </Link>
-                    ) : currentUser?.role === 'STUDENT' ? (
-                      <Link href="/teaching" className="rounded-lg px-3 py-2.5 text-[13.5px] text-ink hover:bg-surface">
-                        {t('account.becomeInstructor')}
-                      </Link>
-                    ) : null}
-                    {/* Ngôn ngữ giao diện (26/09/2026, hoàn thiện) — đổi chữ thật qua next-intl,
-                        xem `LocaleProvider`/`LanguageModal.tsx` (trước đây chỉ cosmetic). */}
-                    <button
-                      type="button"
-                      onClick={() => setShowLanguageModal(true)}
-                      className="flex items-center justify-between rounded-lg px-3 py-2.5 text-left text-[13.5px] text-ink hover:bg-surface"
-                    >
-                      <span>{t('account.language')}</span>
-                      <span className="flex items-center gap-1 text-ink-muted">
-                        {LOCALE_NATIVE_NAMES[locale]}
-                        <span aria-hidden>🌐</span>
-                      </span>
-                    </button>
-                    <div className="my-1.5 h-px bg-line-soft"></div>
-                    <button
-                      onClick={() => setShowLogoutModal(true)}
-                      className="rounded-lg px-3 py-2.5 text-left text-[13.5px] font-medium text-red-600 hover:bg-red-50"
-                    >
-                      {t('account.logout')}
-                    </button>
+                  <div className="absolute right-0 top-full z-[200] pt-2">
+                    <AccountMenu
+                      user={{
+                        id: currentUser?.id ?? null,
+                        fullName: currentUser?.fullName ?? '',
+                        email: currentUser?.email ?? '',
+                        avatarUrl: currentUser?.avatarUrl ?? null,
+                        role: currentUser?.role,
+                      }}
+                      languageName={LOCALE_NATIVE_NAMES[locale]}
+                      onNavigate={() => headerDropdown.closeNow('account')}
+                      onOpenLanguage={() => setShowLanguageModal(true)}
+                      onLogout={() => setShowLogoutModal(true)}
+                    />
                   </div>
                 )}
               </div>
@@ -665,15 +548,15 @@ export function Header() {
               <>
                 <Link
                   href="/login"
-                  className="cursor-pointer whitespace-nowrap rounded-lg px-3.5 py-2 text-[13.5px] font-semibold text-ink hover:bg-surface no-underline"
+                  className="cursor-pointer whitespace-nowrap rounded-md px-3.5 py-2 text-[13.5px] font-semibold text-accent-dark no-underline hover:bg-tint"
                 >
                   {t('auth.login')}
                 </Link>
                 <Link
                   href="/register"
-                  className="cursor-pointer whitespace-nowrap rounded-lg bg-accent px-4 py-2 text-[13.5px] font-bold text-white hover:bg-accent-dark no-underline"
+                  className="btn-tactile cursor-pointer whitespace-nowrap rounded-md bg-accent px-4 py-2 text-[13.5px] font-semibold text-white no-underline hover:bg-accent-dark hover:text-white"
                 >
-                  {t('auth.register')}
+                  {t('auth.getStarted')}
                 </Link>
               </>
             )}
