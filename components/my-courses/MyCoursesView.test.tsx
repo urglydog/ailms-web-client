@@ -1,5 +1,8 @@
 import { fireEvent, screen, within } from '@testing-library/react';
+import { NextIntlClientProvider } from 'next-intl';
+import { renderToString } from 'react-dom/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import viMessages from '@/messages/vi.json';
 import { makeCourse } from '@/test/fixtures';
 import { renderWithIntl } from '@/test/renderWithIntl';
 import type { EnrolledCourse } from '@/types/domain';
@@ -52,6 +55,19 @@ beforeEach(() => {
 });
 
 describe('MyCoursesView', () => {
+  it('HTML phía máy chủ luôn là trạng thái Đang tải để khớp lần render đầu của trình duyệt', () => {
+    // Máy chủ không có token nên truy vấn bị tắt (data rỗng, isLoading false); trình duyệt có token thì
+    // đang tải. Nếu máy chủ vẽ "chưa có khóa nào" sẽ lệch HTML và Next báo lỗi hydration.
+    setCourses([]);
+    const html = renderToString(
+      <NextIntlClientProvider locale="vi" messages={viMessages}>
+        <MyCoursesView />
+      </NextIntlClientProvider>,
+    );
+    expect(html).toContain('Đang tải…');
+    expect(html).not.toContain('Bắt đầu khóa học đầu tiên');
+  });
+
   it('đang tải thì báo Đang tải', () => {
     state.enrollments = { data: [], isLoading: true, error: null };
     renderWithIntl(<MyCoursesView />);

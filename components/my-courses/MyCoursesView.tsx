@@ -44,8 +44,12 @@ export function MyCoursesView() {
   // Đọc lựa chọn đã lưu trong effect (không đọc lúc khởi tạo) để HTML server và client khớp nhau.
   const [storedView, setStoredView] = useState<string | null>(null);
   const [itemsRef, shown] = useReveal<HTMLDivElement>();
+  // Máy chủ không có token nên truy vấn bị tắt (không tải, data rỗng) còn trình duyệt thì đang tải; nếu cả hai
+  // vẽ theo `isLoading` ngay lần đầu, HTML lệch nhau (lỗi hydration). Chỉ quyết định hiển thị sau khi đã gắn kết.
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     try {
       setStoredView(localStorage.getItem(VIEW_KEY));
     } catch {
@@ -71,7 +75,7 @@ export function MyCoursesView() {
   const profileHref = currentUser?.id != null ? `/u/${currentUser.id}?tab=certificates` : null;
   const certificates = courses.filter((c) => c.certificateCode).length;
 
-  if (error) {
+  if (mounted && error) {
     return (
       <div className="shell py-8">
         <div className="rounded-card border border-line bg-surface-raised p-4 text-sm text-danger">
@@ -81,7 +85,7 @@ export function MyCoursesView() {
     );
   }
 
-  if (isLoading) {
+  if (!mounted || isLoading) {
     return (
       <div className="shell py-8">
         <p className="text-sm text-ink-muted">{t('loading')}</p>
