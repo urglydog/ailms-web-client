@@ -27,6 +27,12 @@ function stubReducedMotion(matches: boolean) {
   }));
 }
 
+/** Khung chỉ xuất hiện SAU lần render đầu (vd trang hiện "Đang tải" rồi mới có danh sách). */
+function LateProbe({ ready }: { ready: boolean }) {
+  const [ref, shown] = useReveal<HTMLDivElement>();
+  return ready ? <div ref={ref} data-testid="late" data-shown={String(shown)} /> : <p>đang tải</p>;
+}
+
 describe('useReveal', () => {
   beforeEach(() => {
     trigger = null;
@@ -49,6 +55,22 @@ describe('useReveal', () => {
     render(<Probe />);
     act(() => trigger?.(false));
     expect(screen.getByTestId('probe')).toHaveAttribute('data-shown', 'false');
+  });
+
+  it('vẫn quan sát được khung xuất hiện muộn sau lần render đầu', () => {
+    stubReducedMotion(false);
+    const { rerender } = render(<LateProbe ready={false} />);
+    rerender(<LateProbe ready />);
+    expect(screen.getByTestId('late')).toHaveAttribute('data-shown', 'false');
+    act(() => trigger?.(true));
+    expect(screen.getByTestId('late')).toHaveAttribute('data-shown', 'true');
+  });
+
+  it('khung xuất hiện muộn cũng hiện ngay khi bật giảm chuyển động', () => {
+    stubReducedMotion(true);
+    const { rerender } = render(<LateProbe ready={false} />);
+    rerender(<LateProbe ready />);
+    expect(screen.getByTestId('late')).toHaveAttribute('data-shown', 'true');
   });
 
   it('hiện ngay khi bật giảm chuyển động', () => {
