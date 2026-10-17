@@ -236,5 +236,66 @@
       "hasAttachments": "Có tài liệu đính kèm",
       "signInPrompt": "Đăng nhập để xem toàn bộ chương trình học và theo dõi tiến độ của khóa này."
     }
+  },
+  "profile": {
+    "role": {
+      "student": "Học viên",
+      "instructor": "Giảng viên"
+    },
+    "memberSince": "Thành viên từ {date}",
+    "share": "Chia sẻ hồ sơ",
+    "shareCopied": "Đã sao chép liên kết hồ sơ",
+    "shareFailed": "Không sao chép được, vui lòng thử lại.",
+    "settings": "Cài đặt tài khoản",
+    "stats": {
+      "certificates": "Chứng chỉ",
+      "courses": "Khóa học",
+      "streak": "Ngày streak"
+    },
+    "tabs": {
+      "certificates": "Chứng chỉ",
+      "courses": "Đã học",
+      "wishlist": "Yêu thích"
+    },
+    "loading": "Đang tải...",
+    "notFound": "Không tìm thấy người dùng này.",
+    "loadError": "Không tải được hồ sơ, thử lại sau.",
+    "hidden": "Học viên này đã ẩn mục này.",
+    "emptyCourses": "Chưa sở hữu khóa học nào.",
+    "emptyWishlist": "Chưa lưu khóa học yêu thích nào.",
+    "emptyCertificates": "Chưa có chứng chỉ nào.",
+    "certs": {
+      "all": "Tất cả",
+      "sortLabel": "Sắp xếp",
+      "issuedOn": "Cấp ngày {date}",
+      "sort": {
+        "newest": "Ngày nhận: Mới nhất",
+        "oldest": "Ngày nhận: Cũ nhất",
+        "topic": "Chủ đề khóa học",
+        "title": "Tên khóa học (A-Z)"
+      }
+    },
+    "free": "Miễn phí"
+  },
+  "certificate": {
+    "back": "Chứng chỉ của tôi",
+    "valid": "Chứng chỉ hợp lệ",
+    "congrats": "Chúc mừng bạn đã hoàn thành khóa học!",
+    "recipient": "Người nhận",
+    "instructor": "Giảng viên",
+    "completedOn": "Ngày hoàn thành",
+    "code": "Mã chứng chỉ",
+    "download": "Tải PDF",
+    "downloading": "Đang tải...",
+    "downloadError": "Có lỗi khi tải chứng chỉ, vui lòng thử lại.",
+    "linkedin": "Thêm vào LinkedIn",
+    "verifyLink": "Liên kết xác thực",
+    "copy": "Sao chép",
+    "copied": "Đã sao chép",
+    "copyError": "Không sao chép được, vui lòng thử lại.",
+    "linkedinHint": "Dán liên kết này vào mục Licenses & Certifications trên LinkedIn hoặc phần Certifications trong CV.",
+    "loading": "Đang tải...",
+    "notFound": "Không tìm thấy chứng chỉ này.",
+    "loadError": "Không tải được chứng chỉ, thử lại sau."
   }
 }

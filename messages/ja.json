@@ -236,5 +236,66 @@
       "hasAttachments": "添付資料あり",
       "signInPrompt": "ログインすると全カリキュラムと学習の進捗を確認できます。"
     }
+  },
+  "profile": {
+    "role": {
+      "student": "受講生",
+      "instructor": "講師"
+    },
+    "memberSince": "{date} から利用",
+    "share": "プロフィールを共有",
+    "shareCopied": "プロフィールのリンクをコピーしました",
+    "shareFailed": "コピーできませんでした。もう一度お試しください。",
+    "settings": "アカウント設定",
+    "stats": {
+      "certificates": "証明書",
+      "courses": "講座",
+      "streak": "連続日数"
+    },
+    "tabs": {
+      "certificates": "証明書",
+      "courses": "学習済み",
+      "wishlist": "お気に入り"
+    },
+    "loading": "読み込み中...",
+    "notFound": "ユーザーが見つかりません。",
+    "loadError": "プロフィールを読み込めませんでした。",
+    "hidden": "この受講生はこの項目を非表示にしています。",
+    "emptyCourses": "まだ講座がありません。",
+    "emptyWishlist": "お気に入りの講座はまだありません。",
+    "emptyCertificates": "まだ証明書がありません。",
+    "certs": {
+      "all": "すべて",
+      "sortLabel": "並べ替え",
+      "issuedOn": "{date} 発行",
+      "sort": {
+        "newest": "日付：新しい順",
+        "oldest": "日付：古い順",
+        "topic": "講座のテーマ",
+        "title": "講座名（A-Z）"
+      }
+    },
+    "free": "無料"
+  },
+  "certificate": {
+    "back": "証明書一覧",
+    "valid": "有効な証明書",
+    "congrats": "講座の修了おめでとうございます！",
+    "recipient": "受領者",
+    "instructor": "講師",
+    "completedOn": "修了日",
+    "code": "証明書コード",
+    "download": "PDFをダウンロード",
+    "downloading": "ダウンロード中...",
+    "downloadError": "証明書のダウンロードに失敗しました。もう一度お試しください。",
+    "linkedin": "LinkedInに追加",
+    "verifyLink": "検証リンク",
+    "copy": "コピー",
+    "copied": "コピーしました",
+    "copyError": "コピーできませんでした。もう一度お試しください。",
+    "linkedinHint": "このリンクを LinkedIn の「資格・認定」または履歴書の資格欄に貼り付けてください。",
+    "loading": "読み込み中...",
+    "notFound": "証明書が見つかりません。",
+    "loadError": "証明書を読み込めませんでした。"
   }
 }

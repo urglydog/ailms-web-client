@@ -44,6 +44,10 @@ describe('chuỗi dịch', () => {
       'learn.dubbing.listenOriginal',
       'learn.tabs.materials',
       'learn.sidebar.tutor',
+      'profile.tabs.certificates',
+      'profile.share',
+      'certificate.download',
+      'certificate.valid',
     ]) {
       expect(viKeys).toContain(key);
     }

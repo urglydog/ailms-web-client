@@ -236,5 +236,66 @@
       "hasAttachments": "含附件",
       "signInPrompt": "登录后可查看完整课程大纲并跟踪学习进度。"
     }
+  },
+  "profile": {
+    "role": {
+      "student": "学员",
+      "instructor": "讲师"
+    },
+    "memberSince": "加入于 {date}",
+    "share": "分享主页",
+    "shareCopied": "已复制主页链接",
+    "shareFailed": "无法复制，请重试。",
+    "settings": "账户设置",
+    "stats": {
+      "certificates": "证书",
+      "courses": "课程",
+      "streak": "连续天数"
+    },
+    "tabs": {
+      "certificates": "证书",
+      "courses": "已学",
+      "wishlist": "收藏"
+    },
+    "loading": "加载中...",
+    "notFound": "找不到该用户。",
+    "loadError": "无法加载主页，请稍后再试。",
+    "hidden": "该学员已隐藏此部分。",
+    "emptyCourses": "还没有课程。",
+    "emptyWishlist": "还没有收藏的课程。",
+    "emptyCertificates": "还没有证书。",
+    "certs": {
+      "all": "全部",
+      "sortLabel": "排序",
+      "issuedOn": "颁发于 {date}",
+      "sort": {
+        "newest": "日期：最新",
+        "oldest": "日期：最早",
+        "topic": "课程主题",
+        "title": "课程名称（A-Z）"
+      }
+    },
+    "free": "免费"
+  },
+  "certificate": {
+    "back": "我的证书",
+    "valid": "证书有效",
+    "congrats": "恭喜你完成课程！",
+    "recipient": "获得者",
+    "instructor": "讲师",
+    "completedOn": "完成日期",
+    "code": "证书编号",
+    "download": "下载 PDF",
+    "downloading": "下载中...",
+    "downloadError": "下载证书时出错，请重试。",
+    "linkedin": "添加到 LinkedIn",
+    "verifyLink": "验证链接",
+    "copy": "复制",
+    "copied": "已复制",
+    "copyError": "无法复制，请重试。",
+    "linkedinHint": "将此链接粘贴到 LinkedIn 的“证书”栏或简历的证书部分。",
+    "loading": "加载中...",
+    "notFound": "找不到该证书。",
+    "loadError": "无法加载证书，请稍后再试。"
   }
 }

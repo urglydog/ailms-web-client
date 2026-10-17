@@ -236,5 +236,66 @@
       "hasAttachments": "Has attachments",
       "signInPrompt": "Sign in to see the full curriculum and track your progress in this course."
     }
+  },
+  "profile": {
+    "role": {
+      "student": "Student",
+      "instructor": "Instructor"
+    },
+    "memberSince": "Member since {date}",
+    "share": "Share profile",
+    "shareCopied": "Profile link copied",
+    "shareFailed": "Could not copy, please try again.",
+    "settings": "Account settings",
+    "stats": {
+      "certificates": "Certificates",
+      "courses": "Courses",
+      "streak": "Day streak"
+    },
+    "tabs": {
+      "certificates": "Certificates",
+      "courses": "Learned",
+      "wishlist": "Wishlist"
+    },
+    "loading": "Loading...",
+    "notFound": "User not found.",
+    "loadError": "Could not load the profile, try again later.",
+    "hidden": "This learner has hidden this section.",
+    "emptyCourses": "No courses yet.",
+    "emptyWishlist": "No wishlisted courses yet.",
+    "emptyCertificates": "No certificates yet.",
+    "certs": {
+      "all": "All",
+      "sortLabel": "Sort by",
+      "issuedOn": "Issued {date}",
+      "sort": {
+        "newest": "Date: Newest",
+        "oldest": "Date: Oldest",
+        "topic": "Course topic",
+        "title": "Course title (A-Z)"
+      }
+    },
+    "free": "Free"
+  },
+  "certificate": {
+    "back": "My certificates",
+    "valid": "Valid certificate",
+    "congrats": "Congratulations on completing the course!",
+    "recipient": "Recipient",
+    "instructor": "Instructor",
+    "completedOn": "Completed on",
+    "code": "Certificate code",
+    "download": "Download PDF",
+    "downloading": "Downloading...",
+    "downloadError": "Could not download the certificate, please try again.",
+    "linkedin": "Add to LinkedIn",
+    "verifyLink": "Verification link",
+    "copy": "Copy",
+    "copied": "Copied",
+    "copyError": "Could not copy, please try again.",
+    "linkedinHint": "Paste this link into Licenses & Certifications on LinkedIn or the Certifications section of your CV.",
+    "loading": "Loading...",
+    "notFound": "Certificate not found.",
+    "loadError": "Could not load the certificate, try again later."
   }
 }
