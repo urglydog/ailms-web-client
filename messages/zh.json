@@ -5,7 +5,8 @@
       "myCourses": "我的课程",
       "live": "直播",
       "community": "社区",
-      "about": "关于我们"
+      "about": "关于我们",
+      "explore": "探索"
     },
     "search": {
       "ariaLabel": "搜索",
@@ -46,17 +47,25 @@
       "instructorChannel": "讲师频道",
       "becomeInstructor": "成为讲师",
       "language": "语言",
-      "logout": "退出登录"
+      "logout": "退出登录",
+      "certificates": "证书与成就"
     },
     "auth": {
       "login": "登录",
-      "register": "注册"
+      "register": "注册",
+      "getStarted": "开始"
     },
     "logoutModal": {
       "title": "确认退出登录",
       "body": "您确定要退出登录吗？",
       "cancel": "取消",
       "confirm": "退出登录"
+    },
+    "explore": {
+      "allCourses": "全部课程",
+      "categories": "分类",
+      "more": "更多",
+      "liveNow": "直播中"
     }
   },
   "footer": {
@@ -87,5 +96,30 @@
   "languageModal": {
     "title": "选择语言",
     "close": "关闭"
+  },
+  "home": {
+    "hero": {
+      "tag": "全新 · AI 配音",
+      "titleBefore": "所有课程，用",
+      "titleHighlight": "你的语言",
+      "description": "AI 将国际课程配音成你选择的语言，与原视频同步，无需字幕。",
+      "cta": "探索课程",
+      "demoLink": "观看演示 →"
+    },
+    "demo": {
+      "ariaLabel": "AI 配音演示视频",
+      "step1": "选择课程",
+      "step2": "选择语言",
+      "step3": "询问 AI 导师",
+      "goToStep": "转到第 {n} 步：{title}",
+      "chatQuestion": "什么是组件？",
+      "chatAnswer": "把它想象成积木。请回看这一段"
+    },
+    "trending": {
+      "title": "热门课程",
+      "all": "全部",
+      "viewAll": "查看全部",
+      "empty": "此分类暂无课程。"
+    }
   }
 }

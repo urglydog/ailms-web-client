@@ -5,7 +5,8 @@
       "myCourses": "マイコース",
       "live": "ライブ",
       "community": "コミュニティ",
-      "about": "私たちについて"
+      "about": "私たちについて",
+      "explore": "探す"
     },
     "search": {
       "ariaLabel": "検索",
@@ -46,17 +47,25 @@
       "instructorChannel": "講師チャンネル",
       "becomeInstructor": "講師になる",
       "language": "言語",
-      "logout": "ログアウト"
+      "logout": "ログアウト",
+      "certificates": "証明書と実績"
     },
     "auth": {
       "login": "ログイン",
-      "register": "新規登録"
+      "register": "新規登録",
+      "getStarted": "始める"
     },
     "logoutModal": {
       "title": "ログアウトの確認",
       "body": "本当にログアウトしますか？",
       "cancel": "キャンセル",
       "confirm": "ログアウト"
+    },
+    "explore": {
+      "allCourses": "すべての講座",
+      "categories": "カテゴリ",
+      "more": "その他",
+      "liveNow": "配信中"
     }
   },
   "footer": {
@@ -87,5 +96,30 @@
   "languageModal": {
     "title": "言語を選択",
     "close": "閉じる"
+  },
+  "home": {
+    "hero": {
+      "tag": "新機能 · AI吹き替え",
+      "titleBefore": "すべての講座を",
+      "titleHighlight": "あなたの言語で",
+      "description": "AIが海外の講座を選んだ言語に吹き替え、元の映像と同期。字幕は不要です。",
+      "cta": "講座を探す",
+      "demoLink": "デモを見る →"
+    },
+    "demo": {
+      "ariaLabel": "AI吹き替えデモ動画",
+      "step1": "講座を選ぶ",
+      "step2": "言語を選ぶ",
+      "step3": "AIチューターに質問",
+      "goToStep": "ステップ{n}へ：{title}",
+      "chatQuestion": "コンポーネントとは？",
+      "chatAnswer": "組み立て部品のように考えてみましょう。この部分を見直してください"
+    },
+    "trending": {
+      "title": "人気の講座",
+      "all": "すべて",
+      "viewAll": "すべて見る",
+      "empty": "このカテゴリにはまだ講座がありません。"
+    }
   }
 }

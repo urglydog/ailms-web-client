@@ -5,7 +5,8 @@
       "myCourses": "My Courses",
       "live": "Live",
       "community": "Community",
-      "about": "About Us"
+      "about": "About Us",
+      "explore": "Explore"
     },
     "search": {
       "ariaLabel": "Search",
@@ -46,17 +47,25 @@
       "instructorChannel": "Instructor Channel",
       "becomeInstructor": "Become an Instructor",
       "language": "Language",
-      "logout": "Log out"
+      "logout": "Log out",
+      "certificates": "Certificates and achievements"
     },
     "auth": {
       "login": "Log in",
-      "register": "Sign up"
+      "register": "Sign up",
+      "getStarted": "Get started"
     },
     "logoutModal": {
       "title": "Confirm log out",
       "body": "Are you sure you want to log out?",
       "cancel": "Cancel",
       "confirm": "Log out"
+    },
+    "explore": {
+      "allCourses": "All courses",
+      "categories": "CATEGORIES",
+      "more": "MORE",
+      "liveNow": "Live now"
     }
   },
   "footer": {
@@ -87,5 +96,30 @@
   "languageModal": {
     "title": "Choose language",
     "close": "Close"
+  },
+  "home": {
+    "hero": {
+      "tag": "New · AI dubbing",
+      "titleBefore": "Every course in",
+      "titleHighlight": "your language",
+      "description": "AI dubs international courses into the language you choose, in sync with the original video. No subtitles needed.",
+      "cta": "Explore courses",
+      "demoLink": "Watch the demo →"
+    },
+    "demo": {
+      "ariaLabel": "AI dubbing demo video",
+      "step1": "Choose a course",
+      "step2": "Choose a language",
+      "step3": "Ask the AI tutor",
+      "goToStep": "Go to step {n}: {title}",
+      "chatQuestion": "What is a component?",
+      "chatAnswer": "Think of it like a building block. Review this part"
+    },
+    "trending": {
+      "title": "Trending now",
+      "all": "All",
+      "viewAll": "View all",
+      "empty": "No courses in this category yet."
+    }
   }
 }

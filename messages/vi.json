@@ -5,7 +5,8 @@
       "myCourses": "Khóa học của tôi",
       "live": "Live",
       "community": "Cộng đồng",
-      "about": "Về chúng tôi"
+      "about": "Về chúng tôi",
+      "explore": "Khám phá"
     },
     "search": {
       "ariaLabel": "Tìm kiếm",
@@ -46,17 +47,25 @@
       "instructorChannel": "Kênh Giảng viên",
       "becomeInstructor": "Trở thành Giảng viên",
       "language": "Ngôn ngữ",
-      "logout": "Đăng xuất"
+      "logout": "Đăng xuất",
+      "certificates": "Chứng chỉ và thành tích"
     },
     "auth": {
       "login": "Đăng nhập",
-      "register": "Đăng ký"
+      "register": "Đăng ký",
+      "getStarted": "Bắt đầu"
     },
     "logoutModal": {
       "title": "Xác nhận đăng xuất",
       "body": "Bạn có chắc chắn muốn đăng xuất khỏi hệ thống không?",
       "cancel": "Hủy bỏ",
       "confirm": "Đăng xuất"
+    },
+    "explore": {
+      "allCourses": "Tất cả khóa học",
+      "categories": "DANH MỤC",
+      "more": "KHÁM PHÁ THÊM",
+      "liveNow": "Đang diễn ra"
     }
   },
   "footer": {
@@ -87,5 +96,30 @@
   "languageModal": {
     "title": "Chọn ngôn ngữ",
     "close": "Đóng"
+  },
+  "home": {
+    "hero": {
+      "tag": "Mới · AI lồng tiếng",
+      "titleBefore": "Mọi khóa học bằng",
+      "titleHighlight": "ngôn ngữ của bạn",
+      "description": "AI lồng tiếng khóa học quốc tế sang ngôn ngữ bạn chọn, đồng bộ với video gốc. Hiểu ngay, không cần phụ đề.",
+      "cta": "Khám phá khóa học",
+      "demoLink": "Xem demo →"
+    },
+    "demo": {
+      "ariaLabel": "Video demo lồng tiếng AI",
+      "step1": "Chọn khóa học",
+      "step2": "Chọn ngôn ngữ",
+      "step3": "Hỏi gia sư AI",
+      "goToStep": "Đi tới bước {n}: {title}",
+      "chatQuestion": "Component là gì?",
+      "chatAnswer": "Hãy thử nghĩ về một món đồ lắp ghép. Xem lại đoạn này nhé"
+    },
+    "trending": {
+      "title": "Đang thịnh hành",
+      "all": "Tất cả",
+      "viewAll": "Xem tất cả",
+      "empty": "Chưa có khóa học nào trong danh mục này."
+    }
   }
 }
