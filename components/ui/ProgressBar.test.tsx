@@ -25,6 +25,12 @@ describe('ProgressBar', () => {
     expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '100');
   });
 
+  it('tone onAccent dùng nền trắng mờ và phần đầy màu trắng để đọc được trên nền accent', () => {
+    const { container } = render(<ProgressBar value={50} label="x" tone="onAccent" />);
+    expect(screen.getByRole('progressbar')).toHaveClass('bg-white/30');
+    expect(container.querySelector('.bg-white')).not.toBeNull();
+  });
+
   it('tone success dùng màu success', () => {
     const { container } = render(<ProgressBar value={100} label="x" tone="success" />);
     expect(container.querySelector('.bg-success')).not.toBeNull();
