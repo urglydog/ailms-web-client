@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { format } from 'date-fns';
 import type { CertificateVisual } from '@/types/domain';
+import { COLORS } from '@/lib/theme/colors';
 import { certificatePlayfair, certificateWorkSans } from './certificateFonts';
 
 const GOLD = '#B8892B';
@@ -11,9 +12,9 @@ const NAVY = '#1B2A4A';
 const SLATE = '#5B6472';
 const CREAM = '#FBF8F0';
 const LINE_GREY = '#D8CDA9';
-/** Xanh dương thật của logo hệ thống (`tailwind.config.ts` — `accent: #2563EB`), khác bảng màu
- * vàng-navy còn lại của chứng chỉ — giữ nguyên màu logo gốc để đúng nhận diện thương hiệu. */
-const ACCENT_BLUE = '#2563EB';
+/** Xanh dương thật của logo hệ thống (`COLORS.accent`), khác bảng màu vàng-navy còn lại của
+ * chứng chỉ — giữ đúng màu logo để đúng nhận diện thương hiệu. */
+const ACCENT_BLUE = COLORS.accent;
 
 const PLAYFAIR = 'var(--font-certificate-playfair)';
 const WORK_SANS = 'var(--font-certificate-worksans)';
