@@ -1,40 +1,38 @@
 'use client';
 
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 /**
- * Thanh tab điều hướng nhanh giữa "Khóa học của tôi" và "Danh sách yêu thích" (14/09/2026, mở
- * rộng ngoài đặc tả gốc) — theo đúng layout trang "My learning" của Udemy: 1 tiêu đề lớn đứng
- * yên (bản dịch tiếng Việt của "My learning") + hàng tab bên dưới để chuyển qua lại, thay vì
- * phải quay lại menu tài khoản ở Header mỗi lần muốn đổi trang. Chỉ 2 tab khớp đúng những gì dự
- * án THẬT SỰ có (Udemy còn "My Lists"/"Certifications"/"Archived"/"Learning tools" — dự án chưa
- * có các tính năng đó nên không thêm tab giả không có nội dung thật).
+ * Tiêu đề "Khóa học của tôi" + hai tab chuyển giữa "Tất cả khóa học" và "Yêu thích" (14/09/2026, mở rộng
+ * ngoài đặc tả gốc). Chỉ 2 tab khớp đúng những gì dự án THẬT SỰ có.
  *
- * Nền đen full-bleed (14/09/2026, sửa lần 2 theo yêu cầu) — component này CHỈ vẽ chữ (title +
- * tab), không tự vẽ nền: trang cha (`my-courses/page.tsx`/`wishlist/page.tsx`) mới là nơi bọc
- * `bg-ink` full-bleed NẰM NGOÀI `.shell`, cùng kiểu với vùng hero đen ở trang chi tiết khóa học
- * (`courses/[slug]/page.tsx`) — đặt màu nền ở đây (bên trong `.shell` đã có padding) sẽ chỉ tô
- * đen được phần bên trong khung 1280px, không tràn hết chiều ngang màn hình như ảnh Udemy.
+ * (17/10/2026) Bỏ nền đen full-bleed cũ (kiểu hero Udemy) theo thiết kế azure sáng: component này CHỈ vẽ
+ * chữ, trang cha bọc nó trong dải nền `surface` có viền dưới (`my-courses/page.tsx`, `wishlist/page.tsx`).
  */
 const TABS = [
-  { href: '/my-courses', label: 'Tất cả khóa học', key: 'courses' },
-  { href: '/wishlist', label: 'Yêu thích', key: 'wishlist' },
+  { href: '/my-courses', key: 'all', page: 'courses' },
+  { href: '/wishlist', key: 'wishlist', page: 'wishlist' },
 ] as const;
 
-export function MyLearningTabs({ active }: { active: (typeof TABS)[number]['key'] }) {
+export function MyLearningTabs({ active }: { active: (typeof TABS)[number]['page'] }) {
+  const t = useTranslations('myCourses');
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="font-display text-3xl font-bold text-white">Khóa học của tôi</h1>
-      <nav className="flex gap-6 border-b border-white/15">
+      <h1 className="m-0 font-display text-3xl font-semibold text-ink">{t('title')}</h1>
+      <nav className="flex gap-6 border-b border-line">
         {TABS.map((tab) => (
           <Link
             key={tab.key}
             href={tab.href}
+            aria-current={active === tab.page ? 'page' : undefined}
             className={`-mb-px border-b-2 pb-3 text-sm font-semibold no-underline hover:no-underline ${
-              active === tab.key ? 'border-white text-white' : 'border-transparent text-white/60 hover:text-white'
+              active === tab.page
+                ? 'border-accent text-accent-dark hover:text-accent-dark'
+                : 'border-transparent text-ink-muted hover:text-ink'
             }`}
           >
-            {tab.label}
+            {t(`tabs.${tab.key}`)}
           </Link>
         ))}
       </nav>
