@@ -138,20 +138,18 @@ export function CourseCard({ course }: { course: CourseSummary }) {
           </button>
         )}
 
-        {/* Nhãn góc trên trái: Miễn phí và/hoặc AI lồng tiếng (thay hàng cờ ngôn ngữ cũ — spec mục 4) */}
-        {(course.isFree || course.langs.length > 0) && (
-          <div className="absolute left-2.5 top-2.5 flex flex-col items-start gap-1">
-            {course.isFree && <Badge tone="success">Miễn phí</Badge>}
-            {course.langs.length > 0 && (
-              <span
-                title={course.langs.map((l) => l.label).join(', ')}
-                className="rounded-full bg-white px-2 py-0.5 text-[11px] font-medium text-accent-dark shadow-sm"
-              >
-                AI lồng tiếng
-              </span>
-            )}
-          </div>
-        )}
+        {/* Nhãn góc trên trái: Miễn phí (nếu có) và AI lồng tiếng (thay hàng cờ ngôn ngữ cũ — spec mục 4) */}
+        <div className="absolute left-2.5 top-2.5 flex flex-col items-start gap-1">
+          {course.isFree && <Badge tone="success">Miễn phí</Badge>}
+          {/* Mọi khóa đều hỗ trợ lồng tiếng AI; API công khai chưa trả danh sách giọng (`langs` luôn rỗng)
+              nên nhãn luôn hiện, chỉ có tooltip khi danh sách có dữ liệu. */}
+          <span
+            title={course.langs.length > 0 ? course.langs.map((l) => l.label).join(', ') : undefined}
+            className="rounded-full bg-white px-2 py-0.5 text-[11px] font-medium text-accent-dark shadow-sm"
+          >
+            AI lồng tiếng
+          </span>
+        </div>
 
         {/* Thanh "Xem trước" trượt lên khi hover — chỉ là gợi ý thị giác, cả thẻ đã là liên kết */}
         <span

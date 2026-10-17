@@ -19,14 +19,21 @@ vi.mock('@/hooks/useWishlist', () => ({
 const LANG = { code: 'vi', label: 'Tiếng Việt', flag: '🇻🇳', available: true } as unknown as DubLanguage;
 
 describe('CourseCard', () => {
-  it('hiện nhãn AI lồng tiếng khi khóa có giọng lồng tiếng', () => {
+  it('luôn hiện nhãn AI lồng tiếng vì mọi khóa đều hỗ trợ lồng tiếng', () => {
     render(<CourseCard course={makeCourse(1, { langs: [LANG] })} />);
     expect(screen.getByText('AI lồng tiếng')).toBeInTheDocument();
   });
 
-  it('không hiện nhãn khi chưa có giọng nào', () => {
+  it('vẫn hiện nhãn khi API chưa trả danh sách giọng (langs rỗng)', () => {
     render(<CourseCard course={makeCourse(2, { langs: [] })} />);
-    expect(screen.queryByText('AI lồng tiếng')).toBeNull();
+    const label = screen.getByText('AI lồng tiếng');
+    expect(label).toBeInTheDocument();
+    expect(label).not.toHaveAttribute('title');
+  });
+
+  it('nhãn liệt kê các giọng trong tooltip khi có danh sách', () => {
+    render(<CourseCard course={makeCourse(6, { langs: [LANG] })} />);
+    expect(screen.getByText('AI lồng tiếng')).toHaveAttribute('title', 'Tiếng Việt');
   });
 
   it('không còn hàng cờ ngôn ngữ', () => {
