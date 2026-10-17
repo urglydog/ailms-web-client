@@ -84,6 +84,12 @@
     animation-delay: calc(var(--i, 0) * 60ms);
   }
 
+  /* Vạch tiến độ của video demo ở trang chủ: đầy dần đúng bằng thời lượng một cảnh (3,8 giây). */
+  .demo-seg-fill {
+    transform-origin: left;
+    animation: demo-fill 3800ms linear forwards;
+  }
+
   /* "Trở thành Giảng viên" — trang thành công cuối wizard onboarding (19/09/2026, tính năng
    * mới): vòng tròn nảy vào rồi dấu tích "vẽ" theo sau, không dùng thư viện animation ngoài
    * (dự án chưa cài `framer-motion`/`tailwindcss-animate`). */
@@ -114,6 +120,15 @@
    * không chói như "AI vibe" cũ (xem docblock đầu tailwind.config.ts). */
   .ranking-rank-1-glow {
     animation: ranking-gold-pulse 2.4s ease-in-out infinite;
+  }
+}
+
+@keyframes demo-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
   }
 }
 
