@@ -1,4 +1,5 @@
 import { HomeHero } from '@/components/home/HomeHero';
+import { HomeShelves } from '@/components/home/HomeShelves';
 import { TrendingCourses } from '@/components/home/TrendingCourses';
 import { RankingBanner } from '@/components/ranking/RankingBanner';
 import { publicCoursesApi, EMPTY_FILTERS } from '@/lib/api/publicCourses';
@@ -13,15 +14,21 @@ import { TRENDING_FETCH_SIZE } from '@/lib/home/trending';
  */
 export const dynamic = 'force-dynamic';
 
-/** Trang chủ (spec mục 4): hero chia đôi, rồi "Đang thịnh hành". Banner xếp hạng cộng đồng (có sẵn)
+/** Trang chủ (spec mục 4): hero chia đôi, rồi "Đang thịnh hành" và các hàng Mới ra mắt / Miễn phí / Người mới / Chủ đề. Banner xếp hạng cộng đồng (có sẵn)
  * đặt cuối để không tranh chú ý với hero. */
 export default async function HomePage() {
-  const courses = await publicCoursesApi.search(EMPTY_FILTERS, 'rating', TRENDING_FETCH_SIZE);
+  const [courses, newest, free, beginner] = await Promise.all([
+    publicCoursesApi.search(EMPTY_FILTERS, 'rating', TRENDING_FETCH_SIZE),
+    publicCoursesApi.search(EMPTY_FILTERS, 'newest', TRENDING_FETCH_SIZE),
+    publicCoursesApi.search({ ...EMPTY_FILTERS, priceType: 'free' }, 'reviews', TRENDING_FETCH_SIZE),
+    publicCoursesApi.search({ ...EMPTY_FILTERS, level: 'BEGINNER', priceType: 'paid' }, 'rating', TRENDING_FETCH_SIZE),
+  ]);
 
   return (
     <>
       <HomeHero />
       <TrendingCourses initialCourses={courses} />
+      <HomeShelves newest={newest} free={free} beginner={beginner} />
       <RankingBanner />
     </>
   );

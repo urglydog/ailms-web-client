@@ -121,6 +121,24 @@
       "all": "全部",
       "viewAll": "查看全部",
       "empty": "此分类暂无课程。"
+    },
+    "shelves": {
+      "newest": {
+        "title": "新上线",
+        "subtitle": "LinguaLearn 最近新增的课程"
+      },
+      "free": {
+        "title": "免费学习",
+        "subtitle": "立即开始，无需费用"
+      },
+      "beginner": {
+        "title": "适合初学者",
+        "subtitle": "基础课程，零基础也能跟上"
+      }
+    },
+    "topics": {
+      "title": "按主题探索",
+      "subtitle": "选择你想学习的领域"
     }
   },
   "myCourses": {

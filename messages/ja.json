@@ -121,6 +121,24 @@
       "all": "すべて",
       "viewAll": "すべて見る",
       "empty": "このカテゴリにはまだ講座がありません。"
+    },
+    "shelves": {
+      "newest": {
+        "title": "新着講座",
+        "subtitle": "LinguaLearn に追加されたばかりの講座"
+      },
+      "free": {
+        "title": "無料で学ぶ",
+        "subtitle": "費用なしで今すぐ始められます"
+      },
+      "beginner": {
+        "title": "初心者向け",
+        "subtitle": "ゼロから学べる基礎講座"
+      }
+    },
+    "topics": {
+      "title": "テーマから探す",
+      "subtitle": "学びたい分野を選びましょう"
     }
   },
   "myCourses": {

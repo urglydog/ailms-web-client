@@ -121,6 +121,24 @@
       "all": "Tất cả",
       "viewAll": "Xem tất cả",
       "empty": "Chưa có khóa học nào trong danh mục này."
+    },
+    "shelves": {
+      "newest": {
+        "title": "Mới ra mắt",
+        "subtitle": "Những khóa học vừa được thêm vào LinguaLearn"
+      },
+      "free": {
+        "title": "Học miễn phí",
+        "subtitle": "Bắt đầu ngay, không tốn chi phí"
+      },
+      "beginner": {
+        "title": "Dành cho người mới bắt đầu",
+        "subtitle": "Khóa cơ bản, dễ theo kịp từ con số 0"
+      }
+    },
+    "topics": {
+      "title": "Khám phá theo chủ đề",
+      "subtitle": "Chọn lĩnh vực bạn muốn học"
     }
   },
   "myCourses": {

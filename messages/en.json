@@ -121,6 +121,24 @@
       "all": "All",
       "viewAll": "View all",
       "empty": "No courses in this category yet."
+    },
+    "shelves": {
+      "newest": {
+        "title": "Just launched",
+        "subtitle": "Courses recently added to LinguaLearn"
+      },
+      "free": {
+        "title": "Learn for free",
+        "subtitle": "Start right now at no cost"
+      },
+      "beginner": {
+        "title": "For beginners",
+        "subtitle": "Foundational courses, easy to follow from scratch"
+      }
+    },
+    "topics": {
+      "title": "Explore by topic",
+      "subtitle": "Pick the field you want to learn"
     }
   },
   "myCourses": {

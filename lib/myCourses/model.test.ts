@@ -150,14 +150,13 @@ describe('certificateHref', () => {
 
 describe('resolveViewMode', () => {
   it('dùng lựa chọn đã lưu nếu hợp lệ', () => {
-    expect(resolveViewMode('grid', 1)).toBe('grid');
-    expect(resolveViewMode('list', 9)).toBe('list');
+    expect(resolveViewMode('grid')).toBe('grid');
+    expect(resolveViewMode('list')).toBe('list');
   });
-  it('chưa lưu thì mặc định theo số khóa: dưới 4 là danh sách, từ 4 là thẻ', () => {
-    expect(resolveViewMode(null, 3)).toBe('list');
-    expect(resolveViewMode(null, 4)).toBe('grid');
+  it('chưa lưu thì mặc định dạng thẻ', () => {
+    expect(resolveViewMode(null)).toBe('grid');
   });
   it('giá trị lưu sai thì coi như chưa lưu', () => {
-    expect(resolveViewMode('abc', 2)).toBe('list');
+    expect(resolveViewMode('abc')).toBe('grid');
   });
 });

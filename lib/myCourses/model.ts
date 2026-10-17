@@ -72,8 +72,8 @@ export function certificateHref(course: EnrolledCourse): string | null {
   return course.certificateCode ? `/certificates/${course.certificateCode}` : null;
 }
 
-/** Dạng xem: dùng lựa chọn đã lưu nếu hợp lệ; chưa có thì dưới 4 khóa là danh sách, từ 4 khóa là thẻ. */
-export function resolveViewMode(stored: string | null, courseCount: number): ViewMode {
+/** Dạng xem: dùng lựa chọn đã lưu nếu hợp lệ; chưa có thì mặc định dạng thẻ. */
+export function resolveViewMode(stored: string | null): ViewMode {
   if (stored === 'list' || stored === 'grid') return stored;
-  return courseCount >= 4 ? 'grid' : 'list';
+  return 'grid';
 }

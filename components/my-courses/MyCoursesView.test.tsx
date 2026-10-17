@@ -114,19 +114,18 @@ describe('MyCoursesView', () => {
     expect(screen.getByText('Không tìm thấy khóa học phù hợp')).toBeInTheDocument();
   });
 
-  it('mọi khóa đã xong: khối chúc mừng và gợi ý khóa tiếp theo', () => {
+  it('mọi khóa đã xong: không có khối chúc mừng, vẫn gợi ý khóa tiếp theo', () => {
     setCourses([enrolled(1, { progressPct: 100, completedAt: '2026-10-01T00:00:00', certificateCode: 'LL-1' })]);
     renderWithIntl(<MyCoursesView />);
-    expect(screen.getByText('CHÚC MỪNG, BẠN ĐÃ HOÀN THÀNH')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Chia sẻ lên hồ sơ' })).toHaveAttribute('href', '/u/7?tab=certificates');
+    expect(screen.queryByText('CHÚC MỪNG, BẠN ĐÃ HOÀN THÀNH')).toBeNull();
     expect(screen.getByText('Gợi ý cho bạn tiếp theo')).toBeInTheDocument();
     expect(screen.getByTestId('suggestion')).toBeInTheDocument();
   });
 
-  it('dưới 4 khóa mặc định dạng danh sách, từ 4 khóa mặc định dạng thẻ', () => {
+  it('mặc định dạng thẻ dù ít hay nhiều khóa', () => {
     setCourses([enrolled(1), enrolled(2)]);
     const first = renderWithIntl(<MyCoursesView />);
-    expect(screen.getByTestId('course-items')).toHaveAttribute('data-view', 'list');
+    expect(screen.getByTestId('course-items')).toHaveAttribute('data-view', 'grid');
     first.unmount();
     setCourses([enrolled(1), enrolled(2), enrolled(3), enrolled(4)]);
     renderWithIntl(<MyCoursesView />);

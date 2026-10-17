@@ -13,7 +13,6 @@ import { ApiError } from '@/lib/api/client';
 import {
   countByStatus,
   filterAndSort,
-  pickCompleted,
   pickContinue,
   resolveViewMode,
 } from '@/lib/myCourses/model';
@@ -57,7 +56,7 @@ export function MyCoursesView() {
     }
   }, []);
 
-  const view: ViewMode = resolveViewMode(storedView, courses.length);
+  const view: ViewMode = resolveViewMode(storedView);
   const changeView = (next: ViewMode) => {
     setStoredView(next);
     try {
@@ -69,7 +68,7 @@ export function MyCoursesView() {
 
   const counts = useMemo(() => countByStatus(courses), [courses]);
   const visible = useMemo(() => filterAndSort(courses, { status, query, sort }), [courses, status, query, sort]);
-  const featured = pickContinue(courses) ?? pickCompleted(courses);
+  const featured = pickContinue(courses);
   const hasInProgress = pickContinue(courses) !== null;
   const ownedIds = useMemo(() => new Set(courses.map((c) => c.courseId)), [courses]);
   const profileHref = currentUser?.id != null ? `/u/${currentUser.id}?tab=certificates` : null;
