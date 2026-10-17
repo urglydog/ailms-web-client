@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Briefcase, ChevronDown, Code, Info, Languages, Palette, Users, Video } from 'lucide-react';
 import type { Category } from '@/types/domain';
@@ -29,24 +29,66 @@ export function ExploreMenu({ categories, liveNow }: ExploreMenuProps) {
   const t = useTranslations('header');
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  // `pinned`: người dùng đã bấm nên menu giữ mở dù rời chuột (rê chuột chỉ mở tạm). Nếu không
+  // phân biệt, rê chuột rồi bấm sẽ đảo trạng thái và đóng menu ngay.
+  const [pinned, setPinned] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
   const active = isNavItemActive(pathname, '/courses');
+
+  const close = () => {
+    setOpen(false);
+    setPinned(false);
+  };
+
+  const handleClick = () => {
+    if (open && !pinned) {
+      setPinned(true);
+      return;
+    }
+    if (open) {
+      close();
+      return;
+    }
+    setOpen(true);
+    setPinned(true);
+  };
 
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpen(false);
+      if (e.key === 'Escape') {
+        setOpen(false);
+        setPinned(false);
+      }
+    };
+    const onPointerDown = (e: MouseEvent) => {
+      if (rootRef.current && !rootRef.current.contains(e.target as Node)) {
+        setOpen(false);
+        setPinned(false);
+      }
     };
     document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
+    document.addEventListener('mousedown', onPointerDown);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.removeEventListener('mousedown', onPointerDown);
+    };
   }, [open]);
 
   return (
-    <div className="relative" onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
+    <div
+      ref={rootRef}
+      className="relative"
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => {
+        if (!pinned) setOpen(false);
+      }}
+    >
       <button
         type="button"
         aria-expanded={open}
         aria-haspopup="true"
-        onClick={() => setOpen((v) => !v)}
+        onClick={handleClick}
         className={`flex items-center gap-1 rounded-md px-2.5 py-2 text-sm font-semibold transition-colors duration-150 ${
           active || open ? 'bg-tint text-accent-dark' : 'text-ink hover:bg-tint'
         }`}
@@ -59,7 +101,7 @@ export function ExploreMenu({ categories, liveNow }: ExploreMenuProps) {
         <div className="absolute left-0 top-full z-[200] grid w-[400px] grid-cols-2 gap-4 rounded-panel border border-line bg-surface-raised p-4 shadow-card-hover">
           <div>
             <p className="mb-1.5 px-2 text-[11px] font-medium tracking-wide text-ink-muted">{t('explore.categories')}</p>
-            <Link href="/courses" onClick={() => setOpen(false)} className={ROW}>
+            <Link href="/courses" onClick={close} className={ROW}>
               <Languages size={16} aria-hidden className="text-accent" />
               {t('explore.allCourses')}
             </Link>
@@ -67,7 +109,7 @@ export function ExploreMenu({ categories, liveNow }: ExploreMenuProps) {
               <Link
                 key={c.id}
                 href={`/courses?category=${c.slug}`}
-                onClick={() => setOpen(false)}
+                onClick={close}
                 className={ROW}
               >
                 <CategoryIcon index={i} />
@@ -77,7 +119,7 @@ export function ExploreMenu({ categories, liveNow }: ExploreMenuProps) {
           </div>
           <div>
             <p className="mb-1.5 px-2 text-[11px] font-medium tracking-wide text-ink-muted">{t('explore.more')}</p>
-            <Link href="/live" onClick={() => setOpen(false)} className={ROW}>
+            <Link href="/live" onClick={close} className={ROW}>
               <Video size={16} aria-hidden className="text-accent" />
               {t('nav.live')}
               {liveNow && (
@@ -86,11 +128,11 @@ export function ExploreMenu({ categories, liveNow }: ExploreMenuProps) {
                 </span>
               )}
             </Link>
-            <Link href="/community" onClick={() => setOpen(false)} className={ROW}>
+            <Link href="/community" onClick={close} className={ROW}>
               <Users size={16} aria-hidden className="text-accent" />
               {t('nav.community')}
             </Link>
-            <Link href="/about" onClick={() => setOpen(false)} className={ROW}>
+            <Link href="/about" onClick={close} className={ROW}>
               <Info size={16} aria-hidden className="text-accent" />
               {t('nav.about')}
             </Link>

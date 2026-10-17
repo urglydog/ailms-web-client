@@ -38,6 +38,43 @@ describe('ExploreMenu', () => {
     expect(screen.getByText('Đang diễn ra')).toBeInTheDocument();
   });
 
+  it('rê chuột vào thì mở, rời chuột thì đóng', () => {
+    renderWithIntl(<ExploreMenu categories={CATEGORIES} liveNow={false} />);
+    const trigger = screen.getByRole('button', { name: /Khám phá/ });
+    const wrapper = trigger.parentElement as HTMLElement;
+    fireEvent.mouseEnter(wrapper);
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    fireEvent.mouseLeave(wrapper);
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('rê chuột rồi bấm thì ghim menu mở, rời chuột không đóng', () => {
+    renderWithIntl(<ExploreMenu categories={CATEGORIES} liveNow={false} />);
+    const trigger = screen.getByRole('button', { name: /Khám phá/ });
+    const wrapper = trigger.parentElement as HTMLElement;
+    fireEvent.mouseEnter(wrapper);
+    fireEvent.click(trigger);
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    fireEvent.mouseLeave(wrapper);
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+  });
+
+  it('bấm lần nữa vào nút đang ghim thì đóng', () => {
+    renderWithIntl(<ExploreMenu categories={CATEGORIES} liveNow={false} />);
+    const trigger = screen.getByRole('button', { name: /Khám phá/ });
+    fireEvent.click(trigger);
+    fireEvent.click(trigger);
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('bấm ra ngoài thì đóng', () => {
+    renderWithIntl(<ExploreMenu categories={CATEGORIES} liveNow={false} />);
+    const trigger = screen.getByRole('button', { name: /Khám phá/ });
+    fireEvent.click(trigger);
+    fireEvent.mouseDown(document.body);
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+  });
+
   it('đóng khi nhấn Escape', () => {
     renderWithIntl(<ExploreMenu categories={CATEGORIES} liveNow={false} />);
     const trigger = screen.getByRole('button', { name: /Khám phá/ });
