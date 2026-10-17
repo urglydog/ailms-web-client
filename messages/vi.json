@@ -121,5 +121,77 @@
       "viewAll": "Xem tất cả",
       "empty": "Chưa có khóa học nào trong danh mục này."
     }
+  },
+  "myCourses": {
+    "title": "Khóa học của tôi",
+    "tabs": {
+      "all": "Tất cả khóa học",
+      "wishlist": "Yêu thích"
+    },
+    "count": "{count} khóa học",
+    "loading": "Đang tải…",
+    "error": "Không tải được danh sách khóa học.",
+    "stats": {
+      "streak": "Chuỗi học liên tiếp",
+      "streakDays": "{n} ngày",
+      "inProgress": "Đang học",
+      "certificates": "Chứng chỉ đã nhận"
+    },
+    "continue": {
+      "label": "TIẾP TỤC HỌC",
+      "cta": "Học tiếp",
+      "details": "Chi tiết khóa học",
+      "progress": "Hoàn thành {pct}%",
+      "lastAccessed": "Học gần nhất {time}"
+    },
+    "done": {
+      "label": "CHÚC MỪNG, BẠN ĐÃ HOÀN THÀNH",
+      "body": "Chứng chỉ của bạn đã sẵn sàng, tải về hoặc hiển thị trên hồ sơ công khai.",
+      "viewCertificate": "Xem chứng chỉ",
+      "share": "Chia sẻ lên hồ sơ"
+    },
+    "filter": {
+      "all": "Tất cả",
+      "inProgress": "Đang học",
+      "completed": "Hoàn thành"
+    },
+    "search": {
+      "placeholder": "Tìm theo tên khóa học…",
+      "aria": "Tìm kiếm"
+    },
+    "sort": {
+      "label": "Sắp xếp",
+      "recentlyAccessed": "Truy cập gần đây",
+      "recentlyEnrolled": "Ghi danh gần đây",
+      "titleAsc": "Tên: A đến Z",
+      "titleDesc": "Tên: Z đến A"
+    },
+    "view": {
+      "list": "Dạng danh sách",
+      "grid": "Dạng thẻ"
+    },
+    "card": {
+      "continue": "Học tiếp",
+      "viewCertificate": "Xem chứng chỉ",
+      "certificateTooltip": "Mở trang chứng chỉ",
+      "completed": "Hoàn thành",
+      "byInstructor": "GV. {name}",
+      "lastAccessed": "Học gần nhất {time}",
+      "neverAccessed": "Chưa học bài nào",
+      "yourRating": "Đánh giá của bạn cho khóa này"
+    },
+    "empty": {
+      "title": "Bắt đầu khóa học đầu tiên",
+      "body": "Chọn một khóa quốc tế, bật lồng tiếng AI và học bằng ngôn ngữ của bạn.",
+      "cta": "Khám phá khóa học"
+    },
+    "noResults": {
+      "title": "Không tìm thấy khóa học phù hợp",
+      "body": "Thử đổi từ khóa hoặc bỏ bớt bộ lọc."
+    },
+    "suggestions": {
+      "title": "Gợi ý cho bạn tiếp theo",
+      "trending": "Đang thịnh hành"
+    }
   }
 }

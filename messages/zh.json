@@ -121,5 +121,77 @@
       "viewAll": "查看全部",
       "empty": "此分类暂无课程。"
     }
+  },
+  "myCourses": {
+    "title": "我的课程",
+    "tabs": {
+      "all": "全部课程",
+      "wishlist": "收藏"
+    },
+    "count": "{count} 门课程",
+    "loading": "加载中…",
+    "error": "无法加载课程列表。",
+    "stats": {
+      "streak": "连续学习",
+      "streakDays": "{n} 天",
+      "inProgress": "学习中",
+      "certificates": "已获证书"
+    },
+    "continue": {
+      "label": "继续学习",
+      "cta": "继续学习",
+      "details": "课程详情",
+      "progress": "已完成 {pct}%",
+      "lastAccessed": "上次学习 {time}"
+    },
+    "done": {
+      "label": "恭喜，你已完成",
+      "body": "你的证书已就绪，可下载或展示在公开主页上。",
+      "viewCertificate": "查看证书",
+      "share": "分享到主页"
+    },
+    "filter": {
+      "all": "全部",
+      "inProgress": "学习中",
+      "completed": "已完成"
+    },
+    "search": {
+      "placeholder": "按课程名称搜索…",
+      "aria": "搜索"
+    },
+    "sort": {
+      "label": "排序",
+      "recentlyAccessed": "最近访问",
+      "recentlyEnrolled": "最近报名",
+      "titleAsc": "名称：A 到 Z",
+      "titleDesc": "名称：Z 到 A"
+    },
+    "view": {
+      "list": "列表视图",
+      "grid": "卡片视图"
+    },
+    "card": {
+      "continue": "继续学习",
+      "viewCertificate": "查看证书",
+      "certificateTooltip": "打开证书页面",
+      "completed": "已完成",
+      "byInstructor": "讲师：{name}",
+      "lastAccessed": "上次学习 {time}",
+      "neverAccessed": "还没有学习任何课时",
+      "yourRating": "你对这门课的评分"
+    },
+    "empty": {
+      "title": "开始你的第一门课程",
+      "body": "选择一门国际课程，开启 AI 配音，用你的语言学习。",
+      "cta": "探索课程"
+    },
+    "noResults": {
+      "title": "没有找到匹配的课程",
+      "body": "试试更换关键词或去掉部分筛选。"
+    },
+    "suggestions": {
+      "title": "接下来推荐",
+      "trending": "热门课程"
+    }
   }
 }

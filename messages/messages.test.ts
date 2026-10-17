@@ -36,6 +36,10 @@ describe('chuỗi dịch', () => {
       'home.demo.step1',
       'home.demo.chatAnswer',
       'home.trending.title',
+      'myCourses.title',
+      'myCourses.continue.cta',
+      'myCourses.card.viewCertificate',
+      'myCourses.empty.title',
     ]) {
       expect(viKeys).toContain(key);
     }

@@ -121,5 +121,77 @@
       "viewAll": "View all",
       "empty": "No courses in this category yet."
     }
+  },
+  "myCourses": {
+    "title": "My courses",
+    "tabs": {
+      "all": "All courses",
+      "wishlist": "Wishlist"
+    },
+    "count": "{count} courses",
+    "loading": "Loading…",
+    "error": "Could not load your courses.",
+    "stats": {
+      "streak": "Learning streak",
+      "streakDays": "{n} days",
+      "inProgress": "In progress",
+      "certificates": "Certificates earned"
+    },
+    "continue": {
+      "label": "CONTINUE LEARNING",
+      "cta": "Continue",
+      "details": "Course details",
+      "progress": "{pct}% complete",
+      "lastAccessed": "Last studied {time}"
+    },
+    "done": {
+      "label": "CONGRATULATIONS, YOU FINISHED",
+      "body": "Your certificate is ready. Download it or show it on your public profile.",
+      "viewCertificate": "View certificate",
+      "share": "Share to profile"
+    },
+    "filter": {
+      "all": "All",
+      "inProgress": "In progress",
+      "completed": "Completed"
+    },
+    "search": {
+      "placeholder": "Search by course name…",
+      "aria": "Search"
+    },
+    "sort": {
+      "label": "Sort by",
+      "recentlyAccessed": "Recently accessed",
+      "recentlyEnrolled": "Recently enrolled",
+      "titleAsc": "Title: A to Z",
+      "titleDesc": "Title: Z to A"
+    },
+    "view": {
+      "list": "List view",
+      "grid": "Card view"
+    },
+    "card": {
+      "continue": "Continue",
+      "viewCertificate": "View certificate",
+      "certificateTooltip": "Open the certificate page",
+      "completed": "Completed",
+      "byInstructor": "By {name}",
+      "lastAccessed": "Last studied {time}",
+      "neverAccessed": "No lessons watched yet",
+      "yourRating": "Your rating for this course"
+    },
+    "empty": {
+      "title": "Start your first course",
+      "body": "Pick an international course, turn on AI dubbing and learn in your own language.",
+      "cta": "Explore courses"
+    },
+    "noResults": {
+      "title": "No matching courses",
+      "body": "Try a different keyword or remove some filters."
+    },
+    "suggestions": {
+      "title": "Suggested next",
+      "trending": "Trending now"
+    }
   }
 }
