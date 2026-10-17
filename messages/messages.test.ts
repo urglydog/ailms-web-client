@@ -40,6 +40,10 @@ describe('chuỗi dịch', () => {
       'myCourses.continue.cta',
       'myCourses.card.viewCertificate',
       'myCourses.empty.title',
+      'learn.dubbing.label',
+      'learn.dubbing.listenOriginal',
+      'learn.tabs.materials',
+      'learn.sidebar.tutor',
     ]) {
       expect(viKeys).toContain(key);
     }

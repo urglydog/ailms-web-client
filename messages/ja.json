@@ -193,5 +193,48 @@
       "title": "次のおすすめ",
       "trending": "人気の講座"
     }
+  },
+  "learn": {
+    "header": {
+      "back": "マイコース"
+    },
+    "dubbing": {
+      "groupAria": "AI吹き替えの音声を選ぶ",
+      "label": "AI吹き替え音声",
+      "original": "元の音声",
+      "listenOriginal": "元の音声で聞く",
+      "listAria": "言語の一覧",
+      "searchPlaceholder": "言語を検索…",
+      "searchAria": "言語を検索",
+      "noResults": "言語が見つかりません",
+      "ready": "準備完了",
+      "processing": "作成中 {percent}%",
+      "create": "音声を作成",
+      "sourceTag": "原語",
+      "sourceTitle": "この講義はすでに選んだ言語です"
+    },
+    "tabs": {
+      "overview": "概要",
+      "studyPlan": "AI学習プラン",
+      "qna": "質問",
+      "materials": "教材",
+      "gradebook": "成績表",
+      "reviews": "レビュー"
+    },
+    "materials": {
+      "courseResources": "講座リソース"
+    },
+    "sidebar": {
+      "content": "内容",
+      "transcript": "書き起こし",
+      "tutor": "AIチューター",
+      "collapse": "折りたたんで動画を広げる",
+      "expand": "講座の内容を広げる",
+      "completed": "修了",
+      "current": "学習中",
+      "notStarted": "未学習",
+      "hasAttachments": "添付資料あり",
+      "signInPrompt": "ログインすると全カリキュラムと学習の進捗を確認できます。"
+    }
   }
 }

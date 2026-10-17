@@ -193,5 +193,48 @@
       "title": "Gợi ý cho bạn tiếp theo",
       "trending": "Đang thịnh hành"
     }
+  },
+  "learn": {
+    "header": {
+      "back": "Khóa học của tôi"
+    },
+    "dubbing": {
+      "groupAria": "Chọn giọng lồng tiếng AI",
+      "label": "Giọng lồng tiếng AI",
+      "original": "Âm thanh gốc",
+      "listenOriginal": "Nghe bản gốc",
+      "listAria": "Danh sách ngôn ngữ",
+      "searchPlaceholder": "Tìm ngôn ngữ…",
+      "searchAria": "Tìm ngôn ngữ",
+      "noResults": "Không tìm thấy ngôn ngữ nào",
+      "ready": "Sẵn sàng",
+      "processing": "Đang tạo {percent}%",
+      "create": "Tạo giọng",
+      "sourceTag": "gốc",
+      "sourceTitle": "Bài giảng này vốn đã sử dụng ngôn ngữ bạn chọn"
+    },
+    "tabs": {
+      "overview": "Tổng quan",
+      "studyPlan": "Lộ trình AI",
+      "qna": "Hỏi đáp",
+      "materials": "Học liệu",
+      "gradebook": "Bảng điểm",
+      "reviews": "Đánh giá"
+    },
+    "materials": {
+      "courseResources": "Tài nguyên khóa học"
+    },
+    "sidebar": {
+      "content": "Nội dung",
+      "transcript": "Bản ghi lời thoại",
+      "tutor": "Gia sư AI",
+      "collapse": "Thu gọn — mở rộng không gian video",
+      "expand": "Mở rộng nội dung khóa học",
+      "completed": "Đã hoàn thành",
+      "current": "Đang học",
+      "notStarted": "Chưa học",
+      "hasAttachments": "Có tài liệu đính kèm",
+      "signInPrompt": "Đăng nhập để xem toàn bộ chương trình học và theo dõi tiến độ của khóa này."
+    }
   }
 }

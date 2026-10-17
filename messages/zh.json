@@ -193,5 +193,48 @@
       "title": "接下来推荐",
       "trending": "热门课程"
     }
+  },
+  "learn": {
+    "header": {
+      "back": "我的课程"
+    },
+    "dubbing": {
+      "groupAria": "选择 AI 配音声音",
+      "label": "AI 配音声音",
+      "original": "原声",
+      "listenOriginal": "收听原声",
+      "listAria": "语言列表",
+      "searchPlaceholder": "搜索语言…",
+      "searchAria": "搜索语言",
+      "noResults": "没有找到语言",
+      "ready": "已就绪",
+      "processing": "正在生成 {percent}%",
+      "create": "生成配音",
+      "sourceTag": "原语言",
+      "sourceTitle": "本课程本身就是你选择的语言"
+    },
+    "tabs": {
+      "overview": "概览",
+      "studyPlan": "AI 学习计划",
+      "qna": "问答",
+      "materials": "学习资料",
+      "gradebook": "成绩单",
+      "reviews": "评价"
+    },
+    "materials": {
+      "courseResources": "课程资源"
+    },
+    "sidebar": {
+      "content": "内容",
+      "transcript": "字幕文稿",
+      "tutor": "AI 导师",
+      "collapse": "收起以扩大视频空间",
+      "expand": "展开课程内容",
+      "completed": "已完成",
+      "current": "正在学习",
+      "notStarted": "未开始",
+      "hasAttachments": "含附件",
+      "signInPrompt": "登录后可查看完整课程大纲并跟踪学习进度。"
+    }
   }
 }

@@ -193,5 +193,48 @@
       "title": "Suggested next",
       "trending": "Trending now"
     }
+  },
+  "learn": {
+    "header": {
+      "back": "My courses"
+    },
+    "dubbing": {
+      "groupAria": "Choose the AI dubbing voice",
+      "label": "AI dubbing voice",
+      "original": "Original audio",
+      "listenOriginal": "Listen to original",
+      "listAria": "Language list",
+      "searchPlaceholder": "Search languages…",
+      "searchAria": "Search languages",
+      "noResults": "No languages found",
+      "ready": "Ready",
+      "processing": "Creating {percent}%",
+      "create": "Create voice",
+      "sourceTag": "original",
+      "sourceTitle": "This lesson is already in the language you picked"
+    },
+    "tabs": {
+      "overview": "Overview",
+      "studyPlan": "AI study plan",
+      "qna": "Q&A",
+      "materials": "Materials",
+      "gradebook": "Gradebook",
+      "reviews": "Reviews"
+    },
+    "materials": {
+      "courseResources": "Course resources"
+    },
+    "sidebar": {
+      "content": "Content",
+      "transcript": "Transcript",
+      "tutor": "AI tutor",
+      "collapse": "Collapse to give the video more room",
+      "expand": "Expand course content",
+      "completed": "Completed",
+      "current": "Now studying",
+      "notStarted": "Not started",
+      "hasAttachments": "Has attachments",
+      "signInPrompt": "Sign in to see the full curriculum and track your progress in this course."
+    }
   }
 }
