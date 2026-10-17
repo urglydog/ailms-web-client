@@ -108,13 +108,65 @@
       "demoLink": "デモを見る →"
     },
     "demo": {
-      "ariaLabel": "AI吹き替えデモ動画",
+      "ariaLabel": "AI 吹き替えのデモ動画",
       "step1": "講座を選ぶ",
       "step2": "言語を選ぶ",
-      "step3": "AIチューターに質問",
-      "goToStep": "ステップ{n}へ：{title}",
-      "chatQuestion": "コンポーネントとは？",
-      "chatAnswer": "組み立て部品のように考えてみましょう。この部分を見直してください"
+      "step3": "AI チューターに質問",
+      "chatQuestion": "Figma のオートレイアウトは何に使いますか？",
+      "chatAnswer": "オートレイアウトはフレームを中身に合わせて自動で伸縮させるので、余白を手作業で直す必要がありません。講師の解説はこちら：",
+      "aiName": "AI チューター",
+      "aiThinking": "AI チューターが考え中…",
+      "jumpToast": "{time} へジャンプ",
+      "badgeOriginal": "原音",
+      "badgeReady": "利用可",
+      "originalSuffix": " · 原音",
+      "captions": {
+        "pick": "好きな講座を選びます",
+        "play": "再生を押して学習を始めます",
+        "original": "動画は原語で再生されます（英語字幕）",
+        "chooseLang": "AI 吹き替えの音声を選ぶと字幕も切り替わります",
+        "askTutor": "分からない点は、レッスン内で AI チューターに質問",
+        "clickTime": "タイムスタンプを押すとその場面へ移動します",
+        "jumped": "講師が解説している場面へ動画が移動します"
+      },
+      "header": {
+        "title": "人気の講座",
+        "subtitle": "受講生の評価が高い講座",
+        "search": "講座を検索…"
+      },
+      "player": {
+        "back": "← マイ講座",
+        "progress": "22% 完了",
+        "dubLabel": "AI 吹き替え音声",
+        "listenOriginal": "原音で聞く",
+        "tabLessons": "レッスン",
+        "tabTutor": "AI チューター",
+        "lessons": [
+          "講座の紹介",
+          "デザインの原則",
+          "Figma を始めよう",
+          "オートレイアウトとコンポーネント",
+          "インタラクティブなプロトタイプ"
+        ]
+      },
+      "card": {
+        "aiDub": "AI 吹き替え",
+        "instructor": "講師 {name}",
+        "beginner": "初級",
+        "intermediate": "中級",
+        "free": "無料"
+      },
+      "courses": [
+        "AI 入門",
+        "React で学ぶ Web 開発",
+        "Python データ分析",
+        "UI/UX デザイン基礎",
+        "IT 英会話",
+        "データ分析のための SQL",
+        "仕事で使うプロンプト設計",
+        "実践 TypeScript",
+        "初心者向け Figma"
+      ]
     },
     "trending": {
       "title": "人気の講座",

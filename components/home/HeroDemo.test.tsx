@@ -1,4 +1,4 @@
-import { act, fireEvent, screen } from '@testing-library/react';
+import { act, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderWithIntl } from '@/test/renderWithIntl';
 import { HeroDemo } from './HeroDemo';
@@ -22,48 +22,41 @@ describe('HeroDemo', () => {
     vi.unstubAllGlobals();
   });
 
-  it('bắt đầu ở bước 1 với nhãn Chọn khóa học', () => {
+  it('có vùng mô tả cho trình đọc màn hình và nhãn bước 1', () => {
     renderWithIntl(<HeroDemo />);
+    expect(screen.getByRole('img', { name: 'Video demo lồng tiếng AI' })).toBeInTheDocument();
     expect(screen.getByTestId('step-badge')).toHaveTextContent('Chọn khóa học');
-    expect(screen.getByRole('button', { name: /Đi tới bước 1/ })).toHaveAttribute('aria-current', 'step');
   });
 
-  it('tự chuyển sang bước sau sau 3,8 giây và quay vòng', () => {
+  it('danh sách khóa học có ảnh, tên và không còn thanh Xem trước', () => {
     renderWithIntl(<HeroDemo />);
-    act(() => void vi.advanceTimersByTime(3800));
+    expect(screen.getAllByText('UI/UX Design Basics').length).toBeGreaterThan(0);
+    expect(screen.getByText('Nhập môn Trí tuệ nhân tạo')).toBeInTheDocument();
+    expect(screen.queryByText('Xem trước')).toBeNull();
+  });
+
+  it('kịch bản chạy sang bước 2 rồi bước 3 theo thời gian', async () => {
+    renderWithIntl(<HeroDemo />);
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(12000);
+    });
     expect(screen.getByTestId('step-badge')).toHaveTextContent('Chọn ngôn ngữ');
-    act(() => void vi.advanceTimersByTime(3800));
-    expect(screen.getByTestId('step-badge')).toHaveTextContent('Hỏi gia sư AI');
-    act(() => void vi.advanceTimersByTime(3800));
-    expect(screen.getByTestId('step-badge')).toHaveTextContent('Chọn khóa học');
   });
 
-  it('bấm vạch tiến độ thì nhảy tới bước đó', () => {
-    renderWithIntl(<HeroDemo />);
-    fireEvent.click(screen.getByRole('button', { name: /Đi tới bước 3/ }));
-    expect(screen.getByTestId('step-badge')).toHaveTextContent('Hỏi gia sư AI');
-    expect(screen.getByRole('button', { name: /Đi tới bước 3/ })).toHaveAttribute('aria-current', 'step');
-  });
-
-  it('ở bước 2 ngôn ngữ đổi liên tục, bắt đầu từ Tiếng Việt', () => {
-    renderWithIntl(<HeroDemo />);
-    fireEvent.click(screen.getByRole('button', { name: /Đi tới bước 2/ }));
-    expect(screen.getByTestId('lang-label')).toHaveTextContent('Tiếng Việt');
-    act(() => void vi.advanceTimersByTime(900));
-    expect(screen.getByTestId('lang-label')).toHaveTextContent('日本語');
-  });
-
-  it('bước 3 hiện câu hỏi và câu trả lời của gia sư', () => {
-    renderWithIntl(<HeroDemo />);
-    fireEvent.click(screen.getByRole('button', { name: /Đi tới bước 3/ }));
-    expect(screen.getByText('Component là gì?')).toBeInTheDocument();
-    expect(screen.getByText(/Hãy thử nghĩ về một món đồ lắp ghép/)).toBeInTheDocument();
-  });
-
-  it('giảm chuyển động thì không tự chuyển bước', () => {
+  it('giảm chuyển động thì dừng ở cảnh hỏi gia sư đã có câu trả lời và mốc 02:15', async () => {
     stubReducedMotion(true);
     renderWithIntl(<HeroDemo />);
-    act(() => void vi.advanceTimersByTime(20000));
-    expect(screen.getByTestId('step-badge')).toHaveTextContent('Chọn khóa học');
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(20000);
+    });
+    expect(screen.getByTestId('step-badge')).toHaveTextContent('Hỏi gia sư AI');
+    expect(screen.getAllByText('Auto layout trong Figma dùng để làm gì?').length).toBeGreaterThan(0);
+    expect(screen.getByText('02:15')).toBeInTheDocument();
+  });
+
+  it('tháo component thì dừng kịch bản, không còn bộ hẹn giờ', () => {
+    const { unmount } = renderWithIntl(<HeroDemo />);
+    unmount();
+    expect(vi.getTimerCount()).toBe(0);
   });
 });

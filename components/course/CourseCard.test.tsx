@@ -41,9 +41,9 @@ describe('CourseCard', () => {
     expect(screen.queryByText('🇻🇳')).toBeNull();
   });
 
-  it('có thanh Xem trước ẩn khỏi trình đọc màn hình', () => {
+  it('không có thanh Xem trước khi hover', () => {
     render(<CourseCard course={makeCourse(4)} />);
-    expect(screen.getByText('Xem trước')).toHaveAttribute('aria-hidden', 'true');
+    expect(screen.queryByText('Xem trước')).toBeNull();
   });
 
   it('khóa miễn phí hiện nhãn Miễn phí', () => {

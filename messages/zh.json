@@ -111,10 +111,62 @@
       "ariaLabel": "AI 配音演示视频",
       "step1": "选择课程",
       "step2": "选择语言",
-      "step3": "询问 AI 导师",
-      "goToStep": "转到第 {n} 步：{title}",
-      "chatQuestion": "什么是组件？",
-      "chatAnswer": "把它想象成积木。请回看这一段"
+      "step3": "向 AI 导师提问",
+      "chatQuestion": "Figma 的自动布局有什么用？",
+      "chatAnswer": "自动布局能让框架随内容自动伸缩，你不用再手动调整每个间距。讲师在这里讲解：",
+      "aiName": "AI 导师",
+      "aiThinking": "AI 导师正在思考…",
+      "jumpToast": "跳转到 {time}",
+      "badgeOriginal": "原声",
+      "badgeReady": "就绪",
+      "originalSuffix": " · 原声",
+      "captions": {
+        "pick": "选择任意一门课程",
+        "play": "点击播放开始学习",
+        "original": "视频以原语言播放（英文字幕）",
+        "chooseLang": "选择 AI 配音声音，字幕随语言切换",
+        "askTutor": "有不懂的地方？直接在课程里问 AI 导师",
+        "clickTime": "点击时间戳即可跳到对应片段",
+        "jumped": "视频跳转到讲师讲解的位置"
+      },
+      "header": {
+        "title": "热门课程",
+        "subtitle": "学员高分评价的课程",
+        "search": "搜索课程…"
+      },
+      "player": {
+        "back": "← 我的课程",
+        "progress": "已完成 22%",
+        "dubLabel": "AI 配音声音",
+        "listenOriginal": "收听原声",
+        "tabLessons": "课时",
+        "tabTutor": "AI 导师",
+        "lessons": [
+          "课程介绍",
+          "设计原则",
+          "认识 Figma",
+          "自动布局与组件",
+          "交互原型"
+        ]
+      },
+      "card": {
+        "aiDub": "AI 配音",
+        "instructor": "讲师 {name}",
+        "beginner": "入门",
+        "intermediate": "中级",
+        "free": "免费"
+      },
+      "courses": [
+        "人工智能入门",
+        "React 网页开发",
+        "Python 数据分析",
+        "UI/UX 设计基础",
+        "IT 英语交流",
+        "数据分析 SQL",
+        "职场提示词工程",
+        "TypeScript 实战",
+        "新手 Figma"
+      ]
     },
     "trending": {
       "title": "热门课程",

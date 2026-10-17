@@ -112,9 +112,61 @@
       "step1": "Chọn khóa học",
       "step2": "Chọn ngôn ngữ",
       "step3": "Hỏi gia sư AI",
-      "goToStep": "Đi tới bước {n}: {title}",
-      "chatQuestion": "Component là gì?",
-      "chatAnswer": "Hãy thử nghĩ về một món đồ lắp ghép. Xem lại đoạn này nhé"
+      "chatQuestion": "Auto layout trong Figma dùng để làm gì?",
+      "chatAnswer": "Auto layout giúp khung tự co giãn theo nội dung bên trong, nên bạn không phải chỉnh tay từng khoảng cách. Giảng viên giải thích ở",
+      "aiName": "AI Tutor",
+      "aiThinking": "AI Tutor đang suy nghĩ…",
+      "jumpToast": "Tua tới {time}",
+      "badgeOriginal": "GỐC",
+      "badgeReady": "SẴN SÀNG",
+      "originalSuffix": " · gốc",
+      "captions": {
+        "pick": "Chọn một khóa học bất kỳ",
+        "play": "Nhấn phát để bắt đầu học",
+        "original": "Video chạy bằng ngôn ngữ gốc (phụ đề tiếng Anh)",
+        "chooseLang": "Chọn giọng lồng tiếng AI, phụ đề đổi theo ngôn ngữ",
+        "askTutor": "Gặp chỗ chưa hiểu? Hỏi AI Tutor ngay trong bài học",
+        "clickTime": "Bấm vào mốc thời gian để tua đúng đoạn video",
+        "jumped": "Video tua tới đúng đoạn giảng viên giải thích"
+      },
+      "header": {
+        "title": "Đang thịnh hành",
+        "subtitle": "Khóa học được học viên đánh giá cao",
+        "search": "Tìm khóa học…"
+      },
+      "player": {
+        "back": "← Khóa học của tôi",
+        "progress": "22% hoàn thành",
+        "dubLabel": "Giọng lồng tiếng AI",
+        "listenOriginal": "Nghe bản gốc",
+        "tabLessons": "Bài học",
+        "tabTutor": "AI Tutor",
+        "lessons": [
+          "Giới thiệu khóa học",
+          "Nguyên lý thiết kế",
+          "Làm quen với Figma",
+          "Auto layout & component",
+          "Prototype tương tác"
+        ]
+      },
+      "card": {
+        "aiDub": "AI lồng tiếng",
+        "instructor": "GV. {name}",
+        "beginner": "Cơ bản",
+        "intermediate": "Trung cấp",
+        "free": "Miễn phí"
+      },
+      "courses": [
+        "Nhập môn Trí tuệ nhân tạo",
+        "Lập trình Web với React",
+        "Phân tích dữ liệu với Python",
+        "UI/UX Design Basics",
+        "Tiếng Anh giao tiếp cho IT",
+        "SQL cho phân tích dữ liệu",
+        "Prompt Engineering công việc",
+        "TypeScript thực chiến",
+        "Figma cho người mới"
+      ]
     },
     "trending": {
       "title": "Đang thịnh hành",

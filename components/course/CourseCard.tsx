@@ -150,14 +150,6 @@ export function CourseCard({ course }: { course: CourseSummary }) {
             AI lồng tiếng
           </span>
         </div>
-
-        {/* Thanh "Xem trước" trượt lên khi hover — chỉ là gợi ý thị giác, cả thẻ đã là liên kết */}
-        <span
-          aria-hidden="true"
-          className="absolute inset-x-0 bottom-0 translate-y-full bg-accent py-1 text-center text-[11px] font-medium text-white transition-transform duration-[250ms] ease-soft group-hover:translate-y-0"
-        >
-          Xem trước
-        </span>
       </div>
 
       {/* Nội dung */}

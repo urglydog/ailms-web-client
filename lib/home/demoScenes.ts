@@ -1,9 +1,3 @@
-export const SCENE_COUNT = 3;
-/** Mỗi cảnh chạy 3,8 giây (spec mục 4). */
-export const SCENE_DURATION_MS = 3800;
-/** Ở cảnh "Chọn ngôn ngữ", điểm chọn nhảy sang giọng kế tiếp mỗi 0,9 giây. */
-export const LANG_CYCLE_MS = 900;
-
 export interface DemoLanguage {
   code: string;
   /** Tên viết bằng chính ngôn ngữ đó nên không dịch. */
@@ -13,19 +7,29 @@ export interface DemoLanguage {
   original?: boolean;
 }
 
+/** Thứ tự trong menu chọn giọng của video demo; phần tử đầu là bản gốc. */
 export const DEMO_LANGUAGES: ReadonlyArray<DemoLanguage> = [
-  { code: 'en', name: 'English', subtitle: 'Today we will start with the basic concepts', original: true },
-  { code: 'vi', name: 'Tiếng Việt', subtitle: 'Hôm nay chúng ta sẽ bắt đầu với khái niệm cơ bản' },
-  { code: 'ja', name: '日本語', subtitle: '今日は基本的な概念から始めましょう' },
-  { code: 'zh', name: '中文', subtitle: '今天我们从基本概念开始' },
+  { code: 'en', name: 'English', subtitle: "Today we'll start with the basics", original: true },
+  { code: 'vi', name: 'Tiếng Việt', subtitle: 'Hôm nay chúng ta bắt đầu với các khái niệm cơ bản' },
+  { code: 'ja', name: '日本語', subtitle: '今日は基本的な概念から始めます' },
   { code: 'es', name: 'Español', subtitle: 'Hoy empezaremos con los conceptos básicos' },
+  { code: 'zh', name: '中文', subtitle: '今天我们从基本概念开始' },
 ];
 
-export function nextScene(i: number): number {
-  return (i + 1) % SCENE_COUNT;
-}
+/** Các lần chọn giọng trong kịch bản: [chỉ mục được chọn, chỉ mục đang chọn trước đó]. Kết thúc ở Tiếng Việt. */
+export const DEMO_PICKS: ReadonlyArray<readonly [number, number]> = [
+  [1, 0],
+  [2, 1],
+  [3, 2],
+  [1, 3],
+];
 
-/** Xoay trong các giọng lồng tiếng (chỉ số 1 đến 4), bỏ qua bản gốc ở chỉ số 0. */
-export function nextDubLanguage(i: number): number {
-  return i >= DEMO_LANGUAGES.length - 1 ? 1 : i + 1;
-}
+/** Khóa được chọn ở bước 1 (chỉ mục trong danh sách thẻ của demo). */
+export const DEMO_PICKED_INDEX = 3;
+
+export const DEMO_START_SECONDS = 42;
+export const DEMO_JUMP_SECONDS = 135;
+export const DEMO_TOTAL_SECONDS = 510;
+
+/** Phụ đề tiếng Việt hiện sau khi tua tới mốc 02:15. */
+export const DEMO_JUMP_SUBTITLE = 'Auto layout giúp khung tự co giãn theo nội dung';

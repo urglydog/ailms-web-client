@@ -1,21 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { DEMO_LANGUAGES, SCENE_COUNT, nextDubLanguage, nextScene } from './demoScenes';
-
-describe('nextScene', () => {
-  it('đi lần lượt rồi quay về cảnh đầu', () => {
-    expect(nextScene(0)).toBe(1);
-    expect(nextScene(1)).toBe(2);
-    expect(nextScene(SCENE_COUNT - 1)).toBe(0);
-  });
-});
-
-describe('nextDubLanguage', () => {
-  it('xoay trong các giọng lồng tiếng (bỏ qua bản gốc)', () => {
-    expect(nextDubLanguage(0)).toBe(1);
-    expect(nextDubLanguage(1)).toBe(2);
-    expect(nextDubLanguage(4)).toBe(1);
-  });
-});
+import {
+  DEMO_JUMP_SECONDS,
+  DEMO_LANGUAGES,
+  DEMO_PICKS,
+  DEMO_START_SECONDS,
+  DEMO_TOTAL_SECONDS,
+} from './demoScenes';
 
 describe('DEMO_LANGUAGES', () => {
   it('có 5 ngôn ngữ, phần tử đầu là bản gốc', () => {
@@ -27,5 +17,27 @@ describe('DEMO_LANGUAGES', () => {
       expect(l.name.length).toBeGreaterThan(0);
       expect(l.subtitle.length).toBeGreaterThan(0);
     }
+  });
+});
+
+describe('DEMO_PICKS', () => {
+  it('lần chọn đầu đi từ bản gốc, mỗi lần chọn bắt đầu từ lựa chọn trước đó', () => {
+    expect(DEMO_PICKS[0]?.[1]).toBe(0);
+    DEMO_PICKS.forEach(([pick], i) => {
+      if (i > 0) expect(DEMO_PICKS[i]?.[1]).toBe(DEMO_PICKS[i - 1]?.[0]);
+      expect(pick).toBeGreaterThan(0);
+      expect(pick).toBeLessThan(DEMO_LANGUAGES.length);
+    });
+  });
+  it('kết thúc ở Tiếng Việt, ngôn ngữ của câu hỏi gia sư', () => {
+    const last = DEMO_PICKS[DEMO_PICKS.length - 1];
+    expect(DEMO_LANGUAGES[last?.[0] ?? 0]?.code).toBe('vi');
+  });
+});
+
+describe('mốc thời gian của video demo', () => {
+  it('điểm tua nằm sau điểm bắt đầu và trong thời lượng video', () => {
+    expect(DEMO_JUMP_SECONDS).toBeGreaterThan(DEMO_START_SECONDS);
+    expect(DEMO_JUMP_SECONDS).toBeLessThan(DEMO_TOTAL_SECONDS);
   });
 });
