@@ -5,7 +5,8 @@
       "myCourses": "Khóa học của tôi",
       "live": "Live",
       "community": "Cộng đồng",
-      "about": "Về chúng tôi"
+      "about": "Về chúng tôi",
+      "explore": "Khám phá"
     },
     "search": {
       "ariaLabel": "Tìm kiếm",
@@ -46,18 +47,27 @@
       "instructorChannel": "Kênh Giảng viên",
       "becomeInstructor": "Trở thành Giảng viên",
       "language": "Ngôn ngữ",
-      "logout": "Đăng xuất"
+      "logout": "Đăng xuất",
+      "certificates": "Chứng chỉ và thành tích"
     },
     "auth": {
       "login": "Đăng nhập",
-      "register": "Đăng ký"
+      "register": "Đăng ký",
+      "getStarted": "Bắt đầu"
     },
     "logoutModal": {
       "title": "Xác nhận đăng xuất",
       "body": "Bạn có chắc chắn muốn đăng xuất khỏi hệ thống không?",
       "cancel": "Hủy bỏ",
       "confirm": "Đăng xuất"
-    }
+    },
+    "explore": {
+      "allCourses": "Tất cả khóa học",
+      "categories": "DANH MỤC",
+      "more": "KHÁM PHÁ THÊM",
+      "liveNow": "Đang diễn ra"
+    },
+    "skipToContent": "Bỏ qua tới nội dung"
   },
   "footer": {
     "tagline": "Hệ thống quản lý học tập và thi cử trực tuyến chuẩn học thuật.",
@@ -87,5 +97,276 @@
   "languageModal": {
     "title": "Chọn ngôn ngữ",
     "close": "Đóng"
+  },
+  "home": {
+    "hero": {
+      "tag": "Mới · AI lồng tiếng",
+      "titleBefore": "Mọi khóa học bằng",
+      "titleHighlight": "ngôn ngữ của bạn",
+      "description": "AI lồng tiếng khóa học quốc tế sang ngôn ngữ bạn chọn, đồng bộ với video gốc. Hiểu ngay, không cần phụ đề.",
+      "cta": "Khám phá khóa học",
+      "demoLink": "Xem demo →"
+    },
+    "demo": {
+      "ariaLabel": "Video demo lồng tiếng AI",
+      "step1": "Chọn khóa học",
+      "step2": "Chọn ngôn ngữ",
+      "step3": "Hỏi gia sư AI",
+      "chatQuestion": "Auto layout trong Figma dùng để làm gì?",
+      "chatAnswer": "Auto layout giúp khung tự co giãn theo nội dung bên trong, nên bạn không phải chỉnh tay từng khoảng cách. Giảng viên giải thích ở",
+      "aiName": "AI Tutor",
+      "aiThinking": "AI Tutor đang suy nghĩ…",
+      "jumpToast": "Tua tới {time}",
+      "badgeOriginal": "GỐC",
+      "badgeReady": "SẴN SÀNG",
+      "originalSuffix": " · gốc",
+      "captions": {
+        "pick": "Chọn một khóa học bất kỳ",
+        "play": "Nhấn phát để bắt đầu học",
+        "original": "Video chạy bằng ngôn ngữ gốc (phụ đề tiếng Anh)",
+        "chooseLang": "Chọn giọng lồng tiếng AI, phụ đề đổi theo ngôn ngữ",
+        "askTutor": "Gặp chỗ chưa hiểu? Hỏi AI Tutor ngay trong bài học",
+        "clickTime": "Bấm vào mốc thời gian để tua đúng đoạn video",
+        "jumped": "Video tua tới đúng đoạn giảng viên giải thích"
+      },
+      "header": {
+        "title": "Đang thịnh hành",
+        "subtitle": "Khóa học được học viên đánh giá cao",
+        "search": "Tìm khóa học…"
+      },
+      "player": {
+        "back": "← Khóa học của tôi",
+        "progress": "22% hoàn thành",
+        "dubLabel": "Giọng lồng tiếng AI",
+        "listenOriginal": "Nghe bản gốc",
+        "tabLessons": "Bài học",
+        "tabTutor": "AI Tutor",
+        "lessons": [
+          "Giới thiệu khóa học",
+          "Nguyên lý thiết kế",
+          "Làm quen với Figma",
+          "Auto layout & component",
+          "Prototype tương tác"
+        ]
+      },
+      "card": {
+        "aiDub": "AI lồng tiếng",
+        "instructor": "GV. {name}",
+        "beginner": "Cơ bản",
+        "intermediate": "Trung cấp",
+        "free": "Miễn phí"
+      },
+      "courses": [
+        "Nhập môn Trí tuệ nhân tạo",
+        "Lập trình Web với React",
+        "Phân tích dữ liệu với Python",
+        "UI/UX Design Basics",
+        "Tiếng Anh giao tiếp cho IT",
+        "SQL cho phân tích dữ liệu",
+        "Prompt Engineering công việc",
+        "TypeScript thực chiến",
+        "Figma cho người mới"
+      ]
+    },
+    "trending": {
+      "title": "Đang thịnh hành",
+      "all": "Tất cả",
+      "viewAll": "Xem tất cả",
+      "empty": "Chưa có khóa học nào trong danh mục này."
+    },
+    "shelves": {
+      "newest": {
+        "title": "Mới ra mắt",
+        "subtitle": "Những khóa học vừa được thêm vào LinguaLearn"
+      },
+      "free": {
+        "title": "Học miễn phí",
+        "subtitle": "Bắt đầu ngay, không tốn chi phí"
+      },
+      "beginner": {
+        "title": "Dành cho người mới bắt đầu",
+        "subtitle": "Khóa cơ bản, dễ theo kịp từ con số 0"
+      }
+    },
+    "topics": {
+      "title": "Khám phá theo chủ đề",
+      "subtitle": "Chọn lĩnh vực bạn muốn học"
+    }
+  },
+  "myCourses": {
+    "title": "Khóa học của tôi",
+    "tabs": {
+      "all": "Tất cả khóa học",
+      "wishlist": "Yêu thích"
+    },
+    "count": "{count} khóa học",
+    "loading": "Đang tải…",
+    "error": "Không tải được danh sách khóa học.",
+    "stats": {
+      "streak": "Chuỗi học liên tiếp",
+      "streakDays": "{n} ngày",
+      "inProgress": "Đang học",
+      "certificates": "Chứng chỉ đã nhận"
+    },
+    "continue": {
+      "label": "TIẾP TỤC HỌC",
+      "cta": "Học tiếp",
+      "details": "Chi tiết khóa học",
+      "progress": "Hoàn thành {pct}%",
+      "lastAccessed": "Học gần nhất {time}"
+    },
+    "done": {
+      "label": "CHÚC MỪNG, BẠN ĐÃ HOÀN THÀNH",
+      "body": "Chứng chỉ của bạn đã sẵn sàng, tải về hoặc hiển thị trên hồ sơ công khai.",
+      "viewCertificate": "Xem chứng chỉ",
+      "share": "Chia sẻ lên hồ sơ"
+    },
+    "filter": {
+      "all": "Tất cả",
+      "inProgress": "Đang học",
+      "completed": "Hoàn thành"
+    },
+    "search": {
+      "placeholder": "Tìm theo tên khóa học…",
+      "aria": "Tìm kiếm"
+    },
+    "sort": {
+      "label": "Sắp xếp",
+      "recentlyAccessed": "Truy cập gần đây",
+      "recentlyEnrolled": "Ghi danh gần đây",
+      "titleAsc": "Tên: A đến Z",
+      "titleDesc": "Tên: Z đến A"
+    },
+    "view": {
+      "list": "Dạng danh sách",
+      "grid": "Dạng thẻ"
+    },
+    "card": {
+      "continue": "Học tiếp",
+      "viewCertificate": "Xem chứng chỉ",
+      "certificateTooltip": "Mở trang chứng chỉ",
+      "completed": "Hoàn thành",
+      "byInstructor": "GV. {name}",
+      "lastAccessed": "Học gần nhất {time}",
+      "neverAccessed": "Chưa học bài nào",
+      "yourRating": "Đánh giá của bạn cho khóa này"
+    },
+    "empty": {
+      "title": "Bắt đầu khóa học đầu tiên",
+      "body": "Chọn một khóa quốc tế, bật lồng tiếng AI và học bằng ngôn ngữ của bạn.",
+      "cta": "Khám phá khóa học"
+    },
+    "noResults": {
+      "title": "Không tìm thấy khóa học phù hợp",
+      "body": "Thử đổi từ khóa hoặc bỏ bớt bộ lọc."
+    },
+    "suggestions": {
+      "title": "Gợi ý cho bạn tiếp theo",
+      "trending": "Đang thịnh hành"
+    }
+  },
+  "learn": {
+    "header": {
+      "back": "Khóa học của tôi"
+    },
+    "dubbing": {
+      "groupAria": "Chọn giọng lồng tiếng AI",
+      "label": "Giọng lồng tiếng AI",
+      "original": "Âm thanh gốc",
+      "listenOriginal": "Nghe bản gốc",
+      "listAria": "Danh sách ngôn ngữ",
+      "searchPlaceholder": "Tìm ngôn ngữ…",
+      "searchAria": "Tìm ngôn ngữ",
+      "noResults": "Không tìm thấy ngôn ngữ nào",
+      "ready": "Sẵn sàng",
+      "processing": "Đang tạo {percent}%",
+      "create": "Tạo giọng",
+      "sourceTag": "gốc",
+      "sourceTitle": "Bài giảng này vốn đã sử dụng ngôn ngữ bạn chọn"
+    },
+    "tabs": {
+      "overview": "Tổng quan",
+      "studyPlan": "Lộ trình AI",
+      "qna": "Hỏi đáp",
+      "materials": "Học liệu",
+      "gradebook": "Bảng điểm",
+      "reviews": "Đánh giá"
+    },
+    "materials": {
+      "courseResources": "Tài nguyên khóa học"
+    },
+    "sidebar": {
+      "content": "Nội dung",
+      "transcript": "Bản ghi lời thoại",
+      "tutor": "Gia sư AI",
+      "collapse": "Thu gọn — mở rộng không gian video",
+      "expand": "Mở rộng nội dung khóa học",
+      "completed": "Đã hoàn thành",
+      "current": "Đang học",
+      "notStarted": "Chưa học",
+      "hasAttachments": "Có tài liệu đính kèm",
+      "signInPrompt": "Đăng nhập để xem toàn bộ chương trình học và theo dõi tiến độ của khóa này."
+    }
+  },
+  "profile": {
+    "role": {
+      "student": "Học viên",
+      "instructor": "Giảng viên"
+    },
+    "memberSince": "Thành viên từ {date}",
+    "share": "Chia sẻ hồ sơ",
+    "shareCopied": "Đã sao chép liên kết hồ sơ",
+    "shareFailed": "Không sao chép được, vui lòng thử lại.",
+    "settings": "Cài đặt tài khoản",
+    "stats": {
+      "certificates": "Chứng chỉ",
+      "courses": "Khóa học",
+      "streak": "Ngày streak"
+    },
+    "tabs": {
+      "certificates": "Chứng chỉ",
+      "courses": "Đã học",
+      "wishlist": "Yêu thích"
+    },
+    "loading": "Đang tải...",
+    "notFound": "Không tìm thấy người dùng này.",
+    "loadError": "Không tải được hồ sơ, thử lại sau.",
+    "hidden": "Học viên này đã ẩn mục này.",
+    "emptyCourses": "Chưa sở hữu khóa học nào.",
+    "emptyWishlist": "Chưa lưu khóa học yêu thích nào.",
+    "emptyCertificates": "Chưa có chứng chỉ nào.",
+    "certs": {
+      "all": "Tất cả",
+      "sortLabel": "Sắp xếp",
+      "issuedOn": "Cấp ngày {date}",
+      "sort": {
+        "newest": "Ngày nhận: Mới nhất",
+        "oldest": "Ngày nhận: Cũ nhất",
+        "topic": "Chủ đề khóa học",
+        "title": "Tên khóa học (A-Z)"
+      }
+    },
+    "free": "Miễn phí"
+  },
+  "certificate": {
+    "back": "Chứng chỉ của tôi",
+    "valid": "Chứng chỉ hợp lệ",
+    "congrats": "Chúc mừng bạn đã hoàn thành khóa học!",
+    "recipient": "Người nhận",
+    "instructor": "Giảng viên",
+    "completedOn": "Ngày hoàn thành",
+    "code": "Mã chứng chỉ",
+    "download": "Tải PDF",
+    "downloading": "Đang tải...",
+    "downloadError": "Có lỗi khi tải chứng chỉ, vui lòng thử lại.",
+    "linkedin": "Thêm vào LinkedIn",
+    "verifyLink": "Liên kết xác thực",
+    "copy": "Sao chép",
+    "copied": "Đã sao chép",
+    "copyError": "Không sao chép được, vui lòng thử lại.",
+    "linkedinHint": "Dán liên kết này vào mục Licenses & Certifications trên LinkedIn hoặc phần Certifications trong CV.",
+    "loading": "Đang tải...",
+    "notFound": "Không tìm thấy chứng chỉ này.",
+    "loadError": "Không tải được chứng chỉ, thử lại sau."
   }
 }

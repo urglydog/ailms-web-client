@@ -593,6 +593,11 @@ export interface EnrolledCourse {
   /** doc/DacTa_ChucNangChungChi.md — chỉ có giá trị khi đã hoàn thành 100% VÀ chứng chỉ đã được
    * cấp; dùng để điều hướng "Xem chứng chỉ" tới `/certificates/{code}` thay vì tải PDF thẳng. */
   certificateCode: string | null;
+  /** "Học tiếp" — bài đang học dở (hoặc bài kế tiếp nếu bài gần nhất đã xong); null nếu khóa chưa có bài nào.
+   * Backend: `ResumePointResolver`. Bản backend cũ chưa trả field này nên FE luôn có đường lùi về `firstLessonId`. */
+  resumeLessonId?: number | null;
+  /** Vị trí (giây) mở `resumeLessonId`; trình phát tự khôi phục từ tiến độ đã lưu nên FE chỉ cần id bài. */
+  resumePositionSec?: number | null;
 }
 
 // ── F6.2: Tiến độ học tập (UC21, UC22) ───────────────────────────

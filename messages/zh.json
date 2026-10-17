@@ -5,7 +5,8 @@
       "myCourses": "我的课程",
       "live": "直播",
       "community": "社区",
-      "about": "关于我们"
+      "about": "关于我们",
+      "explore": "探索"
     },
     "search": {
       "ariaLabel": "搜索",
@@ -46,18 +47,27 @@
       "instructorChannel": "讲师频道",
       "becomeInstructor": "成为讲师",
       "language": "语言",
-      "logout": "退出登录"
+      "logout": "退出登录",
+      "certificates": "证书与成就"
     },
     "auth": {
       "login": "登录",
-      "register": "注册"
+      "register": "注册",
+      "getStarted": "开始"
     },
     "logoutModal": {
       "title": "确认退出登录",
       "body": "您确定要退出登录吗？",
       "cancel": "取消",
       "confirm": "退出登录"
-    }
+    },
+    "explore": {
+      "allCourses": "全部课程",
+      "categories": "分类",
+      "more": "更多",
+      "liveNow": "直播中"
+    },
+    "skipToContent": "跳到主要内容"
   },
   "footer": {
     "tagline": "学术级在线学习与考试管理系统。",
@@ -87,5 +97,276 @@
   "languageModal": {
     "title": "选择语言",
     "close": "关闭"
+  },
+  "home": {
+    "hero": {
+      "tag": "全新 · AI 配音",
+      "titleBefore": "所有课程，用",
+      "titleHighlight": "你的语言",
+      "description": "AI 将国际课程配音成你选择的语言，与原视频同步，无需字幕。",
+      "cta": "探索课程",
+      "demoLink": "观看演示 →"
+    },
+    "demo": {
+      "ariaLabel": "AI 配音演示视频",
+      "step1": "选择课程",
+      "step2": "选择语言",
+      "step3": "向 AI 导师提问",
+      "chatQuestion": "Figma 的自动布局有什么用？",
+      "chatAnswer": "自动布局能让框架随内容自动伸缩，你不用再手动调整每个间距。讲师在这里讲解：",
+      "aiName": "AI 导师",
+      "aiThinking": "AI 导师正在思考…",
+      "jumpToast": "跳转到 {time}",
+      "badgeOriginal": "原声",
+      "badgeReady": "就绪",
+      "originalSuffix": " · 原声",
+      "captions": {
+        "pick": "选择任意一门课程",
+        "play": "点击播放开始学习",
+        "original": "视频以原语言播放（英文字幕）",
+        "chooseLang": "选择 AI 配音声音，字幕随语言切换",
+        "askTutor": "有不懂的地方？直接在课程里问 AI 导师",
+        "clickTime": "点击时间戳即可跳到对应片段",
+        "jumped": "视频跳转到讲师讲解的位置"
+      },
+      "header": {
+        "title": "热门课程",
+        "subtitle": "学员高分评价的课程",
+        "search": "搜索课程…"
+      },
+      "player": {
+        "back": "← 我的课程",
+        "progress": "已完成 22%",
+        "dubLabel": "AI 配音声音",
+        "listenOriginal": "收听原声",
+        "tabLessons": "课时",
+        "tabTutor": "AI 导师",
+        "lessons": [
+          "课程介绍",
+          "设计原则",
+          "认识 Figma",
+          "自动布局与组件",
+          "交互原型"
+        ]
+      },
+      "card": {
+        "aiDub": "AI 配音",
+        "instructor": "讲师 {name}",
+        "beginner": "入门",
+        "intermediate": "中级",
+        "free": "免费"
+      },
+      "courses": [
+        "人工智能入门",
+        "React 网页开发",
+        "Python 数据分析",
+        "UI/UX 设计基础",
+        "IT 英语交流",
+        "数据分析 SQL",
+        "职场提示词工程",
+        "TypeScript 实战",
+        "新手 Figma"
+      ]
+    },
+    "trending": {
+      "title": "热门课程",
+      "all": "全部",
+      "viewAll": "查看全部",
+      "empty": "此分类暂无课程。"
+    },
+    "shelves": {
+      "newest": {
+        "title": "新上线",
+        "subtitle": "LinguaLearn 最近新增的课程"
+      },
+      "free": {
+        "title": "免费学习",
+        "subtitle": "立即开始，无需费用"
+      },
+      "beginner": {
+        "title": "适合初学者",
+        "subtitle": "基础课程，零基础也能跟上"
+      }
+    },
+    "topics": {
+      "title": "按主题探索",
+      "subtitle": "选择你想学习的领域"
+    }
+  },
+  "myCourses": {
+    "title": "我的课程",
+    "tabs": {
+      "all": "全部课程",
+      "wishlist": "收藏"
+    },
+    "count": "{count} 门课程",
+    "loading": "加载中…",
+    "error": "无法加载课程列表。",
+    "stats": {
+      "streak": "连续学习",
+      "streakDays": "{n} 天",
+      "inProgress": "学习中",
+      "certificates": "已获证书"
+    },
+    "continue": {
+      "label": "继续学习",
+      "cta": "继续学习",
+      "details": "课程详情",
+      "progress": "已完成 {pct}%",
+      "lastAccessed": "上次学习 {time}"
+    },
+    "done": {
+      "label": "恭喜，你已完成",
+      "body": "你的证书已就绪，可下载或展示在公开主页上。",
+      "viewCertificate": "查看证书",
+      "share": "分享到主页"
+    },
+    "filter": {
+      "all": "全部",
+      "inProgress": "学习中",
+      "completed": "已完成"
+    },
+    "search": {
+      "placeholder": "按课程名称搜索…",
+      "aria": "搜索"
+    },
+    "sort": {
+      "label": "排序",
+      "recentlyAccessed": "最近访问",
+      "recentlyEnrolled": "最近报名",
+      "titleAsc": "名称：A 到 Z",
+      "titleDesc": "名称：Z 到 A"
+    },
+    "view": {
+      "list": "列表视图",
+      "grid": "卡片视图"
+    },
+    "card": {
+      "continue": "继续学习",
+      "viewCertificate": "查看证书",
+      "certificateTooltip": "打开证书页面",
+      "completed": "已完成",
+      "byInstructor": "讲师：{name}",
+      "lastAccessed": "上次学习 {time}",
+      "neverAccessed": "还没有学习任何课时",
+      "yourRating": "你对这门课的评分"
+    },
+    "empty": {
+      "title": "开始你的第一门课程",
+      "body": "选择一门国际课程，开启 AI 配音，用你的语言学习。",
+      "cta": "探索课程"
+    },
+    "noResults": {
+      "title": "没有找到匹配的课程",
+      "body": "试试更换关键词或去掉部分筛选。"
+    },
+    "suggestions": {
+      "title": "接下来推荐",
+      "trending": "热门课程"
+    }
+  },
+  "learn": {
+    "header": {
+      "back": "我的课程"
+    },
+    "dubbing": {
+      "groupAria": "选择 AI 配音声音",
+      "label": "AI 配音声音",
+      "original": "原声",
+      "listenOriginal": "收听原声",
+      "listAria": "语言列表",
+      "searchPlaceholder": "搜索语言…",
+      "searchAria": "搜索语言",
+      "noResults": "没有找到语言",
+      "ready": "已就绪",
+      "processing": "正在生成 {percent}%",
+      "create": "生成配音",
+      "sourceTag": "原语言",
+      "sourceTitle": "本课程本身就是你选择的语言"
+    },
+    "tabs": {
+      "overview": "概览",
+      "studyPlan": "AI 学习计划",
+      "qna": "问答",
+      "materials": "学习资料",
+      "gradebook": "成绩单",
+      "reviews": "评价"
+    },
+    "materials": {
+      "courseResources": "课程资源"
+    },
+    "sidebar": {
+      "content": "内容",
+      "transcript": "字幕文稿",
+      "tutor": "AI 导师",
+      "collapse": "收起以扩大视频空间",
+      "expand": "展开课程内容",
+      "completed": "已完成",
+      "current": "正在学习",
+      "notStarted": "未开始",
+      "hasAttachments": "含附件",
+      "signInPrompt": "登录后可查看完整课程大纲并跟踪学习进度。"
+    }
+  },
+  "profile": {
+    "role": {
+      "student": "学员",
+      "instructor": "讲师"
+    },
+    "memberSince": "加入于 {date}",
+    "share": "分享主页",
+    "shareCopied": "已复制主页链接",
+    "shareFailed": "无法复制，请重试。",
+    "settings": "账户设置",
+    "stats": {
+      "certificates": "证书",
+      "courses": "课程",
+      "streak": "连续天数"
+    },
+    "tabs": {
+      "certificates": "证书",
+      "courses": "已学",
+      "wishlist": "收藏"
+    },
+    "loading": "加载中...",
+    "notFound": "找不到该用户。",
+    "loadError": "无法加载主页，请稍后再试。",
+    "hidden": "该学员已隐藏此部分。",
+    "emptyCourses": "还没有课程。",
+    "emptyWishlist": "还没有收藏的课程。",
+    "emptyCertificates": "还没有证书。",
+    "certs": {
+      "all": "全部",
+      "sortLabel": "排序",
+      "issuedOn": "颁发于 {date}",
+      "sort": {
+        "newest": "日期：最新",
+        "oldest": "日期：最早",
+        "topic": "课程主题",
+        "title": "课程名称（A-Z）"
+      }
+    },
+    "free": "免费"
+  },
+  "certificate": {
+    "back": "我的证书",
+    "valid": "证书有效",
+    "congrats": "恭喜你完成课程！",
+    "recipient": "获得者",
+    "instructor": "讲师",
+    "completedOn": "完成日期",
+    "code": "证书编号",
+    "download": "下载 PDF",
+    "downloading": "下载中...",
+    "downloadError": "下载证书时出错，请重试。",
+    "linkedin": "添加到 LinkedIn",
+    "verifyLink": "验证链接",
+    "copy": "复制",
+    "copied": "已复制",
+    "copyError": "无法复制，请重试。",
+    "linkedinHint": "将此链接粘贴到 LinkedIn 的“证书”栏或简历的证书部分。",
+    "loading": "加载中...",
+    "notFound": "找不到该证书。",
+    "loadError": "无法加载证书，请稍后再试。"
   }
 }

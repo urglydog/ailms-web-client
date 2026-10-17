@@ -5,7 +5,8 @@
       "myCourses": "My Courses",
       "live": "Live",
       "community": "Community",
-      "about": "About Us"
+      "about": "About Us",
+      "explore": "Explore"
     },
     "search": {
       "ariaLabel": "Search",
@@ -46,18 +47,27 @@
       "instructorChannel": "Instructor Channel",
       "becomeInstructor": "Become an Instructor",
       "language": "Language",
-      "logout": "Log out"
+      "logout": "Log out",
+      "certificates": "Certificates and achievements"
     },
     "auth": {
       "login": "Log in",
-      "register": "Sign up"
+      "register": "Sign up",
+      "getStarted": "Get started"
     },
     "logoutModal": {
       "title": "Confirm log out",
       "body": "Are you sure you want to log out?",
       "cancel": "Cancel",
       "confirm": "Log out"
-    }
+    },
+    "explore": {
+      "allCourses": "All courses",
+      "categories": "CATEGORIES",
+      "more": "MORE",
+      "liveNow": "Live now"
+    },
+    "skipToContent": "Skip to content"
   },
   "footer": {
     "tagline": "An academic-grade online learning and examination management system.",
@@ -87,5 +97,276 @@
   "languageModal": {
     "title": "Choose language",
     "close": "Close"
+  },
+  "home": {
+    "hero": {
+      "tag": "New · AI dubbing",
+      "titleBefore": "Every course in",
+      "titleHighlight": "your language",
+      "description": "AI dubs international courses into the language you choose, in sync with the original video. No subtitles needed.",
+      "cta": "Explore courses",
+      "demoLink": "Watch the demo →"
+    },
+    "demo": {
+      "ariaLabel": "AI dubbing demo video",
+      "step1": "Pick a course",
+      "step2": "Choose a language",
+      "step3": "Ask the AI tutor",
+      "chatQuestion": "What is auto layout in Figma used for?",
+      "chatAnswer": "Auto layout lets a frame resize with its content, so you do not have to adjust every gap by hand. The instructor explains it at",
+      "aiName": "AI Tutor",
+      "aiThinking": "AI Tutor is thinking…",
+      "jumpToast": "Jump to {time}",
+      "badgeOriginal": "ORIGINAL",
+      "badgeReady": "READY",
+      "originalSuffix": " · original",
+      "captions": {
+        "pick": "Pick any course",
+        "play": "Press play to start learning",
+        "original": "The video plays in its original language (English subtitles)",
+        "chooseLang": "Choose an AI dubbing voice, subtitles follow the language",
+        "askTutor": "Stuck on something? Ask the AI Tutor right in the lesson",
+        "clickTime": "Click the timestamp to jump to that part of the video",
+        "jumped": "The video jumps to where the instructor explains it"
+      },
+      "header": {
+        "title": "Trending now",
+        "subtitle": "Courses highly rated by learners",
+        "search": "Search courses…"
+      },
+      "player": {
+        "back": "← My courses",
+        "progress": "22% complete",
+        "dubLabel": "AI dubbing voice",
+        "listenOriginal": "Original audio",
+        "tabLessons": "Lessons",
+        "tabTutor": "AI Tutor",
+        "lessons": [
+          "Course introduction",
+          "Design principles",
+          "Getting started with Figma",
+          "Auto layout & components",
+          "Interactive prototypes"
+        ]
+      },
+      "card": {
+        "aiDub": "AI dubbing",
+        "instructor": "By {name}",
+        "beginner": "Beginner",
+        "intermediate": "Intermediate",
+        "free": "Free"
+      },
+      "courses": [
+        "Introduction to AI",
+        "Web Development with React",
+        "Data Analysis with Python",
+        "UI/UX Design Basics",
+        "English for IT Communication",
+        "SQL for Data Analysis",
+        "Prompt Engineering at Work",
+        "Practical TypeScript",
+        "Figma for Beginners"
+      ]
+    },
+    "trending": {
+      "title": "Trending now",
+      "all": "All",
+      "viewAll": "View all",
+      "empty": "No courses in this category yet."
+    },
+    "shelves": {
+      "newest": {
+        "title": "Just launched",
+        "subtitle": "Courses recently added to LinguaLearn"
+      },
+      "free": {
+        "title": "Learn for free",
+        "subtitle": "Start right now at no cost"
+      },
+      "beginner": {
+        "title": "For beginners",
+        "subtitle": "Foundational courses, easy to follow from scratch"
+      }
+    },
+    "topics": {
+      "title": "Explore by topic",
+      "subtitle": "Pick the field you want to learn"
+    }
+  },
+  "myCourses": {
+    "title": "My courses",
+    "tabs": {
+      "all": "All courses",
+      "wishlist": "Wishlist"
+    },
+    "count": "{count} courses",
+    "loading": "Loading…",
+    "error": "Could not load your courses.",
+    "stats": {
+      "streak": "Learning streak",
+      "streakDays": "{n} days",
+      "inProgress": "In progress",
+      "certificates": "Certificates earned"
+    },
+    "continue": {
+      "label": "CONTINUE LEARNING",
+      "cta": "Continue",
+      "details": "Course details",
+      "progress": "{pct}% complete",
+      "lastAccessed": "Last studied {time}"
+    },
+    "done": {
+      "label": "CONGRATULATIONS, YOU FINISHED",
+      "body": "Your certificate is ready. Download it or show it on your public profile.",
+      "viewCertificate": "View certificate",
+      "share": "Share to profile"
+    },
+    "filter": {
+      "all": "All",
+      "inProgress": "In progress",
+      "completed": "Completed"
+    },
+    "search": {
+      "placeholder": "Search by course name…",
+      "aria": "Search"
+    },
+    "sort": {
+      "label": "Sort by",
+      "recentlyAccessed": "Recently accessed",
+      "recentlyEnrolled": "Recently enrolled",
+      "titleAsc": "Title: A to Z",
+      "titleDesc": "Title: Z to A"
+    },
+    "view": {
+      "list": "List view",
+      "grid": "Card view"
+    },
+    "card": {
+      "continue": "Continue",
+      "viewCertificate": "View certificate",
+      "certificateTooltip": "Open the certificate page",
+      "completed": "Completed",
+      "byInstructor": "By {name}",
+      "lastAccessed": "Last studied {time}",
+      "neverAccessed": "No lessons watched yet",
+      "yourRating": "Your rating for this course"
+    },
+    "empty": {
+      "title": "Start your first course",
+      "body": "Pick an international course, turn on AI dubbing and learn in your own language.",
+      "cta": "Explore courses"
+    },
+    "noResults": {
+      "title": "No matching courses",
+      "body": "Try a different keyword or remove some filters."
+    },
+    "suggestions": {
+      "title": "Suggested next",
+      "trending": "Trending now"
+    }
+  },
+  "learn": {
+    "header": {
+      "back": "My courses"
+    },
+    "dubbing": {
+      "groupAria": "Choose the AI dubbing voice",
+      "label": "AI dubbing voice",
+      "original": "Original audio",
+      "listenOriginal": "Listen to original",
+      "listAria": "Language list",
+      "searchPlaceholder": "Search languages…",
+      "searchAria": "Search languages",
+      "noResults": "No languages found",
+      "ready": "Ready",
+      "processing": "Creating {percent}%",
+      "create": "Create voice",
+      "sourceTag": "original",
+      "sourceTitle": "This lesson is already in the language you picked"
+    },
+    "tabs": {
+      "overview": "Overview",
+      "studyPlan": "AI study plan",
+      "qna": "Q&A",
+      "materials": "Materials",
+      "gradebook": "Gradebook",
+      "reviews": "Reviews"
+    },
+    "materials": {
+      "courseResources": "Course resources"
+    },
+    "sidebar": {
+      "content": "Content",
+      "transcript": "Transcript",
+      "tutor": "AI tutor",
+      "collapse": "Collapse to give the video more room",
+      "expand": "Expand course content",
+      "completed": "Completed",
+      "current": "Now studying",
+      "notStarted": "Not started",
+      "hasAttachments": "Has attachments",
+      "signInPrompt": "Sign in to see the full curriculum and track your progress in this course."
+    }
+  },
+  "profile": {
+    "role": {
+      "student": "Student",
+      "instructor": "Instructor"
+    },
+    "memberSince": "Member since {date}",
+    "share": "Share profile",
+    "shareCopied": "Profile link copied",
+    "shareFailed": "Could not copy, please try again.",
+    "settings": "Account settings",
+    "stats": {
+      "certificates": "Certificates",
+      "courses": "Courses",
+      "streak": "Day streak"
+    },
+    "tabs": {
+      "certificates": "Certificates",
+      "courses": "Learned",
+      "wishlist": "Wishlist"
+    },
+    "loading": "Loading...",
+    "notFound": "User not found.",
+    "loadError": "Could not load the profile, try again later.",
+    "hidden": "This learner has hidden this section.",
+    "emptyCourses": "No courses yet.",
+    "emptyWishlist": "No wishlisted courses yet.",
+    "emptyCertificates": "No certificates yet.",
+    "certs": {
+      "all": "All",
+      "sortLabel": "Sort by",
+      "issuedOn": "Issued {date}",
+      "sort": {
+        "newest": "Date: Newest",
+        "oldest": "Date: Oldest",
+        "topic": "Course topic",
+        "title": "Course title (A-Z)"
+      }
+    },
+    "free": "Free"
+  },
+  "certificate": {
+    "back": "My certificates",
+    "valid": "Valid certificate",
+    "congrats": "Congratulations on completing the course!",
+    "recipient": "Recipient",
+    "instructor": "Instructor",
+    "completedOn": "Completed on",
+    "code": "Certificate code",
+    "download": "Download PDF",
+    "downloading": "Downloading...",
+    "downloadError": "Could not download the certificate, please try again.",
+    "linkedin": "Add to LinkedIn",
+    "verifyLink": "Verification link",
+    "copy": "Copy",
+    "copied": "Copied",
+    "copyError": "Could not copy, please try again.",
+    "linkedinHint": "Paste this link into Licenses & Certifications on LinkedIn or the Certifications section of your CV.",
+    "loading": "Loading...",
+    "notFound": "Certificate not found.",
+    "loadError": "Could not load the certificate, try again later."
   }
 }

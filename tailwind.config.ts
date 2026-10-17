@@ -1,13 +1,11 @@
 import type { Config } from 'tailwindcss';
+import { COLORS } from './lib/theme/colors';
 
 /**
- * Enterprise/Academic Design System
- * 
- * Loại bỏ hoàn toàn phong cách "AI Vibe" (tím gradient, nút pill, phát sáng chói lóa).
- * Thay vào đó sử dụng phong cách nghiêm túc, sắc nét, mật độ thông tin cao:
- * - Màu chủ đạo: Slate/Zinc (Xám thép) kết hợp Xanh Navy đậm (Học thuật).
- * - Góc bo (Border Radius): 6px-8px (Gọn gàng, vuông vức hơn).
- * - Bóng đổ (Shadow): Cực kỳ tinh tế, chỉ dùng màu đen mờ (black opacity), không glow màu.
+ * Design system giao diện học viên (spec: doc/feat/uiux/DacTa_CaiTienUIUX_HocVien.md, mục 3).
+ * Màu lấy từ `lib/theme/colors.ts` — KHÔNG ghi cứng mã hex ở đây.
+ * Phong cách: sáng, đơn giản, chuyên nghiệp; bóng chỉ xuất hiện khi hover; điểm nhấn cyan
+ * dành riêng cho tính năng lồng tiếng AI, vàng chỉ dùng tô nền cụm chữ nhấn.
  */
 const config: Config = {
   content: [
@@ -19,37 +17,44 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        /** Accent chính — Màu Xanh Tín nhiệm / Học thuật (Enterprise Blue/Navy) */
         accent: {
-          DEFAULT: '#2563EB', // Blue 600
-          dark: '#1D4ED8',    // Blue 700
-          glow: 'transparent',// Không dùng glow
+          DEFAULT: COLORS.accent,
+          dark: COLORS.accentDark, // cũng là màu chữ accent trên nền tint/surface (đạt AA)
+          glow: 'transparent',
         },
         ink: {
-          DEFAULT: '#0F172A', // Slate 900 (Đen ngả xám thép)
-          muted: '#475569',   // Slate 600 (đậm hơn Slate 500 cũ — text phụ từng quá nhạt trên nền trắng)
-          faint: '#64748B',   // Slate 500 (đậm hơn Slate 400 cũ)
+          DEFAULT: COLORS.ink,
+          muted: COLORS.inkMuted,
+          faint: COLORS.inkFaint,
         },
         line: {
-          DEFAULT: '#CBD5E1', // Slate 300 (đậm hơn Slate 200 cũ — border từng gần như vô hình trên nền trắng)
-          soft: '#E2E8F0',    // Slate 200 — đường phân cách mờ, đậm hơn Slate 100 cũ
-          dot: '#94A3B8',
+          DEFAULT: COLORS.line,
+          soft: COLORS.lineSoft,
+          dot: COLORS.lineDot,
         },
         surface: {
-          DEFAULT: '#F8FAFC', // Slate 50 (Nền trang rất nhẹ)
-          raised: '#FFFFFF',
-          hover: '#F1F5F9',
+          DEFAULT: COLORS.surface,
+          raised: COLORS.surfaceRaised,
+          hover: COLORS.tint,
         },
-        success: '#16A34A',
-        danger: '#DC2626', // Nhiều file đã dùng `bg-danger`/`border-danger` nhưng token này
-                            // chưa từng được khai báo — các class đó trước đây không sinh CSS gì
-                            // (giống lỗi `accent-glow` cũ), phần tử liên quan mất màu/viền.
-        // (26/09/2026) — cùng lỗi y hệt `danger` ở trên: `bg-warning`/`text-warning` đã được dùng
-        // ở vài nơi (vd trang lịch sử giao dịch) nhưng token chưa từng khai báo, KHÔNG sinh CSS
-        // gì cả — khai báo bù ở đây khắc phục luôn các chỗ đó, không chỉ riêng SystemBanner mới
-        // thêm. Amber 600, khác `star` (Amber 500) để 2 mục đích sử dụng không lẫn màu nhau.
-        warning: '#D97706',
-        star: '#F59E0B',
+        tint: COLORS.tint,
+        cyan: {
+          DEFAULT: COLORS.cyan,
+          ink: COLORS.cyanInk, // chữ trên nền cyan
+        },
+        highlight: COLORS.highlight, // tô nền cụm chữ nhấn, chữ trên đó là `ink`
+        success: {
+          DEFAULT: COLORS.success,
+          ink: COLORS.successInk, // chữ xanh lá trên nền success-tint
+          tint: COLORS.successTint,
+        },
+        streak: {
+          bg: COLORS.streakBg,
+          ink: COLORS.streakInk,
+        },
+        danger: COLORS.danger,
+        warning: COLORS.warning,
+        star: COLORS.star,
       },
       fontFamily: {
         display: ['var(--font-outfit)', 'sans-serif'],
@@ -57,11 +62,15 @@ const config: Config = {
         mono: ['var(--font-plex-mono)', 'monospace'],
       },
       borderRadius: {
-        card: '8px', // Bỏ 16px. Dùng 8px chuẩn Enterprise
+        card: '10px',
+        panel: '12px',
       },
       boxShadow: {
-        card: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-        'card-hover': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+        card: '0 1px 2px 0 rgba(10, 37, 64, 0.05)',
+        'card-hover': '0 10px 20px rgba(10, 37, 64, 0.12)',
+      },
+      transitionTimingFunction: {
+        soft: 'cubic-bezier(.2, .7, .2, 1)',
       },
       maxWidth: {
         shell: '1280px',

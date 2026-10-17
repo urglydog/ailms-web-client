@@ -92,7 +92,7 @@ export function CourseCard({ course }: { course: CourseSummary }) {
   return (
     <Link
       href={targetHref}
-      className="card-interactive flex h-full flex-col overflow-hidden no-underline hover:no-underline"
+      className="card-interactive group flex h-full flex-col overflow-hidden no-underline hover:no-underline"
     >
       {/* Ảnh bìa */}
       <div
@@ -111,7 +111,7 @@ export function CourseCard({ course }: { course: CourseSummary }) {
             alt={course.title}
             fill
             sizes="(min-width: 1280px) 25vw, (min-width: 640px) 33vw, 100vw"
-            className="object-cover"
+            className="object-cover transition-transform duration-[400ms] ease-soft group-hover:scale-105"
           />
         ) : (
           <span className="rounded-full bg-ink/35 px-2.5 py-1 font-mono text-[11px] tracking-wide text-white/85">
@@ -119,41 +119,37 @@ export function CourseCard({ course }: { course: CourseSummary }) {
           </span>
         )}
 
-        {/* Cờ các ngôn ngữ đã có bản lồng tiếng + nút yêu thích (14/09/2026, mở rộng) */}
-        <div className="absolute right-2.5 top-2.5 flex gap-1">
-          {!isOwned && (
-            <button
-              type="button"
-              onClick={handleToggleWishlist}
-              disabled={wishlistPending}
-              aria-label={inWishlist ? 'Bỏ khỏi danh sách yêu thích' : 'Thêm vào danh sách yêu thích'}
-              aria-pressed={inWishlist}
-              className={`flex h-9 w-9 items-center justify-center rounded-full shadow-sm transition-colors ${
-                inWishlist ? 'bg-white text-red-500' : 'bg-white/90 text-ink-faint hover:text-red-500'
-              }`}
-            >
-              {/* SVG duy nhất cho cả 2 trạng thái, chỉ đổi fill — tránh lệch hình dạng như 2 ký tự Unicode ♥/♡ cũ. */}
-              <svg width="18" height="18" viewBox="0 0 24 24" fill={inWishlist ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-              </svg>
-            </button>
-          )}
-          {course.langs.map((lang) => (
-            <span
-              key={lang.code}
-              title={lang.label}
-              className="flex h-6 w-6 items-center justify-center rounded-full bg-white/90 text-[13px] shadow-sm"
-            >
-              {lang.flag}
-            </span>
-          ))}
-        </div>
-
-        {course.isFree && (
-          <Badge tone="success" className="absolute left-2.5 top-2.5">
-            Miễn phí
-          </Badge>
+        {/* Nút yêu thích (14/09/2026, mở rộng) */}
+        {!isOwned && (
+          <button
+            type="button"
+            onClick={handleToggleWishlist}
+            disabled={wishlistPending}
+            aria-label={inWishlist ? 'Bỏ khỏi danh sách yêu thích' : 'Thêm vào danh sách yêu thích'}
+            aria-pressed={inWishlist}
+            className={`absolute right-2.5 top-2.5 flex h-9 w-9 items-center justify-center rounded-full shadow-sm transition-colors ${
+              inWishlist ? 'bg-white text-red-500' : 'bg-white/90 text-ink-faint hover:text-red-500'
+            }`}
+          >
+            {/* SVG duy nhất cho cả 2 trạng thái, chỉ đổi fill — tránh lệch hình dạng như 2 ký tự Unicode ♥/♡ cũ. */}
+            <svg width="18" height="18" viewBox="0 0 24 24" fill={inWishlist ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+            </svg>
+          </button>
         )}
+
+        {/* Nhãn góc trên trái: Miễn phí (nếu có) và AI lồng tiếng (thay hàng cờ ngôn ngữ cũ — spec mục 4) */}
+        <div className="absolute left-2.5 top-2.5 flex flex-col items-start gap-1">
+          {course.isFree && <Badge tone="success">Miễn phí</Badge>}
+          {/* Mọi khóa đều hỗ trợ lồng tiếng AI; API công khai chưa trả danh sách giọng (`langs` luôn rỗng)
+              nên nhãn luôn hiện, chỉ có tooltip khi danh sách có dữ liệu. */}
+          <span
+            title={course.langs.length > 0 ? course.langs.map((l) => l.label).join(', ') : undefined}
+            className="rounded-full bg-white px-2 py-0.5 text-[11px] font-medium text-accent-dark shadow-sm"
+          >
+            AI lồng tiếng
+          </span>
+        </div>
       </div>
 
       {/* Nội dung */}
@@ -228,7 +224,7 @@ export function CourseCard({ course }: { course: CourseSummary }) {
               className={`shrink-0 rounded-full px-3.5 py-2 text-[13px] font-semibold transition-colors ${
                 inCart
                   ? 'bg-success/10 text-success hover:bg-success/20'
-                  : 'bg-accent text-white hover:bg-accent-dark'
+                  : 'bg-accent text-white hover:bg-accent-dark hover:text-white'
               } disabled:cursor-not-allowed`}
             >
               {inCart ? 'Đi đến giỏ hàng' : addToCart.isPending ? 'Đang thêm...' : 'Thêm vào giỏ hàng'}

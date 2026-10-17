@@ -8,6 +8,7 @@ import { useCategories } from '@/hooks/useCategories';
 import { useMyEnrollments } from '@/hooks/useEnrollments';
 import { useCourseSearch } from '@/hooks/usePublicCourses';
 import { EMPTY_FILTERS } from '@/lib/api/publicCourses';
+import { resolveCategoryParam } from '@/lib/courses/categoryParam';
 import { ApiError } from '@/lib/api/client';
 import type { CourseFilterState, CourseSortBy } from '@/types/domain';
 
@@ -55,6 +56,12 @@ function CoursesPageContent() {
     const q = searchParams.get('q') ?? '';
     setFilters((prev) => (prev.keyword === q ? prev : { ...prev, keyword: q }));
   }, [searchParams]);
+
+  // Liên kết từ menu "Khám phá" (`/courses?category=<slug>`): áp bộ lọc danh mục khi danh mục đã tải.
+  useEffect(() => {
+    const slug = resolveCategoryParam(searchParams.get('category'), categories ?? []);
+    setFilters((prev) => (prev.category === slug ? prev : { ...prev, category: slug }));
+  }, [searchParams, categories]);
 
   // Khóa học ĐÃ SỞ HỮU không còn liệt kê ở đây nữa (06/09/2026) — trang này chỉ nên gợi ý
   // khóa CHƯA mua. Khách chưa đăng nhập (`enrollments` là `undefined`) thì không lọc gì.

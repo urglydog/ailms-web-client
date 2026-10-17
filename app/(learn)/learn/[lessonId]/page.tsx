@@ -14,7 +14,7 @@ import { ReviewsSection } from '@/components/course/ReviewsSection';
 import { MaterialManager } from '@/components/materials/MaterialManager';
 import { DualPlayer, type DualPlayerHandle } from '@/components/player/DualPlayer';
 import { DubbingActivatePanel } from '@/components/player/DubbingActivatePanel';
-import { LanguageDropdown } from '@/components/player/LanguageDropdown';
+import { DubbingBar } from '@/components/player/DubbingBar';
 import { LessonSidebar } from '@/components/player/LessonSidebar';
 import { materialsApi } from '@/lib/api/materials';
 import { PipelineProgress } from '@/components/player/PipelineProgress';
@@ -32,24 +32,25 @@ import { api, ApiError, getOrCreateStreamSessionId } from '@/lib/api/client';
 import { lessonPlayerApi } from '@/lib/api/lessonPlayer';
 import type { CourseResource } from '@/lib/api/courseResourcesApi';
 import { PanelRightClose, PanelRightOpen } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { MAIN_TAB_KEYS, resolveMainTab, type MainTab } from '@/lib/learn/mainTabs';
 import { LiveChatPanel } from '@/components/community/LiveChatPanel';
 import { MessageInstructorFloatingButton } from '@/components/course/MessageInstructorFloatingButton';
 import { useSetLearnTitle, useSetLearnProgress } from '@/components/layout/LearnTitleContext';
 import { getAccessToken } from '@/lib/auth/token';
 import type { PipelineStep } from '@/types/domain';
 
-type MainTab = 'overview' | 'qna' | 'reviews' | 'materials' | 'gradebook' | 'resources' | 'study-plan';
 type SidebarTab = 'content' | 'tutor';
 
-const MAIN_TABS: Array<{ key: MainTab; label: string }> = [
-  { key: 'overview', label: 'Tổng quan' },
-  { key: 'study-plan', label: 'Lộ trình AI' },
-  { key: 'qna', label: 'Hỏi đáp' },
-  { key: 'materials', label: 'Học liệu' },
-  { key: 'gradebook', label: 'Bảng điểm' },
-  { key: 'resources', label: 'Tài nguyên' },
-  { key: 'reviews', label: 'Đánh giá' },
-];
+/** Khóa dịch (`learn.tabs.*`) của từng tab dưới video; "Tài nguyên" đã gộp vào "Học liệu" (spec mục 7). */
+const TAB_LABEL_KEYS: Record<MainTab, string> = {
+  overview: 'overview',
+  'study-plan': 'studyPlan',
+  qna: 'qna',
+  materials: 'materials',
+  gradebook: 'gradebook',
+  reviews: 'reviews',
+};
 
 /** Thông báo khoá thống nhất cho 3 mục cần sở hữu khoá học (Hỏi đáp/Học liệu/Gia sư AI) — thay
  * cho khối CTA rời trước đây, giờ mỗi mục tự hiện đúng ngay trong tab/khu vực của nó. */
@@ -137,6 +138,7 @@ function LearnPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
+  const t = useTranslations('learn');
   const lessonId = Number(params.lessonId);
   const hasToken = !!getAccessToken();
   const { data: currentUser } = useCurrentUser();
@@ -251,8 +253,7 @@ function LearnPageContent() {
   // Giao diện tham khảo Udemy (06/09/2026) — tab dưới video (Tổng quan/Hỏi đáp/Đánh giá/Học liệu)
   // và tab trong sidebar (Nội dung khóa học/AI Gia sư), thay cho panel Gia sư AI trượt nổi + nút
   // "Mở Quản lý Học liệu AI" điều hướng sang trang riêng trước đây.
-  const tabParam = searchParams.get('tab') as MainTab | null;
-  const mainTab: MainTab = tabParam && MAIN_TABS.some(t => t.key === tabParam) ? tabParam : 'overview';
+  const mainTab: MainTab = resolveMainTab(searchParams.get('tab'));
 
   const setMainTab = (tab: MainTab) => {
     const newSearchParams = new URLSearchParams(searchParams.toString());
@@ -607,6 +608,12 @@ function LearnPageContent() {
     setSelectedVoiceName(defaultVoice?.voiceName ?? null);
   };
 
+  const handleUseOriginal = () => {
+    setActiveLang(null);
+    setMode('watching');
+    setSelectedVoiceName(null);
+  };
+
   const handleActivate = () => {
     if (!activeLang) return;
     setQuotaExceeded(false);
@@ -705,11 +712,13 @@ function LearnPageContent() {
             </div>
 
             {lesson.languages.length > 0 && (
-              <LanguageDropdown
+              <DubbingBar
                 languages={lesson.languages}
                 activeCode={activeLang}
                 sourceLanguage={lesson.sourceLanguage}
+                processing={mode === 'processing' && activeLang ? { code: activeLang, percent } : null}
                 onSelect={handleSelectLanguage}
+                onUseOriginal={handleUseOriginal}
               />
             )}
 
@@ -746,26 +755,27 @@ function LearnPageContent() {
               </div>
             )}
 
-            <h1 className="font-display text-xl font-bold text-ink">{lesson.lessonTitle}</h1>
+            <h1 className="m-0 font-display text-xl font-semibold text-ink">{lesson.lessonTitle}</h1>
 
             {/* Tổng quan / Hỏi đáp / Đánh giá / Học liệu — thay cho panel Gia sư AI trượt nổi +
                 nút "Mở Quản lý Học liệu AI" điều hướng trang riêng trước đây. */}
             <div className="card overflow-hidden p-0">
               <div className="flex overflow-x-auto border-b border-line">
-                {MAIN_TABS.map((tab) => (
+                {MAIN_TAB_KEYS.map((key) => (
                   <button
-                    key={tab.key}
+                    key={key}
                     type="button"
-                    onClick={() => setMainTab(tab.key)}
+                    onClick={() => setMainTab(key)}
+                    aria-current={mainTab === key ? 'page' : undefined}
                     className={`shrink-0 border-b-2 px-5 py-3 text-sm font-semibold transition-colors ${
-                      mainTab === tab.key
-                        ? 'border-accent text-accent'
+                      mainTab === key
+                        ? 'border-accent text-accent-dark'
                         : 'border-transparent text-ink-muted hover:text-ink'
                     }`}
                   >
-                    {tab.label}
-                    {tab.key === 'materials' && currentLessonMaterialCount > 0 && (
-                      <span className="ml-2 inline-flex items-center justify-center rounded-full bg-red-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                    {t(`tabs.${TAB_LABEL_KEYS[key]}` as Parameters<typeof t>[0])}
+                    {key === 'materials' && currentLessonMaterialCount > 0 && (
+                      <span className="ml-2 inline-flex min-w-[18px] items-center justify-center rounded-full bg-danger px-1.5 py-0.5 text-[11px] font-medium text-white">
                         {currentLessonMaterialCount}
                       </span>
                     )}
@@ -804,12 +814,17 @@ function LearnPageContent() {
 
                 {mainTab === 'reviews' && <ReviewsSection courseId={lesson.courseId} />}
                 {mainTab === 'gradebook' && <CourseGradebookTab courseId={lesson.courseId} />}
-                {mainTab === 'resources' && <CourseResourcesTab courseId={lesson.courseId} />}
                 {mainTab === 'materials' && (
                   lesson.enrolled ? (
                     <div className="flex flex-col gap-5">
                       <LessonAssignmentsList lessonId={lesson.lessonId} />
                       <MaterialManager courseId={lesson.courseId} lessonId={lesson.lessonId} />
+                      <section>
+                        <h3 className="m-0 mb-3 font-display text-sm font-semibold text-ink">
+                          {t('materials.courseResources')}
+                        </h3>
+                        <CourseResourcesTab courseId={lesson.courseId} />
+                      </section>
                     </div>
                   ) : (
                     <LockedFeatureNotice feature="Học liệu" courseSlug={lesson.courseSlug} />
@@ -825,8 +840,8 @@ function LearnPageContent() {
               <button
                 type="button"
                 onClick={() => setSidebarCollapsed(false)}
-                title="Mở rộng nội dung khóa học"
-                aria-label="Mở rộng nội dung khóa học"
+                title={t('sidebar.expand')}
+                aria-label={t('sidebar.expand')}
                 className="hidden h-10 w-10 items-center justify-center rounded-xl border border-line bg-white text-ink-muted shadow-sm transition-colors hover:border-accent hover:text-accent lg:flex"
               >
                 <PanelRightOpen className="h-5 w-5" strokeWidth={1.75} />
@@ -839,28 +854,28 @@ function LearnPageContent() {
                   onClick={() => setSidebarTab('content')}
                   className={`flex-1 border-b-2 px-3 py-3 text-[13px] font-semibold transition-colors ${
                     sidebarTab === 'content'
-                      ? 'border-accent text-accent'
+                      ? 'border-accent text-accent-dark'
                       : 'border-transparent text-ink-muted hover:text-ink'
                   }`}
                 >
-                  {showTranscript ? 'Bản ghi lời thoại' : 'Nội dung khóa học'}
+                  {showTranscript ? t('sidebar.transcript') : t('sidebar.content')}
                 </button>
                 <button
                   type="button"
                   onClick={() => setSidebarTab('tutor')}
                   className={`flex-1 border-b-2 px-3 py-3 text-[13px] font-semibold transition-colors ${
                     sidebarTab === 'tutor'
-                      ? 'border-accent text-accent'
+                      ? 'border-accent text-accent-dark'
                       : 'border-transparent text-ink-muted hover:text-ink'
                   }`}
                 >
-                  AI Gia sư
+                  {t('sidebar.tutor')}
                 </button>
                 <button
                   type="button"
                   onClick={() => setSidebarCollapsed(true)}
-                  title="Thu gọn — mở rộng không gian video"
-                  aria-label="Thu gọn nội dung khóa học"
+                  title={t('sidebar.collapse')}
+                  aria-label={t('sidebar.collapse')}
                   className="hidden shrink-0 border-b-2 border-transparent px-3 py-3 text-ink-muted transition-colors hover:text-ink lg:block"
                 >
                   <PanelRightClose className="h-[18px] w-[18px]" strokeWidth={1.75} />
@@ -888,7 +903,7 @@ function LearnPageContent() {
                       />
                     ) : (
                       <p className="text-sm text-ink-muted">
-                        Đăng nhập để xem toàn bộ chương trình học và theo dõi tiến độ của khoá này.
+                        {t('sidebar.signInPrompt')}
                       </p>
                     )}
                   </div>

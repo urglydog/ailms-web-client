@@ -5,7 +5,8 @@
       "myCourses": "マイコース",
       "live": "ライブ",
       "community": "コミュニティ",
-      "about": "私たちについて"
+      "about": "私たちについて",
+      "explore": "探す"
     },
     "search": {
       "ariaLabel": "検索",
@@ -46,18 +47,27 @@
       "instructorChannel": "講師チャンネル",
       "becomeInstructor": "講師になる",
       "language": "言語",
-      "logout": "ログアウト"
+      "logout": "ログアウト",
+      "certificates": "証明書と実績"
     },
     "auth": {
       "login": "ログイン",
-      "register": "新規登録"
+      "register": "新規登録",
+      "getStarted": "始める"
     },
     "logoutModal": {
       "title": "ログアウトの確認",
       "body": "本当にログアウトしますか？",
       "cancel": "キャンセル",
       "confirm": "ログアウト"
-    }
+    },
+    "explore": {
+      "allCourses": "すべての講座",
+      "categories": "カテゴリ",
+      "more": "その他",
+      "liveNow": "配信中"
+    },
+    "skipToContent": "本文へスキップ"
   },
   "footer": {
     "tagline": "学術水準のオンライン学習・試験管理システムです。",
@@ -87,5 +97,276 @@
   "languageModal": {
     "title": "言語を選択",
     "close": "閉じる"
+  },
+  "home": {
+    "hero": {
+      "tag": "新機能 · AI吹き替え",
+      "titleBefore": "すべての講座を",
+      "titleHighlight": "あなたの言語で",
+      "description": "AIが海外の講座を選んだ言語に吹き替え、元の映像と同期。字幕は不要です。",
+      "cta": "講座を探す",
+      "demoLink": "デモを見る →"
+    },
+    "demo": {
+      "ariaLabel": "AI 吹き替えのデモ動画",
+      "step1": "講座を選ぶ",
+      "step2": "言語を選ぶ",
+      "step3": "AI チューターに質問",
+      "chatQuestion": "Figma のオートレイアウトは何に使いますか？",
+      "chatAnswer": "オートレイアウトはフレームを中身に合わせて自動で伸縮させるので、余白を手作業で直す必要がありません。講師の解説はこちら：",
+      "aiName": "AI チューター",
+      "aiThinking": "AI チューターが考え中…",
+      "jumpToast": "{time} へジャンプ",
+      "badgeOriginal": "原音",
+      "badgeReady": "利用可",
+      "originalSuffix": " · 原音",
+      "captions": {
+        "pick": "好きな講座を選びます",
+        "play": "再生を押して学習を始めます",
+        "original": "動画は原語で再生されます（英語字幕）",
+        "chooseLang": "AI 吹き替えの音声を選ぶと字幕も切り替わります",
+        "askTutor": "分からない点は、レッスン内で AI チューターに質問",
+        "clickTime": "タイムスタンプを押すとその場面へ移動します",
+        "jumped": "講師が解説している場面へ動画が移動します"
+      },
+      "header": {
+        "title": "人気の講座",
+        "subtitle": "受講生の評価が高い講座",
+        "search": "講座を検索…"
+      },
+      "player": {
+        "back": "← マイ講座",
+        "progress": "22% 完了",
+        "dubLabel": "AI 吹き替え音声",
+        "listenOriginal": "原音で聞く",
+        "tabLessons": "レッスン",
+        "tabTutor": "AI チューター",
+        "lessons": [
+          "講座の紹介",
+          "デザインの原則",
+          "Figma を始めよう",
+          "オートレイアウトとコンポーネント",
+          "インタラクティブなプロトタイプ"
+        ]
+      },
+      "card": {
+        "aiDub": "AI 吹き替え",
+        "instructor": "講師 {name}",
+        "beginner": "初級",
+        "intermediate": "中級",
+        "free": "無料"
+      },
+      "courses": [
+        "AI 入門",
+        "React で学ぶ Web 開発",
+        "Python データ分析",
+        "UI/UX デザイン基礎",
+        "IT 英会話",
+        "データ分析のための SQL",
+        "仕事で使うプロンプト設計",
+        "実践 TypeScript",
+        "初心者向け Figma"
+      ]
+    },
+    "trending": {
+      "title": "人気の講座",
+      "all": "すべて",
+      "viewAll": "すべて見る",
+      "empty": "このカテゴリにはまだ講座がありません。"
+    },
+    "shelves": {
+      "newest": {
+        "title": "新着講座",
+        "subtitle": "LinguaLearn に追加されたばかりの講座"
+      },
+      "free": {
+        "title": "無料で学ぶ",
+        "subtitle": "費用なしで今すぐ始められます"
+      },
+      "beginner": {
+        "title": "初心者向け",
+        "subtitle": "ゼロから学べる基礎講座"
+      }
+    },
+    "topics": {
+      "title": "テーマから探す",
+      "subtitle": "学びたい分野を選びましょう"
+    }
+  },
+  "myCourses": {
+    "title": "マイコース",
+    "tabs": {
+      "all": "すべての講座",
+      "wishlist": "お気に入り"
+    },
+    "count": "{count} 講座",
+    "loading": "読み込み中…",
+    "error": "講座の一覧を読み込めませんでした。",
+    "stats": {
+      "streak": "連続学習",
+      "streakDays": "{n} 日",
+      "inProgress": "学習中",
+      "certificates": "取得した証明書"
+    },
+    "continue": {
+      "label": "続きから学ぶ",
+      "cta": "続きを学ぶ",
+      "details": "講座の詳細",
+      "progress": "{pct}% 完了",
+      "lastAccessed": "最終学習 {time}"
+    },
+    "done": {
+      "label": "おめでとうございます、修了しました",
+      "body": "証明書の準備ができました。ダウンロードするか、公開プロフィールに表示できます。",
+      "viewCertificate": "証明書を見る",
+      "share": "プロフィールで共有"
+    },
+    "filter": {
+      "all": "すべて",
+      "inProgress": "学習中",
+      "completed": "修了"
+    },
+    "search": {
+      "placeholder": "講座名で検索…",
+      "aria": "検索"
+    },
+    "sort": {
+      "label": "並べ替え",
+      "recentlyAccessed": "最近アクセス",
+      "recentlyEnrolled": "最近の登録",
+      "titleAsc": "名前：A から Z",
+      "titleDesc": "名前：Z から A"
+    },
+    "view": {
+      "list": "リスト表示",
+      "grid": "カード表示"
+    },
+    "card": {
+      "continue": "続きを学ぶ",
+      "viewCertificate": "証明書を見る",
+      "certificateTooltip": "証明書ページを開く",
+      "completed": "修了",
+      "byInstructor": "講師：{name}",
+      "lastAccessed": "最終学習 {time}",
+      "neverAccessed": "まだ視聴していません",
+      "yourRating": "この講座へのあなたの評価"
+    },
+    "empty": {
+      "title": "最初の講座を始めましょう",
+      "body": "海外の講座を選び、AI吹き替えをオンにして、あなたの言語で学びましょう。",
+      "cta": "講座を探す"
+    },
+    "noResults": {
+      "title": "一致する講座がありません",
+      "body": "キーワードを変えるか、絞り込みを減らしてください。"
+    },
+    "suggestions": {
+      "title": "次のおすすめ",
+      "trending": "人気の講座"
+    }
+  },
+  "learn": {
+    "header": {
+      "back": "マイコース"
+    },
+    "dubbing": {
+      "groupAria": "AI吹き替えの音声を選ぶ",
+      "label": "AI吹き替え音声",
+      "original": "元の音声",
+      "listenOriginal": "元の音声で聞く",
+      "listAria": "言語の一覧",
+      "searchPlaceholder": "言語を検索…",
+      "searchAria": "言語を検索",
+      "noResults": "言語が見つかりません",
+      "ready": "準備完了",
+      "processing": "作成中 {percent}%",
+      "create": "音声を作成",
+      "sourceTag": "原語",
+      "sourceTitle": "この講義はすでに選んだ言語です"
+    },
+    "tabs": {
+      "overview": "概要",
+      "studyPlan": "AI学習プラン",
+      "qna": "質問",
+      "materials": "教材",
+      "gradebook": "成績表",
+      "reviews": "レビュー"
+    },
+    "materials": {
+      "courseResources": "講座リソース"
+    },
+    "sidebar": {
+      "content": "内容",
+      "transcript": "書き起こし",
+      "tutor": "AIチューター",
+      "collapse": "折りたたんで動画を広げる",
+      "expand": "講座の内容を広げる",
+      "completed": "修了",
+      "current": "学習中",
+      "notStarted": "未学習",
+      "hasAttachments": "添付資料あり",
+      "signInPrompt": "ログインすると全カリキュラムと学習の進捗を確認できます。"
+    }
+  },
+  "profile": {
+    "role": {
+      "student": "受講生",
+      "instructor": "講師"
+    },
+    "memberSince": "{date} から利用",
+    "share": "プロフィールを共有",
+    "shareCopied": "プロフィールのリンクをコピーしました",
+    "shareFailed": "コピーできませんでした。もう一度お試しください。",
+    "settings": "アカウント設定",
+    "stats": {
+      "certificates": "証明書",
+      "courses": "講座",
+      "streak": "連続日数"
+    },
+    "tabs": {
+      "certificates": "証明書",
+      "courses": "学習済み",
+      "wishlist": "お気に入り"
+    },
+    "loading": "読み込み中...",
+    "notFound": "ユーザーが見つかりません。",
+    "loadError": "プロフィールを読み込めませんでした。",
+    "hidden": "この受講生はこの項目を非表示にしています。",
+    "emptyCourses": "まだ講座がありません。",
+    "emptyWishlist": "お気に入りの講座はまだありません。",
+    "emptyCertificates": "まだ証明書がありません。",
+    "certs": {
+      "all": "すべて",
+      "sortLabel": "並べ替え",
+      "issuedOn": "{date} 発行",
+      "sort": {
+        "newest": "日付：新しい順",
+        "oldest": "日付：古い順",
+        "topic": "講座のテーマ",
+        "title": "講座名（A-Z）"
+      }
+    },
+    "free": "無料"
+  },
+  "certificate": {
+    "back": "証明書一覧",
+    "valid": "有効な証明書",
+    "congrats": "講座の修了おめでとうございます！",
+    "recipient": "受領者",
+    "instructor": "講師",
+    "completedOn": "修了日",
+    "code": "証明書コード",
+    "download": "PDFをダウンロード",
+    "downloading": "ダウンロード中...",
+    "downloadError": "証明書のダウンロードに失敗しました。もう一度お試しください。",
+    "linkedin": "LinkedInに追加",
+    "verifyLink": "検証リンク",
+    "copy": "コピー",
+    "copied": "コピーしました",
+    "copyError": "コピーできませんでした。もう一度お試しください。",
+    "linkedinHint": "このリンクを LinkedIn の「資格・認定」または履歴書の資格欄に貼り付けてください。",
+    "loading": "読み込み中...",
+    "notFound": "証明書が見つかりません。",
+    "loadError": "証明書を読み込めませんでした。"
   }
 }

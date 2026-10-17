@@ -49,8 +49,8 @@ export default function WishlistPage() {
 
   return (
     <div>
-      <div className="bg-ink">
-        <div className="shell py-8">
+      <div className="border-b border-line bg-surface">
+        <div className="shell pb-0 pt-8">
           <MyLearningTabs active="wishlist" />
         </div>
       </div>
