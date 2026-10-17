@@ -28,4 +28,14 @@ describe('ProfileTabs', () => {
     renderWithIntl(<ProfileTabs active="certificates" certificateCount={1} onChange={vi.fn()} />);
     expect(screen.getByRole('tablist')).toBeInTheDocument();
   });
+  it('chỉ tab đang chọn nằm trong thứ tự Tab, mũi tên trái/phải đổi tab', () => {
+    const onChange = vi.fn();
+    renderWithIntl(<ProfileTabs active="certificates" certificateCount={1} onChange={onChange} />);
+    const tabs = screen.getAllByRole('tab');
+    expect(tabs.map((t) => t.getAttribute('tabindex'))).toEqual(['0', '-1', '-1']);
+    fireEvent.keyDown(tabs[0]!, { key: 'ArrowRight' });
+    expect(onChange).toHaveBeenLastCalledWith('courses');
+    fireEvent.keyDown(tabs[0]!, { key: 'ArrowLeft' });
+    expect(onChange).toHaveBeenLastCalledWith('wishlist');
+  });
 });

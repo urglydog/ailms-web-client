@@ -13,6 +13,15 @@ const ORDER: ProfileTab[] = ['certificates', 'courses', 'wishlist'];
 
 export function ProfileTabs({ active, certificateCount, onChange }: ProfileTabsProps) {
   const t = useTranslations('profile.tabs');
+  const moveFocus = (e: React.KeyboardEvent<HTMLButtonElement>, from: ProfileTab) => {
+    const step = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+    if (step === 0) return;
+    e.preventDefault();
+    const next = ORDER[(ORDER.indexOf(from) + step + ORDER.length) % ORDER.length]!;
+    onChange(next);
+    const buttons = e.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="tab"]');
+    buttons?.[ORDER.indexOf(next)]?.focus();
+  };
   return (
     <div role="tablist" aria-label={t('certificates')} className="mb-6 flex gap-6 border-b border-line">
       {ORDER.map((tab) => {
@@ -24,6 +33,8 @@ export function ProfileTabs({ active, certificateCount, onChange }: ProfileTabsP
             type="button"
             role="tab"
             aria-selected={selected}
+            tabIndex={selected ? 0 : -1}
+            onKeyDown={(e) => moveFocus(e, tab)}
             onClick={() => onChange(tab)}
             className={`-mb-px border-b-2 px-1 pb-3 text-sm font-semibold transition-colors ${
               selected ? 'border-accent text-ink' : 'border-transparent text-ink-muted hover:text-ink'
