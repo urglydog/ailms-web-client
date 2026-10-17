@@ -66,7 +66,8 @@
       "categories": "CATEGORIES",
       "more": "MORE",
       "liveNow": "Live now"
-    }
+    },
+    "skipToContent": "Skip to content"
   },
   "footer": {
     "tagline": "An academic-grade online learning and examination management system.",

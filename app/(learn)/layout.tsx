@@ -72,7 +72,7 @@ export default function LearnLayout({ children }: { children: React.ReactNode })
     <LearnTitleProvider>
       <div className="flex min-h-dvh flex-col">
         <LearnHeaderBar />
-        <main className="flex-1">{children}</main>
+        <main id="main-content" tabIndex={-1} className="flex-1">{children}</main>
       </div>
     </LearnTitleProvider>
   );

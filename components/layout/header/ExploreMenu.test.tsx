@@ -83,4 +83,12 @@ describe('ExploreMenu', () => {
     fireEvent.keyDown(document, { key: 'Escape' });
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
   });
+
+  it('Escape trả focus về nút Khám phá', () => {
+    renderWithIntl(<ExploreMenu categories={CATEGORIES} liveNow={false} />);
+    const trigger = screen.getByRole('button', { name: /Khám phá/ });
+    fireEvent.click(trigger);
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(trigger).toHaveFocus();
+  });
 });

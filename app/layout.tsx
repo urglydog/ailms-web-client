@@ -3,6 +3,7 @@ import Script from 'next/script';
 import localFont from 'next/font/local';
 import './globals.css';
 import { Providers } from './providers';
+import { SkipLink } from '@/components/layout/SkipLink';
 import { ServiceWorkerRegister } from '@/components/providers/ServiceWorkerRegister';
 import { COLORS } from '@/lib/theme/colors';
 
@@ -80,7 +81,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <ServiceWorkerRegister />
-        <Providers>{children}</Providers>
+        <Providers>
+          <SkipLink />
+          {children}
+        </Providers>
       </body>
     </html>
   );

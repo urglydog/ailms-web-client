@@ -33,6 +33,7 @@ export function ExploreMenu({ categories, liveNow }: ExploreMenuProps) {
   // phân biệt, rê chuột rồi bấm sẽ đảo trạng thái và đóng menu ngay.
   const [pinned, setPinned] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const active = isNavItemActive(pathname, '/courses');
 
   const close = () => {
@@ -57,6 +58,7 @@ export function ExploreMenu({ categories, liveNow }: ExploreMenuProps) {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
+        triggerRef.current?.focus();
         setOpen(false);
         setPinned(false);
       }
@@ -85,6 +87,7 @@ export function ExploreMenu({ categories, liveNow }: ExploreMenuProps) {
       }}
     >
       <button
+        ref={triggerRef}
         type="button"
         aria-expanded={open}
         aria-haspopup="true"

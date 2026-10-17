@@ -109,6 +109,13 @@ describe('DubbingBar', () => {
     expect(screen.queryByRole('listbox')).toBeNull();
   });
 
+  it('Escape trả focus về nút chọn giọng', () => {
+    setup();
+    openMenu();
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(document.activeElement).toHaveAttribute('aria-haspopup', 'listbox');
+  });
+
   it('đang nghe giọng lồng tiếng, bật Nghe bản gốc thì gọi onUseOriginal', () => {
     const p = setup({ activeCode: 'vi' });
     fireEvent.click(screen.getByRole('switch', { name: 'Nghe bản gốc' }));

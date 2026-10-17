@@ -33,6 +33,7 @@ export function DubbingBar({ languages, activeCode, sourceLanguage, processing, 
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
   const lastCodeRef = useRef<string | null>(null);
 
@@ -55,7 +56,10 @@ export function DubbingBar({ languages, activeCode, sourceLanguage, processing, 
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) setOpen(false);
     };
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpen(false);
+      if (e.key === 'Escape') {
+        setOpen(false);
+        triggerRef.current?.focus();
+      }
     };
     document.addEventListener('pointerdown', onPointerDown);
     document.addEventListener('keydown', onKeyDown);
@@ -90,6 +94,7 @@ export function DubbingBar({ languages, activeCode, sourceLanguage, processing, 
     >
       <button
         type="button"
+        ref={triggerRef}
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="listbox"
         aria-expanded={open}
