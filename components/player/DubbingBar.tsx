@@ -3,7 +3,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { Check, ChevronDown, Languages, Loader2, Plus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { filterLanguages, languageStatus, languageToUseWhenOriginalOff } from '@/lib/learn/dubbing';
+import {
+  filterLanguages,
+  languageStatus,
+  languageToUseWhenOriginalOff,
+  sortLanguagesForMenu,
+} from '@/lib/learn/dubbing';
 import type { DubLanguage } from '@/types/domain';
 
 interface DubbingBarProps {
@@ -32,7 +37,10 @@ export function DubbingBar({ languages, activeCode, sourceLanguage, processing, 
   const lastCodeRef = useRef<string | null>(null);
 
   const active = languages.find((l) => l.code === activeCode) ?? null;
-  const visible = filterLanguages(languages, query);
+  const visible = filterLanguages(
+    sortLanguagesForMenu(languages, { sourceLanguage, processingCode: processing?.code ?? null }),
+    query,
+  );
   const usingOriginal = activeCode === null;
 
   useEffect(() => {

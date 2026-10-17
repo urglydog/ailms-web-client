@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { DubLanguage } from '@/types/domain';
-import { filterLanguages, languageStatus, languageToUseWhenOriginalOff } from './dubbing';
+import { filterLanguages, languageStatus, languageToUseWhenOriginalOff, sortLanguagesForMenu } from './dubbing';
 
 function lang(code: string, available: boolean, label = code.toUpperCase()): DubLanguage {
   return { code, label, flag: '', available, subtitles: [] };
@@ -44,6 +44,27 @@ describe('languageToUseWhenOriginalOff', () => {
   it('không có giọng nào sẵn sàng thì trả null', () => {
     expect(languageToUseWhenOriginalOff([lang('en', true), lang('ja', false)], 'en', null)).toBeNull();
     expect(languageToUseWhenOriginalOff([], null, null)).toBeNull();
+  });
+});
+
+describe('sortLanguagesForMenu', () => {
+  const ctx = { sourceLanguage: 'en', processingCode: null as string | null };
+
+  it('đưa giọng đã sẵn sàng lên đầu, rồi đến chưa có, ngôn ngữ gốc xuống cuối', () => {
+    const list = [lang('en', true), lang('ja', false), lang('vi', true), lang('zh', false), lang('fr', true)];
+    expect(sortLanguagesForMenu(list, ctx).map((l) => l.code)).toEqual(['vi', 'fr', 'ja', 'zh', 'en']);
+  });
+
+  it('ngôn ngữ đang tạo đứng trước cả giọng đã sẵn sàng', () => {
+    const list = [lang('vi', true), lang('ja', false), lang('zh', false)];
+    expect(sortLanguagesForMenu(list, { ...ctx, processingCode: 'zh' }).map((l) => l.code)).toEqual(['zh', 'vi', 'ja']);
+  });
+
+  it('giữ nguyên thứ tự ban đầu trong cùng một nhóm và không đổi mảng gốc', () => {
+    const list = [lang('b', false), lang('a', false), lang('c', false)];
+    const copy = [...list];
+    expect(sortLanguagesForMenu(list, ctx).map((l) => l.code)).toEqual(['b', 'a', 'c']);
+    expect(list).toEqual(copy);
   });
 });
 

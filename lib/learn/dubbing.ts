@@ -30,6 +30,28 @@ export function languageToUseWhenOriginalOff(
   return usable.find((l) => l.available)?.code ?? null;
 }
 
+const MENU_RANK: Record<LanguageStatus, number> = {
+  processing: 0,
+  ready: 1,
+  none: 2,
+  'original-source': 3,
+};
+
+/**
+ * Thứ tự trong menu: đang tạo, rồi giọng đã sẵn sàng, rồi chưa có, ngôn ngữ gốc ở cuối. Danh sách thật có
+ * hàng trăm ngôn ngữ (mọi giọng đang active), nên đưa những gì dùng được ngay lên đầu. Ổn định: giữ thứ tự
+ * ban đầu trong cùng nhóm; không đổi mảng gốc.
+ */
+export function sortLanguagesForMenu(
+  languages: DubLanguage[],
+  ctx: { sourceLanguage: string | null; processingCode: string | null },
+): DubLanguage[] {
+  return languages
+    .map((lang, index) => ({ lang, index, rank: MENU_RANK[languageStatus(lang, ctx)] }))
+    .sort((a, b) => a.rank - b.rank || a.index - b.index)
+    .map((entry) => entry.lang);
+}
+
 /** Bỏ dấu và hạ chữ thường, để gõ "viet" vẫn khớp "Tiếng Việt". */
 function fold(text: string): string {
   return text

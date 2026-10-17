@@ -55,6 +55,14 @@ describe('DubbingBar', () => {
     expect(within(list).getByRole('option', { name: /English/ })).toHaveTextContent('gốc');
   });
 
+  it('menu xếp giọng đã sẵn sàng lên đầu, ngôn ngữ gốc xuống cuối', () => {
+    setup({ activeCode: null });
+    openMenu();
+    const names = screen.getAllByRole('option').map((o) => o.textContent ?? '');
+    expect(names[0]).toContain('Tiếng Việt');
+    expect(names[names.length - 1]).toContain('English');
+  });
+
   it('ngôn ngữ đang tạo hiện phần trăm', () => {
     setup({ activeCode: 'ja', processing: { code: 'ja', percent: 63 } });
     openMenu();
