@@ -15,7 +15,7 @@ export function HomeHero() {
         <div className="flex flex-col items-start gap-4">
           <span className="rounded-full bg-tint px-3 py-1 text-xs font-medium text-accent-dark">{t('tag')}</span>
           <h1 className="m-0 font-display text-[32px] font-semibold leading-[1.35] text-ink sm:text-[36px]">
-            {t('titleBefore')}
+            {t('titleBefore')}{' '}
             <br />
             <mark className="inline-block whitespace-nowrap rounded-md bg-highlight px-2.5 text-ink">
               {t('titleHighlight')}
