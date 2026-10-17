@@ -1,7 +1,8 @@
-import Link from 'next/link';
-import { FeaturedCourseGrid } from '@/components/course/FeaturedCourseGrid';
+import { HomeHero } from '@/components/home/HomeHero';
+import { TrendingCourses } from '@/components/home/TrendingCourses';
 import { RankingBanner } from '@/components/ranking/RankingBanner';
 import { publicCoursesApi, EMPTY_FILTERS } from '@/lib/api/publicCourses';
+import { TRENDING_FETCH_SIZE } from '@/lib/home/trending';
 
 /**
  * Trang chủ gọi API thật (danh sách khóa nổi bật) — không có route segment động nên
@@ -12,125 +13,16 @@ import { publicCoursesApi, EMPTY_FILTERS } from '@/lib/api/publicCourses';
  */
 export const dynamic = 'force-dynamic';
 
-const CATEGORY_PILLS = [
-  { label: 'Lập trình Web' },
-  { label: 'Data Science' },
-  { label: 'Mobile App' },
-  { label: 'DevOps' },
-  { label: 'UI/UX Design' }
-];
-
-const HOW_IT_WORKS = [
-  {
-    num: '01',
-    title: 'Chọn khoá học quốc tế',
-    desc: 'Hàng ngàn khoá học từ các chuyên gia hàng đầu thế giới, không giới hạn bởi rào cản ngôn ngữ gốc.',
-  },
-  {
-    num: '02',
-    title: 'Kích hoạt lồng tiếng AI',
-    desc: 'AI tự động dịch, tạo giọng đọc tự nhiên và đồng bộ mốc thời gian hoàn hảo với video gốc.',
-  },
-  {
-    num: '03',
-    title: 'Học cùng Socratic Tutor',
-    desc: 'Không chỉ là xem video. Trợ lý ảo AI sẽ gợi mở kiến thức, giải đáp thắc mắc theo ngữ cảnh bài học.',
-  },
-];
-
+/** Trang chủ (spec mục 4): hero chia đôi, rồi "Đang thịnh hành". Banner xếp hạng cộng đồng (có sẵn)
+ * đặt cuối để không tranh chú ý với hero. */
 export default async function HomePage() {
-  const courses = await publicCoursesApi.search(EMPTY_FILTERS, 'rating', 6);
+  const courses = await publicCoursesApi.search(EMPTY_FILTERS, 'rating', TRENDING_FETCH_SIZE);
 
   return (
     <>
+      <HomeHero />
+      <TrendingCourses initialCourses={courses} />
       <RankingBanner />
-
-      {/* ── Hero chia đôi ── */}
-      <section className="shell pt-10">
-        <div className="grid items-center gap-14 lg:grid-cols-[1.05fr_0.95fr]">
-          <div className="flex flex-col gap-4">
-            <h1 className="m-0 font-display text-[32px] font-bold leading-[1.2] tracking-[-0.01em] text-ink">
-              Học lập trình từ giảng viên quốc tế, nghe bằng ngôn ngữ của bạn
-            </h1>
-            <p className="m-0 max-w-[52ch] text-[15px] leading-[1.6] text-ink-muted">
-              AI tự động lồng tiếng bài giảng nước ngoài sang tiếng Việt, đồng bộ với hình ảnh gốc — không cần đọc phụ đề.
-            </p>
-            <div className="flex items-center gap-[18px]">
-              <Link
-                href="/courses"
-                className="cursor-pointer whitespace-nowrap rounded-lg bg-accent px-[26px] py-[14px] text-[15px] font-bold text-white no-underline hover:bg-accent-dark btn-tactile shadow-sm"
-              >
-                Khám phá khóa học
-              </Link>
-              <Link
-                href="#demo"
-                className="cursor-pointer whitespace-nowrap text-[14.5px] font-semibold text-accent no-underline hover:text-accent-dark"
-              >
-                Xem demo lồng tiếng AI →
-              </Link>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2 pt-1">
-              <span className="mr-0.5 text-[13px] text-ink-faint">Danh mục:</span>
-              {CATEGORY_PILLS.map((cat, idx) => (
-                <Link
-                  key={idx}
-                  href={`/courses?category=${cat.label}`}
-                  className="cursor-pointer rounded-full border border-line bg-white px-3.5 py-1.5 text-[13px] font-semibold text-ink no-underline hover:bg-surface-hover"
-                >
-                  {cat.label}
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          <div className="relative">
-            <div className="relative rounded-card border border-line bg-white p-4 shadow-card">
-              <div className="relative flex aspect-[16/10] items-center justify-center overflow-hidden rounded-[6px] bg-[repeating-linear-gradient(135deg,#1D4ED8,#1D4ED8_14px,#2563EB_14px,#2563EB_28px)]">
-                <div className="ml-1.5 h-0 w-0 border-y-[11px] border-l-[19px] border-y-transparent border-l-white/90"></div>
-                <span className="absolute bottom-2.5 left-3 rounded-full bg-ink/50 px-2.5 py-1 font-mono text-[11px] text-white/85">
-                  video bài giảng gốc
-                </span>
-              </div>
-              <div className="flex flex-col gap-2 p-4 pb-1">
-                <div className="flex items-center justify-between rounded-md bg-surface px-3.5 py-2.5">
-                  <span className="text-[13px] text-ink-muted">Audio gốc (tiếng Anh)</span>
-                  <span className="text-[11px] font-bold text-ink-faint">TẮT</span>
-                </div>
-                <div className="flex items-center justify-between rounded-md border border-accent/30 bg-accent/5 px-3.5 py-2.5">
-                  <span className="text-[13px] font-semibold text-accent">Lồng tiếng AI · Tiếng Việt</span>
-                  <span className="h-2 w-2 animate-ai-pulse rounded-full bg-accent"></span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Khoá học nổi bật ── */}
-      <section className="shell pb-2 pt-14">
-        <div className="mb-6 flex flex-col gap-1.5">
-          <h2 className="m-0 font-display text-[21px] font-bold text-ink">Khóa học nổi bật</h2>
-          <p className="m-0 text-[14px] text-ink-muted">Mỗi khóa học đều hỗ trợ lồng tiếng AI đa ngôn ngữ.</p>
-        </div>
-
-        <FeaturedCourseGrid courses={courses} />
-      </section>
-
-      {/* ── Quy trình 3 bước ── */}
-      <section id="how-it-works" className="shell py-14">
-        <div className="grid gap-9 rounded-card bg-ink px-12 py-12 md:grid-cols-3">
-          {HOW_IT_WORKS.map((item) => (
-            <div key={item.num} className="flex flex-col gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-[6px] border border-accent/40 bg-accent/20 font-display text-base font-bold text-white">
-                {item.num}
-              </span>
-              <h3 className="m-0 font-display text-[17px] font-semibold text-white">{item.title}</h3>
-              <p className="m-0 text-sm leading-[1.55] text-white/60">{item.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
     </>
   );
 }
