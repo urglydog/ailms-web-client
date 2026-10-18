@@ -421,5 +421,64 @@
       "toastSuccess": "报名成功！",
       "toastError": "操作出错"
     }
+  },
+  "courseList": {
+    "title": "课程库",
+    "subtitle": "每门课程都可以配音成你选择的语言。",
+    "all": "全部",
+    "found": "找到 <b>{count}</b> 门课程",
+    "loading": "加载中…",
+    "loadError": "无法加载课程列表。",
+    "sort": {
+      "label": "排序",
+      "relevance": "最相关",
+      "rating": "评分最高",
+      "reviews": "评价最多",
+      "newest": "最新"
+    },
+    "view": {
+      "grid": "卡片视图",
+      "list": "列表视图"
+    },
+    "filtersToggle": "筛选",
+    "activeLabel": "当前筛选：",
+    "clearAll": "全部清除",
+    "remove": "移除筛选 {name}",
+    "empty": {
+      "title": "没有找到合适的课程",
+      "body": "试试去掉一些筛选条件或更换关键词。",
+      "clear": "清除所有筛选"
+    },
+    "card": {
+      "lessons": "{count} 节",
+      "free": "免费"
+    },
+    "level": {
+      "BEGINNER": "入门",
+      "INTERMEDIATE": "中级",
+      "ADVANCED": "高级"
+    },
+    "ratingTier": "{tier} 及以上",
+    "duration": {
+      "0-1": "1 小时以内",
+      "1-3": "1 - 3 小时",
+      "3-6": "3 - 6 小时",
+      "6-17": "6 - 17 小时",
+      "17+": "17 小时以上"
+    },
+    "filters": {
+      "aria": "课程筛选",
+      "title": "筛选",
+      "clear": "清除筛选",
+      "category": "分类",
+      "rating": "评分",
+      "duration": "视频时长",
+      "price": "价格",
+      "level": "难度",
+      "free": "免费",
+      "paid": "付费",
+      "showMore": "显示更多（{count}）",
+      "showLess": "收起"
+    }
   }
 }

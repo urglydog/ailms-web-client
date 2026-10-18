@@ -421,5 +421,64 @@
       "toastSuccess": "Signed up successfully!",
       "toastError": "Something went wrong"
     }
+  },
+  "courseList": {
+    "title": "Course catalog",
+    "subtitle": "Every course can be dubbed into the language of your choice.",
+    "all": "All",
+    "found": "<b>{count}</b> courses found",
+    "loading": "Loading…",
+    "loadError": "Could not load the course list.",
+    "sort": {
+      "label": "Sort by",
+      "relevance": "Most relevant",
+      "rating": "Highest rated",
+      "reviews": "Most reviewed",
+      "newest": "Newest"
+    },
+    "view": {
+      "grid": "Card view",
+      "list": "List view"
+    },
+    "filtersToggle": "Filters",
+    "activeLabel": "Filtering by:",
+    "clearAll": "Clear all",
+    "remove": "Remove filter {name}",
+    "empty": {
+      "title": "No matching courses",
+      "body": "Try removing some filters or using different keywords.",
+      "clear": "Clear all filters"
+    },
+    "card": {
+      "lessons": "{count} lessons",
+      "free": "Free"
+    },
+    "level": {
+      "BEGINNER": "Beginner",
+      "INTERMEDIATE": "Intermediate",
+      "ADVANCED": "Advanced"
+    },
+    "ratingTier": "{tier} & up",
+    "duration": {
+      "0-1": "Under 1 hour",
+      "1-3": "1 - 3 hours",
+      "3-6": "3 - 6 hours",
+      "6-17": "6 - 17 hours",
+      "17+": "Over 17 hours"
+    },
+    "filters": {
+      "aria": "Course filters",
+      "title": "Filters",
+      "clear": "Clear filters",
+      "category": "Category",
+      "rating": "Rating",
+      "duration": "Video duration",
+      "price": "Price",
+      "level": "Level",
+      "free": "Free",
+      "paid": "Paid",
+      "showMore": "Show more ({count})",
+      "showLess": "Show less"
+    }
   }
 }

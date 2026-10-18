@@ -421,5 +421,64 @@
       "toastSuccess": "Đăng ký thành công!",
       "toastError": "Có lỗi xảy ra khi thực hiện"
     }
+  },
+  "courseList": {
+    "title": "Kho khóa học",
+    "subtitle": "Mọi khóa học đều có thể lồng tiếng sang ngôn ngữ bạn chọn.",
+    "all": "Tất cả",
+    "found": "Tìm thấy <b>{count}</b> khóa học",
+    "loading": "Đang tải…",
+    "loadError": "Không tải được danh sách khóa học.",
+    "sort": {
+      "label": "Sắp xếp",
+      "relevance": "Phù hợp nhất",
+      "rating": "Đánh giá cao",
+      "reviews": "Đánh giá nhiều",
+      "newest": "Mới nhất"
+    },
+    "view": {
+      "grid": "Dạng thẻ",
+      "list": "Dạng danh sách"
+    },
+    "filtersToggle": "Bộ lọc",
+    "activeLabel": "Đang lọc:",
+    "clearAll": "Xóa tất cả",
+    "remove": "Bỏ lọc {name}",
+    "empty": {
+      "title": "Không tìm thấy khóa học phù hợp",
+      "body": "Thử bỏ một vài bộ lọc hoặc dùng từ khóa khác.",
+      "clear": "Xóa toàn bộ bộ lọc"
+    },
+    "card": {
+      "lessons": "{count} bài",
+      "free": "Miễn phí"
+    },
+    "level": {
+      "BEGINNER": "Cơ bản",
+      "INTERMEDIATE": "Trung cấp",
+      "ADVANCED": "Nâng cao"
+    },
+    "ratingTier": "{tier} trở lên",
+    "duration": {
+      "0-1": "Dưới 1 giờ",
+      "1-3": "1 - 3 giờ",
+      "3-6": "3 - 6 giờ",
+      "6-17": "6 - 17 giờ",
+      "17+": "Trên 17 giờ"
+    },
+    "filters": {
+      "aria": "Bộ lọc khóa học",
+      "title": "Bộ lọc",
+      "clear": "Xóa bộ lọc",
+      "category": "Danh mục",
+      "rating": "Đánh giá",
+      "duration": "Thời lượng video",
+      "price": "Học phí",
+      "level": "Trình độ",
+      "free": "Miễn phí",
+      "paid": "Trả phí",
+      "showMore": "Hiện thêm ({count})",
+      "showLess": "Hiện ít hơn"
+    }
   }
 }

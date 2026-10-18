@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useCourseFilterCounts } from '@/hooks/useCourseFilterCounts';
 import { EMPTY_FILTERS } from '@/lib/api/publicCourses';
 import type { Category, CourseFilterState } from '@/types/domain';
@@ -22,23 +23,13 @@ import type { Category, CourseFilterState } from '@/types/domain';
  * tuyệt đối, chấp nhận được ở quy mô đồ án).
  */
 
-const LEVELS = [
-  { value: 'BEGINNER', label: 'Cơ bản' },
-  { value: 'INTERMEDIATE', label: 'Trung cấp' },
-  { value: 'ADVANCED', label: 'Nâng cao' },
-] as const;
+const LEVELS = ['BEGINNER', 'INTERMEDIATE', 'ADVANCED'] as const;
 
 const RATING_TIERS = [4.5, 4.0, 3.5, 3.0] as const;
 
-const DURATION_BUCKETS = [
-  { value: '0-1', label: 'Dưới 1 giờ' },
-  { value: '1-3', label: '1 - 3 giờ' },
-  { value: '3-6', label: '3 - 6 giờ' },
-  { value: '6-17', label: '6 - 17 giờ' },
-  { value: '17+', label: 'Trên 17 giờ' },
-] as const;
+const DURATION_BUCKETS = ['0-1', '1-3', '3-6', '6-17', '17+'] as const;
 
-function durationBucketOf(totalDurationSec: number): (typeof DURATION_BUCKETS)[number]['value'] {
+function durationBucketOf(totalDurationSec: number): (typeof DURATION_BUCKETS)[number] {
   const hours = totalDurationSec / 3600;
   if (hours <= 1) return '0-1';
   if (hours <= 3) return '1-3';
@@ -54,6 +45,7 @@ interface CourseFiltersProps {
 }
 
 export function CourseFilters({ filters, onChange, categories }: CourseFiltersProps) {
+  const t = useTranslations('courseList');
   const router = useRouter();
   const { data: countingCourses } = useCourseFilterCounts(filters.keyword);
 
@@ -99,21 +91,21 @@ export function CourseFilters({ filters, onChange, categories }: CourseFiltersPr
   };
 
   return (
-    <aside className="flex flex-col divide-y divide-line-soft" aria-label="Bộ lọc khoá học">
+    <aside className="flex flex-col divide-y divide-line-soft" aria-label={t('filters.aria')}>
       <div className="flex items-center justify-between pb-4">
-        <span className="font-display text-sm font-bold text-ink">Bộ lọc</span>
+        <span className="font-display text-sm font-bold text-ink">{t('filters.title')}</span>
         {hasActiveFilter && (
           <button
             type="button"
             onClick={clearFilters}
             className="text-[13px] font-semibold text-accent underline-offset-4 hover:underline"
           >
-            Xoá bộ lọc
+            {t('filters.clear')}
           </button>
         )}
       </div>
 
-      <FilterSection title="Danh mục">
+      <FilterSection title={t('filters.category')}>
         {categories.map((cat) => (
           <CheckboxRow
             key={cat.slug}
@@ -125,7 +117,7 @@ export function CourseFilters({ filters, onChange, categories }: CourseFiltersPr
         ))}
       </FilterSection>
 
-      <FilterSection title="Đánh giá">
+      <FilterSection title={t('filters.rating')}>
         {RATING_TIERS.map((tier) => (
           <RadioRow
             key={tier}
@@ -134,46 +126,46 @@ export function CourseFilters({ filters, onChange, categories }: CourseFiltersPr
             count={counts.byRating.get(tier) ?? 0}
           >
             <StarsIcon />
-            <span className="text-ink">{tier.toFixed(1)} trở lên</span>
+            <span className="text-ink">{t('ratingTier', { tier: tier.toFixed(1) })}</span>
           </RadioRow>
         ))}
       </FilterSection>
 
-      <FilterSection title="Thời lượng video">
+      <FilterSection title={t('filters.duration')}>
         {DURATION_BUCKETS.map((bucket) => (
           <CheckboxRow
-            key={bucket.value}
-            label={bucket.label}
-            count={counts.byDuration.get(bucket.value) ?? 0}
-            checked={filters.durationBucket === bucket.value}
-            onChange={() => toggle('durationBucket', bucket.value)}
+            key={bucket}
+            label={t(`duration.${bucket}`)}
+            count={counts.byDuration.get(bucket) ?? 0}
+            checked={filters.durationBucket === bucket}
+            onChange={() => toggle('durationBucket', bucket)}
           />
         ))}
       </FilterSection>
 
-      <FilterSection title="Học phí">
+      <FilterSection title={t('filters.price')}>
         <CheckboxRow
-          label="Miễn phí"
+          label={t('filters.free')}
           count={counts.free}
           checked={filters.priceType === 'free'}
           onChange={() => onChange({ ...filters, priceType: filters.priceType === 'free' ? 'all' : 'free' })}
         />
         <CheckboxRow
-          label="Trả phí"
+          label={t('filters.paid')}
           count={counts.paid}
           checked={filters.priceType === 'paid'}
           onChange={() => onChange({ ...filters, priceType: filters.priceType === 'paid' ? 'all' : 'paid' })}
         />
       </FilterSection>
 
-      <FilterSection title="Trình độ">
+      <FilterSection title={t('filters.level')}>
         {LEVELS.map((lv) => (
           <CheckboxRow
-            key={lv.value}
-            label={lv.label}
-            count={counts.byLevel.get(lv.value) ?? 0}
-            checked={filters.level === lv.value}
-            onChange={() => toggle('level', lv.value)}
+            key={lv}
+            label={t(`level.${lv}`)}
+            count={counts.byLevel.get(lv) ?? 0}
+            checked={filters.level === lv}
+            onChange={() => toggle('level', lv)}
           />
         ))}
       </FilterSection>
@@ -183,6 +175,7 @@ export function CourseFilters({ filters, onChange, categories }: CourseFiltersPr
 
 /** Thu gọn/mở rộng + "Hiện thêm/Hiện ít hơn" khi nhiều hơn 5 lựa chọn — đúng khuôn Udemy. */
 function FilterSection({ title, children }: { title: string; children: React.ReactNode }) {
+  const t = useTranslations('courseList.filters');
   const [collapsed, setCollapsed] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const items = Array.isArray(children) ? children : [children];
@@ -212,7 +205,7 @@ function FilterSection({ title, children }: { title: string; children: React.Rea
               onClick={() => setExpanded((e) => !e)}
               className="mt-1 w-fit text-[13px] font-semibold text-accent underline-offset-4 hover:underline"
             >
-              {expanded ? 'Hiện ít hơn' : `Hiện thêm (${items.length - SHOW_LIMIT})`}
+              {expanded ? t('showLess') : t('showMore', { count: items.length - SHOW_LIMIT })}
             </button>
           )}
         </div>
@@ -243,7 +236,7 @@ function CheckboxRow({
       </span>
       <input type="checkbox" checked={checked} onChange={onChange} className="sr-only" />
       <span className="text-ink">{label}</span>
-      <span className="text-ink-faint">({count.toLocaleString('vi-VN')})</span>
+      <span className="text-ink-muted">({count})</span>
     </label>
   );
 }
@@ -266,7 +259,7 @@ function RadioRow({
       </span>
       <input type="radio" checked={checked} onChange={onChange} className="sr-only" />
       <span className="flex items-center gap-1.5">{children}</span>
-      <span className="text-ink-faint">({count.toLocaleString('vi-VN')})</span>
+      <span className="text-ink-muted">({count})</span>
     </label>
   );
 }
