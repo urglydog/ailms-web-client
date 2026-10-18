@@ -707,6 +707,74 @@
       "logoutBody": "Are you sure you want to sign out?",
       "cancel": "Cancel",
       "confirm": "Sign out"
+    },
+    "courses": {
+      "title": "My courses",
+      "subtitle": "Manage, complete and track the status of your courses.",
+      "loading": "Loading...",
+      "loadError": "Could not load your courses.",
+      "search": "Search your courses...",
+      "searchLabel": "Search",
+      "sort": {
+        "label": "Sort by",
+        "newest": "Newest",
+        "oldest": "Oldest",
+        "az": "A-Z",
+        "za": "Z-A"
+      },
+      "status": {
+        "ALL": "All",
+        "DRAFT": "Draft",
+        "PENDING": "In review",
+        "PUBLISHED": "Published",
+        "REJECTED": "Rejected",
+        "ARCHIVED": "Archived"
+      },
+      "stats": {
+        "total": "Total courses",
+        "published": "Published",
+        "pending": "In review",
+        "attention": "Needs attention"
+      },
+      "row": {
+        "lessons": "{count} lessons",
+        "completion": "Course completion",
+        "edit": "Edit",
+        "remove": "Remove",
+        "select": "Select {title}",
+        "selectAll": "Select all",
+        "columns": {
+          "course": "Course",
+          "status": "Status",
+          "progress": "Completion",
+          "next": "Next step"
+        }
+      },
+      "next": {
+        "complete": "Finish the course",
+        "submit": "Submit for review",
+        "fixRejected": "See the reason and edit",
+        "reactivate": "Reactivate",
+        "waiting": "Waiting for admin review",
+        "live": "Open to learners"
+      },
+      "bulk": {
+        "remove": "Remove selected ({count})",
+        "selected": "{count} courses selected"
+      },
+      "confirm": {
+        "title": "Remove course",
+        "message": "Are you sure you want to remove {label}? New learners will no longer find or sign up for it, but learners already signed up keep access.",
+        "confirm": "Remove",
+        "cancel": "Cancel",
+        "many": "{count} selected courses"
+      },
+      "empty": {
+        "filtered": "No courses with this status yet.",
+        "noneTitle": "You have no courses yet",
+        "noneBody": "Create your first course, add videos and let AI dub them into many languages.",
+        "noneCta": "Create a course"
+      }
     }
   }
 }

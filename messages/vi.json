@@ -707,6 +707,74 @@
       "logoutBody": "Bạn có chắc chắn muốn đăng xuất khỏi hệ thống không?",
       "cancel": "Hủy",
       "confirm": "Đăng xuất"
+    },
+    "courses": {
+      "title": "Khóa học của tôi",
+      "subtitle": "Quản lý, hoàn thiện và theo dõi trạng thái các khóa học của bạn.",
+      "loading": "Đang tải...",
+      "loadError": "Không tải được danh sách khóa học.",
+      "search": "Tìm khóa học của bạn...",
+      "searchLabel": "Tìm kiếm",
+      "sort": {
+        "label": "Sắp xếp",
+        "newest": "Mới nhất",
+        "oldest": "Cũ nhất",
+        "az": "A-Z",
+        "za": "Z-A"
+      },
+      "status": {
+        "ALL": "Tất cả",
+        "DRAFT": "Nháp",
+        "PENDING": "Chờ duyệt",
+        "PUBLISHED": "Đã xuất bản",
+        "REJECTED": "Bị từ chối",
+        "ARCHIVED": "Đã lưu trữ"
+      },
+      "stats": {
+        "total": "Tổng số khóa",
+        "published": "Đã xuất bản",
+        "pending": "Chờ duyệt",
+        "attention": "Cần xử lý"
+      },
+      "row": {
+        "lessons": "{count} bài",
+        "completion": "Hoàn thành khóa học",
+        "edit": "Chỉnh sửa",
+        "remove": "Gỡ bỏ",
+        "select": "Chọn {title}",
+        "selectAll": "Chọn tất cả",
+        "columns": {
+          "course": "Khóa học",
+          "status": "Trạng thái",
+          "progress": "Hoàn thiện",
+          "next": "Việc tiếp theo"
+        }
+      },
+      "next": {
+        "complete": "Hoàn thiện khóa học",
+        "submit": "Gửi duyệt",
+        "fixRejected": "Xem lý do và chỉnh sửa",
+        "reactivate": "Kích hoạt lại",
+        "waiting": "Đang chờ quản trị viên duyệt",
+        "live": "Đang mở cho học viên"
+      },
+      "bulk": {
+        "remove": "Gỡ bỏ đã chọn ({count})",
+        "selected": "{count} khóa đã chọn"
+      },
+      "confirm": {
+        "title": "Gỡ bỏ khóa học",
+        "message": "Bạn có chắc chắn muốn gỡ bỏ {label}? Học viên mới sẽ không tìm và đăng ký được nữa, nhưng học viên đã đăng ký vẫn giữ quyền truy cập.",
+        "confirm": "Gỡ bỏ",
+        "cancel": "Hủy",
+        "many": "{count} khóa học đã chọn"
+      },
+      "empty": {
+        "filtered": "Chưa có khóa học nào ở trạng thái này.",
+        "noneTitle": "Bạn chưa có khóa học nào",
+        "noneBody": "Tạo khóa học đầu tiên, thêm video và để AI lồng tiếng sang nhiều ngôn ngữ.",
+        "noneCta": "Tạo khóa học"
+      }
     }
   }
 }
