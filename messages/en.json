@@ -1607,6 +1607,237 @@
       "empty": "No jobs.",
       "retry": "Retry",
       "retryError": "Could not retry this job."
+    },
+    "payments": {
+      "title": "Payment reconciliation",
+      "subtitle": "Manage and reconcile course purchase transactions on the platform.",
+      "refresh": "Refresh data",
+      "loadError": "Could not load the transaction history",
+      "empty": "There are no transactions yet.",
+      "noMatch": "No transactions match the filters.",
+      "status": {
+        "PAID": "Paid",
+        "PENDING": "Pending",
+        "FAILED": "Failed",
+        "EXPIRED": "Expired"
+      },
+      "source": {
+        "referral": "Referral",
+        "organic": "Organic"
+      },
+      "filters": {
+        "email": "Search by email",
+        "emailPh": "Enter learner email...",
+        "date": "Filter by date",
+        "status": "Status",
+        "all": "All statuses"
+      },
+      "cols": {
+        "ref": "Transaction ID",
+        "user": "User",
+        "amount": "Amount",
+        "fee": "Platform fee",
+        "net": "Net earnings",
+        "source": "Source",
+        "method": "Method",
+        "status": "Status",
+        "time": "Time",
+        "actions": "Actions"
+      },
+      "details": "Details",
+      "pager": {
+        "aria": "Transaction pagination",
+        "showing": "Showing {shown} of {total} transactions",
+        "prev": "Previous",
+        "next": "Next",
+        "page": "Page {page} of {total}"
+      },
+      "detail": {
+        "title": "Transaction details",
+        "close": "Close",
+        "course": "Course",
+        "account": "Purchasing account",
+        "billingName": "Billing name",
+        "phone": "Phone number",
+        "none": "None",
+        "source": "Revenue source",
+        "sourceReferral": "Instructor’s own referral link",
+        "sourceOrganic": "Found by the learner on the platform",
+        "fee": "Platform fee ({percent}%)",
+        "earning": "Instructor receives ({percent}%)",
+        "coupon": "Coupon used",
+        "couponMath": "Original {original} − Discount {discount}",
+        "method": "Payment method",
+        "status": "Status",
+        "failReason": "Failure reason",
+        "failText": "Cancelled by the payment gateway or by the user.",
+        "ref": "Reference code",
+        "gateway": "Gateway code",
+        "notYet": "Not yet",
+        "refund": "Refund",
+        "refundSoon": "Refunds are still under development.",
+        "dispute": "Handle dispute",
+        "disputeMarked": "Report marked as handled!"
+      }
+    },
+    "settings": {
+      "title": "System settings",
+      "subtitle": "Read-only information about the AI Worker, business quotas and server resources.",
+      "worker": {
+        "title": "AI Worker",
+        "up": "Running",
+        "down": "Cannot connect",
+        "gemini": "Gemini model (LLM)",
+        "geminiDesc": "BR-DUB-02: not hardcoded — read from the GEMINI_MODEL env variable",
+        "asr": "ASR backend (speech-to-text)",
+        "asrDesc": "groq = Groq Cloud API · whisperx_local = local GPU",
+        "chunk": "Chunk length (BR-CHUNK-02)",
+        "minutes": "{count} min",
+        "chunkDesc": "Videos are split into fixed chunks for parallel processing",
+        "url": "AI Worker URL",
+        "urlDesc": "Internal address of the FastAPI service"
+      },
+      "quotas": {
+        "title": "Business quotas",
+        "dubStudent": "Dubbing / learner / day",
+        "dubStudentUnit": "{count} requests",
+        "dubInstructor": "Dubbing / instructor / day",
+        "dubInstructorUnit": "{count} requests",
+        "materials": "Generated materials / day",
+        "materialsUnit": "{count} requests",
+        "tutor": "AI Tutor messages / day",
+        "tutorUnit": "{count} messages",
+        "guestSearch": "AI search (guest) / hour",
+        "guestSearchUnit": "{count} requests"
+      },
+      "resources": {
+        "title": "Backend resources",
+        "ram": "JVM RAM",
+        "disk": "Server disk",
+        "uptime": "Backend uptime",
+        "courses": "Total courses",
+        "users": "Total users"
+      },
+      "env": {
+        "title": "Environment"
+      }
+    },
+    "categories": {
+      "title": "Category management",
+      "subtitle": "Add, rename or delete course categories.",
+      "newPh": "New category name...",
+      "newLabel": "New category name",
+      "add": "Add category",
+      "error": "Something went wrong",
+      "deleteError": "Could not delete this category.",
+      "cols": {
+        "name": "Category name",
+        "slug": "Slug",
+        "actions": "Actions"
+      },
+      "loading": "Loading...",
+      "empty": "No categories yet.",
+      "nameLabel": "Category name",
+      "delete": "Delete",
+      "confirm": {
+        "title": "Delete this category?",
+        "body": "The category \"{name}\" will be deleted. The system will refuse if courses still belong to it.",
+        "cancel": "Cancel"
+      }
+    },
+    "reviews": {
+      "title": "Review moderation",
+      "subtitle": "Hide reviews that break the rules and handle reports from instructors.",
+      "coursePh": "Course name...",
+      "instructorPh": "Instructor email...",
+      "statusLabel": "Status",
+      "statusOpt": {
+        "ALL": "All statuses",
+        "VISIBLE": "Visible",
+        "HIDDEN": "Hidden",
+        "PENDING_REPORT": "Pending (reported by instructor)"
+      },
+      "cols": {
+        "course": "Course",
+        "student": "Learner",
+        "stars": "Stars",
+        "comment": "Comment",
+        "date": "Date",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "loading": "Loading...",
+      "empty": "No reviews yet.",
+      "noComment": "(no comment)",
+      "badge": {
+        "pending": "Report pending",
+        "hidden": "Hidden",
+        "visible": "Visible"
+      },
+      "reason": "Reason: {reason}",
+      "unhide": "Show again",
+      "hide": "Hide",
+      "keepHidden": "Keep hidden",
+      "rejectReportTip": "Reject the report and show the review again",
+      "confirmReportTip": "Confirm the report and keep it hidden",
+      "hideError": "Could not hide this review.",
+      "unhideError": "Could not unhide this review.",
+      "starsLabel": "{count} out of 5 stars",
+      "pager": {
+        "aria": "Review pagination",
+        "prev": "Previous page",
+        "next": "Next page",
+        "page": "Page {page} of {total}"
+      }
+    },
+    "announce": {
+      "title": "System announcements",
+      "subtitle": "Send announcements to everyone, instructors only, learners only, or one person. Sending runs in the background, so it can take seconds to minutes to reach every recipient.",
+      "severity": {
+        "HIGH": "High — shown as a banner at the top (e.g. maintenance)",
+        "MEDIUM": "Medium — notification bell only",
+        "LOW": "Low — notification bell only"
+      },
+      "audience": {
+        "ALL": "Everyone",
+        "INSTRUCTOR": "Instructors only",
+        "STUDENT": "Learners only",
+        "SPECIFIC_USER": "One specific person (by ID)"
+      },
+      "dispatch": {
+        "PENDING": "Pending",
+        "PROCESSING": "Sending...",
+        "DONE": "Sent",
+        "FAILED": "Failed"
+      },
+      "form": {
+        "title": "Title",
+        "titlePh": "E.g. System maintenance",
+        "severity": "Severity",
+        "content": "Content",
+        "audience": "Audience",
+        "userId": "User ID (see the Users page)",
+        "expires": "Hide the banner after (leave blank = show until a newer High announcement)",
+        "sending": "Sending...",
+        "send": "Send announcement",
+        "error": "Something went wrong, please try again."
+      },
+      "cols": {
+        "title": "Title",
+        "severity": "Severity",
+        "audience": "Audience",
+        "status": "Status",
+        "sent": "Sent",
+        "created": "Created"
+      },
+      "loading": "Loading...",
+      "empty": "No announcements sent yet.",
+      "user": "User #{id}",
+      "sevLabel": {
+        "HIGH": "High",
+        "MEDIUM": "Medium",
+        "LOW": "Low"
+      }
     }
   }
 }

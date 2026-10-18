@@ -1607,6 +1607,237 @@
       "empty": "ジョブはありません。",
       "retry": "再試行",
       "retryError": "このジョブを再試行できませんでした。"
+    },
+    "payments": {
+      "title": "支払いの照合",
+      "subtitle": "プラットフォーム上の講座購入取引を管理・照合します。",
+      "refresh": "データを更新",
+      "loadError": "取引履歴を読み込めませんでした",
+      "empty": "取引はまだありません。",
+      "noMatch": "条件に一致する取引がありません。",
+      "status": {
+        "PAID": "成功",
+        "PENDING": "処理待ち",
+        "FAILED": "失敗",
+        "EXPIRED": "期限切れ"
+      },
+      "source": {
+        "referral": "紹介",
+        "organic": "自然流入"
+      },
+      "filters": {
+        "email": "メールで検索",
+        "emailPh": "受講生のメールを入力...",
+        "date": "日付で絞り込み",
+        "status": "状態",
+        "all": "すべての状態"
+      },
+      "cols": {
+        "ref": "取引 ID",
+        "user": "ユーザー",
+        "amount": "金額",
+        "fee": "プラットフォーム手数料",
+        "net": "実収益",
+        "source": "流入元",
+        "method": "方法",
+        "status": "状態",
+        "time": "日時",
+        "actions": "操作"
+      },
+      "details": "詳細",
+      "pager": {
+        "aria": "取引のページ送り",
+        "showing": "{total} 件中 {shown} 件を表示",
+        "prev": "前へ",
+        "next": "次へ",
+        "page": "{page} / {total} ページ"
+      },
+      "detail": {
+        "title": "取引の詳細",
+        "close": "閉じる",
+        "course": "講座",
+        "account": "購入アカウント",
+        "billingName": "支払者名",
+        "phone": "電話番号",
+        "none": "なし",
+        "source": "収益の流入元",
+        "sourceReferral": "講師専用の紹介リンク",
+        "sourceOrganic": "受講生がプラットフォームで自分で見つけた",
+        "fee": "プラットフォーム手数料（{percent}%）",
+        "earning": "講師の受取額（{percent}%）",
+        "coupon": "使用したクーポン",
+        "couponMath": "定価 {original} − 割引 {discount}",
+        "method": "支払い方法",
+        "status": "状態",
+        "failReason": "失敗の理由",
+        "failText": "決済ゲートウェイまたはユーザーによりキャンセルされました。",
+        "ref": "参照コード",
+        "gateway": "ゲートウェイのコード",
+        "notYet": "まだありません",
+        "refund": "返金",
+        "refundSoon": "返金機能は開発中です。",
+        "dispute": "問い合わせ対応",
+        "disputeMarked": "対応済みとして記録しました！"
+      }
+    },
+    "settings": {
+      "title": "システム設定",
+      "subtitle": "AI Worker、業務上の上限、サーバーリソースの閲覧専用情報です。",
+      "worker": {
+        "title": "AI Worker",
+        "up": "稼働中",
+        "down": "接続できません",
+        "gemini": "Gemini モデル（LLM）",
+        "geminiDesc": "BR-DUB-02：ハードコードせず、環境変数 GEMINI_MODEL から取得",
+        "asr": "ASR バックエンド（音声認識）",
+        "asrDesc": "groq = Groq Cloud API · whisperx_local = ローカル GPU",
+        "chunk": "チャンクの長さ（BR-CHUNK-02）",
+        "minutes": "{count} 分",
+        "chunkDesc": "動画を固定のチャンクに分けて並列処理します",
+        "url": "AI Worker URL",
+        "urlDesc": "FastAPI サービスとの内部通信用アドレス"
+      },
+      "quotas": {
+        "title": "業務上の上限",
+        "dubStudent": "吹き替え / 受講生 / 日",
+        "dubStudentUnit": "{count} 回",
+        "dubInstructor": "吹き替え / 講師 / 日",
+        "dubInstructorUnit": "{count} 回",
+        "materials": "教材の生成 / 日",
+        "materialsUnit": "{count} 回",
+        "tutor": "AI チューターのメッセージ / 日",
+        "tutorUnit": "{count} 件",
+        "guestSearch": "AI 検索（ゲスト）/ 時間",
+        "guestSearchUnit": "{count} 回"
+      },
+      "resources": {
+        "title": "バックエンドのリソース",
+        "ram": "JVM メモリ",
+        "disk": "サーバーのディスク",
+        "uptime": "バックエンドの稼働時間",
+        "courses": "講座総数",
+        "users": "ユーザー総数"
+      },
+      "env": {
+        "title": "環境"
+      }
+    },
+    "categories": {
+      "title": "カテゴリ管理",
+      "subtitle": "講座カテゴリの追加、名前の変更、削除ができます。",
+      "newPh": "新しいカテゴリ名...",
+      "newLabel": "新しいカテゴリ名",
+      "add": "カテゴリを追加",
+      "error": "エラーが発生しました",
+      "deleteError": "このカテゴリを削除できませんでした。",
+      "cols": {
+        "name": "カテゴリ名",
+        "slug": "スラッグ",
+        "actions": "操作"
+      },
+      "loading": "読み込み中...",
+      "empty": "カテゴリはまだありません。",
+      "nameLabel": "カテゴリ名",
+      "delete": "削除",
+      "confirm": {
+        "title": "このカテゴリを削除しますか？",
+        "body": "カテゴリ「{name}」を削除します。まだ講座が属している場合は拒否されます。",
+        "cancel": "キャンセル"
+      }
+    },
+    "reviews": {
+      "title": "レビューの審査",
+      "subtitle": "違反レビューを非表示にし、講師からの報告に対応します。",
+      "coursePh": "講座名...",
+      "instructorPh": "講師のメール...",
+      "statusLabel": "状態",
+      "statusOpt": {
+        "ALL": "すべての状態",
+        "VISIBLE": "表示中",
+        "HIDDEN": "非表示",
+        "PENDING_REPORT": "対応待ち（講師の報告）"
+      },
+      "cols": {
+        "course": "講座",
+        "student": "受講生",
+        "stars": "評価",
+        "comment": "コメント",
+        "date": "日付",
+        "status": "状態",
+        "actions": "操作"
+      },
+      "loading": "読み込み中...",
+      "empty": "レビューはまだありません。",
+      "noComment": "（コメントなし）",
+      "badge": {
+        "pending": "報告の対応待ち",
+        "hidden": "非表示",
+        "visible": "表示中"
+      },
+      "reason": "理由：{reason}",
+      "unhide": "再表示",
+      "hide": "非表示にする",
+      "keepHidden": "非表示のまま",
+      "rejectReportTip": "報告を却下してレビューを再表示",
+      "confirmReportTip": "報告を承認して非表示のままにする",
+      "hideError": "このレビューを非表示にできませんでした。",
+      "unhideError": "このレビューの非表示を解除できませんでした。",
+      "starsLabel": "5 つ星中 {count}",
+      "pager": {
+        "aria": "レビューのページ送り",
+        "prev": "前のページ",
+        "next": "次のページ",
+        "page": "{page} / {total} ページ"
+      }
+    },
+    "announce": {
+      "title": "システムのお知らせ",
+      "subtitle": "全員、講師のみ、受講生のみ、または特定の 1 人にお知らせを送ります。送信はバックグラウンドで行われ、全員に届くまで数秒から数分かかることがあります。",
+      "severity": {
+        "HIGH": "高 — ページ上部のバナーとして表示（例：メンテナンス）",
+        "MEDIUM": "中 — 通知ベルのみ",
+        "LOW": "低 — 通知ベルのみ"
+      },
+      "audience": {
+        "ALL": "全員",
+        "INSTRUCTOR": "講師のみ",
+        "STUDENT": "受講生のみ",
+        "SPECIFIC_USER": "特定の 1 人（ID 指定）"
+      },
+      "dispatch": {
+        "PENDING": "待機中",
+        "PROCESSING": "送信中...",
+        "DONE": "送信済み",
+        "FAILED": "失敗"
+      },
+      "form": {
+        "title": "タイトル",
+        "titlePh": "例：システムメンテナンス",
+        "severity": "重要度",
+        "content": "内容",
+        "audience": "送信先",
+        "userId": "ユーザー ID（ユーザー画面で確認）",
+        "expires": "バナーを自動で隠す日時（空欄 = より新しい高重要度のお知らせが出るまで表示）",
+        "sending": "送信中...",
+        "send": "お知らせを送信",
+        "error": "エラーが発生しました。もう一度お試しください。"
+      },
+      "cols": {
+        "title": "タイトル",
+        "severity": "重要度",
+        "audience": "送信先",
+        "status": "状態",
+        "sent": "送信数",
+        "created": "作成日"
+      },
+      "loading": "読み込み中...",
+      "empty": "お知らせはまだ送信されていません。",
+      "user": "ユーザー #{id}",
+      "sevLabel": {
+        "HIGH": "高",
+        "MEDIUM": "中",
+        "LOW": "低"
+      }
     }
   }
 }

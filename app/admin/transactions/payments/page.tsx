@@ -1,9 +1,15 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
-import { format, isSameDay } from 'date-fns';
-import { paymentsApi } from '@/lib/api/payments';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { isSameDay } from 'date-fns';
+import { ArrowDown, ArrowUp, ArrowUpDown, RefreshCw, X } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
 import { toast } from 'sonner';
+import { PageHeader } from '@/components/instructor/ui/PageHeader';
+import { Skeleton } from '@/components/ui/Skeleton';
+import { paginate, type SortOrder } from '@/lib/admin/users';
+import { paymentsApi } from '@/lib/api/payments';
+import { formatMoney } from '@/lib/shop/money';
 
 export interface AdminPayment {
   txnRef: string;
@@ -26,269 +32,213 @@ export interface AdminPayment {
   revenueSource: 'ORGANIC' | 'INSTRUCTOR_REFERRAL';
 }
 
-type SortField = 'txnRef' | 'userEmail' | 'amount' | 'paidAt';
-type SortOrder = 'asc' | 'desc';
+type SortField = 'txnRef' | 'userEmail' | 'amount' | 'paymentMethod' | 'paidAt';
 
+const STATUSES = ['PAID', 'PENDING', 'FAILED', 'EXPIRED'] as const;
+const STATUS_CLASS: Record<string, string> = {
+  PAID: 'bg-success-tint text-success-ink border-success/30',
+  PENDING: 'bg-white text-ink border-warning',
+  FAILED: 'bg-white text-danger border-danger/40',
+  EXPIRED: 'bg-line-soft text-ink-muted border-line',
+};
+const PAGE_SIZE = 10;
+
+/** Đối soát thanh toán: lọc theo email/ngày/trạng thái, bảng sắp xếp được, phân trang và hộp chi tiết giao dịch. */
 export default function AdminPaymentsPage() {
+  const t = useTranslations('admin.payments');
+  const locale = useLocale();
+  const money = (n: number) => formatMoney(n, locale);
   const [payments, setPayments] = useState<AdminPayment[]>([]);
   const [loading, setLoading] = useState(true);
-  
-  // Filters
+
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
   const [searchEmail, setSearchEmail] = useState('');
   const [searchDate, setSearchDate] = useState('');
-  
-  // Sort
   const [sortField, setSortField] = useState<SortField>('paidAt');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
-  
-  // Pagination
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
-  
-  // Modal
   const [selectedPayment, setSelectedPayment] = useState<AdminPayment | null>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
 
-  useEffect(() => {
-    fetchPayments();
-  }, []);
-  
   const fetchPayments = () => {
     setLoading(true);
     paymentsApi
       .listAllAdmin()
       .then((data) => setPayments(data as unknown as AdminPayment[]))
-      .catch(() => toast.error('Lỗi khi tải lịch sử giao dịch'))
+      .catch(() => toast.error(t('loadError')))
       .finally(() => setLoading(false));
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'PAID':
-        return 'bg-success/10 text-success border-success/20';
-      case 'PENDING':
-        return 'bg-warning/10 text-ink border-warning/40';
-      case 'FAILED':
-        return 'bg-danger/10 text-danger border-danger/20';
-      case 'EXPIRED':
-        return 'bg-ink-muted/10 text-ink-muted border-line';
-      default:
-        return 'bg-line text-ink border-line';
-    }
-  };
+  useEffect(() => {
+    fetchPayments();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- chỉ tải một lần khi vào trang
+  }, []);
 
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case 'PAID': return 'Thành công';
-      case 'PENDING': return 'Đang chờ xử lý';
-      case 'FAILED': return 'Thất bại';
-      case 'EXPIRED': return 'Hết hạn';
-      default: return status;
-    }
-  };
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [statusFilter, searchEmail, searchDate]);
+
+  // Hộp chi tiết: Escape để đóng, tiêu điểm vào nút Đóng, trả tiêu điểm về nút đã mở.
+  useEffect(() => {
+    if (!selectedPayment) return;
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    closeRef.current?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setSelectedPayment(null);
+    };
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      previouslyFocused?.focus?.();
+    };
+  }, [selectedPayment]);
+
+  const statusLabel = (status: string) => (STATUSES.includes(status as (typeof STATUSES)[number]) ? t(`status.${status}`) : status);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+      setSortOrder((o) => (o === 'asc' ? 'desc' : 'asc'));
     } else {
       setSortField(field);
       setSortOrder('asc');
     }
   };
 
-  const SortIcon = ({ field }: { field: SortField }) => {
-    if (sortField !== field) return <span className="opacity-30 ml-1">↕</span>;
-    return <span className="ml-1">{sortOrder === 'asc' ? '↑' : '↓'}</span>;
-  };
-
-  // Lọc dữ liệu
-  const filteredPayments = useMemo(() => {
+  const filtered = useMemo(() => {
     let result = [...payments];
-    
-    // Status
-    if (statusFilter !== 'ALL') {
-      result = result.filter(p => p.status === statusFilter);
-    }
-    
-    // Email
+    if (statusFilter !== 'ALL') result = result.filter((p) => p.status === statusFilter);
     if (searchEmail.trim()) {
-      const lowerSearch = searchEmail.toLowerCase();
-      result = result.filter(p => p.userEmail?.toLowerCase().includes(lowerSearch));
+      const q = searchEmail.toLowerCase();
+      result = result.filter((p) => p.userEmail?.toLowerCase().includes(q));
     }
-    
-    // Date
     if (searchDate) {
-      const targetDate = new Date(searchDate);
-      result = result.filter(p => {
-        if (!p.paidAt) return false;
-        const pDate = new Date(p.paidAt);
-        return isSameDay(pDate, targetDate);
-      });
+      const target = new Date(searchDate);
+      result = result.filter((p) => p.paidAt && isSameDay(new Date(p.paidAt), target));
     }
-    
-    // Sắp xếp
-    result.sort((a, b) => {
-      let valA: string | number = a[sortField] || 0;
-      let valB: string | number = b[sortField] || 0;
-      
-      if (sortField === 'paidAt') {
-        valA = a.paidAt ? new Date(a.paidAt).getTime() : 0;
-        valB = b.paidAt ? new Date(b.paidAt).getTime() : 0;
-      }
-      
-      if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
-      if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
-      return 0;
+    const dir = sortOrder === 'asc' ? 1 : -1;
+    return result.sort((a, b) => {
+      const value = (p: AdminPayment): string | number =>
+        sortField === 'paidAt' ? (p.paidAt ? new Date(p.paidAt).getTime() : 0) : (p[sortField] ?? 0);
+      const va = value(a);
+      const vb = value(b);
+      return va < vb ? -dir : va > vb ? dir : 0;
     });
-    
-    return result;
   }, [payments, statusFilter, searchEmail, searchDate, sortField, sortOrder]);
 
-  // Phân trang
-  const totalPages = Math.ceil(filteredPayments.length / itemsPerPage);
-  const paginatedPayments = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    return filteredPayments.slice(startIndex, startIndex + itemsPerPage);
-  }, [filteredPayments, currentPage]);
+  const paged = paginate(filtered, currentPage, PAGE_SIZE);
+  const dateTime = (iso: string) => new Date(iso).toLocaleString(locale, { dateStyle: 'short', timeStyle: 'short' });
 
-  // Reset page when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [statusFilter, searchEmail, searchDate]);
+  const SortHeader = ({ field, label }: { field: SortField; label: string }) => {
+    const Icon = sortField !== field ? ArrowUpDown : sortOrder === 'asc' ? ArrowUp : ArrowDown;
+    return (
+      <th scope="col" aria-sort={sortField !== field ? 'none' : sortOrder === 'asc' ? 'ascending' : 'descending'} className="px-4 py-3 font-semibold">
+        <button type="button" onClick={() => handleSort(field)} className="inline-flex items-center gap-1.5 whitespace-nowrap font-semibold text-ink-muted hover:text-ink">
+          {label}
+          <Icon size={13} aria-hidden className={sortField === field ? 'text-accent' : 'opacity-50'} />
+        </button>
+      </th>
+    );
+  };
+
+  const field = 'w-full rounded-lg border border-line bg-white p-2.5 text-sm text-ink outline-none focus:border-accent';
+  const labelCls = 'text-xs font-semibold text-ink-muted';
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex justify-between items-end">
-        <div>
-          <h1 className="font-display text-2xl font-bold text-ink">Đối soát thanh toán</h1>
-          <p className="mt-1 text-sm text-ink-muted">
-            Quản lý và đối soát các giao dịch mua khóa học trên hệ thống.
-          </p>
-        </div>
-        <button 
-          onClick={fetchPayments}
-          className="px-4 py-2 bg-surface-raised border border-line rounded-lg text-sm font-semibold hover:bg-line/50 transition-colors"
-        >
-          Làm mới dữ liệu
-        </button>
-      </div>
-      
-      {/* Bộ lọc */}
-      <div className="card p-4 flex flex-wrap gap-4 items-center">
-        <div className="flex flex-col gap-1.5 w-full sm:w-64">
-          <label className="text-xs font-semibold text-ink-muted uppercase">Tìm theo Email</label>
-          <input 
-            type="text" 
-            placeholder="Nhập email học viên..." 
-            className="w-full rounded-lg border border-line bg-surface p-2.5 text-sm outline-none focus:border-cyan-500"
-            value={searchEmail}
-            onChange={(e) => setSearchEmail(e.target.value)}
-          />
-        </div>
-        <div className="flex flex-col gap-1.5 w-full sm:w-48">
-          <label className="text-xs font-semibold text-ink-muted uppercase">Lọc theo ngày</label>
-          <input 
-            type="date" 
-            className="w-full rounded-lg border border-line bg-surface p-2.5 text-sm outline-none focus:border-cyan-500 text-ink"
-            value={searchDate}
-            onChange={(e) => setSearchDate(e.target.value)}
-          />
-        </div>
-        <div className="flex flex-col gap-1.5 w-full sm:w-48">
-          <label className="text-xs font-semibold text-ink-muted uppercase">Trạng thái</label>
-          <select 
-            className="w-full rounded-lg border border-line bg-surface p-2.5 text-sm outline-none focus:border-cyan-500 text-ink"
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-          >
-            <option value="ALL">Tất cả trạng thái</option>
-            <option value="PAID">Thành công</option>
-            <option value="PENDING">Đang chờ xử lý</option>
-            <option value="FAILED">Thất bại</option>
-            <option value="EXPIRED">Hết hạn</option>
+    <>
+      <PageHeader
+        title={t('title')}
+        subtitle={t('subtitle')}
+        action={
+          <button type="button" onClick={fetchPayments} className="inline-flex items-center gap-1.5 rounded-lg border border-line bg-white px-4 py-2 text-sm font-semibold text-ink hover:bg-tint">
+            <RefreshCw size={14} aria-hidden />
+            {t('refresh')}
+          </button>
+        }
+      />
+
+      <div className="flex flex-wrap items-end gap-4 rounded-xl border border-line bg-white p-4">
+        <label className="flex w-full flex-col gap-1.5 sm:w-64">
+          <span className={labelCls}>{t('filters.email')}</span>
+          <input type="search" placeholder={t('filters.emailPh')} className={field} value={searchEmail} onChange={(e) => setSearchEmail(e.target.value)} />
+        </label>
+        <label className="flex w-full flex-col gap-1.5 sm:w-48">
+          <span className={labelCls}>{t('filters.date')}</span>
+          <input type="date" className={field} value={searchDate} onChange={(e) => setSearchDate(e.target.value)} />
+        </label>
+        <label className="flex w-full flex-col gap-1.5 sm:w-48">
+          <span className={labelCls}>{t('filters.status')}</span>
+          <select className={field} value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+            <option value="ALL">{t('filters.all')}</option>
+            {STATUSES.map((s) => (
+              <option key={s} value={s}>
+                {t(`status.${s}`)}
+              </option>
+            ))}
           </select>
-        </div>
+        </label>
       </div>
-      
+
       {loading ? (
-        <div className="text-ink-muted">Đang tải dữ liệu...</div>
-      ) : payments.length === 0 ? (
-        <div className="card p-8 text-center text-ink-muted border border-line">
-          Chưa có giao dịch nào trên hệ thống.
+        <div className="flex flex-col gap-2 rounded-xl border border-line bg-white p-4">
+          {Array.from({ length: 5 }, (_, i) => (
+            <Skeleton key={i} className="h-11" />
+          ))}
         </div>
+      ) : payments.length === 0 ? (
+        <div className="rounded-xl border border-line bg-white p-8 text-center text-ink-muted">{t('empty')}</div>
       ) : (
         <div className="flex flex-col gap-4">
-          <div className="overflow-x-auto card border border-line rounded-xl">
-            <table className="w-full text-left text-sm text-ink-muted">
-              <thead className="bg-surface-raised text-xs uppercase text-ink border-b border-line">
+          <div className="overflow-x-auto rounded-xl border border-line bg-white shadow-sm">
+            <table className="w-full min-w-[980px] text-left text-sm">
+              <thead className="border-b border-line bg-surface text-xs text-ink-muted">
                 <tr>
-                  <th className="px-6 py-4 cursor-pointer hover:bg-line/30" onClick={() => handleSort('txnRef')}>
-                    Mã giao dịch <SortIcon field="txnRef" />
-                  </th>
-                  <th className="px-6 py-4 cursor-pointer hover:bg-line/30" onClick={() => handleSort('userEmail')}>
-                    Người dùng <SortIcon field="userEmail" />
-                  </th>
-                  <th className="px-6 py-4 cursor-pointer hover:bg-line/30" onClick={() => handleSort('amount')}>
-                    Số tiền <SortIcon field="amount" />
-                  </th>
-                  <th className="px-6 py-4">Phí nền tảng</th>
-                  <th className="px-6 py-4">Thực nhận</th>
-                  <th className="px-6 py-4">Nguồn</th>
-                  <th className="px-6 py-4 cursor-pointer hover:bg-line/30" onClick={() => handleSort('paymentMethod' as SortField)}>
-                    Phương thức <SortIcon field={'paymentMethod' as SortField} />
-                  </th>
-                  <th className="px-6 py-4">Trạng thái</th>
-                  <th className="px-6 py-4 cursor-pointer hover:bg-line/30" onClick={() => handleSort('paidAt')}>
-                    Thời gian <SortIcon field="paidAt" />
-                  </th>
-                  <th className="px-6 py-4 text-right">Thao tác</th>
+                  <SortHeader field="txnRef" label={t('cols.ref')} />
+                  <SortHeader field="userEmail" label={t('cols.user')} />
+                  <SortHeader field="amount" label={t('cols.amount')} />
+                  <th scope="col" className="px-4 py-3 font-semibold">{t('cols.fee')}</th>
+                  <th scope="col" className="px-4 py-3 font-semibold">{t('cols.net')}</th>
+                  <th scope="col" className="px-4 py-3 font-semibold">{t('cols.source')}</th>
+                  <SortHeader field="paymentMethod" label={t('cols.method')} />
+                  <th scope="col" className="px-4 py-3 font-semibold">{t('cols.status')}</th>
+                  <SortHeader field="paidAt" label={t('cols.time')} />
+                  <th scope="col" className="px-4 py-3 text-right font-semibold">{t('cols.actions')}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-line">
-                {paginatedPayments.length === 0 ? (
+              <tbody className="divide-y divide-line-soft">
+                {paged.items.length === 0 ? (
                   <tr>
-                    <td colSpan={9} className="px-6 py-8 text-center">Không tìm thấy giao dịch nào phù hợp với bộ lọc.</td>
+                    <td colSpan={10} className="px-6 py-8 text-center text-ink-muted">{t('noMatch')}</td>
                   </tr>
                 ) : (
-                  paginatedPayments.map((p) => (
-                    <tr key={p.txnRef} className="hover:bg-surface-raised transition-colors">
-                      <td className="px-6 py-4 font-mono font-medium text-ink">{p.txnRef.substring(0, 8)}</td>
-                      <td className="px-6 py-4 font-medium text-ink max-w-[150px] truncate" title={p.userEmail}>{p.userEmail}</td>
-                      <td className="px-6 py-4 font-semibold">
-                        {p.amount?.toLocaleString('vi-VN')}đ
-                      </td>
-                      <td className="px-6 py-4 text-ink font-semibold">
-                        {p.platformFee ? p.platformFee.toLocaleString('vi-VN') + 'đ' : '-'}
-                      </td>
-                      <td className="px-6 py-4 text-success font-semibold">
-                        {p.instructorEarning ? p.instructorEarning.toLocaleString('vi-VN') + 'đ' : '-'}
-                      </td>
-                      <td className="px-6 py-4">
-                        {p.revenueSource === 'INSTRUCTOR_REFERRAL' ? (
-                          <span className="inline-block bg-cyan-50 px-2.5 py-1 rounded-full text-xs font-semibold text-cyan-700">Giới thiệu</span>
-                        ) : (
-                          <span className="inline-block bg-line/20 px-2.5 py-1 rounded-full text-xs font-semibold text-ink-muted">Tự tìm thấy</span>
-                        )}
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className="inline-block bg-line/20 px-2.5 py-1 rounded-full text-xs font-semibold text-ink">
-                          {p.paymentMethod}
+                  paged.items.map((p) => (
+                    <tr key={p.txnRef} className="transition-colors hover:bg-surface">
+                      <td className="px-4 py-3 font-mono font-medium text-ink">{p.txnRef.substring(0, 8)}</td>
+                      <td className="max-w-[170px] truncate px-4 py-3 font-medium text-ink" title={p.userEmail}>{p.userEmail}</td>
+                      <td className="px-4 py-3 font-semibold text-ink">{money(p.amount ?? 0)}</td>
+                      <td className="px-4 py-3 font-semibold text-ink">{p.platformFee ? money(p.platformFee) : '-'}</td>
+                      <td className="px-4 py-3 font-semibold text-success-ink">{p.instructorEarning ? money(p.instructorEarning) : '-'}</td>
+                      <td className="px-4 py-3">
+                        <span className={`inline-block rounded-full px-2.5 py-1 text-xs font-semibold ${p.revenueSource === 'INSTRUCTOR_REFERRAL' ? 'bg-tint text-accent-dark' : 'bg-line-soft text-ink-muted'}`}>
+                          {p.revenueSource === 'INSTRUCTOR_REFERRAL' ? t('source.referral') : t('source.organic')}
                         </span>
                       </td>
-                      <td className="px-6 py-4">
-                        <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-medium border ${getStatusColor(p.status)}`}>
-                          {getStatusLabel(p.status)}
+                      <td className="px-4 py-3">
+                        <span className="inline-block rounded-full bg-line-soft px-2.5 py-1 text-xs font-semibold text-ink">{p.paymentMethod}</span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className={`inline-block rounded-full border px-2.5 py-1 text-xs font-medium ${STATUS_CLASS[p.status] ?? 'border-line bg-line-soft text-ink'}`}>
+                          {statusLabel(p.status)}
                         </span>
                       </td>
-                      <td className="px-6 py-4">
-                        {p.paidAt ? format(new Date(p.paidAt), 'dd/MM/yyyy HH:mm') : '-'}
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <button 
+                      <td className="whitespace-nowrap px-4 py-3 text-ink-muted">{p.paidAt ? dateTime(p.paidAt) : '-'}</td>
+                      <td className="px-4 py-3 text-right">
+                        <button
+                          type="button"
                           onClick={() => setSelectedPayment(p)}
-                          className="text-cyan-600 font-semibold hover:text-cyan-700 underline text-xs"
+                          aria-label={`${t('details')}: ${p.txnRef.substring(0, 8)}`}
+                          className="rounded-lg px-2.5 py-1.5 text-xs font-bold text-accent-dark hover:bg-tint"
                         >
-                          Chi tiết
+                          {t('details')}
                         </button>
                       </td>
                     </tr>
@@ -297,171 +247,103 @@ export default function AdminPaymentsPage() {
               </tbody>
             </table>
           </div>
-          
-          {/* Phân trang */}
-          {totalPages > 1 && (
-            <div className="flex justify-between items-center px-2">
-              <span className="text-sm text-ink-muted">
-                Đang xem {paginatedPayments.length} / {filteredPayments.length} giao dịch
-              </span>
-              <div className="flex gap-2">
-                <button
-                  disabled={currentPage === 1}
-                  onClick={() => setCurrentPage(prev => prev - 1)}
-                  className="px-3 py-1.5 rounded bg-surface-raised border border-line text-sm font-semibold disabled:opacity-50"
-                >
-                  Trước
+
+          {paged.totalPages > 1 && (
+            <nav aria-label={t('pager.aria')} className="flex flex-wrap items-center justify-between gap-3 px-1">
+              <span className="text-sm text-ink-muted">{t('pager.showing', { shown: paged.items.length, total: filtered.length })}</span>
+              <div className="flex items-center gap-2">
+                <button type="button" disabled={paged.page === 1} onClick={() => setCurrentPage(paged.page - 1)} className="rounded-lg border border-line bg-white px-3 py-1.5 text-sm font-semibold text-ink hover:bg-tint disabled:opacity-50">
+                  {t('pager.prev')}
                 </button>
-                <span className="px-3 py-1.5 text-sm font-semibold text-ink">
-                  Trang {currentPage} / {totalPages}
-                </span>
-                <button
-                  disabled={currentPage === totalPages}
-                  onClick={() => setCurrentPage(prev => prev + 1)}
-                  className="px-3 py-1.5 rounded bg-surface-raised border border-line text-sm font-semibold disabled:opacity-50"
-                >
-                  Sau
+                <span className="px-2 text-sm font-semibold text-ink">{t('pager.page', { page: paged.page, total: paged.totalPages })}</span>
+                <button type="button" disabled={paged.page === paged.totalPages} onClick={() => setCurrentPage(paged.page + 1)} className="rounded-lg border border-line bg-white px-3 py-1.5 text-sm font-semibold text-ink hover:bg-tint disabled:opacity-50">
+                  {t('pager.next')}
                 </button>
               </div>
-            </div>
+            </nav>
           )}
         </div>
       )}
 
-      {/* Modal Chi Tiết */}
       {selectedPayment && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-          <div className="w-full max-w-lg rounded-2xl bg-surface shadow-2xl overflow-hidden flex flex-col">
-            <div className="px-6 py-4 border-b border-line flex justify-between items-center">
-              <h2 className="font-display text-xl font-bold text-ink">Chi tiết giao dịch</h2>
-              <button 
-                onClick={() => setSelectedPayment(null)}
-                className="text-ink-muted hover:text-ink text-xl font-bold"
-              >
-                &times;
+        <div className="fixed inset-0 z-[400] flex items-center justify-center bg-ink/40 p-4">
+          <div role="dialog" aria-modal="true" aria-labelledby="payment-detail-title" className="flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-line bg-white shadow-card-hover">
+            <div className="flex items-center justify-between border-b border-line px-6 py-4">
+              <h2 id="payment-detail-title" className="m-0 font-display text-xl font-bold text-ink">{t('detail.title')}</h2>
+              <button type="button" onClick={() => setSelectedPayment(null)} aria-label={t('detail.close')} className="flex h-8 w-8 items-center justify-center rounded-full text-ink-muted hover:bg-tint hover:text-ink">
+                <X size={18} aria-hidden />
               </button>
             </div>
-            
-            <div className="p-6 overflow-y-auto max-h-[70vh]">
-              <div className="grid grid-cols-2 gap-y-4 gap-x-6">
-                <div className="col-span-2">
-                  <p className="text-sm font-medium text-ink-muted mb-1">Khóa học</p>
-                  <p className="font-medium text-ink">{selectedPayment.courseTitle}</p>
-                </div>
-                
-                <div className="col-span-2">
-                  <p className="text-sm font-medium text-ink-muted mb-1">Tài khoản mua</p>
-                  <p className="font-medium text-ink">{selectedPayment.userEmail}</p>
-                </div>
-                
-                <div>
-                  <p className="text-sm font-medium text-ink-muted mb-1">Họ tên thanh toán</p>
-                  <p className="font-medium text-ink">{selectedPayment.billingName || 'Không có'}</p>
-                </div>
-                
-                <div>
-                  <p className="text-sm font-medium text-ink-muted mb-1">Số điện thoại</p>
-                  <p className="font-medium text-ink">{selectedPayment.billingPhone || 'Không có'}</p>
-                </div>
 
-                <div className="col-span-2">
-                  <p className="text-sm font-medium text-ink-muted mb-1">Nguồn doanh thu</p>
-                  {selectedPayment.revenueSource === 'INSTRUCTOR_REFERRAL' ? (
-                    <span className="inline-block rounded-full bg-cyan-50 px-2.5 py-1 text-xs font-semibold text-cyan-700">
-                      Liên kết giới thiệu riêng của Giảng viên
-                    </span>
-                  ) : (
-                    <span className="inline-block rounded-full bg-line/20 px-2.5 py-1 text-xs font-semibold text-ink-muted">
-                      Học viên tự tìm thấy trên nền tảng
-                    </span>
-                  )}
-                </div>
-
-                <div>
-                  <p className="text-sm font-medium text-ink-muted mb-1">
-                    Phí nền tảng ({selectedPayment.revenueSource === 'INSTRUCTOR_REFERRAL' ? '3' : '63'}%)
-                  </p>
-                  <p className="font-medium text-ink font-semibold">
-                    {selectedPayment.platformFee ? selectedPayment.platformFee.toLocaleString('vi-VN') + 'đ' : '-'}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-sm font-medium text-ink-muted mb-1">
-                    Giảng viên nhận ({selectedPayment.revenueSource === 'INSTRUCTOR_REFERRAL' ? '97' : '37'}%)
-                  </p>
-                  <p className="font-medium text-success font-semibold">
-                    {selectedPayment.instructorEarning ? selectedPayment.instructorEarning.toLocaleString('vi-VN') + 'đ' : '-'}
-                  </p>
-                </div>
-
+            <div className="overflow-y-auto p-6">
+              <dl className="m-0 grid grid-cols-2 gap-x-6 gap-y-4">
+                <Detail wide label={t('detail.course')}>{selectedPayment.courseTitle}</Detail>
+                <Detail wide label={t('detail.account')}>{selectedPayment.userEmail}</Detail>
+                <Detail label={t('detail.billingName')}>{selectedPayment.billingName || t('detail.none')}</Detail>
+                <Detail label={t('detail.phone')}>{selectedPayment.billingPhone || t('detail.none')}</Detail>
+                <Detail wide label={t('detail.source')}>
+                  <span className={`inline-block rounded-full px-2.5 py-1 text-xs font-semibold ${selectedPayment.revenueSource === 'INSTRUCTOR_REFERRAL' ? 'bg-tint text-accent-dark' : 'bg-line-soft text-ink-muted'}`}>
+                    {selectedPayment.revenueSource === 'INSTRUCTOR_REFERRAL' ? t('detail.sourceReferral') : t('detail.sourceOrganic')}
+                  </span>
+                </Detail>
+                <Detail label={t('detail.fee', { percent: selectedPayment.revenueSource === 'INSTRUCTOR_REFERRAL' ? 3 : 63 })}>
+                  <span className="font-semibold">{selectedPayment.platformFee ? money(selectedPayment.platformFee) : '-'}</span>
+                </Detail>
+                <Detail label={t('detail.earning', { percent: selectedPayment.revenueSource === 'INSTRUCTOR_REFERRAL' ? 97 : 37 })}>
+                  <span className="font-semibold text-success-ink">{selectedPayment.instructorEarning ? money(selectedPayment.instructorEarning) : '-'}</span>
+                </Detail>
                 {selectedPayment.couponCode && (
-                  <div className="col-span-2 rounded-lg bg-accent/5 border border-accent/20 p-3">
-                    <p className="text-sm font-medium text-ink-muted mb-1">Mã giảm giá đã dùng</p>
-                    <div className="flex items-center justify-between">
+                  <div className="col-span-2 rounded-lg border border-accent/20 bg-tint p-3">
+                    <dt className="mb-1 text-sm font-medium text-ink-muted">{t('detail.coupon')}</dt>
+                    <dd className="m-0 flex flex-wrap items-center justify-between gap-2">
                       <span className="font-mono font-bold text-accent-dark">{selectedPayment.couponCode}</span>
                       <span className="text-sm text-ink-muted">
-                        Giá gốc {selectedPayment.originalAmount?.toLocaleString('vi-VN')}đ − Giảm{' '}
-                        {selectedPayment.discountAmount.toLocaleString('vi-VN')}đ
+                        {t('detail.couponMath', { original: money(selectedPayment.originalAmount ?? 0), discount: money(selectedPayment.discountAmount) })}
                       </span>
-                    </div>
+                    </dd>
                   </div>
                 )}
-
-                <div>
-                  <p className="text-sm font-medium text-ink-muted mb-1">Phương thức TT</p>
-                  <p className="font-medium text-ink">{selectedPayment.paymentMethod}</p>
-                </div>
-
-                <div>
-                  <p className="text-sm font-medium text-ink-muted mb-1">Trạng thái</p>
-                  <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-medium border ${getStatusColor(selectedPayment.status)}`}>
-                    {getStatusLabel(selectedPayment.status)}
+                <Detail label={t('detail.method')}>{selectedPayment.paymentMethod}</Detail>
+                <Detail label={t('detail.status')}>
+                  <span className={`inline-block rounded-full border px-2.5 py-1 text-xs font-medium ${STATUS_CLASS[selectedPayment.status] ?? 'border-line bg-line-soft text-ink'}`}>
+                    {statusLabel(selectedPayment.status)}
                   </span>
-                </div>
-
-                <div>
-                  <p className="text-sm font-medium text-ink-muted mb-1">Lý do thất bại</p>
-                  <p className="font-medium text-ink">{selectedPayment.status === 'FAILED' ? 'Bị hủy bởi hệ thống cổng thanh toán hoặc người dùng tự hủy.' : 'Không có'}</p>
-                </div>
-                
-                <div>
-                  <p className="text-sm font-medium text-ink-muted mb-1">Mã tham chiếu</p>
-                  <p className="font-mono text-sm text-ink bg-surface-raised px-2 py-1 rounded inline-block">{selectedPayment.txnRef}</p>
-                </div>
-                
-                <div>
-                  <p className="text-sm font-medium text-ink-muted mb-1">Mã cổng TT</p>
-                  <p className="font-mono text-sm text-ink">{selectedPayment.gatewayTxnNo || 'Chưa có'}</p>
-                </div>
-              </div>
+                </Detail>
+                <Detail label={t('detail.failReason')}>{selectedPayment.status === 'FAILED' ? t('detail.failText') : t('detail.none')}</Detail>
+                <Detail label={t('detail.ref')}>
+                  <span className="inline-block rounded bg-surface px-2 py-1 font-mono text-sm">{selectedPayment.txnRef}</span>
+                </Detail>
+                <Detail label={t('detail.gateway')}>
+                  <span className="font-mono text-sm">{selectedPayment.gatewayTxnNo || t('detail.notYet')}</span>
+                </Detail>
+              </dl>
             </div>
-            
-            <div className="px-6 py-4 bg-surface-raised border-t border-line flex justify-between items-center">
+
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line bg-surface px-6 py-4">
               <div className="flex gap-2">
-                <button
-                  onClick={() => toast.info('Tính năng hoàn tiền đang được phát triển.')}
-                  className="px-3 py-1.5 bg-danger/10 text-danger text-sm font-semibold rounded hover:bg-danger/20 transition-colors"
-                >
-                  Hoàn tiền
+                <button type="button" onClick={() => toast.info(t('detail.refundSoon'))} className="rounded-lg bg-white px-3 py-1.5 text-sm font-semibold text-danger ring-1 ring-inset ring-danger/40 hover:bg-danger/5">
+                  {t('detail.refund')}
                 </button>
-                <button
-                  onClick={() => toast.info('Đã đánh dấu báo cáo thành công!')}
-                  className="px-3 py-1.5 border border-line bg-surface text-ink text-sm font-semibold rounded hover:bg-line/50 transition-colors"
-                >
-                  Xử lý khiếu nại
+                <button type="button" onClick={() => toast.info(t('detail.disputeMarked'))} className="rounded-lg border border-line bg-white px-3 py-1.5 text-sm font-semibold text-ink hover:bg-tint">
+                  {t('detail.dispute')}
                 </button>
               </div>
-              <button
-                onClick={() => setSelectedPayment(null)}
-                className="px-5 py-2 bg-accent text-white font-semibold rounded-lg hover:bg-accent-dark transition-colors"
-              >
-                Đóng
+              <button ref={closeRef} type="button" onClick={() => setSelectedPayment(null)} className="rounded-lg bg-accent px-5 py-2 font-semibold text-white hover:bg-accent-dark">
+                {t('detail.close')}
               </button>
             </div>
           </div>
         </div>
       )}
+    </>
+  );
+}
+
+function Detail({ label, children, wide = false }: { label: string; children: React.ReactNode; wide?: boolean }) {
+  return (
+    <div className={wide ? 'col-span-2' : ''}>
+      <dt className="mb-1 text-sm font-medium text-ink-muted">{label}</dt>
+      <dd className="m-0 font-medium text-ink">{children}</dd>
     </div>
   );
 }

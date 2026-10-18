@@ -1,6 +1,13 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslations } from 'next-intl';
+import type { SystemMetrics } from '@/components/admin/overview/SystemHealth';
+import { PageHeader } from '@/components/instructor/ui/PageHeader';
+import { api } from '@/lib/api/client';
+import { formatBytes, formatUptime, usagePercent, usageTone } from '@/lib/admin/overview';
+import { getAccessToken } from '@/lib/auth/token';
 
 interface HealthData {
   status: string;
@@ -17,15 +24,6 @@ interface AdminDashboardData {
   totalRevenue: number;
 }
 
-interface SystemMetrics {
-  ram: { used: number; total: number };
-  disk: { used: number; total: number };
-  uptime: number;
-}
-
-import { getAccessToken } from '@/lib/auth/token';
-import { api } from '@/lib/api/client';
-
 const AI_WORKER_URL = process.env.NEXT_PUBLIC_AI_WORKER_URL || 'http://localhost:8002';
 
 async function fetchAiHealth(): Promise<HealthData> {
@@ -34,34 +32,61 @@ async function fetchAiHealth(): Promise<HealthData> {
   return res.json();
 }
 
-function ConfigRow({ label, value, description, badge }: {
-  label: string;
-  value: string | number;
-  description?: string;
-  badge?: { text: string; color: string };
-}) {
+const QUOTAS = [
+  { id: 'dubStudent', value: 15, rule: 'BR-DUB-06' },
+  { id: 'dubInstructor', value: 30, rule: 'BR-DUB-06' },
+  { id: 'materials', value: 6, rule: 'BR-MAT-08' },
+  { id: 'tutor', value: 30, rule: 'BR-TUTOR-04' },
+  { id: 'guestSearch', value: 15, rule: 'BR-DISCOVERY-01' },
+] as const;
+
+const ENVIRONMENT = [
+  { key: 'Service', val: 'Spring Boot 3 + Next.js 15' },
+  { key: 'Database', val: 'MySQL 8.0' },
+  { key: 'Cache/Queue', val: 'Redis 7' },
+  { key: 'AI Runtime', val: 'FastAPI + Celery' },
+  { key: 'Profile', val: 'dev' },
+] as const;
+
+const BAR_COLOR = { ok: 'bg-success', warn: 'bg-warning', critical: 'bg-danger' } as const;
+
+function ConfigRow({ label, value, description, badge }: { label: string; value: string | number; description?: string; badge?: string }) {
   return (
-    <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 last:border-0">
-      <div className="flex flex-col gap-0.5">
-        <span className="text-[13.5px] font-semibold text-gray-800">{label}</span>
-        {description && <span className="text-xs text-gray-400">{description}</span>}
+    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line-soft px-5 py-4 last:border-0">
+      <div className="flex min-w-0 flex-col gap-0.5">
+        <span className="text-[13.5px] font-semibold text-ink">{label}</span>
+        {description && <span className="text-xs text-ink-muted">{description}</span>}
       </div>
       <div className="flex items-center gap-2">
-        {badge && (
-          <span className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${badge.color}`}>
-            {badge.text}
-          </span>
-        )}
-        <code className="rounded bg-gray-100 px-2.5 py-1 font-mono text-[12.5px] text-gray-700">
-          {value}
-        </code>
+        {badge && <span className="rounded-full bg-tint px-2.5 py-1 text-[11px] font-bold text-accent-dark">{badge}</span>}
+        <code className="break-all rounded bg-surface px-2.5 py-1 font-mono text-[12.5px] text-ink">{value}</code>
       </div>
     </div>
   );
 }
 
+function Meter({ label, used, total, warnAt, criticalAt }: { label: string; used: number; total: number; warnAt: number; criticalAt: number }) {
+  const percent = usagePercent(used, total);
+  const tone = usageTone(used, total, warnAt, criticalAt);
+  return (
+    <div>
+      <div className="mb-1.5 flex justify-between gap-2 text-xs">
+        <span className="font-medium text-ink-muted">{label}</span>
+        <span className="font-semibold text-ink">{total > 0 ? `${formatBytes(used)} / ${formatBytes(total)} (${percent}%)` : '—'}</span>
+      </div>
+      <div role="progressbar" aria-label={label} aria-valuemin={0} aria-valuemax={100} aria-valuenow={percent} data-tone={tone} className="h-2 w-full overflow-hidden rounded-full bg-tint">
+        <div className={`h-full rounded-full transition-all ${BAR_COLOR[tone]}`} style={{ width: `${percent}%` }} />
+      </div>
+    </div>
+  );
+}
+
+/** Cấu hình hệ thống (chỉ xem): AI Worker, hạn ngạch nghiệp vụ, tài nguyên Backend và môi trường chạy. */
 export default function AdminSettingsPage() {
-  const token = getAccessToken() ?? '';
+  const t = useTranslations('admin.settings');
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const token = mounted ? (getAccessToken() ?? '') : '';
 
   const { data: aiHealth, isError: aiError } = useQuery({
     queryKey: ['settings', 'ai-health'],
@@ -82,148 +107,72 @@ export default function AdminSettingsPage() {
     enabled: !!token,
   });
 
-  const formatBytes = (bytes: number) => {
-    if (!bytes) return 'N/A';
-    const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(1024));
-    return parseFloat((bytes / Math.pow(1024, i)).toFixed(1)) + ' ' + sizes[i];
-  };
-
-  const formatUptime = (ms: number) => {
-    if (!ms) return 'N/A';
-    const h = Math.floor(ms / (1000 * 60 * 60));
-    const m = Math.floor((ms / (1000 * 60)) % 60);
-    return `${Math.floor(ms / (1000 * 60 * 60 * 24))}d ${h % 24}h ${m}m`;
-  };
-
-  const ramPct = systemMetrics ? Math.round((systemMetrics.ram.used / systemMetrics.ram.total) * 100) : 0;
-  const diskPct = systemMetrics ? Math.round((systemMetrics.disk.used / systemMetrics.disk.total) * 100) : 0;
-
   return (
     <>
-      <h1 className="m-0 font-display text-[22px] font-bold text-gray-900">Cấu hình hệ thống</h1>
+      <PageHeader title={t('title')} subtitle={t('subtitle')} />
 
-      <div className="grid grid-cols-3 gap-4">
-        {/* AI Worker Config */}
-        <div className="col-span-2 flex flex-col gap-2.5">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <div className="flex flex-col gap-2.5 lg:col-span-2">
           <div className="flex items-center gap-2.5">
-            <span className="font-display text-[15px] font-bold text-gray-900">AI Worker</span>
-            <span className={`flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${
-              aiError ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-700'
-            }`}>
-              <span className={`h-1.5 w-1.5 rounded-full ${aiError ? 'bg-red-500' : 'bg-green-500'}`}></span>
-              {aiError ? 'Không kết nối được' : 'Đang hoạt động'}
+            <h2 className="m-0 font-display text-[15px] font-bold text-ink">{t('worker.title')}</h2>
+            <span
+              role="status"
+              className={`flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${
+                aiError ? 'border border-danger/40 bg-white text-danger' : 'bg-success-tint text-success-ink'
+              }`}
+            >
+              <span aria-hidden className={`h-1.5 w-1.5 rounded-full ${aiError ? 'bg-danger' : 'bg-success'}`} />
+              {aiError ? t('worker.down') : t('worker.up')}
             </span>
           </div>
-          <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
-            <ConfigRow
-              label="Gemini Model (LLM)"
-              value={aiHealth?.gemini_model ?? '—'}
-              description="BR-DUB-02: Không hardcode — đọc từ GEMINI_MODEL env"
-              badge={{ text: 'Live', color: 'bg-blue-100 text-blue-700' }}
-            />
-            <ConfigRow
-              label="ASR Backend (STT)"
-              value={aiHealth?.asr_backend ?? '—'}
-              description="groq = Groq Cloud API · whisperx_local = GPU local"
-            />
-            <ConfigRow
-              label="Chunk Duration (BR-CHUNK-02)"
-              value={aiHealth ? `${aiHealth.chunk_minutes} phút` : '—'}
-              description="Phân đoạn video cố định để xử lý song song"
-            />
-            <ConfigRow
-              label="AI Worker URL"
-              value={AI_WORKER_URL}
-              description="URL giao tiếp nội bộ với FastAPI service"
-            />
+          <div className="overflow-hidden rounded-xl border border-line bg-white shadow-sm">
+            <ConfigRow label={t('worker.gemini')} value={aiHealth?.gemini_model ?? '—'} description={t('worker.geminiDesc')} badge="Live" />
+            <ConfigRow label={t('worker.asr')} value={aiHealth?.asr_backend ?? '—'} description={t('worker.asrDesc')} />
+            <ConfigRow label={t('worker.chunk')} value={aiHealth ? t('worker.minutes', { count: aiHealth.chunk_minutes }) : '—'} description={t('worker.chunkDesc')} />
+            <ConfigRow label={t('worker.url')} value={AI_WORKER_URL} description={t('worker.urlDesc')} />
           </div>
 
-          {/* Business Rules Quotas */}
-          <span className="mt-2 font-display text-[15px] font-bold text-gray-900">Hạn ngạch nghiệp vụ (Quotas)</span>
-          <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
-            {[
-              { label: 'Lồng tiếng / Học viên / ngày', value: '15 lượt', rule: 'BR-DUB-06' },
-              { label: 'Lồng tiếng / Giảng viên / ngày', value: '30 lượt', rule: 'BR-DUB-06' },
-              { label: 'Sinh học liệu / ngày', value: '6 lượt', rule: 'BR-MAT-08' },
-              { label: 'Tin nhắn AI Tutor / ngày', value: '30 tin', rule: 'BR-TUTOR-04' },
-              { label: 'Tìm kiếm AI (Guest) / giờ', value: '15 lượt', rule: 'BR-DISCOVERY-01' },
-            ].map((item, idx, arr) => (
-              <div key={item.label} className={`flex items-center justify-between px-5 py-3.5 ${idx < arr.length - 1 ? 'border-b border-gray-100' : ''}`}>
-                <div className="flex items-center gap-2">
-                  <span className="text-[13px] text-gray-700">{item.label}</span>
-                  <span className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[10px] text-slate-500">{item.rule}</span>
+          <h2 className="m-0 mt-2 font-display text-[15px] font-bold text-ink">{t('quotas.title')}</h2>
+          <div className="overflow-hidden rounded-xl border border-line bg-white shadow-sm">
+            {QUOTAS.map((item) => (
+              <div key={item.id} className="flex flex-wrap items-center justify-between gap-2 border-b border-line-soft px-5 py-3.5 last:border-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-[13px] text-ink">{t(`quotas.${item.id}`)}</span>
+                  <span className="rounded bg-surface px-1.5 py-0.5 font-mono text-[10px] text-ink-muted">{item.rule}</span>
                 </div>
-                <code className="rounded bg-gray-100 px-2.5 py-1 font-mono text-[12.5px] text-gray-700">{item.value}</code>
+                <code className="rounded bg-surface px-2.5 py-1 font-mono text-[12.5px] text-ink">{t(`quotas.${item.id}Unit`, { count: item.value })}</code>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Server Resources */}
         <div className="flex flex-col gap-2.5">
-          <span className="font-display text-[15px] font-bold text-gray-900">Tài nguyên Backend</span>
-          <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm flex flex-col gap-5">
-
-            <div>
-              <div className="mb-1.5 flex justify-between text-xs">
-                <span className="font-medium text-gray-600">RAM JVM</span>
-                <span className="font-semibold text-gray-900">
-                  {systemMetrics ? `${formatBytes(systemMetrics.ram.used)} / ${formatBytes(systemMetrics.ram.total)} (${ramPct}%)` : '—'}
-                </span>
-              </div>
-              <div className="h-2 w-full overflow-hidden rounded-full bg-gray-100">
-                <div
-                  className={`h-full rounded-full transition-all ${ramPct > 80 ? 'bg-red-500' : 'bg-emerald-500'}`}
-                  style={{ width: `${ramPct}%` }}
-                />
-              </div>
-            </div>
-
-            <div>
-              <div className="mb-1.5 flex justify-between text-xs">
-                <span className="font-medium text-gray-600">Disk (Server)</span>
-                <span className="font-semibold text-gray-900">
-                  {systemMetrics ? `${formatBytes(systemMetrics.disk.used)} / ${formatBytes(systemMetrics.disk.total)} (${diskPct}%)` : '—'}
-                </span>
-              </div>
-              <div className="h-2 w-full overflow-hidden rounded-full bg-gray-100">
-                <div
-                  className={`h-full rounded-full transition-all ${diskPct > 90 ? 'bg-red-500' : 'bg-blue-500'}`}
-                  style={{ width: `${diskPct}%` }}
-                />
-              </div>
-            </div>
-
-            <div className="border-t border-gray-100 pt-4 flex flex-col gap-3">
+          <h2 className="m-0 font-display text-[15px] font-bold text-ink">{t('resources.title')}</h2>
+          <div className="flex flex-col gap-5 rounded-xl border border-line bg-white p-5 shadow-sm">
+            <Meter label={t('resources.ram')} used={systemMetrics?.ram.used ?? 0} total={systemMetrics?.ram.total ?? 0} warnAt={0.7} criticalAt={0.8} />
+            <Meter label={t('resources.disk')} used={systemMetrics?.disk.used ?? 0} total={systemMetrics?.disk.total ?? 0} warnAt={0.8} criticalAt={0.9} />
+            <div className="flex flex-col gap-3 border-t border-line-soft pt-4">
               <div className="flex justify-between text-xs">
-                <span className="text-gray-500">Uptime Backend</span>
-                <span className="font-semibold text-gray-800">{formatUptime(systemMetrics?.uptime ?? 0)}</span>
+                <span className="text-ink-muted">{t('resources.uptime')}</span>
+                <span className="font-semibold text-ink">{systemMetrics ? formatUptime(systemMetrics.uptime) : 'N/A'}</span>
               </div>
               <div className="flex justify-between text-xs">
-                <span className="text-gray-500">Tổng khóa học</span>
-                <span className="font-semibold text-gray-800">{dashStats?.totalCourses ?? '—'}</span>
+                <span className="text-ink-muted">{t('resources.courses')}</span>
+                <span className="font-semibold text-ink">{dashStats?.totalCourses ?? '—'}</span>
               </div>
               <div className="flex justify-between text-xs">
-                <span className="text-gray-500">Tổng người dùng</span>
-                <span className="font-semibold text-gray-800">{dashStats?.totalUsers ?? '—'}</span>
+                <span className="text-ink-muted">{t('resources.users')}</span>
+                <span className="font-semibold text-ink">{dashStats?.totalUsers ?? '—'}</span>
               </div>
             </div>
           </div>
 
-          {/* Version & Environment Info */}
-          <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm flex flex-col gap-3">
-            <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">Môi trường</span>
-            {[
-              { key: 'Service', val: 'Spring Boot 3 + Next.js 15' },
-              { key: 'Database', val: 'MySQL 8.0' },
-              { key: 'Cache/Queue', val: 'Redis 7' },
-              { key: 'AI Runtime', val: 'FastAPI + Celery' },
-              { key: 'Profile', val: 'dev' },
-            ].map(({ key, val }) => (
-              <div key={key} className="flex justify-between">
-                <span className="text-xs text-gray-500">{key}</span>
-                <code className="text-[11.5px] font-mono text-gray-700">{val}</code>
+          <div className="flex flex-col gap-3 rounded-xl border border-line bg-white p-4 shadow-sm">
+            <span className="text-xs font-bold uppercase tracking-wide text-ink-muted">{t('env.title')}</span>
+            {ENVIRONMENT.map(({ key, val }) => (
+              <div key={key} className="flex justify-between gap-3">
+                <span className="text-xs text-ink-muted">{key}</span>
+                <code className="text-right font-mono text-[11.5px] text-ink">{val}</code>
               </div>
             ))}
           </div>

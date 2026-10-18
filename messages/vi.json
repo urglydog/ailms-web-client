@@ -1607,6 +1607,237 @@
       "empty": "Không có job nào.",
       "retry": "Thử lại",
       "retryError": "Không thử lại được job này."
+    },
+    "payments": {
+      "title": "Đối soát thanh toán",
+      "subtitle": "Quản lý và đối soát các giao dịch mua khóa học trên hệ thống.",
+      "refresh": "Làm mới dữ liệu",
+      "loadError": "Lỗi khi tải lịch sử giao dịch",
+      "empty": "Chưa có giao dịch nào trên hệ thống.",
+      "noMatch": "Không tìm thấy giao dịch nào phù hợp với bộ lọc.",
+      "status": {
+        "PAID": "Thành công",
+        "PENDING": "Đang chờ xử lý",
+        "FAILED": "Thất bại",
+        "EXPIRED": "Hết hạn"
+      },
+      "source": {
+        "referral": "Giới thiệu",
+        "organic": "Tự tìm thấy"
+      },
+      "filters": {
+        "email": "Tìm theo email",
+        "emailPh": "Nhập email học viên...",
+        "date": "Lọc theo ngày",
+        "status": "Trạng thái",
+        "all": "Tất cả trạng thái"
+      },
+      "cols": {
+        "ref": "Mã giao dịch",
+        "user": "Người dùng",
+        "amount": "Số tiền",
+        "fee": "Phí nền tảng",
+        "net": "Thực nhận",
+        "source": "Nguồn",
+        "method": "Phương thức",
+        "status": "Trạng thái",
+        "time": "Thời gian",
+        "actions": "Thao tác"
+      },
+      "details": "Chi tiết",
+      "pager": {
+        "aria": "Phân trang giao dịch",
+        "showing": "Đang xem {shown} / {total} giao dịch",
+        "prev": "Trước",
+        "next": "Sau",
+        "page": "Trang {page} / {total}"
+      },
+      "detail": {
+        "title": "Chi tiết giao dịch",
+        "close": "Đóng",
+        "course": "Khóa học",
+        "account": "Tài khoản mua",
+        "billingName": "Họ tên thanh toán",
+        "phone": "Số điện thoại",
+        "none": "Không có",
+        "source": "Nguồn doanh thu",
+        "sourceReferral": "Liên kết giới thiệu riêng của giảng viên",
+        "sourceOrganic": "Học viên tự tìm thấy trên nền tảng",
+        "fee": "Phí nền tảng ({percent}%)",
+        "earning": "Giảng viên nhận ({percent}%)",
+        "coupon": "Mã giảm giá đã dùng",
+        "couponMath": "Giá gốc {original} − Giảm {discount}",
+        "method": "Phương thức thanh toán",
+        "status": "Trạng thái",
+        "failReason": "Lý do thất bại",
+        "failText": "Bị hủy bởi cổng thanh toán hoặc người dùng tự hủy.",
+        "ref": "Mã tham chiếu",
+        "gateway": "Mã cổng thanh toán",
+        "notYet": "Chưa có",
+        "refund": "Hoàn tiền",
+        "refundSoon": "Tính năng hoàn tiền đang được phát triển.",
+        "dispute": "Xử lý khiếu nại",
+        "disputeMarked": "Đã đánh dấu báo cáo thành công!"
+      }
+    },
+    "settings": {
+      "title": "Cấu hình hệ thống",
+      "subtitle": "Thông tin chỉ xem về AI Worker, hạn ngạch nghiệp vụ và tài nguyên máy chủ.",
+      "worker": {
+        "title": "AI Worker",
+        "up": "Đang hoạt động",
+        "down": "Không kết nối được",
+        "gemini": "Mô hình Gemini (LLM)",
+        "geminiDesc": "BR-DUB-02: không hardcode — đọc từ biến môi trường GEMINI_MODEL",
+        "asr": "ASR Backend (nhận dạng giọng nói)",
+        "asrDesc": "groq = Groq Cloud API · whisperx_local = GPU nội bộ",
+        "chunk": "Độ dài mỗi đoạn (BR-CHUNK-02)",
+        "minutes": "{count} phút",
+        "chunkDesc": "Chia video thành các đoạn cố định để xử lý song song",
+        "url": "AI Worker URL",
+        "urlDesc": "Địa chỉ giao tiếp nội bộ với dịch vụ FastAPI"
+      },
+      "quotas": {
+        "title": "Hạn ngạch nghiệp vụ",
+        "dubStudent": "Lồng tiếng / học viên / ngày",
+        "dubStudentUnit": "{count} lượt",
+        "dubInstructor": "Lồng tiếng / giảng viên / ngày",
+        "dubInstructorUnit": "{count} lượt",
+        "materials": "Sinh học liệu / ngày",
+        "materialsUnit": "{count} lượt",
+        "tutor": "Tin nhắn AI Tutor / ngày",
+        "tutorUnit": "{count} tin",
+        "guestSearch": "Tìm kiếm AI (khách) / giờ",
+        "guestSearchUnit": "{count} lượt"
+      },
+      "resources": {
+        "title": "Tài nguyên Backend",
+        "ram": "RAM JVM",
+        "disk": "Ổ đĩa máy chủ",
+        "uptime": "Thời gian chạy Backend",
+        "courses": "Tổng khóa học",
+        "users": "Tổng người dùng"
+      },
+      "env": {
+        "title": "Môi trường"
+      }
+    },
+    "categories": {
+      "title": "Quản lý danh mục",
+      "subtitle": "Thêm, đổi tên hoặc xóa danh mục khóa học.",
+      "newPh": "Tên danh mục mới...",
+      "newLabel": "Tên danh mục mới",
+      "add": "Thêm danh mục",
+      "error": "Có lỗi xảy ra",
+      "deleteError": "Không xóa được danh mục này.",
+      "cols": {
+        "name": "Tên danh mục",
+        "slug": "Slug",
+        "actions": "Hành động"
+      },
+      "loading": "Đang tải...",
+      "empty": "Chưa có danh mục nào.",
+      "nameLabel": "Tên danh mục",
+      "delete": "Xóa",
+      "confirm": {
+        "title": "Xóa danh mục này?",
+        "body": "Danh mục \"{name}\" sẽ bị xóa. Nếu còn khóa học thuộc danh mục này, hệ thống sẽ từ chối.",
+        "cancel": "Hủy"
+      }
+    },
+    "reviews": {
+      "title": "Kiểm duyệt đánh giá",
+      "subtitle": "Ẩn đánh giá vi phạm và xử lý các báo cáo từ giảng viên.",
+      "coursePh": "Tên khóa học...",
+      "instructorPh": "Email giảng viên...",
+      "statusLabel": "Trạng thái",
+      "statusOpt": {
+        "ALL": "Tất cả trạng thái",
+        "VISIBLE": "Đang hiện",
+        "HIDDEN": "Bị ẩn",
+        "PENDING_REPORT": "Chờ duyệt (giảng viên báo cáo)"
+      },
+      "cols": {
+        "course": "Khóa học",
+        "student": "Học viên",
+        "stars": "Sao",
+        "comment": "Bình luận",
+        "date": "Ngày",
+        "status": "Trạng thái",
+        "actions": "Hành động"
+      },
+      "loading": "Đang tải...",
+      "empty": "Chưa có đánh giá nào.",
+      "noComment": "(không có bình luận)",
+      "badge": {
+        "pending": "Chờ duyệt báo cáo",
+        "hidden": "Đã ẩn",
+        "visible": "Đang hiện"
+      },
+      "reason": "Lý do: {reason}",
+      "unhide": "Hiện lại",
+      "hide": "Ẩn",
+      "keepHidden": "Giữ ẩn",
+      "rejectReportTip": "Từ chối báo cáo, hiện lại đánh giá",
+      "confirmReportTip": "Xác nhận báo cáo, giữ ẩn",
+      "hideError": "Không ẩn được đánh giá này.",
+      "unhideError": "Không bỏ ẩn được đánh giá này.",
+      "starsLabel": "{count} trên 5 sao",
+      "pager": {
+        "aria": "Phân trang đánh giá",
+        "prev": "Trang trước",
+        "next": "Trang sau",
+        "page": "Trang {page} / {total}"
+      }
+    },
+    "announce": {
+      "title": "Thông báo hệ thống",
+      "subtitle": "Gửi thông báo tới toàn hệ thống, chỉ giảng viên, chỉ học viên hoặc một cá nhân. Việc gửi chạy nền nên có thể mất vài giây tới vài phút để tới hết người nhận.",
+      "severity": {
+        "HIGH": "Cao — hiện thành banner đầu trang (vd: bảo trì hệ thống)",
+        "MEDIUM": "Trung bình — chỉ vào chuông thông báo",
+        "LOW": "Thấp — chỉ vào chuông thông báo"
+      },
+      "audience": {
+        "ALL": "Toàn bộ hệ thống",
+        "INSTRUCTOR": "Chỉ giảng viên",
+        "STUDENT": "Chỉ học viên",
+        "SPECIFIC_USER": "Một cá nhân cụ thể (theo ID)"
+      },
+      "dispatch": {
+        "PENDING": "Đang chờ xử lý",
+        "PROCESSING": "Đang gửi...",
+        "DONE": "Đã gửi xong",
+        "FAILED": "Lỗi"
+      },
+      "form": {
+        "title": "Tiêu đề",
+        "titlePh": "Vd: Bảo trì hệ thống",
+        "severity": "Mức độ",
+        "content": "Nội dung",
+        "audience": "Phạm vi người nhận",
+        "userId": "ID người dùng (xem ở trang Người dùng)",
+        "expires": "Tự ẩn banner sau (để trống = hiển thị đến khi có thông báo Cao mới hơn)",
+        "sending": "Đang gửi...",
+        "send": "Gửi thông báo",
+        "error": "Có lỗi xảy ra, thử lại sau."
+      },
+      "cols": {
+        "title": "Tiêu đề",
+        "severity": "Mức độ",
+        "audience": "Phạm vi",
+        "status": "Trạng thái",
+        "sent": "Đã gửi",
+        "created": "Ngày tạo"
+      },
+      "loading": "Đang tải...",
+      "empty": "Chưa gửi thông báo nào.",
+      "user": "Người dùng #{id}",
+      "sevLabel": {
+        "HIGH": "Cao",
+        "MEDIUM": "Trung bình",
+        "LOW": "Thấp"
+      }
     }
   }
 }
