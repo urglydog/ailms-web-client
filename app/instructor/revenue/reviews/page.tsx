@@ -57,11 +57,11 @@ export default function InstructorReviewsPage() {
   return (
     <>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="m-0 font-display text-[20px] font-bold text-gray-900">Đánh giá</h1>
+        <h1 className="m-0 font-display text-[20px] font-bold text-ink">Đánh giá</h1>
         <select
           value={courseId}
           onChange={(e) => setCourseId(e.target.value ? Number(e.target.value) : '')}
-          className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-[13px] font-semibold text-gray-700 focus:border-cyan-400 focus:outline-none"
+          className="rounded-lg border border-line bg-white px-3 py-2 text-[13px] font-semibold text-ink focus:border-accent focus:outline-none"
         >
           <option value="">Tất cả khóa học</option>
           {courses?.map((c) => (
@@ -72,13 +72,13 @@ export default function InstructorReviewsPage() {
 
       {stats && (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-[220px_1fr]">
-          <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-            <span className="text-[11.5px] font-semibold text-gray-500">Điểm trung bình</span>
+          <div className="rounded-xl border border-line bg-white p-4 shadow-sm">
+            <span className="text-[11.5px] font-semibold text-ink-muted">Điểm trung bình</span>
             <div className="mt-1 font-display text-[28px] font-extrabold text-amber-500">{stats.avg.toFixed(1)}/5</div>
-            <span className="text-[12px] text-gray-400">{stats.total} đánh giá</span>
+            <span className="text-[12px] text-ink-muted">{stats.total} đánh giá</span>
           </div>
-          <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-            <span className="mb-1 block text-[11.5px] font-semibold text-gray-500">Phân bố theo số sao</span>
+          <div className="rounded-xl border border-line bg-white p-4 shadow-sm">
+            <span className="mb-1 block text-[11.5px] font-semibold text-ink-muted">Phân bố theo số sao</span>
             <div className="h-32 w-full min-w-0">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={stats.distribution} layout="vertical">
@@ -104,26 +104,26 @@ export default function InstructorReviewsPage() {
         </InsightCallout>
       )}
 
-      {isLoading && <div className="p-10 text-center text-sm text-gray-500">Đang tải...</div>}
+      {isLoading && <div className="p-10 text-center text-sm text-ink-muted">Đang tải...</div>}
       {!isLoading && (!reviews || reviews.length === 0) && (
-        <div className="rounded-xl border border-gray-200 bg-white p-10 text-center text-sm text-gray-500 shadow-sm">
+        <div className="rounded-xl border border-line bg-white p-10 text-center text-sm text-ink-muted shadow-sm">
           Chưa có đánh giá nào.
         </div>
       )}
 
       <div className="flex flex-col gap-3">
         {reviews?.map((r) => (
-          <div key={r.id} className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+          <div key={r.id} className="rounded-xl border border-line bg-white p-4 shadow-sm">
             <div className="mb-1.5 flex items-center justify-between gap-3">
-              <span className="font-semibold text-gray-900">{r.studentName}</span>
+              <span className="font-semibold text-ink">{r.studentName}</span>
               <div className="flex items-center gap-3">
-                <span className="text-[12px] text-gray-400">{new Date(r.createdAt).toLocaleDateString('vi-VN')}</span>
+                <span className="text-[12px] text-ink-muted">{new Date(r.createdAt).toLocaleDateString('vi-VN')}</span>
                 <button
                   type="button"
                   onClick={() => handleReport(r.id)}
                   disabled={reportingId === r.id}
                   title="Report review này (vi phạm tiêu chuẩn cộng đồng)"
-                  className="flex items-center gap-1 text-[11px] font-semibold text-gray-400 hover:text-red-500 disabled:opacity-50"
+                  className="flex items-center gap-1 text-[11px] font-semibold text-ink-muted hover:text-red-500 disabled:opacity-50"
                 >
                   <Flag size={13} />
                 </button>
@@ -131,9 +131,9 @@ export default function InstructorReviewsPage() {
             </div>
             <div className="mb-2 flex items-center gap-2">
               <span className="text-amber-500">{'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)}</span>
-              <span className="text-[12px] text-gray-400">{r.courseTitle}</span>
+              <span className="text-[12px] text-ink-muted">{r.courseTitle}</span>
             </div>
-            {r.comment && <p className="text-[13px] text-gray-700">{r.comment}</p>}
+            {r.comment && <p className="text-[13px] text-ink">{r.comment}</p>}
           </div>
         ))}
       </div>

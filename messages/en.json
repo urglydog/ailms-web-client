@@ -834,6 +834,51 @@
         "cancel": "Cancel",
         "coInstructor": "Co-instructor management is in development and will arrive in a later update."
       }
+    },
+    "performance": {
+      "tabsAria": "Performance sections",
+      "tabs": {
+        "overview": "Overview",
+        "revenue": "Revenue",
+        "students": "Students",
+        "reviews": "Reviews",
+        "hardQuestions": "Hard questions",
+        "retention": "Retention"
+      },
+      "range": {
+        "label": "Date range",
+        "7d": "Last 7 days",
+        "30d": "Last 30 days",
+        "12m": "Last 12 months",
+        "all": "All time"
+      },
+      "insight": {
+        "see": "View →"
+      },
+      "overview": {
+        "title": "Overview",
+        "subtitle": "Get top insights about your performance.",
+        "kpi": {
+          "revenue": "Net revenue (30 days)",
+          "enrollments": "New sign-ups",
+          "rating": "Average rating",
+          "hardQuestions": "Hard questions"
+        },
+        "chart": {
+          "title": "Daily net revenue (last 30 days)",
+          "aria": "Bar chart of daily revenue, {total} in total over 30 days, best day {peak}",
+          "empty": "No revenue in the last 30 days."
+        },
+        "growth": {
+          "start": "Revenue started this period",
+          "none": "No revenue yet",
+          "flat": "Revenue is unchanged from the previous period",
+          "up": "Revenue is up {percent}% from the previous period",
+          "down": "Revenue is down {percent}% from the previous period"
+        },
+        "hard": "{count} questions are answered wrong by over 60% of learners, so review the related content.",
+        "lowRating": "A new {rating}★ review from {student} on \"{course}\", worth replying to soon."
+      }
     }
   }
 }

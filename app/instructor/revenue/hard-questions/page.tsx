@@ -50,8 +50,8 @@ export default function HardQuestionsPage() {
   return (
     <>
       <div>
-        <h1 className="m-0 font-display text-[20px] font-bold text-gray-900">Câu hỏi khó</h1>
-        <p className="mt-1 text-[12.5px] text-gray-500">
+        <h1 className="m-0 font-display text-[20px] font-bold text-ink">Câu hỏi khó</h1>
+        <p className="mt-1 text-[12.5px] text-ink-muted">
           Câu hỏi có tỷ lệ học viên trả lời sai trên 60% — có thể nội dung bài giảng chưa rõ, hoặc câu hỏi/đáp án cần xem lại.
         </p>
       </div>
@@ -66,7 +66,7 @@ export default function HardQuestionsPage() {
         <select
           value={courseId}
           onChange={(e) => handleFilterChange(() => setCourseId(e.target.value ? Number(e.target.value) : ''))}
-          className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-[13px] font-semibold text-gray-700 focus:border-cyan-400 focus:outline-none"
+          className="rounded-lg border border-line bg-white px-3 py-2 text-[13px] font-semibold text-ink focus:border-accent focus:outline-none"
         >
           <option value="">Tất cả khóa học</option>
           {courses?.map((c) => (
@@ -76,7 +76,7 @@ export default function HardQuestionsPage() {
         <select
           value={severity}
           onChange={(e) => handleFilterChange(() => setSeverity(e.target.value as Severity))}
-          className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-[13px] font-semibold text-gray-700 focus:border-cyan-400 focus:outline-none"
+          className="rounded-lg border border-line bg-white px-3 py-2 text-[13px] font-semibold text-ink focus:border-accent focus:outline-none"
         >
           <option value="all">Mọi mức độ</option>
           <option value="critical">≥ 80% — Báo động đỏ</option>
@@ -85,16 +85,16 @@ export default function HardQuestionsPage() {
         <select
           value={sortBy}
           onChange={(e) => handleFilterChange(() => setSortBy(e.target.value as SortBy))}
-          className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-[13px] font-semibold text-gray-700 focus:border-cyan-400 focus:outline-none"
+          className="rounded-lg border border-line bg-white px-3 py-2 text-[13px] font-semibold text-ink focus:border-accent focus:outline-none"
         >
           <option value="wrongRate">Sắp xếp: Tỷ lệ sai</option>
           <option value="totalAnswers">Sắp xếp: Số lượt trả lời</option>
         </select>
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+      <div className="overflow-hidden rounded-xl border border-line bg-white shadow-sm">
         <div className="overflow-x-auto">
-          <div className="grid min-w-[820px] grid-cols-[1.6fr_1fr_110px_160px_130px] gap-3 border-b border-gray-200 bg-gray-50 px-4 py-2.5 text-[11.5px] font-bold text-gray-500">
+          <div className="grid min-w-[820px] grid-cols-[1.6fr_1fr_110px_160px_130px] gap-3 border-b border-line bg-surface px-4 py-2.5 text-[11.5px] font-bold text-ink-muted">
             <span>Câu hỏi</span>
             <span>Khóa học / Bài học</span>
             <span>Lượt trả lời</span>
@@ -102,9 +102,9 @@ export default function HardQuestionsPage() {
             <span>Thao tác</span>
           </div>
 
-          {isLoading && <div className="p-10 text-center text-sm text-gray-500">Đang tải...</div>}
+          {isLoading && <div className="p-10 text-center text-sm text-ink-muted">Đang tải...</div>}
           {!isLoading && pageRows.length === 0 && (
-            <div className="p-10 text-center text-sm text-gray-500">
+            <div className="p-10 text-center text-sm text-ink-muted">
               {rows && rows.length > 0
                 ? 'Không có câu hỏi nào khớp bộ lọc đang chọn.'
                 : 'Chưa có câu hỏi nào vượt ngưỡng 60% trả lời sai (với đủ mẫu học viên) — bài giảng của bạn đang ổn.'}
@@ -115,26 +115,26 @@ export default function HardQuestionsPage() {
             <div
               key={row.questionId}
               className={`grid min-w-[820px] grid-cols-[1.6fr_1fr_110px_160px_130px] items-center gap-3 px-4 py-2.5 text-[13px] ${
-                idx < pageRows.length - 1 ? 'border-b border-gray-100' : ''
+                idx < pageRows.length - 1 ? 'border-b border-line-soft' : ''
               }`}
             >
-              <span className="truncate font-semibold text-gray-900" title={row.content}>{row.content}</span>
-              <span className="truncate text-gray-600">
+              <span className="truncate font-semibold text-ink" title={row.content}>{row.content}</span>
+              <span className="truncate text-ink-muted">
                 {row.courseTitle}
                 {row.lessonTitle ? ` · ${row.lessonTitle}` : ''}
               </span>
-              <span className="text-gray-500">{row.totalAnswers}</span>
+              <span className="text-ink-muted">{row.totalAnswers}</span>
               <div className="flex items-center gap-2">
-                <div className="h-2 w-16 overflow-hidden rounded-full bg-gray-100">
+                <div className="h-2 w-16 overflow-hidden rounded-full bg-line-soft">
                   <div className={`h-full rounded-full ${severityColor(row.wrongRatePercent)}`} style={{ width: `${row.wrongRatePercent}%` }} />
                 </div>
-                <span className={`text-[12px] font-bold ${row.wrongRatePercent >= 80 ? 'text-red-600' : 'text-amber-600'}`}>
+                <span className={`text-[12px] font-bold ${row.wrongRatePercent >= 80 ? 'text-danger' : 'text-amber-600'}`}>
                   {row.wrongRatePercent.toFixed(0)}%
                 </span>
               </div>
               <Link
                 href={`/instructor/courses/${row.courseId}/edit/materials?inspect=${row.materialGenerationId}`}
-                className="rounded-lg border border-cyan-200 bg-cyan-50 px-2.5 py-1.5 text-center text-[12px] font-bold text-cyan-700 no-underline hover:bg-cyan-100"
+                className="rounded-lg border border-line bg-tint px-2.5 py-1.5 text-center text-[12px] font-bold text-accent-dark no-underline hover:bg-cyan-100"
               >
                 Xem & sửa
               </Link>

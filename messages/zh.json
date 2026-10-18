@@ -834,6 +834,51 @@
         "cancel": "取消",
         "coInstructor": "协作讲师管理正在开发中，将在后续更新中提供。"
       }
+    },
+    "performance": {
+      "tabsAria": "数据表现栏目",
+      "tabs": {
+        "overview": "概览",
+        "revenue": "收入",
+        "students": "学员",
+        "reviews": "评价",
+        "hardQuestions": "难题",
+        "retention": "留存"
+      },
+      "range": {
+        "label": "时间范围",
+        "7d": "近 7 天",
+        "30d": "近 30 天",
+        "12m": "近 12 个月",
+        "all": "全部时间"
+      },
+      "insight": {
+        "see": "查看 →"
+      },
+      "overview": {
+        "title": "概览",
+        "subtitle": "快速了解你的核心表现。",
+        "kpi": {
+          "revenue": "实际收入（30 天）",
+          "enrollments": "新增报名",
+          "rating": "平均评分",
+          "hardQuestions": "难题"
+        },
+        "chart": {
+          "title": "每日实际收入（近 30 天）",
+          "aria": "每日收入柱状图，30 天共 {total}，最高一天 {peak}",
+          "empty": "近 30 天暂无收入。"
+        },
+        "growth": {
+          "start": "本期开始有收入",
+          "none": "暂无收入",
+          "flat": "收入与上一期持平",
+          "up": "收入比上一期增长 {percent}%",
+          "down": "收入比上一期下降 {percent}%"
+        },
+        "hard": "有 {count} 道题超过 60% 的学员答错，建议回顾相关内容。",
+        "lowRating": "{student} 在“{course}”给出了新的 {rating}★ 评价，建议尽快回复。"
+      }
     }
   }
 }

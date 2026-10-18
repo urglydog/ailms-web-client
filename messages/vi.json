@@ -834,6 +834,51 @@
         "cancel": "Hủy",
         "coInstructor": "Quản lý đồng giảng viên đang được phát triển, sẽ bổ sung ở bản cập nhật sau."
       }
+    },
+    "performance": {
+      "tabsAria": "Các mục hiệu suất",
+      "tabs": {
+        "overview": "Tổng quan",
+        "revenue": "Doanh thu",
+        "students": "Sinh viên",
+        "reviews": "Đánh giá",
+        "hardQuestions": "Câu hỏi khó",
+        "retention": "Giữ chân"
+      },
+      "range": {
+        "label": "Khoảng thời gian",
+        "7d": "7 ngày qua",
+        "30d": "30 ngày qua",
+        "12m": "12 tháng qua",
+        "all": "Mọi thời điểm"
+      },
+      "insight": {
+        "see": "Xem →"
+      },
+      "overview": {
+        "title": "Tổng quan",
+        "subtitle": "Nhận thông tin chi tiết hàng đầu về hiệu suất của bạn.",
+        "kpi": {
+          "revenue": "Doanh thu thực nhận (30 ngày)",
+          "enrollments": "Lượt đăng ký mới",
+          "rating": "Điểm đánh giá trung bình",
+          "hardQuestions": "Câu hỏi khó"
+        },
+        "chart": {
+          "title": "Doanh thu thực nhận theo ngày (30 ngày qua)",
+          "aria": "Biểu đồ cột doanh thu theo ngày, tổng {total} trong 30 ngày, ngày cao nhất {peak}",
+          "empty": "Chưa có doanh thu trong 30 ngày qua."
+        },
+        "growth": {
+          "start": "Bắt đầu có doanh thu trong kỳ này",
+          "none": "Chưa có phát sinh doanh thu",
+          "flat": "Doanh thu không đổi so với kỳ trước",
+          "up": "Doanh thu tăng {percent}% so với kỳ trước",
+          "down": "Doanh thu giảm {percent}% so với kỳ trước"
+        },
+        "hard": "Có {count} câu hỏi đang bị hơn 60% học viên trả lời sai, nên xem lại nội dung liên quan.",
+        "lowRating": "Có đánh giá {rating}★ mới từ {student} ở khóa \"{course}\", nên phản hồi sớm."
+      }
     }
   }
 }

@@ -834,6 +834,51 @@
         "cancel": "キャンセル",
         "coInstructor": "共同講師の管理は開発中で、今後のアップデートで追加されます。"
       }
+    },
+    "performance": {
+      "tabsAria": "パフォーマンスのセクション",
+      "tabs": {
+        "overview": "概要",
+        "revenue": "収益",
+        "students": "受講生",
+        "reviews": "レビュー",
+        "hardQuestions": "難問",
+        "retention": "定着"
+      },
+      "range": {
+        "label": "期間",
+        "7d": "過去 7 日間",
+        "30d": "過去 30 日間",
+        "12m": "過去 12 か月",
+        "all": "すべての期間"
+      },
+      "insight": {
+        "see": "見る →"
+      },
+      "overview": {
+        "title": "概要",
+        "subtitle": "パフォーマンスの要点をひと目で確認できます。",
+        "kpi": {
+          "revenue": "実収益（30 日間）",
+          "enrollments": "新規登録",
+          "rating": "平均評価",
+          "hardQuestions": "難問"
+        },
+        "chart": {
+          "title": "日別の実収益（過去 30 日間）",
+          "aria": "日別収益の棒グラフ。30 日間の合計 {total}、最も多い日 {peak}",
+          "empty": "過去 30 日間の収益はありません。"
+        },
+        "growth": {
+          "start": "今期から収益が発生しました",
+          "none": "収益はまだありません",
+          "flat": "収益は前期と変わりません",
+          "up": "収益は前期より {percent}% 増加",
+          "down": "収益は前期より {percent}% 減少"
+        },
+        "hard": "{count} 問が受講生の 60% 超に間違えられています。関連する内容を見直しましょう。",
+        "lowRating": "{student} さんから「{course}」に新しい {rating}★ のレビューがあります。早めに返信しましょう。"
+      }
     }
   }
 }

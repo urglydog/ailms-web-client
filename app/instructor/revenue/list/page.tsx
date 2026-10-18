@@ -130,20 +130,20 @@ export default function RevenuePage() {
   return (
     <>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="m-0 font-display text-[20px] font-bold text-gray-900">Doanh thu</h1>
+        <h1 className="m-0 font-display text-[20px] font-bold text-ink">Doanh thu</h1>
         <div className="flex items-center gap-2">
-          <div className="flex rounded-lg border border-gray-200 bg-white p-0.5 text-[12.5px] font-semibold">
+          <div className="flex rounded-lg border border-line bg-white p-0.5 text-[12.5px] font-semibold">
             <button
               type="button"
               onClick={() => setMode('preset')}
-              className={`rounded-md px-3 py-1.5 ${mode === 'preset' ? 'bg-cyan-600 text-white' : 'text-gray-600 hover:text-gray-900'}`}
+              className={`rounded-md px-3 py-1.5 ${mode === 'preset' ? 'bg-accent text-white' : 'text-ink-muted hover:text-gray-900'}`}
             >
               Khoảng nhanh
             </button>
             <button
               type="button"
               onClick={() => setMode('custom')}
-              className={`rounded-md px-3 py-1.5 ${mode === 'custom' ? 'bg-cyan-600 text-white' : 'text-gray-600 hover:text-gray-900'}`}
+              className={`rounded-md px-3 py-1.5 ${mode === 'custom' ? 'bg-accent text-white' : 'text-ink-muted hover:text-gray-900'}`}
             >
               Tự chọn ngày
             </button>
@@ -157,16 +157,16 @@ export default function RevenuePage() {
                 value={from}
                 max={to}
                 onChange={(e) => setFrom(e.target.value)}
-                className="rounded-lg border border-gray-200 px-2.5 py-1.5 text-[12.5px] text-gray-800"
+                className="rounded-lg border border-line px-2.5 py-1.5 text-[12.5px] text-ink"
               />
-              <span className="text-gray-400">–</span>
+              <span className="text-ink-muted">–</span>
               <input
                 type="date"
                 value={to}
                 min={from}
                 max={todayIso()}
                 onChange={(e) => setTo(e.target.value)}
-                className="rounded-lg border border-gray-200 px-2.5 py-1.5 text-[12.5px] text-gray-800"
+                className="rounded-lg border border-line px-2.5 py-1.5 text-[12.5px] text-ink"
               />
             </div>
           )}
@@ -175,7 +175,7 @@ export default function RevenuePage() {
               type="button"
               onClick={handleExport}
               disabled={!rows || rows.length === 0}
-              className="flex items-center gap-1.5 rounded-lg bg-cyan-600 px-3.5 py-2 text-[13px] font-bold text-white hover:bg-cyan-700 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex items-center gap-1.5 rounded-lg bg-accent px-3.5 py-2 text-[13px] font-bold text-white hover:bg-accent-dark disabled:cursor-not-allowed disabled:opacity-50"
             >
               <DownloadIcon /> Xuất CSV
             </button>
@@ -187,14 +187,14 @@ export default function RevenuePage() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
           <StatCard label="Số giao dịch" value={loadingSummary ? '...' : String(summary?.transactionCount ?? 0)} />
           <StatCard label="Doanh thu gộp" value={loadingSummary ? '...' : formatMoney(summary?.grossRevenue ?? 0)} />
-          <StatCard label="Phí nền tảng" value={loadingSummary ? '...' : formatMoney(summary?.platformFee ?? 0)} tone="text-gray-500" />
-          <StatCard label="Thực nhận" value={loadingSummary ? '...' : formatMoney(summary?.netRevenue ?? 0)} tone="text-green-600" />
+          <StatCard label="Phí nền tảng" value={loadingSummary ? '...' : formatMoney(summary?.platformFee ?? 0)} tone="text-ink-muted" />
+          <StatCard label="Thực nhận" value={loadingSummary ? '...' : formatMoney(summary?.netRevenue ?? 0)} tone="text-success-ink" />
         </div>
       ) : (
         <>
-          <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-            <span className="text-[12.5px] font-semibold text-gray-500">Tổng thực nhận trong khoảng thời gian này</span>
-            <div className="mt-1 font-display text-[22px] font-extrabold text-green-600">{formatMoney(total)}</div>
+          <div className="rounded-xl border border-line bg-white p-4 shadow-sm">
+            <span className="text-[12.5px] font-semibold text-ink-muted">Tổng thực nhận trong khoảng thời gian này</span>
+            <div className="mt-1 font-display text-[22px] font-extrabold text-success-ink">{formatMoney(total)}</div>
           </div>
 
           {topCourse && (
@@ -210,9 +210,9 @@ export default function RevenuePage() {
             </div>
           )}
 
-          <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-            <h2 className="mb-1 font-display text-[15px] font-bold text-gray-900">Doanh thu theo ngày</h2>
-            <div className="mb-3 flex items-center gap-4 text-[12px] text-gray-500">
+          <div className="rounded-xl border border-line bg-white p-5 shadow-sm">
+            <h2 className="mb-1 font-display text-[15px] font-bold text-ink">Doanh thu theo ngày</h2>
+            <div className="mb-3 flex items-center gap-4 text-[12px] text-ink-muted">
               <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full" style={{ background: COLOR_ORGANIC }} /> Tự tìm thấy</span>
               <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full" style={{ background: COLOR_REFERRAL }} /> Giới thiệu</span>
             </div>
@@ -233,13 +233,13 @@ export default function RevenuePage() {
                 </ResponsiveContainer>
               </div>
             ) : (
-              <div className="py-8 text-center text-sm text-gray-500">Chưa có dữ liệu để vẽ biểu đồ.</div>
+              <div className="py-8 text-center text-sm text-ink-muted">Chưa có dữ liệu để vẽ biểu đồ.</div>
             )}
           </div>
 
           {cumulativeData.length > 0 && (
-            <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-              <h2 className="mb-3 font-display text-[15px] font-bold text-gray-900">Doanh thu lũy kế trong kỳ</h2>
+            <div className="rounded-xl border border-line bg-white p-5 shadow-sm">
+              <h2 className="mb-3 font-display text-[15px] font-bold text-ink">Doanh thu lũy kế trong kỳ</h2>
               <div className="h-40 w-full min-w-0">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={cumulativeData}>
@@ -257,9 +257,9 @@ export default function RevenuePage() {
             </div>
           )}
 
-          <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+          <div className="overflow-hidden rounded-xl border border-line bg-white shadow-sm">
             <div className="overflow-x-auto">
-              <div className="grid min-w-[720px] grid-cols-[1.4fr_110px_110px_130px_100px_130px] gap-3 border-b border-gray-200 bg-gray-50 px-4 py-2.5 text-[11.5px] font-bold text-gray-500">
+              <div className="grid min-w-[720px] grid-cols-[1.4fr_110px_110px_130px_100px_130px] gap-3 border-b border-line bg-surface px-4 py-2.5 text-[11.5px] font-bold text-ink-muted">
                 <span>Khóa học</span>
                 <span>Số tiền</span>
                 <span>Thực nhận</span>
@@ -268,30 +268,30 @@ export default function RevenuePage() {
                 <span>Ngày thanh toán</span>
               </div>
 
-              {loadingList && <div className="p-10 text-center text-sm text-gray-500">Đang tải...</div>}
+              {loadingList && <div className="p-10 text-center text-sm text-ink-muted">Đang tải...</div>}
               {!loadingList && (!rows || rows.length === 0) && (
-                <div className="p-10 text-center text-sm text-gray-500">Không có giao dịch nào trong khoảng thời gian này.</div>
+                <div className="p-10 text-center text-sm text-ink-muted">Không có giao dịch nào trong khoảng thời gian này.</div>
               )}
 
               {rows?.map((row, idx) => (
                 <div
                   key={idx}
                   className={`grid min-w-[720px] grid-cols-[1.4fr_110px_110px_130px_100px_130px] items-center gap-3 px-4 py-2.5 text-[13px] ${
-                    idx < rows.length - 1 ? 'border-b border-gray-100' : ''
+                    idx < rows.length - 1 ? 'border-b border-line-soft' : ''
                   }`}
                 >
-                  <span className="truncate font-semibold text-gray-900">{row.courseTitle}</span>
-                  <span className="text-gray-600">{formatMoney(row.amount)}</span>
-                  <span className="font-semibold text-green-600">{formatMoney(row.instructorEarning)}</span>
+                  <span className="truncate font-semibold text-ink">{row.courseTitle}</span>
+                  <span className="text-ink-muted">{formatMoney(row.amount)}</span>
+                  <span className="font-semibold text-success-ink">{formatMoney(row.instructorEarning)}</span>
                   <span>
                     {row.revenueSource === 'INSTRUCTOR_REFERRAL' ? (
-                      <span className="rounded-full bg-cyan-50 px-2 py-0.5 text-[11px] font-bold text-cyan-700">Giới thiệu (97%)</span>
+                      <span className="rounded-full bg-tint px-2 py-0.5 text-[11px] font-bold text-accent-dark">Giới thiệu (97%)</span>
                     ) : (
-                      <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[11px] font-bold text-gray-600">Tự tìm thấy (37%)</span>
+                      <span className="rounded-full bg-line-soft px-2 py-0.5 text-[11px] font-bold text-ink-muted">Tự tìm thấy (37%)</span>
                     )}
                   </span>
-                  <span className="font-mono text-[12px] text-gray-500">{row.couponCode ?? '—'}</span>
-                  <span className="text-gray-500">{new Date(row.paidAt).toLocaleDateString('vi-VN')}</span>
+                  <span className="font-mono text-[12px] text-ink-muted">{row.couponCode ?? '—'}</span>
+                  <span className="text-ink-muted">{new Date(row.paidAt).toLocaleDateString('vi-VN')}</span>
                 </div>
               ))}
             </div>
@@ -302,10 +302,10 @@ export default function RevenuePage() {
   );
 }
 
-function StatCard({ label, value, tone = 'text-gray-900' }: { label: string; value: string; tone?: string }) {
+function StatCard({ label, value, tone = 'text-ink' }: { label: string; value: string; tone?: string }) {
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-      <span className="text-[11.5px] font-semibold text-gray-500">{label}</span>
+    <div className="rounded-xl border border-line bg-white p-4 shadow-sm">
+      <span className="text-[11.5px] font-semibold text-ink-muted">{label}</span>
       <div className={`mt-1 font-display text-[22px] font-extrabold ${tone}`}>{value}</div>
     </div>
   );
@@ -315,13 +315,13 @@ function StatCard({ label, value, tone = 'text-gray-900' }: { label: string; val
  * khô khan, tính từ `instructorEarning` (thực nhận), không cần endpoint mới. */
 function SplitBar({ label, percent, leftLabel, rightLabel }: { label: string; percent: number; leftLabel: string; rightLabel: string }) {
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-      <span className="text-[11.5px] font-semibold text-gray-500">{label}</span>
-      <div className="mt-2 flex h-3 w-full overflow-hidden rounded-full bg-gray-100">
-        <div className="h-full bg-cyan-500" style={{ width: `${percent}%` }} />
+    <div className="rounded-xl border border-line bg-white p-4 shadow-sm">
+      <span className="text-[11.5px] font-semibold text-ink-muted">{label}</span>
+      <div className="mt-2 flex h-3 w-full overflow-hidden rounded-full bg-line-soft">
+        <div className="h-full bg-accent" style={{ width: `${percent}%` }} />
         <div className="h-full bg-gray-300" style={{ width: `${100 - percent}%` }} />
       </div>
-      <div className="mt-1.5 flex justify-between text-[11.5px] text-gray-500">
+      <div className="mt-1.5 flex justify-between text-[11.5px] text-ink-muted">
         <span>{leftLabel} ({percent.toFixed(0)}%)</span>
         <span>{rightLabel} ({(100 - percent).toFixed(0)}%)</span>
       </div>
