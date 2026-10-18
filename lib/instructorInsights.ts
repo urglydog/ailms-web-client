@@ -59,3 +59,43 @@ export function describeGrowth(current: number, previous: number): string {
   if (percent === 0) return 'Doanh thu không đổi so với kỳ trước';
   return percent > 0 ? `Doanh thu tăng ${rounded}% so với kỳ trước` : `Doanh thu giảm ${rounded}% so với kỳ trước`;
 }
+
+export type GrowthTrend =
+  | { kind: 'none' }
+  | { kind: 'start' }
+  | { kind: 'flat' }
+  | { kind: 'up'; percent: number }
+  | { kind: 'down'; percent: number };
+
+/** Như {@link describeGrowth} nhưng trả về dạng có cấu trúc để nơi hiển thị tự dịch theo ngôn ngữ giao diện. */
+export function growthTrend(current: number, previous: number): GrowthTrend {
+  if (previous === 0) return current > 0 ? { kind: 'start' } : { kind: 'none' };
+  const percent = ((current - previous) / previous) * 100;
+  if (percent === 0) return { kind: 'flat' };
+  const rounded = Math.round(Math.abs(percent));
+  return percent > 0 ? { kind: 'up', percent: rounded } : { kind: 'down', percent: rounded };
+}
+
+const localDay = (d: Date) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
+/** Doanh thu thực nhận theo từng ngày (giờ địa phương) của `days` ngày kết thúc ở ngày của `now`, ngày không có giao dịch là 0.
+ * Không dùng `toISOString` để khỏi lệch ngày ở múi giờ dương (như Việt Nam, UTC+7). */
+export function dailyEarnings(
+  rows: ReadonlyArray<{ paidAt: string; instructorEarning: number }>,
+  days: number,
+  now: Date = new Date(),
+): { day: string; value: number }[] {
+  const byDay = new Map<string, number>();
+  for (const r of rows) {
+    const key = localDay(new Date(r.paidAt));
+    byDay.set(key, (byDay.get(key) ?? 0) + r.instructorEarning);
+  }
+  const series: { day: string; value: number }[] = [];
+  for (let i = days - 1; i >= 0; i -= 1) {
+    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+    const key = localDay(d);
+    series.push({ day: key, value: byDay.get(key) ?? 0 });
+  }
+  return series;
+}

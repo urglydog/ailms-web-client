@@ -1,9 +1,14 @@
+'use client';
+
+import { useTranslations } from 'next-intl';
 import { VoiceMappingManager } from '@/components/admin/VoiceMappingManager';
+import { PageHeader } from '@/components/instructor/ui/PageHeader';
 
 export default function AdminVoiceMappingsPage() {
+  const t = useTranslations('admin.voices');
   return (
     <>
-      <h1 className="m-0 font-display text-[22px] font-bold text-gray-900">Giọng đọc lồng tiếng</h1>
+      <PageHeader title={t('title')} subtitle={t('subtitle')} />
       <VoiceMappingManager />
     </>
   );

@@ -1,44 +1,53 @@
 'use client';
 
 import { useState, Suspense } from 'react';
+import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import Step1ForgotPassword from './step1';
-import Step2ResetPassword from './step2';
+import { useTranslations } from 'next-intl';
+import { AuthLayout } from '@/components/auth/AuthLayout';
+import { ForgotEmailStep } from '@/components/auth/ForgotEmailStep';
+import { ForgotResetStep } from '@/components/auth/ForgotResetStep';
 
 function ForgotPasswordContent() {
+  const t = useTranslations('auth');
   const searchParams = useSearchParams();
   const initialEmail = searchParams.get('email') || '';
   const [step, setStep] = useState<1 | 2>(1);
   const [email, setEmail] = useState(initialEmail);
 
   return (
-    <div className="card w-full max-w-md p-8 border border-line bg-surface-raised rounded-2xl shadow-sm">
-      <h1 className="font-display text-2xl font-bold text-ink mb-6 text-center">Quên Mật Khẩu</h1>
-
+    <AuthLayout
+      title={t('forgot.title')}
+      footer={
+        <Link href="/login" className="font-semibold text-accent-dark no-underline hover:underline">
+          {t('forgot.backToLogin')}
+        </Link>
+      }
+    >
       {step === 1 ? (
-        <Step1ForgotPassword
+        <ForgotEmailStep
           initialEmail={email}
-          onSuccess={(email) => {
-            setEmail(email);
+          onSuccess={(value) => {
+            setEmail(value);
             setStep(2);
           }}
         />
       ) : (
-        <Step2ResetPassword
-          email={email}
-          onSuccess={() => window.location.href = '/'}
-        />
+        <ForgotResetStep email={email} onSuccess={() => (window.location.href = '/')} />
       )}
-    </div>
+    </AuthLayout>
   );
+}
+
+function Loading() {
+  const t = useTranslations('auth');
+  return <div className="shell py-16 text-center text-sm text-ink-muted">{t('forgot.loading')}</div>;
 }
 
 export default function ForgotPasswordPage() {
   return (
-    <section className="shell flex min-h-[70vh] items-center justify-center py-16">
-      <Suspense fallback={<div className="text-center text-sm text-ink-muted">Đang tải...</div>}>
-        <ForgotPasswordContent />
-      </Suspense>
-    </section>
+    <Suspense fallback={<Loading />}>
+      <ForgotPasswordContent />
+    </Suspense>
   );
 }

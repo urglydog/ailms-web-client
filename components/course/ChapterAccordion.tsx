@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Badge } from '@/components/ui/Badge';
 import { formatDuration } from '@/lib/format';
 import type { Chapter } from '@/types/domain';
@@ -22,6 +23,7 @@ interface ChapterAccordionProps {
 }
 
 export function ChapterAccordion({ chapters, enrolled }: ChapterAccordionProps) {
+  const t = useTranslations('courseDetail.content');
   // Mở chương đầu tiên sẵn để người xem thấy ngay cấu trúc bài học
   const [openIds, setOpenIds] = useState<number[]>(() =>
     chapters[0] ? [chapters[0].id] : [],
@@ -47,7 +49,7 @@ export function ChapterAccordion({ chapters, enrolled }: ChapterAccordionProps) 
               <span className="font-display text-[15px] font-semibold text-ink">{chapter.title}</span>
               <span className="flex shrink-0 items-center gap-3 text-[13px] text-ink-muted">
                 <span>
-                  {chapter.lessons.length} bài · {formatDuration(totalSec)}
+                  {t('lessons', { count: chapter.lessons.length })} · {formatDuration(totalSec)}
                 </span>
                 <span aria-hidden className={isOpen ? 'rotate-180 transition-transform' : 'transition-transform'}>
                   ▾
@@ -85,7 +87,7 @@ export function ChapterAccordion({ chapters, enrolled }: ChapterAccordionProps) 
                         )}
                         {lesson.isPreview && (
                           <Badge tone="accent" className="shrink-0">
-                            Học thử
+                            {t('preview')}
                           </Badge>
                         )}
                       </span>

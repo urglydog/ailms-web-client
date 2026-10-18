@@ -2,7 +2,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useState, useRef, type KeyboardEvent } from 'react';
+import { useEffect, useState, useRef, type KeyboardEvent, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
@@ -20,7 +20,8 @@ import { authApi } from '@/lib/api/auth';
 import { enrollmentsApi } from '@/lib/api/enrollments';
 import { ApiError } from '@/lib/api/client';
 import { LanguageModal } from '@/components/layout/LanguageModal';
-import { MaterialTabs } from '@/components/materials/ui/MaterialTabs';
+import { MobileDrawer } from '@/components/layout/header/MobileDrawer';
+import { NotificationMenu } from '@/components/layout/header/NotificationMenu';
 import { LOCALE_NATIVE_NAMES, useLocaleStore } from '@/lib/stores/localeStore';
 import type { CartItem, WishlistItem } from '@/types/domain';
 
@@ -83,14 +84,11 @@ export function Header() {
   // chuột qua lại giữa 2 icon làm 2 dropdown cùng mở đè lên nhau.
   const headerDropdown = useExclusiveHoverDropdown();
   const [searchText, setSearchText] = useState('');
-  // (08/10/2026, theo phản hồi) — bỏ hẳn trang `/notifications` riêng (user: "ai đời thiết kế
-  // nút xem toàn bộ rồi vào mới thấy danh sách dài ngoằng") — popup này giờ LÀ nơi đọc thông
-  // báo duy nhất, không còn điều hướng sang trang khác.
-  const [notifTab, setNotifTab] = useState<'main' | 'system' | 'unread'>('main');
   // (26/09/2026, tính năng mới) — menu di động: dưới `md` nav chính + ô tìm kiếm trước đây bị
   // ẩn hẳn (`hidden md:flex`) mà KHÔNG có lối vào thay thế nào — học viên dùng điện thoại không
   // điều hướng/tìm kiếm được. Gộp cả 2 vào 1 panel xổ xuống dưới header, mở bằng nút hamburger.
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const closeMobileMenu = useCallback(() => setMobileMenuOpen(false), []);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showLanguageModal, setShowLanguageModal] = useState(false);
@@ -444,63 +442,20 @@ export function Header() {
                   )}
                 </button>
 
-                {headerDropdown.activeId === 'notifications' && (() => {
-                  // Chỉ duy nhất SystemAnnouncementService sinh type "SYSTEM_*" — cùng quy tắc
-                  // phân tab đã dùng ở trang /notifications cũ (nay đã gộp hẳn vào đây).
-                  const mainNotifs = notifications.filter(n => !n.type?.startsWith('SYSTEM_'));
-                  const systemNotifs = notifications.filter(n => n.type?.startsWith('SYSTEM_'));
-                  const unreadNotifs = notifications.filter(n => !n.isRead);
-                  const visible = notifTab === 'system' ? systemNotifs : notifTab === 'unread' ? unreadNotifs : mainNotifs;
-
-                  return (
-                    <div className="absolute right-0 top-12 z-[200] w-96 rounded-2xl border border-line bg-white p-2 shadow-[0_20px_50px_rgba(19,22,32,0.15)]">
-                      <div className="flex items-center justify-between border-b border-line-soft px-2 pb-2 pt-1">
-                        <span className="text-[13.5px] font-bold text-ink">{t('notifications.title')}</span>
-                        {unreadCount > 0 && (
-                          <button onClick={() => markAllAsRead()} className="text-[11px] font-semibold text-accent hover:text-accent-dark">
-                            {t('notifications.markAllRead')}
-                          </button>
-                        )}
-                      </div>
-
-                      <div className="px-1 py-2">
-                        <MaterialTabs
-                          tabs={[
-                            { key: 'main', label: 'Tin chính', count: mainNotifs.length },
-                            { key: 'system', label: 'Hệ thống', count: systemNotifs.length },
-                            { key: 'unread', label: 'Đã đọc', count: unreadNotifs.length },
-                          ]}
-                          active={notifTab}
-                          onChange={(key) => setNotifTab(key as 'main' | 'system' | 'unread')}
-                        />
-                      </div>
-
-                      <div className="flex max-h-[28rem] flex-col overflow-y-auto">
-                        {visible.length === 0 ? (
-                          <div className="py-6 text-center text-[12.5px] text-ink-muted">{t('notifications.empty')}</div>
-                        ) : (
-                          visible.map(n => (
-                            <button
-                              key={n.id}
-                              onClick={() => {
-                                if (!n.isRead) markAsRead(n.id);
-                                if (n.linkUrl) {
-                                  headerDropdown.closeNow('notifications');
-                                  router.push(n.linkUrl);
-                                }
-                              }}
-                              className={`flex w-full flex-col gap-1 rounded-xl p-3 text-left ${!n.isRead ? 'bg-accent/5' : 'hover:bg-surface'} ${n.linkUrl ? 'cursor-pointer' : 'cursor-default'}`}
-                            >
-                              <span className="text-[13px] font-semibold text-ink">{n.title}</span>
-                              <span className="text-[12.5px] text-ink-muted">{n.content}</span>
-                              <span className="text-[10px] text-ink-faint">{new Date(n.createdAt).toLocaleDateString('vi-VN')}</span>
-                            </button>
-                          ))
-                        )}
-                      </div>
-                    </div>
-                  );
-                })()}
+                {headerDropdown.activeId === 'notifications' && (
+                  <div className="absolute right-0 top-full z-[200] pt-2">
+                    <NotificationMenu
+                      notifications={notifications}
+                      unreadCount={unreadCount}
+                      onMarkRead={markAsRead}
+                      onMarkAllRead={markAllAsRead}
+                      onOpenLink={(url) => {
+                        headerDropdown.closeNow('notifications');
+                        router.push(url);
+                      }}
+                    />
+                  </div>
+                )}
               </div>
             )}
 
@@ -563,82 +518,18 @@ export function Header() {
           </div>
         </div>
 
-        {/* Panel menu di động (26/09/2026, tính năng mới) — gộp nav chính + tìm kiếm, chỉ hiện
-            dưới `md` khi bấm nút hamburger. */}
-        {mobileMenuOpen && (
-          <div className="border-t border-line bg-white px-4 py-3 md:hidden">
-            <div className="mb-3 flex items-center gap-2 rounded-xl border border-line bg-surface px-3.5 py-2.5">
-              <button
-                type="button"
-                onClick={submitSearch}
-                aria-label={t('search.ariaLabel')}
-                className="flex shrink-0 cursor-pointer items-center justify-center"
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="11" cy="11" r="8"></circle>
-                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                </svg>
-              </button>
-              <input
-                type="text"
-                value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
-                onKeyDown={handleSearchKeyDown}
-                placeholder={t('search.placeholder')}
-                className="w-full min-w-0 bg-transparent text-[13.5px] text-ink outline-none placeholder:text-ink-muted font-sans"
-              />
-            </div>
-            <nav className="flex flex-col gap-1">
-              <Link
-                href="/courses"
-                onClick={() => setMobileMenuOpen(false)}
-                className={`rounded-lg px-3 py-2.5 text-sm font-semibold no-underline ${
-                  isNavItemActive(pathname, '/courses') ? 'bg-accent/10 text-accent' : 'text-ink hover:bg-surface'
-                }`}
-              >
-                {t('nav.courses')}
-              </Link>
-              {isLoggedIn && (
-                <Link
-                  href="/my-courses"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`rounded-lg px-3 py-2.5 text-sm font-semibold no-underline ${
-                    isNavItemActive(pathname, '/my-courses') ? 'bg-accent/10 text-accent' : 'text-ink hover:bg-surface'
-                  }`}
-                >
-                  {t('nav.myCourses')}
-                </Link>
-              )}
-              <Link
-                href="/live"
-                onClick={() => setMobileMenuOpen(false)}
-                className={`rounded-lg px-3 py-2.5 text-sm font-semibold no-underline ${
-                  isNavItemActive(pathname, '/live') ? 'bg-accent/10 text-accent' : 'text-ink hover:bg-surface'
-                }`}
-              >
-                {t('nav.live')}
-              </Link>
-              <Link
-                href="/community"
-                onClick={() => setMobileMenuOpen(false)}
-                className={`rounded-lg px-3 py-2.5 text-sm font-semibold no-underline ${
-                  isNavItemActive(pathname, '/community') ? 'bg-accent/10 text-accent' : 'text-ink hover:bg-surface'
-                }`}
-              >
-                {t('nav.community')}
-              </Link>
-              <Link
-                href="/about"
-                onClick={() => setMobileMenuOpen(false)}
-                className={`rounded-lg px-3 py-2.5 text-sm font-medium no-underline ${
-                  isNavItemActive(pathname, '/about') ? 'bg-accent/10 text-accent' : 'text-ink-muted hover:bg-surface'
-                }`}
-              >
-                {t('nav.about')}
-              </Link>
-            </nav>
-          </div>
-        )}
+        {/* Ngăn kéo menu di động (thay panel xổ xuống cũ): tìm kiếm, Khám phá (danh mục), các mục chính, đăng nhập. */}
+        <MobileDrawer
+          open={mobileMenuOpen}
+          onClose={closeMobileMenu}
+          categories={categories ?? []}
+          isLoggedIn={isLoggedIn}
+          liveNow={liveNow}
+          pathname={pathname}
+          search={searchText}
+          onSearchChange={setSearchText}
+          onSearchSubmit={submitSearch}
+        />
       </header>
 
       {/* Custom Logout Modal */}

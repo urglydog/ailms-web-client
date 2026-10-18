@@ -1,10 +1,14 @@
 'use client';
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { useLocale, useTranslations } from 'next-intl';
+import { toast } from 'sonner';
+import { PageHeader } from '@/components/instructor/ui/PageHeader';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { api } from '@/lib/api/client';
 import { getAccessToken } from '@/lib/auth/token';
-import { toast } from 'sonner';
+import { COLORS } from '@/lib/theme/colors';
 
 interface AiUsageSummary {
   userId: number;
@@ -20,24 +24,21 @@ interface AiUsageDaily {
   totalCost: number;
 }
 
+/** Thống kê dùng AI: biểu đồ chi phí 30 ngày và bảng tiêu thụ theo học viên, có nút khóa/mở khóa quyền dùng AI. */
 export default function AiAnalyticsPage() {
+  const t = useTranslations('admin.aiAnalytics');
+  const locale = useLocale();
   const queryClient = useQueryClient();
 
   const { data: usageData, isLoading } = useQuery({
     queryKey: ['admin-ai-usage'],
-    queryFn: () =>
-      api.get<AiUsageSummary[]>('/api/v1/admin/ai-usage', {
-        token: getAccessToken() ?? undefined,
-      }),
+    queryFn: () => api.get<AiUsageSummary[]>('/api/v1/admin/ai-usage', { token: getAccessToken() ?? undefined }),
     enabled: !!getAccessToken(),
   });
 
   const { data: dailyData } = useQuery({
     queryKey: ['admin-ai-usage-daily'],
-    queryFn: () =>
-      api.get<AiUsageDaily[]>('/api/v1/admin/ai-usage/daily', {
-        token: getAccessToken() ?? undefined,
-      }),
+    queryFn: () => api.get<AiUsageDaily[]>('/api/v1/admin/ai-usage/daily', { token: getAccessToken() ?? undefined }),
     enabled: !!getAccessToken(),
   });
 
@@ -47,91 +48,96 @@ export default function AiAnalyticsPage() {
         token: getAccessToken() ?? undefined,
       }),
     onSuccess: () => {
-      toast.success('Đã cập nhật trạng thái AI của người dùng');
+      toast.success(t('updated'));
       queryClient.invalidateQueries({ queryKey: ['admin-ai-usage'] });
     },
     onError: (err: Error) => {
-      toast.error(err.message || 'Có lỗi xảy ra');
+      toast.error(err.message || t('error'));
     },
   });
 
-  if (isLoading) return <div className="p-8 text-center text-gray-500">Đang tải dữ liệu...</div>;
+  if (isLoading) {
+    return (
+      <div className="flex flex-col gap-3">
+        <Skeleton className="h-10 w-1/2" />
+        <Skeleton className="h-64" />
+        <Skeleton className="h-40" />
+      </div>
+    );
+  }
+
+  const th = 'px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-ink-muted';
 
   return (
-    <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-gray-900">AI Analytics</h1>
-        <p className="mt-2 text-sm text-gray-600">Giám sát lượng tiêu thụ API của học viên và chặn quyền sử dụng AI nếu cần thiết.</p>
-      </div>
+    <>
+      <PageHeader title={t('title')} subtitle={t('subtitle')} />
 
-      <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-        <h2 className="mb-4 text-sm font-semibold text-gray-700">Chi phí AI theo ngày (30 ngày gần nhất)</h2>
+      <section aria-labelledby="ai-cost-title" className="rounded-xl border border-line bg-white p-6 shadow-sm">
+        <h2 id="ai-cost-title" className="m-0 mb-4 text-sm font-semibold text-ink">
+          {t('chartTitle')}
+        </h2>
         {dailyData && dailyData.length > 0 ? (
           <ResponsiveContainer width="100%" height={240}>
             <AreaChart data={dailyData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+              <CartesianGrid strokeDasharray="3 3" stroke={COLORS.lineSoft} />
               <XAxis dataKey="day" tick={{ fontSize: 11 }} />
               <YAxis tick={{ fontSize: 11 }} tickFormatter={(v: number) => `$${v.toFixed(2)}`} />
               <Tooltip
-                formatter={(value) => [`$${Number(value ?? 0).toFixed(4)}`, 'Chi phí']}
-                labelFormatter={(label) => `Ngày ${label ?? ''}`}
+                formatter={(value) => [`$${Number(value ?? 0).toFixed(4)}`, t('cost')]}
+                labelFormatter={(label) => t('day', { date: String(label ?? '') })}
               />
-              <Area type="monotone" dataKey="totalCost" stroke="#059669" fill="#059669" fillOpacity={0.15} />
+              <Area type="monotone" dataKey="totalCost" stroke={COLORS.accent} fill={COLORS.accent} fillOpacity={0.15} />
             </AreaChart>
           </ResponsiveContainer>
         ) : (
-          <div className="py-8 text-center text-sm text-gray-500">Chưa có dữ liệu theo ngày</div>
+          <div className="py-8 text-center text-sm text-ink-muted">{t('noDaily')}</div>
         )}
-      </div>
+      </section>
 
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+      <div className="overflow-hidden rounded-xl border border-line bg-white shadow-sm">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full divide-y divide-line-soft">
+            <thead className="bg-surface">
               <tr>
-                <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Email Học viên</th>
-                <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Trạng thái AI</th>
-                <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Tổng Tokens</th>
-                <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Tổng Chi phí ($)</th>
-                <th scope="col" className="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Hành động</th>
+                <th scope="col" className={th}>{t('cols.email')}</th>
+                <th scope="col" className={th}>{t('cols.status')}</th>
+                <th scope="col" className={th}>{t('cols.tokens')}</th>
+                <th scope="col" className={th}>{t('cols.cost')}</th>
+                <th scope="col" className={`${th} text-right`}>{t('cols.actions')}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200 bg-white">
-              {usageData?.map((row: AiUsageSummary, idx: number) => (
-                <tr key={idx} className="hover:bg-gray-50 transition-colors">
-                  <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">{row.email}</td>
+            <tbody className="divide-y divide-line-soft bg-white">
+              {usageData?.map((row: AiUsageSummary) => (
+                <tr key={row.userId} className="transition-colors hover:bg-surface">
+                  <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-ink">{row.email}</td>
                   <td className="whitespace-nowrap px-6 py-4 text-sm">
                     {row.isAiLocked ? (
-                      <span className="inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10">Bị khóa</span>
+                      <span className="inline-flex items-center rounded-md bg-white px-2 py-1 text-xs font-medium text-danger ring-1 ring-inset ring-danger/40">{t('locked')}</span>
                     ) : (
-                      <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">Hoạt động</span>
+                      <span className="inline-flex items-center rounded-md bg-success-tint px-2 py-1 text-xs font-medium text-success-ink">{t('active')}</span>
                     )}
                   </td>
-                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-600">
-                    {row.totalTokens.toLocaleString()}
-                  </td>
-                  <td className="whitespace-nowrap px-6 py-4 text-sm font-semibold text-emerald-600">
-                    ${row.totalCost.toFixed(4)}
-                  </td>
+                  <td className="whitespace-nowrap px-6 py-4 text-sm text-ink-muted">{row.totalTokens.toLocaleString(locale)}</td>
+                  <td className="whitespace-nowrap px-6 py-4 text-sm font-semibold text-ink">${row.totalCost.toFixed(4)}</td>
                   <td className="whitespace-nowrap px-6 py-4 text-right text-sm">
-                    <button 
+                    <button
+                      type="button"
                       onClick={() => toggleLockMutation.mutate({ userId: row.userId, isLocked: !row.isAiLocked })}
                       disabled={toggleLockMutation.isPending}
-                      className={`inline-flex items-center rounded-md px-3 py-1.5 text-xs font-semibold shadow-sm ring-1 ring-inset ${
-                        row.isAiLocked 
-                          ? 'bg-white text-gray-700 ring-gray-300 hover:bg-gray-50' 
-                          : 'bg-white text-red-600 ring-red-300 hover:bg-red-50'
-                      } disabled:opacity-50`}
+                      aria-label={`${row.isAiLocked ? t('unlock') : t('lock')}: ${row.email}`}
+                      className={`inline-flex items-center rounded-md bg-white px-3 py-1.5 text-xs font-semibold shadow-sm ring-1 ring-inset disabled:opacity-50 ${
+                        row.isAiLocked ? 'text-ink ring-line hover:bg-surface' : 'text-danger ring-danger/40 hover:bg-danger/5'
+                      }`}
                     >
-                      {row.isAiLocked ? 'Mở khóa' : 'Khóa AI'}
+                      {row.isAiLocked ? t('unlock') : t('lock')}
                     </button>
                   </td>
                 </tr>
               ))}
               {(!usageData || usageData.length === 0) && (
                 <tr>
-                  <td colSpan={4} className="px-6 py-8 text-center text-sm text-gray-500">
-                    Chưa có dữ liệu thống kê
+                  <td colSpan={5} className="px-6 py-8 text-center text-sm text-ink-muted">
+                    {t('empty')}
                   </td>
                 </tr>
               )}
@@ -139,6 +145,6 @@ export default function AiAnalyticsPage() {
           </table>
         </div>
       </div>
-    </div>
+    </>
   );
 }

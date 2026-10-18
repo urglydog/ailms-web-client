@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import { useMyCourses } from '@/hooks/useCourses';
 import { useCreateCoupon, useDeleteCoupon, useMyCoupons, useUpdateCoupon } from '@/hooks/useCoupons';
 import { publicCoursesApi } from '@/lib/api/publicCourses';
@@ -59,18 +60,11 @@ function couponToForm(coupon: Coupon): FormState {
   };
 }
 
-const DISCOUNT_TYPE_LABEL: Record<DiscountType, string> = {
-  PERCENTAGE: 'Theo %',
-  FIXED_AMOUNT: 'Số tiền cố định',
-};
-
-const SCOPE_LABEL: Record<CouponScopeType, string> = {
-  ALL_COURSES: 'Toàn bộ khóa học',
-  SPECIFIC_COURSES: 'Nhiều khóa học chỉ định',
-  SINGLE_COURSE: '1 khóa học',
-};
+const DISCOUNT_TYPES: DiscountType[] = ['PERCENTAGE', 'FIXED_AMOUNT'];
 
 export function CouponManager({ role }: CouponManagerProps) {
+  const t = useTranslations('coupons');
+  const locale = useLocale();
   const { data: coupons, isLoading } = useMyCoupons();
   const createCoupon = useCreateCoupon();
   const updateCoupon = useUpdateCoupon();
@@ -90,7 +84,7 @@ export function CouponManager({ role }: CouponManagerProps) {
   const closeModal = () => setEditing(null);
 
   const handleDelete = (coupon: Coupon) => {
-    if (!window.confirm(`Xóa mã giảm giá "${coupon.code ?? '(tự động)'}"?`)) return;
+    if (!window.confirm(t('confirmDelete', { code: coupon.code ?? t('autoCode') }))) return;
     deleteCoupon.mutate(coupon.id);
   };
 
@@ -122,63 +116,63 @@ export function CouponManager({ role }: CouponManagerProps) {
     <div className="flex flex-col gap-6">
       <div className="flex justify-between items-end">
         <div>
-          <h1 className="font-display text-2xl font-bold text-ink">Mã giảm giá</h1>
+          <h1 className="font-display text-2xl font-bold text-ink">{t('title')}</h1>
           <p className="mt-1 text-sm text-ink-muted">
             {role === 'admin'
-              ? 'Coupon toàn hệ thống hoặc cho khóa học bất kỳ.'
-              : 'Coupon áp dụng cho khóa học của riêng bạn.'}
+              ? t('subtitleAdmin')
+              : t('subtitleInstructor')}
           </p>
         </div>
         <button
           onClick={openCreate}
           className="rounded-lg bg-accent px-4 py-2.5 text-sm font-bold text-white hover:bg-accent-dark transition-colors"
         >
-          + Tạo mã giảm giá
+          {t('create')}
         </button>
       </div>
 
       {isLoading ? (
-        <div className="text-sm text-ink-muted">Đang tải...</div>
+        <div className="text-sm text-ink-muted">{t('loading')}</div>
       ) : !coupons || coupons.length === 0 ? (
         <div className="card border border-line rounded-xl p-10 text-center text-sm text-ink-muted">
-          Chưa có mã giảm giá nào.
+          {t('empty')}
         </div>
       ) : (
         <div className="overflow-x-auto card border border-line rounded-xl">
           <table className="w-full text-left text-sm text-ink-muted">
             <thead className="bg-surface-raised text-xs uppercase text-ink border-b border-line">
               <tr>
-                <th className="px-6 py-4">Mã</th>
-                <th className="px-6 py-4">Giảm giá</th>
-                <th className="px-6 py-4">Phạm vi</th>
-                <th className="px-6 py-4">Thời gian</th>
-                <th className="px-6 py-4">Đã dùng</th>
-                <th className="px-6 py-4">Trạng thái</th>
-                <th className="px-6 py-4 text-right">Hành động</th>
+                <th className="px-6 py-4">{t('cols.code')}</th>
+                <th className="px-6 py-4">{t('cols.discount')}</th>
+                <th className="px-6 py-4">{t('cols.scope')}</th>
+                <th className="px-6 py-4">{t('cols.time')}</th>
+                <th className="px-6 py-4">{t('cols.used')}</th>
+                <th className="px-6 py-4">{t('cols.status')}</th>
+                <th className="px-6 py-4 text-right">{t('cols.actions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-line">
               {coupons.map((coupon) => (
                 <tr key={coupon.id} className="hover:bg-surface-raised transition-colors">
                   <td className="px-6 py-4 font-mono font-bold text-ink">
-                    {coupon.code ?? <span className="italic font-sans font-normal text-ink-muted">Tự động</span>}
+                    {coupon.code ?? <span className="italic font-sans font-normal text-ink-muted">{t('auto')}</span>}
                   </td>
                   <td className="px-6 py-4 text-ink">
                     {coupon.discountType === 'PERCENTAGE'
                       ? `${coupon.discountValue}%`
-                      : `${coupon.discountValue.toLocaleString('vi-VN')}đ`}
+                      : `${coupon.discountValue.toLocaleString(locale)}đ`}
                   </td>
                   <td className="px-6 py-4">
-                    {SCOPE_LABEL[coupon.scopeType]}
+                    {t(`scope.${coupon.scopeType}`)}
                     {coupon.scopeType !== 'ALL_COURSES' && (
                       <div className="mt-1 text-xs text-ink-muted max-w-[220px] truncate" title={coupon.courses.map((c) => c.courseTitle).join(', ')}>
-                        {coupon.courses.map((c) => c.courseTitle).join(', ') || 'Chưa chọn khóa nào'}
+                        {coupon.courses.map((c) => c.courseTitle).join(', ') || t('noCourse')}
                       </div>
                     )}
                   </td>
                   <td className="px-6 py-4 text-xs text-ink-muted">
-                    {new Date(coupon.startAt).toLocaleDateString('vi-VN')} –{' '}
-                    {new Date(coupon.endAt).toLocaleDateString('vi-VN')}
+                    {new Date(coupon.startAt).toLocaleDateString(locale)} –{' '}
+                    {new Date(coupon.endAt).toLocaleDateString(locale)}
                   </td>
                   <td className="px-6 py-4 text-ink">
                     {coupon.usageCount}
@@ -190,23 +184,23 @@ export function CouponManager({ role }: CouponManagerProps) {
                       if (!coupon.isActive) {
                         return (
                           <span className="rounded-full px-2.5 py-1 text-[11px] font-bold bg-surface-raised text-ink-muted border border-line">
-                            Đã tắt
+                            {t('status.off')}
                           </span>
                         );
                       }
                       if (isExpired) {
                         return (
                           <span
-                            className="rounded-full px-2.5 py-1 text-[11px] font-bold bg-warning/10 text-warning border border-warning/20"
-                            title="Mã đã hết hạn, học viên không áp dụng được dù vẫn đang bật"
+                            className="rounded-full px-2.5 py-1 text-[11px] font-bold bg-warning/10 text-ink border border-warning/20"
+                            title={t('status.expiredTitle')}
                           >
-                            Hết hạn
+                            {t('status.expired')}
                           </span>
                         );
                       }
                       return (
                         <span className="rounded-full px-2.5 py-1 text-[11px] font-bold bg-success/10 text-success border border-success/20">
-                          Đang bật
+                          {t('status.on')}
                         </span>
                       );
                     })()}
@@ -216,13 +210,13 @@ export function CouponManager({ role }: CouponManagerProps) {
                       onClick={() => openEdit(coupon)}
                       className="text-xs font-bold text-accent hover:underline mr-3"
                     >
-                      Sửa
+                      {t('edit')}
                     </button>
                     <button
                       onClick={() => handleDelete(coupon)}
                       className="text-xs font-bold text-danger hover:underline"
                     >
-                      Xóa
+                      {t('delete')}
                     </button>
                   </td>
                 </tr>
@@ -237,7 +231,7 @@ export function CouponManager({ role }: CouponManagerProps) {
           <div className="w-full max-w-lg rounded-2xl bg-surface shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
             <div className="px-6 py-4 border-b border-line flex justify-between items-center">
               <h2 className="font-display text-xl font-bold text-ink">
-                {editing === 'new' ? 'Tạo mã giảm giá' : 'Sửa mã giảm giá'}
+                {editing === 'new' ? t('form.createTitle') : t('form.editTitle')}
               </h2>
               <button onClick={closeModal} className="text-ink-muted hover:text-ink text-xl font-bold">
                 &times;
@@ -251,13 +245,13 @@ export function CouponManager({ role }: CouponManagerProps) {
                   checked={form.autoApply}
                   onChange={(e) => setForm((f) => ({ ...f, autoApply: e.target.checked }))}
                 />
-                Tự động áp dụng (không cần nhập mã)
+                {t('form.autoApply')}
               </label>
 
               {!form.autoApply && (
                 <div>
                   <label className="mb-1.5 block text-sm font-semibold text-ink">
-                    Mã giảm giá <span className="text-red-500">*</span>
+                    {t('form.code')} <span className="text-red-500">*</span>
                   </label>
                   <input
                     required
@@ -272,20 +266,20 @@ export function CouponManager({ role }: CouponManagerProps) {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="mb-1.5 block text-sm font-semibold text-ink">Loại giảm giá</label>
+                  <label className="mb-1.5 block text-sm font-semibold text-ink">{t('form.type')}</label>
                   <select
                     className="w-full rounded-lg border border-line p-2.5 text-sm focus:border-accent focus:outline-none"
                     value={form.discountType}
                     onChange={(e) => setForm((f) => ({ ...f, discountType: e.target.value as DiscountType }))}
                   >
-                    {Object.entries(DISCOUNT_TYPE_LABEL).map(([value, label]) => (
-                      <option key={value} value={value}>{label}</option>
+                    {DISCOUNT_TYPES.map((value) => (
+                      <option key={value} value={value}>{t(`type.${value}`)}</option>
                     ))}
                   </select>
                 </div>
                 <div>
                   <label className="mb-1.5 block text-sm font-semibold text-ink">
-                    Giá trị {form.discountType === 'PERCENTAGE' ? '(%)' : '(đ)'} <span className="text-red-500">*</span>
+                    {form.discountType === 'PERCENTAGE' ? t('form.valuePct') : t('form.valueFixed')} <span className="text-red-500">*</span>
                   </label>
                   <input
                     required
@@ -301,7 +295,7 @@ export function CouponManager({ role }: CouponManagerProps) {
               </div>
 
               <div>
-                <label className="mb-1.5 block text-sm font-semibold text-ink">Phạm vi áp dụng</label>
+                <label className="mb-1.5 block text-sm font-semibold text-ink">{t('form.scope')}</label>
                 <select
                   className="w-full rounded-lg border border-line p-2.5 text-sm focus:border-accent focus:outline-none"
                   value={form.scopeType}
@@ -309,12 +303,12 @@ export function CouponManager({ role }: CouponManagerProps) {
                     setForm((f) => ({ ...f, scopeType: e.target.value as CouponScopeType, courseIds: [] }))
                   }
                 >
-                  {role === 'admin' && <option value="ALL_COURSES">{SCOPE_LABEL.ALL_COURSES}</option>}
+                  {role === 'admin' && <option value="ALL_COURSES">{t('scope.ALL_COURSES')}</option>}
                   {role === 'instructor' && (
-                    <option value="ALL_COURSES">Toàn bộ khóa học CỦA TÔI</option>
+                    <option value="ALL_COURSES">{t('form.scopeMine')}</option>
                   )}
-                  <option value="SPECIFIC_COURSES">{SCOPE_LABEL.SPECIFIC_COURSES}</option>
-                  <option value="SINGLE_COURSE">{SCOPE_LABEL.SINGLE_COURSE}</option>
+                  <option value="SPECIFIC_COURSES">{t('scope.SPECIFIC_COURSES')}</option>
+                  <option value="SINGLE_COURSE">{t('scope.SINGLE_COURSE')}</option>
                 </select>
               </div>
 
@@ -330,7 +324,7 @@ export function CouponManager({ role }: CouponManagerProps) {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="mb-1.5 block text-sm font-semibold text-ink">
-                    Bắt đầu <span className="text-red-500">*</span>
+                    {t('form.start')} <span className="text-red-500">*</span>
                   </label>
                   <input
                     required
@@ -342,7 +336,7 @@ export function CouponManager({ role }: CouponManagerProps) {
                 </div>
                 <div>
                   <label className="mb-1.5 block text-sm font-semibold text-ink">
-                    Kết thúc <span className="text-red-500">*</span>
+                    {t('form.end')} <span className="text-red-500">*</span>
                   </label>
                   <input
                     required
@@ -356,23 +350,23 @@ export function CouponManager({ role }: CouponManagerProps) {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="mb-1.5 block text-sm font-semibold text-ink">Giới hạn lượt dùng (tổng)</label>
+                  <label className="mb-1.5 block text-sm font-semibold text-ink">{t('form.maxUsage')}</label>
                   <input
                     type="number"
                     min={1}
                     className="w-full rounded-lg border border-line p-2.5 text-sm focus:border-accent focus:outline-none"
-                    placeholder="Không giới hạn"
+                    placeholder={t('form.unlimited')}
                     value={form.maxUsageCount}
                     onChange={(e) => setForm((f) => ({ ...f, maxUsageCount: e.target.value }))}
                   />
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-sm font-semibold text-ink">Giới hạn / học viên</label>
+                  <label className="mb-1.5 block text-sm font-semibold text-ink">{t('form.maxPerUser')}</label>
                   <input
                     type="number"
                     min={1}
                     className="w-full rounded-lg border border-line p-2.5 text-sm focus:border-accent focus:outline-none"
-                    placeholder="Không giới hạn"
+                    placeholder={t('form.unlimited')}
                     value={form.maxUsagePerUser}
                     onChange={(e) => setForm((f) => ({ ...f, maxUsagePerUser: e.target.value }))}
                   />
@@ -386,7 +380,7 @@ export function CouponManager({ role }: CouponManagerProps) {
                     checked={form.isActive}
                     onChange={(e) => setForm((f) => ({ ...f, isActive: e.target.checked }))}
                   />
-                  Đang bật (bỏ chọn để tạm ngừng coupon này)
+                  {t('form.active')}
                 </label>
               )}
 
@@ -396,14 +390,14 @@ export function CouponManager({ role }: CouponManagerProps) {
                   onClick={closeModal}
                   className="flex-1 rounded-lg border border-line py-2.5 text-sm font-semibold text-ink hover:bg-surface-hover transition-colors"
                 >
-                  Hủy
+                  {t('form.cancel')}
                 </button>
                 <button
                   type="submit"
                   disabled={isSaving}
                   className="flex-1 rounded-lg bg-accent py-2.5 text-sm font-bold text-white hover:bg-accent-dark transition-colors disabled:opacity-60"
                 >
-                  {isSaving ? 'Đang lưu...' : 'Lưu'}
+                  {isSaving ? t('form.saving') : t('form.save')}
                 </button>
               </div>
             </form>
@@ -422,6 +416,7 @@ function CoursePicker({
   selectedIds: number[];
   onChange: (ids: number[]) => void;
 }) {
+  const t = useTranslations('coupons.picker');
   const { data: myCoursesPage } = useMyCourses({ size: 100 }, { enabled: role === 'instructor' });
   const [keyword, setKeyword] = useState('');
   const [searchResults, setSearchResults] = useState<CourseSummary[]>([]);
@@ -459,14 +454,14 @@ function CoursePicker({
   return (
     <div>
       <label className="mb-1.5 block text-sm font-semibold text-ink">
-        Chọn khóa học <span className="text-red-500">*</span>
+        {t('label')} <span className="text-red-500">*</span>
       </label>
       {role === 'admin' && (
         <div className="mb-2 flex gap-2">
           <input
             type="text"
             className="flex-1 rounded-lg border border-line p-2.5 text-sm focus:border-accent focus:outline-none"
-            placeholder="Tìm khóa học theo tên..."
+            placeholder={t('search')}
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); void handleSearch(); } }}
@@ -477,14 +472,14 @@ function CoursePicker({
             disabled={searching}
             className="rounded-lg border border-line px-4 text-sm font-semibold text-ink hover:bg-surface-hover"
           >
-            Tìm
+            {t('searchBtn')}
           </button>
         </div>
       )}
       <div className="max-h-48 overflow-y-auto rounded-lg border border-line divide-y divide-line">
         {options.length === 0 ? (
           <div className="p-4 text-center text-sm text-ink-muted">
-            {role === 'admin' ? 'Tìm kiếm khóa học ở trên.' : 'Bạn chưa có khóa học nào.'}
+            {role === 'admin' ? t('adminHint') : t('none')}
           </div>
         ) : (
           options.map((course) => (
@@ -500,7 +495,7 @@ function CoursePicker({
         )}
       </div>
       {selectedIds.length === 0 && (
-        <p className="mt-1 text-xs text-danger">Cần chọn ít nhất 1 khóa học.</p>
+        <p className="mt-1 text-xs text-danger">{t('needOne')}</p>
       )}
     </div>
   );

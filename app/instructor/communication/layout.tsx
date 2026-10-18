@@ -1,41 +1,15 @@
 'use client';
 
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { CommunicationTabs } from '@/components/instructor/communication/CommunicationTabs';
 
-const NAV_ITEMS = [
-  { key: 'qa', label: 'Hỏi đáp', href: '/instructor/communication/qa' },
-  { key: 'messages', label: 'Tin nhắn', href: '/instructor/communication/messages' },
-  { key: 'assignments', label: 'Bài tập', href: '/instructor/communication/assignments' },
-  { key: 'announcements', label: 'Thông báo', href: '/instructor/communication/announcements' },
-];
-
-/** "Giao tiếp" — giao diện tham khảo Udemy "Communication" (19/09/2026, xây mới): Hỏi đáp (tái
- * dùng lesson_chats có sẵn), Tin nhắn, Bài tập, Thông báo. Cùng khuôn mini-sidebar với
- * `app/instructor/revenue/layout.tsx`. */
+/** "Giao tiếp": Hỏi đáp (tái dùng lesson_chats có sẵn), Tin nhắn, Bài tập, Thông báo. Thanh tab ngang ở trên, nội dung từng mục
+ * ở dưới (trước đây là mini-sidebar dọc). */
 export default function CommunicationLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-
   return (
-    // (26/09/2026, sửa lỗi) — cột nav 200px cố định không co giãn dưới `md`. Dưới `md`: xếp dọc,
-    // nav thành 1 thanh tab cuộn ngang; từ `md:` giữ nguyên 2 cột.
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-[200px_1fr] md:gap-6">
-      <nav className="flex gap-1 overflow-x-auto pb-1 md:flex-col md:overflow-visible md:pb-0">
-        {NAV_ITEMS.map((item) => {
-          const isActive = pathname === item.href;
-          return (
-            <Link
-              key={item.key}
-              href={item.href}
-              className={`shrink-0 whitespace-nowrap rounded-lg px-3 py-2 text-[13px] font-semibold no-underline transition-colors ${
-                isActive ? 'bg-cyan-50 text-cyan-700' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-              }`}
-            >
-              {item.label}
-            </Link>
-          );
-        })}
-      </nav>
+    <div className="flex flex-col gap-5">
+      <CommunicationTabs pathname={pathname} />
       <div className="flex flex-col gap-5">{children}</div>
     </div>
   );

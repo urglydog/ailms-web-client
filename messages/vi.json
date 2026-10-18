@@ -14,7 +14,8 @@
     },
     "mobileMenu": {
       "open": "Mở menu",
-      "close": "Đóng menu"
+      "close": "Đóng menu",
+      "title": "Menu điều hướng"
     },
     "wishlist": {
       "viewAll": "Đi đến danh sách yêu thích",
@@ -35,7 +36,12 @@
       "title": "Thông báo",
       "markAllRead": "Đánh dấu đã đọc",
       "empty": "Không có thông báo nào",
-      "viewAll": "Xem tất cả thông báo"
+      "viewAll": "Xem tất cả thông báo",
+      "tabMain": "Tin chính",
+      "tabSystem": "Hệ thống",
+      "tabUnread": "Chưa đọc",
+      "unreadDot": "Chưa đọc",
+      "tabsAria": "Loại thông báo"
     },
     "account": {
       "guestName": "Người dùng",
@@ -368,5 +374,1470 @@
     "loading": "Đang tải...",
     "notFound": "Không tìm thấy chứng chỉ này.",
     "loadError": "Không tải được chứng chỉ, thử lại sau."
+  },
+  "courseDetail": {
+    "breadcrumbAria": "Đường dẫn",
+    "allCourses": "Kho khóa học",
+    "learners": "{count} học viên",
+    "level": {
+      "BEGINNER": "Cơ bản",
+      "INTERMEDIATE": "Trung cấp",
+      "ADVANCED": "Nâng cao"
+    },
+    "instructor": "Giảng viên:",
+    "updated": "Cập nhật {date}",
+    "dubbed": "Đã lồng tiếng:",
+    "dubPanel": {
+      "title": "Học bằng ngôn ngữ của bạn",
+      "body": "Mỗi bài giảng được AI lồng tiếng, đồng bộ với video gốc. Chọn giọng bạn muốn ngay trong khi học, phụ đề đổi theo."
+    },
+    "content": {
+      "title": "Nội dung khóa học",
+      "summary": "{chapters} chương · {lessons} bài",
+      "lessons": "{count} bài",
+      "preview": "Học thử"
+    },
+    "reviews": "Đánh giá từ học viên",
+    "price": {
+      "free": "Miễn phí",
+      "lifetime": "Sở hữu vĩnh viễn"
+    },
+    "includes": [
+      "{count} bài giảng có lồng tiếng AI",
+      "Trợ lý Socratic AI Tutor",
+      "Sơ đồ tư duy, thẻ ghi nhớ, quiz tự sinh",
+      "Truy cập vĩnh viễn sau khi sở hữu"
+    ],
+    "related": {
+      "title": "Khóa học liên quan",
+      "subtitle": "Cùng chủ đề với khóa này"
+    },
+    "enroll": {
+      "free": "Đăng ký",
+      "buy": "Mua khóa học",
+      "learnNow": "Học ngay",
+      "processing": "Đang xử lý...",
+      "addCart": "Thêm vào giỏ hàng",
+      "inCart": "Đã có trong giỏ hàng ✓",
+      "adding": "Đang thêm...",
+      "passwordPlaceholder": "Nhập mật khẩu đăng ký",
+      "privateNote": "Khóa học riêng tư, nhập mật khẩu ở bước thanh toán để mua trực tiếp.",
+      "wishlistAdd": "Thêm vào danh sách yêu thích",
+      "wishlistRemove": "Bỏ khỏi danh sách yêu thích",
+      "toastSuccess": "Đăng ký thành công!",
+      "toastError": "Có lỗi xảy ra khi thực hiện"
+    }
+  },
+  "courseList": {
+    "title": "Kho khóa học",
+    "subtitle": "Mọi khóa học đều có thể lồng tiếng sang ngôn ngữ bạn chọn.",
+    "all": "Tất cả",
+    "found": "Tìm thấy <b>{count}</b> khóa học",
+    "loading": "Đang tải…",
+    "loadError": "Không tải được danh sách khóa học.",
+    "sort": {
+      "label": "Sắp xếp",
+      "relevance": "Phù hợp nhất",
+      "rating": "Đánh giá cao",
+      "reviews": "Đánh giá nhiều",
+      "newest": "Mới nhất"
+    },
+    "view": {
+      "grid": "Dạng thẻ",
+      "list": "Dạng danh sách"
+    },
+    "filtersToggle": "Bộ lọc",
+    "activeLabel": "Đang lọc:",
+    "clearAll": "Xóa tất cả",
+    "remove": "Bỏ lọc {name}",
+    "empty": {
+      "title": "Không tìm thấy khóa học phù hợp",
+      "body": "Thử bỏ một vài bộ lọc hoặc dùng từ khóa khác.",
+      "clear": "Xóa toàn bộ bộ lọc"
+    },
+    "card": {
+      "lessons": "{count} bài",
+      "free": "Miễn phí"
+    },
+    "level": {
+      "BEGINNER": "Cơ bản",
+      "INTERMEDIATE": "Trung cấp",
+      "ADVANCED": "Nâng cao"
+    },
+    "ratingTier": "{tier} trở lên",
+    "duration": {
+      "0-1": "Dưới 1 giờ",
+      "1-3": "1 - 3 giờ",
+      "3-6": "3 - 6 giờ",
+      "6-17": "6 - 17 giờ",
+      "17+": "Trên 17 giờ"
+    },
+    "filters": {
+      "aria": "Bộ lọc khóa học",
+      "title": "Bộ lọc",
+      "clear": "Xóa bộ lọc",
+      "category": "Danh mục",
+      "rating": "Đánh giá",
+      "duration": "Thời lượng video",
+      "price": "Học phí",
+      "level": "Trình độ",
+      "free": "Miễn phí",
+      "paid": "Trả phí",
+      "showMore": "Hiện thêm ({count})",
+      "showLess": "Hiện ít hơn"
+    }
+  },
+  "shop": {
+    "steps": {
+      "aria": "Tiến trình mua hàng",
+      "cart": "Giỏ hàng",
+      "payment": "Thanh toán"
+    },
+    "coupon": {
+      "title": "Mã giảm giá",
+      "placeholder": "Nhập mã giảm giá",
+      "apply": "Áp dụng",
+      "checking": "Đang kiểm tra...",
+      "remove": "Bỏ mã",
+      "invalidMany": "Mã giảm giá không áp dụng được cho các khóa đã chọn.",
+      "invalidOne": "Mã giảm giá không áp dụng được cho khóa học này.",
+      "applied": "Đã áp dụng mã giảm giá.",
+      "failed": "Không áp dụng được mã giảm giá, thử lại sau.",
+      "selectOne": "Chọn ít nhất 1 khóa học để áp dụng mã giảm giá."
+    },
+    "summary": {
+      "title": "Tóm tắt đơn hàng",
+      "selected": "Đã chọn",
+      "selectedOf": "{selected} / {total} khóa học",
+      "subtotal": "Tạm tính ({count} khóa học)",
+      "subtotalOne": "Tạm tính",
+      "discount": "Đã giảm",
+      "total": "Tổng cộng",
+      "terms": "Bằng việc thanh toán, bạn đồng ý với <link>Điều khoản dịch vụ</link> của LinguaLearn."
+    },
+    "billing": {
+      "title": "Thông tin bổ sung",
+      "name": "Họ và tên",
+      "namePh": "Tên của bạn",
+      "phone": "Số điện thoại",
+      "phonePh": "Số điện thoại liên hệ",
+      "note": "* Thông tin trên chỉ dùng để liên hệ hỗ trợ khi cần thiết, không ảnh hưởng đến tài khoản thanh toán của bạn."
+    },
+    "pay": {
+      "payos": "Chuyển khoản QR (PayOS)",
+      "error": "Có lỗi xảy ra khi thực hiện thanh toán",
+      "proceed": "Tiến hành thanh toán"
+    },
+    "cart": {
+      "title": "Giỏ hàng",
+      "loading": "Đang tải giỏ hàng...",
+      "selectAll": "Chọn tất cả ({count} khóa học)",
+      "removeSelected": "Xóa đã chọn ({count})",
+      "remove": "Xóa",
+      "selectCourse": "Chọn {title}",
+      "instructor": "GV. {name}",
+      "meta": "{hours} giờ học · {lessons} bài giảng · {level}",
+      "bundleBadge": "Gói combo -{percent}%",
+      "bundleSuggest": "Thêm <b>{title}</b> (+{price}) để được giảm <b>{percent}%</b> theo gói \"{bundle}\"",
+      "addToCart": "Thêm vào giỏ",
+      "emptyTitle": "Giỏ hàng của bạn đang trống.",
+      "emptyCta": "Khám phá khóa học"
+    },
+    "checkout": {
+      "titleOne": "Thanh toán khóa học",
+      "titleMany": "Thanh toán {count} khóa học",
+      "backToCart": "Quay lại giỏ hàng",
+      "backToCourse": "Quay lại khóa học",
+      "courseInfo": "Thông tin khóa học",
+      "coursesChosen": "{count} khóa học đã chọn",
+      "course": "Khóa học",
+      "instructor": "Giảng viên:",
+      "updating": "Đang cập nhật",
+      "noItems": "Không có khóa học nào để thanh toán, có thể đã bị xóa khỏi giỏ hàng.",
+      "loadError": "Không thể tải thông tin khóa học",
+      "passwordTitle": "Mật khẩu đăng ký",
+      "passwordNote": "Khóa học này là khóa riêng tư, bạn cần nhập đúng mật khẩu do Giảng viên cung cấp mới thanh toán được.",
+      "passwordPh": "Nhập mật khẩu đăng ký"
+    },
+    "wishlist": {
+      "loading": "Đang tải…",
+      "search": "Tìm trong danh sách yêu thích…",
+      "searchLabel": "Tìm kiếm",
+      "empty": "Bạn chưa lưu khóa học nào vào danh sách yêu thích.",
+      "explore": "Khám phá khóa học",
+      "noMatch": "Không tìm thấy khóa học phù hợp",
+      "noMatchHint": "Thử đổi từ khóa khác.",
+      "remove": "Bỏ khỏi danh sách yêu thích",
+      "signUp": "Đăng ký",
+      "inCart": "✓ Đã có trong giỏ",
+      "adding": "Đang thêm...",
+      "addCart": "Thêm vào giỏ hàng",
+      "free": "Miễn phí",
+      "signedUp": "Đăng ký thành công!",
+      "signUpFailed": "Không đăng ký được, thử lại sau.",
+      "instructor": "GV. {name}"
+    },
+    "courseLevel": {
+      "BEGINNER": "Cơ bản",
+      "INTERMEDIATE": "Trung cấp",
+      "ADVANCED": "Nâng cao"
+    }
+  },
+  "auth": {
+    "layout": {
+      "tagline": "Học mọi khóa học bằng ngôn ngữ của bạn",
+      "body": "AI lồng tiếng đồng bộ với video gốc, kèm gia sư AI hỏi đáp ngay trong bài học.",
+      "highlights": [
+        "Giọng lồng tiếng AI theo ngôn ngữ bạn chọn",
+        "Gia sư AI giải đáp, dẫn thẳng tới đoạn video liên quan",
+        "Chứng chỉ hoàn thành, chia sẻ lên hồ sơ và LinkedIn"
+      ]
+    },
+    "fields": {
+      "email": "Email",
+      "password": "Mật khẩu",
+      "fullName": "Họ tên",
+      "confirmPassword": "Xác nhận mật khẩu",
+      "showPassword": "Hiện mật khẩu",
+      "hidePassword": "Ẩn mật khẩu"
+    },
+    "strength": {
+      "label": "Mức độ bảo mật:",
+      "short": "Quá ngắn (tối thiểu 6 ký tự)",
+      "weak": "Yếu (cần cả chữ và số)",
+      "good": "Tốt",
+      "strong": "Mạnh (tuyệt vời!)",
+      "tooWeak": "Mật khẩu chưa đủ mạnh. Vui lòng nhập ít nhất 6 ký tự gồm cả chữ cái và chữ số."
+    },
+    "match": {
+      "yes": "Mật khẩu khớp",
+      "no": "Mật khẩu chưa khớp",
+      "mismatch": "Mật khẩu xác nhận không khớp."
+    },
+    "login": {
+      "title": "Đăng nhập",
+      "registered": "Tài khoản đã được tạo thành công! Mời bạn đăng nhập.",
+      "orEmail": "hoặc đăng nhập với email",
+      "forgot": "Quên mật khẩu?",
+      "forgotNeedEmail": "Vui lòng nhập email để đổi mật khẩu",
+      "submit": "Đăng nhập",
+      "submitting": "Đang xử lý...",
+      "failed": "Đăng nhập thất bại",
+      "generic": "Đã có lỗi xảy ra",
+      "loading": "Đang tải biểu mẫu...",
+      "noAccount": "Chưa có tài khoản?",
+      "signUpNow": "Đăng ký ngay"
+    },
+    "register": {
+      "title": "Đăng ký tài khoản",
+      "stepInfo": "Thông tin",
+      "stepOtp": "Xác thực OTP",
+      "submit": "Đăng ký",
+      "submitting": "Đang xử lý...",
+      "serverError": "Lỗi đăng ký từ máy chủ",
+      "connectionError": "Lỗi kết nối đến máy chủ. Vui lòng thử lại.",
+      "otpIntro": "Vui lòng kiểm tra email {email} để lấy mã OTP (6 chữ số).",
+      "otpLabel": "Mã OTP",
+      "verify": "Xác thực",
+      "verifying": "Đang xác thực...",
+      "otpInvalid": "OTP không hợp lệ",
+      "hasAccount": "Đã có tài khoản?",
+      "signInNow": "Đăng nhập ngay"
+    },
+    "forgot": {
+      "title": "Quên mật khẩu",
+      "intro": "Nhập email đã đăng ký, chúng tôi sẽ gửi mã OTP để bạn đặt lại mật khẩu.",
+      "emailPh": "Nhập email của bạn",
+      "send": "Gửi OTP",
+      "sending": "Đang gửi...",
+      "otpLabel": "Mã OTP",
+      "otpHint": "Nhập 6 chữ số OTP từ email",
+      "newPassword": "Mật khẩu mới",
+      "newPasswordPh": "Nhập mật khẩu mới",
+      "confirmPh": "Xác nhận mật khẩu mới",
+      "reset": "Đặt lại mật khẩu",
+      "processing": "Đang xử lý...",
+      "success": "Đổi mật khẩu thành công! Bạn sẽ được chuyển về trang chủ.",
+      "generic": "Có lỗi xảy ra",
+      "loading": "Đang tải...",
+      "backToLogin": "Quay lại đăng nhập"
+    }
+  },
+  "community": {
+    "title": "Bảng xếp hạng cộng đồng",
+    "subtitle": "Tích lũy XP mỗi ngày học bài, làm quiz, giữ streak — thi đua cùng cả cộng đồng.",
+    "loading": "Đang tải bảng xếp hạng...",
+    "empty": "Chưa có ai trên bảng xếp hạng.",
+    "xp": "{xp} XP",
+    "yourRank": "Vị trí của bạn",
+    "yourRankInline": "Vị trí của bạn: #{rank} · {xp} XP",
+    "loginHint": "Đăng nhập để theo dõi streak và vị trí của bạn.",
+    "login": "Đăng nhập",
+    "viewAll": "Xem toàn bộ",
+    "rank": "Hạng {rank}",
+    "podiumAria": "Top 3 bảng xếp hạng",
+    "listAria": "Bảng xếp hạng"
+  },
+  "instructor": {
+    "nav": {
+      "courses": "Khóa học của tôi",
+      "bundles": "Gói khóa học",
+      "communication": "Giao tiếp",
+      "revenue": "Hiệu suất",
+      "tools": "Công cụ",
+      "aria": "Điều hướng kênh giảng viên"
+    },
+    "shell": {
+      "brand": "LinguaLearn",
+      "role": "Giảng viên",
+      "channel": "Kênh giảng viên",
+      "loading": "Đang tải...",
+      "backToStudent": "Về trang học viên",
+      "createCourse": "Tạo khóa học",
+      "collapse": "Thu gọn thanh bên",
+      "expand": "Mở rộng thanh bên",
+      "openMenu": "Mở menu",
+      "closeMenu": "Đóng menu",
+      "menuTitle": "Menu kênh giảng viên",
+      "account": "Tài khoản",
+      "language": "Ngôn ngữ",
+      "logout": "Đăng xuất",
+      "notifications": "Thông báo",
+      "logoutTitle": "Xác nhận đăng xuất",
+      "logoutBody": "Bạn có chắc chắn muốn đăng xuất khỏi hệ thống không?",
+      "cancel": "Hủy",
+      "confirm": "Đăng xuất"
+    },
+    "courses": {
+      "title": "Khóa học của tôi",
+      "subtitle": "Quản lý, hoàn thiện và theo dõi trạng thái các khóa học của bạn.",
+      "loading": "Đang tải...",
+      "loadError": "Không tải được danh sách khóa học.",
+      "search": "Tìm khóa học của bạn...",
+      "searchLabel": "Tìm kiếm",
+      "sort": {
+        "label": "Sắp xếp",
+        "newest": "Mới nhất",
+        "oldest": "Cũ nhất",
+        "az": "A-Z",
+        "za": "Z-A"
+      },
+      "status": {
+        "ALL": "Tất cả",
+        "DRAFT": "Nháp",
+        "PENDING": "Chờ duyệt",
+        "PUBLISHED": "Đã xuất bản",
+        "REJECTED": "Bị từ chối",
+        "ARCHIVED": "Đã lưu trữ"
+      },
+      "stats": {
+        "total": "Tổng số khóa",
+        "published": "Đã xuất bản",
+        "pending": "Chờ duyệt",
+        "attention": "Cần xử lý"
+      },
+      "row": {
+        "lessons": "{count} bài",
+        "completion": "Hoàn thành khóa học",
+        "edit": "Chỉnh sửa",
+        "remove": "Gỡ bỏ",
+        "select": "Chọn {title}",
+        "selectAll": "Chọn tất cả",
+        "columns": {
+          "course": "Khóa học",
+          "status": "Trạng thái",
+          "progress": "Hoàn thiện",
+          "next": "Việc tiếp theo"
+        }
+      },
+      "next": {
+        "complete": "Hoàn thiện khóa học",
+        "submit": "Gửi duyệt",
+        "fixRejected": "Xem lý do và chỉnh sửa",
+        "reactivate": "Kích hoạt lại",
+        "waiting": "Đang chờ quản trị viên duyệt",
+        "live": "Đang mở cho học viên"
+      },
+      "bulk": {
+        "remove": "Gỡ bỏ đã chọn ({count})",
+        "selected": "{count} khóa đã chọn"
+      },
+      "confirm": {
+        "title": "Gỡ bỏ khóa học",
+        "message": "Bạn có chắc chắn muốn gỡ bỏ {label}? Học viên mới sẽ không tìm và đăng ký được nữa, nhưng học viên đã đăng ký vẫn giữ quyền truy cập.",
+        "confirm": "Gỡ bỏ",
+        "cancel": "Hủy",
+        "many": "{count} khóa học đã chọn"
+      },
+      "empty": {
+        "filtered": "Chưa có khóa học nào ở trạng thái này.",
+        "noneTitle": "Bạn chưa có khóa học nào",
+        "noneBody": "Tạo khóa học đầu tiên, thêm video và để AI lồng tiếng sang nhiều ngôn ngữ.",
+        "noneCta": "Tạo khóa học"
+      }
+    },
+    "edit": {
+      "loading": "Đang tải khóa học...",
+      "back": "Quay lại các khóa học",
+      "tabsAria": "Các mục chỉnh sửa khóa học",
+      "groups": {
+        "content": "Nội dung khóa học",
+        "publish": "Đăng tải khóa học"
+      },
+      "tabs": {
+        "curriculum": "Chương trình giảng dạy",
+        "materials": "Học liệu & Quiz thi cử",
+        "resources": "Tài nguyên tĩnh",
+        "proctoring": "Giám sát thi",
+        "basics": "Thông tin cơ bản",
+        "pricing": "Giá cả",
+        "promotions": "Khuyến mãi"
+      },
+      "completion": {
+        "label": "Hoàn thiện {percent}%",
+        "ready": "Sẵn sàng gửi duyệt",
+        "missingTitle": "Còn thiếu để gửi duyệt",
+        "aria": "Tiến độ hoàn thiện khóa học: {percent}%"
+      },
+      "submit": {
+        "send": "Gửi duyệt",
+        "resubmit": "Gửi duyệt lại",
+        "needMore": "Hoàn thiện đủ điều kiện để gửi duyệt"
+      },
+      "preview": {
+        "label": "Xem trước",
+        "asInstructor": "Với tư cách là Giảng viên",
+        "asLearner": "Với tư cách là học viên"
+      },
+      "settingsLabel": "Cài đặt",
+      "banners": {
+        "rejected": "Lý do bị từ chối:",
+        "resubmitCount": "(đã gửi lại {count}/5 lần)",
+        "published": "Khóa học đã xuất bản. Sửa tiêu đề, mô tả, giá, chương, bài học hoặc video được áp dụng ngay, không cần Admin duyệt lại.",
+        "locked": "Khóa học đang được phê duyệt. Bạn không thể chỉnh sửa nội dung trong thời gian này."
+      },
+      "settings": {
+        "title": "Cài đặt",
+        "statusTitle": "Trạng thái khóa học",
+        "statusDraft": "Khóa học đang ở dạng nháp, chưa từng gửi duyệt.",
+        "statusPublished": "Khóa học đang được đăng tải công khai.",
+        "statusArchived": "Khóa học đã được gỡ khỏi tìm kiếm, học viên đã đăng ký vẫn truy cập được bình thường.",
+        "statusOther": "Khóa học chưa được đăng tải công khai.",
+        "reactivate": "Kích hoạt lại",
+        "reactivating": "Đang kích hoạt...",
+        "reactivateHint": "Khôi phục khóa học về đúng trạng thái trước khi lưu trữ, học viên mới có thể tìm và đăng ký lại như bình thường.",
+        "archive": "Gỡ bỏ khóa học",
+        "archiveHint": "Học viên mới sẽ không tìm và đăng ký được khóa học này nữa, nhưng học viên đã đăng ký vẫn giữ nguyên quyền truy cập. Đây không phải xóa vĩnh viễn, bạn có thể kích hoạt lại bất cứ lúc nào.",
+        "archiveConfirmTitle": "Gỡ bỏ khóa học",
+        "archiveConfirmMessage": "Học viên mới sẽ không còn tìm và đăng ký được khóa học này qua tìm kiếm nữa, nhưng học viên đã đăng ký vẫn giữ nguyên quyền truy cập. Bạn có thể kích hoạt lại bất cứ lúc nào.",
+        "archiveConfirm": "Gỡ bỏ",
+        "cancel": "Hủy",
+        "coInstructor": "Quản lý đồng giảng viên đang được phát triển, sẽ bổ sung ở bản cập nhật sau."
+      }
+    },
+    "performance": {
+      "tabsAria": "Các mục hiệu suất",
+      "tabs": {
+        "overview": "Tổng quan",
+        "revenue": "Doanh thu",
+        "students": "Sinh viên",
+        "reviews": "Đánh giá",
+        "hardQuestions": "Câu hỏi khó",
+        "retention": "Giữ chân"
+      },
+      "range": {
+        "label": "Khoảng thời gian",
+        "7d": "7 ngày qua",
+        "30d": "30 ngày qua",
+        "12m": "12 tháng qua",
+        "all": "Mọi thời điểm"
+      },
+      "insight": {
+        "see": "Xem →"
+      },
+      "overview": {
+        "title": "Tổng quan",
+        "subtitle": "Nhận thông tin chi tiết hàng đầu về hiệu suất của bạn.",
+        "kpi": {
+          "revenue": "Doanh thu thực nhận (30 ngày)",
+          "enrollments": "Lượt đăng ký mới",
+          "rating": "Điểm đánh giá trung bình",
+          "hardQuestions": "Câu hỏi khó"
+        },
+        "chart": {
+          "title": "Doanh thu thực nhận theo ngày (30 ngày qua)",
+          "aria": "Biểu đồ cột doanh thu theo ngày, tổng {total} trong 30 ngày, ngày cao nhất {peak}",
+          "empty": "Chưa có doanh thu trong 30 ngày qua."
+        },
+        "growth": {
+          "start": "Bắt đầu có doanh thu trong kỳ này",
+          "none": "Chưa có phát sinh doanh thu",
+          "flat": "Doanh thu không đổi so với kỳ trước",
+          "up": "Doanh thu tăng {percent}% so với kỳ trước",
+          "down": "Doanh thu giảm {percent}% so với kỳ trước"
+        },
+        "hard": "Có {count} câu hỏi đang bị hơn 60% học viên trả lời sai, nên xem lại nội dung liên quan.",
+        "lowRating": "Có đánh giá {rating}★ mới từ {student} ở khóa \"{course}\", nên phản hồi sớm."
+      }
+    },
+    "communication": {
+      "tabsAria": "Các mục giao tiếp",
+      "tabs": {
+        "qa": "Hỏi đáp",
+        "messages": "Tin nhắn",
+        "assignments": "Bài tập",
+        "announcements": "Thông báo"
+      }
+    },
+    "tools": {
+      "title": "Công cụ",
+      "subtitle": "Các công cụ hỗ trợ quản lý và phát triển khóa học của bạn.",
+      "open": "Mở",
+      "items": {
+        "live": {
+          "title": "Live",
+          "description": "Tạo và quản lý các buổi dạy trực tuyến, xem lại thống kê buổi đã diễn ra."
+        },
+        "coupons": {
+          "title": "Mã giảm giá",
+          "description": "Tạo mã giảm giá áp dụng cho một, nhiều hoặc toàn bộ khóa học của bạn."
+        },
+        "bundles": {
+          "title": "Gói khóa học",
+          "description": "Gộp nhiều khóa thành một gói với mức giảm giá hấp dẫn để học viên mua trọn bộ."
+        }
+      }
+    },
+    "live": {
+      "title": "Live Classroom",
+      "create": "Tạo buổi live mới",
+      "loading": "Đang tải...",
+      "loadError": "Không tải được danh sách buổi live.",
+      "status": {
+        "SCHEDULED": "Sắp live",
+        "LIVE": "Đang live",
+        "ENDED": "Đã kết thúc"
+      },
+      "columns": {
+        "title": "Tiêu đề",
+        "course": "Khóa học",
+        "status": "Trạng thái"
+      },
+      "enter": "Vào phòng",
+      "details": "Xem chi tiết",
+      "empty": {
+        "title": "Chưa có buổi live nào",
+        "body": "Tạo buổi live đầu tiên để dạy trực tuyến cùng học viên của bạn."
+      },
+      "new": {
+        "title": "Tạo buổi Live mới",
+        "intro": "Đặt lịch trước hoặc để trống giờ bắt đầu để bấm \"Bắt đầu Live\" bất kỳ lúc nào sau khi tạo. Ảnh thumbnail cho trang khám phá Live sẽ thêm được ở bước kế tiếp, ngay sau khi tạo xong.",
+        "form": {
+          "title": "Tiêu đề buổi live",
+          "course": "Khóa học",
+          "pickCourse": "-- Chọn khóa học --",
+          "language": "Ngôn ngữ bạn sẽ nói",
+          "optional": "(không bắt buộc)",
+          "languageDefault": "-- Mặc định theo hồ sơ cá nhân --",
+          "languageHint": "Học viên chọn ngôn ngữ lồng tiếng khác ngôn ngữ này để nghe bản dịch trong lúc live.",
+          "visibility": "Phạm vi hiển thị",
+          "courseOnly": "Chỉ học viên đã đăng ký khóa học này",
+          "public": "Công khai, ai cũng xem được, kể cả chưa đăng nhập",
+          "startsAt": "Giờ dự kiến bắt đầu",
+          "creating": "Đang tạo...",
+          "create": "Tạo buổi live →"
+        }
+      },
+      "room": {
+        "loading": "Đang tải...",
+        "ended": "Buổi live này đã kết thúc.",
+        "meta": "Khóa học: {course} · Ngôn ngữ nói: {language}",
+        "thumbnail": "Ảnh thumbnail cho trang khám phá Live",
+        "thumbnailAlt": "Xem trước thumbnail",
+        "noThumbnail": "Chưa tải ảnh riêng, đang dùng tạm ảnh bìa khóa học.",
+        "uploading": "Đang tải ảnh lên...",
+        "thumbnailTask": "Ảnh buổi live: {title}",
+        "connecting": "Đang kết nối...",
+        "start": "● Bắt đầu Live",
+        "ending": "Đang kết thúc...",
+        "end": "Kết thúc Live",
+        "cameraOff": "Camera và chia sẻ màn hình đang tắt",
+        "shareScreen": "Chia sẻ màn hình",
+        "shareAudio": "Chia sẻ âm thanh hệ thống",
+        "audioHint": "Chia sẻ âm thanh hệ thống phụ thuộc trình duyệt, hoạt động ổn định nhất trên Chrome khi bạn tick đúng ô trong hộp thoại chia sẻ màn hình lúc trình duyệt hỏi."
+      }
+    },
+    "common": {
+      "close": "Đóng"
+    },
+    "perf": {
+      "common": {
+        "allCourses": "Tất cả khóa học",
+        "loading": "Đang tải..."
+      },
+      "students": {
+        "title": "Học viên",
+        "export": "Xuất CSV",
+        "total": "Tổng học viên",
+        "avgProgress": "Tiến độ trung bình",
+        "atRisk": "Học viên < {pct}% tiến độ",
+        "atRiskWarn": "{ratio}% học viên chưa xem quá {pct}% khóa học, cân nhắc gửi email nhắc nhở hoặc xem lại bài mở đầu có đủ hấp dẫn không.",
+        "cols": {
+          "student": "Học viên",
+          "email": "Email",
+          "course": "Khóa học",
+          "enrolled": "Ngày đăng ký",
+          "progress": "Tiến độ"
+        },
+        "csv": {
+          "progress": "Tiến độ (%)"
+        },
+        "empty": "Chưa có học viên nào đăng ký."
+      },
+      "reviews": {
+        "title": "Đánh giá",
+        "average": "Điểm trung bình",
+        "count": "{count} đánh giá",
+        "distribution": "Phân bố theo số sao",
+        "tooltip": "{count} đánh giá",
+        "lowAlert": "Có {count} đánh giá {threshold}★ trở xuống trong 30 ngày gần đây, nên xem lại nhận xét bên dưới và phản hồi hoặc liên hệ học viên.",
+        "empty": "Chưa có đánh giá nào.",
+        "reportPrompt": "Lý do report review này (vi phạm tiêu chuẩn cộng đồng, spam...):",
+        "reported": "Đã report, review bị ẩn tạm thời và chờ Admin duyệt.",
+        "reportError": "Có lỗi xảy ra khi report review.",
+        "reportTitle": "Report review này (vi phạm tiêu chuẩn cộng đồng)"
+      },
+      "hardQuestions": {
+        "title": "Câu hỏi khó",
+        "subtitle": "Câu hỏi có tỷ lệ học viên trả lời sai trên 60%. Có thể nội dung bài giảng chưa rõ, hoặc câu hỏi và đáp án cần xem lại.",
+        "warn": "{count} câu hỏi đang vượt ngưỡng 60% sai, ưu tiên xem lại câu \"{question}\" ({percent}% sai, {course}).",
+        "level": {
+          "all": "Mọi mức độ",
+          "critical": "≥ 80% — Báo động đỏ",
+          "warning": "60–79% — Cảnh báo"
+        },
+        "sort": {
+          "wrongRate": "Sắp xếp: Tỷ lệ sai",
+          "totalAnswers": "Sắp xếp: Số lượt trả lời"
+        },
+        "cols": {
+          "question": "Câu hỏi",
+          "lesson": "Khóa học / Bài học",
+          "answers": "Lượt trả lời",
+          "wrongRate": "Tỷ lệ sai",
+          "actions": "Thao tác"
+        },
+        "emptyFiltered": "Không có câu hỏi nào khớp bộ lọc đang chọn.",
+        "emptyAll": "Chưa có câu hỏi nào vượt ngưỡng 60% trả lời sai (với đủ mẫu học viên), bài giảng của bạn đang ổn.",
+        "edit": "Xem & sửa"
+      },
+      "retention": {
+        "title": "Giữ chân học viên",
+        "subtitle": "% học viên còn xem tới từng mốc 10% thời lượng video, chỗ tụt mạnh là chỗ dễ bỏ ngang.",
+        "course": "Khóa học",
+        "lesson": "Bài học",
+        "chooseCourse": "— Chọn khóa học —",
+        "chooseLesson": "— Chọn bài học —",
+        "pick": "Chọn khóa học và bài học để xem biểu đồ giữ chân.",
+        "noViews": "Bài học này chưa có học viên nào xem, chưa đủ dữ liệu để vẽ biểu đồ.",
+        "drop": "Học viên rớt mạnh nhất giữa {from}%–{to}% video (giảm {points} điểm %), xem lại đoạn này, có thể đang dài hoặc khó hiểu.",
+        "tooltip": "Còn xem tới đây",
+        "label": "Đã xem tới {label}"
+      },
+      "list": {
+        "quick": "Khoảng nhanh",
+        "custom": "Tự chọn ngày",
+        "export": "Xuất CSV",
+        "kpi": {
+          "transactions": "Số giao dịch",
+          "gross": "Doanh thu gộp",
+          "fee": "Phí nền tảng",
+          "net": "Thực nhận"
+        },
+        "netTotal": "Tổng thực nhận trong khoảng thời gian này",
+        "topCourse": "Khóa <b>{title}</b> đóng góp doanh thu nhiều nhất kỳ này: {amount}.",
+        "split": {
+          "bundleLabel": "Gói combo vs Bán lẻ",
+          "bundle": "Gói combo",
+          "retail": "Bán lẻ",
+          "couponLabel": "Có mã giảm giá vs Giá gốc",
+          "coupon": "Có mã giảm giá",
+          "full": "Giá gốc"
+        },
+        "chart": {
+          "byDay": "Doanh thu theo ngày",
+          "organic": "Tự tìm thấy",
+          "referral": "Giới thiệu",
+          "empty": "Chưa có dữ liệu để vẽ biểu đồ.",
+          "day": "Ngày {date}",
+          "cumulativeTitle": "Doanh thu lũy kế trong kỳ",
+          "cumulative": "Lũy kế"
+        },
+        "cols": {
+          "course": "Khóa học",
+          "amount": "Số tiền",
+          "net": "Thực nhận",
+          "source": "Nguồn",
+          "coupon": "Mã giảm giá",
+          "paidAt": "Ngày thanh toán"
+        },
+        "empty": "Không có giao dịch nào trong khoảng thời gian này.",
+        "sourceReferral": "Giới thiệu (97%)",
+        "sourceOrganic": "Tự tìm thấy (37%)"
+      }
+    },
+    "comm": {
+      "loading": "Đang tải...",
+      "qa": {
+        "title": "Hỏi đáp",
+        "sortLabel": "Sắp xếp: {value}",
+        "newest": "Mới nhất",
+        "oldest": "Cũ nhất",
+        "twoCols": "Xem 2 cột",
+        "oneCol": "Xem 1 cột",
+        "onlyUnanswered": "Chỉ hiện câu hỏi chưa có câu trả lời",
+        "empty": "Chưa có câu hỏi nào.",
+        "pick": "Chọn 1 câu hỏi để xem chi tiết",
+        "detail": "Chi tiết câu hỏi",
+        "close": "Đóng",
+        "noAnswer": "Chưa có câu trả lời",
+        "answers": "{count} câu trả lời",
+        "youAnswered": "Bạn đã trả lời",
+        "instructorTag": " (Giảng viên)",
+        "placeholder": "Trả lời học viên...",
+        "send": "Gửi"
+      },
+      "assignments": {
+        "title": "Bài tập",
+        "empty": "Chưa có bài tập nào. Thêm bài tập ngay trong trình soạn Chương trình giảng dạy (nút \"+ Bài tập\").",
+        "due": "Hạn: {date}",
+        "graded": "{graded}/{total} đã chấm",
+        "noSubmissions": "Chưa có học viên nào nộp bài.",
+        "attachment": "Tệp đính kèm",
+        "score": "Điểm",
+        "feedback": "Phản hồi",
+        "save": "Lưu",
+        "gradedLine": "Đã chấm: {score} điểm",
+        "close": "Đóng"
+      },
+      "announcements": {
+        "title": "Thông báo",
+        "empty": "Chưa có thông báo nào.",
+        "delete": "Xóa",
+        "deleteTitle": "Xóa thông báo",
+        "deleteMessage": "Bạn có chắc chắn muốn xóa thông báo này? Học viên đã nhận sẽ vẫn giữ thông báo trong hộp thư của họ.",
+        "deleteConfirm": "Xóa",
+        "newTitle": "Gửi thông báo mới",
+        "pickCourse": "Chọn khóa học...",
+        "titlePh": "Tiêu đề thông báo",
+        "contentPh": "Nội dung thông báo gửi tới toàn bộ học viên đã đăng ký khóa học này...",
+        "send": "Gửi thông báo"
+      },
+      "messages": {
+        "title": "Tin nhắn"
+      },
+      "compose": {
+        "button": "+ Soạn",
+        "title": "Soạn tin nhắn mới",
+        "course": "Khóa học",
+        "pickCourse": "Chọn khóa học...",
+        "student": "Học viên",
+        "pickStudent": "Chọn học viên...",
+        "pickCourseFirst": "Chọn khóa học trước",
+        "cancel": "Hủy",
+        "start": "Bắt đầu"
+      },
+      "filter": {
+        "allCourses": "Tất cả khóa học",
+        "search": "Tìm khóa học...",
+        "notFound": "Không tìm thấy khóa học nào."
+      }
+    }
+  },
+  "coupons": {
+    "title": "Mã giảm giá",
+    "subtitleAdmin": "Coupon toàn hệ thống hoặc cho khóa học bất kỳ.",
+    "subtitleInstructor": "Coupon áp dụng cho khóa học của riêng bạn.",
+    "create": "+ Tạo mã giảm giá",
+    "loading": "Đang tải...",
+    "empty": "Chưa có mã giảm giá nào.",
+    "cols": {
+      "code": "Mã",
+      "discount": "Giảm giá",
+      "scope": "Phạm vi",
+      "time": "Thời gian",
+      "used": "Đã dùng",
+      "status": "Trạng thái",
+      "actions": "Hành động"
+    },
+    "auto": "Tự động",
+    "autoCode": "(tự động)",
+    "noCourse": "Chưa chọn khóa nào",
+    "status": {
+      "off": "Đã tắt",
+      "expired": "Hết hạn",
+      "on": "Đang bật",
+      "expiredTitle": "Mã đã hết hạn, học viên không áp dụng được dù vẫn đang bật"
+    },
+    "edit": "Sửa",
+    "delete": "Xóa",
+    "confirmDelete": "Xóa mã giảm giá \"{code}\"?",
+    "type": {
+      "PERCENTAGE": "Theo %",
+      "FIXED_AMOUNT": "Số tiền cố định"
+    },
+    "scope": {
+      "ALL_COURSES": "Toàn bộ khóa học",
+      "SPECIFIC_COURSES": "Nhiều khóa học chỉ định",
+      "SINGLE_COURSE": "1 khóa học"
+    },
+    "form": {
+      "createTitle": "Tạo mã giảm giá",
+      "editTitle": "Sửa mã giảm giá",
+      "autoApply": "Tự động áp dụng (không cần nhập mã)",
+      "code": "Mã giảm giá",
+      "type": "Loại giảm giá",
+      "valuePct": "Giá trị (%)",
+      "valueFixed": "Giá trị (đ)",
+      "scope": "Phạm vi áp dụng",
+      "scopeMine": "Toàn bộ khóa học CỦA TÔI",
+      "start": "Bắt đầu",
+      "end": "Kết thúc",
+      "maxUsage": "Giới hạn lượt dùng (tổng)",
+      "maxPerUser": "Giới hạn / học viên",
+      "unlimited": "Không giới hạn",
+      "active": "Đang bật (bỏ chọn để tạm ngừng coupon này)",
+      "cancel": "Hủy",
+      "saving": "Đang lưu...",
+      "save": "Lưu"
+    },
+    "picker": {
+      "label": "Chọn khóa học",
+      "search": "Tìm khóa học theo tên...",
+      "searchBtn": "Tìm",
+      "adminHint": "Tìm kiếm khóa học ở trên.",
+      "none": "Bạn chưa có khóa học nào.",
+      "needOne": "Cần chọn ít nhất 1 khóa học."
+    }
+  },
+  "bundles": {
+    "pageTitle": "Gói khóa học",
+    "pageSubtitle": "Tạo combo khóa học với giá ưu đãi hơn để tăng doanh thu.",
+    "createNew": "Tạo gói mới",
+    "emptyTitle": "Chưa có gói nào",
+    "emptyBody": "Tạo gói đầu tiên để tăng tỷ lệ chuyển đổi và doanh thu trung bình mỗi đơn hàng.",
+    "createFirst": "Tạo gói đầu tiên",
+    "off": "Đã tắt",
+    "edit": "Sửa",
+    "info": {
+      "title": "Cách gói khóa học hoạt động",
+      "owned": "Nếu học viên đã sở hữu 1 khóa trong gói, hệ thống tự <b>trừ tiền</b> khóa đó.",
+      "coupon": "Coupon riêng lẻ <b>không áp dụng chồng</b> lên khóa học trong gói.",
+      "price": "Giá được <b>chốt ngay khi tạo đơn</b>, không đổi kể cả khi bạn chỉnh giá sau."
+    },
+    "form": {
+      "editTitle": "Sửa gói khóa học",
+      "createTitle": "Tạo gói khóa học mới",
+      "name": "Tên gói",
+      "namePh": "VD: Combo Lập trình Web Full-stack",
+      "desc": "Mô tả ngắn",
+      "descPh": "Mô tả lợi ích khi mua gói...",
+      "discount": "Mức giảm giá Bundle",
+      "pickCourses": "Chọn khóa học ({count} đã chọn, cần ít nhất 2)",
+      "noPublished": "Bạn chưa có khóa học nào đã xuất bản.",
+      "minTwo": "Gói phải có ít nhất 2 khóa học!",
+      "preview": "Xem trước giá",
+      "originalSum": "Giá gốc tổng",
+      "discountLine": "Giảm {percent}%",
+      "learnerPays": "Học viên trả",
+      "active": "Đang hoạt động",
+      "cancel": "Hủy",
+      "saving": "Đang lưu...",
+      "update": "Cập nhật gói",
+      "create": "Tạo gói",
+      "close": "Đóng"
+    }
+  },
+  "admin": {
+    "nav": {
+      "aria": "Điều hướng quản trị",
+      "groups": {
+        "content": "Nội dung khóa học",
+        "ai": "AI & Tự động hóa",
+        "finance": "Tài chính",
+        "system": "Hệ thống"
+      },
+      "overview": "Tổng quan",
+      "users": "Người dùng",
+      "moderation": "Kiểm duyệt khóa học",
+      "categories": "Danh mục",
+      "reviews": "Đánh giá",
+      "aianalytics": "AI Analytics",
+      "aiqueue": "Giám sát AI Queue",
+      "voicemappings": "Giọng đọc lồng tiếng",
+      "tutorsecurity": "Bảo mật AI Tutor",
+      "transactions": "Đối soát giao dịch",
+      "coupons": "Mã giảm giá",
+      "announcements": "Thông báo hệ thống",
+      "settings": "Cấu hình hệ thống"
+    },
+    "shell": {
+      "brand": "LinguaLearn",
+      "role": "Quản trị viên",
+      "panel": "Quản trị",
+      "loading": "Đang tải...",
+      "backToStudent": "Về trang học viên",
+      "collapse": "Thu gọn thanh bên",
+      "expand": "Mở rộng thanh bên",
+      "openMenu": "Mở menu",
+      "closeMenu": "Đóng menu",
+      "menuTitle": "Menu quản trị",
+      "account": "Tài khoản",
+      "language": "Ngôn ngữ",
+      "logout": "Đăng xuất",
+      "notifications": "Thông báo"
+    },
+    "overview": {
+      "title": "Tổng quan hệ thống",
+      "subtitle": "Việc cần xử lý và tình trạng nền tảng trong một màn hình.",
+      "kpi": {
+        "pending": "Khóa học chờ duyệt",
+        "users": "Tổng người dùng",
+        "courses": "Tổng khóa học",
+        "revenue": "Doanh thu tạm tính"
+      },
+      "pending": {
+        "title": "Khóa học chờ duyệt gần đây",
+        "viewAll": "Xem tất cả ({count})",
+        "empty": "Không có khóa học nào đang chờ duyệt.",
+        "review": "Duyệt khóa {title}",
+        "reviewShort": "Duyệt"
+      },
+      "quick": {
+        "title": "Lối tắt",
+        "moderation": "Duyệt khóa học đang chờ",
+        "users": "Tìm, khóa hoặc đổi vai trò người dùng",
+        "transactions": "Kiểm tra thanh toán và hoàn tiền",
+        "aiqueue": "Theo dõi tiến trình lồng tiếng AI"
+      },
+      "health": {
+        "title": "Trạng thái máy chủ",
+        "refresh": "Làm mới",
+        "ram": "Bộ nhớ RAM của JVM",
+        "disk": "Dung lượng ổ đĩa máy chủ",
+        "uptime": "Thời gian chạy",
+        "loading": "Đang tải thông số..."
+      }
+    },
+    "users": {
+      "title": "Quản lý người dùng",
+      "subtitle": "Tìm kiếm, lọc theo vai trò và khóa hoặc mở khóa tài khoản.",
+      "filtersAria": "Lọc theo vai trò",
+      "filter": {
+        "ALL": "Tất cả",
+        "STUDENT": "Học viên",
+        "INSTRUCTOR": "Giảng viên",
+        "ADMIN": "Quản trị",
+        "LOCKED": "Bị khóa"
+      },
+      "searchLabel": "Tìm người dùng",
+      "searchPh": "Tên hoặc email...",
+      "cols": {
+        "fullName": "Họ và tên",
+        "email": "Email",
+        "createdAt": "Ngày tạo",
+        "role": "Vai trò",
+        "status": "Trạng thái",
+        "actions": "Hành động"
+      },
+      "role": {
+        "STUDENT": "Học viên",
+        "INSTRUCTOR": "Giảng viên",
+        "ADMIN": "Quản trị viên"
+      },
+      "active": "Hoạt động",
+      "locked": "Bị khóa",
+      "lock": "Khóa tài khoản",
+      "unlock": "Mở khóa",
+      "empty": "Không tìm thấy người dùng phù hợp.",
+      "loadError": "Không tải được danh sách người dùng.",
+      "lockedToast": "Đã khóa người dùng.",
+      "unlockedToast": "Đã mở khóa người dùng.",
+      "updateError": "Có lỗi khi cập nhật người dùng.",
+      "confirm": {
+        "lockTitle": "Khóa tài khoản này?",
+        "lockBody": "{name} sẽ không thể đăng nhập cho tới khi được mở khóa.",
+        "unlockTitle": "Mở khóa tài khoản này?",
+        "unlockBody": "{name} sẽ đăng nhập và sử dụng hệ thống trở lại bình thường.",
+        "cancel": "Hủy"
+      },
+      "ai": {
+        "title": "Đề xuất khóa từ AI ({count})",
+        "confirm": "Xác nhận khóa",
+        "dismiss": "Bỏ qua",
+        "confirmed": "Đã khóa AI cho người dùng theo đề xuất.",
+        "dismissed": "Đã bỏ qua đề xuất.",
+        "confirmError": "Có lỗi khi xác nhận khóa.",
+        "dismissError": "Có lỗi khi bỏ qua đề xuất."
+      },
+      "pager": {
+        "aria": "Phân trang người dùng",
+        "showing": "Đang xem {shown} / {total} người dùng",
+        "prev": "Trước",
+        "next": "Sau",
+        "page": "Trang {page} / {total}"
+      }
+    },
+    "moderation": {
+      "title": "Kiểm duyệt khóa học",
+      "subtitle": "Xem nội dung và quyết định xuất bản hoặc từ chối khóa học của giảng viên.",
+      "filtersAria": "Lọc theo trạng thái",
+      "tabs": {
+        "PENDING": "Chờ duyệt",
+        "PUBLISHED": "Đã xuất bản",
+        "REJECTED": "Bị từ chối",
+        "ARCHIVED": "Đã lưu trữ"
+      },
+      "loadError": "Không tải được danh sách khóa học.",
+      "empty": {
+        "title": "Không có khóa học nào",
+        "PENDING": "Hiện không có khóa nào đang chờ duyệt.",
+        "PUBLISHED": "Chưa có khóa nào được xuất bản.",
+        "REJECTED": "Chưa có khóa nào bị từ chối.",
+        "ARCHIVED": "Chưa có khóa nào được lưu trữ."
+      },
+      "lessons": "{count} bài",
+      "free": "Miễn phí",
+      "review": "Duyệt",
+      "view": "Xem",
+      "reviewAria": "Duyệt khóa {title}",
+      "viewAria": "Xem khóa {title}",
+      "detail": {
+        "back": "Quay lại",
+        "notFound": "Không tìm thấy khóa học.",
+        "reject": "Từ chối",
+        "approve": "Phê duyệt",
+        "cancel": "Hủy",
+        "rejectedReason": "Lý do đã từ chối:",
+        "content": "Nội dung khóa học",
+        "previewTag": "Xem thử",
+        "info": {
+          "instructor": "Giảng viên",
+          "category": "Danh mục",
+          "level": "Trình độ",
+          "price": "Giá",
+          "free": "Miễn phí",
+          "resubmits": "Số lần đã gửi lại"
+        },
+        "approveConfirm": {
+          "title": "Phê duyệt khóa học này?",
+          "body": "Khóa \"{title}\" sẽ được xuất bản và học viên có thể ghi danh ngay."
+        }
+      },
+      "reject": {
+        "title": "Từ chối khóa học",
+        "body": "Khóa \"{title}\" sẽ chuyển sang trạng thái Bị từ chối. Giảng viên sẽ thấy lý do này để chỉnh sửa và gửi duyệt lại.",
+        "label": "Lý do từ chối",
+        "placeholder": "Nêu rõ lý do từ chối (tối thiểu {min} ký tự)...",
+        "counter": "{count}/{min} ký tự",
+        "cancel": "Hủy",
+        "confirm": "Xác nhận từ chối"
+      },
+      "lesson": {
+        "videoTitle": "Xem video gốc — {title}",
+        "noVideo": "Bài học chưa nạp video.",
+        "documents": "Tài liệu đính kèm",
+        "loading": "Đang tải...",
+        "docsError": "Không tải được danh sách tài liệu.",
+        "noDocs": "Không có tài liệu đính kèm.",
+        "view": "Xem",
+        "download": "Tải xuống"
+      }
+    },
+    "queue": {
+      "title": "Giám sát AI Queue",
+      "subtitle": "Tình trạng AI Worker, hàng đợi tác vụ, nhóm khóa Gemini và các job lồng tiếng.",
+      "worker": "AI Worker: {status}",
+      "ok": "Hoạt động",
+      "down": "Lỗi",
+      "refresh": "Làm mới",
+      "stats": {
+        "pending": "Đang chờ trong Queue",
+        "started": "Đang xử lý",
+        "success": "Hoàn thành",
+        "failure": "Thất bại"
+      },
+      "queueDetail": "Chi tiết Queue",
+      "loading": "Đang tải...",
+      "connectError": "Không thể kết nối AI Worker tại",
+      "queueEmpty": "Queue trống — không có task đang chờ.",
+      "defaultQueue": "Hàng đợi mặc định của Celery",
+      "pendingTasks": "{count} task đang chờ",
+      "keyPool": "Nhóm khóa Gemini (slot)",
+      "slots": "{total} slot ({active} đang dùng được)",
+      "noKeys": "Chưa có khóa nào được cấu hình.",
+      "failures": "{count} lỗi liên tiếp",
+      "recoverIn": "hồi phục sau {sec}s",
+      "slot": {
+        "cooldown": "⏸ Đang nghỉ",
+        "active": "✓ Hoạt động"
+      },
+      "beat": {
+        "title": "Celery Beat — Lịch job định kỳ",
+        "running": "✓ Đang chạy",
+        "planned": "○ Chờ triển khai",
+        "cleanupTemp": {
+          "desc": "Dọn file trung gian (.wav, chunk video) quá 24 giờ",
+          "schedule": "Mỗi giờ (phút :00)"
+        },
+        "cleanupNotifications": {
+          "desc": "Xóa thông báo đã đọc quá 90 ngày",
+          "schedule": "3:00 sáng hằng ngày"
+        },
+        "remindFlashcards": {
+          "desc": "Nhắc lịch ôn Flashcards (SM-2)",
+          "schedule": "7:00 sáng hằng ngày"
+        },
+        "reportAudio": {
+          "desc": "Báo cáo audio không dùng quá 180 ngày",
+          "schedule": "Thứ Hai hằng tuần lúc 4:00 sáng"
+        }
+      },
+      "jobs": "Danh sách job lồng tiếng"
+    },
+    "aiAnalytics": {
+      "title": "AI Analytics",
+      "subtitle": "Giám sát lượng tiêu thụ API của học viên và khóa quyền dùng AI khi cần.",
+      "chartTitle": "Chi phí AI theo ngày (30 ngày gần nhất)",
+      "cost": "Chi phí",
+      "day": "Ngày {date}",
+      "noDaily": "Chưa có dữ liệu theo ngày",
+      "cols": {
+        "email": "Email học viên",
+        "status": "Trạng thái AI",
+        "tokens": "Tổng token",
+        "cost": "Tổng chi phí ($)",
+        "actions": "Hành động"
+      },
+      "locked": "Bị khóa",
+      "active": "Hoạt động",
+      "lock": "Khóa AI",
+      "unlock": "Mở khóa",
+      "empty": "Chưa có dữ liệu thống kê",
+      "updated": "Đã cập nhật trạng thái AI của người dùng",
+      "error": "Có lỗi xảy ra"
+    },
+    "voices": {
+      "title": "Giọng đọc lồng tiếng",
+      "subtitle": "Nguồn duy nhất quyết định ngôn ngữ lồng tiếng học viên được chọn; tắt kích hoạt là ẩn ngôn ngữ đó.",
+      "langPh": "Mã ngôn ngữ (vd: en-US)",
+      "langLabel": "Mã ngôn ngữ",
+      "voicePh": "Tên giọng Edge-TTS (vd: en-US-JennyNeural)",
+      "voiceLabel": "Tên giọng Edge-TTS",
+      "gender": {
+        "FEMALE": "Nữ",
+        "MALE": "Nam"
+      },
+      "genderLabel": "Giới tính",
+      "isDefault": "Mặc định",
+      "add": "Thêm giọng đọc",
+      "cols": {
+        "language": "Ngôn ngữ",
+        "voice": "Giọng đọc",
+        "gender": "Giới tính",
+        "default": "Mặc định",
+        "active": "Kích hoạt",
+        "actions": "Hành động"
+      },
+      "loading": "Đang tải...",
+      "empty": "Chưa có giọng đọc nào — học viên sẽ không thấy ngôn ngữ nào để lồng tiếng (BR-DUB-07).",
+      "delete": "Xóa",
+      "error": "Có lỗi xảy ra",
+      "deleteError": "Không xóa được giọng đọc này.",
+      "confirmDelete": {
+        "title": "Xóa giọng đọc này?",
+        "body": "Giọng {voice} ({language}) sẽ bị gỡ khỏi hệ thống.",
+        "cancel": "Hủy"
+      },
+      "searchLabel": "Tìm giọng đọc",
+      "searchPh": "Tìm theo ngôn ngữ hoặc tên giọng...",
+      "showMore": "Hiển thị thêm",
+      "showing": "Đang hiện {shown} / {total} giọng đọc",
+      "noMatch": "Không có giọng đọc phù hợp."
+    },
+    "tutorSec": {
+      "title": "Bảo mật AI Tutor",
+      "subtitle": "Tin nhắn học viên gửi cho Gia sư AI bị lớp kiểm tra sơ bộ phát hiện mẫu nghi vấn (yêu cầu bỏ qua quy tắc, giả danh quản trị, jailbreak...). Chỉ để theo dõi — không có hành động khóa hay chặn tài khoản tự động ở đây.",
+      "cols": {
+        "student": "Học viên",
+        "course": "Khóa học",
+        "pattern": "Mẫu khớp",
+        "message": "Nội dung tin nhắn",
+        "time": "Thời gian"
+      },
+      "loading": "Đang tải...",
+      "empty": "Chưa có tin nhắn nào bị gắn cờ nghi vấn.",
+      "pager": {
+        "aria": "Phân trang bản ghi bảo mật",
+        "info": "Trang {page} / {total} — {count} bản ghi",
+        "prev": "Trước",
+        "next": "Sau"
+      }
+    },
+    "jobs": {
+      "filterLabel": "Lọc theo trạng thái",
+      "status": {
+        "ALL": "Tất cả",
+        "PENDING": "Đang chờ",
+        "PROCESSING": "Đang xử lý",
+        "COMPLETED": "Hoàn tất",
+        "FAILED": "Lỗi",
+        "SKIPPED": "Bỏ qua"
+      },
+      "cols": {
+        "lesson": "Bài học",
+        "language": "Ngôn ngữ",
+        "status": "Trạng thái",
+        "progress": "Tiến độ",
+        "retry": "Thử lại",
+        "error": "Lỗi",
+        "actions": "Hành động"
+      },
+      "loading": "Đang tải...",
+      "empty": "Không có job nào.",
+      "retry": "Thử lại",
+      "retryError": "Không thử lại được job này."
+    },
+    "payments": {
+      "title": "Đối soát thanh toán",
+      "subtitle": "Quản lý và đối soát các giao dịch mua khóa học trên hệ thống.",
+      "refresh": "Làm mới dữ liệu",
+      "loadError": "Lỗi khi tải lịch sử giao dịch",
+      "empty": "Chưa có giao dịch nào trên hệ thống.",
+      "noMatch": "Không tìm thấy giao dịch nào phù hợp với bộ lọc.",
+      "status": {
+        "PAID": "Thành công",
+        "PENDING": "Đang chờ xử lý",
+        "FAILED": "Thất bại",
+        "EXPIRED": "Hết hạn"
+      },
+      "source": {
+        "referral": "Giới thiệu",
+        "organic": "Tự tìm thấy"
+      },
+      "filters": {
+        "email": "Tìm theo email",
+        "emailPh": "Nhập email học viên...",
+        "date": "Lọc theo ngày",
+        "status": "Trạng thái",
+        "all": "Tất cả trạng thái"
+      },
+      "cols": {
+        "ref": "Mã giao dịch",
+        "user": "Người dùng",
+        "amount": "Số tiền",
+        "fee": "Phí nền tảng",
+        "net": "Thực nhận",
+        "source": "Nguồn",
+        "method": "Phương thức",
+        "status": "Trạng thái",
+        "time": "Thời gian",
+        "actions": "Thao tác"
+      },
+      "details": "Chi tiết",
+      "pager": {
+        "aria": "Phân trang giao dịch",
+        "showing": "Đang xem {shown} / {total} giao dịch",
+        "prev": "Trước",
+        "next": "Sau",
+        "page": "Trang {page} / {total}"
+      },
+      "detail": {
+        "title": "Chi tiết giao dịch",
+        "close": "Đóng",
+        "course": "Khóa học",
+        "account": "Tài khoản mua",
+        "billingName": "Họ tên thanh toán",
+        "phone": "Số điện thoại",
+        "none": "Không có",
+        "source": "Nguồn doanh thu",
+        "sourceReferral": "Liên kết giới thiệu riêng của giảng viên",
+        "sourceOrganic": "Học viên tự tìm thấy trên nền tảng",
+        "fee": "Phí nền tảng ({percent}%)",
+        "earning": "Giảng viên nhận ({percent}%)",
+        "coupon": "Mã giảm giá đã dùng",
+        "couponMath": "Giá gốc {original} − Giảm {discount}",
+        "method": "Phương thức thanh toán",
+        "status": "Trạng thái",
+        "failReason": "Lý do thất bại",
+        "failText": "Bị hủy bởi cổng thanh toán hoặc người dùng tự hủy.",
+        "ref": "Mã tham chiếu",
+        "gateway": "Mã cổng thanh toán",
+        "notYet": "Chưa có",
+        "refund": "Hoàn tiền",
+        "refundSoon": "Tính năng hoàn tiền đang được phát triển.",
+        "dispute": "Xử lý khiếu nại",
+        "disputeMarked": "Đã đánh dấu báo cáo thành công!"
+      }
+    },
+    "settings": {
+      "title": "Cấu hình hệ thống",
+      "subtitle": "Thông tin chỉ xem về AI Worker, hạn ngạch nghiệp vụ và tài nguyên máy chủ.",
+      "worker": {
+        "title": "AI Worker",
+        "up": "Đang hoạt động",
+        "down": "Không kết nối được",
+        "gemini": "Mô hình Gemini (LLM)",
+        "geminiDesc": "BR-DUB-02: không hardcode — đọc từ biến môi trường GEMINI_MODEL",
+        "asr": "ASR Backend (nhận dạng giọng nói)",
+        "asrDesc": "groq = Groq Cloud API · whisperx_local = GPU nội bộ",
+        "chunk": "Độ dài mỗi đoạn (BR-CHUNK-02)",
+        "minutes": "{count} phút",
+        "chunkDesc": "Chia video thành các đoạn cố định để xử lý song song",
+        "url": "AI Worker URL",
+        "urlDesc": "Địa chỉ giao tiếp nội bộ với dịch vụ FastAPI"
+      },
+      "quotas": {
+        "title": "Hạn ngạch nghiệp vụ",
+        "dubStudent": "Lồng tiếng / học viên / ngày",
+        "dubStudentUnit": "{count} lượt",
+        "dubInstructor": "Lồng tiếng / giảng viên / ngày",
+        "dubInstructorUnit": "{count} lượt",
+        "materials": "Sinh học liệu / ngày",
+        "materialsUnit": "{count} lượt",
+        "tutor": "Tin nhắn AI Tutor / ngày",
+        "tutorUnit": "{count} tin",
+        "guestSearch": "Tìm kiếm AI (khách) / giờ",
+        "guestSearchUnit": "{count} lượt"
+      },
+      "resources": {
+        "title": "Tài nguyên Backend",
+        "ram": "RAM JVM",
+        "disk": "Ổ đĩa máy chủ",
+        "uptime": "Thời gian chạy Backend",
+        "courses": "Tổng khóa học",
+        "users": "Tổng người dùng"
+      },
+      "env": {
+        "title": "Môi trường"
+      }
+    },
+    "categories": {
+      "title": "Quản lý danh mục",
+      "subtitle": "Thêm, đổi tên hoặc xóa danh mục khóa học.",
+      "newPh": "Tên danh mục mới...",
+      "newLabel": "Tên danh mục mới",
+      "add": "Thêm danh mục",
+      "error": "Có lỗi xảy ra",
+      "deleteError": "Không xóa được danh mục này.",
+      "cols": {
+        "name": "Tên danh mục",
+        "slug": "Slug",
+        "actions": "Hành động"
+      },
+      "loading": "Đang tải...",
+      "empty": "Chưa có danh mục nào.",
+      "nameLabel": "Tên danh mục",
+      "delete": "Xóa",
+      "confirm": {
+        "title": "Xóa danh mục này?",
+        "body": "Danh mục \"{name}\" sẽ bị xóa. Nếu còn khóa học thuộc danh mục này, hệ thống sẽ từ chối.",
+        "cancel": "Hủy"
+      }
+    },
+    "reviews": {
+      "title": "Kiểm duyệt đánh giá",
+      "subtitle": "Ẩn đánh giá vi phạm và xử lý các báo cáo từ giảng viên.",
+      "coursePh": "Tên khóa học...",
+      "instructorPh": "Email giảng viên...",
+      "statusLabel": "Trạng thái",
+      "statusOpt": {
+        "ALL": "Tất cả trạng thái",
+        "VISIBLE": "Đang hiện",
+        "HIDDEN": "Bị ẩn",
+        "PENDING_REPORT": "Chờ duyệt (giảng viên báo cáo)"
+      },
+      "cols": {
+        "course": "Khóa học",
+        "student": "Học viên",
+        "stars": "Sao",
+        "comment": "Bình luận",
+        "date": "Ngày",
+        "status": "Trạng thái",
+        "actions": "Hành động"
+      },
+      "loading": "Đang tải...",
+      "empty": "Chưa có đánh giá nào.",
+      "noComment": "(không có bình luận)",
+      "badge": {
+        "pending": "Chờ duyệt báo cáo",
+        "hidden": "Đã ẩn",
+        "visible": "Đang hiện"
+      },
+      "reason": "Lý do: {reason}",
+      "unhide": "Hiện lại",
+      "hide": "Ẩn",
+      "keepHidden": "Giữ ẩn",
+      "rejectReportTip": "Từ chối báo cáo, hiện lại đánh giá",
+      "confirmReportTip": "Xác nhận báo cáo, giữ ẩn",
+      "hideError": "Không ẩn được đánh giá này.",
+      "unhideError": "Không bỏ ẩn được đánh giá này.",
+      "starsLabel": "{count} trên 5 sao",
+      "pager": {
+        "aria": "Phân trang đánh giá",
+        "prev": "Trang trước",
+        "next": "Trang sau",
+        "page": "Trang {page} / {total}"
+      }
+    },
+    "announce": {
+      "title": "Thông báo hệ thống",
+      "subtitle": "Gửi thông báo tới toàn hệ thống, chỉ giảng viên, chỉ học viên hoặc một cá nhân. Việc gửi chạy nền nên có thể mất vài giây tới vài phút để tới hết người nhận.",
+      "severity": {
+        "HIGH": "Cao — hiện thành banner đầu trang (vd: bảo trì hệ thống)",
+        "MEDIUM": "Trung bình — chỉ vào chuông thông báo",
+        "LOW": "Thấp — chỉ vào chuông thông báo"
+      },
+      "audience": {
+        "ALL": "Toàn bộ hệ thống",
+        "INSTRUCTOR": "Chỉ giảng viên",
+        "STUDENT": "Chỉ học viên",
+        "SPECIFIC_USER": "Một cá nhân cụ thể (theo ID)"
+      },
+      "dispatch": {
+        "PENDING": "Đang chờ xử lý",
+        "PROCESSING": "Đang gửi...",
+        "DONE": "Đã gửi xong",
+        "FAILED": "Lỗi"
+      },
+      "form": {
+        "title": "Tiêu đề",
+        "titlePh": "Vd: Bảo trì hệ thống",
+        "severity": "Mức độ",
+        "content": "Nội dung",
+        "audience": "Phạm vi người nhận",
+        "userId": "ID người dùng (xem ở trang Người dùng)",
+        "expires": "Tự ẩn banner sau (để trống = hiển thị đến khi có thông báo Cao mới hơn)",
+        "sending": "Đang gửi...",
+        "send": "Gửi thông báo",
+        "error": "Có lỗi xảy ra, thử lại sau."
+      },
+      "cols": {
+        "title": "Tiêu đề",
+        "severity": "Mức độ",
+        "audience": "Phạm vi",
+        "status": "Trạng thái",
+        "sent": "Đã gửi",
+        "created": "Ngày tạo"
+      },
+      "loading": "Đang tải...",
+      "empty": "Chưa gửi thông báo nào.",
+      "user": "Người dùng #{id}",
+      "sevLabel": {
+        "HIGH": "Cao",
+        "MEDIUM": "Trung bình",
+        "LOW": "Thấp"
+      }
+    }
   }
 }

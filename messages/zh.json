@@ -14,7 +14,8 @@
     },
     "mobileMenu": {
       "open": "打开菜单",
-      "close": "关闭菜单"
+      "close": "关闭菜单",
+      "title": "导航菜单"
     },
     "wishlist": {
       "viewAll": "前往收藏夹",
@@ -35,7 +36,12 @@
       "title": "通知",
       "markAllRead": "全部标记为已读",
       "empty": "暂无通知",
-      "viewAll": "查看全部通知"
+      "viewAll": "查看全部通知",
+      "tabMain": "主要",
+      "tabSystem": "系统",
+      "tabUnread": "未读",
+      "unreadDot": "未读",
+      "tabsAria": "通知类型"
     },
     "account": {
       "guestName": "用户",
@@ -368,5 +374,1470 @@
     "loading": "加载中...",
     "notFound": "找不到该证书。",
     "loadError": "无法加载证书，请稍后再试。"
+  },
+  "courseDetail": {
+    "breadcrumbAria": "路径",
+    "allCourses": "课程库",
+    "learners": "{count} 名学员",
+    "level": {
+      "BEGINNER": "入门",
+      "INTERMEDIATE": "中级",
+      "ADVANCED": "高级"
+    },
+    "instructor": "讲师：",
+    "updated": "更新于 {date}",
+    "dubbed": "已配音：",
+    "dubPanel": {
+      "title": "用你自己的语言学习",
+      "body": "每节课都由 AI 配音，并与原视频同步。学习时可随时切换声音，字幕也会随之改变。"
+    },
+    "content": {
+      "title": "课程内容",
+      "summary": "{chapters} 章 · {lessons} 节",
+      "lessons": "{count} 节",
+      "preview": "试看"
+    },
+    "reviews": "学员评价",
+    "price": {
+      "free": "免费",
+      "lifetime": "永久拥有"
+    },
+    "includes": [
+      "{count} 节带 AI 配音的课程",
+      "苏格拉底式 AI 导师",
+      "自动生成思维导图、记忆卡片和测验",
+      "购买后永久访问"
+    ],
+    "related": {
+      "title": "相关课程",
+      "subtitle": "与本课程同主题"
+    },
+    "enroll": {
+      "free": "报名",
+      "buy": "购买课程",
+      "learnNow": "开始学习",
+      "processing": "处理中...",
+      "addCart": "加入购物车",
+      "inCart": "已在购物车 ✓",
+      "adding": "添加中...",
+      "passwordPlaceholder": "输入报名密码",
+      "privateNote": "私密课程：请在结算时输入密码以直接购买。",
+      "wishlistAdd": "加入收藏",
+      "wishlistRemove": "取消收藏",
+      "toastSuccess": "报名成功！",
+      "toastError": "操作出错"
+    }
+  },
+  "courseList": {
+    "title": "课程库",
+    "subtitle": "每门课程都可以配音成你选择的语言。",
+    "all": "全部",
+    "found": "找到 <b>{count}</b> 门课程",
+    "loading": "加载中…",
+    "loadError": "无法加载课程列表。",
+    "sort": {
+      "label": "排序",
+      "relevance": "最相关",
+      "rating": "评分最高",
+      "reviews": "评价最多",
+      "newest": "最新"
+    },
+    "view": {
+      "grid": "卡片视图",
+      "list": "列表视图"
+    },
+    "filtersToggle": "筛选",
+    "activeLabel": "当前筛选：",
+    "clearAll": "全部清除",
+    "remove": "移除筛选 {name}",
+    "empty": {
+      "title": "没有找到合适的课程",
+      "body": "试试去掉一些筛选条件或更换关键词。",
+      "clear": "清除所有筛选"
+    },
+    "card": {
+      "lessons": "{count} 节",
+      "free": "免费"
+    },
+    "level": {
+      "BEGINNER": "入门",
+      "INTERMEDIATE": "中级",
+      "ADVANCED": "高级"
+    },
+    "ratingTier": "{tier} 及以上",
+    "duration": {
+      "0-1": "1 小时以内",
+      "1-3": "1 - 3 小时",
+      "3-6": "3 - 6 小时",
+      "6-17": "6 - 17 小时",
+      "17+": "17 小时以上"
+    },
+    "filters": {
+      "aria": "课程筛选",
+      "title": "筛选",
+      "clear": "清除筛选",
+      "category": "分类",
+      "rating": "评分",
+      "duration": "视频时长",
+      "price": "价格",
+      "level": "难度",
+      "free": "免费",
+      "paid": "付费",
+      "showMore": "显示更多（{count}）",
+      "showLess": "收起"
+    }
+  },
+  "shop": {
+    "steps": {
+      "aria": "购买进度",
+      "cart": "购物车",
+      "payment": "付款"
+    },
+    "coupon": {
+      "title": "优惠码",
+      "placeholder": "输入优惠码",
+      "apply": "使用",
+      "checking": "检查中...",
+      "remove": "移除优惠码",
+      "invalidMany": "该优惠码不适用于所选课程。",
+      "invalidOne": "该优惠码不适用于此课程。",
+      "applied": "已使用优惠码。",
+      "failed": "无法使用优惠码，请稍后再试。",
+      "selectOne": "请至少选择 1 门课程再使用优惠码。"
+    },
+    "summary": {
+      "title": "订单摘要",
+      "selected": "已选",
+      "selectedOf": "{selected} / {total} 门课程",
+      "subtotal": "小计（{count} 门课程）",
+      "subtotalOne": "小计",
+      "discount": "已优惠",
+      "total": "合计",
+      "terms": "付款即表示你同意 LinguaLearn 的<link>服务条款</link>。"
+    },
+    "billing": {
+      "title": "补充信息",
+      "name": "姓名",
+      "namePh": "你的姓名",
+      "phone": "电话号码",
+      "phonePh": "联系电话",
+      "note": "* 以上信息仅用于必要时联系你提供支持，不影响你的付款账户。"
+    },
+    "pay": {
+      "payos": "二维码转账（PayOS）",
+      "error": "付款时出错",
+      "proceed": "前往付款"
+    },
+    "cart": {
+      "title": "购物车",
+      "loading": "正在加载购物车...",
+      "selectAll": "全选（{count} 门课程）",
+      "removeSelected": "删除所选（{count}）",
+      "remove": "删除",
+      "selectCourse": "选择 {title}",
+      "instructor": "讲师 {name}",
+      "meta": "{hours} 小时课程 · {lessons} 节课 · {level}",
+      "bundleBadge": "组合 -{percent}%",
+      "bundleSuggest": "再加入 <b>{title}</b>（+{price}），即可享受“{bundle}”组合 <b>{percent}%</b> 折扣",
+      "addToCart": "加入购物车",
+      "emptyTitle": "你的购物车是空的。",
+      "emptyCta": "探索课程"
+    },
+    "checkout": {
+      "titleOne": "课程付款",
+      "titleMany": "{count} 门课程付款",
+      "backToCart": "返回购物车",
+      "backToCourse": "返回课程",
+      "courseInfo": "课程信息",
+      "coursesChosen": "已选 {count} 门课程",
+      "course": "课程",
+      "instructor": "讲师：",
+      "updating": "更新中",
+      "noItems": "没有可付款的课程，可能已从购物车中移除。",
+      "loadError": "无法加载课程信息",
+      "passwordTitle": "报名密码",
+      "passwordNote": "这是私密课程，需输入讲师提供的正确密码才能付款。",
+      "passwordPh": "输入报名密码"
+    },
+    "wishlist": {
+      "loading": "加载中…",
+      "search": "在收藏中搜索…",
+      "searchLabel": "搜索",
+      "empty": "你还没有收藏任何课程。",
+      "explore": "探索课程",
+      "noMatch": "没有找到合适的课程",
+      "noMatchHint": "换个关键词试试。",
+      "remove": "取消收藏",
+      "signUp": "报名",
+      "inCart": "✓ 已在购物车",
+      "adding": "添加中...",
+      "addCart": "加入购物车",
+      "free": "免费",
+      "signedUp": "报名成功！",
+      "signUpFailed": "报名失败，请稍后再试。",
+      "instructor": "讲师 {name}"
+    },
+    "courseLevel": {
+      "BEGINNER": "入门",
+      "INTERMEDIATE": "中级",
+      "ADVANCED": "高级"
+    }
+  },
+  "auth": {
+    "layout": {
+      "tagline": "用你自己的语言学习每一门课程",
+      "body": "AI 配音与原视频同步，还有可在课程中随时提问的 AI 导师。",
+      "highlights": [
+        "按你选择的语言生成 AI 配音",
+        "AI 导师答疑并直接跳转到相关视频片段",
+        "完成证书，可分享到个人主页和 LinkedIn"
+      ]
+    },
+    "fields": {
+      "email": "邮箱",
+      "password": "密码",
+      "fullName": "姓名",
+      "confirmPassword": "确认密码",
+      "showPassword": "显示密码",
+      "hidePassword": "隐藏密码"
+    },
+    "strength": {
+      "label": "密码强度：",
+      "short": "太短（至少 6 个字符）",
+      "weak": "较弱（需包含字母和数字）",
+      "good": "良好",
+      "strong": "很强（太棒了！）",
+      "tooWeak": "密码强度不够。请输入至少 6 个字符，并同时包含字母和数字。"
+    },
+    "match": {
+      "yes": "密码一致",
+      "no": "密码不一致",
+      "mismatch": "两次输入的密码不一致。"
+    },
+    "login": {
+      "title": "登录",
+      "registered": "账号创建成功！请登录。",
+      "orEmail": "或使用邮箱登录",
+      "forgot": "忘记密码？",
+      "forgotNeedEmail": "请先输入邮箱以重置密码",
+      "submit": "登录",
+      "submitting": "处理中...",
+      "failed": "登录失败",
+      "generic": "出了点问题",
+      "loading": "正在加载表单...",
+      "noAccount": "还没有账号？",
+      "signUpNow": "立即注册"
+    },
+    "register": {
+      "title": "注册账号",
+      "stepInfo": "信息",
+      "stepOtp": "验证 OTP",
+      "submit": "注册",
+      "submitting": "处理中...",
+      "serverError": "注册时服务器出错",
+      "connectionError": "无法连接服务器，请重试。",
+      "otpIntro": "请查看邮箱 {email} 获取 6 位 OTP 验证码。",
+      "otpLabel": "OTP 验证码",
+      "verify": "验证",
+      "verifying": "验证中...",
+      "otpInvalid": "OTP 无效",
+      "hasAccount": "已有账号？",
+      "signInNow": "立即登录"
+    },
+    "forgot": {
+      "title": "忘记密码",
+      "intro": "输入注册邮箱，我们会发送 OTP 供你重置密码。",
+      "emailPh": "输入你的邮箱",
+      "send": "发送 OTP",
+      "sending": "发送中...",
+      "otpLabel": "OTP 验证码",
+      "otpHint": "输入邮件中的 6 位 OTP",
+      "newPassword": "新密码",
+      "newPasswordPh": "输入新密码",
+      "confirmPh": "确认新密码",
+      "reset": "重置密码",
+      "processing": "处理中...",
+      "success": "密码已修改！即将返回首页。",
+      "generic": "出错了",
+      "loading": "加载中...",
+      "backToLogin": "返回登录"
+    }
+  },
+  "community": {
+    "title": "社区排行榜",
+    "subtitle": "每天学习、做测验、保持连续天数来积累 XP，与整个社区一起比拼。",
+    "loading": "正在加载排行榜...",
+    "empty": "排行榜上还没有人。",
+    "xp": "{xp} XP",
+    "yourRank": "你的排名",
+    "yourRankInline": "你的排名：#{rank} · {xp} XP",
+    "loginHint": "登录后可查看连续天数和你的排名。",
+    "login": "登录",
+    "viewAll": "查看全部",
+    "rank": "第 {rank} 名",
+    "podiumAria": "排行榜前三名",
+    "listAria": "排行榜"
+  },
+  "instructor": {
+    "nav": {
+      "courses": "我的课程",
+      "bundles": "课程组合",
+      "communication": "沟通",
+      "revenue": "数据表现",
+      "tools": "工具",
+      "aria": "讲师频道导航"
+    },
+    "shell": {
+      "brand": "LinguaLearn",
+      "role": "讲师",
+      "channel": "讲师频道",
+      "loading": "加载中...",
+      "backToStudent": "返回学员站点",
+      "createCourse": "创建课程",
+      "collapse": "收起侧栏",
+      "expand": "展开侧栏",
+      "openMenu": "打开菜单",
+      "closeMenu": "关闭菜单",
+      "menuTitle": "讲师频道菜单",
+      "account": "账户",
+      "language": "语言",
+      "logout": "退出登录",
+      "notifications": "通知",
+      "logoutTitle": "确认退出登录",
+      "logoutBody": "确定要退出系统吗？",
+      "cancel": "取消",
+      "confirm": "退出登录"
+    },
+    "courses": {
+      "title": "我的课程",
+      "subtitle": "管理、完善并跟踪你课程的状态。",
+      "loading": "加载中...",
+      "loadError": "无法加载课程列表。",
+      "search": "搜索你的课程...",
+      "searchLabel": "搜索",
+      "sort": {
+        "label": "排序",
+        "newest": "最新",
+        "oldest": "最早",
+        "az": "A-Z",
+        "za": "Z-A"
+      },
+      "status": {
+        "ALL": "全部",
+        "DRAFT": "草稿",
+        "PENDING": "待审核",
+        "PUBLISHED": "已发布",
+        "REJECTED": "已拒绝",
+        "ARCHIVED": "已归档"
+      },
+      "stats": {
+        "total": "课程总数",
+        "published": "已发布",
+        "pending": "待审核",
+        "attention": "需要处理"
+      },
+      "row": {
+        "lessons": "{count} 节",
+        "completion": "课程完成度",
+        "edit": "编辑",
+        "remove": "移除",
+        "select": "选择 {title}",
+        "selectAll": "全选",
+        "columns": {
+          "course": "课程",
+          "status": "状态",
+          "progress": "完成度",
+          "next": "下一步"
+        }
+      },
+      "next": {
+        "complete": "完善课程",
+        "submit": "提交审核",
+        "fixRejected": "查看原因并编辑",
+        "reactivate": "重新启用",
+        "waiting": "等待管理员审核",
+        "live": "已向学员开放"
+      },
+      "bulk": {
+        "remove": "移除所选（{count}）",
+        "selected": "已选 {count} 门课程"
+      },
+      "confirm": {
+        "title": "移除课程",
+        "message": "确定要移除 {label} 吗？新学员将无法找到和报名，已报名的学员仍可继续访问。",
+        "confirm": "移除",
+        "cancel": "取消",
+        "many": "已选 {count} 门课程"
+      },
+      "empty": {
+        "filtered": "该状态下还没有课程。",
+        "noneTitle": "你还没有课程",
+        "noneBody": "创建第一门课程，添加视频，让 AI 配音成多种语言。",
+        "noneCta": "创建课程"
+      }
+    },
+    "edit": {
+      "loading": "正在加载课程...",
+      "back": "返回课程列表",
+      "tabsAria": "课程编辑栏目",
+      "groups": {
+        "content": "课程内容",
+        "publish": "发布课程"
+      },
+      "tabs": {
+        "curriculum": "课程大纲",
+        "materials": "学习资料与测验",
+        "resources": "静态资源",
+        "proctoring": "考试监考",
+        "basics": "基本信息",
+        "pricing": "定价",
+        "promotions": "促销"
+      },
+      "completion": {
+        "label": "已完成 {percent}%",
+        "ready": "可以提交审核",
+        "missingTitle": "提交审核还缺少",
+        "aria": "课程完善进度：{percent}%"
+      },
+      "submit": {
+        "send": "提交审核",
+        "resubmit": "重新提交审核",
+        "needMore": "请先满足提交条件"
+      },
+      "preview": {
+        "label": "预览",
+        "asInstructor": "以讲师身份",
+        "asLearner": "以学员身份"
+      },
+      "settingsLabel": "设置",
+      "banners": {
+        "rejected": "拒绝原因：",
+        "resubmitCount": "（已重新提交 {count}/5 次）",
+        "published": "课程已发布。修改标题、简介、价格、章节、课时或视频会立即生效，无需管理员再次审核。",
+        "locked": "课程正在审核中，期间无法编辑内容。"
+      },
+      "settings": {
+        "title": "设置",
+        "statusTitle": "课程状态",
+        "statusDraft": "课程为草稿，尚未提交过。",
+        "statusPublished": "课程已公开发布。",
+        "statusArchived": "课程已从搜索中移除，已报名的学员仍可正常访问。",
+        "statusOther": "课程尚未公开发布。",
+        "reactivate": "重新启用",
+        "reactivating": "正在启用...",
+        "reactivateHint": "将课程恢复到归档前的状态，新学员即可重新搜索并报名。",
+        "archive": "移除课程",
+        "archiveHint": "新学员将无法再找到或报名此课程，但已报名的学员仍保留访问权限。这不是永久删除，你可以随时重新启用。",
+        "archiveConfirmTitle": "移除课程",
+        "archiveConfirmMessage": "新学员将无法再通过搜索找到或报名此课程，但已报名的学员仍保留访问权限。你可以随时重新启用。",
+        "archiveConfirm": "移除",
+        "cancel": "取消",
+        "coInstructor": "协作讲师管理正在开发中，将在后续更新中提供。"
+      }
+    },
+    "performance": {
+      "tabsAria": "数据表现栏目",
+      "tabs": {
+        "overview": "概览",
+        "revenue": "收入",
+        "students": "学员",
+        "reviews": "评价",
+        "hardQuestions": "难题",
+        "retention": "留存"
+      },
+      "range": {
+        "label": "时间范围",
+        "7d": "近 7 天",
+        "30d": "近 30 天",
+        "12m": "近 12 个月",
+        "all": "全部时间"
+      },
+      "insight": {
+        "see": "查看 →"
+      },
+      "overview": {
+        "title": "概览",
+        "subtitle": "快速了解你的核心表现。",
+        "kpi": {
+          "revenue": "实际收入（30 天）",
+          "enrollments": "新增报名",
+          "rating": "平均评分",
+          "hardQuestions": "难题"
+        },
+        "chart": {
+          "title": "每日实际收入（近 30 天）",
+          "aria": "每日收入柱状图，30 天共 {total}，最高一天 {peak}",
+          "empty": "近 30 天暂无收入。"
+        },
+        "growth": {
+          "start": "本期开始有收入",
+          "none": "暂无收入",
+          "flat": "收入与上一期持平",
+          "up": "收入比上一期增长 {percent}%",
+          "down": "收入比上一期下降 {percent}%"
+        },
+        "hard": "有 {count} 道题超过 60% 的学员答错，建议回顾相关内容。",
+        "lowRating": "{student} 在“{course}”给出了新的 {rating}★ 评价，建议尽快回复。"
+      }
+    },
+    "communication": {
+      "tabsAria": "沟通栏目",
+      "tabs": {
+        "qa": "问答",
+        "messages": "消息",
+        "assignments": "作业",
+        "announcements": "公告"
+      }
+    },
+    "tools": {
+      "title": "工具",
+      "subtitle": "帮助你管理和发展课程的工具。",
+      "open": "打开",
+      "items": {
+        "live": {
+          "title": "直播",
+          "description": "创建并管理在线直播授课，查看已结束场次的统计。"
+        },
+        "coupons": {
+          "title": "优惠码",
+          "description": "创建适用于一门、多门或全部课程的优惠码。"
+        },
+        "bundles": {
+          "title": "课程组合",
+          "description": "把多门课程打包并给出优惠，方便学员整套购买。"
+        }
+      }
+    },
+    "live": {
+      "title": "直播课堂",
+      "create": "创建直播",
+      "loading": "加载中...",
+      "loadError": "无法加载直播列表。",
+      "status": {
+        "SCHEDULED": "即将开始",
+        "LIVE": "直播中",
+        "ENDED": "已结束"
+      },
+      "columns": {
+        "title": "标题",
+        "course": "课程",
+        "status": "状态"
+      },
+      "enter": "进入直播间",
+      "details": "查看详情",
+      "empty": {
+        "title": "还没有直播",
+        "body": "创建第一场直播，与学员在线授课。"
+      },
+      "new": {
+        "title": "创建新直播",
+        "intro": "可提前预约，也可留空开始时间，创建后随时点击“开始直播”。直播发现页的缩略图可在下一步（创建完成后）添加。",
+        "form": {
+          "title": "直播标题",
+          "course": "课程",
+          "pickCourse": "-- 选择课程 --",
+          "language": "你将使用的语言",
+          "optional": "（可选）",
+          "languageDefault": "-- 默认使用个人资料中的语言 --",
+          "languageHint": "学员选择与此不同的配音语言，即可在直播中收听翻译。",
+          "visibility": "可见范围",
+          "courseOnly": "仅限已报名本课程的学员",
+          "public": "公开，任何人都能观看，包括未登录用户",
+          "startsAt": "计划开始时间",
+          "creating": "创建中...",
+          "create": "创建直播 →"
+        }
+      },
+      "room": {
+        "loading": "加载中...",
+        "ended": "本场直播已结束。",
+        "meta": "课程：{course} · 讲话语言：{language}",
+        "thumbnail": "直播发现页的缩略图",
+        "thumbnailAlt": "缩略图预览",
+        "noThumbnail": "尚未上传专属图片，暂时使用课程封面。",
+        "uploading": "正在上传图片...",
+        "thumbnailTask": "直播图片：{title}",
+        "connecting": "连接中...",
+        "start": "● 开始直播",
+        "ending": "正在结束...",
+        "end": "结束直播",
+        "cameraOff": "摄像头和屏幕共享已关闭",
+        "shareScreen": "共享屏幕",
+        "shareAudio": "共享系统声音",
+        "audioHint": "共享系统声音取决于浏览器，在 Chrome 上最稳定，需在浏览器弹出的屏幕共享对话框中勾选对应选项。"
+      }
+    },
+    "common": {
+      "close": "关闭"
+    },
+    "perf": {
+      "common": {
+        "allCourses": "全部课程",
+        "loading": "加载中..."
+      },
+      "students": {
+        "title": "学员",
+        "export": "导出 CSV",
+        "total": "学员总数",
+        "avgProgress": "平均进度",
+        "atRisk": "进度低于 {pct}% 的学员",
+        "atRiskWarn": "{ratio}% 的学员观看进度未超过课程的 {pct}%，可考虑发送提醒邮件，或检查开篇课程是否足够吸引人。",
+        "cols": {
+          "student": "学员",
+          "email": "邮箱",
+          "course": "课程",
+          "enrolled": "报名日期",
+          "progress": "进度"
+        },
+        "csv": {
+          "progress": "进度（%）"
+        },
+        "empty": "还没有学员报名。"
+      },
+      "reviews": {
+        "title": "评价",
+        "average": "平均评分",
+        "count": "{count} 条评价",
+        "distribution": "星级分布",
+        "tooltip": "{count} 条评价",
+        "lowAlert": "近 30 天有 {count} 条 {threshold}★ 及以下的评价，建议查看下方评论并回复或联系学员。",
+        "empty": "还没有评价。",
+        "reportPrompt": "举报此评价的原因（违反社区规范、垃圾信息等）：",
+        "reported": "已举报，该评价暂时隐藏，等待管理员审核。",
+        "reportError": "举报评价时出错。",
+        "reportTitle": "举报此评价（违反社区规范）"
+      },
+      "hardQuestions": {
+        "title": "难题",
+        "subtitle": "超过 60% 的学员答错的题目。可能是讲解不够清楚，或题目和答案需要复查。",
+        "warn": "有 {count} 道题的错误率超过 60%，建议优先复查“{question}”（{percent}% 错误，{course}）。",
+        "level": {
+          "all": "所有级别",
+          "critical": "≥ 80% — 红色警报",
+          "warning": "60–79% — 警告"
+        },
+        "sort": {
+          "wrongRate": "排序：错误率",
+          "totalAnswers": "排序：作答次数"
+        },
+        "cols": {
+          "question": "题目",
+          "lesson": "课程 / 课时",
+          "answers": "作答次数",
+          "wrongRate": "错误率",
+          "actions": "操作"
+        },
+        "emptyFiltered": "没有符合当前筛选的题目。",
+        "emptyAll": "暂时没有错误率超过 60% 的题目（样本足够时），你的课程状态良好。",
+        "edit": "查看并修改"
+      },
+      "retention": {
+        "title": "学员留存",
+        "subtitle": "视频每 10% 处仍在观看的学员比例，骤降的位置最容易有人离开。",
+        "course": "课程",
+        "lesson": "课时",
+        "chooseCourse": "— 选择课程 —",
+        "chooseLesson": "— 选择课时 —",
+        "pick": "请选择课程和课时以查看留存图表。",
+        "noViews": "该课时还没有学员观看，数据不足以绘制图表。",
+        "drop": "学员在视频 {from}%–{to}% 之间流失最多（下降 {points} 个百分点），请复查这一段，可能过长或难以理解。",
+        "tooltip": "仍在观看",
+        "label": "已观看到 {label}"
+      },
+      "list": {
+        "quick": "快速范围",
+        "custom": "自选日期",
+        "export": "导出 CSV",
+        "kpi": {
+          "transactions": "交易数",
+          "gross": "总收入",
+          "fee": "平台费用",
+          "net": "实际收入"
+        },
+        "netTotal": "此时间段内实际收入合计",
+        "topCourse": "<b>{title}</b> 本期贡献的收入最多：{amount}。",
+        "split": {
+          "bundleLabel": "组合与零售",
+          "bundle": "组合",
+          "retail": "零售",
+          "couponLabel": "使用优惠码与原价",
+          "coupon": "使用优惠码",
+          "full": "原价"
+        },
+        "chart": {
+          "byDay": "每日收入",
+          "organic": "自然流量",
+          "referral": "推荐",
+          "empty": "暂无数据可绘制图表。",
+          "day": "{date} 日",
+          "cumulativeTitle": "本期累计收入",
+          "cumulative": "累计"
+        },
+        "cols": {
+          "course": "课程",
+          "amount": "金额",
+          "net": "实际收入",
+          "source": "来源",
+          "coupon": "优惠码",
+          "paidAt": "支付日期"
+        },
+        "empty": "此时间段内没有交易。",
+        "sourceReferral": "推荐（97%）",
+        "sourceOrganic": "自然流量（37%）"
+      }
+    },
+    "comm": {
+      "loading": "加载中...",
+      "qa": {
+        "title": "问答",
+        "sortLabel": "排序：{value}",
+        "newest": "最新",
+        "oldest": "最早",
+        "twoCols": "双栏视图",
+        "oneCol": "单栏视图",
+        "onlyUnanswered": "只显示未回答的问题",
+        "empty": "还没有问题。",
+        "pick": "选择一个问题查看详情",
+        "detail": "问题详情",
+        "close": "关闭",
+        "noAnswer": "暂无回答",
+        "answers": "{count} 条回答",
+        "youAnswered": "你已回答",
+        "instructorTag": "（讲师）",
+        "placeholder": "回复学员...",
+        "send": "发送"
+      },
+      "assignments": {
+        "title": "作业",
+        "empty": "还没有作业。可在课程大纲编辑器中直接添加（“+ 作业”按钮）。",
+        "due": "截止：{date}",
+        "graded": "已批改 {graded}/{total}",
+        "noSubmissions": "还没有学员提交。",
+        "attachment": "附件",
+        "score": "分数",
+        "feedback": "反馈",
+        "save": "保存",
+        "gradedLine": "已批改：{score} 分",
+        "close": "关闭"
+      },
+      "announcements": {
+        "title": "公告",
+        "empty": "还没有公告。",
+        "delete": "删除",
+        "deleteTitle": "删除公告",
+        "deleteMessage": "确定要删除这条公告吗？已收到的学员仍会在收件箱中保留。",
+        "deleteConfirm": "删除",
+        "newTitle": "发送新公告",
+        "pickCourse": "选择课程...",
+        "titlePh": "公告标题",
+        "contentPh": "发送给本课程所有已报名学员的公告内容...",
+        "send": "发送公告"
+      },
+      "messages": {
+        "title": "消息"
+      },
+      "compose": {
+        "button": "+ 写消息",
+        "title": "写新消息",
+        "course": "课程",
+        "pickCourse": "选择课程...",
+        "student": "学员",
+        "pickStudent": "选择学员...",
+        "pickCourseFirst": "请先选择课程",
+        "cancel": "取消",
+        "start": "开始"
+      },
+      "filter": {
+        "allCourses": "全部课程",
+        "search": "搜索课程...",
+        "notFound": "没有找到课程。"
+      }
+    }
+  },
+  "coupons": {
+    "title": "优惠码",
+    "subtitleAdmin": "全站优惠券，或适用于任意课程的优惠券。",
+    "subtitleInstructor": "仅适用于你自己课程的优惠券。",
+    "create": "+ 创建优惠码",
+    "loading": "加载中...",
+    "empty": "还没有优惠码。",
+    "cols": {
+      "code": "优惠码",
+      "discount": "折扣",
+      "scope": "范围",
+      "time": "有效期",
+      "used": "已使用",
+      "status": "状态",
+      "actions": "操作"
+    },
+    "auto": "自动",
+    "autoCode": "（自动）",
+    "noCourse": "尚未选择课程",
+    "status": {
+      "off": "已关闭",
+      "expired": "已过期",
+      "on": "已启用",
+      "expiredTitle": "优惠码已过期，即使仍处于开启状态学员也无法使用"
+    },
+    "edit": "编辑",
+    "delete": "删除",
+    "confirmDelete": "删除优惠码“{code}”？",
+    "type": {
+      "PERCENTAGE": "按百分比",
+      "FIXED_AMOUNT": "固定金额"
+    },
+    "scope": {
+      "ALL_COURSES": "全部课程",
+      "SPECIFIC_COURSES": "指定的多门课程",
+      "SINGLE_COURSE": "1 门课程"
+    },
+    "form": {
+      "createTitle": "创建优惠码",
+      "editTitle": "编辑优惠码",
+      "autoApply": "自动应用（无需输入优惠码）",
+      "code": "优惠码",
+      "type": "折扣类型",
+      "valuePct": "数值（%）",
+      "valueFixed": "数值（đ）",
+      "scope": "适用范围",
+      "scopeMine": "我的全部课程",
+      "start": "开始",
+      "end": "结束",
+      "maxUsage": "使用次数上限（总计）",
+      "maxPerUser": "每位学员上限",
+      "unlimited": "不限",
+      "active": "启用（取消勾选可暂停此优惠券）",
+      "cancel": "取消",
+      "saving": "保存中...",
+      "save": "保存"
+    },
+    "picker": {
+      "label": "选择课程",
+      "search": "按名称搜索课程...",
+      "searchBtn": "搜索",
+      "adminHint": "请在上方搜索课程。",
+      "none": "你还没有课程。",
+      "needOne": "至少选择 1 门课程。"
+    }
+  },
+  "bundles": {
+    "pageTitle": "课程组合",
+    "pageSubtitle": "创建更优惠的课程组合来提升收入。",
+    "createNew": "创建组合",
+    "emptyTitle": "还没有组合",
+    "emptyBody": "创建第一个组合，提高转化率和每单平均收入。",
+    "createFirst": "创建第一个组合",
+    "off": "已关闭",
+    "edit": "编辑",
+    "info": {
+      "title": "课程组合如何运作",
+      "owned": "如果学员已拥有组合中的某门课程，系统会自动<b>扣除</b>该课程的价格。",
+      "coupon": "单独的优惠券<b>不会叠加</b>在组合内的课程上。",
+      "price": "价格在<b>下单时锁定</b>，之后即使你调整价格也不会变。"
+    },
+    "form": {
+      "editTitle": "编辑组合",
+      "createTitle": "创建新组合",
+      "name": "组合名称",
+      "namePh": "例如：全栈 Web 开发组合",
+      "desc": "简短描述",
+      "descPh": "描述购买组合的好处...",
+      "discount": "组合折扣",
+      "pickCourses": "选择课程（已选 {count} 门，至少 2 门）",
+      "noPublished": "你还没有已发布的课程。",
+      "minTwo": "组合至少需要 2 门课程！",
+      "preview": "价格预览",
+      "originalSum": "原价合计",
+      "discountLine": "减 {percent}%",
+      "learnerPays": "学员支付",
+      "active": "启用中",
+      "cancel": "取消",
+      "saving": "保存中...",
+      "update": "更新组合",
+      "create": "创建组合",
+      "close": "关闭"
+    }
+  },
+  "admin": {
+    "nav": {
+      "aria": "管理导航",
+      "groups": {
+        "content": "课程内容",
+        "ai": "AI 与自动化",
+        "finance": "财务",
+        "system": "系统"
+      },
+      "overview": "总览",
+      "users": "用户",
+      "moderation": "课程审核",
+      "categories": "分类",
+      "reviews": "评价",
+      "aianalytics": "AI 分析",
+      "aiqueue": "AI 队列监控",
+      "voicemappings": "配音声音",
+      "tutorsecurity": "AI 助教安全",
+      "transactions": "交易对账",
+      "coupons": "优惠券",
+      "announcements": "系统公告",
+      "settings": "系统设置"
+    },
+    "shell": {
+      "brand": "LinguaLearn",
+      "role": "管理员",
+      "panel": "管理",
+      "loading": "加载中...",
+      "backToStudent": "返回学员站点",
+      "collapse": "收起侧栏",
+      "expand": "展开侧栏",
+      "openMenu": "打开菜单",
+      "closeMenu": "关闭菜单",
+      "menuTitle": "管理菜单",
+      "account": "账户",
+      "language": "语言",
+      "logout": "退出登录",
+      "notifications": "通知"
+    },
+    "overview": {
+      "title": "系统总览",
+      "subtitle": "待处理事项和平台状态，一屏查看。",
+      "kpi": {
+        "pending": "待审核课程",
+        "users": "用户总数",
+        "courses": "课程总数",
+        "revenue": "预估收入"
+      },
+      "pending": {
+        "title": "最近提交的课程",
+        "viewAll": "查看全部（{count}）",
+        "empty": "没有等待审核的课程。",
+        "review": "审核 {title}",
+        "reviewShort": "审核"
+      },
+      "quick": {
+        "title": "快捷入口",
+        "moderation": "审核队列中的课程",
+        "users": "查找、锁定或更改用户角色",
+        "transactions": "查看支付和退款",
+        "aiqueue": "跟踪 AI 配音进度"
+      },
+      "health": {
+        "title": "服务器状态",
+        "refresh": "刷新",
+        "ram": "JVM 内存（RAM）",
+        "disk": "服务器磁盘空间",
+        "uptime": "运行时间",
+        "loading": "正在加载指标..."
+      }
+    },
+    "users": {
+      "title": "用户管理",
+      "subtitle": "搜索、按角色筛选，并锁定或解锁账户。",
+      "filtersAria": "按角色筛选",
+      "filter": {
+        "ALL": "全部",
+        "STUDENT": "学员",
+        "INSTRUCTOR": "讲师",
+        "ADMIN": "管理员",
+        "LOCKED": "已锁定"
+      },
+      "searchLabel": "搜索用户",
+      "searchPh": "姓名或邮箱...",
+      "cols": {
+        "fullName": "姓名",
+        "email": "邮箱",
+        "createdAt": "创建时间",
+        "role": "角色",
+        "status": "状态",
+        "actions": "操作"
+      },
+      "role": {
+        "STUDENT": "学员",
+        "INSTRUCTOR": "讲师",
+        "ADMIN": "管理员"
+      },
+      "active": "正常",
+      "locked": "已锁定",
+      "lock": "锁定账户",
+      "unlock": "解锁",
+      "empty": "没有找到匹配的用户。",
+      "loadError": "无法加载用户列表。",
+      "lockedToast": "已锁定该用户。",
+      "unlockedToast": "已解锁该用户。",
+      "updateError": "更新用户时出错。",
+      "confirm": {
+        "lockTitle": "锁定此账户？",
+        "lockBody": "{name} 在解锁前将无法登录。",
+        "unlockTitle": "解锁此账户？",
+        "unlockBody": "{name} 将可以重新登录并使用系统。",
+        "cancel": "取消"
+      },
+      "ai": {
+        "title": "AI 锁定建议（{count}）",
+        "confirm": "确认锁定",
+        "dismiss": "忽略",
+        "confirmed": "已按建议锁定该用户的 AI 功能。",
+        "dismissed": "已忽略该建议。",
+        "confirmError": "确认锁定时出错。",
+        "dismissError": "忽略建议时出错。"
+      },
+      "pager": {
+        "aria": "用户分页",
+        "showing": "显示 {shown} / {total} 位用户",
+        "prev": "上一页",
+        "next": "下一页",
+        "page": "第 {page} / {total} 页"
+      }
+    },
+    "moderation": {
+      "title": "课程审核",
+      "subtitle": "查看内容，决定发布或拒绝讲师的课程。",
+      "filtersAria": "按状态筛选",
+      "tabs": {
+        "PENDING": "待审核",
+        "PUBLISHED": "已发布",
+        "REJECTED": "已拒绝",
+        "ARCHIVED": "已归档"
+      },
+      "loadError": "无法加载课程列表。",
+      "empty": {
+        "title": "没有课程",
+        "PENDING": "目前没有等待审核的课程。",
+        "PUBLISHED": "还没有已发布的课程。",
+        "REJECTED": "还没有被拒绝的课程。",
+        "ARCHIVED": "还没有已归档的课程。"
+      },
+      "lessons": "{count} 节课",
+      "free": "免费",
+      "review": "审核",
+      "view": "查看",
+      "reviewAria": "审核 {title}",
+      "viewAria": "查看 {title}",
+      "detail": {
+        "back": "返回",
+        "notFound": "未找到课程。",
+        "reject": "拒绝",
+        "approve": "批准",
+        "cancel": "取消",
+        "rejectedReason": "拒绝原因：",
+        "content": "课程内容",
+        "previewTag": "试看",
+        "info": {
+          "instructor": "讲师",
+          "category": "分类",
+          "level": "难度",
+          "price": "价格",
+          "free": "免费",
+          "resubmits": "重新提交次数"
+        },
+        "approveConfirm": {
+          "title": "批准此课程？",
+          "body": "“{title}”将被发布，学员可以立即报名。"
+        }
+      },
+      "reject": {
+        "title": "拒绝课程",
+        "body": "“{title}”将变为已拒绝状态。讲师会看到此原因，以便修改后重新提交。",
+        "label": "拒绝原因",
+        "placeholder": "请清楚说明原因（至少 {min} 个字符）...",
+        "counter": "{count}/{min} 个字符",
+        "cancel": "取消",
+        "confirm": "确认拒绝"
+      },
+      "lesson": {
+        "videoTitle": "原始视频 — {title}",
+        "noVideo": "该课时尚未上传视频。",
+        "documents": "附件",
+        "loading": "加载中...",
+        "docsError": "无法加载附件列表。",
+        "noDocs": "没有附件。",
+        "view": "查看",
+        "download": "下载"
+      }
+    },
+    "queue": {
+      "title": "AI 队列监控",
+      "subtitle": "AI Worker 状态、任务队列、Gemini 密钥池和配音任务。",
+      "worker": "AI Worker：{status}",
+      "ok": "运行中",
+      "down": "异常",
+      "refresh": "刷新",
+      "stats": {
+        "pending": "队列中等待",
+        "started": "处理中",
+        "success": "已完成",
+        "failure": "失败"
+      },
+      "queueDetail": "队列详情",
+      "loading": "加载中...",
+      "connectError": "无法连接 AI Worker：",
+      "queueEmpty": "队列为空，没有等待中的任务。",
+      "defaultQueue": "Celery 默认队列",
+      "pendingTasks": "{count} 个任务等待中",
+      "keyPool": "Gemini 密钥池（槽位）",
+      "slots": "{total} 个槽位（{active} 个可用）",
+      "noKeys": "尚未配置任何密钥。",
+      "failures": "连续失败 {count} 次",
+      "recoverIn": "{sec} 秒后恢复",
+      "slot": {
+        "cooldown": "⏸ 冷却中",
+        "active": "✓ 可用"
+      },
+      "beat": {
+        "title": "Celery Beat — 定时任务",
+        "running": "✓ 运行中",
+        "planned": "○ 待部署",
+        "cleanupTemp": {
+          "desc": "清理超过 24 小时的中间文件（.wav、视频分块）",
+          "schedule": "每小时（整点）"
+        },
+        "cleanupNotifications": {
+          "desc": "删除超过 90 天的已读通知",
+          "schedule": "每天凌晨 3:00"
+        },
+        "remindFlashcards": {
+          "desc": "提醒复习闪卡（SM-2）",
+          "schedule": "每天早上 7:00"
+        },
+        "reportAudio": {
+          "desc": "报告超过 180 天未使用的音频",
+          "schedule": "每周一凌晨 4:00"
+        }
+      },
+      "jobs": "配音任务列表"
+    },
+    "aiAnalytics": {
+      "title": "AI 分析",
+      "subtitle": "监控学员的 API 用量，必要时锁定 AI 使用权限。",
+      "chartTitle": "每日 AI 费用（最近 30 天）",
+      "cost": "费用",
+      "day": "{date} 日",
+      "noDaily": "暂无每日数据",
+      "cols": {
+        "email": "学员邮箱",
+        "status": "AI 状态",
+        "tokens": "总 token",
+        "cost": "总费用（$）",
+        "actions": "操作"
+      },
+      "locked": "已锁定",
+      "active": "正常",
+      "lock": "锁定 AI",
+      "unlock": "解锁",
+      "empty": "暂无统计数据",
+      "updated": "已更新该用户的 AI 状态",
+      "error": "出错了"
+    },
+    "voices": {
+      "title": "配音声音",
+      "subtitle": "决定学员可选配音语言的唯一来源；关闭启用即隐藏该语言。",
+      "langPh": "语言代码（例如 en-US）",
+      "langLabel": "语言代码",
+      "voicePh": "Edge-TTS 声音名称（例如 en-US-JennyNeural）",
+      "voiceLabel": "Edge-TTS 声音名称",
+      "gender": {
+        "FEMALE": "女",
+        "MALE": "男"
+      },
+      "genderLabel": "性别",
+      "isDefault": "默认",
+      "add": "添加声音",
+      "cols": {
+        "language": "语言",
+        "voice": "声音",
+        "gender": "性别",
+        "default": "默认",
+        "active": "启用",
+        "actions": "操作"
+      },
+      "loading": "加载中...",
+      "empty": "还没有声音，学员将看不到任何配音语言（BR-DUB-07）。",
+      "delete": "删除",
+      "error": "出错了",
+      "deleteError": "无法删除此声音。",
+      "confirmDelete": {
+        "title": "删除此声音？",
+        "body": "声音 {voice}（{language}）将从系统中移除。",
+        "cancel": "取消"
+      },
+      "searchLabel": "搜索声音",
+      "searchPh": "按语言或声音名称搜索...",
+      "showMore": "显示更多",
+      "showing": "显示 {shown} / {total} 个声音",
+      "noMatch": "没有匹配的声音。"
+    },
+    "tutorSec": {
+      "title": "AI 助教安全",
+      "subtitle": "学员发给 AI 助教的消息中，被预检查标记为可疑的内容（要求忽略规则、冒充管理员、越狱等）。仅用于监控，此处不会自动锁定或封禁账户。",
+      "cols": {
+        "student": "学员",
+        "course": "课程",
+        "pattern": "匹配的模式",
+        "message": "消息内容",
+        "time": "时间"
+      },
+      "loading": "加载中...",
+      "empty": "还没有被标记为可疑的消息。",
+      "pager": {
+        "aria": "安全日志分页",
+        "info": "第 {page} / {total} 页 — 共 {count} 条记录",
+        "prev": "上一页",
+        "next": "下一页"
+      }
+    },
+    "jobs": {
+      "filterLabel": "按状态筛选",
+      "status": {
+        "ALL": "全部",
+        "PENDING": "等待中",
+        "PROCESSING": "处理中",
+        "COMPLETED": "已完成",
+        "FAILED": "失败",
+        "SKIPPED": "已跳过"
+      },
+      "cols": {
+        "lesson": "课时",
+        "language": "语言",
+        "status": "状态",
+        "progress": "进度",
+        "retry": "重试",
+        "error": "错误",
+        "actions": "操作"
+      },
+      "loading": "加载中...",
+      "empty": "没有任务。",
+      "retry": "重试",
+      "retryError": "无法重试此任务。"
+    },
+    "payments": {
+      "title": "支付对账",
+      "subtitle": "管理并核对平台上的课程购买交易。",
+      "refresh": "刷新数据",
+      "loadError": "无法加载交易记录",
+      "empty": "平台上还没有交易。",
+      "noMatch": "没有符合筛选条件的交易。",
+      "status": {
+        "PAID": "成功",
+        "PENDING": "处理中",
+        "FAILED": "失败",
+        "EXPIRED": "已过期"
+      },
+      "source": {
+        "referral": "推荐",
+        "organic": "自然流量"
+      },
+      "filters": {
+        "email": "按邮箱搜索",
+        "emailPh": "输入学员邮箱...",
+        "date": "按日期筛选",
+        "status": "状态",
+        "all": "全部状态"
+      },
+      "cols": {
+        "ref": "交易编号",
+        "user": "用户",
+        "amount": "金额",
+        "fee": "平台费用",
+        "net": "实际收入",
+        "source": "来源",
+        "method": "方式",
+        "status": "状态",
+        "time": "时间",
+        "actions": "操作"
+      },
+      "details": "详情",
+      "pager": {
+        "aria": "交易分页",
+        "showing": "显示 {shown} / {total} 笔交易",
+        "prev": "上一页",
+        "next": "下一页",
+        "page": "第 {page} / {total} 页"
+      },
+      "detail": {
+        "title": "交易详情",
+        "close": "关闭",
+        "course": "课程",
+        "account": "购买账户",
+        "billingName": "付款姓名",
+        "phone": "电话号码",
+        "none": "无",
+        "source": "收入来源",
+        "sourceReferral": "讲师专属推荐链接",
+        "sourceOrganic": "学员在平台上自行发现",
+        "fee": "平台费用（{percent}%）",
+        "earning": "讲师所得（{percent}%）",
+        "coupon": "已使用的优惠码",
+        "couponMath": "原价 {original} − 优惠 {discount}",
+        "method": "支付方式",
+        "status": "状态",
+        "failReason": "失败原因",
+        "failText": "被支付网关取消，或由用户自行取消。",
+        "ref": "参考编号",
+        "gateway": "网关编号",
+        "notYet": "暂无",
+        "refund": "退款",
+        "refundSoon": "退款功能正在开发中。",
+        "dispute": "处理投诉",
+        "disputeMarked": "已标记为处理完成！"
+      }
+    },
+    "settings": {
+      "title": "系统设置",
+      "subtitle": "关于 AI Worker、业务配额和服务器资源的只读信息。",
+      "worker": {
+        "title": "AI Worker",
+        "up": "运行中",
+        "down": "无法连接",
+        "gemini": "Gemini 模型（LLM）",
+        "geminiDesc": "BR-DUB-02：不写死，读取环境变量 GEMINI_MODEL",
+        "asr": "ASR 后端（语音转文字）",
+        "asrDesc": "groq = Groq 云 API · whisperx_local = 本地 GPU",
+        "chunk": "分块时长（BR-CHUNK-02）",
+        "minutes": "{count} 分钟",
+        "chunkDesc": "将视频切成固定分块以便并行处理",
+        "url": "AI Worker URL",
+        "urlDesc": "与 FastAPI 服务通信的内部地址"
+      },
+      "quotas": {
+        "title": "业务配额",
+        "dubStudent": "配音 / 学员 / 天",
+        "dubStudentUnit": "{count} 次",
+        "dubInstructor": "配音 / 讲师 / 天",
+        "dubInstructorUnit": "{count} 次",
+        "materials": "生成学习资料 / 天",
+        "materialsUnit": "{count} 次",
+        "tutor": "AI 助教消息 / 天",
+        "tutorUnit": "{count} 条",
+        "guestSearch": "AI 搜索（访客）/ 小时",
+        "guestSearchUnit": "{count} 次"
+      },
+      "resources": {
+        "title": "后端资源",
+        "ram": "JVM 内存",
+        "disk": "服务器磁盘",
+        "uptime": "后端运行时间",
+        "courses": "课程总数",
+        "users": "用户总数"
+      },
+      "env": {
+        "title": "环境"
+      }
+    },
+    "categories": {
+      "title": "分类管理",
+      "subtitle": "添加、重命名或删除课程分类。",
+      "newPh": "新分类名称...",
+      "newLabel": "新分类名称",
+      "add": "添加分类",
+      "error": "出错了",
+      "deleteError": "无法删除此分类。",
+      "cols": {
+        "name": "分类名称",
+        "slug": "Slug",
+        "actions": "操作"
+      },
+      "loading": "加载中...",
+      "empty": "还没有分类。",
+      "nameLabel": "分类名称",
+      "delete": "删除",
+      "confirm": {
+        "title": "删除此分类？",
+        "body": "分类“{name}”将被删除。如果仍有课程属于该分类，系统会拒绝。",
+        "cancel": "取消"
+      }
+    },
+    "reviews": {
+      "title": "评价审核",
+      "subtitle": "隐藏违规评价，并处理讲师的举报。",
+      "coursePh": "课程名称...",
+      "instructorPh": "讲师邮箱...",
+      "statusLabel": "状态",
+      "statusOpt": {
+        "ALL": "全部状态",
+        "VISIBLE": "显示中",
+        "HIDDEN": "已隐藏",
+        "PENDING_REPORT": "待处理（讲师举报）"
+      },
+      "cols": {
+        "course": "课程",
+        "student": "学员",
+        "stars": "星级",
+        "comment": "评论",
+        "date": "日期",
+        "status": "状态",
+        "actions": "操作"
+      },
+      "loading": "加载中...",
+      "empty": "还没有评价。",
+      "noComment": "（无评论）",
+      "badge": {
+        "pending": "举报待处理",
+        "hidden": "已隐藏",
+        "visible": "显示中"
+      },
+      "reason": "原因：{reason}",
+      "unhide": "重新显示",
+      "hide": "隐藏",
+      "keepHidden": "保持隐藏",
+      "rejectReportTip": "驳回举报，重新显示评价",
+      "confirmReportTip": "确认举报，保持隐藏",
+      "hideError": "无法隐藏此评价。",
+      "unhideError": "无法取消隐藏此评价。",
+      "starsLabel": "5 星中的 {count} 星",
+      "pager": {
+        "aria": "评价分页",
+        "prev": "上一页",
+        "next": "下一页",
+        "page": "第 {page} / {total} 页"
+      }
+    },
+    "announce": {
+      "title": "系统公告",
+      "subtitle": "向所有人、仅讲师、仅学员或某一位用户发送公告。发送在后台运行，送达所有收件人可能需要几秒到几分钟。",
+      "severity": {
+        "HIGH": "高 — 显示为页面顶部横幅（例如系统维护）",
+        "MEDIUM": "中 — 仅出现在通知铃中",
+        "LOW": "低 — 仅出现在通知铃中"
+      },
+      "audience": {
+        "ALL": "所有人",
+        "INSTRUCTOR": "仅讲师",
+        "STUDENT": "仅学员",
+        "SPECIFIC_USER": "指定某位用户（按 ID）"
+      },
+      "dispatch": {
+        "PENDING": "等待处理",
+        "PROCESSING": "发送中...",
+        "DONE": "已发送",
+        "FAILED": "失败"
+      },
+      "form": {
+        "title": "标题",
+        "titlePh": "例如：系统维护",
+        "severity": "级别",
+        "content": "内容",
+        "audience": "接收范围",
+        "userId": "用户 ID（见“用户”页面）",
+        "expires": "横幅自动隐藏时间（留空 = 显示到有更新的高级别公告）",
+        "sending": "发送中...",
+        "send": "发送公告",
+        "error": "出错了，请稍后重试。"
+      },
+      "cols": {
+        "title": "标题",
+        "severity": "级别",
+        "audience": "范围",
+        "status": "状态",
+        "sent": "已发送",
+        "created": "创建时间"
+      },
+      "loading": "加载中...",
+      "empty": "还没有发送过公告。",
+      "user": "用户 #{id}",
+      "sevLabel": {
+        "HIGH": "高",
+        "MEDIUM": "中",
+        "LOW": "低"
+      }
+    }
   }
 }

@@ -14,7 +14,8 @@
     },
     "mobileMenu": {
       "open": "Open menu",
-      "close": "Close menu"
+      "close": "Close menu",
+      "title": "Navigation menu"
     },
     "wishlist": {
       "viewAll": "Go to wishlist",
@@ -35,7 +36,12 @@
       "title": "Notifications",
       "markAllRead": "Mark all as read",
       "empty": "No notifications yet",
-      "viewAll": "View all notifications"
+      "viewAll": "View all notifications",
+      "tabMain": "Main",
+      "tabSystem": "System",
+      "tabUnread": "Unread",
+      "unreadDot": "Unread",
+      "tabsAria": "Notification types"
     },
     "account": {
       "guestName": "User",
@@ -368,5 +374,1470 @@
     "loading": "Loading...",
     "notFound": "Certificate not found.",
     "loadError": "Could not load the certificate, try again later."
+  },
+  "courseDetail": {
+    "breadcrumbAria": "Breadcrumb",
+    "allCourses": "Course catalog",
+    "learners": "{count} learners",
+    "level": {
+      "BEGINNER": "Beginner",
+      "INTERMEDIATE": "Intermediate",
+      "ADVANCED": "Advanced"
+    },
+    "instructor": "Instructor:",
+    "updated": "Updated {date}",
+    "dubbed": "Dubbed in:",
+    "dubPanel": {
+      "title": "Learn in your own language",
+      "body": "Every lesson is dubbed by AI and synced with the original video. Pick the voice you want while you learn, and the subtitles follow."
+    },
+    "content": {
+      "title": "Course content",
+      "summary": "{chapters} chapters · {lessons} lessons",
+      "lessons": "{count} lessons",
+      "preview": "Preview"
+    },
+    "reviews": "Learner reviews",
+    "price": {
+      "free": "Free",
+      "lifetime": "Lifetime access"
+    },
+    "includes": [
+      "{count} lessons with AI dubbing",
+      "Socratic AI Tutor assistant",
+      "Auto-generated mind maps, flashcards and quizzes",
+      "Lifetime access once you own it"
+    ],
+    "related": {
+      "title": "Related courses",
+      "subtitle": "Same topic as this course"
+    },
+    "enroll": {
+      "free": "Sign up",
+      "buy": "Buy course",
+      "learnNow": "Start learning",
+      "processing": "Processing...",
+      "addCart": "Add to cart",
+      "inCart": "In your cart ✓",
+      "adding": "Adding...",
+      "passwordPlaceholder": "Enter the sign-up password",
+      "privateNote": "Private course: enter the password at checkout to buy it directly.",
+      "wishlistAdd": "Add to wishlist",
+      "wishlistRemove": "Remove from wishlist",
+      "toastSuccess": "Signed up successfully!",
+      "toastError": "Something went wrong"
+    }
+  },
+  "courseList": {
+    "title": "Course catalog",
+    "subtitle": "Every course can be dubbed into the language of your choice.",
+    "all": "All",
+    "found": "<b>{count}</b> courses found",
+    "loading": "Loading…",
+    "loadError": "Could not load the course list.",
+    "sort": {
+      "label": "Sort by",
+      "relevance": "Most relevant",
+      "rating": "Highest rated",
+      "reviews": "Most reviewed",
+      "newest": "Newest"
+    },
+    "view": {
+      "grid": "Card view",
+      "list": "List view"
+    },
+    "filtersToggle": "Filters",
+    "activeLabel": "Filtering by:",
+    "clearAll": "Clear all",
+    "remove": "Remove filter {name}",
+    "empty": {
+      "title": "No matching courses",
+      "body": "Try removing some filters or using different keywords.",
+      "clear": "Clear all filters"
+    },
+    "card": {
+      "lessons": "{count} lessons",
+      "free": "Free"
+    },
+    "level": {
+      "BEGINNER": "Beginner",
+      "INTERMEDIATE": "Intermediate",
+      "ADVANCED": "Advanced"
+    },
+    "ratingTier": "{tier} & up",
+    "duration": {
+      "0-1": "Under 1 hour",
+      "1-3": "1 - 3 hours",
+      "3-6": "3 - 6 hours",
+      "6-17": "6 - 17 hours",
+      "17+": "Over 17 hours"
+    },
+    "filters": {
+      "aria": "Course filters",
+      "title": "Filters",
+      "clear": "Clear filters",
+      "category": "Category",
+      "rating": "Rating",
+      "duration": "Video duration",
+      "price": "Price",
+      "level": "Level",
+      "free": "Free",
+      "paid": "Paid",
+      "showMore": "Show more ({count})",
+      "showLess": "Show less"
+    }
+  },
+  "shop": {
+    "steps": {
+      "aria": "Purchase progress",
+      "cart": "Cart",
+      "payment": "Payment"
+    },
+    "coupon": {
+      "title": "Discount code",
+      "placeholder": "Enter discount code",
+      "apply": "Apply",
+      "checking": "Checking...",
+      "remove": "Remove code",
+      "invalidMany": "This code does not apply to the selected courses.",
+      "invalidOne": "This code does not apply to this course.",
+      "applied": "Discount code applied.",
+      "failed": "Could not apply the code, please try again later.",
+      "selectOne": "Select at least one course to apply a discount code."
+    },
+    "summary": {
+      "title": "Order summary",
+      "selected": "Selected",
+      "selectedOf": "{selected} / {total} courses",
+      "subtotal": "Subtotal ({count} courses)",
+      "subtotalOne": "Subtotal",
+      "discount": "Discount",
+      "total": "Total",
+      "terms": "By paying, you agree to LinguaLearn's <link>Terms of Service</link>."
+    },
+    "billing": {
+      "title": "Additional information",
+      "name": "Full name",
+      "namePh": "Your name",
+      "phone": "Phone number",
+      "phonePh": "Contact phone number",
+      "note": "* This information is only used to contact you for support when needed and does not affect your payment account."
+    },
+    "pay": {
+      "payos": "QR bank transfer (PayOS)",
+      "error": "Something went wrong while paying",
+      "proceed": "Proceed to payment"
+    },
+    "cart": {
+      "title": "Cart",
+      "loading": "Loading your cart...",
+      "selectAll": "Select all ({count} courses)",
+      "removeSelected": "Remove selected ({count})",
+      "remove": "Remove",
+      "selectCourse": "Select {title}",
+      "instructor": "By {name}",
+      "meta": "{hours} h of content · {lessons} lessons · {level}",
+      "bundleBadge": "Bundle -{percent}%",
+      "bundleSuggest": "Add <b>{title}</b> (+{price}) to get <b>{percent}%</b> off with the \"{bundle}\" bundle",
+      "addToCart": "Add to cart",
+      "emptyTitle": "Your cart is empty.",
+      "emptyCta": "Explore courses"
+    },
+    "checkout": {
+      "titleOne": "Pay for course",
+      "titleMany": "Pay for {count} courses",
+      "backToCart": "Back to cart",
+      "backToCourse": "Back to course",
+      "courseInfo": "Course information",
+      "coursesChosen": "{count} courses selected",
+      "course": "Course",
+      "instructor": "Instructor:",
+      "updating": "Updating",
+      "noItems": "There is nothing to pay for, the courses may have been removed from your cart.",
+      "loadError": "Could not load the course",
+      "passwordTitle": "Sign-up password",
+      "passwordNote": "This is a private course. Enter the password provided by the instructor to pay.",
+      "passwordPh": "Enter the sign-up password"
+    },
+    "wishlist": {
+      "loading": "Loading…",
+      "search": "Search your wishlist…",
+      "searchLabel": "Search",
+      "empty": "You have not saved any courses to your wishlist yet.",
+      "explore": "Explore courses",
+      "noMatch": "No matching courses",
+      "noMatchHint": "Try a different keyword.",
+      "remove": "Remove from wishlist",
+      "signUp": "Sign up",
+      "inCart": "✓ In cart",
+      "adding": "Adding...",
+      "addCart": "Add to cart",
+      "free": "Free",
+      "signedUp": "Signed up successfully!",
+      "signUpFailed": "Could not sign up, please try again later.",
+      "instructor": "By {name}"
+    },
+    "courseLevel": {
+      "BEGINNER": "Beginner",
+      "INTERMEDIATE": "Intermediate",
+      "ADVANCED": "Advanced"
+    }
+  },
+  "auth": {
+    "layout": {
+      "tagline": "Learn every course in your own language",
+      "body": "AI dubbing synced to the original video, plus an AI tutor you can ask right inside the lesson.",
+      "highlights": [
+        "AI dubbing voices in the language you choose",
+        "An AI tutor that answers and jumps to the right moment in the video",
+        "Completion certificates you can share on your profile and LinkedIn"
+      ]
+    },
+    "fields": {
+      "email": "Email",
+      "password": "Password",
+      "fullName": "Full name",
+      "confirmPassword": "Confirm password",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password"
+    },
+    "strength": {
+      "label": "Password strength:",
+      "short": "Too short (at least 6 characters)",
+      "weak": "Weak (needs letters and numbers)",
+      "good": "Good",
+      "strong": "Strong (great!)",
+      "tooWeak": "Password is not strong enough. Use at least 6 characters with both letters and numbers."
+    },
+    "match": {
+      "yes": "Passwords match",
+      "no": "Passwords do not match",
+      "mismatch": "The confirmation password does not match."
+    },
+    "login": {
+      "title": "Sign in",
+      "registered": "Your account has been created! Please sign in.",
+      "orEmail": "or sign in with email",
+      "forgot": "Forgot password?",
+      "forgotNeedEmail": "Please enter your email to reset your password",
+      "submit": "Sign in",
+      "submitting": "Processing...",
+      "failed": "Sign-in failed",
+      "generic": "Something went wrong",
+      "loading": "Loading form...",
+      "noAccount": "No account yet?",
+      "signUpNow": "Sign up now"
+    },
+    "register": {
+      "title": "Create an account",
+      "stepInfo": "Details",
+      "stepOtp": "Verify OTP",
+      "submit": "Sign up",
+      "submitting": "Processing...",
+      "serverError": "Server error while signing up",
+      "connectionError": "Could not reach the server. Please try again.",
+      "otpIntro": "Check {email} for your 6-digit OTP code.",
+      "otpLabel": "OTP code",
+      "verify": "Verify",
+      "verifying": "Verifying...",
+      "otpInvalid": "Invalid OTP",
+      "hasAccount": "Already have an account?",
+      "signInNow": "Sign in now"
+    },
+    "forgot": {
+      "title": "Forgot password",
+      "intro": "Enter your registered email and we will send an OTP so you can reset your password.",
+      "emailPh": "Enter your email",
+      "send": "Send OTP",
+      "sending": "Sending...",
+      "otpLabel": "OTP code",
+      "otpHint": "Enter the 6-digit OTP from the email",
+      "newPassword": "New password",
+      "newPasswordPh": "Enter a new password",
+      "confirmPh": "Confirm the new password",
+      "reset": "Reset password",
+      "processing": "Processing...",
+      "success": "Password changed! Taking you to the home page.",
+      "generic": "Something went wrong",
+      "loading": "Loading...",
+      "backToLogin": "Back to sign in"
+    }
+  },
+  "community": {
+    "title": "Community leaderboard",
+    "subtitle": "Earn XP every day by studying, taking quizzes and keeping your streak, and compete with the whole community.",
+    "loading": "Loading the leaderboard...",
+    "empty": "Nobody is on the leaderboard yet.",
+    "xp": "{xp} XP",
+    "yourRank": "Your rank",
+    "yourRankInline": "Your rank: #{rank} · {xp} XP",
+    "loginHint": "Sign in to track your streak and rank.",
+    "login": "Sign in",
+    "viewAll": "View all",
+    "rank": "Rank {rank}",
+    "podiumAria": "Top 3 on the leaderboard",
+    "listAria": "Leaderboard"
+  },
+  "instructor": {
+    "nav": {
+      "courses": "My courses",
+      "bundles": "Course bundles",
+      "communication": "Communication",
+      "revenue": "Performance",
+      "tools": "Tools",
+      "aria": "Instructor channel navigation"
+    },
+    "shell": {
+      "brand": "LinguaLearn",
+      "role": "Instructor",
+      "channel": "Instructor channel",
+      "loading": "Loading...",
+      "backToStudent": "Back to learner site",
+      "createCourse": "Create course",
+      "collapse": "Collapse sidebar",
+      "expand": "Expand sidebar",
+      "openMenu": "Open menu",
+      "closeMenu": "Close menu",
+      "menuTitle": "Instructor channel menu",
+      "account": "Account",
+      "language": "Language",
+      "logout": "Sign out",
+      "notifications": "Notifications",
+      "logoutTitle": "Confirm sign out",
+      "logoutBody": "Are you sure you want to sign out?",
+      "cancel": "Cancel",
+      "confirm": "Sign out"
+    },
+    "courses": {
+      "title": "My courses",
+      "subtitle": "Manage, complete and track the status of your courses.",
+      "loading": "Loading...",
+      "loadError": "Could not load your courses.",
+      "search": "Search your courses...",
+      "searchLabel": "Search",
+      "sort": {
+        "label": "Sort by",
+        "newest": "Newest",
+        "oldest": "Oldest",
+        "az": "A-Z",
+        "za": "Z-A"
+      },
+      "status": {
+        "ALL": "All",
+        "DRAFT": "Draft",
+        "PENDING": "In review",
+        "PUBLISHED": "Published",
+        "REJECTED": "Rejected",
+        "ARCHIVED": "Archived"
+      },
+      "stats": {
+        "total": "Total courses",
+        "published": "Published",
+        "pending": "In review",
+        "attention": "Needs attention"
+      },
+      "row": {
+        "lessons": "{count} lessons",
+        "completion": "Course completion",
+        "edit": "Edit",
+        "remove": "Remove",
+        "select": "Select {title}",
+        "selectAll": "Select all",
+        "columns": {
+          "course": "Course",
+          "status": "Status",
+          "progress": "Completion",
+          "next": "Next step"
+        }
+      },
+      "next": {
+        "complete": "Finish the course",
+        "submit": "Submit for review",
+        "fixRejected": "See the reason and edit",
+        "reactivate": "Reactivate",
+        "waiting": "Waiting for admin review",
+        "live": "Open to learners"
+      },
+      "bulk": {
+        "remove": "Remove selected ({count})",
+        "selected": "{count} courses selected"
+      },
+      "confirm": {
+        "title": "Remove course",
+        "message": "Are you sure you want to remove {label}? New learners will no longer find or sign up for it, but learners already signed up keep access.",
+        "confirm": "Remove",
+        "cancel": "Cancel",
+        "many": "{count} selected courses"
+      },
+      "empty": {
+        "filtered": "No courses with this status yet.",
+        "noneTitle": "You have no courses yet",
+        "noneBody": "Create your first course, add videos and let AI dub them into many languages.",
+        "noneCta": "Create a course"
+      }
+    },
+    "edit": {
+      "loading": "Loading course...",
+      "back": "Back to courses",
+      "tabsAria": "Course editing sections",
+      "groups": {
+        "content": "Course content",
+        "publish": "Publish"
+      },
+      "tabs": {
+        "curriculum": "Curriculum",
+        "materials": "Materials & quizzes",
+        "resources": "Static resources",
+        "proctoring": "Exam proctoring",
+        "basics": "Basic information",
+        "pricing": "Pricing",
+        "promotions": "Promotions"
+      },
+      "completion": {
+        "label": "{percent}% complete",
+        "ready": "Ready to submit",
+        "missingTitle": "Still missing to submit",
+        "aria": "Course completion progress: {percent}%"
+      },
+      "submit": {
+        "send": "Submit for review",
+        "resubmit": "Resubmit for review",
+        "needMore": "Complete the requirements to submit"
+      },
+      "preview": {
+        "label": "Preview",
+        "asInstructor": "As an instructor",
+        "asLearner": "As a learner"
+      },
+      "settingsLabel": "Settings",
+      "banners": {
+        "rejected": "Reason for rejection:",
+        "resubmitCount": "(resubmitted {count}/5 times)",
+        "published": "This course is published. Changes to the title, description, price, chapters, lessons or videos apply immediately, with no new admin review.",
+        "locked": "This course is under review. You cannot edit its content in the meantime."
+      },
+      "settings": {
+        "title": "Settings",
+        "statusTitle": "Course status",
+        "statusDraft": "The course is a draft and has never been submitted.",
+        "statusPublished": "The course is publicly available.",
+        "statusArchived": "The course was removed from search; learners already signed up can still access it.",
+        "statusOther": "The course is not publicly available yet.",
+        "reactivate": "Reactivate",
+        "reactivating": "Reactivating...",
+        "reactivateHint": "Restores the course to the status it had before archiving so new learners can find and sign up again.",
+        "archive": "Remove course",
+        "archiveHint": "New learners will no longer find or sign up for this course, but learners already signed up keep access. This is not a permanent delete; you can reactivate it any time.",
+        "archiveConfirmTitle": "Remove course",
+        "archiveConfirmMessage": "New learners will no longer find or sign up for this course through search, but learners already signed up keep access. You can reactivate it any time.",
+        "archiveConfirm": "Remove",
+        "cancel": "Cancel",
+        "coInstructor": "Co-instructor management is in development and will arrive in a later update."
+      }
+    },
+    "performance": {
+      "tabsAria": "Performance sections",
+      "tabs": {
+        "overview": "Overview",
+        "revenue": "Revenue",
+        "students": "Students",
+        "reviews": "Reviews",
+        "hardQuestions": "Hard questions",
+        "retention": "Retention"
+      },
+      "range": {
+        "label": "Date range",
+        "7d": "Last 7 days",
+        "30d": "Last 30 days",
+        "12m": "Last 12 months",
+        "all": "All time"
+      },
+      "insight": {
+        "see": "View →"
+      },
+      "overview": {
+        "title": "Overview",
+        "subtitle": "Get top insights about your performance.",
+        "kpi": {
+          "revenue": "Net revenue (30 days)",
+          "enrollments": "New sign-ups",
+          "rating": "Average rating",
+          "hardQuestions": "Hard questions"
+        },
+        "chart": {
+          "title": "Daily net revenue (last 30 days)",
+          "aria": "Bar chart of daily revenue, {total} in total over 30 days, best day {peak}",
+          "empty": "No revenue in the last 30 days."
+        },
+        "growth": {
+          "start": "Revenue started this period",
+          "none": "No revenue yet",
+          "flat": "Revenue is unchanged from the previous period",
+          "up": "Revenue is up {percent}% from the previous period",
+          "down": "Revenue is down {percent}% from the previous period"
+        },
+        "hard": "{count} questions are answered wrong by over 60% of learners, so review the related content.",
+        "lowRating": "A new {rating}★ review from {student} on \"{course}\", worth replying to soon."
+      }
+    },
+    "communication": {
+      "tabsAria": "Communication sections",
+      "tabs": {
+        "qa": "Q&A",
+        "messages": "Messages",
+        "assignments": "Assignments",
+        "announcements": "Announcements"
+      }
+    },
+    "tools": {
+      "title": "Tools",
+      "subtitle": "Tools to help you manage and grow your courses.",
+      "open": "Open",
+      "items": {
+        "live": {
+          "title": "Live",
+          "description": "Create and manage live teaching sessions and review stats of past sessions."
+        },
+        "coupons": {
+          "title": "Discount codes",
+          "description": "Create discount codes for one, several or all of your courses."
+        },
+        "bundles": {
+          "title": "Course bundles",
+          "description": "Group several courses into a bundle with an attractive discount so learners buy the whole set."
+        }
+      }
+    },
+    "live": {
+      "title": "Live Classroom",
+      "create": "Create a live session",
+      "loading": "Loading...",
+      "loadError": "Could not load your live sessions.",
+      "status": {
+        "SCHEDULED": "Upcoming",
+        "LIVE": "Live now",
+        "ENDED": "Ended"
+      },
+      "columns": {
+        "title": "Title",
+        "course": "Course",
+        "status": "Status"
+      },
+      "enter": "Enter room",
+      "details": "View details",
+      "empty": {
+        "title": "No live sessions yet",
+        "body": "Create your first live session to teach online with your learners."
+      },
+      "new": {
+        "title": "Create a new live session",
+        "intro": "Schedule ahead, or leave the start time empty and press \"Go live\" any time after creating. You can add a thumbnail for the Live discovery page in the next step, right after creating.",
+        "form": {
+          "title": "Live session title",
+          "course": "Course",
+          "pickCourse": "-- Choose a course --",
+          "language": "Language you will speak",
+          "optional": "(optional)",
+          "languageDefault": "-- Default from your profile --",
+          "languageHint": "Learners pick a dubbing language different from this one to hear the translation during the live session.",
+          "visibility": "Visibility",
+          "courseOnly": "Only learners signed up for this course",
+          "public": "Public, anyone can watch, even without signing in",
+          "startsAt": "Planned start time",
+          "creating": "Creating...",
+          "create": "Create live session →"
+        }
+      },
+      "room": {
+        "loading": "Loading...",
+        "ended": "This live session has ended.",
+        "meta": "Course: {course} · Spoken language: {language}",
+        "thumbnail": "Thumbnail for the Live discovery page",
+        "thumbnailAlt": "Thumbnail preview",
+        "noThumbnail": "No custom image yet, the course cover is used for now.",
+        "uploading": "Uploading image...",
+        "thumbnailTask": "Live image: {title}",
+        "connecting": "Connecting...",
+        "start": "● Go live",
+        "ending": "Ending...",
+        "end": "End live",
+        "cameraOff": "Camera and screen sharing are off",
+        "shareScreen": "Share screen",
+        "shareAudio": "Share system audio",
+        "audioHint": "Sharing system audio depends on the browser. It works most reliably on Chrome when you tick the right box in the screen-share dialog the browser shows."
+      }
+    },
+    "common": {
+      "close": "Close"
+    },
+    "perf": {
+      "common": {
+        "allCourses": "All courses",
+        "loading": "Loading..."
+      },
+      "students": {
+        "title": "Students",
+        "export": "Export CSV",
+        "total": "Total students",
+        "avgProgress": "Average progress",
+        "atRisk": "Students under {pct}% progress",
+        "atRiskWarn": "{ratio}% of students have not watched past {pct}% of the course. Consider sending a reminder email or checking whether the opening lesson is engaging enough.",
+        "cols": {
+          "student": "Student",
+          "email": "Email",
+          "course": "Course",
+          "enrolled": "Sign-up date",
+          "progress": "Progress"
+        },
+        "csv": {
+          "progress": "Progress (%)"
+        },
+        "empty": "No students have signed up yet."
+      },
+      "reviews": {
+        "title": "Reviews",
+        "average": "Average rating",
+        "count": "{count} reviews",
+        "distribution": "Distribution by stars",
+        "tooltip": "{count} reviews",
+        "lowAlert": "{count} reviews of {threshold}★ or lower in the last 30 days. Read the comments below and reply to or contact the learners.",
+        "empty": "No reviews yet.",
+        "reportPrompt": "Reason for reporting this review (violates community standards, spam...):",
+        "reported": "Reported. The review is hidden for now and waits for admin review.",
+        "reportError": "Something went wrong while reporting the review.",
+        "reportTitle": "Report this review (violates community standards)"
+      },
+      "hardQuestions": {
+        "title": "Hard questions",
+        "subtitle": "Questions that over 60% of learners answer wrong. The lesson may be unclear, or the question and answers need a second look.",
+        "warn": "{count} questions are above the 60% wrong threshold. Review \"{question}\" first ({percent}% wrong, {course}).",
+        "level": {
+          "all": "All levels",
+          "critical": "≥ 80% — Red alert",
+          "warning": "60–79% — Warning"
+        },
+        "sort": {
+          "wrongRate": "Sort: Wrong rate",
+          "totalAnswers": "Sort: Number of answers"
+        },
+        "cols": {
+          "question": "Question",
+          "lesson": "Course / Lesson",
+          "answers": "Answers",
+          "wrongRate": "Wrong rate",
+          "actions": "Actions"
+        },
+        "emptyFiltered": "No questions match the selected filters.",
+        "emptyAll": "No question is above the 60% wrong threshold (with enough learner samples). Your lessons look healthy.",
+        "edit": "View & edit"
+      },
+      "retention": {
+        "title": "Learner retention",
+        "subtitle": "% of learners still watching at each 10% mark of the video. A sharp drop is where people tend to leave.",
+        "course": "Course",
+        "lesson": "Lesson",
+        "chooseCourse": "— Choose a course —",
+        "chooseLesson": "— Choose a lesson —",
+        "pick": "Choose a course and a lesson to see the retention chart.",
+        "noViews": "Nobody has watched this lesson yet, so there is not enough data for a chart.",
+        "drop": "Learners drop the most between {from}%–{to}% of the video ({points} points). Review this part, it may be long or hard to follow.",
+        "tooltip": "Still watching here",
+        "label": "Watched up to {label}"
+      },
+      "list": {
+        "quick": "Quick range",
+        "custom": "Custom dates",
+        "export": "Export CSV",
+        "kpi": {
+          "transactions": "Transactions",
+          "gross": "Gross revenue",
+          "fee": "Platform fee",
+          "net": "Net earnings"
+        },
+        "netTotal": "Total net earnings in this period",
+        "topCourse": "<b>{title}</b> brought in the most revenue this period: {amount}.",
+        "split": {
+          "bundleLabel": "Bundle vs Retail",
+          "bundle": "Bundle",
+          "retail": "Retail",
+          "couponLabel": "With coupon vs Full price",
+          "coupon": "With coupon",
+          "full": "Full price"
+        },
+        "chart": {
+          "byDay": "Revenue by day",
+          "organic": "Organic",
+          "referral": "Referral",
+          "empty": "No data to chart yet.",
+          "day": "Day {date}",
+          "cumulativeTitle": "Cumulative revenue in the period",
+          "cumulative": "Cumulative"
+        },
+        "cols": {
+          "course": "Course",
+          "amount": "Amount",
+          "net": "Net earnings",
+          "source": "Source",
+          "coupon": "Discount code",
+          "paidAt": "Paid on"
+        },
+        "empty": "No transactions in this period.",
+        "sourceReferral": "Referral (97%)",
+        "sourceOrganic": "Organic (37%)"
+      }
+    },
+    "comm": {
+      "loading": "Loading...",
+      "qa": {
+        "title": "Q&A",
+        "sortLabel": "Sort: {value}",
+        "newest": "Newest",
+        "oldest": "Oldest",
+        "twoCols": "Two-column view",
+        "oneCol": "One-column view",
+        "onlyUnanswered": "Show only unanswered questions",
+        "empty": "No questions yet.",
+        "pick": "Pick a question to see the details",
+        "detail": "Question details",
+        "close": "Close",
+        "noAnswer": "No answers yet",
+        "answers": "{count} answers",
+        "youAnswered": "You replied",
+        "instructorTag": " (Instructor)",
+        "placeholder": "Reply to the learner...",
+        "send": "Send"
+      },
+      "assignments": {
+        "title": "Assignments",
+        "empty": "No assignments yet. Add one right in the curriculum editor (the \"+ Assignment\" button).",
+        "due": "Due: {date}",
+        "graded": "{graded}/{total} graded",
+        "noSubmissions": "No learner has submitted yet.",
+        "attachment": "Attachment",
+        "score": "Score",
+        "feedback": "Feedback",
+        "save": "Save",
+        "gradedLine": "Graded: {score} points",
+        "close": "Close"
+      },
+      "announcements": {
+        "title": "Announcements",
+        "empty": "No announcements yet.",
+        "delete": "Delete",
+        "deleteTitle": "Delete announcement",
+        "deleteMessage": "Are you sure you want to delete this announcement? Learners who already received it keep it in their inbox.",
+        "deleteConfirm": "Delete",
+        "newTitle": "Send a new announcement",
+        "pickCourse": "Choose a course...",
+        "titlePh": "Announcement title",
+        "contentPh": "Announcement content sent to every learner signed up for this course...",
+        "send": "Send announcement"
+      },
+      "messages": {
+        "title": "Messages"
+      },
+      "compose": {
+        "button": "+ Compose",
+        "title": "Compose a new message",
+        "course": "Course",
+        "pickCourse": "Choose a course...",
+        "student": "Learner",
+        "pickStudent": "Choose a learner...",
+        "pickCourseFirst": "Choose a course first",
+        "cancel": "Cancel",
+        "start": "Start"
+      },
+      "filter": {
+        "allCourses": "All courses",
+        "search": "Search courses...",
+        "notFound": "No courses found."
+      }
+    }
+  },
+  "coupons": {
+    "title": "Discount codes",
+    "subtitleAdmin": "Platform-wide coupons or coupons for any course.",
+    "subtitleInstructor": "Coupons that apply to your own courses.",
+    "create": "+ Create discount code",
+    "loading": "Loading...",
+    "empty": "No discount codes yet.",
+    "cols": {
+      "code": "Code",
+      "discount": "Discount",
+      "scope": "Scope",
+      "time": "Period",
+      "used": "Used",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "auto": "Automatic",
+    "autoCode": "(automatic)",
+    "noCourse": "No course selected",
+    "status": {
+      "off": "Off",
+      "expired": "Expired",
+      "on": "Active",
+      "expiredTitle": "The code has expired, learners cannot apply it even though it is still switched on"
+    },
+    "edit": "Edit",
+    "delete": "Delete",
+    "confirmDelete": "Delete the discount code \"{code}\"?",
+    "type": {
+      "PERCENTAGE": "By %",
+      "FIXED_AMOUNT": "Fixed amount"
+    },
+    "scope": {
+      "ALL_COURSES": "All courses",
+      "SPECIFIC_COURSES": "Several chosen courses",
+      "SINGLE_COURSE": "1 course"
+    },
+    "form": {
+      "createTitle": "Create a discount code",
+      "editTitle": "Edit discount code",
+      "autoApply": "Apply automatically (no code needed)",
+      "code": "Discount code",
+      "type": "Discount type",
+      "valuePct": "Value (%)",
+      "valueFixed": "Value (VND)",
+      "scope": "Applies to",
+      "scopeMine": "All MY courses",
+      "start": "Starts",
+      "end": "Ends",
+      "maxUsage": "Usage limit (total)",
+      "maxPerUser": "Limit per learner",
+      "unlimited": "Unlimited",
+      "active": "Active (untick to pause this coupon)",
+      "cancel": "Cancel",
+      "saving": "Saving...",
+      "save": "Save"
+    },
+    "picker": {
+      "label": "Choose courses",
+      "search": "Search courses by name...",
+      "searchBtn": "Search",
+      "adminHint": "Search for courses above.",
+      "none": "You have no courses yet.",
+      "needOne": "Choose at least 1 course."
+    }
+  },
+  "bundles": {
+    "pageTitle": "Course bundles",
+    "pageSubtitle": "Create course combos at a better price to grow your revenue.",
+    "createNew": "Create bundle",
+    "emptyTitle": "No bundles yet",
+    "emptyBody": "Create your first bundle to raise conversion and the average revenue per order.",
+    "createFirst": "Create your first bundle",
+    "off": "Off",
+    "edit": "Edit",
+    "info": {
+      "title": "How bundles work",
+      "owned": "If a learner already owns a course in the bundle, the system <b>deducts</b> that course automatically.",
+      "coupon": "Individual coupons <b>do not stack</b> on courses inside a bundle.",
+      "price": "The price is <b>locked when the order is created</b>, even if you change prices later."
+    },
+    "form": {
+      "editTitle": "Edit bundle",
+      "createTitle": "Create a new bundle",
+      "name": "Bundle name",
+      "namePh": "E.g. Full-stack Web Development Combo",
+      "desc": "Short description",
+      "descPh": "Describe the benefits of the bundle...",
+      "discount": "Bundle discount",
+      "pickCourses": "Choose courses ({count} selected, at least 2)",
+      "noPublished": "You have no published courses yet.",
+      "minTwo": "A bundle needs at least 2 courses!",
+      "preview": "Price preview",
+      "originalSum": "Original total",
+      "discountLine": "{percent}% off",
+      "learnerPays": "Learner pays",
+      "active": "Active",
+      "cancel": "Cancel",
+      "saving": "Saving...",
+      "update": "Update bundle",
+      "create": "Create bundle",
+      "close": "Close"
+    }
+  },
+  "admin": {
+    "nav": {
+      "aria": "Admin navigation",
+      "groups": {
+        "content": "Course content",
+        "ai": "AI & Automation",
+        "finance": "Finance",
+        "system": "System"
+      },
+      "overview": "Overview",
+      "users": "Users",
+      "moderation": "Course moderation",
+      "categories": "Categories",
+      "reviews": "Reviews",
+      "aianalytics": "AI Analytics",
+      "aiqueue": "AI Queue monitor",
+      "voicemappings": "Dubbing voices",
+      "tutorsecurity": "AI Tutor security",
+      "transactions": "Payment reconciliation",
+      "coupons": "Coupons",
+      "announcements": "System announcements",
+      "settings": "System settings"
+    },
+    "shell": {
+      "brand": "LinguaLearn",
+      "role": "Administrator",
+      "panel": "Admin",
+      "loading": "Loading...",
+      "backToStudent": "Back to learner site",
+      "collapse": "Collapse sidebar",
+      "expand": "Expand sidebar",
+      "openMenu": "Open menu",
+      "closeMenu": "Close menu",
+      "menuTitle": "Admin menu",
+      "account": "Account",
+      "language": "Language",
+      "logout": "Sign out",
+      "notifications": "Notifications"
+    },
+    "overview": {
+      "title": "System overview",
+      "subtitle": "What needs attention and how the platform is doing, on one screen.",
+      "kpi": {
+        "pending": "Courses awaiting review",
+        "users": "Total users",
+        "courses": "Total courses",
+        "revenue": "Estimated revenue"
+      },
+      "pending": {
+        "title": "Recently submitted courses",
+        "viewAll": "View all ({count})",
+        "empty": "No courses are waiting for review.",
+        "review": "Review {title}",
+        "reviewShort": "Review"
+      },
+      "quick": {
+        "title": "Shortcuts",
+        "moderation": "Review courses in the queue",
+        "users": "Find, lock or change a user role",
+        "transactions": "Check payments and refunds",
+        "aiqueue": "Track AI dubbing progress"
+      },
+      "health": {
+        "title": "Server status",
+        "refresh": "Refresh",
+        "ram": "JVM memory (RAM)",
+        "disk": "Server disk space",
+        "uptime": "Uptime",
+        "loading": "Loading metrics..."
+      }
+    },
+    "users": {
+      "title": "User management",
+      "subtitle": "Search, filter by role, and lock or unlock accounts.",
+      "filtersAria": "Filter by role",
+      "filter": {
+        "ALL": "All",
+        "STUDENT": "Learners",
+        "INSTRUCTOR": "Instructors",
+        "ADMIN": "Admins",
+        "LOCKED": "Locked"
+      },
+      "searchLabel": "Search users",
+      "searchPh": "Name or email...",
+      "cols": {
+        "fullName": "Full name",
+        "email": "Email",
+        "createdAt": "Created",
+        "role": "Role",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "role": {
+        "STUDENT": "Learner",
+        "INSTRUCTOR": "Instructor",
+        "ADMIN": "Administrator"
+      },
+      "active": "Active",
+      "locked": "Locked",
+      "lock": "Lock account",
+      "unlock": "Unlock",
+      "empty": "No matching users found.",
+      "loadError": "Could not load the user list.",
+      "lockedToast": "User locked.",
+      "unlockedToast": "User unlocked.",
+      "updateError": "Something went wrong while updating the user.",
+      "confirm": {
+        "lockTitle": "Lock this account?",
+        "lockBody": "{name} will not be able to sign in until the account is unlocked.",
+        "unlockTitle": "Unlock this account?",
+        "unlockBody": "{name} will be able to sign in and use the platform again.",
+        "cancel": "Cancel"
+      },
+      "ai": {
+        "title": "AI lock proposals ({count})",
+        "confirm": "Confirm lock",
+        "dismiss": "Dismiss",
+        "confirmed": "AI lock applied as proposed.",
+        "dismissed": "Proposal dismissed.",
+        "confirmError": "Could not confirm the lock.",
+        "dismissError": "Could not dismiss the proposal."
+      },
+      "pager": {
+        "aria": "User pagination",
+        "showing": "Showing {shown} of {total} users",
+        "prev": "Previous",
+        "next": "Next",
+        "page": "Page {page} of {total}"
+      }
+    },
+    "moderation": {
+      "title": "Course moderation",
+      "subtitle": "Review content and decide whether to publish or reject instructors’ courses.",
+      "filtersAria": "Filter by status",
+      "tabs": {
+        "PENDING": "Pending",
+        "PUBLISHED": "Published",
+        "REJECTED": "Rejected",
+        "ARCHIVED": "Archived"
+      },
+      "loadError": "Could not load the course list.",
+      "empty": {
+        "title": "No courses",
+        "PENDING": "No courses are waiting for review right now.",
+        "PUBLISHED": "No courses have been published yet.",
+        "REJECTED": "No courses have been rejected.",
+        "ARCHIVED": "No courses have been archived."
+      },
+      "lessons": "{count} lessons",
+      "free": "Free",
+      "review": "Review",
+      "view": "View",
+      "reviewAria": "Review {title}",
+      "viewAria": "View {title}",
+      "detail": {
+        "back": "Back",
+        "notFound": "Course not found.",
+        "reject": "Reject",
+        "approve": "Approve",
+        "cancel": "Cancel",
+        "rejectedReason": "Rejection reason:",
+        "content": "Course content",
+        "previewTag": "Preview",
+        "info": {
+          "instructor": "Instructor",
+          "category": "Category",
+          "level": "Level",
+          "price": "Price",
+          "free": "Free",
+          "resubmits": "Times resubmitted"
+        },
+        "approveConfirm": {
+          "title": "Approve this course?",
+          "body": "\"{title}\" will be published and learners can enroll right away."
+        }
+      },
+      "reject": {
+        "title": "Reject course",
+        "body": "\"{title}\" will move to Rejected. The instructor will see this reason so they can fix the course and resubmit.",
+        "label": "Rejection reason",
+        "placeholder": "State the reason clearly (at least {min} characters)...",
+        "counter": "{count}/{min} characters",
+        "cancel": "Cancel",
+        "confirm": "Confirm rejection"
+      },
+      "lesson": {
+        "videoTitle": "Original video — {title}",
+        "noVideo": "This lesson has no video yet.",
+        "documents": "Attached documents",
+        "loading": "Loading...",
+        "docsError": "Could not load the document list.",
+        "noDocs": "No attached documents.",
+        "view": "View",
+        "download": "Download"
+      }
+    },
+    "queue": {
+      "title": "AI Queue monitor",
+      "subtitle": "AI Worker health, task queues, the Gemini key pool and dubbing jobs.",
+      "worker": "AI Worker: {status}",
+      "ok": "Running",
+      "down": "Error",
+      "refresh": "Refresh",
+      "stats": {
+        "pending": "Waiting in queue",
+        "started": "In progress",
+        "success": "Completed",
+        "failure": "Failed"
+      },
+      "queueDetail": "Queue details",
+      "loading": "Loading...",
+      "connectError": "Cannot reach the AI Worker at",
+      "queueEmpty": "Queue is empty — no tasks waiting.",
+      "defaultQueue": "Celery default queue",
+      "pendingTasks": "{count} tasks waiting",
+      "keyPool": "Gemini key pool (slots)",
+      "slots": "{total} slots ({active} usable)",
+      "noKeys": "No keys configured yet.",
+      "failures": "{count} consecutive failures",
+      "recoverIn": "recovers in {sec}s",
+      "slot": {
+        "cooldown": "⏸ Cooling down",
+        "active": "✓ Active"
+      },
+      "beat": {
+        "title": "Celery Beat — scheduled jobs",
+        "running": "✓ Running",
+        "planned": "○ Planned",
+        "cleanupTemp": {
+          "desc": "Clean intermediate files (.wav, video chunks) older than 24h",
+          "schedule": "Hourly (at :00)"
+        },
+        "cleanupNotifications": {
+          "desc": "Delete read notifications older than 90 days",
+          "schedule": "Daily at 3:00 AM"
+        },
+        "remindFlashcards": {
+          "desc": "Remind learners to review flashcards (SM-2)",
+          "schedule": "Daily at 7:00 AM"
+        },
+        "reportAudio": {
+          "desc": "Report audio unused for over 180 days",
+          "schedule": "Weekly, Monday 4:00 AM"
+        }
+      },
+      "jobs": "Dubbing jobs"
+    },
+    "aiAnalytics": {
+      "title": "AI Analytics",
+      "subtitle": "Monitor learners’ API usage and lock AI access when needed.",
+      "chartTitle": "AI cost per day (last 30 days)",
+      "cost": "Cost",
+      "day": "Day {date}",
+      "noDaily": "No daily data yet",
+      "cols": {
+        "email": "Learner email",
+        "status": "AI status",
+        "tokens": "Total tokens",
+        "cost": "Total cost ($)",
+        "actions": "Actions"
+      },
+      "locked": "Locked",
+      "active": "Active",
+      "lock": "Lock AI",
+      "unlock": "Unlock",
+      "empty": "No usage data yet",
+      "updated": "Updated the user’s AI status",
+      "error": "Something went wrong"
+    },
+    "voices": {
+      "title": "Dubbing voices",
+      "subtitle": "The single source that decides which dubbing languages learners can pick; turning one off hides that language.",
+      "langPh": "Language code (e.g. en-US)",
+      "langLabel": "Language code",
+      "voicePh": "Edge-TTS voice name (e.g. en-US-JennyNeural)",
+      "voiceLabel": "Edge-TTS voice name",
+      "gender": {
+        "FEMALE": "Female",
+        "MALE": "Male"
+      },
+      "genderLabel": "Gender",
+      "isDefault": "Default",
+      "add": "Add voice",
+      "cols": {
+        "language": "Language",
+        "voice": "Voice",
+        "gender": "Gender",
+        "default": "Default",
+        "active": "Enabled",
+        "actions": "Actions"
+      },
+      "loading": "Loading...",
+      "empty": "No voices yet — learners will see no dubbing languages (BR-DUB-07).",
+      "delete": "Delete",
+      "error": "Something went wrong",
+      "deleteError": "Could not delete this voice.",
+      "confirmDelete": {
+        "title": "Delete this voice?",
+        "body": "The voice {voice} ({language}) will be removed from the system.",
+        "cancel": "Cancel"
+      },
+      "searchLabel": "Search voices",
+      "searchPh": "Search by language or voice name...",
+      "showMore": "Show more",
+      "showing": "Showing {shown} of {total} voices",
+      "noMatch": "No matching voices."
+    },
+    "tutorSec": {
+      "title": "AI Tutor security",
+      "subtitle": "Messages learners send to the AI Tutor that the pre-check flags as suspicious (asking to ignore rules, impersonating an admin, jailbreaks...). For monitoring only — nothing here locks or blocks accounts automatically.",
+      "cols": {
+        "student": "Learner",
+        "course": "Course",
+        "pattern": "Matched pattern",
+        "message": "Message",
+        "time": "Time"
+      },
+      "loading": "Loading...",
+      "empty": "No messages have been flagged as suspicious.",
+      "pager": {
+        "aria": "Security log pagination",
+        "info": "Page {page} of {total} — {count} records",
+        "prev": "Previous",
+        "next": "Next"
+      }
+    },
+    "jobs": {
+      "filterLabel": "Filter by status",
+      "status": {
+        "ALL": "All",
+        "PENDING": "Pending",
+        "PROCESSING": "Processing",
+        "COMPLETED": "Completed",
+        "FAILED": "Failed",
+        "SKIPPED": "Skipped"
+      },
+      "cols": {
+        "lesson": "Lesson",
+        "language": "Language",
+        "status": "Status",
+        "progress": "Progress",
+        "retry": "Retries",
+        "error": "Error",
+        "actions": "Actions"
+      },
+      "loading": "Loading...",
+      "empty": "No jobs.",
+      "retry": "Retry",
+      "retryError": "Could not retry this job."
+    },
+    "payments": {
+      "title": "Payment reconciliation",
+      "subtitle": "Manage and reconcile course purchase transactions on the platform.",
+      "refresh": "Refresh data",
+      "loadError": "Could not load the transaction history",
+      "empty": "There are no transactions yet.",
+      "noMatch": "No transactions match the filters.",
+      "status": {
+        "PAID": "Paid",
+        "PENDING": "Pending",
+        "FAILED": "Failed",
+        "EXPIRED": "Expired"
+      },
+      "source": {
+        "referral": "Referral",
+        "organic": "Organic"
+      },
+      "filters": {
+        "email": "Search by email",
+        "emailPh": "Enter learner email...",
+        "date": "Filter by date",
+        "status": "Status",
+        "all": "All statuses"
+      },
+      "cols": {
+        "ref": "Transaction ID",
+        "user": "User",
+        "amount": "Amount",
+        "fee": "Platform fee",
+        "net": "Net earnings",
+        "source": "Source",
+        "method": "Method",
+        "status": "Status",
+        "time": "Time",
+        "actions": "Actions"
+      },
+      "details": "Details",
+      "pager": {
+        "aria": "Transaction pagination",
+        "showing": "Showing {shown} of {total} transactions",
+        "prev": "Previous",
+        "next": "Next",
+        "page": "Page {page} of {total}"
+      },
+      "detail": {
+        "title": "Transaction details",
+        "close": "Close",
+        "course": "Course",
+        "account": "Purchasing account",
+        "billingName": "Billing name",
+        "phone": "Phone number",
+        "none": "None",
+        "source": "Revenue source",
+        "sourceReferral": "Instructor’s own referral link",
+        "sourceOrganic": "Found by the learner on the platform",
+        "fee": "Platform fee ({percent}%)",
+        "earning": "Instructor receives ({percent}%)",
+        "coupon": "Coupon used",
+        "couponMath": "Original {original} − Discount {discount}",
+        "method": "Payment method",
+        "status": "Status",
+        "failReason": "Failure reason",
+        "failText": "Cancelled by the payment gateway or by the user.",
+        "ref": "Reference code",
+        "gateway": "Gateway code",
+        "notYet": "Not yet",
+        "refund": "Refund",
+        "refundSoon": "Refunds are still under development.",
+        "dispute": "Handle dispute",
+        "disputeMarked": "Report marked as handled!"
+      }
+    },
+    "settings": {
+      "title": "System settings",
+      "subtitle": "Read-only information about the AI Worker, business quotas and server resources.",
+      "worker": {
+        "title": "AI Worker",
+        "up": "Running",
+        "down": "Cannot connect",
+        "gemini": "Gemini model (LLM)",
+        "geminiDesc": "BR-DUB-02: not hardcoded — read from the GEMINI_MODEL env variable",
+        "asr": "ASR backend (speech-to-text)",
+        "asrDesc": "groq = Groq Cloud API · whisperx_local = local GPU",
+        "chunk": "Chunk length (BR-CHUNK-02)",
+        "minutes": "{count} min",
+        "chunkDesc": "Videos are split into fixed chunks for parallel processing",
+        "url": "AI Worker URL",
+        "urlDesc": "Internal address of the FastAPI service"
+      },
+      "quotas": {
+        "title": "Business quotas",
+        "dubStudent": "Dubbing / learner / day",
+        "dubStudentUnit": "{count} requests",
+        "dubInstructor": "Dubbing / instructor / day",
+        "dubInstructorUnit": "{count} requests",
+        "materials": "Generated materials / day",
+        "materialsUnit": "{count} requests",
+        "tutor": "AI Tutor messages / day",
+        "tutorUnit": "{count} messages",
+        "guestSearch": "AI search (guest) / hour",
+        "guestSearchUnit": "{count} requests"
+      },
+      "resources": {
+        "title": "Backend resources",
+        "ram": "JVM RAM",
+        "disk": "Server disk",
+        "uptime": "Backend uptime",
+        "courses": "Total courses",
+        "users": "Total users"
+      },
+      "env": {
+        "title": "Environment"
+      }
+    },
+    "categories": {
+      "title": "Category management",
+      "subtitle": "Add, rename or delete course categories.",
+      "newPh": "New category name...",
+      "newLabel": "New category name",
+      "add": "Add category",
+      "error": "Something went wrong",
+      "deleteError": "Could not delete this category.",
+      "cols": {
+        "name": "Category name",
+        "slug": "Slug",
+        "actions": "Actions"
+      },
+      "loading": "Loading...",
+      "empty": "No categories yet.",
+      "nameLabel": "Category name",
+      "delete": "Delete",
+      "confirm": {
+        "title": "Delete this category?",
+        "body": "The category \"{name}\" will be deleted. The system will refuse if courses still belong to it.",
+        "cancel": "Cancel"
+      }
+    },
+    "reviews": {
+      "title": "Review moderation",
+      "subtitle": "Hide reviews that break the rules and handle reports from instructors.",
+      "coursePh": "Course name...",
+      "instructorPh": "Instructor email...",
+      "statusLabel": "Status",
+      "statusOpt": {
+        "ALL": "All statuses",
+        "VISIBLE": "Visible",
+        "HIDDEN": "Hidden",
+        "PENDING_REPORT": "Pending (reported by instructor)"
+      },
+      "cols": {
+        "course": "Course",
+        "student": "Learner",
+        "stars": "Stars",
+        "comment": "Comment",
+        "date": "Date",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "loading": "Loading...",
+      "empty": "No reviews yet.",
+      "noComment": "(no comment)",
+      "badge": {
+        "pending": "Report pending",
+        "hidden": "Hidden",
+        "visible": "Visible"
+      },
+      "reason": "Reason: {reason}",
+      "unhide": "Show again",
+      "hide": "Hide",
+      "keepHidden": "Keep hidden",
+      "rejectReportTip": "Reject the report and show the review again",
+      "confirmReportTip": "Confirm the report and keep it hidden",
+      "hideError": "Could not hide this review.",
+      "unhideError": "Could not unhide this review.",
+      "starsLabel": "{count} out of 5 stars",
+      "pager": {
+        "aria": "Review pagination",
+        "prev": "Previous page",
+        "next": "Next page",
+        "page": "Page {page} of {total}"
+      }
+    },
+    "announce": {
+      "title": "System announcements",
+      "subtitle": "Send announcements to everyone, instructors only, learners only, or one person. Sending runs in the background, so it can take seconds to minutes to reach every recipient.",
+      "severity": {
+        "HIGH": "High — shown as a banner at the top (e.g. maintenance)",
+        "MEDIUM": "Medium — notification bell only",
+        "LOW": "Low — notification bell only"
+      },
+      "audience": {
+        "ALL": "Everyone",
+        "INSTRUCTOR": "Instructors only",
+        "STUDENT": "Learners only",
+        "SPECIFIC_USER": "One specific person (by ID)"
+      },
+      "dispatch": {
+        "PENDING": "Pending",
+        "PROCESSING": "Sending...",
+        "DONE": "Sent",
+        "FAILED": "Failed"
+      },
+      "form": {
+        "title": "Title",
+        "titlePh": "E.g. System maintenance",
+        "severity": "Severity",
+        "content": "Content",
+        "audience": "Audience",
+        "userId": "User ID (see the Users page)",
+        "expires": "Hide the banner after (leave blank = show until a newer High announcement)",
+        "sending": "Sending...",
+        "send": "Send announcement",
+        "error": "Something went wrong, please try again."
+      },
+      "cols": {
+        "title": "Title",
+        "severity": "Severity",
+        "audience": "Audience",
+        "status": "Status",
+        "sent": "Sent",
+        "created": "Created"
+      },
+      "loading": "Loading...",
+      "empty": "No announcements sent yet.",
+      "user": "User #{id}",
+      "sevLabel": {
+        "HIGH": "High",
+        "MEDIUM": "Medium",
+        "LOW": "Low"
+      }
+    }
   }
 }

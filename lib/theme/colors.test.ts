@@ -23,7 +23,12 @@ const PAIRS: Array<[string, string, string]> = [
   ['cyan-ink trên cyan (nút ngôn ngữ)', COLORS.cyanInk, COLORS.cyan],
   ['ink trên highlight (mảng tô vàng)', COLORS.ink, COLORS.highlight],
   ['streak-ink trên streak-bg', COLORS.streakInk, COLORS.streakBg],
-  ['chữ trắng trên danger (huy hiệu đếm)', COLORS.white, COLORS.danger],
+  ['chữ trắng trên danger (huy hiệu đếm, nhãn đang live)', COLORS.white, COLORS.danger],
+  ['danger làm chữ trên trắng (lỗi, nút xóa)', COLORS.danger, COLORS.surfaceRaised],
+  ['danger làm chữ trên surface', COLORS.danger, COLORS.surface],
+  ['ink-muted trên line-soft (nhãn đã lưu trữ)', COLORS.inkMuted, COLORS.lineSoft],
+  ['ink-faint trên trắng', COLORS.inkFaint, COLORS.surfaceRaised],
+  ['ink trên warning (ô hạng 3 trên bục)', COLORS.ink, COLORS.warning],
 ];
 
 describe('bảng màu', () => {

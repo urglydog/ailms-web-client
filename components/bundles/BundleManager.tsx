@@ -1,14 +1,15 @@
 'use client';
 
 import { useState } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import { useMyBundles, useCreateBundle, useUpdateBundle } from '@/hooks/useBundles';
 import { useMyCourses } from '@/hooks/useCourses';
 import type { CourseBundle, CreateBundleReq, UpdateBundleReq } from '@/types/domain';
 
 // ── Helpers ──────────────────────────────────────────────────────
 
-function fmt(amount: number) {
-  return amount.toLocaleString('vi-VN') + '₫';
+function formatAmount(amount: number, locale: string) {
+  return amount.toLocaleString(locale) + '₫';
 }
 
 // ── Sidebar Form ─────────────────────────────────────────────────
@@ -19,6 +20,9 @@ interface BundleFormProps {
 }
 
 function BundleForm({ editing, onClose }: BundleFormProps) {
+  const t = useTranslations('bundles');
+  const locale = useLocale();
+  const fmt = (amount: number) => formatAmount(amount, locale);
   const { data: coursesData } = useMyCourses({ status: 'PUBLISHED' });
   const publishedCourses = coursesData?.content ?? [];
 
@@ -46,7 +50,7 @@ function BundleForm({ editing, onClose }: BundleFormProps) {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (selectedIds.length < 2) {
-      alert('Gói phải có ít nhất 2 khóa học!');
+      alert(t('form.minTwo'));
       return;
     }
     if (editing) {
@@ -63,13 +67,14 @@ function BundleForm({ editing, onClose }: BundleFormProps) {
       <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white rounded-2xl shadow-2xl flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b bg-gradient-to-r from-cyan-50 to-blue-50 rounded-t-2xl">
-          <h2 className="text-lg font-bold text-gray-900">
-            {editing ? '✏️ Sửa gói khóa học' : '✨ Tạo gói khóa học mới'}
+          <h2 className="text-lg font-bold text-ink">
+            {editing ? `✏️ ${t('form.editTitle')}` : `✨ ${t('form.createTitle')}`}
           </h2>
           <button
             type="button"
             onClick={onClose}
-            className="h-8 w-8 rounded-full hover:bg-gray-200 flex items-center justify-center text-gray-500 hover:text-gray-700 transition-colors"
+            aria-label={t('form.close')}
+            className="h-8 w-8 rounded-full hover:bg-gray-200 flex items-center justify-center text-ink-muted hover:text-gray-700 transition-colors"
           >
             ✕
           </button>
@@ -78,34 +83,34 @@ function BundleForm({ editing, onClose }: BundleFormProps) {
         <form onSubmit={handleSubmit} className="flex flex-col gap-5 p-6">
           {/* Tên gói */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-              Tên gói <span className="text-red-500">*</span>
+            <label className="block text-sm font-semibold text-ink mb-1.5">
+              {t('form.name')} <span className="text-red-500">*</span>
             </label>
             <input
               required
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="VD: Combo Lập trình Web Full-stack"
-              className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 bg-gray-50"
+              placeholder={t('form.namePh')}
+              className="w-full rounded-xl border border-line px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 bg-surface"
             />
           </div>
 
           {/* Mô tả */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Mô tả ngắn</label>
+            <label className="block text-sm font-semibold text-ink mb-1.5">{t('form.desc')}</label>
             <textarea
               rows={2}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Mô tả lợi ích khi mua gói..."
-              className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 bg-gray-50 resize-none"
+              placeholder={t('form.descPh')}
+              className="w-full rounded-xl border border-line px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 bg-surface resize-none"
             />
           </div>
 
           {/* Giảm giá % */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-              Mức giảm giá Bundle
+            <label className="block text-sm font-semibold text-ink mb-1.5">
+              {t('form.discount')}
             </label>
             <div className="flex items-center gap-3">
               <input
@@ -117,7 +122,7 @@ function BundleForm({ editing, onClose }: BundleFormProps) {
                 onChange={(e) => setDiscountPercent(Number(e.target.value))}
                 className="flex-1 accent-cyan-500"
               />
-              <span className="w-16 rounded-lg bg-cyan-100 text-cyan-700 font-bold text-sm text-center py-1.5">
+              <span className="w-16 rounded-lg bg-cyan-100 text-accent-dark font-bold text-sm text-center py-1.5">
                 {discountPercent}%
               </span>
             </div>
@@ -125,21 +130,21 @@ function BundleForm({ editing, onClose }: BundleFormProps) {
 
           {/* Chọn khóa học */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-              Chọn khóa học ({selectedIds.length} đã chọn — cần ít nhất 2)
+            <label className="block text-sm font-semibold text-ink mb-1.5">
+              {t('form.pickCourses', { count: selectedIds.length })}
             </label>
             {publishedCourses.length === 0 ? (
-              <p className="text-sm text-gray-400 py-3 text-center">
-                Bạn chưa có khóa học nào đã xuất bản.
+              <p className="text-sm text-ink-muted py-3 text-center">
+                {t('form.noPublished')}
               </p>
             ) : (
-              <div className="rounded-xl border border-gray-200 divide-y max-h-48 overflow-y-auto">
+              <div className="rounded-xl border border-line divide-y max-h-48 overflow-y-auto">
                 {publishedCourses.map((course) => {
                   const selected = selectedIds.includes(course.id);
                   return (
                     <label
                       key={course.id}
-                      className={`flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors ${selected ? 'bg-cyan-50' : ''}`}
+                      className={`flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-surface transition-colors ${selected ? 'bg-tint' : ''}`}
                     >
                       <input
                         type="checkbox"
@@ -147,9 +152,9 @@ function BundleForm({ editing, onClose }: BundleFormProps) {
                         onChange={() => toggleCourse(course.id)}
                         className="h-4 w-4 rounded accent-cyan-600 flex-shrink-0"
                       />
-                      <span className="flex-1 text-sm text-gray-800 truncate">{course.title}</span>
+                      <span className="flex-1 text-sm text-ink truncate">{course.title}</span>
                       {course.price != null && (
-                        <span className="text-sm font-semibold text-gray-500 flex-shrink-0">
+                        <span className="text-sm font-semibold text-ink-muted flex-shrink-0">
                           {fmt(course.price)}
                         </span>
                       )}
@@ -163,17 +168,17 @@ function BundleForm({ editing, onClose }: BundleFormProps) {
           {/* Preview giá */}
           {selectedIds.length >= 2 && (
             <div className="rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 text-white p-4 space-y-1.5">
-              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Xem trước giá</p>
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">{t('form.preview')}</p>
               <div className="flex justify-between text-sm">
-                <span className="text-slate-300">Giá gốc tổng</span>
+                <span className="text-slate-300">{t('form.originalSum')}</span>
                 <span className="line-through text-slate-400">{fmt(originalSum)}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-slate-300">Giảm {discountPercent}%</span>
+                <span className="text-slate-300">{t('form.discountLine', { percent: discountPercent })}</span>
                 <span className="text-red-400 font-semibold">- {fmt(discountAmt)}</span>
               </div>
               <div className="flex justify-between text-base font-bold border-t border-white/10 pt-2 mt-1">
-                <span>Học viên trả</span>
+                <span>{t('form.learnerPays')}</span>
                 <span className="text-cyan-400">{fmt(finalPrice)}</span>
               </div>
             </div>
@@ -184,14 +189,14 @@ function BundleForm({ editing, onClose }: BundleFormProps) {
             <label className="flex items-center gap-3 cursor-pointer">
               <div
                 onClick={() => setIsActive((v) => !v)}
-                className={`relative w-10 h-6 rounded-full transition-colors ${isActive ? 'bg-cyan-500' : 'bg-gray-300'}`}
+                className={`relative w-10 h-6 rounded-full transition-colors ${isActive ? 'bg-accent' : 'bg-line'}`}
               >
                 <span
                   className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white shadow transition-transform ${isActive ? 'translate-x-4' : 'translate-x-0'}`}
                 />
               </div>
-              <span className="text-sm font-medium text-gray-700">
-                {isActive ? 'Đang hoạt động' : 'Đã tắt'}
+              <span className="text-sm font-medium text-ink">
+                {isActive ? t('form.active') : t('off')}
               </span>
             </label>
           )}
@@ -201,16 +206,16 @@ function BundleForm({ editing, onClose }: BundleFormProps) {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 rounded-xl border border-gray-200 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors"
+              className="flex-1 rounded-xl border border-line py-2.5 text-sm font-semibold text-ink-muted hover:bg-surface transition-colors"
             >
-              Hủy
+              {t('form.cancel')}
             </button>
             <button
               type="submit"
               disabled={isPending || selectedIds.length < 2}
-              className="flex-1 rounded-xl bg-cyan-600 py-2.5 text-sm font-bold text-white hover:bg-cyan-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="flex-1 rounded-xl bg-accent py-2.5 text-sm font-bold text-white hover:bg-accent-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              {isPending ? 'Đang lưu...' : editing ? 'Cập nhật gói' : 'Tạo gói'}
+              {isPending ? t('form.saving') : editing ? t('form.update') : t('form.create')}
             </button>
           </div>
         </form>
@@ -222,6 +227,9 @@ function BundleForm({ editing, onClose }: BundleFormProps) {
 // ── Bundle Card ──────────────────────────────────────────────────
 
 function BundleCard({ bundle, onEdit }: { bundle: CourseBundle; onEdit: () => void }) {
+  const t = useTranslations('bundles');
+  const locale = useLocale();
+  const fmt = (amount: number) => formatAmount(amount, locale);
   return (
     <div
       className={`rounded-2xl border bg-white shadow-sm hover:shadow-md transition-shadow overflow-hidden ${!bundle.isActive ? 'opacity-60 grayscale' : ''}`}
@@ -233,49 +241,49 @@ function BundleCard({ bundle, onEdit }: { bundle: CourseBundle; onEdit: () => vo
         <div className="flex items-start justify-between gap-3 mb-3">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="inline-flex items-center gap-1 rounded-full bg-cyan-100 px-2.5 py-0.5 text-xs font-bold text-cyan-700">
+              <span className="inline-flex items-center gap-1 rounded-full bg-cyan-100 px-2.5 py-0.5 text-xs font-bold text-accent-dark">
                 -{bundle.discountPercent}%
               </span>
               {!bundle.isActive && (
-                <span className="inline-flex rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold text-gray-500">
-                  Đã tắt
+                <span className="inline-flex rounded-full bg-line-soft px-2.5 py-0.5 text-xs font-semibold text-ink-muted">
+                  {t('off')}
                 </span>
               )}
             </div>
-            <h3 className="mt-1.5 text-[15px] font-bold text-gray-900 leading-tight line-clamp-2">
+            <h3 className="mt-1.5 text-[15px] font-bold text-ink leading-tight line-clamp-2">
               {bundle.title}
             </h3>
             {bundle.description && (
-              <p className="mt-1 text-xs text-gray-500 line-clamp-1">{bundle.description}</p>
+              <p className="mt-1 text-xs text-ink-muted line-clamp-1">{bundle.description}</p>
             )}
           </div>
           <button
             type="button"
             onClick={onEdit}
-            className="shrink-0 rounded-xl border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-50 hover:border-cyan-300 hover:text-cyan-600 transition-colors"
+            className="shrink-0 rounded-xl border border-line px-3 py-1.5 text-xs font-semibold text-ink-muted hover:bg-surface hover:border-cyan-300 hover:text-cyan-600 transition-colors"
           >
-            Sửa
+            {t('edit')}
           </button>
         </div>
 
         {/* Courses list */}
         <ul className="space-y-1.5 mb-4">
           {bundle.courses.map((c) => (
-            <li key={c.id} className="flex items-center gap-2 text-xs text-gray-600">
+            <li key={c.id} className="flex items-center gap-2 text-xs text-ink-muted">
               <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 flex-shrink-0" />
               <span className="flex-1 truncate">{c.title}</span>
-              <span className="font-semibold text-gray-400 flex-shrink-0">{fmt(c.price)}</span>
+              <span className="font-semibold text-ink-muted flex-shrink-0">{fmt(c.price)}</span>
             </li>
           ))}
         </ul>
 
         {/* Price summary */}
-        <div className="rounded-xl bg-gray-50 px-4 py-3 flex items-center justify-between border border-gray-100">
-          <div className="text-xs text-gray-500">
+        <div className="rounded-xl bg-surface px-4 py-3 flex items-center justify-between border border-line-soft">
+          <div className="text-xs text-ink-muted">
             <span className="line-through">{fmt(bundle.originalPrice)}</span>
             <span className="ml-2 text-red-500 font-semibold">-{fmt(bundle.discountAmount)}</span>
           </div>
-          <div className="text-base font-bold text-cyan-700">{fmt(bundle.finalPrice)}</div>
+          <div className="text-base font-bold text-accent-dark">{fmt(bundle.finalPrice)}</div>
         </div>
       </div>
     </div>
@@ -285,6 +293,7 @@ function BundleCard({ bundle, onEdit }: { bundle: CourseBundle; onEdit: () => vo
 // ── Main Component ────────────────────────────────────────────────
 
 export function BundleManager() {
+  const t = useTranslations('bundles');
   const { data, isLoading } = useMyBundles();
   const [editing, setEditing] = useState<CourseBundle | null>(null);
   const [showForm, setShowForm] = useState(false);
@@ -296,9 +305,9 @@ export function BundleManager() {
       {/* Page header */}
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">🎁 Gói Khóa Học</h1>
-          <p className="mt-1 text-sm text-gray-500">
-            Tạo combo khóa học với giá ưu đãi hơn để tăng doanh thu.
+          <h1 className="text-2xl font-bold text-ink">🎁 {t('pageTitle')}</h1>
+          <p className="mt-1 text-sm text-ink-muted">
+            {t('pageSubtitle')}
           </p>
         </div>
         <button
@@ -307,7 +316,7 @@ export function BundleManager() {
           className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-cyan-200 hover:from-cyan-700 hover:to-blue-700 transition-all active:scale-95"
         >
           <span className="text-lg leading-none">+</span>
-          Tạo gói mới
+          {t('createNew')}
         </button>
       </div>
 
@@ -315,7 +324,7 @@ export function BundleManager() {
       {isLoading && (
         <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-5">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-48 rounded-2xl bg-gray-100 animate-pulse" />
+            <div key={i} className="h-48 rounded-2xl bg-line-soft animate-pulse" />
           ))}
         </div>
       )}
@@ -323,16 +332,16 @@ export function BundleManager() {
       {!isLoading && bundles.length === 0 && (
         <div className="flex flex-col items-center justify-center py-20 text-center">
           <div className="text-6xl mb-4">🎁</div>
-          <h2 className="text-lg font-bold text-gray-700">Chưa có gói nào</h2>
-          <p className="mt-1 text-sm text-gray-400 max-w-sm">
-            Tạo gói đầu tiên để tăng tỷ lệ chuyển đổi và doanh thu trung bình mỗi đơn hàng.
+          <h2 className="text-lg font-bold text-ink">{t('emptyTitle')}</h2>
+          <p className="mt-1 text-sm text-ink-muted max-w-sm">
+            {t('emptyBody')}
           </p>
           <button
             type="button"
             onClick={() => { setEditing(null); setShowForm(true); }}
-            className="mt-5 rounded-xl bg-cyan-600 px-6 py-2.5 text-sm font-bold text-white hover:bg-cyan-700 transition-colors"
+            className="mt-5 rounded-xl bg-accent px-6 py-2.5 text-sm font-bold text-white hover:bg-accent-dark transition-colors"
           >
-            Tạo gói đầu tiên
+            {t('createFirst')}
           </button>
         </div>
       )}
@@ -353,11 +362,11 @@ export function BundleManager() {
       <div className="rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm text-blue-700 flex gap-3">
         <span className="text-lg leading-tight flex-shrink-0">💡</span>
         <div>
-          <p className="font-semibold mb-1">Cách gói khóa học hoạt động</p>
+          <p className="font-semibold mb-1">{t('info.title')}</p>
           <ul className="list-disc pl-4 space-y-0.5 text-blue-600">
-            <li>Nếu học viên đã sở hữu 1 khóa trong gói, hệ thống tự <strong>trừ tiền</strong> khóa đó.</li>
-            <li>Coupon riêng lẻ <strong>không áp dụng chồng</strong> lên khóa học trong gói.</li>
-            <li>Giá được <strong>chốt ngay khi tạo đơn</strong>, không đổi kể cả khi bạn chỉnh giá sau.</li>
+            <li>{t.rich('info.owned', { b: (c) => <strong>{c}</strong> })}</li>
+            <li>{t.rich('info.coupon', { b: (c) => <strong>{c}</strong> })}</li>
+            <li>{t.rich('info.price', { b: (c) => <strong>{c}</strong> })}</li>
           </ul>
         </div>
       </div>
