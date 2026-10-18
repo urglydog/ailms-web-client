@@ -576,5 +576,85 @@
       "INTERMEDIATE": "Trung cấp",
       "ADVANCED": "Nâng cao"
     }
+  },
+  "auth": {
+    "layout": {
+      "tagline": "Học mọi khóa học bằng ngôn ngữ của bạn",
+      "body": "AI lồng tiếng đồng bộ với video gốc, kèm gia sư AI hỏi đáp ngay trong bài học.",
+      "highlights": [
+        "Giọng lồng tiếng AI theo ngôn ngữ bạn chọn",
+        "Gia sư AI giải đáp, dẫn thẳng tới đoạn video liên quan",
+        "Chứng chỉ hoàn thành, chia sẻ lên hồ sơ và LinkedIn"
+      ]
+    },
+    "fields": {
+      "email": "Email",
+      "password": "Mật khẩu",
+      "fullName": "Họ tên",
+      "confirmPassword": "Xác nhận mật khẩu",
+      "showPassword": "Hiện mật khẩu",
+      "hidePassword": "Ẩn mật khẩu"
+    },
+    "strength": {
+      "label": "Mức độ bảo mật:",
+      "short": "Quá ngắn (tối thiểu 6 ký tự)",
+      "weak": "Yếu (cần cả chữ và số)",
+      "good": "Tốt",
+      "strong": "Mạnh (tuyệt vời!)",
+      "tooWeak": "Mật khẩu chưa đủ mạnh. Vui lòng nhập ít nhất 6 ký tự gồm cả chữ cái và chữ số."
+    },
+    "match": {
+      "yes": "Mật khẩu khớp",
+      "no": "Mật khẩu chưa khớp",
+      "mismatch": "Mật khẩu xác nhận không khớp."
+    },
+    "login": {
+      "title": "Đăng nhập",
+      "registered": "Tài khoản đã được tạo thành công! Mời bạn đăng nhập.",
+      "orEmail": "hoặc đăng nhập với email",
+      "forgot": "Quên mật khẩu?",
+      "forgotNeedEmail": "Vui lòng nhập email để đổi mật khẩu",
+      "submit": "Đăng nhập",
+      "submitting": "Đang xử lý...",
+      "failed": "Đăng nhập thất bại",
+      "generic": "Đã có lỗi xảy ra",
+      "loading": "Đang tải biểu mẫu...",
+      "noAccount": "Chưa có tài khoản?",
+      "signUpNow": "Đăng ký ngay"
+    },
+    "register": {
+      "title": "Đăng ký tài khoản",
+      "stepInfo": "Thông tin",
+      "stepOtp": "Xác thực OTP",
+      "submit": "Đăng ký",
+      "submitting": "Đang xử lý...",
+      "serverError": "Lỗi đăng ký từ máy chủ",
+      "connectionError": "Lỗi kết nối đến máy chủ. Vui lòng thử lại.",
+      "otpIntro": "Vui lòng kiểm tra email {email} để lấy mã OTP (6 chữ số).",
+      "otpLabel": "Mã OTP",
+      "verify": "Xác thực",
+      "verifying": "Đang xác thực...",
+      "otpInvalid": "OTP không hợp lệ",
+      "hasAccount": "Đã có tài khoản?",
+      "signInNow": "Đăng nhập ngay"
+    },
+    "forgot": {
+      "title": "Quên mật khẩu",
+      "intro": "Nhập email đã đăng ký, chúng tôi sẽ gửi mã OTP để bạn đặt lại mật khẩu.",
+      "emailPh": "Nhập email của bạn",
+      "send": "Gửi OTP",
+      "sending": "Đang gửi...",
+      "otpLabel": "Mã OTP",
+      "otpHint": "Nhập 6 chữ số OTP từ email",
+      "newPassword": "Mật khẩu mới",
+      "newPasswordPh": "Nhập mật khẩu mới",
+      "confirmPh": "Xác nhận mật khẩu mới",
+      "reset": "Đặt lại mật khẩu",
+      "processing": "Đang xử lý...",
+      "success": "Đổi mật khẩu thành công! Bạn sẽ được chuyển về trang chủ.",
+      "generic": "Có lỗi xảy ra",
+      "loading": "Đang tải...",
+      "backToLogin": "Quay lại đăng nhập"
+    }
   }
 }

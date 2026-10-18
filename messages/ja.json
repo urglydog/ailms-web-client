@@ -576,5 +576,85 @@
       "INTERMEDIATE": "中級",
       "ADVANCED": "上級"
     }
+  },
+  "auth": {
+    "layout": {
+      "tagline": "すべての講座を、あなたの言語で",
+      "body": "元の動画と同期する AI 吹き替えと、レッスン中に質問できる AI チューター。",
+      "highlights": [
+        "選んだ言語で AI 吹き替え音声",
+        "質問に答え、関連する動画の場面へ直接ジャンプする AI チューター",
+        "プロフィールや LinkedIn で共有できる修了証"
+      ]
+    },
+    "fields": {
+      "email": "メールアドレス",
+      "password": "パスワード",
+      "fullName": "氏名",
+      "confirmPassword": "パスワード（確認）",
+      "showPassword": "パスワードを表示",
+      "hidePassword": "パスワードを隠す"
+    },
+    "strength": {
+      "label": "パスワード強度：",
+      "short": "短すぎます（6 文字以上）",
+      "weak": "弱い（英字と数字が必要）",
+      "good": "良い",
+      "strong": "強い（すばらしい！）",
+      "tooWeak": "パスワードが弱すぎます。英字と数字を含む 6 文字以上で入力してください。"
+    },
+    "match": {
+      "yes": "パスワードが一致しています",
+      "no": "パスワードが一致しません",
+      "mismatch": "確認用パスワードが一致しません。"
+    },
+    "login": {
+      "title": "ログイン",
+      "registered": "アカウントを作成しました。ログインしてください。",
+      "orEmail": "またはメールでログイン",
+      "forgot": "パスワードをお忘れですか？",
+      "forgotNeedEmail": "パスワード再設定のためメールアドレスを入力してください",
+      "submit": "ログイン",
+      "submitting": "処理中...",
+      "failed": "ログインに失敗しました",
+      "generic": "エラーが発生しました",
+      "loading": "フォームを読み込み中...",
+      "noAccount": "アカウントをお持ちでないですか？",
+      "signUpNow": "今すぐ登録"
+    },
+    "register": {
+      "title": "アカウント登録",
+      "stepInfo": "情報",
+      "stepOtp": "OTP 認証",
+      "submit": "登録",
+      "submitting": "処理中...",
+      "serverError": "登録中にサーバーエラーが発生しました",
+      "connectionError": "サーバーに接続できません。もう一度お試しください。",
+      "otpIntro": "{email} に届いた 6 桁の OTP コードを確認してください。",
+      "otpLabel": "OTP コード",
+      "verify": "認証",
+      "verifying": "認証中...",
+      "otpInvalid": "OTP が無効です",
+      "hasAccount": "すでにアカウントをお持ちですか？",
+      "signInNow": "今すぐログイン"
+    },
+    "forgot": {
+      "title": "パスワードをお忘れの方",
+      "intro": "登録済みのメールアドレスを入力すると、再設定用の OTP を送信します。",
+      "emailPh": "メールアドレスを入力",
+      "send": "OTP を送信",
+      "sending": "送信中...",
+      "otpLabel": "OTP コード",
+      "otpHint": "メールに届いた 6 桁の OTP を入力",
+      "newPassword": "新しいパスワード",
+      "newPasswordPh": "新しいパスワードを入力",
+      "confirmPh": "新しいパスワードを再入力",
+      "reset": "パスワードを再設定",
+      "processing": "処理中...",
+      "success": "パスワードを変更しました。ホームに移動します。",
+      "generic": "エラーが発生しました",
+      "loading": "読み込み中...",
+      "backToLogin": "ログインに戻る"
+    }
   }
 }

@@ -576,5 +576,85 @@
       "INTERMEDIATE": "Intermediate",
       "ADVANCED": "Advanced"
     }
+  },
+  "auth": {
+    "layout": {
+      "tagline": "Learn every course in your own language",
+      "body": "AI dubbing synced to the original video, plus an AI tutor you can ask right inside the lesson.",
+      "highlights": [
+        "AI dubbing voices in the language you choose",
+        "An AI tutor that answers and jumps to the right moment in the video",
+        "Completion certificates you can share on your profile and LinkedIn"
+      ]
+    },
+    "fields": {
+      "email": "Email",
+      "password": "Password",
+      "fullName": "Full name",
+      "confirmPassword": "Confirm password",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password"
+    },
+    "strength": {
+      "label": "Password strength:",
+      "short": "Too short (at least 6 characters)",
+      "weak": "Weak (needs letters and numbers)",
+      "good": "Good",
+      "strong": "Strong (great!)",
+      "tooWeak": "Password is not strong enough. Use at least 6 characters with both letters and numbers."
+    },
+    "match": {
+      "yes": "Passwords match",
+      "no": "Passwords do not match",
+      "mismatch": "The confirmation password does not match."
+    },
+    "login": {
+      "title": "Sign in",
+      "registered": "Your account has been created! Please sign in.",
+      "orEmail": "or sign in with email",
+      "forgot": "Forgot password?",
+      "forgotNeedEmail": "Please enter your email to reset your password",
+      "submit": "Sign in",
+      "submitting": "Processing...",
+      "failed": "Sign-in failed",
+      "generic": "Something went wrong",
+      "loading": "Loading form...",
+      "noAccount": "No account yet?",
+      "signUpNow": "Sign up now"
+    },
+    "register": {
+      "title": "Create an account",
+      "stepInfo": "Details",
+      "stepOtp": "Verify OTP",
+      "submit": "Sign up",
+      "submitting": "Processing...",
+      "serverError": "Server error while signing up",
+      "connectionError": "Could not reach the server. Please try again.",
+      "otpIntro": "Check {email} for your 6-digit OTP code.",
+      "otpLabel": "OTP code",
+      "verify": "Verify",
+      "verifying": "Verifying...",
+      "otpInvalid": "Invalid OTP",
+      "hasAccount": "Already have an account?",
+      "signInNow": "Sign in now"
+    },
+    "forgot": {
+      "title": "Forgot password",
+      "intro": "Enter your registered email and we will send an OTP so you can reset your password.",
+      "emailPh": "Enter your email",
+      "send": "Send OTP",
+      "sending": "Sending...",
+      "otpLabel": "OTP code",
+      "otpHint": "Enter the 6-digit OTP from the email",
+      "newPassword": "New password",
+      "newPasswordPh": "Enter a new password",
+      "confirmPh": "Confirm the new password",
+      "reset": "Reset password",
+      "processing": "Processing...",
+      "success": "Password changed! Taking you to the home page.",
+      "generic": "Something went wrong",
+      "loading": "Loading...",
+      "backToLogin": "Back to sign in"
+    }
   }
 }

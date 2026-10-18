@@ -4,99 +4,84 @@ import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { useRegister, useVerifyOtp } from '@/hooks/useAuthMutations';
 import { useRouter } from 'next/navigation';
-import { Check, X, Mail } from 'lucide-react';
+import { Check, Mail } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
+import { MIN_ACCEPTED_SCORE, passwordStrength } from '@/lib/auth/passwordStrength';
+import { PasswordField } from './PasswordField';
+import { PasswordMatchHint, PasswordStrengthMeter } from './PasswordStrengthMeter';
 
-function getPasswordStrength(password: string) {
-  if (!password) return { score: 0, label: '', color: 'bg-line', textColor: 'text-ink-muted' };
-  if (password.length < 6) return { score: 1, label: 'Quá ngắn (tối thiểu 6 ký tự)', color: 'bg-danger', textColor: 'text-danger' };
-
-  const hasLetter = /[A-Za-z]/.test(password);
-  const hasNumber = /\d/.test(password);
-  const hasSpecial = /[@$!%*#?&.]/.test(password);
-
-  if (hasLetter && hasNumber && hasSpecial && password.length >= 8) {
-    return { score: 4, label: 'Mạnh (Tuyệt vời!)', color: 'bg-success', textColor: 'text-success' };
-  }
-  if (hasLetter && hasNumber) {
-    return { score: 3, label: 'Tốt', color: 'bg-accent', textColor: 'text-accent' };
-  }
-
-  return { score: 2, label: 'Yếu (Cần cả chữ và số)', color: 'bg-star', textColor: 'text-star' };
-}
+type ApiErr = { response?: { data?: { detail?: string; message?: string } } };
+const serverMessage = (err: unknown) => {
+  const data = (err as ApiErr | null)?.response?.data;
+  return data?.detail || data?.message;
+};
 
 /** Thanh tiến trình 2 bước Đăng ký → Xác thực OTP — thuần hiển thị. */
 function StepIndicator({ step }: { step: 'register' | 'otp' }) {
+  const t = useTranslations('auth.register');
   const steps: { key: 'register' | 'otp'; label: string }[] = [
-    { key: 'register', label: 'Thông tin' },
-    { key: 'otp', label: 'Xác thực OTP' },
+    { key: 'register', label: t('stepInfo') },
+    { key: 'otp', label: t('stepOtp') },
   ];
   return (
-    <div className="flex items-center gap-2 mb-5">
+    <ol className="m-0 mb-5 flex list-none items-center gap-2 p-0">
       {steps.map((s, idx) => {
         const isDone = step === 'otp' && s.key === 'register';
         const isActive = step === s.key;
         return (
-          <div key={s.key} className="flex items-center gap-2 flex-1">
+          <li key={s.key} aria-current={isActive ? 'step' : undefined} className="flex flex-1 items-center gap-2">
             <div
-              className={`flex items-center justify-center w-6 h-6 rounded-full text-[11px] font-bold flex-shrink-0 transition-colors ${
-                isDone ? 'bg-success text-white' : isActive ? 'bg-accent text-white' : 'bg-line-soft text-ink-faint'
+              className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[11px] font-bold transition-colors ${
+                isDone ? 'bg-success text-white' : isActive ? 'bg-accent text-white' : 'bg-tint text-ink-muted'
               }`}
             >
-              {isDone ? <Check className="w-3.5 h-3.5" /> : idx + 1}
+              {isDone ? <Check className="h-3.5 w-3.5" aria-hidden /> : idx + 1}
             </div>
-            <span className={`text-xs font-medium ${isActive ? 'text-ink' : 'text-ink-faint'}`}>{s.label}</span>
-            {idx < steps.length - 1 && <div className={`flex-1 h-px ${isDone ? 'bg-success' : 'bg-line'}`} />}
-          </div>
+            <span className={`text-xs font-medium ${isActive ? 'text-ink' : 'text-ink-muted'}`}>{s.label}</span>
+            {idx < steps.length - 1 && <div className={`h-px flex-1 ${isDone ? 'bg-success' : 'bg-line'}`} />}
+          </li>
         );
       })}
-    </div>
+    </ol>
   );
 }
 
 export function RegisterForm() {
+  const t = useTranslations('auth');
   const router = useRouter();
   const [step, setStep] = useState<'register' | 'otp'>('register');
   const [formData, setFormData] = useState({ fullName: '', email: '', password: '', confirmPassword: '' });
   const [otp, setOtp] = useState('');
   const [validationError, setValidationError] = useState('');
-  
+
   const { mutate: register, isPending: isRegPending, error: regError } = useRegister();
   const { mutate: verify, isPending: isVerifyPending, error: verifyError } = useVerifyOtp();
 
-  const strength = getPasswordStrength(formData.password);
-  
-  // Trạng thái khớp của Confirm Password
+  const strength = passwordStrength(formData.password);
   const isMatch = formData.confirmPassword === formData.password;
-  const showMatchStatus = formData.confirmPassword.length > 0;
 
   const handleRegister = (e: React.FormEvent) => {
     e.preventDefault();
     setValidationError('');
-    
-    if (strength.score < 3) {
-      setValidationError('Mật khẩu chưa đủ mạnh. Vui lòng nhập ít nhất 6 ký tự gồm cả chữ cái và chữ số.');
+
+    if (strength.score < MIN_ACCEPTED_SCORE) {
+      setValidationError(t('strength.tooWeak'));
       return;
     }
-    
+
     if (!isMatch) {
-      setValidationError('Mật khẩu xác nhận không khớp.');
+      setValidationError(t('match.mismatch'));
       return;
     }
 
-    const payload = {
-      fullName: formData.fullName,
-      email: formData.email,
-      password: formData.password
-    };
-
-    register(payload, {
-      onSuccess: () => setStep('otp'),
-      onError: (err: unknown) => {
-        const error = err as { response?: { data?: { detail?: string, message?: string } } };
-        toast.error(error.response?.data?.detail || error.response?.data?.message || 'Lỗi đăng ký từ máy chủ');
-      }
-    });
+    register(
+      { fullName: formData.fullName, email: formData.email, password: formData.password },
+      {
+        onSuccess: () => setStep('otp'),
+        onError: (err: unknown) => toast.error(serverMessage(err) || t('register.serverError')),
+      },
+    );
   };
 
   const handleVerify = (e: React.FormEvent) => {
@@ -106,10 +91,7 @@ export function RegisterForm() {
         // Tự động chuyển hướng không dùng alert block
         router.push('/login?registered=true');
       },
-      onError: (err: unknown) => {
-        const error = err as { response?: { data?: { detail?: string, message?: string } } };
-        toast.error(error.response?.data?.detail || error.response?.data?.message || 'OTP không hợp lệ');
-      }
+      onError: (err: unknown) => toast.error(serverMessage(err) || t('register.otpInvalid')),
     });
   };
 
@@ -118,18 +100,22 @@ export function RegisterForm() {
       <>
         <StepIndicator step={step} />
         <form onSubmit={handleVerify} className="flex flex-col gap-4">
-          {verifyError && <div className="text-danger text-sm text-center">{((verifyError as unknown) as { response?: { data?: { detail?: string, message?: string } } }).response?.data?.detail || ((verifyError as unknown) as { response?: { data?: { message?: string } } }).response?.data?.message || 'OTP không đúng'}</div>}
-          <div className="flex flex-col items-center gap-2 text-center mb-2">
-            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-accent/10 text-accent">
-              <Mail className="w-5 h-5" strokeWidth={1.75} />
+          {verifyError && (
+            <div role="alert" className="text-center text-sm text-danger">
+              {serverMessage(verifyError) || t('register.otpInvalid')}
+            </div>
+          )}
+          <div className="mb-2 flex flex-col items-center gap-2 text-center">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-tint text-accent">
+              <Mail className="h-5 w-5" strokeWidth={1.75} aria-hidden />
             </div>
             <p className="text-sm text-ink-muted">
-              Vui lòng kiểm tra email <b className="text-ink">{formData.email}</b> để lấy mã OTP (6 chữ số).
+              {t.rich('register.otpIntro', { email: formData.email, b: (c) => <b className="text-ink">{c}</b> })}
             </p>
           </div>
-          <Input id="otp" label="Mã OTP" required value={otp} onChange={e => setOtp(e.target.value)} maxLength={6} />
+          <Input id="otp" label={t('register.otpLabel')} required value={otp} onChange={e => setOtp(e.target.value)} maxLength={6} inputMode="numeric" autoComplete="one-time-code" />
           <Button type="submit" disabled={isVerifyPending} className="mt-2 w-full">
-            {isVerifyPending ? 'Đang xác thực...' : 'Xác thực'}
+            {isVerifyPending ? t('register.verifying') : t('register.verify')}
           </Button>
         </form>
       </>
@@ -140,45 +126,29 @@ export function RegisterForm() {
     <>
       <StepIndicator step={step} />
       <form onSubmit={handleRegister} className="flex flex-col gap-4">
-      {validationError && <div className="text-danger text-sm text-center">{validationError}</div>}
-      {regError && <div className="text-danger text-sm text-center">{((regError as unknown) as { response?: { data?: { detail?: string, message?: string } } }).response?.data?.detail || ((regError as unknown) as { response?: { data?: { message?: string } } }).response?.data?.message || 'Lỗi kết nối đến máy chủ. Vui lòng thử lại.'}</div>}
-
-      <Input id="fullName" label="Họ tên" required value={formData.fullName} onChange={e => setFormData({...formData, fullName: e.target.value})} />
-      <Input id="email" label="Email" type="email" required value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
-      
-      <div className="flex flex-col gap-1">
-        <Input id="password" label="Mật khẩu" type="password" required value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} />
-        {/* Password Strength Meter */}
-        <div className={`transition-all duration-300 overflow-hidden ${formData.password.length > 0 ? 'h-8 opacity-100 mt-1' : 'h-0 opacity-0'}`}>
-          <div className="flex justify-between items-center mb-1">
-            <span className="text-[11px] text-ink-muted">Mức độ bảo mật:</span>
-            <span className={`text-[11px] font-semibold ${strength.textColor}`}>{strength.label}</span>
+        {validationError && <div role="alert" className="text-center text-sm text-danger">{validationError}</div>}
+        {regError && (
+          <div role="alert" className="text-center text-sm text-danger">
+            {serverMessage(regError) || t('register.connectionError')}
           </div>
-          <div className="flex gap-1 h-1 w-full">
-            {[1, 2, 3, 4].map((level) => (
-              <div 
-                key={level} 
-                className={`flex-1 rounded-full transition-colors duration-500 ${level <= strength.score ? strength.color : 'bg-surface-raised'}`}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
+        )}
 
-      <div className="flex flex-col gap-1">
-        <Input id="confirmPassword" label="Xác nhận mật khẩu" type="password" required value={formData.confirmPassword} onChange={e => setFormData({...formData, confirmPassword: e.target.value})} />
-        {/* Confirm Password Match Indicator */}
-        <div className={`transition-all duration-300 overflow-hidden ${showMatchStatus ? 'h-4 opacity-100 mt-1' : 'h-0 opacity-0'}`}>
-          <span className={`flex items-center gap-1 text-[11px] font-semibold ${isMatch ? 'text-success' : 'text-danger'}`}>
-            {isMatch ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
-            {isMatch ? 'Mật khẩu khớp' : 'Mật khẩu chưa khớp'}
-          </span>
-        </div>
-      </div>
+        <Input id="fullName" label={t('fields.fullName')} required autoComplete="name" value={formData.fullName} onChange={e => setFormData({ ...formData, fullName: e.target.value })} />
+        <Input id="email" label={t('fields.email')} type="email" required autoComplete="email" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} />
 
-      <Button type="submit" disabled={isRegPending} className="mt-2 w-full">
-        {isRegPending ? 'Đang xử lý...' : 'Đăng ký'}
-      </Button>
+        <div className="flex flex-col">
+          <PasswordField id="password" label={t('fields.password')} required autoComplete="new-password" value={formData.password} onChange={(v) => setFormData({ ...formData, password: v })} />
+          <PasswordStrengthMeter password={formData.password} />
+        </div>
+
+        <div className="flex flex-col">
+          <PasswordField id="confirmPassword" label={t('fields.confirmPassword')} required autoComplete="new-password" value={formData.confirmPassword} onChange={(v) => setFormData({ ...formData, confirmPassword: v })} />
+          <PasswordMatchHint password={formData.password} confirm={formData.confirmPassword} />
+        </div>
+
+        <Button type="submit" disabled={isRegPending} className="mt-2 w-full">
+          {isRegPending ? t('register.submitting') : t('register.submit')}
+        </Button>
       </form>
     </>
   );

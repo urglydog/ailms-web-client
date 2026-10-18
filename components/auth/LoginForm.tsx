@@ -5,27 +5,27 @@ import { Button } from '@/components/ui/Button';
 import { useLogin } from '@/hooks/useAuthMutations';
 import { useSearchParams } from 'next/navigation';
 import { GoogleSignInButton } from './GoogleSignInButton';
+import { PasswordField } from './PasswordField';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { CheckCircle2 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 export function LoginForm() {
-
+  const t = useTranslations('auth');
   const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
+  const [registered, setRegistered] = useState(false);
   const { mutate: login, isPending, error } = useLogin();
 
   useEffect(() => {
-    if (searchParams.get('registered') === 'true') {
-      setSuccessMessage('Tài khoản đã được tạo thành công! Mời bạn đăng nhập.');
-    }
+    if (searchParams.get('registered') === 'true') setRegistered(true);
   }, [searchParams]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setSuccessMessage('');
+    setRegistered(false);
     login({ email, password }, {
       onSuccess: (data: { accessToken?: string; refreshToken?: string }) => {
         // Lưu token vào localStorage (Giai đoạn 1)
@@ -35,7 +35,7 @@ export function LoginForm() {
         if (data?.refreshToken) {
           localStorage.setItem('refreshToken', data.refreshToken);
         }
-        
+
         // (19/09/2026, sửa theo yêu cầu) — Giảng viên đăng nhập giờ cũng về trang chủ như Học
         // viên, KHÔNG còn tự động nhảy thẳng vào trang quản lý khóa học nữa (muốn vào thì tự bấm
         // "Kênh Giảng viên" ở dropdown avatar). Chỉ còn Admin có trang đích riêng vì đó không
@@ -61,67 +61,71 @@ export function LoginForm() {
             console.error('Lỗi giải mã token lúc đăng nhập:', e);
           }
         }
-        
+
         // Cập nhật lại giao diện (reload) và chuyển hướng
-        window.location.href = targetUrl; 
+        window.location.href = targetUrl;
       },
       onError: (err: unknown) => {
         const error = err as { response?: { data?: { detail?: string, message?: string } } };
-        toast.error(error.response?.data?.message || error.response?.data?.detail || 'Đăng nhập thất bại');
+        toast.error(error.response?.data?.message || error.response?.data?.detail || t('login.failed'));
       }
     });
   };
 
+  const errorDetail = error
+    ? ((error as unknown) as { response?: { data?: { detail?: string } } })?.response?.data?.detail || t('login.generic')
+    : null;
+
   return (
     <div className="flex flex-col gap-4">
-      {successMessage && (
-        <div className="flex items-center justify-center gap-1.5 text-success text-sm text-center font-medium">
-          <CheckCircle2 className="w-4 h-4" strokeWidth={1.75} />
-          {successMessage}
+      {registered && (
+        <div role="status" className="flex items-center justify-center gap-1.5 rounded-lg bg-success-tint px-3 py-2 text-center text-sm font-medium text-success-ink">
+          <CheckCircle2 className="h-4 w-4 shrink-0" strokeWidth={1.75} aria-hidden />
+          {t('login.registered')}
         </div>
       )}
-      {error && <div className="text-danger text-sm text-center">{((error as unknown) as { response?: { data?: { detail?: string } } })?.response?.data?.detail || 'Đã có lỗi xảy ra'}</div>}
+      {errorDetail && <div role="alert" className="text-center text-sm text-danger">{errorDetail}</div>}
 
       {/* Google Sign-In Button */}
       <GoogleSignInButton />
 
-      <div className="relative my-4">
+      <div className="relative my-2">
         <div className="absolute inset-0 flex items-center">
           <div className="w-full border-t border-line"></div>
         </div>
         <div className="relative flex justify-center text-sm">
-          <span className="px-2 bg-surface-raised text-ink-muted">hoặc đăng nhập với email</span>
+          <span className="bg-surface-raised px-2 text-ink-muted">{t('login.orEmail')}</span>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <Input
-          id="email" label="Email" type="email" required
+          id="email" label={t('fields.email')} type="email" required autoComplete="email"
           value={email} onChange={e => setEmail(e.target.value)}
         />
         <div className="flex flex-col gap-2">
-          <Input
-            id="password" label="Mật khẩu" type="password" required
-            value={password} onChange={e => setPassword(e.target.value)}
+          <PasswordField
+            id="password" label={t('fields.password')} required autoComplete="current-password"
+            value={password} onChange={setPassword}
           />
           <div className="flex justify-end">
-            <Link 
+            <Link
               href={`/forgot-password${email ? `?email=${encodeURIComponent(email)}` : ''}`}
               onClick={(e) => {
                 if (!email) {
                   e.preventDefault();
-                  toast.error('Vui lòng nhập email để đổi mật khẩu');
+                  toast.error(t('login.forgotNeedEmail'));
                   document.getElementById('email')?.focus();
                 }
               }}
-              className="text-sm font-semibold text-accent no-underline hover:underline"
+              className="text-sm font-semibold text-accent-dark no-underline hover:underline"
             >
-              Quên mật khẩu?
+              {t('login.forgot')}
             </Link>
           </div>
         </div>
         <Button type="submit" disabled={isPending} className="mt-2 w-full" size="lg">
-          {isPending ? 'Đang xử lý...' : 'Đăng nhập'}
+          {isPending ? t('login.submitting') : t('login.submit')}
         </Button>
       </form>
     </div>

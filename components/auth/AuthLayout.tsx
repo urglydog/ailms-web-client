@@ -1,53 +1,57 @@
 'use client';
 
 import { useEffect, useState, type ReactNode } from 'react';
-import { BookOpen, Sparkles, GraduationCap } from 'lucide-react';
+import { AudioLines, Bot, Award } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
-const HIGHLIGHTS = [
-  { icon: BookOpen, text: 'Học liệu Official do giảng viên biên soạn' },
-  { icon: Sparkles, text: 'Trợ lý AI hỗ trợ giải thích bài tập 24/7' },
-  { icon: GraduationCap, text: 'Theo dõi tiến độ & bảng điểm minh bạch' },
-];
+const ICONS = [AudioLines, Bot, Award] as const;
 
 /**
- * Khung split-screen dùng chung cho Đăng nhập/Đăng ký — panel thương hiệu bên trái
- * (accent solid, không gradient/glow theo đúng "Enterprise/Academic Design System"),
- * card form bên phải. Thuần hiển thị — không chứa logic nghiệp vụ.
+ * Khung chia đôi dùng chung cho Đăng nhập, Đăng ký và Quên mật khẩu: bảng thương hiệu azure bên trái nêu điểm
+ * nổi bật (AI lồng tiếng, gia sư AI, chứng chỉ), thẻ form bên phải. Thuần hiển thị, không chứa logic nghiệp vụ.
+ * Form tự hiện dần khi vào trang (chỉ opacity/transform); giảm chuyển động thì CSS toàn cục đã tắt hiệu ứng.
  */
 export function AuthLayout({ title, children, footer }: { title: string; children: ReactNode; footer: ReactNode }) {
+  const t = useTranslations('auth.layout');
   const [entered, setEntered] = useState(false);
   useEffect(() => {
     const id = requestAnimationFrame(() => setEntered(true));
     return () => cancelAnimationFrame(id);
   }, []);
 
+  const highlights = t.raw('highlights') as string[];
+
   return (
     <section className="shell flex min-h-[75vh] items-center justify-center py-12">
-      <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 rounded-card overflow-hidden border border-line shadow-card-hover bg-surface-raised">
-        {/* Panel thương hiệu — chỉ hiện ở màn hình vừa trở lên */}
-        <div className="hidden md:flex flex-col justify-between bg-accent text-white p-10">
+      <div className="grid w-full max-w-4xl grid-cols-1 overflow-hidden rounded-card border border-line bg-surface-raised shadow-card-hover md:grid-cols-2">
+        <div className="hidden flex-col justify-between gap-8 bg-accent p-10 text-white md:flex">
           <div>
             <div className="font-display text-xl font-bold">LinguaLearn</div>
-            <p className="mt-3 text-sm text-white/80 leading-relaxed">Học không giới hạn — cùng đồng hành với giảng viên và trợ lý AI.</p>
+            <p className="mt-6 font-display text-2xl font-bold leading-snug">{t('tagline')}</p>
+            <p className="mt-3 text-sm leading-relaxed text-white/85">{t('body')}</p>
           </div>
-          <ul className="flex flex-col gap-4">
-            {HIGHLIGHTS.map(({ icon: Icon, text }) => (
-              <li key={text} className="flex items-start gap-3 text-sm text-white/90">
-                <Icon className="w-4 h-4 mt-0.5 flex-shrink-0" strokeWidth={1.75} />
-                <span>{text}</span>
-              </li>
-            ))}
+          <ul className="m-0 flex list-none flex-col gap-4 p-0">
+            {highlights.map((text, i) => {
+              const Icon = ICONS[i] ?? AudioLines;
+              return (
+                <li key={text} className="flex items-start gap-3 text-sm text-white">
+                  <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-white/15">
+                    <Icon className="h-4 w-4" strokeWidth={1.75} aria-hidden />
+                  </span>
+                  <span>{text}</span>
+                </li>
+              );
+            })}
           </ul>
-          <div className="text-xs text-white/50">© {new Date().getFullYear()} LinguaLearn</div>
+          <div className="text-xs text-white/70">© {new Date().getFullYear()} LinguaLearn</div>
         </div>
 
-        {/* Panel form */}
         <div
-          className={`p-8 sm:p-10 flex flex-col justify-center transition-all duration-300 ${
-            entered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
+          className={`flex flex-col justify-center p-8 transition-all duration-300 sm:p-10 ${
+            entered ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'
           }`}
         >
-          <h1 className="font-display text-2xl font-bold text-ink mb-6">{title}</h1>
+          <h1 className="mb-6 font-display text-2xl font-bold text-ink">{title}</h1>
           {children}
           <p className="mt-6 text-center text-sm text-ink-muted">{footer}</p>
         </div>
