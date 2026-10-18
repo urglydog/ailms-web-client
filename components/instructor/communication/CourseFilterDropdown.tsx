@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { SearchIcon } from '@/components/instructor/SidebarIcons';
 import type { InstructorCourseOption } from '@/lib/api/dashboard';
 
@@ -10,7 +11,7 @@ export function CourseFilterDropdown({
   courses,
   value,
   onChange,
-  allLabel = 'Tất cả khóa học',
+  allLabel,
   showAllOption = true,
   fullWidth = false,
 }: {
@@ -25,6 +26,8 @@ export function CourseFilterDropdown({
   /** true khi đặt trong 1 form dọc (thay cho `<select>` full-width trước đây). */
   fullWidth?: boolean;
 }) {
+  const t = useTranslations('instructor.comm.filter');
+  const emptyLabel = allLabel ?? t('allCourses');
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
 
@@ -40,7 +43,7 @@ export function CourseFilterDropdown({
           fullWidth ? 'w-full text-left' : ''
         }`}
       >
-        {selected ? selected.title : allLabel} ▾
+        {selected ? selected.title : emptyLabel} ▾
       </button>
 
       {open && (
@@ -53,7 +56,7 @@ export function CourseFilterDropdown({
                 autoFocus
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Tìm khóa học..."
+                placeholder={t('search')}
                 className="w-full text-[12.5px] outline-none"
               />
             </div>
@@ -64,7 +67,7 @@ export function CourseFilterDropdown({
                   onClick={() => { onChange(''); setOpen(false); setSearch(''); }}
                   className={`block w-full px-3 py-1.5 text-left text-[12.5px] hover:bg-surface ${value === '' ? 'font-bold text-accent-dark' : 'text-ink'}`}
                 >
-                  {allLabel}
+                  {emptyLabel}
                 </button>
               )}
               {filtered.map((c) => (
@@ -78,7 +81,7 @@ export function CourseFilterDropdown({
                 </button>
               ))}
               {filtered.length === 0 && (
-                <p className="px-3 py-2 text-[12px] text-ink-muted">Không tìm thấy khóa học nào.</p>
+                <p className="px-3 py-2 text-[12px] text-ink-muted">{t('notFound')}</p>
               )}
             </div>
           </div>

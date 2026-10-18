@@ -4,6 +4,7 @@ import { LiveKitRoom, useLocalParticipant, useTracks, VideoTrack } from '@liveki
 import { Track } from 'livekit-client';
 import { useParams } from 'next/navigation';
 import { useEffect, useState, type ChangeEvent } from 'react';
+import { useTranslations } from 'next-intl';
 import { LiveChatPanel } from '@/components/live/LiveChatPanel';
 import { UploadProgressBar } from '@/components/ui/UploadProgressBar';
 import { useEndLiveSession, useLiveSession, useStartLiveSession } from '@/hooks/useLiveSessions';
@@ -19,6 +20,7 @@ import type { LiveSessionStartRes } from '@/types/domain';
  * `LiveKitRoom` cung cấp, không tách ra ngoài được.
  */
 export default function LiveControlRoomPage() {
+  const t = useTranslations('instructor.live.room');
   const params = useParams<{ sessionId: string }>();
   const sessionId = Number(params.sessionId);
   const { data: session, isLoading } = useLiveSession(sessionId);
@@ -34,7 +36,7 @@ export default function LiveControlRoomPage() {
     const file = e.target.files?.[0];
     e.target.value = '';
     if (!file || !session) return;
-    startThumbnailUpload(file, `Ảnh buổi live: ${session.title}`);
+    startThumbnailUpload(file, t('thumbnailTask', { title: session.title }));
   };
 
   // Phiên ĐÃ live (tải lại trang, hoặc vào lại sau khi rớt mạng trong 60s ân hạn BR-LIVE-09)
@@ -47,14 +49,14 @@ export default function LiveControlRoomPage() {
   }, [session?.status]);
 
   if (isLoading || !session) {
-    return <div className="p-10 text-center text-sm text-ink-muted">Đang tải...</div>;
+    return <div className="p-10 text-center text-sm text-ink-muted">{t('loading')}</div>;
   }
 
   if (session.status === 'ENDED') {
     return (
       <div className="mx-auto flex max-w-lg flex-col items-center gap-2 rounded-xl border border-line bg-white p-8 text-center">
         <h1 className="m-0 font-display text-lg font-bold text-ink">{session.title}</h1>
-        <p className="text-sm text-ink-muted">Buổi live này đã kết thúc.</p>
+        <p className="text-sm text-ink-muted">{t('ended')}</p>
       </div>
     );
   }
@@ -65,18 +67,18 @@ export default function LiveControlRoomPage() {
       <div className="mx-auto flex max-w-lg flex-col items-center gap-4 rounded-xl border border-line bg-white p-8 text-center">
         <h1 className="m-0 font-display text-lg font-bold text-ink">{session.title}</h1>
         <p className="text-[13px] text-ink-muted">
-          Khóa học: {session.courseTitle} · Ngôn ngữ nói: {session.sourceLanguage}
+          {t('meta', { course: session.courseTitle, language: session.sourceLanguage })}
         </p>
 
         {/* F11.9 mở rộng — ảnh hiện trên trang khám phá /live, không bắt buộc (mặc định dùng
             ảnh bìa khóa học nếu bỏ trống). Sửa được bất kỳ lúc nào, kể cả sau khi đã live. */}
         <div className="w-full text-left">
           <span className="mb-1.5 block text-[12.5px] font-semibold text-ink">
-            Ảnh thumbnail cho trang khám phá Live
+            {t('thumbnail')}
           </span>
           {previewUrl && (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={previewUrl} alt="Xem trước thumbnail" className="mb-2 h-32 w-full rounded-lg object-cover" />
+            <img src={previewUrl} alt={t('thumbnailAlt')} className="mb-2 h-32 w-full rounded-lg object-cover" />
           )}
           <input
             type="file"
@@ -87,11 +89,11 @@ export default function LiveControlRoomPage() {
           />
           {!session.thumbnailUrl && (
             <p className="mt-1 text-[11px] text-ink-muted">
-              Chưa tải ảnh riêng — đang dùng tạm ảnh bìa khóa học.
+              {t('noThumbnail')}
             </p>
           )}
           {thumbnailTask?.status === 'uploading' && (
-            <UploadProgressBar percent={thumbnailTask.percent} label="Đang tải ảnh lên..." />
+            <UploadProgressBar percent={thumbnailTask.percent} label={t('uploading')} />
           )}
           {thumbnailTask?.status === 'error' && (
             <p className="text-[11.5px] text-danger">{thumbnailTask.errorMessage}</p>
@@ -106,7 +108,7 @@ export default function LiveControlRoomPage() {
           disabled={startLive.isPending}
           className="rounded-full bg-red-600 px-6 py-2.5 text-[13.5px] font-bold text-white hover:bg-red-700 disabled:opacity-50"
         >
-          {startLive.isPending ? 'Đang kết nối...' : '● Bắt đầu Live'}
+          {startLive.isPending ? t('connecting') : t('start')}
         </button>
       </div>
     );
@@ -143,6 +145,7 @@ function ControlRoomBody({
   onEnd: () => void;
   isEnding: boolean;
 }) {
+  const t = useTranslations('instructor.live.room');
   const { localParticipant, isCameraEnabled, isMicrophoneEnabled, isScreenShareEnabled } =
     useLocalParticipant();
   const [shareSystemAudio, setShareSystemAudio] = useState(false);
@@ -162,7 +165,7 @@ function ControlRoomBody({
           disabled={isEnding}
           className="cursor-pointer rounded-full bg-gray-900 px-5 py-2 text-[12.5px] font-bold text-white hover:bg-black disabled:opacity-50"
         >
-          {isEnding ? 'Đang kết thúc...' : 'Kết thúc Live'}
+          {isEnding ? t('ending') : t('end')}
         </button>
       </div>
 
@@ -174,7 +177,7 @@ function ControlRoomBody({
           <VideoTrack trackRef={cameraTrack} className="h-full w-full object-cover" />
         ) : (
           <div className="flex h-full items-center justify-center text-sm text-ink-muted">
-            Camera và chia sẻ màn hình đang tắt
+            {t('cameraOff')}
           </div>
         )}
         {screenTrack && cameraTrack && (
@@ -200,7 +203,7 @@ function ControlRoomBody({
           onClick={() =>
             localParticipant.setScreenShareEnabled(!isScreenShareEnabled, { audio: shareSystemAudio })
           }
-          label="Chia sẻ màn hình"
+          label={t('shareScreen')}
         />
         <label className="flex cursor-pointer items-center gap-1.5 text-[12.5px] text-ink-muted">
           <input
@@ -208,12 +211,11 @@ function ControlRoomBody({
             checked={shareSystemAudio}
             onChange={(e) => setShareSystemAudio(e.target.checked)}
           />
-          Chia sẻ âm thanh hệ thống
+          {t('shareAudio')}
         </label>
       </div>
       <p className="text-[11.5px] text-ink-muted">
-        Chia sẻ âm thanh hệ thống phụ thuộc trình duyệt — hoạt động ổn định nhất trên Chrome khi bạn
-        tick đúng ô trong hộp thoại chia sẻ màn hình lúc trình duyệt hỏi.
+        {t('audioHint')}
       </p>
     </div>
   );

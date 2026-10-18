@@ -928,6 +928,43 @@
       "empty": {
         "title": "还没有直播",
         "body": "创建第一场直播，与学员在线授课。"
+      },
+      "new": {
+        "title": "创建新直播",
+        "intro": "可提前预约，也可留空开始时间，创建后随时点击“开始直播”。直播发现页的缩略图可在下一步（创建完成后）添加。",
+        "form": {
+          "title": "直播标题",
+          "course": "课程",
+          "pickCourse": "-- 选择课程 --",
+          "language": "你将使用的语言",
+          "optional": "（可选）",
+          "languageDefault": "-- 默认使用个人资料中的语言 --",
+          "languageHint": "学员选择与此不同的配音语言，即可在直播中收听翻译。",
+          "visibility": "可见范围",
+          "courseOnly": "仅限已报名本课程的学员",
+          "public": "公开，任何人都能观看，包括未登录用户",
+          "startsAt": "计划开始时间",
+          "creating": "创建中...",
+          "create": "创建直播 →"
+        }
+      },
+      "room": {
+        "loading": "加载中...",
+        "ended": "本场直播已结束。",
+        "meta": "课程：{course} · 讲话语言：{language}",
+        "thumbnail": "直播发现页的缩略图",
+        "thumbnailAlt": "缩略图预览",
+        "noThumbnail": "尚未上传专属图片，暂时使用课程封面。",
+        "uploading": "正在上传图片...",
+        "thumbnailTask": "直播图片：{title}",
+        "connecting": "连接中...",
+        "start": "● 开始直播",
+        "ending": "正在结束...",
+        "end": "结束直播",
+        "cameraOff": "摄像头和屏幕共享已关闭",
+        "shareScreen": "共享屏幕",
+        "shareAudio": "共享系统声音",
+        "audioHint": "共享系统声音取决于浏览器，在 Chrome 上最稳定，需在浏览器弹出的屏幕共享对话框中勾选对应选项。"
       }
     },
     "common": {
@@ -1048,6 +1085,177 @@
         "sourceReferral": "推荐（97%）",
         "sourceOrganic": "自然流量（37%）"
       }
+    },
+    "comm": {
+      "loading": "加载中...",
+      "qa": {
+        "title": "问答",
+        "sortLabel": "排序：{value}",
+        "newest": "最新",
+        "oldest": "最早",
+        "twoCols": "双栏视图",
+        "oneCol": "单栏视图",
+        "onlyUnanswered": "只显示未回答的问题",
+        "empty": "还没有问题。",
+        "pick": "选择一个问题查看详情",
+        "detail": "问题详情",
+        "close": "关闭",
+        "noAnswer": "暂无回答",
+        "answers": "{count} 条回答",
+        "youAnswered": "你已回答",
+        "instructorTag": "（讲师）",
+        "placeholder": "回复学员...",
+        "send": "发送"
+      },
+      "assignments": {
+        "title": "作业",
+        "empty": "还没有作业。可在课程大纲编辑器中直接添加（“+ 作业”按钮）。",
+        "due": "截止：{date}",
+        "graded": "已批改 {graded}/{total}",
+        "noSubmissions": "还没有学员提交。",
+        "attachment": "附件",
+        "score": "分数",
+        "feedback": "反馈",
+        "save": "保存",
+        "gradedLine": "已批改：{score} 分",
+        "close": "关闭"
+      },
+      "announcements": {
+        "title": "公告",
+        "empty": "还没有公告。",
+        "delete": "删除",
+        "deleteTitle": "删除公告",
+        "deleteMessage": "确定要删除这条公告吗？已收到的学员仍会在收件箱中保留。",
+        "deleteConfirm": "删除",
+        "newTitle": "发送新公告",
+        "pickCourse": "选择课程...",
+        "titlePh": "公告标题",
+        "contentPh": "发送给本课程所有已报名学员的公告内容...",
+        "send": "发送公告"
+      },
+      "messages": {
+        "title": "消息"
+      },
+      "compose": {
+        "button": "+ 写消息",
+        "title": "写新消息",
+        "course": "课程",
+        "pickCourse": "选择课程...",
+        "student": "学员",
+        "pickStudent": "选择学员...",
+        "pickCourseFirst": "请先选择课程",
+        "cancel": "取消",
+        "start": "开始"
+      },
+      "filter": {
+        "allCourses": "全部课程",
+        "search": "搜索课程...",
+        "notFound": "没有找到课程。"
+      }
+    }
+  },
+  "coupons": {
+    "title": "优惠码",
+    "subtitleAdmin": "全站优惠券，或适用于任意课程的优惠券。",
+    "subtitleInstructor": "仅适用于你自己课程的优惠券。",
+    "create": "+ 创建优惠码",
+    "loading": "加载中...",
+    "empty": "还没有优惠码。",
+    "cols": {
+      "code": "优惠码",
+      "discount": "折扣",
+      "scope": "范围",
+      "time": "有效期",
+      "used": "已使用",
+      "status": "状态",
+      "actions": "操作"
+    },
+    "auto": "自动",
+    "autoCode": "（自动）",
+    "noCourse": "尚未选择课程",
+    "status": {
+      "off": "已关闭",
+      "expired": "已过期",
+      "on": "已启用",
+      "expiredTitle": "优惠码已过期，即使仍处于开启状态学员也无法使用"
+    },
+    "edit": "编辑",
+    "delete": "删除",
+    "confirmDelete": "删除优惠码“{code}”？",
+    "type": {
+      "PERCENTAGE": "按百分比",
+      "FIXED_AMOUNT": "固定金额"
+    },
+    "scope": {
+      "ALL_COURSES": "全部课程",
+      "SPECIFIC_COURSES": "指定的多门课程",
+      "SINGLE_COURSE": "1 门课程"
+    },
+    "form": {
+      "createTitle": "创建优惠码",
+      "editTitle": "编辑优惠码",
+      "autoApply": "自动应用（无需输入优惠码）",
+      "code": "优惠码",
+      "type": "折扣类型",
+      "valuePct": "数值（%）",
+      "valueFixed": "数值（đ）",
+      "scope": "适用范围",
+      "scopeMine": "我的全部课程",
+      "start": "开始",
+      "end": "结束",
+      "maxUsage": "使用次数上限（总计）",
+      "maxPerUser": "每位学员上限",
+      "unlimited": "不限",
+      "active": "启用（取消勾选可暂停此优惠券）",
+      "cancel": "取消",
+      "saving": "保存中...",
+      "save": "保存"
+    },
+    "picker": {
+      "label": "选择课程",
+      "search": "按名称搜索课程...",
+      "searchBtn": "搜索",
+      "adminHint": "请在上方搜索课程。",
+      "none": "你还没有课程。",
+      "needOne": "至少选择 1 门课程。"
+    }
+  },
+  "bundles": {
+    "pageTitle": "课程组合",
+    "pageSubtitle": "创建更优惠的课程组合来提升收入。",
+    "createNew": "创建组合",
+    "emptyTitle": "还没有组合",
+    "emptyBody": "创建第一个组合，提高转化率和每单平均收入。",
+    "createFirst": "创建第一个组合",
+    "off": "已关闭",
+    "edit": "编辑",
+    "info": {
+      "title": "课程组合如何运作",
+      "owned": "如果学员已拥有组合中的某门课程，系统会自动<b>扣除</b>该课程的价格。",
+      "coupon": "单独的优惠券<b>不会叠加</b>在组合内的课程上。",
+      "price": "价格在<b>下单时锁定</b>，之后即使你调整价格也不会变。"
+    },
+    "form": {
+      "editTitle": "编辑组合",
+      "createTitle": "创建新组合",
+      "name": "组合名称",
+      "namePh": "例如：全栈 Web 开发组合",
+      "desc": "简短描述",
+      "descPh": "描述购买组合的好处...",
+      "discount": "组合折扣",
+      "pickCourses": "选择课程（已选 {count} 门，至少 2 门）",
+      "noPublished": "你还没有已发布的课程。",
+      "minTwo": "组合至少需要 2 门课程！",
+      "preview": "价格预览",
+      "originalSum": "原价合计",
+      "discountLine": "减 {percent}%",
+      "learnerPays": "学员支付",
+      "active": "启用中",
+      "cancel": "取消",
+      "saving": "保存中...",
+      "update": "更新组合",
+      "create": "创建组合",
+      "close": "关闭"
     }
   }
 }

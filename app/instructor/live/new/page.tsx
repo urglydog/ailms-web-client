@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useMemo, useState, type FormEvent } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import { useMyCourses } from '@/hooks/useCourses';
 import { useCreateLiveSession } from '@/hooks/useLiveSessions';
 import { useVoiceOptions } from '@/hooks/useVoiceOptions';
@@ -10,9 +11,9 @@ import type { LiveVisibility } from '@/types/domain';
 
 /** Tên hiển thị từ mã BCP-47 — khớp cách `LiveLanguagePicker` (F11.3) đang hiển thị, không tự
  * liệt kê bảng tên cho 148 ngôn ngữ (BR-DUB-07). */
-function languageDisplayName(code: string): string {
+function languageDisplayName(code: string, locale: string): string {
   try {
-    return new Intl.DisplayNames(['vi'], { type: 'language' }).of(code) ?? code;
+    return new Intl.DisplayNames([locale], { type: 'language' }).of(code) ?? code;
   } catch {
     return code;
   }
@@ -26,6 +27,8 @@ function languageDisplayName(code: string): string {
  * ngôn ngữ dịch trùng ngôn ngữ nguồn mà không biết, nghe ra y hệt audio gốc.
  */
 export default function NewLiveSessionPage() {
+  const t = useTranslations('instructor.live.new');
+  const locale = useLocale();
   const router = useRouter();
   const { data: coursesPage } = useMyCourses();
   const { data: voiceOptions } = useVoiceOptions();
@@ -40,8 +43,8 @@ export default function NewLiveSessionPage() {
   const courses = coursesPage?.content ?? [];
   const languages = useMemo(() => {
     const codes = new Set((voiceOptions ?? []).map((v) => v.language));
-    return Array.from(codes).sort((a, b) => languageDisplayName(a).localeCompare(languageDisplayName(b), 'vi'));
-  }, [voiceOptions]);
+    return Array.from(codes).sort((a, b) => languageDisplayName(a, locale).localeCompare(languageDisplayName(b, locale), locale));
+  }, [voiceOptions, locale]);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -60,17 +63,16 @@ export default function NewLiveSessionPage() {
 
   return (
     <div className="mx-auto flex w-full max-w-lg flex-col gap-5">
-      <h1 className="m-0 font-display text-[22px] font-bold text-ink">Tạo buổi Live mới</h1>
+      <h1 className="m-0 font-display text-[22px] font-bold text-ink">{t('title')}</h1>
       <p className="text-[13px] text-ink-muted">
-        Đặt lịch trước hoặc để trống giờ bắt đầu để bấm &quot;Bắt đầu Live&quot; bất kỳ lúc nào sau khi tạo.
-        Ảnh thumbnail cho trang khám phá Live sẽ thêm được ở bước kế tiếp, ngay sau khi tạo xong.
+        {t('intro')}
       </p>
       <form
         onSubmit={handleSubmit}
         className="flex flex-col gap-4 rounded-xl border border-line bg-white p-5 shadow-sm"
       >
         <label className="flex flex-col gap-1.5">
-          <span className="text-[12.5px] font-semibold text-ink-muted">Tiêu đề buổi live</span>
+          <span className="text-[12.5px] font-semibold text-ink-muted">{t('form.title')}</span>
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
@@ -81,14 +83,14 @@ export default function NewLiveSessionPage() {
         </label>
 
         <label className="flex flex-col gap-1.5">
-          <span className="text-[12.5px] font-semibold text-ink-muted">Khóa học</span>
+          <span className="text-[12.5px] font-semibold text-ink-muted">{t('form.course')}</span>
           <select
             value={courseId}
             onChange={(e) => setCourseId(e.target.value ? Number(e.target.value) : '')}
             required
             className="w-full rounded-lg border border-line px-3 py-2 text-sm focus:border-accent focus:outline-none"
           >
-            <option value="">-- Chọn khóa học --</option>
+            <option value="">{t('form.pickCourse')}</option>
             {courses.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.title}
@@ -99,34 +101,34 @@ export default function NewLiveSessionPage() {
 
         <label className="flex flex-col gap-1.5">
           <span className="text-[12.5px] font-semibold text-ink-muted">
-            Ngôn ngữ bạn sẽ nói <span className="font-normal text-ink-muted">(không bắt buộc)</span>
+            {t('form.language')} <span className="font-normal text-ink-muted">{t('form.optional')}</span>
           </span>
           <select
             value={sourceLanguage}
             onChange={(e) => setSourceLanguage(e.target.value)}
             className="w-full rounded-lg border border-line px-3 py-2 text-sm focus:border-accent focus:outline-none"
           >
-            <option value="">-- Mặc định theo hồ sơ cá nhân --</option>
+            <option value="">{t('form.languageDefault')}</option>
             {languages.map((code) => (
               <option key={code} value={code}>
-                {languageDisplayName(code)}
+                {languageDisplayName(code, locale)}
               </option>
             ))}
           </select>
           <p className="text-[11px] text-ink-muted">
-            Học viên chọn ngôn ngữ lồng tiếng khác ngôn ngữ này để nghe bản dịch trong lúc live.
+            {t('form.languageHint')}
           </p>
         </label>
 
         <fieldset className="flex flex-col gap-1.5">
-          <legend className="text-[12.5px] font-semibold text-ink-muted">Phạm vi hiển thị</legend>
+          <legend className="text-[12.5px] font-semibold text-ink-muted">{t('form.visibility')}</legend>
           <label className="flex items-center gap-2 text-[13px] text-ink">
             <input
               type="radio"
               checked={visibility === 'COURSE_ONLY'}
               onChange={() => setVisibility('COURSE_ONLY')}
             />
-            Chỉ học viên đã ghi danh khóa học này
+            {t('form.courseOnly')}
           </label>
           <label className="flex items-center gap-2 text-[13px] text-ink">
             <input
@@ -134,13 +136,13 @@ export default function NewLiveSessionPage() {
               checked={visibility === 'PUBLIC'}
               onChange={() => setVisibility('PUBLIC')}
             />
-            Công khai — ai cũng xem được, kể cả chưa đăng nhập
+            {t('form.public')}
           </label>
         </fieldset>
 
         <label className="flex flex-col gap-1.5">
           <span className="text-[12.5px] font-semibold text-ink-muted">
-            Giờ dự kiến bắt đầu <span className="font-normal text-ink-muted">(không bắt buộc)</span>
+            {t('form.startsAt')} <span className="font-normal text-ink-muted">{t('form.optional')}</span>
           </span>
           <input
             type="datetime-local"
@@ -161,7 +163,7 @@ export default function NewLiveSessionPage() {
           disabled={createLiveSession.isPending}
           className="self-start rounded-full bg-accent px-5 py-2.5 text-[13px] font-bold text-white hover:bg-accent-dark disabled:opacity-50"
         >
-          {createLiveSession.isPending ? 'Đang tạo...' : 'Tạo buổi live →'}
+          {createLiveSession.isPending ? t('form.creating') : t('form.create')}
         </button>
       </form>
     </div>

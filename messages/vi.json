@@ -928,6 +928,43 @@
       "empty": {
         "title": "Chưa có buổi live nào",
         "body": "Tạo buổi live đầu tiên để dạy trực tuyến cùng học viên của bạn."
+      },
+      "new": {
+        "title": "Tạo buổi Live mới",
+        "intro": "Đặt lịch trước hoặc để trống giờ bắt đầu để bấm \"Bắt đầu Live\" bất kỳ lúc nào sau khi tạo. Ảnh thumbnail cho trang khám phá Live sẽ thêm được ở bước kế tiếp, ngay sau khi tạo xong.",
+        "form": {
+          "title": "Tiêu đề buổi live",
+          "course": "Khóa học",
+          "pickCourse": "-- Chọn khóa học --",
+          "language": "Ngôn ngữ bạn sẽ nói",
+          "optional": "(không bắt buộc)",
+          "languageDefault": "-- Mặc định theo hồ sơ cá nhân --",
+          "languageHint": "Học viên chọn ngôn ngữ lồng tiếng khác ngôn ngữ này để nghe bản dịch trong lúc live.",
+          "visibility": "Phạm vi hiển thị",
+          "courseOnly": "Chỉ học viên đã đăng ký khóa học này",
+          "public": "Công khai, ai cũng xem được, kể cả chưa đăng nhập",
+          "startsAt": "Giờ dự kiến bắt đầu",
+          "creating": "Đang tạo...",
+          "create": "Tạo buổi live →"
+        }
+      },
+      "room": {
+        "loading": "Đang tải...",
+        "ended": "Buổi live này đã kết thúc.",
+        "meta": "Khóa học: {course} · Ngôn ngữ nói: {language}",
+        "thumbnail": "Ảnh thumbnail cho trang khám phá Live",
+        "thumbnailAlt": "Xem trước thumbnail",
+        "noThumbnail": "Chưa tải ảnh riêng, đang dùng tạm ảnh bìa khóa học.",
+        "uploading": "Đang tải ảnh lên...",
+        "thumbnailTask": "Ảnh buổi live: {title}",
+        "connecting": "Đang kết nối...",
+        "start": "● Bắt đầu Live",
+        "ending": "Đang kết thúc...",
+        "end": "Kết thúc Live",
+        "cameraOff": "Camera và chia sẻ màn hình đang tắt",
+        "shareScreen": "Chia sẻ màn hình",
+        "shareAudio": "Chia sẻ âm thanh hệ thống",
+        "audioHint": "Chia sẻ âm thanh hệ thống phụ thuộc trình duyệt, hoạt động ổn định nhất trên Chrome khi bạn tick đúng ô trong hộp thoại chia sẻ màn hình lúc trình duyệt hỏi."
       }
     },
     "common": {
@@ -1048,6 +1085,177 @@
         "sourceReferral": "Giới thiệu (97%)",
         "sourceOrganic": "Tự tìm thấy (37%)"
       }
+    },
+    "comm": {
+      "loading": "Đang tải...",
+      "qa": {
+        "title": "Hỏi đáp",
+        "sortLabel": "Sắp xếp: {value}",
+        "newest": "Mới nhất",
+        "oldest": "Cũ nhất",
+        "twoCols": "Xem 2 cột",
+        "oneCol": "Xem 1 cột",
+        "onlyUnanswered": "Chỉ hiện câu hỏi chưa có câu trả lời",
+        "empty": "Chưa có câu hỏi nào.",
+        "pick": "Chọn 1 câu hỏi để xem chi tiết",
+        "detail": "Chi tiết câu hỏi",
+        "close": "Đóng",
+        "noAnswer": "Chưa có câu trả lời",
+        "answers": "{count} câu trả lời",
+        "youAnswered": "Bạn đã trả lời",
+        "instructorTag": " (Giảng viên)",
+        "placeholder": "Trả lời học viên...",
+        "send": "Gửi"
+      },
+      "assignments": {
+        "title": "Bài tập",
+        "empty": "Chưa có bài tập nào. Thêm bài tập ngay trong trình soạn Chương trình giảng dạy (nút \"+ Bài tập\").",
+        "due": "Hạn: {date}",
+        "graded": "{graded}/{total} đã chấm",
+        "noSubmissions": "Chưa có học viên nào nộp bài.",
+        "attachment": "Tệp đính kèm",
+        "score": "Điểm",
+        "feedback": "Phản hồi",
+        "save": "Lưu",
+        "gradedLine": "Đã chấm: {score} điểm",
+        "close": "Đóng"
+      },
+      "announcements": {
+        "title": "Thông báo",
+        "empty": "Chưa có thông báo nào.",
+        "delete": "Xóa",
+        "deleteTitle": "Xóa thông báo",
+        "deleteMessage": "Bạn có chắc chắn muốn xóa thông báo này? Học viên đã nhận sẽ vẫn giữ thông báo trong hộp thư của họ.",
+        "deleteConfirm": "Xóa",
+        "newTitle": "Gửi thông báo mới",
+        "pickCourse": "Chọn khóa học...",
+        "titlePh": "Tiêu đề thông báo",
+        "contentPh": "Nội dung thông báo gửi tới toàn bộ học viên đã đăng ký khóa học này...",
+        "send": "Gửi thông báo"
+      },
+      "messages": {
+        "title": "Tin nhắn"
+      },
+      "compose": {
+        "button": "+ Soạn",
+        "title": "Soạn tin nhắn mới",
+        "course": "Khóa học",
+        "pickCourse": "Chọn khóa học...",
+        "student": "Học viên",
+        "pickStudent": "Chọn học viên...",
+        "pickCourseFirst": "Chọn khóa học trước",
+        "cancel": "Hủy",
+        "start": "Bắt đầu"
+      },
+      "filter": {
+        "allCourses": "Tất cả khóa học",
+        "search": "Tìm khóa học...",
+        "notFound": "Không tìm thấy khóa học nào."
+      }
+    }
+  },
+  "coupons": {
+    "title": "Mã giảm giá",
+    "subtitleAdmin": "Coupon toàn hệ thống hoặc cho khóa học bất kỳ.",
+    "subtitleInstructor": "Coupon áp dụng cho khóa học của riêng bạn.",
+    "create": "+ Tạo mã giảm giá",
+    "loading": "Đang tải...",
+    "empty": "Chưa có mã giảm giá nào.",
+    "cols": {
+      "code": "Mã",
+      "discount": "Giảm giá",
+      "scope": "Phạm vi",
+      "time": "Thời gian",
+      "used": "Đã dùng",
+      "status": "Trạng thái",
+      "actions": "Hành động"
+    },
+    "auto": "Tự động",
+    "autoCode": "(tự động)",
+    "noCourse": "Chưa chọn khóa nào",
+    "status": {
+      "off": "Đã tắt",
+      "expired": "Hết hạn",
+      "on": "Đang bật",
+      "expiredTitle": "Mã đã hết hạn, học viên không áp dụng được dù vẫn đang bật"
+    },
+    "edit": "Sửa",
+    "delete": "Xóa",
+    "confirmDelete": "Xóa mã giảm giá \"{code}\"?",
+    "type": {
+      "PERCENTAGE": "Theo %",
+      "FIXED_AMOUNT": "Số tiền cố định"
+    },
+    "scope": {
+      "ALL_COURSES": "Toàn bộ khóa học",
+      "SPECIFIC_COURSES": "Nhiều khóa học chỉ định",
+      "SINGLE_COURSE": "1 khóa học"
+    },
+    "form": {
+      "createTitle": "Tạo mã giảm giá",
+      "editTitle": "Sửa mã giảm giá",
+      "autoApply": "Tự động áp dụng (không cần nhập mã)",
+      "code": "Mã giảm giá",
+      "type": "Loại giảm giá",
+      "valuePct": "Giá trị (%)",
+      "valueFixed": "Giá trị (đ)",
+      "scope": "Phạm vi áp dụng",
+      "scopeMine": "Toàn bộ khóa học CỦA TÔI",
+      "start": "Bắt đầu",
+      "end": "Kết thúc",
+      "maxUsage": "Giới hạn lượt dùng (tổng)",
+      "maxPerUser": "Giới hạn / học viên",
+      "unlimited": "Không giới hạn",
+      "active": "Đang bật (bỏ chọn để tạm ngừng coupon này)",
+      "cancel": "Hủy",
+      "saving": "Đang lưu...",
+      "save": "Lưu"
+    },
+    "picker": {
+      "label": "Chọn khóa học",
+      "search": "Tìm khóa học theo tên...",
+      "searchBtn": "Tìm",
+      "adminHint": "Tìm kiếm khóa học ở trên.",
+      "none": "Bạn chưa có khóa học nào.",
+      "needOne": "Cần chọn ít nhất 1 khóa học."
+    }
+  },
+  "bundles": {
+    "pageTitle": "Gói khóa học",
+    "pageSubtitle": "Tạo combo khóa học với giá ưu đãi hơn để tăng doanh thu.",
+    "createNew": "Tạo gói mới",
+    "emptyTitle": "Chưa có gói nào",
+    "emptyBody": "Tạo gói đầu tiên để tăng tỷ lệ chuyển đổi và doanh thu trung bình mỗi đơn hàng.",
+    "createFirst": "Tạo gói đầu tiên",
+    "off": "Đã tắt",
+    "edit": "Sửa",
+    "info": {
+      "title": "Cách gói khóa học hoạt động",
+      "owned": "Nếu học viên đã sở hữu 1 khóa trong gói, hệ thống tự <b>trừ tiền</b> khóa đó.",
+      "coupon": "Coupon riêng lẻ <b>không áp dụng chồng</b> lên khóa học trong gói.",
+      "price": "Giá được <b>chốt ngay khi tạo đơn</b>, không đổi kể cả khi bạn chỉnh giá sau."
+    },
+    "form": {
+      "editTitle": "Sửa gói khóa học",
+      "createTitle": "Tạo gói khóa học mới",
+      "name": "Tên gói",
+      "namePh": "VD: Combo Lập trình Web Full-stack",
+      "desc": "Mô tả ngắn",
+      "descPh": "Mô tả lợi ích khi mua gói...",
+      "discount": "Mức giảm giá Bundle",
+      "pickCourses": "Chọn khóa học ({count} đã chọn, cần ít nhất 2)",
+      "noPublished": "Bạn chưa có khóa học nào đã xuất bản.",
+      "minTwo": "Gói phải có ít nhất 2 khóa học!",
+      "preview": "Xem trước giá",
+      "originalSum": "Giá gốc tổng",
+      "discountLine": "Giảm {percent}%",
+      "learnerPays": "Học viên trả",
+      "active": "Đang hoạt động",
+      "cancel": "Hủy",
+      "saving": "Đang lưu...",
+      "update": "Cập nhật gói",
+      "create": "Tạo gói",
+      "close": "Đóng"
     }
   }
 }

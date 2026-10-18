@@ -928,6 +928,43 @@
       "empty": {
         "title": "ライブはまだありません",
         "body": "最初のライブを作成して、受講生とオンラインで授業しましょう。"
+      },
+      "new": {
+        "title": "新しいライブを作成",
+        "intro": "事前に予約するか、開始時刻を空にして作成後いつでも「ライブ開始」を押せます。ライブ発見ページのサムネイルは、作成直後の次のステップで追加できます。",
+        "form": {
+          "title": "ライブのタイトル",
+          "course": "講座",
+          "pickCourse": "-- 講座を選択 --",
+          "language": "話す言語",
+          "optional": "（任意）",
+          "languageDefault": "-- プロフィールの設定に従う --",
+          "languageHint": "受講生はこの言語と異なる吹き替え言語を選ぶと、ライブ中に翻訳を聞けます。",
+          "visibility": "公開範囲",
+          "courseOnly": "この講座に登録した受講生のみ",
+          "public": "公開：ログインしていなくても誰でも視聴できます",
+          "startsAt": "開始予定時刻",
+          "creating": "作成中...",
+          "create": "ライブを作成 →"
+        }
+      },
+      "room": {
+        "loading": "読み込み中...",
+        "ended": "このライブは終了しました。",
+        "meta": "講座：{course} · 話す言語：{language}",
+        "thumbnail": "ライブ発見ページのサムネイル",
+        "thumbnailAlt": "サムネイルのプレビュー",
+        "noThumbnail": "専用画像は未設定です。当面は講座のカバーを使用します。",
+        "uploading": "画像をアップロード中...",
+        "thumbnailTask": "ライブ画像：{title}",
+        "connecting": "接続中...",
+        "start": "● ライブ開始",
+        "ending": "終了中...",
+        "end": "ライブ終了",
+        "cameraOff": "カメラと画面共有はオフです",
+        "shareScreen": "画面を共有",
+        "shareAudio": "システム音声を共有",
+        "audioHint": "システム音声の共有はブラウザに依存します。Chrome で、画面共有ダイアログの該当項目にチェックを入れると最も安定して動作します。"
       }
     },
     "common": {
@@ -1048,6 +1085,177 @@
         "sourceReferral": "紹介（97%）",
         "sourceOrganic": "自然流入（37%）"
       }
+    },
+    "comm": {
+      "loading": "読み込み中...",
+      "qa": {
+        "title": "Q&A",
+        "sortLabel": "並べ替え：{value}",
+        "newest": "新しい順",
+        "oldest": "古い順",
+        "twoCols": "2 列表示",
+        "oneCol": "1 列表示",
+        "onlyUnanswered": "未回答の質問のみ表示",
+        "empty": "まだ質問はありません。",
+        "pick": "質問を選ぶと詳細が表示されます",
+        "detail": "質問の詳細",
+        "close": "閉じる",
+        "noAnswer": "まだ回答がありません",
+        "answers": "{count} 件の回答",
+        "youAnswered": "回答済み",
+        "instructorTag": "（講師）",
+        "placeholder": "受講生に返信...",
+        "send": "送信"
+      },
+      "assignments": {
+        "title": "課題",
+        "empty": "まだ課題がありません。カリキュラムのエディタで追加できます（「+ 課題」ボタン）。",
+        "due": "期限：{date}",
+        "graded": "{graded}/{total} 採点済み",
+        "noSubmissions": "まだ提出した受講生はいません。",
+        "attachment": "添付ファイル",
+        "score": "点数",
+        "feedback": "フィードバック",
+        "save": "保存",
+        "gradedLine": "採点済み：{score} 点",
+        "close": "閉じる"
+      },
+      "announcements": {
+        "title": "お知らせ",
+        "empty": "まだお知らせはありません。",
+        "delete": "削除",
+        "deleteTitle": "お知らせを削除",
+        "deleteMessage": "このお知らせを削除しますか？すでに受け取った受講生の受信箱には残ります。",
+        "deleteConfirm": "削除",
+        "newTitle": "新しいお知らせを送信",
+        "pickCourse": "講座を選択...",
+        "titlePh": "お知らせのタイトル",
+        "contentPh": "この講座に登録しているすべての受講生に送るお知らせの内容...",
+        "send": "お知らせを送信"
+      },
+      "messages": {
+        "title": "メッセージ"
+      },
+      "compose": {
+        "button": "+ 作成",
+        "title": "新しいメッセージを作成",
+        "course": "講座",
+        "pickCourse": "講座を選択...",
+        "student": "受講生",
+        "pickStudent": "受講生を選択...",
+        "pickCourseFirst": "先に講座を選択",
+        "cancel": "キャンセル",
+        "start": "開始"
+      },
+      "filter": {
+        "allCourses": "すべての講座",
+        "search": "講座を検索...",
+        "notFound": "講座が見つかりません。"
+      }
+    }
+  },
+  "coupons": {
+    "title": "クーポン",
+    "subtitleAdmin": "サイト全体、または任意の講座に使えるクーポン。",
+    "subtitleInstructor": "あなたの講座だけに使えるクーポン。",
+    "create": "+ クーポンを作成",
+    "loading": "読み込み中...",
+    "empty": "クーポンはまだありません。",
+    "cols": {
+      "code": "コード",
+      "discount": "割引",
+      "scope": "対象",
+      "time": "期間",
+      "used": "使用数",
+      "status": "状態",
+      "actions": "操作"
+    },
+    "auto": "自動",
+    "autoCode": "（自動）",
+    "noCourse": "講座が未選択です",
+    "status": {
+      "off": "オフ",
+      "expired": "期限切れ",
+      "on": "有効",
+      "expiredTitle": "期限切れのため、オンのままでも受講生は使えません"
+    },
+    "edit": "編集",
+    "delete": "削除",
+    "confirmDelete": "クーポン「{code}」を削除しますか？",
+    "type": {
+      "PERCENTAGE": "割合（%）",
+      "FIXED_AMOUNT": "固定金額"
+    },
+    "scope": {
+      "ALL_COURSES": "すべての講座",
+      "SPECIFIC_COURSES": "指定した複数の講座",
+      "SINGLE_COURSE": "1 講座"
+    },
+    "form": {
+      "createTitle": "クーポンを作成",
+      "editTitle": "クーポンを編集",
+      "autoApply": "自動適用（コード入力不要）",
+      "code": "クーポンコード",
+      "type": "割引の種類",
+      "valuePct": "値（%）",
+      "valueFixed": "値（đ）",
+      "scope": "適用範囲",
+      "scopeMine": "自分のすべての講座",
+      "start": "開始",
+      "end": "終了",
+      "maxUsage": "利用回数の上限（合計）",
+      "maxPerUser": "受講生ごとの上限",
+      "unlimited": "無制限",
+      "active": "有効（チェックを外すと一時停止）",
+      "cancel": "キャンセル",
+      "saving": "保存中...",
+      "save": "保存"
+    },
+    "picker": {
+      "label": "講座を選択",
+      "search": "講座名で検索...",
+      "searchBtn": "検索",
+      "adminHint": "上で講座を検索してください。",
+      "none": "まだ講座がありません。",
+      "needOne": "講座を 1 つ以上選択してください。"
+    }
+  },
+  "bundles": {
+    "pageTitle": "講座セット",
+    "pageSubtitle": "お得な価格の講座セットを作って収益を伸ばしましょう。",
+    "createNew": "セットを作成",
+    "emptyTitle": "セットはまだありません",
+    "emptyBody": "最初のセットを作成して、購入率と 1 注文あたりの平均収益を高めましょう。",
+    "createFirst": "最初のセットを作成",
+    "off": "オフ",
+    "edit": "編集",
+    "info": {
+      "title": "講座セットの仕組み",
+      "owned": "受講生がセット内の講座をすでに持っている場合、その講座の金額は自動で<b>差し引かれ</b>ます。",
+      "coupon": "個別のクーポンはセット内の講座には<b>重ねて使えません</b>。",
+      "price": "価格は<b>注文作成時に確定</b>し、後で価格を変更しても変わりません。"
+    },
+    "form": {
+      "editTitle": "セットを編集",
+      "createTitle": "新しいセットを作成",
+      "name": "セット名",
+      "namePh": "例：フルスタック Web 開発セット",
+      "desc": "短い説明",
+      "descPh": "セットを買うメリットを説明...",
+      "discount": "セットの割引",
+      "pickCourses": "講座を選択（{count} 件選択中、2 件以上）",
+      "noPublished": "公開済みの講座がまだありません。",
+      "minTwo": "セットには 2 講座以上が必要です！",
+      "preview": "価格プレビュー",
+      "originalSum": "定価の合計",
+      "discountLine": "{percent}% 割引",
+      "learnerPays": "受講生の支払額",
+      "active": "有効",
+      "cancel": "キャンセル",
+      "saving": "保存中...",
+      "update": "セットを更新",
+      "create": "セットを作成",
+      "close": "閉じる"
     }
   }
 }
