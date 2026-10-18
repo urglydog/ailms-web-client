@@ -775,6 +775,65 @@
         "noneBody": "最初の講座を作成し、動画を追加して AI に多言語へ吹き替えさせましょう。",
         "noneCta": "講座を作成"
       }
+    },
+    "edit": {
+      "loading": "講座を読み込み中...",
+      "back": "講座一覧に戻る",
+      "tabsAria": "講座編集のセクション",
+      "groups": {
+        "content": "講座の内容",
+        "publish": "公開"
+      },
+      "tabs": {
+        "curriculum": "カリキュラム",
+        "materials": "教材とクイズ",
+        "resources": "静的リソース",
+        "proctoring": "試験の監督",
+        "basics": "基本情報",
+        "pricing": "価格",
+        "promotions": "プロモーション"
+      },
+      "completion": {
+        "label": "{percent}% 完了",
+        "ready": "審査に提出できます",
+        "missingTitle": "提出に不足している項目",
+        "aria": "講座の完成度：{percent}%"
+      },
+      "submit": {
+        "send": "審査に提出",
+        "resubmit": "再提出",
+        "needMore": "提出条件を満たしてください"
+      },
+      "preview": {
+        "label": "プレビュー",
+        "asInstructor": "講師として",
+        "asLearner": "受講生として"
+      },
+      "settingsLabel": "設定",
+      "banners": {
+        "rejected": "却下の理由：",
+        "resubmitCount": "（再提出 {count}/5 回）",
+        "published": "講座は公開中です。タイトル、説明、価格、章、レッスン、動画の変更は管理者の再審査なしですぐに反映されます。",
+        "locked": "講座は審査中のため、その間は内容を編集できません。"
+      },
+      "settings": {
+        "title": "設定",
+        "statusTitle": "講座の状態",
+        "statusDraft": "講座は下書きで、まだ提出されていません。",
+        "statusPublished": "講座は一般に公開されています。",
+        "statusArchived": "講座は検索から外されています。登録済みの受講生は引き続き利用できます。",
+        "statusOther": "講座はまだ公開されていません。",
+        "reactivate": "再開する",
+        "reactivating": "再開中...",
+        "reactivateHint": "アーカイブ前の状態に戻し、新しい受講生が再び検索・登録できるようにします。",
+        "archive": "講座を削除",
+        "archiveHint": "新しい受講生はこの講座を検索・登録できなくなりますが、登録済みの受講生はアクセスを維持します。完全な削除ではなく、いつでも再開できます。",
+        "archiveConfirmTitle": "講座を削除",
+        "archiveConfirmMessage": "新しい受講生は検索からこの講座を見つけて登録できなくなりますが、登録済みの受講生はアクセスを維持します。いつでも再開できます。",
+        "archiveConfirm": "削除",
+        "cancel": "キャンセル",
+        "coInstructor": "共同講師の管理は開発中で、今後のアップデートで追加されます。"
+      }
     }
   }
 }

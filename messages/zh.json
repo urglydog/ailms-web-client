@@ -775,6 +775,65 @@
         "noneBody": "创建第一门课程，添加视频，让 AI 配音成多种语言。",
         "noneCta": "创建课程"
       }
+    },
+    "edit": {
+      "loading": "正在加载课程...",
+      "back": "返回课程列表",
+      "tabsAria": "课程编辑栏目",
+      "groups": {
+        "content": "课程内容",
+        "publish": "发布课程"
+      },
+      "tabs": {
+        "curriculum": "课程大纲",
+        "materials": "学习资料与测验",
+        "resources": "静态资源",
+        "proctoring": "考试监考",
+        "basics": "基本信息",
+        "pricing": "定价",
+        "promotions": "促销"
+      },
+      "completion": {
+        "label": "已完成 {percent}%",
+        "ready": "可以提交审核",
+        "missingTitle": "提交审核还缺少",
+        "aria": "课程完善进度：{percent}%"
+      },
+      "submit": {
+        "send": "提交审核",
+        "resubmit": "重新提交审核",
+        "needMore": "请先满足提交条件"
+      },
+      "preview": {
+        "label": "预览",
+        "asInstructor": "以讲师身份",
+        "asLearner": "以学员身份"
+      },
+      "settingsLabel": "设置",
+      "banners": {
+        "rejected": "拒绝原因：",
+        "resubmitCount": "（已重新提交 {count}/5 次）",
+        "published": "课程已发布。修改标题、简介、价格、章节、课时或视频会立即生效，无需管理员再次审核。",
+        "locked": "课程正在审核中，期间无法编辑内容。"
+      },
+      "settings": {
+        "title": "设置",
+        "statusTitle": "课程状态",
+        "statusDraft": "课程为草稿，尚未提交过。",
+        "statusPublished": "课程已公开发布。",
+        "statusArchived": "课程已从搜索中移除，已报名的学员仍可正常访问。",
+        "statusOther": "课程尚未公开发布。",
+        "reactivate": "重新启用",
+        "reactivating": "正在启用...",
+        "reactivateHint": "将课程恢复到归档前的状态，新学员即可重新搜索并报名。",
+        "archive": "移除课程",
+        "archiveHint": "新学员将无法再找到或报名此课程，但已报名的学员仍保留访问权限。这不是永久删除，你可以随时重新启用。",
+        "archiveConfirmTitle": "移除课程",
+        "archiveConfirmMessage": "新学员将无法再通过搜索找到或报名此课程，但已报名的学员仍保留访问权限。你可以随时重新启用。",
+        "archiveConfirm": "移除",
+        "cancel": "取消",
+        "coInstructor": "协作讲师管理正在开发中，将在后续更新中提供。"
+      }
     }
   }
 }

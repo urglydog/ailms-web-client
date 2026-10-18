@@ -775,6 +775,65 @@
         "noneBody": "Tạo khóa học đầu tiên, thêm video và để AI lồng tiếng sang nhiều ngôn ngữ.",
         "noneCta": "Tạo khóa học"
       }
+    },
+    "edit": {
+      "loading": "Đang tải khóa học...",
+      "back": "Quay lại các khóa học",
+      "tabsAria": "Các mục chỉnh sửa khóa học",
+      "groups": {
+        "content": "Nội dung khóa học",
+        "publish": "Đăng tải khóa học"
+      },
+      "tabs": {
+        "curriculum": "Chương trình giảng dạy",
+        "materials": "Học liệu & Quiz thi cử",
+        "resources": "Tài nguyên tĩnh",
+        "proctoring": "Giám sát thi",
+        "basics": "Thông tin cơ bản",
+        "pricing": "Giá cả",
+        "promotions": "Khuyến mãi"
+      },
+      "completion": {
+        "label": "Hoàn thiện {percent}%",
+        "ready": "Sẵn sàng gửi duyệt",
+        "missingTitle": "Còn thiếu để gửi duyệt",
+        "aria": "Tiến độ hoàn thiện khóa học: {percent}%"
+      },
+      "submit": {
+        "send": "Gửi duyệt",
+        "resubmit": "Gửi duyệt lại",
+        "needMore": "Hoàn thiện đủ điều kiện để gửi duyệt"
+      },
+      "preview": {
+        "label": "Xem trước",
+        "asInstructor": "Với tư cách là Giảng viên",
+        "asLearner": "Với tư cách là học viên"
+      },
+      "settingsLabel": "Cài đặt",
+      "banners": {
+        "rejected": "Lý do bị từ chối:",
+        "resubmitCount": "(đã gửi lại {count}/5 lần)",
+        "published": "Khóa học đã xuất bản. Sửa tiêu đề, mô tả, giá, chương, bài học hoặc video được áp dụng ngay, không cần Admin duyệt lại.",
+        "locked": "Khóa học đang được phê duyệt. Bạn không thể chỉnh sửa nội dung trong thời gian này."
+      },
+      "settings": {
+        "title": "Cài đặt",
+        "statusTitle": "Trạng thái khóa học",
+        "statusDraft": "Khóa học đang ở dạng nháp, chưa từng gửi duyệt.",
+        "statusPublished": "Khóa học đang được đăng tải công khai.",
+        "statusArchived": "Khóa học đã được gỡ khỏi tìm kiếm, học viên đã đăng ký vẫn truy cập được bình thường.",
+        "statusOther": "Khóa học chưa được đăng tải công khai.",
+        "reactivate": "Kích hoạt lại",
+        "reactivating": "Đang kích hoạt...",
+        "reactivateHint": "Khôi phục khóa học về đúng trạng thái trước khi lưu trữ, học viên mới có thể tìm và đăng ký lại như bình thường.",
+        "archive": "Gỡ bỏ khóa học",
+        "archiveHint": "Học viên mới sẽ không tìm và đăng ký được khóa học này nữa, nhưng học viên đã đăng ký vẫn giữ nguyên quyền truy cập. Đây không phải xóa vĩnh viễn, bạn có thể kích hoạt lại bất cứ lúc nào.",
+        "archiveConfirmTitle": "Gỡ bỏ khóa học",
+        "archiveConfirmMessage": "Học viên mới sẽ không còn tìm và đăng ký được khóa học này qua tìm kiếm nữa, nhưng học viên đã đăng ký vẫn giữ nguyên quyền truy cập. Bạn có thể kích hoạt lại bất cứ lúc nào.",
+        "archiveConfirm": "Gỡ bỏ",
+        "cancel": "Hủy",
+        "coInstructor": "Quản lý đồng giảng viên đang được phát triển, sẽ bổ sung ở bản cập nhật sau."
+      }
     }
   }
 }

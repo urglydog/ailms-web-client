@@ -775,6 +775,65 @@
         "noneBody": "Create your first course, add videos and let AI dub them into many languages.",
         "noneCta": "Create a course"
       }
+    },
+    "edit": {
+      "loading": "Loading course...",
+      "back": "Back to courses",
+      "tabsAria": "Course editing sections",
+      "groups": {
+        "content": "Course content",
+        "publish": "Publish"
+      },
+      "tabs": {
+        "curriculum": "Curriculum",
+        "materials": "Materials & quizzes",
+        "resources": "Static resources",
+        "proctoring": "Exam proctoring",
+        "basics": "Basic information",
+        "pricing": "Pricing",
+        "promotions": "Promotions"
+      },
+      "completion": {
+        "label": "{percent}% complete",
+        "ready": "Ready to submit",
+        "missingTitle": "Still missing to submit",
+        "aria": "Course completion progress: {percent}%"
+      },
+      "submit": {
+        "send": "Submit for review",
+        "resubmit": "Resubmit for review",
+        "needMore": "Complete the requirements to submit"
+      },
+      "preview": {
+        "label": "Preview",
+        "asInstructor": "As an instructor",
+        "asLearner": "As a learner"
+      },
+      "settingsLabel": "Settings",
+      "banners": {
+        "rejected": "Reason for rejection:",
+        "resubmitCount": "(resubmitted {count}/5 times)",
+        "published": "This course is published. Changes to the title, description, price, chapters, lessons or videos apply immediately, with no new admin review.",
+        "locked": "This course is under review. You cannot edit its content in the meantime."
+      },
+      "settings": {
+        "title": "Settings",
+        "statusTitle": "Course status",
+        "statusDraft": "The course is a draft and has never been submitted.",
+        "statusPublished": "The course is publicly available.",
+        "statusArchived": "The course was removed from search; learners already signed up can still access it.",
+        "statusOther": "The course is not publicly available yet.",
+        "reactivate": "Reactivate",
+        "reactivating": "Reactivating...",
+        "reactivateHint": "Restores the course to the status it had before archiving so new learners can find and sign up again.",
+        "archive": "Remove course",
+        "archiveHint": "New learners will no longer find or sign up for this course, but learners already signed up keep access. This is not a permanent delete; you can reactivate it any time.",
+        "archiveConfirmTitle": "Remove course",
+        "archiveConfirmMessage": "New learners will no longer find or sign up for this course through search, but learners already signed up keep access. You can reactivate it any time.",
+        "archiveConfirm": "Remove",
+        "cancel": "Cancel",
+        "coInstructor": "Co-instructor management is in development and will arrive in a later update."
+      }
     }
   }
 }
