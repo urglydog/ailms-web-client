@@ -35,7 +35,12 @@
       "title": "Thông báo",
       "markAllRead": "Đánh dấu đã đọc",
       "empty": "Không có thông báo nào",
-      "viewAll": "Xem tất cả thông báo"
+      "viewAll": "Xem tất cả thông báo",
+      "tabMain": "Tin chính",
+      "tabSystem": "Hệ thống",
+      "tabUnread": "Chưa đọc",
+      "unreadDot": "Chưa đọc",
+      "tabsAria": "Loại thông báo"
     },
     "account": {
       "guestName": "Người dùng",
@@ -656,5 +661,20 @@
       "loading": "Đang tải...",
       "backToLogin": "Quay lại đăng nhập"
     }
+  },
+  "community": {
+    "title": "Bảng xếp hạng cộng đồng",
+    "subtitle": "Tích lũy XP mỗi ngày học bài, làm quiz, giữ streak — thi đua cùng cả cộng đồng.",
+    "loading": "Đang tải bảng xếp hạng...",
+    "empty": "Chưa có ai trên bảng xếp hạng.",
+    "xp": "{xp} XP",
+    "yourRank": "Vị trí của bạn",
+    "yourRankInline": "Vị trí của bạn: #{rank} · {xp} XP",
+    "loginHint": "Đăng nhập để theo dõi streak và vị trí của bạn.",
+    "login": "Đăng nhập",
+    "viewAll": "Xem toàn bộ",
+    "rank": "Hạng {rank}",
+    "podiumAria": "Top 3 bảng xếp hạng",
+    "listAria": "Bảng xếp hạng"
   }
 }

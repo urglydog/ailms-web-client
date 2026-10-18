@@ -35,7 +35,12 @@
       "title": "通知",
       "markAllRead": "すべて既読にする",
       "empty": "通知はありません",
-      "viewAll": "すべての通知を見る"
+      "viewAll": "すべての通知を見る",
+      "tabMain": "メイン",
+      "tabSystem": "システム",
+      "tabUnread": "未読",
+      "unreadDot": "未読",
+      "tabsAria": "通知の種類"
     },
     "account": {
       "guestName": "ユーザー",
@@ -656,5 +661,20 @@
       "loading": "読み込み中...",
       "backToLogin": "ログインに戻る"
     }
+  },
+  "community": {
+    "title": "コミュニティランキング",
+    "subtitle": "毎日の学習、クイズ、連続日数で XP を貯めて、コミュニティ全体と競いましょう。",
+    "loading": "ランキングを読み込み中...",
+    "empty": "ランキングにはまだ誰もいません。",
+    "xp": "{xp} XP",
+    "yourRank": "あなたの順位",
+    "yourRankInline": "あなたの順位：#{rank} · {xp} XP",
+    "loginHint": "ログインすると連続日数と順位を確認できます。",
+    "login": "ログイン",
+    "viewAll": "すべて見る",
+    "rank": "{rank} 位",
+    "podiumAria": "ランキング上位 3 名",
+    "listAria": "ランキング"
   }
 }

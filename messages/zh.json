@@ -35,7 +35,12 @@
       "title": "通知",
       "markAllRead": "全部标记为已读",
       "empty": "暂无通知",
-      "viewAll": "查看全部通知"
+      "viewAll": "查看全部通知",
+      "tabMain": "主要",
+      "tabSystem": "系统",
+      "tabUnread": "未读",
+      "unreadDot": "未读",
+      "tabsAria": "通知类型"
     },
     "account": {
       "guestName": "用户",
@@ -656,5 +661,20 @@
       "loading": "加载中...",
       "backToLogin": "返回登录"
     }
+  },
+  "community": {
+    "title": "社区排行榜",
+    "subtitle": "每天学习、做测验、保持连续天数来积累 XP，与整个社区一起比拼。",
+    "loading": "正在加载排行榜...",
+    "empty": "排行榜上还没有人。",
+    "xp": "{xp} XP",
+    "yourRank": "你的排名",
+    "yourRankInline": "你的排名：#{rank} · {xp} XP",
+    "loginHint": "登录后可查看连续天数和你的排名。",
+    "login": "登录",
+    "viewAll": "查看全部",
+    "rank": "第 {rank} 名",
+    "podiumAria": "排行榜前三名",
+    "listAria": "排行榜"
   }
 }

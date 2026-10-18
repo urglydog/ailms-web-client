@@ -9,6 +9,9 @@ import { useTranslations } from 'next-intl';
  *
  * Chuyển thành Client Component (26/09/2026, tính năng đổi ngôn ngữ) — cần `useTranslations` để
  * đổi chữ theo ngôn ngữ đang chọn (`LocaleProvider`), không thể là Server Component tĩnh nữa.
+ *
+ * Giao diện azure: nền xanh nhạt, mỗi cột có tiêu đề (h2) để trình đọc màn hình nhảy theo cột; chữ phụ dùng
+ * `ink-muted` (đạt tương phản AA), không dùng `ink-faint`.
  */
 export function Footer() {
   const t = useTranslations('footer');
@@ -31,10 +34,15 @@ export function Footer() {
   ];
 
   return (
-    <footer className="mt-20 border-t border-line bg-surface-raised">
-      <div className="shell py-10 grid grid-cols-2 gap-8 text-sm md:grid-cols-4">
-        <div className="col-span-2 flex flex-col gap-2 md:col-span-1">
-          <span className="font-display font-bold text-ink">LinguaLearn</span>
+    <footer className="mt-20 border-t border-line bg-surface">
+      <div className="shell grid grid-cols-2 gap-8 py-10 text-sm md:grid-cols-4">
+        <div className="col-span-2 flex flex-col gap-3 md:col-span-1">
+          <span className="flex items-center gap-2 font-display font-bold text-ink">
+            <span aria-hidden className="flex h-7 w-7 items-center justify-center rounded-md bg-accent text-sm text-white">
+              L
+            </span>
+            LinguaLearn
+          </span>
           <span className="text-ink-muted">{t('tagline')}</span>
         </div>
 
@@ -42,16 +50,22 @@ export function Footer() {
         <FooterColumn title={t('legalTitle')} links={legalLinks} />
 
         <div className="flex flex-col gap-2">
-          <span className="font-display font-bold text-ink">{t('contactTitle')}</span>
-          <a href="tel:02838940390" className="text-ink-muted hover:text-accent transition-colors">{t('phoneLabel')}: 0283.8940 390</a>
-          <a href="mailto:csm@iuh.edu.vn" className="text-ink-muted hover:text-accent transition-colors">{t('emailLabel')}: csm@iuh.edu.vn</a>
+          <h2 className="m-0 font-display text-sm font-bold text-ink">{t('contactTitle')}</h2>
+          <a href="tel:02838940390" className="text-ink-muted transition-colors hover:text-accent-dark">
+            {t('phoneLabel')}: 0283.8940 390
+          </a>
+          <a href="mailto:csm@iuh.edu.vn" className="text-ink-muted transition-colors hover:text-accent-dark">
+            {t('emailLabel')}: csm@iuh.edu.vn
+          </a>
         </div>
       </div>
 
-      <div className="border-t border-line-soft">
-        <div className="shell flex flex-col gap-2 py-4 text-xs text-ink-faint sm:flex-row sm:items-center sm:justify-between">
+      <div className="border-t border-line">
+        <div className="shell flex flex-col gap-2 py-4 text-xs text-ink-muted sm:flex-row sm:items-center sm:justify-between">
           <span>{t('copyright', { year: new Date().getFullYear() })}</span>
-          <Link href="/legal/sitemap" className="text-ink-faint hover:text-accent transition-colors">{t('sitemap')}</Link>
+          <Link href="/legal/sitemap" className="text-ink-muted transition-colors hover:text-accent-dark">
+            {t('sitemap')}
+          </Link>
         </div>
       </div>
     </footer>
@@ -61,9 +75,9 @@ export function Footer() {
 function FooterColumn({ title, links }: { title: string; links: Array<{ label: string; href: string }> }) {
   return (
     <div className="flex flex-col gap-2">
-      <span className="font-display font-bold text-ink">{title}</span>
+      <h2 className="m-0 font-display text-sm font-bold text-ink">{title}</h2>
       {links.map((link) => (
-        <Link key={link.href} href={link.href} className="text-ink-muted hover:text-accent transition-colors">
+        <Link key={link.href} href={link.href} className="text-ink-muted transition-colors hover:text-accent-dark">
           {link.label}
         </Link>
       ))}

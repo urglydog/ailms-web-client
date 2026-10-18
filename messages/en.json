@@ -35,7 +35,12 @@
       "title": "Notifications",
       "markAllRead": "Mark all as read",
       "empty": "No notifications yet",
-      "viewAll": "View all notifications"
+      "viewAll": "View all notifications",
+      "tabMain": "Main",
+      "tabSystem": "System",
+      "tabUnread": "Unread",
+      "unreadDot": "Unread",
+      "tabsAria": "Notification types"
     },
     "account": {
       "guestName": "User",
@@ -656,5 +661,20 @@
       "loading": "Loading...",
       "backToLogin": "Back to sign in"
     }
+  },
+  "community": {
+    "title": "Community leaderboard",
+    "subtitle": "Earn XP every day by studying, taking quizzes and keeping your streak, and compete with the whole community.",
+    "loading": "Loading the leaderboard...",
+    "empty": "Nobody is on the leaderboard yet.",
+    "xp": "{xp} XP",
+    "yourRank": "Your rank",
+    "yourRankInline": "Your rank: #{rank} · {xp} XP",
+    "loginHint": "Sign in to track your streak and rank.",
+    "login": "Sign in",
+    "viewAll": "View all",
+    "rank": "Rank {rank}",
+    "podiumAria": "Top 3 on the leaderboard",
+    "listAria": "Leaderboard"
   }
 }

@@ -20,7 +20,7 @@ import { authApi } from '@/lib/api/auth';
 import { enrollmentsApi } from '@/lib/api/enrollments';
 import { ApiError } from '@/lib/api/client';
 import { LanguageModal } from '@/components/layout/LanguageModal';
-import { MaterialTabs } from '@/components/materials/ui/MaterialTabs';
+import { NotificationMenu } from '@/components/layout/header/NotificationMenu';
 import { LOCALE_NATIVE_NAMES, useLocaleStore } from '@/lib/stores/localeStore';
 import type { CartItem, WishlistItem } from '@/types/domain';
 
@@ -83,10 +83,6 @@ export function Header() {
   // chuột qua lại giữa 2 icon làm 2 dropdown cùng mở đè lên nhau.
   const headerDropdown = useExclusiveHoverDropdown();
   const [searchText, setSearchText] = useState('');
-  // (08/10/2026, theo phản hồi) — bỏ hẳn trang `/notifications` riêng (user: "ai đời thiết kế
-  // nút xem toàn bộ rồi vào mới thấy danh sách dài ngoằng") — popup này giờ LÀ nơi đọc thông
-  // báo duy nhất, không còn điều hướng sang trang khác.
-  const [notifTab, setNotifTab] = useState<'main' | 'system' | 'unread'>('main');
   // (26/09/2026, tính năng mới) — menu di động: dưới `md` nav chính + ô tìm kiếm trước đây bị
   // ẩn hẳn (`hidden md:flex`) mà KHÔNG có lối vào thay thế nào — học viên dùng điện thoại không
   // điều hướng/tìm kiếm được. Gộp cả 2 vào 1 panel xổ xuống dưới header, mở bằng nút hamburger.
@@ -444,63 +440,20 @@ export function Header() {
                   )}
                 </button>
 
-                {headerDropdown.activeId === 'notifications' && (() => {
-                  // Chỉ duy nhất SystemAnnouncementService sinh type "SYSTEM_*" — cùng quy tắc
-                  // phân tab đã dùng ở trang /notifications cũ (nay đã gộp hẳn vào đây).
-                  const mainNotifs = notifications.filter(n => !n.type?.startsWith('SYSTEM_'));
-                  const systemNotifs = notifications.filter(n => n.type?.startsWith('SYSTEM_'));
-                  const unreadNotifs = notifications.filter(n => !n.isRead);
-                  const visible = notifTab === 'system' ? systemNotifs : notifTab === 'unread' ? unreadNotifs : mainNotifs;
-
-                  return (
-                    <div className="absolute right-0 top-12 z-[200] w-96 rounded-2xl border border-line bg-white p-2 shadow-[0_20px_50px_rgba(19,22,32,0.15)]">
-                      <div className="flex items-center justify-between border-b border-line-soft px-2 pb-2 pt-1">
-                        <span className="text-[13.5px] font-bold text-ink">{t('notifications.title')}</span>
-                        {unreadCount > 0 && (
-                          <button onClick={() => markAllAsRead()} className="text-[11px] font-semibold text-accent hover:text-accent-dark">
-                            {t('notifications.markAllRead')}
-                          </button>
-                        )}
-                      </div>
-
-                      <div className="px-1 py-2">
-                        <MaterialTabs
-                          tabs={[
-                            { key: 'main', label: 'Tin chính', count: mainNotifs.length },
-                            { key: 'system', label: 'Hệ thống', count: systemNotifs.length },
-                            { key: 'unread', label: 'Đã đọc', count: unreadNotifs.length },
-                          ]}
-                          active={notifTab}
-                          onChange={(key) => setNotifTab(key as 'main' | 'system' | 'unread')}
-                        />
-                      </div>
-
-                      <div className="flex max-h-[28rem] flex-col overflow-y-auto">
-                        {visible.length === 0 ? (
-                          <div className="py-6 text-center text-[12.5px] text-ink-muted">{t('notifications.empty')}</div>
-                        ) : (
-                          visible.map(n => (
-                            <button
-                              key={n.id}
-                              onClick={() => {
-                                if (!n.isRead) markAsRead(n.id);
-                                if (n.linkUrl) {
-                                  headerDropdown.closeNow('notifications');
-                                  router.push(n.linkUrl);
-                                }
-                              }}
-                              className={`flex w-full flex-col gap-1 rounded-xl p-3 text-left ${!n.isRead ? 'bg-accent/5' : 'hover:bg-surface'} ${n.linkUrl ? 'cursor-pointer' : 'cursor-default'}`}
-                            >
-                              <span className="text-[13px] font-semibold text-ink">{n.title}</span>
-                              <span className="text-[12.5px] text-ink-muted">{n.content}</span>
-                              <span className="text-[10px] text-ink-faint">{new Date(n.createdAt).toLocaleDateString('vi-VN')}</span>
-                            </button>
-                          ))
-                        )}
-                      </div>
-                    </div>
-                  );
-                })()}
+                {headerDropdown.activeId === 'notifications' && (
+                  <div className="absolute right-0 top-full z-[200] pt-2">
+                    <NotificationMenu
+                      notifications={notifications}
+                      unreadCount={unreadCount}
+                      onMarkRead={markAsRead}
+                      onMarkAllRead={markAllAsRead}
+                      onOpenLink={(url) => {
+                        headerDropdown.closeNow('notifications');
+                        router.push(url);
+                      }}
+                    />
+                  </div>
+                )}
               </div>
             )}
 
