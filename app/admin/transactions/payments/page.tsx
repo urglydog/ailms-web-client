@@ -67,7 +67,7 @@ export default function AdminPaymentsPage() {
       case 'PAID':
         return 'bg-success/10 text-success border-success/20';
       case 'PENDING':
-        return 'bg-warning/10 text-warning border-warning/20';
+        return 'bg-warning/10 text-ink border-warning/40';
       case 'FAILED':
         return 'bg-danger/10 text-danger border-danger/20';
       case 'EXPIRED':
@@ -257,7 +257,7 @@ export default function AdminPaymentsPage() {
                       <td className="px-6 py-4 font-semibold">
                         {p.amount?.toLocaleString('vi-VN')}đ
                       </td>
-                      <td className="px-6 py-4 text-warning font-semibold">
+                      <td className="px-6 py-4 text-ink font-semibold">
                         {p.platformFee ? p.platformFee.toLocaleString('vi-VN') + 'đ' : '-'}
                       </td>
                       <td className="px-6 py-4 text-success font-semibold">
@@ -381,7 +381,7 @@ export default function AdminPaymentsPage() {
                   <p className="text-sm font-medium text-ink-muted mb-1">
                     Phí nền tảng ({selectedPayment.revenueSource === 'INSTRUCTOR_REFERRAL' ? '3' : '63'}%)
                   </p>
-                  <p className="font-medium text-warning font-semibold">
+                  <p className="font-medium text-ink font-semibold">
                     {selectedPayment.platformFee ? selectedPayment.platformFee.toLocaleString('vi-VN') + 'đ' : '-'}
                   </p>
                 </div>

@@ -63,7 +63,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
                 // của sonner, cho success/warning màu pastel gần giống nhau, khó phân biệt.
                 success: 'border-success bg-success/10 text-success',
                 error: 'border-danger bg-danger/10 text-danger',
-                warning: 'border-warning bg-warning/10 text-warning',
+                warning: 'border-warning bg-warning/10 text-ink',
                 info: 'border-accent bg-accent/10 text-accent',
               },
             }}

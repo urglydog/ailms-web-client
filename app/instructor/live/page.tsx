@@ -5,6 +5,8 @@ import { useEffect, useState } from 'react';
 import { Plus, Video } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { LIVE_ROW_GRID, LiveRow } from '@/components/instructor/live/LiveRow';
+import { EmptyState } from '@/components/instructor/ui/EmptyState';
+import { PageHeader } from '@/components/instructor/ui/PageHeader';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useMyLiveSessions } from '@/hooks/useLiveSessions';
 import { ApiError } from '@/lib/api/client';
@@ -21,16 +23,18 @@ export default function InstructorLivePage() {
 
   return (
     <>
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="m-0 font-display text-[22px] font-bold text-ink">{t('title')}</h1>
-        <Link
-          href="/instructor/live/new"
-          className="inline-flex items-center gap-1.5 rounded-lg bg-accent px-4 py-2.5 text-[13.5px] font-semibold text-white no-underline hover:bg-accent-dark hover:text-white"
-        >
-          <Plus size={16} aria-hidden />
-          {t('create')}
-        </Link>
-      </div>
+      <PageHeader
+        title={t('title')}
+        action={
+          <Link
+            href="/instructor/live/new"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-accent px-4 py-2.5 text-[13.5px] font-semibold text-white no-underline hover:bg-accent-dark hover:text-white"
+          >
+            <Plus size={16} aria-hidden />
+            {t('create')}
+          </Link>
+        }
+      />
 
       {error && (
         <div role="alert" className="rounded-xl border border-danger/40 bg-white p-4 text-sm text-danger">
@@ -53,13 +57,7 @@ export default function InstructorLivePage() {
             ))}
           </div>
         ) : list.length === 0 ? (
-          <div className="flex flex-col items-center gap-3 px-6 py-14 text-center">
-            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-tint text-accent">
-              <Video size={22} aria-hidden />
-            </span>
-            <p className="m-0 font-display text-lg font-semibold text-ink">{t('empty.title')}</p>
-            <p className="m-0 max-w-sm text-sm text-ink-muted">{t('empty.body')}</p>
-          </div>
+          <EmptyState icon={Video} title={t('empty.title')} body={t('empty.body')} />
         ) : (
           <ul className="m-0 list-none p-0">
             {list.map((session) => (

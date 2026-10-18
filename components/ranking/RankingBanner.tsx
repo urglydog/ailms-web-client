@@ -64,7 +64,7 @@ export function RankingBanner() {
 function medal(rank: number): string {
   if (rank === 1) return 'bg-star text-ink';
   if (rank === 2) return 'bg-line text-ink';
-  if (rank === 3) return 'bg-warning text-white';
+  if (rank === 3) return 'bg-warning text-ink';
   return 'bg-white text-ink-muted';
 }
 

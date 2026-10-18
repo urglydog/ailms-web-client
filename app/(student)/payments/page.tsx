@@ -25,7 +25,7 @@ export default function PaymentsHistoryPage() {
       case 'PAID':
         return 'bg-success/10 text-success border-success/20';
       case 'PENDING':
-        return 'bg-warning/10 text-warning border-warning/20';
+        return 'bg-warning/10 text-ink border-warning/40';
       case 'FAILED':
         return 'bg-danger/10 text-danger border-danger/20';
       case 'EXPIRED':

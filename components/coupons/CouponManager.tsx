@@ -197,7 +197,7 @@ export function CouponManager({ role }: CouponManagerProps) {
                       if (isExpired) {
                         return (
                           <span
-                            className="rounded-full px-2.5 py-1 text-[11px] font-bold bg-warning/10 text-warning border border-warning/20"
+                            className="rounded-full px-2.5 py-1 text-[11px] font-bold bg-warning/10 text-ink border border-warning/20"
                             title="Mã đã hết hạn, học viên không áp dụng được dù vẫn đang bật"
                           >
                             Hết hạn

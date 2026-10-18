@@ -15,7 +15,7 @@ interface PodiumProps {
 const STAND: Record<number, { height: string; badge: string }> = {
   1: { height: 'h-28', badge: 'bg-star text-ink' },
   2: { height: 'h-20', badge: 'bg-line text-ink' },
-  3: { height: 'h-16', badge: 'bg-warning text-white' },
+  3: { height: 'h-16', badge: 'bg-warning text-ink' },
 };
 
 /** Bục top 3 của bảng xếp hạng: hạng 2, hạng 1, hạng 3 từ trái sang phải; mỗi người là liên kết tới tab Chứng chỉ ở hồ sơ. */

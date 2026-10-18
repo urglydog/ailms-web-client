@@ -929,6 +929,9 @@
         "title": "Chưa có buổi live nào",
         "body": "Tạo buổi live đầu tiên để dạy trực tuyến cùng học viên của bạn."
       }
+    },
+    "common": {
+      "close": "Đóng"
     }
   }
 }

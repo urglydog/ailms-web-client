@@ -42,7 +42,7 @@ export function SystemBanner() {
   };
 
   return (
-    <div className="flex items-center gap-3 bg-warning px-4 py-2.5 text-white sm:px-8">
+    <div className="flex items-center gap-3 bg-warning px-4 py-2.5 text-ink sm:px-8">
       <AlertTriangle className="h-4 w-4 shrink-0" strokeWidth={2} />
       <p className="min-w-0 flex-1 text-[13px] leading-snug">
         <strong className="font-bold">{banner.title}</strong>

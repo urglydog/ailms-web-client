@@ -1,12 +1,13 @@
 'use client';
 
-import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
-import { Plus, Search, Trash2 } from 'lucide-react';
+import { BookOpen, Search, Trash2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { CourseRow, ROW_GRID } from '@/components/instructor/courses/CourseRow';
 import { CourseStats } from '@/components/instructor/courses/CourseStats';
 import { StatusTabs } from '@/components/instructor/courses/StatusTabs';
+import { EmptyState } from '@/components/instructor/ui/EmptyState';
+import { PageHeader } from '@/components/instructor/ui/PageHeader';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useDeleteCourse, useMyCourses, useReactivateCourse } from '@/hooks/useCourses';
@@ -69,10 +70,7 @@ export default function InstructorCoursesPage() {
 
   return (
     <>
-      <div>
-        <h1 className="m-0 font-display text-[22px] font-bold text-ink">{t('title')}</h1>
-        <p className="m-0 mt-1 text-sm text-ink-muted">{t('subtitle')}</p>
-      </div>
+      <PageHeader title={t('title')} subtitle={t('subtitle')} />
 
       <CourseStats counts={counts} />
 
@@ -144,17 +142,7 @@ export default function InstructorCoursesPage() {
             ))}
           </div>
         ) : all.length === 0 ? (
-          <div className="flex flex-col items-center gap-3 px-6 py-14 text-center">
-            <p className="m-0 font-display text-lg font-semibold text-ink">{t('empty.noneTitle')}</p>
-            <p className="m-0 max-w-sm text-sm text-ink-muted">{t('empty.noneBody')}</p>
-            <Link
-              href="/instructor/courses/new"
-              className="inline-flex items-center gap-1.5 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white no-underline hover:bg-accent-dark hover:text-white"
-            >
-              <Plus size={16} aria-hidden />
-              {t('empty.noneCta')}
-            </Link>
-          </div>
+          <EmptyState icon={BookOpen} title={t('empty.noneTitle')} body={t('empty.noneBody')} action={{ href: '/instructor/courses/new', label: t('empty.noneCta') }} />
         ) : courses.length === 0 ? (
           <div className="p-10 text-center text-sm text-ink-muted">{t('empty.filtered')}</div>
         ) : (

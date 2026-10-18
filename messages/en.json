@@ -929,6 +929,9 @@
         "title": "No live sessions yet",
         "body": "Create your first live session to teach online with your learners."
       }
+    },
+    "common": {
+      "close": "Close"
     }
   }
 }
