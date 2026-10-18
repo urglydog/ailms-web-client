@@ -1453,6 +1453,160 @@
         "view": "表示",
         "download": "ダウンロード"
       }
+    },
+    "queue": {
+      "title": "AI キュー監視",
+      "subtitle": "AI Worker の状態、タスクキュー、Gemini キープール、吹き替えジョブ。",
+      "worker": "AI Worker：{status}",
+      "ok": "稼働中",
+      "down": "エラー",
+      "refresh": "更新",
+      "stats": {
+        "pending": "キューで待機中",
+        "started": "処理中",
+        "success": "完了",
+        "failure": "失敗"
+      },
+      "queueDetail": "キューの詳細",
+      "loading": "読み込み中...",
+      "connectError": "AI Worker に接続できません：",
+      "queueEmpty": "キューは空です。待機中のタスクはありません。",
+      "defaultQueue": "Celery の既定キュー",
+      "pendingTasks": "待機中のタスク {count} 件",
+      "keyPool": "Gemini キープール（スロット）",
+      "slots": "{total} スロット（{active} 使用可能）",
+      "noKeys": "キーがまだ設定されていません。",
+      "failures": "連続失敗 {count} 回",
+      "recoverIn": "{sec} 秒後に復帰",
+      "slot": {
+        "cooldown": "⏸ クールダウン中",
+        "active": "✓ 有効"
+      },
+      "beat": {
+        "title": "Celery Beat — 定期ジョブ",
+        "running": "✓ 実行中",
+        "planned": "○ 未導入",
+        "cleanupTemp": {
+          "desc": "24 時間を超えた中間ファイル（.wav、動画チャンク）を削除",
+          "schedule": "毎時（0 分）"
+        },
+        "cleanupNotifications": {
+          "desc": "90 日を超えた既読の通知を削除",
+          "schedule": "毎日 午前 3:00"
+        },
+        "remindFlashcards": {
+          "desc": "フラッシュカードの復習をリマインド（SM-2）",
+          "schedule": "毎日 午前 7:00"
+        },
+        "reportAudio": {
+          "desc": "180 日以上使われていない音声をレポート",
+          "schedule": "毎週月曜 午前 4:00"
+        }
+      },
+      "jobs": "吹き替えジョブ一覧"
+    },
+    "aiAnalytics": {
+      "title": "AI 分析",
+      "subtitle": "受講生の API 使用量を確認し、必要に応じて AI の利用をロックします。",
+      "chartTitle": "日別の AI コスト（直近 30 日）",
+      "cost": "コスト",
+      "day": "{date}",
+      "noDaily": "日別のデータはまだありません",
+      "cols": {
+        "email": "受講生のメール",
+        "status": "AI の状態",
+        "tokens": "合計トークン",
+        "cost": "合計コスト（$）",
+        "actions": "操作"
+      },
+      "locked": "ロック中",
+      "active": "有効",
+      "lock": "AI をロック",
+      "unlock": "ロック解除",
+      "empty": "統計データはまだありません",
+      "updated": "ユーザーの AI の状態を更新しました",
+      "error": "エラーが発生しました"
+    },
+    "voices": {
+      "title": "吹き替えの音声",
+      "subtitle": "受講生が選べる吹き替え言語を決める唯一の設定です。無効にするとその言語は非表示になります。",
+      "langPh": "言語コード（例：en-US）",
+      "langLabel": "言語コード",
+      "voicePh": "Edge-TTS の音声名（例：en-US-JennyNeural）",
+      "voiceLabel": "Edge-TTS の音声名",
+      "gender": {
+        "FEMALE": "女性",
+        "MALE": "男性"
+      },
+      "genderLabel": "性別",
+      "isDefault": "既定",
+      "add": "音声を追加",
+      "cols": {
+        "language": "言語",
+        "voice": "音声",
+        "gender": "性別",
+        "default": "既定",
+        "active": "有効",
+        "actions": "操作"
+      },
+      "loading": "読み込み中...",
+      "empty": "音声がまだありません。受講生には吹き替え言語が表示されません（BR-DUB-07）。",
+      "delete": "削除",
+      "error": "エラーが発生しました",
+      "deleteError": "この音声を削除できませんでした。",
+      "confirmDelete": {
+        "title": "この音声を削除しますか？",
+        "body": "音声 {voice}（{language}）をシステムから削除します。",
+        "cancel": "キャンセル"
+      },
+      "searchLabel": "音声を検索",
+      "searchPh": "言語または音声名で検索...",
+      "showMore": "さらに表示",
+      "showing": "{total} 件中 {shown} 件を表示",
+      "noMatch": "該当する音声がありません。"
+    },
+    "tutorSec": {
+      "title": "AI チューターの安全性",
+      "subtitle": "受講生が AI チューターに送ったメッセージのうち、事前チェックで不審と判定されたもの（ルールの無視、管理者のなりすまし、ジェイルブレイクなど）。監視用であり、ここでアカウントが自動でロックやブロックされることはありません。",
+      "cols": {
+        "student": "受講生",
+        "course": "講座",
+        "pattern": "一致したパターン",
+        "message": "メッセージ",
+        "time": "日時"
+      },
+      "loading": "読み込み中...",
+      "empty": "不審と判定されたメッセージはありません。",
+      "pager": {
+        "aria": "セキュリティログのページ送り",
+        "info": "{page} / {total} ページ — {count} 件",
+        "prev": "前へ",
+        "next": "次へ"
+      }
+    },
+    "jobs": {
+      "filterLabel": "状態で絞り込み",
+      "status": {
+        "ALL": "すべて",
+        "PENDING": "待機中",
+        "PROCESSING": "処理中",
+        "COMPLETED": "完了",
+        "FAILED": "失敗",
+        "SKIPPED": "スキップ"
+      },
+      "cols": {
+        "lesson": "レッスン",
+        "language": "言語",
+        "status": "状態",
+        "progress": "進捗",
+        "retry": "再試行",
+        "error": "エラー",
+        "actions": "操作"
+      },
+      "loading": "読み込み中...",
+      "empty": "ジョブはありません。",
+      "retry": "再試行",
+      "retryError": "このジョブを再試行できませんでした。"
     }
   }
 }

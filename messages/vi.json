@@ -1453,6 +1453,160 @@
         "view": "Xem",
         "download": "Tải xuống"
       }
+    },
+    "queue": {
+      "title": "Giám sát AI Queue",
+      "subtitle": "Tình trạng AI Worker, hàng đợi tác vụ, nhóm khóa Gemini và các job lồng tiếng.",
+      "worker": "AI Worker: {status}",
+      "ok": "Hoạt động",
+      "down": "Lỗi",
+      "refresh": "Làm mới",
+      "stats": {
+        "pending": "Đang chờ trong Queue",
+        "started": "Đang xử lý",
+        "success": "Hoàn thành",
+        "failure": "Thất bại"
+      },
+      "queueDetail": "Chi tiết Queue",
+      "loading": "Đang tải...",
+      "connectError": "Không thể kết nối AI Worker tại",
+      "queueEmpty": "Queue trống — không có task đang chờ.",
+      "defaultQueue": "Hàng đợi mặc định của Celery",
+      "pendingTasks": "{count} task đang chờ",
+      "keyPool": "Nhóm khóa Gemini (slot)",
+      "slots": "{total} slot ({active} đang dùng được)",
+      "noKeys": "Chưa có khóa nào được cấu hình.",
+      "failures": "{count} lỗi liên tiếp",
+      "recoverIn": "hồi phục sau {sec}s",
+      "slot": {
+        "cooldown": "⏸ Đang nghỉ",
+        "active": "✓ Hoạt động"
+      },
+      "beat": {
+        "title": "Celery Beat — Lịch job định kỳ",
+        "running": "✓ Đang chạy",
+        "planned": "○ Chờ triển khai",
+        "cleanupTemp": {
+          "desc": "Dọn file trung gian (.wav, chunk video) quá 24 giờ",
+          "schedule": "Mỗi giờ (phút :00)"
+        },
+        "cleanupNotifications": {
+          "desc": "Xóa thông báo đã đọc quá 90 ngày",
+          "schedule": "3:00 sáng hằng ngày"
+        },
+        "remindFlashcards": {
+          "desc": "Nhắc lịch ôn Flashcards (SM-2)",
+          "schedule": "7:00 sáng hằng ngày"
+        },
+        "reportAudio": {
+          "desc": "Báo cáo audio không dùng quá 180 ngày",
+          "schedule": "Thứ Hai hằng tuần lúc 4:00 sáng"
+        }
+      },
+      "jobs": "Danh sách job lồng tiếng"
+    },
+    "aiAnalytics": {
+      "title": "AI Analytics",
+      "subtitle": "Giám sát lượng tiêu thụ API của học viên và khóa quyền dùng AI khi cần.",
+      "chartTitle": "Chi phí AI theo ngày (30 ngày gần nhất)",
+      "cost": "Chi phí",
+      "day": "Ngày {date}",
+      "noDaily": "Chưa có dữ liệu theo ngày",
+      "cols": {
+        "email": "Email học viên",
+        "status": "Trạng thái AI",
+        "tokens": "Tổng token",
+        "cost": "Tổng chi phí ($)",
+        "actions": "Hành động"
+      },
+      "locked": "Bị khóa",
+      "active": "Hoạt động",
+      "lock": "Khóa AI",
+      "unlock": "Mở khóa",
+      "empty": "Chưa có dữ liệu thống kê",
+      "updated": "Đã cập nhật trạng thái AI của người dùng",
+      "error": "Có lỗi xảy ra"
+    },
+    "voices": {
+      "title": "Giọng đọc lồng tiếng",
+      "subtitle": "Nguồn duy nhất quyết định ngôn ngữ lồng tiếng học viên được chọn; tắt kích hoạt là ẩn ngôn ngữ đó.",
+      "langPh": "Mã ngôn ngữ (vd: en-US)",
+      "langLabel": "Mã ngôn ngữ",
+      "voicePh": "Tên giọng Edge-TTS (vd: en-US-JennyNeural)",
+      "voiceLabel": "Tên giọng Edge-TTS",
+      "gender": {
+        "FEMALE": "Nữ",
+        "MALE": "Nam"
+      },
+      "genderLabel": "Giới tính",
+      "isDefault": "Mặc định",
+      "add": "Thêm giọng đọc",
+      "cols": {
+        "language": "Ngôn ngữ",
+        "voice": "Giọng đọc",
+        "gender": "Giới tính",
+        "default": "Mặc định",
+        "active": "Kích hoạt",
+        "actions": "Hành động"
+      },
+      "loading": "Đang tải...",
+      "empty": "Chưa có giọng đọc nào — học viên sẽ không thấy ngôn ngữ nào để lồng tiếng (BR-DUB-07).",
+      "delete": "Xóa",
+      "error": "Có lỗi xảy ra",
+      "deleteError": "Không xóa được giọng đọc này.",
+      "confirmDelete": {
+        "title": "Xóa giọng đọc này?",
+        "body": "Giọng {voice} ({language}) sẽ bị gỡ khỏi hệ thống.",
+        "cancel": "Hủy"
+      },
+      "searchLabel": "Tìm giọng đọc",
+      "searchPh": "Tìm theo ngôn ngữ hoặc tên giọng...",
+      "showMore": "Hiển thị thêm",
+      "showing": "Đang hiện {shown} / {total} giọng đọc",
+      "noMatch": "Không có giọng đọc phù hợp."
+    },
+    "tutorSec": {
+      "title": "Bảo mật AI Tutor",
+      "subtitle": "Tin nhắn học viên gửi cho Gia sư AI bị lớp kiểm tra sơ bộ phát hiện mẫu nghi vấn (yêu cầu bỏ qua quy tắc, giả danh quản trị, jailbreak...). Chỉ để theo dõi — không có hành động khóa hay chặn tài khoản tự động ở đây.",
+      "cols": {
+        "student": "Học viên",
+        "course": "Khóa học",
+        "pattern": "Mẫu khớp",
+        "message": "Nội dung tin nhắn",
+        "time": "Thời gian"
+      },
+      "loading": "Đang tải...",
+      "empty": "Chưa có tin nhắn nào bị gắn cờ nghi vấn.",
+      "pager": {
+        "aria": "Phân trang bản ghi bảo mật",
+        "info": "Trang {page} / {total} — {count} bản ghi",
+        "prev": "Trước",
+        "next": "Sau"
+      }
+    },
+    "jobs": {
+      "filterLabel": "Lọc theo trạng thái",
+      "status": {
+        "ALL": "Tất cả",
+        "PENDING": "Đang chờ",
+        "PROCESSING": "Đang xử lý",
+        "COMPLETED": "Hoàn tất",
+        "FAILED": "Lỗi",
+        "SKIPPED": "Bỏ qua"
+      },
+      "cols": {
+        "lesson": "Bài học",
+        "language": "Ngôn ngữ",
+        "status": "Trạng thái",
+        "progress": "Tiến độ",
+        "retry": "Thử lại",
+        "error": "Lỗi",
+        "actions": "Hành động"
+      },
+      "loading": "Đang tải...",
+      "empty": "Không có job nào.",
+      "retry": "Thử lại",
+      "retryError": "Không thử lại được job này."
     }
   }
 }

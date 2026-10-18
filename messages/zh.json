@@ -1453,6 +1453,160 @@
         "view": "查看",
         "download": "下载"
       }
+    },
+    "queue": {
+      "title": "AI 队列监控",
+      "subtitle": "AI Worker 状态、任务队列、Gemini 密钥池和配音任务。",
+      "worker": "AI Worker：{status}",
+      "ok": "运行中",
+      "down": "异常",
+      "refresh": "刷新",
+      "stats": {
+        "pending": "队列中等待",
+        "started": "处理中",
+        "success": "已完成",
+        "failure": "失败"
+      },
+      "queueDetail": "队列详情",
+      "loading": "加载中...",
+      "connectError": "无法连接 AI Worker：",
+      "queueEmpty": "队列为空，没有等待中的任务。",
+      "defaultQueue": "Celery 默认队列",
+      "pendingTasks": "{count} 个任务等待中",
+      "keyPool": "Gemini 密钥池（槽位）",
+      "slots": "{total} 个槽位（{active} 个可用）",
+      "noKeys": "尚未配置任何密钥。",
+      "failures": "连续失败 {count} 次",
+      "recoverIn": "{sec} 秒后恢复",
+      "slot": {
+        "cooldown": "⏸ 冷却中",
+        "active": "✓ 可用"
+      },
+      "beat": {
+        "title": "Celery Beat — 定时任务",
+        "running": "✓ 运行中",
+        "planned": "○ 待部署",
+        "cleanupTemp": {
+          "desc": "清理超过 24 小时的中间文件（.wav、视频分块）",
+          "schedule": "每小时（整点）"
+        },
+        "cleanupNotifications": {
+          "desc": "删除超过 90 天的已读通知",
+          "schedule": "每天凌晨 3:00"
+        },
+        "remindFlashcards": {
+          "desc": "提醒复习闪卡（SM-2）",
+          "schedule": "每天早上 7:00"
+        },
+        "reportAudio": {
+          "desc": "报告超过 180 天未使用的音频",
+          "schedule": "每周一凌晨 4:00"
+        }
+      },
+      "jobs": "配音任务列表"
+    },
+    "aiAnalytics": {
+      "title": "AI 分析",
+      "subtitle": "监控学员的 API 用量，必要时锁定 AI 使用权限。",
+      "chartTitle": "每日 AI 费用（最近 30 天）",
+      "cost": "费用",
+      "day": "{date} 日",
+      "noDaily": "暂无每日数据",
+      "cols": {
+        "email": "学员邮箱",
+        "status": "AI 状态",
+        "tokens": "总 token",
+        "cost": "总费用（$）",
+        "actions": "操作"
+      },
+      "locked": "已锁定",
+      "active": "正常",
+      "lock": "锁定 AI",
+      "unlock": "解锁",
+      "empty": "暂无统计数据",
+      "updated": "已更新该用户的 AI 状态",
+      "error": "出错了"
+    },
+    "voices": {
+      "title": "配音声音",
+      "subtitle": "决定学员可选配音语言的唯一来源；关闭启用即隐藏该语言。",
+      "langPh": "语言代码（例如 en-US）",
+      "langLabel": "语言代码",
+      "voicePh": "Edge-TTS 声音名称（例如 en-US-JennyNeural）",
+      "voiceLabel": "Edge-TTS 声音名称",
+      "gender": {
+        "FEMALE": "女",
+        "MALE": "男"
+      },
+      "genderLabel": "性别",
+      "isDefault": "默认",
+      "add": "添加声音",
+      "cols": {
+        "language": "语言",
+        "voice": "声音",
+        "gender": "性别",
+        "default": "默认",
+        "active": "启用",
+        "actions": "操作"
+      },
+      "loading": "加载中...",
+      "empty": "还没有声音，学员将看不到任何配音语言（BR-DUB-07）。",
+      "delete": "删除",
+      "error": "出错了",
+      "deleteError": "无法删除此声音。",
+      "confirmDelete": {
+        "title": "删除此声音？",
+        "body": "声音 {voice}（{language}）将从系统中移除。",
+        "cancel": "取消"
+      },
+      "searchLabel": "搜索声音",
+      "searchPh": "按语言或声音名称搜索...",
+      "showMore": "显示更多",
+      "showing": "显示 {shown} / {total} 个声音",
+      "noMatch": "没有匹配的声音。"
+    },
+    "tutorSec": {
+      "title": "AI 助教安全",
+      "subtitle": "学员发给 AI 助教的消息中，被预检查标记为可疑的内容（要求忽略规则、冒充管理员、越狱等）。仅用于监控，此处不会自动锁定或封禁账户。",
+      "cols": {
+        "student": "学员",
+        "course": "课程",
+        "pattern": "匹配的模式",
+        "message": "消息内容",
+        "time": "时间"
+      },
+      "loading": "加载中...",
+      "empty": "还没有被标记为可疑的消息。",
+      "pager": {
+        "aria": "安全日志分页",
+        "info": "第 {page} / {total} 页 — 共 {count} 条记录",
+        "prev": "上一页",
+        "next": "下一页"
+      }
+    },
+    "jobs": {
+      "filterLabel": "按状态筛选",
+      "status": {
+        "ALL": "全部",
+        "PENDING": "等待中",
+        "PROCESSING": "处理中",
+        "COMPLETED": "已完成",
+        "FAILED": "失败",
+        "SKIPPED": "已跳过"
+      },
+      "cols": {
+        "lesson": "课时",
+        "language": "语言",
+        "status": "状态",
+        "progress": "进度",
+        "retry": "重试",
+        "error": "错误",
+        "actions": "操作"
+      },
+      "loading": "加载中...",
+      "empty": "没有任务。",
+      "retry": "重试",
+      "retryError": "无法重试此任务。"
     }
   }
 }

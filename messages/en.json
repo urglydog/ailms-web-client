@@ -1453,6 +1453,160 @@
         "view": "View",
         "download": "Download"
       }
+    },
+    "queue": {
+      "title": "AI Queue monitor",
+      "subtitle": "AI Worker health, task queues, the Gemini key pool and dubbing jobs.",
+      "worker": "AI Worker: {status}",
+      "ok": "Running",
+      "down": "Error",
+      "refresh": "Refresh",
+      "stats": {
+        "pending": "Waiting in queue",
+        "started": "In progress",
+        "success": "Completed",
+        "failure": "Failed"
+      },
+      "queueDetail": "Queue details",
+      "loading": "Loading...",
+      "connectError": "Cannot reach the AI Worker at",
+      "queueEmpty": "Queue is empty — no tasks waiting.",
+      "defaultQueue": "Celery default queue",
+      "pendingTasks": "{count} tasks waiting",
+      "keyPool": "Gemini key pool (slots)",
+      "slots": "{total} slots ({active} usable)",
+      "noKeys": "No keys configured yet.",
+      "failures": "{count} consecutive failures",
+      "recoverIn": "recovers in {sec}s",
+      "slot": {
+        "cooldown": "⏸ Cooling down",
+        "active": "✓ Active"
+      },
+      "beat": {
+        "title": "Celery Beat — scheduled jobs",
+        "running": "✓ Running",
+        "planned": "○ Planned",
+        "cleanupTemp": {
+          "desc": "Clean intermediate files (.wav, video chunks) older than 24h",
+          "schedule": "Hourly (at :00)"
+        },
+        "cleanupNotifications": {
+          "desc": "Delete read notifications older than 90 days",
+          "schedule": "Daily at 3:00 AM"
+        },
+        "remindFlashcards": {
+          "desc": "Remind learners to review flashcards (SM-2)",
+          "schedule": "Daily at 7:00 AM"
+        },
+        "reportAudio": {
+          "desc": "Report audio unused for over 180 days",
+          "schedule": "Weekly, Monday 4:00 AM"
+        }
+      },
+      "jobs": "Dubbing jobs"
+    },
+    "aiAnalytics": {
+      "title": "AI Analytics",
+      "subtitle": "Monitor learners’ API usage and lock AI access when needed.",
+      "chartTitle": "AI cost per day (last 30 days)",
+      "cost": "Cost",
+      "day": "Day {date}",
+      "noDaily": "No daily data yet",
+      "cols": {
+        "email": "Learner email",
+        "status": "AI status",
+        "tokens": "Total tokens",
+        "cost": "Total cost ($)",
+        "actions": "Actions"
+      },
+      "locked": "Locked",
+      "active": "Active",
+      "lock": "Lock AI",
+      "unlock": "Unlock",
+      "empty": "No usage data yet",
+      "updated": "Updated the user’s AI status",
+      "error": "Something went wrong"
+    },
+    "voices": {
+      "title": "Dubbing voices",
+      "subtitle": "The single source that decides which dubbing languages learners can pick; turning one off hides that language.",
+      "langPh": "Language code (e.g. en-US)",
+      "langLabel": "Language code",
+      "voicePh": "Edge-TTS voice name (e.g. en-US-JennyNeural)",
+      "voiceLabel": "Edge-TTS voice name",
+      "gender": {
+        "FEMALE": "Female",
+        "MALE": "Male"
+      },
+      "genderLabel": "Gender",
+      "isDefault": "Default",
+      "add": "Add voice",
+      "cols": {
+        "language": "Language",
+        "voice": "Voice",
+        "gender": "Gender",
+        "default": "Default",
+        "active": "Enabled",
+        "actions": "Actions"
+      },
+      "loading": "Loading...",
+      "empty": "No voices yet — learners will see no dubbing languages (BR-DUB-07).",
+      "delete": "Delete",
+      "error": "Something went wrong",
+      "deleteError": "Could not delete this voice.",
+      "confirmDelete": {
+        "title": "Delete this voice?",
+        "body": "The voice {voice} ({language}) will be removed from the system.",
+        "cancel": "Cancel"
+      },
+      "searchLabel": "Search voices",
+      "searchPh": "Search by language or voice name...",
+      "showMore": "Show more",
+      "showing": "Showing {shown} of {total} voices",
+      "noMatch": "No matching voices."
+    },
+    "tutorSec": {
+      "title": "AI Tutor security",
+      "subtitle": "Messages learners send to the AI Tutor that the pre-check flags as suspicious (asking to ignore rules, impersonating an admin, jailbreaks...). For monitoring only — nothing here locks or blocks accounts automatically.",
+      "cols": {
+        "student": "Learner",
+        "course": "Course",
+        "pattern": "Matched pattern",
+        "message": "Message",
+        "time": "Time"
+      },
+      "loading": "Loading...",
+      "empty": "No messages have been flagged as suspicious.",
+      "pager": {
+        "aria": "Security log pagination",
+        "info": "Page {page} of {total} — {count} records",
+        "prev": "Previous",
+        "next": "Next"
+      }
+    },
+    "jobs": {
+      "filterLabel": "Filter by status",
+      "status": {
+        "ALL": "All",
+        "PENDING": "Pending",
+        "PROCESSING": "Processing",
+        "COMPLETED": "Completed",
+        "FAILED": "Failed",
+        "SKIPPED": "Skipped"
+      },
+      "cols": {
+        "lesson": "Lesson",
+        "language": "Language",
+        "status": "Status",
+        "progress": "Progress",
+        "retry": "Retries",
+        "error": "Error",
+        "actions": "Actions"
+      },
+      "loading": "Loading...",
+      "empty": "No jobs.",
+      "retry": "Retry",
+      "retryError": "Could not retry this job."
     }
   }
 }
