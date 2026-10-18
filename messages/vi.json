@@ -1328,6 +1328,131 @@
         "uptime": "Thời gian chạy",
         "loading": "Đang tải thông số..."
       }
+    },
+    "users": {
+      "title": "Quản lý người dùng",
+      "subtitle": "Tìm kiếm, lọc theo vai trò và khóa hoặc mở khóa tài khoản.",
+      "filtersAria": "Lọc theo vai trò",
+      "filter": {
+        "ALL": "Tất cả",
+        "STUDENT": "Học viên",
+        "INSTRUCTOR": "Giảng viên",
+        "ADMIN": "Quản trị",
+        "LOCKED": "Bị khóa"
+      },
+      "searchLabel": "Tìm người dùng",
+      "searchPh": "Tên hoặc email...",
+      "cols": {
+        "fullName": "Họ và tên",
+        "email": "Email",
+        "createdAt": "Ngày tạo",
+        "role": "Vai trò",
+        "status": "Trạng thái",
+        "actions": "Hành động"
+      },
+      "role": {
+        "STUDENT": "Học viên",
+        "INSTRUCTOR": "Giảng viên",
+        "ADMIN": "Quản trị viên"
+      },
+      "active": "Hoạt động",
+      "locked": "Bị khóa",
+      "lock": "Khóa tài khoản",
+      "unlock": "Mở khóa",
+      "empty": "Không tìm thấy người dùng phù hợp.",
+      "loadError": "Không tải được danh sách người dùng.",
+      "lockedToast": "Đã khóa người dùng.",
+      "unlockedToast": "Đã mở khóa người dùng.",
+      "updateError": "Có lỗi khi cập nhật người dùng.",
+      "confirm": {
+        "lockTitle": "Khóa tài khoản này?",
+        "lockBody": "{name} sẽ không thể đăng nhập cho tới khi được mở khóa.",
+        "unlockTitle": "Mở khóa tài khoản này?",
+        "unlockBody": "{name} sẽ đăng nhập và sử dụng hệ thống trở lại bình thường.",
+        "cancel": "Hủy"
+      },
+      "ai": {
+        "title": "Đề xuất khóa từ AI ({count})",
+        "confirm": "Xác nhận khóa",
+        "dismiss": "Bỏ qua",
+        "confirmed": "Đã khóa AI cho người dùng theo đề xuất.",
+        "dismissed": "Đã bỏ qua đề xuất.",
+        "confirmError": "Có lỗi khi xác nhận khóa.",
+        "dismissError": "Có lỗi khi bỏ qua đề xuất."
+      },
+      "pager": {
+        "aria": "Phân trang người dùng",
+        "showing": "Đang xem {shown} / {total} người dùng",
+        "prev": "Trước",
+        "next": "Sau",
+        "page": "Trang {page} / {total}"
+      }
+    },
+    "moderation": {
+      "title": "Kiểm duyệt khóa học",
+      "subtitle": "Xem nội dung và quyết định xuất bản hoặc từ chối khóa học của giảng viên.",
+      "filtersAria": "Lọc theo trạng thái",
+      "tabs": {
+        "PENDING": "Chờ duyệt",
+        "PUBLISHED": "Đã xuất bản",
+        "REJECTED": "Bị từ chối",
+        "ARCHIVED": "Đã lưu trữ"
+      },
+      "loadError": "Không tải được danh sách khóa học.",
+      "empty": {
+        "title": "Không có khóa học nào",
+        "PENDING": "Hiện không có khóa nào đang chờ duyệt.",
+        "PUBLISHED": "Chưa có khóa nào được xuất bản.",
+        "REJECTED": "Chưa có khóa nào bị từ chối.",
+        "ARCHIVED": "Chưa có khóa nào được lưu trữ."
+      },
+      "lessons": "{count} bài",
+      "free": "Miễn phí",
+      "review": "Duyệt",
+      "view": "Xem",
+      "reviewAria": "Duyệt khóa {title}",
+      "viewAria": "Xem khóa {title}",
+      "detail": {
+        "back": "Quay lại",
+        "notFound": "Không tìm thấy khóa học.",
+        "reject": "Từ chối",
+        "approve": "Phê duyệt",
+        "cancel": "Hủy",
+        "rejectedReason": "Lý do đã từ chối:",
+        "content": "Nội dung khóa học",
+        "previewTag": "Xem thử",
+        "info": {
+          "instructor": "Giảng viên",
+          "category": "Danh mục",
+          "level": "Trình độ",
+          "price": "Giá",
+          "free": "Miễn phí",
+          "resubmits": "Số lần đã gửi lại"
+        },
+        "approveConfirm": {
+          "title": "Phê duyệt khóa học này?",
+          "body": "Khóa \"{title}\" sẽ được xuất bản và học viên có thể ghi danh ngay."
+        }
+      },
+      "reject": {
+        "title": "Từ chối khóa học",
+        "body": "Khóa \"{title}\" sẽ chuyển sang trạng thái Bị từ chối. Giảng viên sẽ thấy lý do này để chỉnh sửa và gửi duyệt lại.",
+        "label": "Lý do từ chối",
+        "placeholder": "Nêu rõ lý do từ chối (tối thiểu {min} ký tự)...",
+        "counter": "{count}/{min} ký tự",
+        "cancel": "Hủy",
+        "confirm": "Xác nhận từ chối"
+      },
+      "lesson": {
+        "videoTitle": "Xem video gốc — {title}",
+        "noVideo": "Bài học chưa nạp video.",
+        "documents": "Tài liệu đính kèm",
+        "loading": "Đang tải...",
+        "docsError": "Không tải được danh sách tài liệu.",
+        "noDocs": "Không có tài liệu đính kèm.",
+        "view": "Xem",
+        "download": "Tải xuống"
+      }
     }
   }
 }

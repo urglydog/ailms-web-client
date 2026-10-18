@@ -1328,6 +1328,131 @@
         "uptime": "稼働時間",
         "loading": "指標を読み込み中..."
       }
+    },
+    "users": {
+      "title": "ユーザー管理",
+      "subtitle": "検索、ロールでの絞り込み、アカウントのロックと解除ができます。",
+      "filtersAria": "ロールで絞り込み",
+      "filter": {
+        "ALL": "すべて",
+        "STUDENT": "受講生",
+        "INSTRUCTOR": "講師",
+        "ADMIN": "管理者",
+        "LOCKED": "ロック中"
+      },
+      "searchLabel": "ユーザーを検索",
+      "searchPh": "名前またはメール...",
+      "cols": {
+        "fullName": "氏名",
+        "email": "メール",
+        "createdAt": "作成日",
+        "role": "ロール",
+        "status": "状態",
+        "actions": "操作"
+      },
+      "role": {
+        "STUDENT": "受講生",
+        "INSTRUCTOR": "講師",
+        "ADMIN": "管理者"
+      },
+      "active": "有効",
+      "locked": "ロック中",
+      "lock": "アカウントをロック",
+      "unlock": "ロック解除",
+      "empty": "該当するユーザーが見つかりません。",
+      "loadError": "ユーザー一覧を読み込めませんでした。",
+      "lockedToast": "ユーザーをロックしました。",
+      "unlockedToast": "ユーザーのロックを解除しました。",
+      "updateError": "ユーザーの更新中にエラーが発生しました。",
+      "confirm": {
+        "lockTitle": "このアカウントをロックしますか？",
+        "lockBody": "{name} はロックが解除されるまでログインできません。",
+        "unlockTitle": "このアカウントのロックを解除しますか？",
+        "unlockBody": "{name} は再びログインして利用できます。",
+        "cancel": "キャンセル"
+      },
+      "ai": {
+        "title": "AI によるロック提案（{count}）",
+        "confirm": "ロックを確定",
+        "dismiss": "見送る",
+        "confirmed": "提案どおり AI 機能をロックしました。",
+        "dismissed": "提案を見送りました。",
+        "confirmError": "ロックの確定中にエラーが発生しました。",
+        "dismissError": "提案の見送り中にエラーが発生しました。"
+      },
+      "pager": {
+        "aria": "ユーザーのページ送り",
+        "showing": "{total} 人中 {shown} 人を表示",
+        "prev": "前へ",
+        "next": "次へ",
+        "page": "{page} / {total} ページ"
+      }
+    },
+    "moderation": {
+      "title": "講座の審査",
+      "subtitle": "内容を確認し、講師の講座を公開するか却下するかを決めます。",
+      "filtersAria": "状態で絞り込み",
+      "tabs": {
+        "PENDING": "審査待ち",
+        "PUBLISHED": "公開済み",
+        "REJECTED": "却下",
+        "ARCHIVED": "アーカイブ"
+      },
+      "loadError": "講座一覧を読み込めませんでした。",
+      "empty": {
+        "title": "講座がありません",
+        "PENDING": "現在、審査待ちの講座はありません。",
+        "PUBLISHED": "公開済みの講座はまだありません。",
+        "REJECTED": "却下された講座はありません。",
+        "ARCHIVED": "アーカイブされた講座はありません。"
+      },
+      "lessons": "{count} レッスン",
+      "free": "無料",
+      "review": "審査",
+      "view": "表示",
+      "reviewAria": "{title} を審査",
+      "viewAria": "{title} を表示",
+      "detail": {
+        "back": "戻る",
+        "notFound": "講座が見つかりません。",
+        "reject": "却下",
+        "approve": "承認",
+        "cancel": "キャンセル",
+        "rejectedReason": "却下の理由：",
+        "content": "講座の内容",
+        "previewTag": "プレビュー",
+        "info": {
+          "instructor": "講師",
+          "category": "カテゴリ",
+          "level": "レベル",
+          "price": "価格",
+          "free": "無料",
+          "resubmits": "再提出の回数"
+        },
+        "approveConfirm": {
+          "title": "この講座を承認しますか？",
+          "body": "「{title}」が公開され、受講生がすぐに申し込めるようになります。"
+        }
+      },
+      "reject": {
+        "title": "講座を却下",
+        "body": "「{title}」は却下の状態になります。講師はこの理由を見て、修正して再提出できます。",
+        "label": "却下の理由",
+        "placeholder": "理由を具体的に書いてください（{min} 文字以上）...",
+        "counter": "{count}/{min} 文字",
+        "cancel": "キャンセル",
+        "confirm": "却下を確定"
+      },
+      "lesson": {
+        "videoTitle": "元の動画 — {title}",
+        "noVideo": "このレッスンには動画がまだありません。",
+        "documents": "添付資料",
+        "loading": "読み込み中...",
+        "docsError": "資料の一覧を読み込めませんでした。",
+        "noDocs": "添付資料はありません。",
+        "view": "表示",
+        "download": "ダウンロード"
+      }
     }
   }
 }

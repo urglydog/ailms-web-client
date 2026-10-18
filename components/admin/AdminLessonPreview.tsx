@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useModerationLessonDocuments } from '@/hooks/useCourses';
 import { formatFileSize } from '@/lib/format';
 import type { LessonEditItem } from '@/types/domain';
@@ -14,18 +15,19 @@ interface AdminLessonPreviewProps {
  * hàng bài học trong trang duyệt (`admin/moderation/[id]`).
  */
 export function AdminLessonPreview({ lesson }: AdminLessonPreviewProps) {
+  const t = useTranslations('admin.moderation.lesson');
   const { data: documents, isLoading, error } = useModerationLessonDocuments(lesson.id);
   const docs = documents ?? [];
 
   return (
-    <div className="mt-2 flex flex-col gap-3 rounded-lg bg-gray-50 p-3">
+    <div className="mt-2 flex flex-col gap-3 rounded-lg bg-surface p-3">
       {lesson.videoUrl ? (
         <div className="aspect-video w-full overflow-hidden rounded-lg bg-black">
           {lesson.videoSource === 'YOUTUBE' && lesson.youtubeId ? (
             <iframe
               key={lesson.youtubeId}
               src={`https://www.youtube.com/embed/${lesson.youtubeId}`}
-              title={`Xem video gốc — ${lesson.title}`}
+              title={t('videoTitle', { title: lesson.title })}
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
               className="h-full w-full"
@@ -35,35 +37,25 @@ export function AdminLessonPreview({ lesson }: AdminLessonPreviewProps) {
           )}
         </div>
       ) : (
-        <p className="text-[12px] text-gray-400">Bài học chưa nạp video.</p>
+        <p className="m-0 text-[12px] text-ink-muted">{t('noVideo')}</p>
       )}
 
       <div>
-        <span className="text-[12px] font-bold text-gray-700">Tài liệu đính kèm</span>
-        {isLoading && <p className="mt-1 text-[12px] text-gray-400">Đang tải...</p>}
-        {error && <p className="mt-1 text-[12px] text-red-600">Không tải được danh sách tài liệu.</p>}
-        {!isLoading && !error && docs.length === 0 && (
-          <p className="mt-1 text-[12px] text-gray-400">Không có tài liệu đính kèm.</p>
-        )}
+        <span className="text-[12px] font-bold text-ink">{t('documents')}</span>
+        {isLoading && <p className="m-0 mt-1 text-[12px] text-ink-muted">{t('loading')}</p>}
+        {error && <p className="m-0 mt-1 text-[12px] text-danger">{t('docsError')}</p>}
+        {!isLoading && !error && docs.length === 0 && <p className="m-0 mt-1 text-[12px] text-ink-muted">{t('noDocs')}</p>}
         {docs.length > 0 && (
           <div className="mt-1.5 flex flex-col gap-1">
             {docs.map((doc) => (
-              <div
-                key={doc.id}
-                className="flex items-center justify-between gap-2 rounded-md bg-white px-2.5 py-1.5 text-[12px]"
-              >
-                <span className="min-w-0 flex-1 truncate text-gray-700">{doc.fileName}</span>
-                <span className="shrink-0 text-gray-400">{formatFileSize(doc.fileSize)}</span>
-                <a
-                  href={doc.fileUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="shrink-0 font-bold text-cyan-700 hover:underline"
-                >
-                  Xem
+              <div key={doc.id} className="flex items-center justify-between gap-2 rounded-md bg-white px-2.5 py-1.5 text-[12px]">
+                <span className="min-w-0 flex-1 truncate text-ink">{doc.fileName}</span>
+                <span className="shrink-0 text-ink-muted">{formatFileSize(doc.fileSize)}</span>
+                <a href={doc.fileUrl} target="_blank" rel="noreferrer" className="shrink-0 font-bold text-accent-dark hover:underline">
+                  {t('view')}
                 </a>
-                <a href={doc.fileUrl} download className="shrink-0 font-bold text-cyan-700 hover:underline">
-                  Tải xuống
+                <a href={doc.fileUrl} download className="shrink-0 font-bold text-accent-dark hover:underline">
+                  {t('download')}
                 </a>
               </div>
             ))}

@@ -1328,6 +1328,131 @@
         "uptime": "Uptime",
         "loading": "Loading metrics..."
       }
+    },
+    "users": {
+      "title": "User management",
+      "subtitle": "Search, filter by role, and lock or unlock accounts.",
+      "filtersAria": "Filter by role",
+      "filter": {
+        "ALL": "All",
+        "STUDENT": "Learners",
+        "INSTRUCTOR": "Instructors",
+        "ADMIN": "Admins",
+        "LOCKED": "Locked"
+      },
+      "searchLabel": "Search users",
+      "searchPh": "Name or email...",
+      "cols": {
+        "fullName": "Full name",
+        "email": "Email",
+        "createdAt": "Created",
+        "role": "Role",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "role": {
+        "STUDENT": "Learner",
+        "INSTRUCTOR": "Instructor",
+        "ADMIN": "Administrator"
+      },
+      "active": "Active",
+      "locked": "Locked",
+      "lock": "Lock account",
+      "unlock": "Unlock",
+      "empty": "No matching users found.",
+      "loadError": "Could not load the user list.",
+      "lockedToast": "User locked.",
+      "unlockedToast": "User unlocked.",
+      "updateError": "Something went wrong while updating the user.",
+      "confirm": {
+        "lockTitle": "Lock this account?",
+        "lockBody": "{name} will not be able to sign in until the account is unlocked.",
+        "unlockTitle": "Unlock this account?",
+        "unlockBody": "{name} will be able to sign in and use the platform again.",
+        "cancel": "Cancel"
+      },
+      "ai": {
+        "title": "AI lock proposals ({count})",
+        "confirm": "Confirm lock",
+        "dismiss": "Dismiss",
+        "confirmed": "AI lock applied as proposed.",
+        "dismissed": "Proposal dismissed.",
+        "confirmError": "Could not confirm the lock.",
+        "dismissError": "Could not dismiss the proposal."
+      },
+      "pager": {
+        "aria": "User pagination",
+        "showing": "Showing {shown} of {total} users",
+        "prev": "Previous",
+        "next": "Next",
+        "page": "Page {page} of {total}"
+      }
+    },
+    "moderation": {
+      "title": "Course moderation",
+      "subtitle": "Review content and decide whether to publish or reject instructors’ courses.",
+      "filtersAria": "Filter by status",
+      "tabs": {
+        "PENDING": "Pending",
+        "PUBLISHED": "Published",
+        "REJECTED": "Rejected",
+        "ARCHIVED": "Archived"
+      },
+      "loadError": "Could not load the course list.",
+      "empty": {
+        "title": "No courses",
+        "PENDING": "No courses are waiting for review right now.",
+        "PUBLISHED": "No courses have been published yet.",
+        "REJECTED": "No courses have been rejected.",
+        "ARCHIVED": "No courses have been archived."
+      },
+      "lessons": "{count} lessons",
+      "free": "Free",
+      "review": "Review",
+      "view": "View",
+      "reviewAria": "Review {title}",
+      "viewAria": "View {title}",
+      "detail": {
+        "back": "Back",
+        "notFound": "Course not found.",
+        "reject": "Reject",
+        "approve": "Approve",
+        "cancel": "Cancel",
+        "rejectedReason": "Rejection reason:",
+        "content": "Course content",
+        "previewTag": "Preview",
+        "info": {
+          "instructor": "Instructor",
+          "category": "Category",
+          "level": "Level",
+          "price": "Price",
+          "free": "Free",
+          "resubmits": "Times resubmitted"
+        },
+        "approveConfirm": {
+          "title": "Approve this course?",
+          "body": "\"{title}\" will be published and learners can enroll right away."
+        }
+      },
+      "reject": {
+        "title": "Reject course",
+        "body": "\"{title}\" will move to Rejected. The instructor will see this reason so they can fix the course and resubmit.",
+        "label": "Rejection reason",
+        "placeholder": "State the reason clearly (at least {min} characters)...",
+        "counter": "{count}/{min} characters",
+        "cancel": "Cancel",
+        "confirm": "Confirm rejection"
+      },
+      "lesson": {
+        "videoTitle": "Original video — {title}",
+        "noVideo": "This lesson has no video yet.",
+        "documents": "Attached documents",
+        "loading": "Loading...",
+        "docsError": "Could not load the document list.",
+        "noDocs": "No attached documents.",
+        "view": "View",
+        "download": "Download"
+      }
     }
   }
 }
