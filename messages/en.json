@@ -1257,5 +1257,77 @@
       "create": "Create bundle",
       "close": "Close"
     }
+  },
+  "admin": {
+    "nav": {
+      "aria": "Admin navigation",
+      "groups": {
+        "content": "Course content",
+        "ai": "AI & Automation",
+        "finance": "Finance",
+        "system": "System"
+      },
+      "overview": "Overview",
+      "users": "Users",
+      "moderation": "Course moderation",
+      "categories": "Categories",
+      "reviews": "Reviews",
+      "aianalytics": "AI Analytics",
+      "aiqueue": "AI Queue monitor",
+      "voicemappings": "Dubbing voices",
+      "tutorsecurity": "AI Tutor security",
+      "transactions": "Payment reconciliation",
+      "coupons": "Coupons",
+      "announcements": "System announcements",
+      "settings": "System settings"
+    },
+    "shell": {
+      "brand": "LinguaLearn",
+      "role": "Administrator",
+      "panel": "Admin",
+      "loading": "Loading...",
+      "backToStudent": "Back to learner site",
+      "collapse": "Collapse sidebar",
+      "expand": "Expand sidebar",
+      "openMenu": "Open menu",
+      "closeMenu": "Close menu",
+      "menuTitle": "Admin menu",
+      "account": "Account",
+      "language": "Language",
+      "logout": "Sign out",
+      "notifications": "Notifications"
+    },
+    "overview": {
+      "title": "System overview",
+      "subtitle": "What needs attention and how the platform is doing, on one screen.",
+      "kpi": {
+        "pending": "Courses awaiting review",
+        "users": "Total users",
+        "courses": "Total courses",
+        "revenue": "Estimated revenue"
+      },
+      "pending": {
+        "title": "Recently submitted courses",
+        "viewAll": "View all ({count})",
+        "empty": "No courses are waiting for review.",
+        "review": "Review {title}",
+        "reviewShort": "Review"
+      },
+      "quick": {
+        "title": "Shortcuts",
+        "moderation": "Review courses in the queue",
+        "users": "Find, lock or change a user role",
+        "transactions": "Check payments and refunds",
+        "aiqueue": "Track AI dubbing progress"
+      },
+      "health": {
+        "title": "Server status",
+        "refresh": "Refresh",
+        "ram": "JVM memory (RAM)",
+        "disk": "Server disk space",
+        "uptime": "Uptime",
+        "loading": "Loading metrics..."
+      }
+    }
   }
 }

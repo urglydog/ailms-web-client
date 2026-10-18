@@ -1257,5 +1257,77 @@
       "create": "セットを作成",
       "close": "閉じる"
     }
+  },
+  "admin": {
+    "nav": {
+      "aria": "管理ナビゲーション",
+      "groups": {
+        "content": "講座コンテンツ",
+        "ai": "AI と自動化",
+        "finance": "財務",
+        "system": "システム"
+      },
+      "overview": "概要",
+      "users": "ユーザー",
+      "moderation": "講座の審査",
+      "categories": "カテゴリ",
+      "reviews": "レビュー",
+      "aianalytics": "AI 分析",
+      "aiqueue": "AI キュー監視",
+      "voicemappings": "吹き替えの音声",
+      "tutorsecurity": "AI チューターの安全性",
+      "transactions": "取引の照合",
+      "coupons": "クーポン",
+      "announcements": "システムのお知らせ",
+      "settings": "システム設定"
+    },
+    "shell": {
+      "brand": "LinguaLearn",
+      "role": "管理者",
+      "panel": "管理",
+      "loading": "読み込み中...",
+      "backToStudent": "受講生サイトへ戻る",
+      "collapse": "サイドバーを閉じる",
+      "expand": "サイドバーを開く",
+      "openMenu": "メニューを開く",
+      "closeMenu": "メニューを閉じる",
+      "menuTitle": "管理メニュー",
+      "account": "アカウント",
+      "language": "言語",
+      "logout": "ログアウト",
+      "notifications": "通知"
+    },
+    "overview": {
+      "title": "システム概要",
+      "subtitle": "対応が必要な項目とプラットフォームの状態を 1 画面で確認できます。",
+      "kpi": {
+        "pending": "審査待ちの講座",
+        "users": "ユーザー総数",
+        "courses": "講座総数",
+        "revenue": "概算の収益"
+      },
+      "pending": {
+        "title": "最近提出された講座",
+        "viewAll": "すべて見る（{count}）",
+        "empty": "審査待ちの講座はありません。",
+        "review": "{title} を審査",
+        "reviewShort": "審査"
+      },
+      "quick": {
+        "title": "ショートカット",
+        "moderation": "審査待ちの講座を確認",
+        "users": "ユーザーの検索・ロック・ロール変更",
+        "transactions": "支払いと返金を確認",
+        "aiqueue": "AI 吹き替えの進行状況を確認"
+      },
+      "health": {
+        "title": "サーバーの状態",
+        "refresh": "更新",
+        "ram": "JVM メモリ（RAM）",
+        "disk": "サーバーのディスク容量",
+        "uptime": "稼働時間",
+        "loading": "指標を読み込み中..."
+      }
+    }
   }
 }

@@ -1257,5 +1257,77 @@
       "create": "创建组合",
       "close": "关闭"
     }
+  },
+  "admin": {
+    "nav": {
+      "aria": "管理导航",
+      "groups": {
+        "content": "课程内容",
+        "ai": "AI 与自动化",
+        "finance": "财务",
+        "system": "系统"
+      },
+      "overview": "总览",
+      "users": "用户",
+      "moderation": "课程审核",
+      "categories": "分类",
+      "reviews": "评价",
+      "aianalytics": "AI 分析",
+      "aiqueue": "AI 队列监控",
+      "voicemappings": "配音声音",
+      "tutorsecurity": "AI 助教安全",
+      "transactions": "交易对账",
+      "coupons": "优惠券",
+      "announcements": "系统公告",
+      "settings": "系统设置"
+    },
+    "shell": {
+      "brand": "LinguaLearn",
+      "role": "管理员",
+      "panel": "管理",
+      "loading": "加载中...",
+      "backToStudent": "返回学员站点",
+      "collapse": "收起侧栏",
+      "expand": "展开侧栏",
+      "openMenu": "打开菜单",
+      "closeMenu": "关闭菜单",
+      "menuTitle": "管理菜单",
+      "account": "账户",
+      "language": "语言",
+      "logout": "退出登录",
+      "notifications": "通知"
+    },
+    "overview": {
+      "title": "系统总览",
+      "subtitle": "待处理事项和平台状态，一屏查看。",
+      "kpi": {
+        "pending": "待审核课程",
+        "users": "用户总数",
+        "courses": "课程总数",
+        "revenue": "预估收入"
+      },
+      "pending": {
+        "title": "最近提交的课程",
+        "viewAll": "查看全部（{count}）",
+        "empty": "没有等待审核的课程。",
+        "review": "审核 {title}",
+        "reviewShort": "审核"
+      },
+      "quick": {
+        "title": "快捷入口",
+        "moderation": "审核队列中的课程",
+        "users": "查找、锁定或更改用户角色",
+        "transactions": "查看支付和退款",
+        "aiqueue": "跟踪 AI 配音进度"
+      },
+      "health": {
+        "title": "服务器状态",
+        "refresh": "刷新",
+        "ram": "JVM 内存（RAM）",
+        "disk": "服务器磁盘空间",
+        "uptime": "运行时间",
+        "loading": "正在加载指标..."
+      }
+    }
   }
 }

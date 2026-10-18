@@ -1257,5 +1257,77 @@
       "create": "Tạo gói",
       "close": "Đóng"
     }
+  },
+  "admin": {
+    "nav": {
+      "aria": "Điều hướng quản trị",
+      "groups": {
+        "content": "Nội dung khóa học",
+        "ai": "AI & Tự động hóa",
+        "finance": "Tài chính",
+        "system": "Hệ thống"
+      },
+      "overview": "Tổng quan",
+      "users": "Người dùng",
+      "moderation": "Kiểm duyệt khóa học",
+      "categories": "Danh mục",
+      "reviews": "Đánh giá",
+      "aianalytics": "AI Analytics",
+      "aiqueue": "Giám sát AI Queue",
+      "voicemappings": "Giọng đọc lồng tiếng",
+      "tutorsecurity": "Bảo mật AI Tutor",
+      "transactions": "Đối soát giao dịch",
+      "coupons": "Mã giảm giá",
+      "announcements": "Thông báo hệ thống",
+      "settings": "Cấu hình hệ thống"
+    },
+    "shell": {
+      "brand": "LinguaLearn",
+      "role": "Quản trị viên",
+      "panel": "Quản trị",
+      "loading": "Đang tải...",
+      "backToStudent": "Về trang học viên",
+      "collapse": "Thu gọn thanh bên",
+      "expand": "Mở rộng thanh bên",
+      "openMenu": "Mở menu",
+      "closeMenu": "Đóng menu",
+      "menuTitle": "Menu quản trị",
+      "account": "Tài khoản",
+      "language": "Ngôn ngữ",
+      "logout": "Đăng xuất",
+      "notifications": "Thông báo"
+    },
+    "overview": {
+      "title": "Tổng quan hệ thống",
+      "subtitle": "Việc cần xử lý và tình trạng nền tảng trong một màn hình.",
+      "kpi": {
+        "pending": "Khóa học chờ duyệt",
+        "users": "Tổng người dùng",
+        "courses": "Tổng khóa học",
+        "revenue": "Doanh thu tạm tính"
+      },
+      "pending": {
+        "title": "Khóa học chờ duyệt gần đây",
+        "viewAll": "Xem tất cả ({count})",
+        "empty": "Không có khóa học nào đang chờ duyệt.",
+        "review": "Duyệt khóa {title}",
+        "reviewShort": "Duyệt"
+      },
+      "quick": {
+        "title": "Lối tắt",
+        "moderation": "Duyệt khóa học đang chờ",
+        "users": "Tìm, khóa hoặc đổi vai trò người dùng",
+        "transactions": "Kiểm tra thanh toán và hoàn tiền",
+        "aiqueue": "Theo dõi tiến trình lồng tiếng AI"
+      },
+      "health": {
+        "title": "Trạng thái máy chủ",
+        "refresh": "Làm mới",
+        "ram": "Bộ nhớ RAM của JVM",
+        "disk": "Dung lượng ổ đĩa máy chủ",
+        "uptime": "Thời gian chạy",
+        "loading": "Đang tải thông số..."
+      }
+    }
   }
 }
