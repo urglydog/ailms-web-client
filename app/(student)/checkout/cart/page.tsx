@@ -42,6 +42,9 @@ function CartCheckoutContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { data: cartItems, isLoading } = useCart();
+  // Giỏ hàng cần token nên máy chủ không có dữ liệu; chờ mount mới chọn giữa "đang tải" và "trống" để HTML hai bên khớp.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const [payingMethod, setPayingMethod] = useState<string | null>(null);
   const [billingName, setBillingName] = useState('');
   const [billingPhone, setBillingPhone] = useState('');
@@ -122,7 +125,7 @@ function CartCheckoutContent() {
     }
   };
 
-  if (isLoading) return <Spinner />;
+  if (!mounted || isLoading) return <Spinner />;
 
   if (courseIds.length === 0 || items.length === 0) {
     return (

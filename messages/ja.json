@@ -14,7 +14,8 @@
     },
     "mobileMenu": {
       "open": "メニューを開く",
-      "close": "メニューを閉じる"
+      "close": "メニューを閉じる",
+      "title": "ナビゲーションメニュー"
     },
     "wishlist": {
       "viewAll": "ウィッシュリストへ",

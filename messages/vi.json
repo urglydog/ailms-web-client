@@ -14,7 +14,8 @@
     },
     "mobileMenu": {
       "open": "Mở menu",
-      "close": "Đóng menu"
+      "close": "Đóng menu",
+      "title": "Menu điều hướng"
     },
     "wishlist": {
       "viewAll": "Đi đến danh sách yêu thích",

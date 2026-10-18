@@ -14,7 +14,8 @@
     },
     "mobileMenu": {
       "open": "打开菜单",
-      "close": "关闭菜单"
+      "close": "关闭菜单",
+      "title": "导航菜单"
     },
     "wishlist": {
       "viewAll": "前往收藏夹",

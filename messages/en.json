@@ -14,7 +14,8 @@
     },
     "mobileMenu": {
       "open": "Open menu",
-      "close": "Close menu"
+      "close": "Close menu",
+      "title": "Navigation menu"
     },
     "wishlist": {
       "viewAll": "Go to wishlist",
