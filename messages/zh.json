@@ -932,6 +932,122 @@
     },
     "common": {
       "close": "关闭"
+    },
+    "perf": {
+      "common": {
+        "allCourses": "全部课程",
+        "loading": "加载中..."
+      },
+      "students": {
+        "title": "学员",
+        "export": "导出 CSV",
+        "total": "学员总数",
+        "avgProgress": "平均进度",
+        "atRisk": "进度低于 {pct}% 的学员",
+        "atRiskWarn": "{ratio}% 的学员观看进度未超过课程的 {pct}%，可考虑发送提醒邮件，或检查开篇课程是否足够吸引人。",
+        "cols": {
+          "student": "学员",
+          "email": "邮箱",
+          "course": "课程",
+          "enrolled": "报名日期",
+          "progress": "进度"
+        },
+        "csv": {
+          "progress": "进度（%）"
+        },
+        "empty": "还没有学员报名。"
+      },
+      "reviews": {
+        "title": "评价",
+        "average": "平均评分",
+        "count": "{count} 条评价",
+        "distribution": "星级分布",
+        "tooltip": "{count} 条评价",
+        "lowAlert": "近 30 天有 {count} 条 {threshold}★ 及以下的评价，建议查看下方评论并回复或联系学员。",
+        "empty": "还没有评价。",
+        "reportPrompt": "举报此评价的原因（违反社区规范、垃圾信息等）：",
+        "reported": "已举报，该评价暂时隐藏，等待管理员审核。",
+        "reportError": "举报评价时出错。",
+        "reportTitle": "举报此评价（违反社区规范）"
+      },
+      "hardQuestions": {
+        "title": "难题",
+        "subtitle": "超过 60% 的学员答错的题目。可能是讲解不够清楚，或题目和答案需要复查。",
+        "warn": "有 {count} 道题的错误率超过 60%，建议优先复查“{question}”（{percent}% 错误，{course}）。",
+        "level": {
+          "all": "所有级别",
+          "critical": "≥ 80% — 红色警报",
+          "warning": "60–79% — 警告"
+        },
+        "sort": {
+          "wrongRate": "排序：错误率",
+          "totalAnswers": "排序：作答次数"
+        },
+        "cols": {
+          "question": "题目",
+          "lesson": "课程 / 课时",
+          "answers": "作答次数",
+          "wrongRate": "错误率",
+          "actions": "操作"
+        },
+        "emptyFiltered": "没有符合当前筛选的题目。",
+        "emptyAll": "暂时没有错误率超过 60% 的题目（样本足够时），你的课程状态良好。",
+        "edit": "查看并修改"
+      },
+      "retention": {
+        "title": "学员留存",
+        "subtitle": "视频每 10% 处仍在观看的学员比例，骤降的位置最容易有人离开。",
+        "course": "课程",
+        "lesson": "课时",
+        "chooseCourse": "— 选择课程 —",
+        "chooseLesson": "— 选择课时 —",
+        "pick": "请选择课程和课时以查看留存图表。",
+        "noViews": "该课时还没有学员观看，数据不足以绘制图表。",
+        "drop": "学员在视频 {from}%–{to}% 之间流失最多（下降 {points} 个百分点），请复查这一段，可能过长或难以理解。",
+        "tooltip": "仍在观看",
+        "label": "已观看到 {label}"
+      },
+      "list": {
+        "quick": "快速范围",
+        "custom": "自选日期",
+        "export": "导出 CSV",
+        "kpi": {
+          "transactions": "交易数",
+          "gross": "总收入",
+          "fee": "平台费用",
+          "net": "实际收入"
+        },
+        "netTotal": "此时间段内实际收入合计",
+        "topCourse": "<b>{title}</b> 本期贡献的收入最多：{amount}。",
+        "split": {
+          "bundleLabel": "组合与零售",
+          "bundle": "组合",
+          "retail": "零售",
+          "couponLabel": "使用优惠码与原价",
+          "coupon": "使用优惠码",
+          "full": "原价"
+        },
+        "chart": {
+          "byDay": "每日收入",
+          "organic": "自然流量",
+          "referral": "推荐",
+          "empty": "暂无数据可绘制图表。",
+          "day": "{date} 日",
+          "cumulativeTitle": "本期累计收入",
+          "cumulative": "累计"
+        },
+        "cols": {
+          "course": "课程",
+          "amount": "金额",
+          "net": "实际收入",
+          "source": "来源",
+          "coupon": "优惠码",
+          "paidAt": "支付日期"
+        },
+        "empty": "此时间段内没有交易。",
+        "sourceReferral": "推荐（97%）",
+        "sourceOrganic": "自然流量（37%）"
+      }
     }
   }
 }

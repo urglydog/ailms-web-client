@@ -932,6 +932,122 @@
     },
     "common": {
       "close": "Đóng"
+    },
+    "perf": {
+      "common": {
+        "allCourses": "Tất cả khóa học",
+        "loading": "Đang tải..."
+      },
+      "students": {
+        "title": "Học viên",
+        "export": "Xuất CSV",
+        "total": "Tổng học viên",
+        "avgProgress": "Tiến độ trung bình",
+        "atRisk": "Học viên < {pct}% tiến độ",
+        "atRiskWarn": "{ratio}% học viên chưa xem quá {pct}% khóa học, cân nhắc gửi email nhắc nhở hoặc xem lại bài mở đầu có đủ hấp dẫn không.",
+        "cols": {
+          "student": "Học viên",
+          "email": "Email",
+          "course": "Khóa học",
+          "enrolled": "Ngày đăng ký",
+          "progress": "Tiến độ"
+        },
+        "csv": {
+          "progress": "Tiến độ (%)"
+        },
+        "empty": "Chưa có học viên nào đăng ký."
+      },
+      "reviews": {
+        "title": "Đánh giá",
+        "average": "Điểm trung bình",
+        "count": "{count} đánh giá",
+        "distribution": "Phân bố theo số sao",
+        "tooltip": "{count} đánh giá",
+        "lowAlert": "Có {count} đánh giá {threshold}★ trở xuống trong 30 ngày gần đây, nên xem lại nhận xét bên dưới và phản hồi hoặc liên hệ học viên.",
+        "empty": "Chưa có đánh giá nào.",
+        "reportPrompt": "Lý do report review này (vi phạm tiêu chuẩn cộng đồng, spam...):",
+        "reported": "Đã report, review bị ẩn tạm thời và chờ Admin duyệt.",
+        "reportError": "Có lỗi xảy ra khi report review.",
+        "reportTitle": "Report review này (vi phạm tiêu chuẩn cộng đồng)"
+      },
+      "hardQuestions": {
+        "title": "Câu hỏi khó",
+        "subtitle": "Câu hỏi có tỷ lệ học viên trả lời sai trên 60%. Có thể nội dung bài giảng chưa rõ, hoặc câu hỏi và đáp án cần xem lại.",
+        "warn": "{count} câu hỏi đang vượt ngưỡng 60% sai, ưu tiên xem lại câu \"{question}\" ({percent}% sai, {course}).",
+        "level": {
+          "all": "Mọi mức độ",
+          "critical": "≥ 80% — Báo động đỏ",
+          "warning": "60–79% — Cảnh báo"
+        },
+        "sort": {
+          "wrongRate": "Sắp xếp: Tỷ lệ sai",
+          "totalAnswers": "Sắp xếp: Số lượt trả lời"
+        },
+        "cols": {
+          "question": "Câu hỏi",
+          "lesson": "Khóa học / Bài học",
+          "answers": "Lượt trả lời",
+          "wrongRate": "Tỷ lệ sai",
+          "actions": "Thao tác"
+        },
+        "emptyFiltered": "Không có câu hỏi nào khớp bộ lọc đang chọn.",
+        "emptyAll": "Chưa có câu hỏi nào vượt ngưỡng 60% trả lời sai (với đủ mẫu học viên), bài giảng của bạn đang ổn.",
+        "edit": "Xem & sửa"
+      },
+      "retention": {
+        "title": "Giữ chân học viên",
+        "subtitle": "% học viên còn xem tới từng mốc 10% thời lượng video, chỗ tụt mạnh là chỗ dễ bỏ ngang.",
+        "course": "Khóa học",
+        "lesson": "Bài học",
+        "chooseCourse": "— Chọn khóa học —",
+        "chooseLesson": "— Chọn bài học —",
+        "pick": "Chọn khóa học và bài học để xem biểu đồ giữ chân.",
+        "noViews": "Bài học này chưa có học viên nào xem, chưa đủ dữ liệu để vẽ biểu đồ.",
+        "drop": "Học viên rớt mạnh nhất giữa {from}%–{to}% video (giảm {points} điểm %), xem lại đoạn này, có thể đang dài hoặc khó hiểu.",
+        "tooltip": "Còn xem tới đây",
+        "label": "Đã xem tới {label}"
+      },
+      "list": {
+        "quick": "Khoảng nhanh",
+        "custom": "Tự chọn ngày",
+        "export": "Xuất CSV",
+        "kpi": {
+          "transactions": "Số giao dịch",
+          "gross": "Doanh thu gộp",
+          "fee": "Phí nền tảng",
+          "net": "Thực nhận"
+        },
+        "netTotal": "Tổng thực nhận trong khoảng thời gian này",
+        "topCourse": "Khóa <b>{title}</b> đóng góp doanh thu nhiều nhất kỳ này: {amount}.",
+        "split": {
+          "bundleLabel": "Gói combo vs Bán lẻ",
+          "bundle": "Gói combo",
+          "retail": "Bán lẻ",
+          "couponLabel": "Có mã giảm giá vs Giá gốc",
+          "coupon": "Có mã giảm giá",
+          "full": "Giá gốc"
+        },
+        "chart": {
+          "byDay": "Doanh thu theo ngày",
+          "organic": "Tự tìm thấy",
+          "referral": "Giới thiệu",
+          "empty": "Chưa có dữ liệu để vẽ biểu đồ.",
+          "day": "Ngày {date}",
+          "cumulativeTitle": "Doanh thu lũy kế trong kỳ",
+          "cumulative": "Lũy kế"
+        },
+        "cols": {
+          "course": "Khóa học",
+          "amount": "Số tiền",
+          "net": "Thực nhận",
+          "source": "Nguồn",
+          "coupon": "Mã giảm giá",
+          "paidAt": "Ngày thanh toán"
+        },
+        "empty": "Không có giao dịch nào trong khoảng thời gian này.",
+        "sourceReferral": "Giới thiệu (97%)",
+        "sourceOrganic": "Tự tìm thấy (37%)"
+      }
     }
   }
 }

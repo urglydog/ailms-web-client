@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { InsightCallout } from '@/components/instructor/InsightCallout';
 import { Pagination } from '@/components/ui/Pagination';
 import { useHardQuestions, useInstructorCourseOptions } from '@/hooks/useDashboard';
@@ -20,6 +21,7 @@ function severityColor(percent: number): string {
  * mục tiêu thật của giảng viên là TÌM và SỬA câu có vấn đề, không phải ngắm biểu đồ). Câu hỏi
  * quiz có tỷ lệ trả lời sai > 60% (đã lọc ngưỡng mẫu tối thiểu ở BE, chống thiên lệch cỡ mẫu nhỏ). */
 export default function HardQuestionsPage() {
+  const t = useTranslations('instructor.perf');
   const { data: rows, isLoading } = useHardQuestions();
   const { data: courses } = useInstructorCourseOptions();
   const [courseId, setCourseId] = useState<number | ''>('');
@@ -50,15 +52,15 @@ export default function HardQuestionsPage() {
   return (
     <>
       <div>
-        <h1 className="m-0 font-display text-[20px] font-bold text-ink">Câu hỏi khó</h1>
+        <h1 className="m-0 font-display text-[20px] font-bold text-ink">{t('hardQuestions.title')}</h1>
         <p className="mt-1 text-[12.5px] text-ink-muted">
-          Câu hỏi có tỷ lệ học viên trả lời sai trên 60% — có thể nội dung bài giảng chưa rõ, hoặc câu hỏi/đáp án cần xem lại.
+          {t('hardQuestions.subtitle')}
         </p>
       </div>
 
       {worst && (
         <InsightCallout tone="warning">
-          {rows?.length ?? 0} câu hỏi đang vượt ngưỡng 60% sai — ưu tiên xem lại câu &quot;{worst.content}&quot; ({worst.wrongRatePercent.toFixed(0)}% sai, {worst.courseTitle}).
+          {t('hardQuestions.warn', { count: rows?.length ?? 0, question: worst.content, percent: worst.wrongRatePercent.toFixed(0), course: worst.courseTitle })}
         </InsightCallout>
       )}
 
@@ -68,7 +70,7 @@ export default function HardQuestionsPage() {
           onChange={(e) => handleFilterChange(() => setCourseId(e.target.value ? Number(e.target.value) : ''))}
           className="rounded-lg border border-line bg-white px-3 py-2 text-[13px] font-semibold text-ink focus:border-accent focus:outline-none"
         >
-          <option value="">Tất cả khóa học</option>
+          <option value="">{t('common.allCourses')}</option>
           {courses?.map((c) => (
             <option key={c.id} value={c.id}>{c.title}</option>
           ))}
@@ -78,36 +80,36 @@ export default function HardQuestionsPage() {
           onChange={(e) => handleFilterChange(() => setSeverity(e.target.value as Severity))}
           className="rounded-lg border border-line bg-white px-3 py-2 text-[13px] font-semibold text-ink focus:border-accent focus:outline-none"
         >
-          <option value="all">Mọi mức độ</option>
-          <option value="critical">≥ 80% — Báo động đỏ</option>
-          <option value="warning">60–79% — Cảnh báo</option>
+          <option value="all">{t('hardQuestions.level.all')}</option>
+          <option value="critical">{t('hardQuestions.level.critical')}</option>
+          <option value="warning">{t('hardQuestions.level.warning')}</option>
         </select>
         <select
           value={sortBy}
           onChange={(e) => handleFilterChange(() => setSortBy(e.target.value as SortBy))}
           className="rounded-lg border border-line bg-white px-3 py-2 text-[13px] font-semibold text-ink focus:border-accent focus:outline-none"
         >
-          <option value="wrongRate">Sắp xếp: Tỷ lệ sai</option>
-          <option value="totalAnswers">Sắp xếp: Số lượt trả lời</option>
+          <option value="wrongRate">{t('hardQuestions.sort.wrongRate')}</option>
+          <option value="totalAnswers">{t('hardQuestions.sort.totalAnswers')}</option>
         </select>
       </div>
 
       <div className="overflow-hidden rounded-xl border border-line bg-white shadow-sm">
         <div className="overflow-x-auto">
           <div className="grid min-w-[820px] grid-cols-[1.6fr_1fr_110px_160px_130px] gap-3 border-b border-line bg-surface px-4 py-2.5 text-[11.5px] font-bold text-ink-muted">
-            <span>Câu hỏi</span>
-            <span>Khóa học / Bài học</span>
-            <span>Lượt trả lời</span>
-            <span>Tỷ lệ sai</span>
-            <span>Thao tác</span>
+            <span>{t('hardQuestions.cols.question')}</span>
+            <span>{t('hardQuestions.cols.lesson')}</span>
+            <span>{t('hardQuestions.cols.answers')}</span>
+            <span>{t('hardQuestions.cols.wrongRate')}</span>
+            <span>{t('hardQuestions.cols.actions')}</span>
           </div>
 
-          {isLoading && <div className="p-10 text-center text-sm text-ink-muted">Đang tải...</div>}
+          {isLoading && <div className="p-10 text-center text-sm text-ink-muted">{t('common.loading')}</div>}
           {!isLoading && pageRows.length === 0 && (
             <div className="p-10 text-center text-sm text-ink-muted">
               {rows && rows.length > 0
-                ? 'Không có câu hỏi nào khớp bộ lọc đang chọn.'
-                : 'Chưa có câu hỏi nào vượt ngưỡng 60% trả lời sai (với đủ mẫu học viên) — bài giảng của bạn đang ổn.'}
+                ? t('hardQuestions.emptyFiltered')
+                : t('hardQuestions.emptyAll')}
             </div>
           )}
 
@@ -136,7 +138,7 @@ export default function HardQuestionsPage() {
                 href={`/instructor/courses/${row.courseId}/edit/materials?inspect=${row.materialGenerationId}`}
                 className="rounded-lg border border-line bg-tint px-2.5 py-1.5 text-center text-[12px] font-bold text-accent-dark no-underline hover:bg-cyan-100"
               >
-                Xem & sửa
+                {t('hardQuestions.edit')}
               </Link>
             </div>
           ))}

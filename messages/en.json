@@ -932,6 +932,122 @@
     },
     "common": {
       "close": "Close"
+    },
+    "perf": {
+      "common": {
+        "allCourses": "All courses",
+        "loading": "Loading..."
+      },
+      "students": {
+        "title": "Students",
+        "export": "Export CSV",
+        "total": "Total students",
+        "avgProgress": "Average progress",
+        "atRisk": "Students under {pct}% progress",
+        "atRiskWarn": "{ratio}% of students have not watched past {pct}% of the course. Consider sending a reminder email or checking whether the opening lesson is engaging enough.",
+        "cols": {
+          "student": "Student",
+          "email": "Email",
+          "course": "Course",
+          "enrolled": "Sign-up date",
+          "progress": "Progress"
+        },
+        "csv": {
+          "progress": "Progress (%)"
+        },
+        "empty": "No students have signed up yet."
+      },
+      "reviews": {
+        "title": "Reviews",
+        "average": "Average rating",
+        "count": "{count} reviews",
+        "distribution": "Distribution by stars",
+        "tooltip": "{count} reviews",
+        "lowAlert": "{count} reviews of {threshold}★ or lower in the last 30 days. Read the comments below and reply to or contact the learners.",
+        "empty": "No reviews yet.",
+        "reportPrompt": "Reason for reporting this review (violates community standards, spam...):",
+        "reported": "Reported. The review is hidden for now and waits for admin review.",
+        "reportError": "Something went wrong while reporting the review.",
+        "reportTitle": "Report this review (violates community standards)"
+      },
+      "hardQuestions": {
+        "title": "Hard questions",
+        "subtitle": "Questions that over 60% of learners answer wrong. The lesson may be unclear, or the question and answers need a second look.",
+        "warn": "{count} questions are above the 60% wrong threshold. Review \"{question}\" first ({percent}% wrong, {course}).",
+        "level": {
+          "all": "All levels",
+          "critical": "≥ 80% — Red alert",
+          "warning": "60–79% — Warning"
+        },
+        "sort": {
+          "wrongRate": "Sort: Wrong rate",
+          "totalAnswers": "Sort: Number of answers"
+        },
+        "cols": {
+          "question": "Question",
+          "lesson": "Course / Lesson",
+          "answers": "Answers",
+          "wrongRate": "Wrong rate",
+          "actions": "Actions"
+        },
+        "emptyFiltered": "No questions match the selected filters.",
+        "emptyAll": "No question is above the 60% wrong threshold (with enough learner samples). Your lessons look healthy.",
+        "edit": "View & edit"
+      },
+      "retention": {
+        "title": "Learner retention",
+        "subtitle": "% of learners still watching at each 10% mark of the video. A sharp drop is where people tend to leave.",
+        "course": "Course",
+        "lesson": "Lesson",
+        "chooseCourse": "— Choose a course —",
+        "chooseLesson": "— Choose a lesson —",
+        "pick": "Choose a course and a lesson to see the retention chart.",
+        "noViews": "Nobody has watched this lesson yet, so there is not enough data for a chart.",
+        "drop": "Learners drop the most between {from}%–{to}% of the video ({points} points). Review this part, it may be long or hard to follow.",
+        "tooltip": "Still watching here",
+        "label": "Watched up to {label}"
+      },
+      "list": {
+        "quick": "Quick range",
+        "custom": "Custom dates",
+        "export": "Export CSV",
+        "kpi": {
+          "transactions": "Transactions",
+          "gross": "Gross revenue",
+          "fee": "Platform fee",
+          "net": "Net earnings"
+        },
+        "netTotal": "Total net earnings in this period",
+        "topCourse": "<b>{title}</b> brought in the most revenue this period: {amount}.",
+        "split": {
+          "bundleLabel": "Bundle vs Retail",
+          "bundle": "Bundle",
+          "retail": "Retail",
+          "couponLabel": "With coupon vs Full price",
+          "coupon": "With coupon",
+          "full": "Full price"
+        },
+        "chart": {
+          "byDay": "Revenue by day",
+          "organic": "Organic",
+          "referral": "Referral",
+          "empty": "No data to chart yet.",
+          "day": "Day {date}",
+          "cumulativeTitle": "Cumulative revenue in the period",
+          "cumulative": "Cumulative"
+        },
+        "cols": {
+          "course": "Course",
+          "amount": "Amount",
+          "net": "Net earnings",
+          "source": "Source",
+          "coupon": "Discount code",
+          "paidAt": "Paid on"
+        },
+        "empty": "No transactions in this period.",
+        "sourceReferral": "Referral (97%)",
+        "sourceOrganic": "Organic (37%)"
+      }
     }
   }
 }

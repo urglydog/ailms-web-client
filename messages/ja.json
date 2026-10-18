@@ -932,6 +932,122 @@
     },
     "common": {
       "close": "閉じる"
+    },
+    "perf": {
+      "common": {
+        "allCourses": "すべての講座",
+        "loading": "読み込み中..."
+      },
+      "students": {
+        "title": "受講生",
+        "export": "CSV を出力",
+        "total": "受講生の合計",
+        "avgProgress": "平均進捗",
+        "atRisk": "進捗 {pct}% 未満の受講生",
+        "atRiskWarn": "受講生の {ratio}% が講座の {pct}% まで視聴していません。リマインドメールを送るか、導入レッスンが魅力的か見直しましょう。",
+        "cols": {
+          "student": "受講生",
+          "email": "メール",
+          "course": "講座",
+          "enrolled": "登録日",
+          "progress": "進捗"
+        },
+        "csv": {
+          "progress": "進捗（%）"
+        },
+        "empty": "まだ登録した受講生はいません。"
+      },
+      "reviews": {
+        "title": "レビュー",
+        "average": "平均評価",
+        "count": "{count} 件のレビュー",
+        "distribution": "星の分布",
+        "tooltip": "{count} 件のレビュー",
+        "lowAlert": "直近 30 日に {threshold}★ 以下のレビューが {count} 件あります。下のコメントを確認し、返信や受講生への連絡をしましょう。",
+        "empty": "まだレビューはありません。",
+        "reportPrompt": "このレビューを報告する理由（コミュニティ基準違反、スパムなど）：",
+        "reported": "報告しました。このレビューは一時的に非表示になり、管理者の確認を待ちます。",
+        "reportError": "レビューの報告中にエラーが発生しました。",
+        "reportTitle": "このレビューを報告（コミュニティ基準違反）"
+      },
+      "hardQuestions": {
+        "title": "難問",
+        "subtitle": "受講生の 60% 超が間違える問題です。講義が分かりにくいか、問題や選択肢の見直しが必要かもしれません。",
+        "warn": "{count} 問が誤答率 60% を超えています。まず「{question}」を見直しましょう（誤答 {percent}%、{course}）。",
+        "level": {
+          "all": "すべてのレベル",
+          "critical": "≥ 80% — 赤信号",
+          "warning": "60–79% — 注意"
+        },
+        "sort": {
+          "wrongRate": "並べ替え：誤答率",
+          "totalAnswers": "並べ替え：回答数"
+        },
+        "cols": {
+          "question": "問題",
+          "lesson": "講座 / レッスン",
+          "answers": "回答数",
+          "wrongRate": "誤答率",
+          "actions": "操作"
+        },
+        "emptyFiltered": "選択した条件に合う問題はありません。",
+        "emptyAll": "誤答率が 60% を超える問題はありません（十分なサンプルがある場合）。講義は順調です。",
+        "edit": "確認して編集"
+      },
+      "retention": {
+        "title": "受講生の定着",
+        "subtitle": "動画の 10% ごとの地点でまだ視聴している受講生の割合。急に落ちる箇所が離脱しやすい場所です。",
+        "course": "講座",
+        "lesson": "レッスン",
+        "chooseCourse": "— 講座を選択 —",
+        "chooseLesson": "— レッスンを選択 —",
+        "pick": "講座とレッスンを選ぶと定着グラフが表示されます。",
+        "noViews": "このレッスンはまだ誰も視聴しておらず、グラフを描くデータが足りません。",
+        "drop": "動画の {from}%–{to}% の間で最も離脱しています（{points} ポイント低下）。この部分は長いか分かりにくい可能性があります。",
+        "tooltip": "ここまで視聴中",
+        "label": "{label} まで視聴"
+      },
+      "list": {
+        "quick": "クイック期間",
+        "custom": "日付を指定",
+        "export": "CSV を出力",
+        "kpi": {
+          "transactions": "取引数",
+          "gross": "総収益",
+          "fee": "プラットフォーム手数料",
+          "net": "実収益"
+        },
+        "netTotal": "この期間の実収益の合計",
+        "topCourse": "<b>{title}</b> が今期最も収益に貢献しました：{amount}。",
+        "split": {
+          "bundleLabel": "セット vs 単品",
+          "bundle": "セット",
+          "retail": "単品",
+          "couponLabel": "クーポンあり vs 定価",
+          "coupon": "クーポンあり",
+          "full": "定価"
+        },
+        "chart": {
+          "byDay": "日別の収益",
+          "organic": "自然流入",
+          "referral": "紹介",
+          "empty": "グラフにするデータがまだありません。",
+          "day": "{date}",
+          "cumulativeTitle": "期間内の累計収益",
+          "cumulative": "累計"
+        },
+        "cols": {
+          "course": "講座",
+          "amount": "金額",
+          "net": "実収益",
+          "source": "流入元",
+          "coupon": "クーポン",
+          "paidAt": "支払日"
+        },
+        "empty": "この期間の取引はありません。",
+        "sourceReferral": "紹介（97%）",
+        "sourceOrganic": "自然流入（37%）"
+      }
     }
   }
 }
