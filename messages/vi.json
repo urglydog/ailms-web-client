@@ -677,5 +677,36 @@
     "rank": "Hạng {rank}",
     "podiumAria": "Top 3 bảng xếp hạng",
     "listAria": "Bảng xếp hạng"
+  },
+  "instructor": {
+    "nav": {
+      "courses": "Khóa học của tôi",
+      "bundles": "Gói khóa học",
+      "communication": "Giao tiếp",
+      "revenue": "Hiệu suất",
+      "tools": "Công cụ",
+      "aria": "Điều hướng kênh giảng viên"
+    },
+    "shell": {
+      "brand": "LinguaLearn",
+      "role": "Giảng viên",
+      "channel": "Kênh giảng viên",
+      "loading": "Đang tải...",
+      "backToStudent": "Về trang học viên",
+      "createCourse": "Tạo khóa học",
+      "collapse": "Thu gọn thanh bên",
+      "expand": "Mở rộng thanh bên",
+      "openMenu": "Mở menu",
+      "closeMenu": "Đóng menu",
+      "menuTitle": "Menu kênh giảng viên",
+      "account": "Tài khoản",
+      "language": "Ngôn ngữ",
+      "logout": "Đăng xuất",
+      "notifications": "Thông báo",
+      "logoutTitle": "Xác nhận đăng xuất",
+      "logoutBody": "Bạn có chắc chắn muốn đăng xuất khỏi hệ thống không?",
+      "cancel": "Hủy",
+      "confirm": "Đăng xuất"
+    }
   }
 }

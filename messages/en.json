@@ -677,5 +677,36 @@
     "rank": "Rank {rank}",
     "podiumAria": "Top 3 on the leaderboard",
     "listAria": "Leaderboard"
+  },
+  "instructor": {
+    "nav": {
+      "courses": "My courses",
+      "bundles": "Course bundles",
+      "communication": "Communication",
+      "revenue": "Performance",
+      "tools": "Tools",
+      "aria": "Instructor channel navigation"
+    },
+    "shell": {
+      "brand": "LinguaLearn",
+      "role": "Instructor",
+      "channel": "Instructor channel",
+      "loading": "Loading...",
+      "backToStudent": "Back to learner site",
+      "createCourse": "Create course",
+      "collapse": "Collapse sidebar",
+      "expand": "Expand sidebar",
+      "openMenu": "Open menu",
+      "closeMenu": "Close menu",
+      "menuTitle": "Instructor channel menu",
+      "account": "Account",
+      "language": "Language",
+      "logout": "Sign out",
+      "notifications": "Notifications",
+      "logoutTitle": "Confirm sign out",
+      "logoutBody": "Are you sure you want to sign out?",
+      "cancel": "Cancel",
+      "confirm": "Sign out"
+    }
   }
 }

@@ -677,5 +677,36 @@
     "rank": "{rank} 位",
     "podiumAria": "ランキング上位 3 名",
     "listAria": "ランキング"
+  },
+  "instructor": {
+    "nav": {
+      "courses": "マイ講座",
+      "bundles": "講座セット",
+      "communication": "コミュニケーション",
+      "revenue": "パフォーマンス",
+      "tools": "ツール",
+      "aria": "講師チャンネルのナビゲーション"
+    },
+    "shell": {
+      "brand": "LinguaLearn",
+      "role": "講師",
+      "channel": "講師チャンネル",
+      "loading": "読み込み中...",
+      "backToStudent": "受講生サイトへ戻る",
+      "createCourse": "講座を作成",
+      "collapse": "サイドバーを閉じる",
+      "expand": "サイドバーを開く",
+      "openMenu": "メニューを開く",
+      "closeMenu": "メニューを閉じる",
+      "menuTitle": "講師チャンネルのメニュー",
+      "account": "アカウント",
+      "language": "言語",
+      "logout": "ログアウト",
+      "notifications": "通知",
+      "logoutTitle": "ログアウトの確認",
+      "logoutBody": "システムからログアウトしますか？",
+      "cancel": "キャンセル",
+      "confirm": "ログアウト"
+    }
   }
 }
