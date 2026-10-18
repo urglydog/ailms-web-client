@@ -4,15 +4,32 @@ import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { toast } from 'sonner';
+import { BillingForm } from '@/components/checkout/BillingForm';
+import { CheckoutSteps } from '@/components/checkout/CheckoutSteps';
+import { CouponBox } from '@/components/checkout/CouponBox';
+import { OrderTotals } from '@/components/checkout/OrderTotals';
+import { PayosButton } from '@/components/checkout/PayosButton';
 import { publicCoursesApi } from '@/lib/api/publicCourses';
 import { couponsApi } from '@/lib/api/coupons';
 import { ApiError } from '@/lib/api/client';
-import type { CourseDetail } from '@/types/domain';
 import { paymentsApi } from '@/lib/api/payments';
 import { getReferralCode } from '@/lib/referral';
-import { toast } from 'sonner';
+import type { CourseDetail } from '@/types/domain';
 
+function Spinner() {
+  return (
+    <div className="flex h-[60vh] items-center justify-center">
+      <div className="h-8 w-8 animate-spin rounded-full border-4 border-accent border-t-transparent" />
+    </div>
+  );
+}
+
+/** Thanh toán đúng 1 khóa (luồng "Mua khóa học" từ trang chi tiết). */
 function CheckoutPageContent() {
+  const t = useTranslations('shop');
   const router = useRouter();
   const params = useParams();
   const searchParams = useSearchParams();
@@ -40,11 +57,12 @@ function CheckoutPageContent() {
       .then((data) => {
         setCourse(data);
       })
-      .catch((_err) => {
-        toast.error('Không thể tải thông tin khóa học');
+      .catch(() => {
+        toast.error(t('checkout.loadError'));
         router.push('/courses');
       })
       .finally(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [courseSlug, router]);
 
   useEffect(() => {
@@ -62,14 +80,14 @@ function CheckoutPageContent() {
     try {
       const result = await couponsApi.preview({ courseId: course.id, code: trimmed });
       if (!result.enteredCodeValid) {
-        toast.error('Mã giảm giá không áp dụng được cho khóa học này.');
+        toast.error(t('coupon.invalidOne'));
         return;
       }
       setPreview({ finalPrice: result.finalPrice, discountPercent: result.discountPercent });
       setAppliedCode(trimmed);
-      toast.success('Đã áp dụng mã giảm giá.');
+      toast.success(t('coupon.applied'));
     } catch (err) {
-      toast.error(err instanceof ApiError ? err.message : 'Không áp dụng được mã giảm giá, thử lại sau.');
+      toast.error(err instanceof ApiError ? err.message : t('coupon.failed'));
     } finally {
       setApplying(false);
     }
@@ -95,101 +113,60 @@ function CheckoutPageContent() {
       // BUG THẬT (25/09/2026): `ApiError` không có field `.detail` (chỉ có `.message`, xem
       // `lib/api/client.ts`) — trước đây luôn rơi về thông báo chung chung, không hiện được lý
       // do thật từ BE. Sửa giống `applyCoupon` ở trên.
-      toast.error(err instanceof ApiError ? err.message : 'Có lỗi xảy ra khi thực hiện thanh toán');
+      toast.error(err instanceof ApiError ? err.message : t('pay.error'));
       setPayingMethod(null);
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex h-[60vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-accent border-t-transparent"></div>
-      </div>
-    );
-  }
-
+  if (loading) return <Spinner />;
   if (!course) return null;
 
   return (
-    <main className="min-h-screen bg-surface py-12">
-      <div className="mx-auto max-w-4xl px-4 md:px-8">
-        <div className="mb-8 flex items-center justify-between">
-          <h1 className="font-display text-3xl font-bold text-ink">Thanh toán khóa học</h1>
-          <button 
+    <div className="bg-surface py-10">
+      <div className="shell">
+        <div className="mb-2 flex flex-wrap items-center justify-between gap-3">
+          <h1 className="font-display text-3xl font-bold text-ink">{t('checkout.titleOne')}</h1>
+          <button
+            type="button"
             onClick={() => (window.history.length > 1 ? router.back() : router.push(`/courses/${courseSlug}`))}
-            className="flex items-center gap-2 rounded-full border border-line bg-white px-4 py-2 text-sm font-medium text-ink-muted transition-colors hover:bg-surface-hover hover:text-ink"
+            className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-4 py-2 text-sm font-medium text-ink-muted transition-colors hover:bg-tint hover:text-ink"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-            Quay lại khóa học
+            <ArrowLeft size={16} aria-hidden />
+            {t('checkout.backToCourse')}
           </button>
         </div>
-        
-        <div className="grid gap-8 md:grid-cols-3">
-          {/* Cột trái: Thông tin đơn hàng */}
-          <div className="md:col-span-2 space-y-6">
-            <div className="rounded-2xl border border-line bg-white p-6 shadow-sm">
-              <h2 className="mb-4 text-lg font-bold text-ink">Thông tin khóa học</h2>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <div className="relative h-32 w-full sm:w-48 shrink-0 overflow-hidden rounded-xl">
-                  {course.thumbnailUrl ? (
-                    <Image
-                      src={course.thumbnailUrl}
-                      alt={course.title}
-                      fill
-                      className="object-cover"
-                    />
-                  ) : (
-                    <div className="h-full w-full bg-accent/10" />
-                  )}
+        <CheckoutSteps current="payment" />
+
+        <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
+          <div className="space-y-6">
+            <div className="card p-6">
+              <h2 className="mb-4 font-display text-lg font-bold text-ink">{t('checkout.courseInfo')}</h2>
+              <div className="flex flex-col gap-4 sm:flex-row">
+                <div className="relative h-32 w-full shrink-0 overflow-hidden rounded-xl bg-tint sm:w-48">
+                  {course.thumbnailUrl && <Image src={course.thumbnailUrl} alt="" fill sizes="192px" className="object-cover" />}
                 </div>
                 <div className="flex flex-col justify-center">
                   <h3 className="font-display text-xl font-bold text-ink">{course.title}</h3>
-                  <p className="mt-2 text-sm text-ink-muted line-clamp-2">{course.description}</p>
+                  <p className="mt-2 line-clamp-2 text-sm text-ink-muted">{course.description}</p>
                   <div className="mt-3 flex items-center gap-2 text-sm font-medium text-ink-muted">
-                    <span>Giảng viên:</span>
-                    <span className="text-accent">{course.instructorName || 'Đang cập nhật'}</span>
+                    <span>{t('checkout.instructor')}</span>
+                    <span className="text-accent-dark">{course.instructorName || t('checkout.updating')}</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="rounded-2xl border border-line bg-white p-6 shadow-sm">
-              <h2 className="mb-4 text-lg font-bold text-ink">Thông tin bổ sung</h2>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <label className="mb-1.5 block text-sm font-semibold text-ink-muted">Họ và tên</label>
-                  <input 
-                    type="text" 
-                    placeholder="Tên của bạn" 
-                    className="w-full rounded-xl border border-line px-4 py-2.5 text-sm outline-none focus:border-accent focus:ring-1 focus:ring-accent" 
-                    value={billingName}
-                    onChange={(e) => setBillingName(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <label className="mb-1.5 block text-sm font-semibold text-ink-muted">Số điện thoại</label>
-                  <input 
-                    type="text" 
-                    placeholder="Số điện thoại liên hệ" 
-                    className="w-full rounded-xl border border-line px-4 py-2.5 text-sm outline-none focus:border-accent focus:ring-1 focus:ring-accent" 
-                    value={billingPhone}
-                    onChange={(e) => setBillingPhone(e.target.value)}
-                  />
-                </div>
-              </div>
-              <p className="mt-3 text-xs text-ink-muted">* Thông tin trên chỉ dùng để liên hệ hỗ trợ khi cần thiết, không ảnh hưởng đến tài khoản thanh toán của bạn.</p>
-            </div>
+            <BillingForm name={billingName} phone={billingPhone} onNameChange={setBillingName} onPhoneChange={setBillingPhone} />
 
             {course.requiresPassword && (
-              <div className="rounded-2xl border border-line bg-white p-6 shadow-sm">
-                <h2 className="mb-1 text-lg font-bold text-ink">Mật khẩu đăng ký</h2>
-                <p className="mb-3 text-xs text-ink-muted">
-                  Khóa học này là khóa riêng tư — bạn cần nhập đúng mật khẩu do Giảng viên cung cấp mới thanh toán được.
-                </p>
+              <div className="card p-6">
+                <h2 className="mb-1 font-display text-lg font-bold text-ink">{t('checkout.passwordTitle')}</h2>
+                <p className="mb-3 text-xs text-ink-muted">{t('checkout.passwordNote')}</p>
                 <input
                   type="text"
-                  placeholder="Nhập mật khẩu đăng ký"
-                  className="w-full rounded-xl border border-line px-4 py-2.5 text-sm outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+                  aria-label={t('checkout.passwordTitle')}
+                  placeholder={t('checkout.passwordPh')}
+                  className="w-full rounded-xl border border-line px-4 py-2.5 text-sm text-ink outline-none focus:border-accent focus:ring-1 focus:ring-accent"
                   value={courseAccessPassword}
                   onChange={(e) => setCourseAccessPassword(e.target.value)}
                 />
@@ -197,99 +174,47 @@ function CheckoutPageContent() {
             )}
           </div>
 
-          {/* Cột phải: Phương thức thanh toán */}
-          <div className="md:col-span-1 space-y-6">
-            <div className="rounded-2xl border border-line bg-white p-6 shadow-sm sticky top-24">
-              <h2 className="mb-4 text-lg font-bold text-ink">Tóm tắt đơn hàng</h2>
-              
-              <div className="flex justify-between border-b border-line-soft pb-4">
-                <span className="text-ink-muted">Tạm tính</span>
-                <span className="font-semibold text-ink">{course.price.toLocaleString('vi-VN')} đ</span>
+          <div>
+            <div className="card sticky top-24 p-6">
+              <h2 className="mb-4 font-display text-lg font-bold text-ink">{t('summary.title')}</h2>
+              <OrderTotals count={1} original={course.price} total={finalPrice} />
+
+              <div className="my-4 border-t border-line-soft pt-4">
+                <CouponBox
+                  value={couponCode}
+                  appliedCode={appliedCode}
+                  applying={applying}
+                  onChange={setCouponCode}
+                  onApply={() => void applyCoupon(couponCode)}
+                  onRemove={() => {
+                    setAppliedCode(null);
+                    setPreview(null);
+                  }}
+                />
               </div>
 
-              {finalPrice < course.price && (
-                <div className="flex justify-between pt-4 text-sm text-ink-muted">
-                  <span>Đã giảm</span>
-                  <span className="font-semibold text-danger">-{(course.price - finalPrice).toLocaleString('vi-VN')} đ</span>
-                </div>
-              )}
+              <PayosButton paying={payingMethod === 'PAYOS'} disabled={payingMethod !== null} onPay={() => handlePay('PAYOS')} />
 
-              <div className="mb-4 border-b border-line-soft pb-4 pt-2">
-                {appliedCode ? (
-                  <div className="flex items-center justify-between rounded-lg bg-success/5 border border-success/20 px-3 py-2 text-sm">
-                    <span className="font-mono font-bold text-success">{appliedCode.toUpperCase()}</span>
-                    <button
-                      type="button"
-                      onClick={() => { setAppliedCode(null); setPreview(null); }}
-                      className="text-xs font-semibold text-ink-muted hover:text-ink"
-                    >
-                      Bỏ mã
-                    </button>
-                  </div>
-                ) : (
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={couponCode}
-                      onChange={(e) => setCouponCode(e.target.value)}
-                      onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); void applyCoupon(couponCode); } }}
-                      placeholder="Mã giảm giá"
-                      className="w-full min-w-0 rounded-lg border border-line px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:border-accent focus:outline-none"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => void applyCoupon(couponCode)}
-                      disabled={applying}
-                      className="shrink-0 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-dark disabled:opacity-60"
-                    >
-                      {applying ? '...' : 'Áp dụng'}
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              <div className="flex justify-between py-4">
-                <span className="text-base font-bold text-ink">Tổng cộng</span>
-                <span className="text-xl font-bold text-accent">{finalPrice.toLocaleString('vi-VN')} đ</span>
-              </div>
-
-              <div className="mt-6 flex flex-col gap-3">
-                <button
-                  onClick={() => handlePay('PAYOS')}
-                  disabled={payingMethod !== null}
-                  className={`flex w-full items-center justify-between rounded-xl border-2 px-4 py-3 transition-colors ${
-                    payingMethod === 'PAYOS' ? 'border-ink bg-surface' : 'border-line bg-white hover:border-ink'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-ink font-bold text-white">P</div>
-                    <span className="font-semibold text-ink">Chuyển khoản QR (PayOS)</span>
-                  </div>
-                  {payingMethod === 'PAYOS' && <div className="h-4 w-4 animate-spin rounded-full border-2 border-ink border-t-transparent" />}
-                </button>
-              </div>
-              
               <p className="mt-4 text-center text-xs text-ink-muted">
-                Bằng việc thanh toán, bạn đồng ý với{' '}
-                <Link href="/legal/terms" className="underline hover:text-accent">Điều khoản dịch vụ</Link> của LinguaLearn.
+                {t.rich('summary.terms', {
+                  link: (chunks) => (
+                    <Link href="/legal/terms" className="underline hover:text-accent-dark">
+                      {chunks}
+                    </Link>
+                  ),
+                })}
               </p>
             </div>
           </div>
         </div>
       </div>
-    </main>
+    </div>
   );
 }
 
 export default function CheckoutPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="flex h-[60vh] items-center justify-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-accent border-t-transparent" />
-        </div>
-      }
-    >
+    <Suspense fallback={<Spinner />}>
       <CheckoutPageContent />
     </Suspense>
   );

@@ -480,5 +480,101 @@
       "showMore": "Show more ({count})",
       "showLess": "Show less"
     }
+  },
+  "shop": {
+    "steps": {
+      "aria": "Purchase progress",
+      "cart": "Cart",
+      "payment": "Payment"
+    },
+    "coupon": {
+      "title": "Discount code",
+      "placeholder": "Enter discount code",
+      "apply": "Apply",
+      "checking": "Checking...",
+      "remove": "Remove code",
+      "invalidMany": "This code does not apply to the selected courses.",
+      "invalidOne": "This code does not apply to this course.",
+      "applied": "Discount code applied.",
+      "failed": "Could not apply the code, please try again later.",
+      "selectOne": "Select at least one course to apply a discount code."
+    },
+    "summary": {
+      "title": "Order summary",
+      "selected": "Selected",
+      "selectedOf": "{selected} / {total} courses",
+      "subtotal": "Subtotal ({count} courses)",
+      "subtotalOne": "Subtotal",
+      "discount": "Discount",
+      "total": "Total",
+      "terms": "By paying, you agree to LinguaLearn's <link>Terms of Service</link>."
+    },
+    "billing": {
+      "title": "Additional information",
+      "name": "Full name",
+      "namePh": "Your name",
+      "phone": "Phone number",
+      "phonePh": "Contact phone number",
+      "note": "* This information is only used to contact you for support when needed and does not affect your payment account."
+    },
+    "pay": {
+      "payos": "QR bank transfer (PayOS)",
+      "error": "Something went wrong while paying",
+      "proceed": "Proceed to payment"
+    },
+    "cart": {
+      "title": "Cart",
+      "loading": "Loading your cart...",
+      "selectAll": "Select all ({count} courses)",
+      "removeSelected": "Remove selected ({count})",
+      "remove": "Remove",
+      "selectCourse": "Select {title}",
+      "instructor": "By {name}",
+      "meta": "{hours} h of content · {lessons} lessons · {level}",
+      "bundleBadge": "Bundle -{percent}%",
+      "bundleSuggest": "Add <b>{title}</b> (+{price}) to get <b>{percent}%</b> off with the \"{bundle}\" bundle",
+      "addToCart": "Add to cart",
+      "emptyTitle": "Your cart is empty.",
+      "emptyCta": "Explore courses"
+    },
+    "checkout": {
+      "titleOne": "Pay for course",
+      "titleMany": "Pay for {count} courses",
+      "backToCart": "Back to cart",
+      "backToCourse": "Back to course",
+      "courseInfo": "Course information",
+      "coursesChosen": "{count} courses selected",
+      "course": "Course",
+      "instructor": "Instructor:",
+      "updating": "Updating",
+      "noItems": "There is nothing to pay for, the courses may have been removed from your cart.",
+      "loadError": "Could not load the course",
+      "passwordTitle": "Sign-up password",
+      "passwordNote": "This is a private course. Enter the password provided by the instructor to pay.",
+      "passwordPh": "Enter the sign-up password"
+    },
+    "wishlist": {
+      "loading": "Loading…",
+      "search": "Search your wishlist…",
+      "searchLabel": "Search",
+      "empty": "You have not saved any courses to your wishlist yet.",
+      "explore": "Explore courses",
+      "noMatch": "No matching courses",
+      "noMatchHint": "Try a different keyword.",
+      "remove": "Remove from wishlist",
+      "signUp": "Sign up",
+      "inCart": "✓ In cart",
+      "adding": "Adding...",
+      "addCart": "Add to cart",
+      "free": "Free",
+      "signedUp": "Signed up successfully!",
+      "signUpFailed": "Could not sign up, please try again later.",
+      "instructor": "By {name}"
+    },
+    "courseLevel": {
+      "BEGINNER": "Beginner",
+      "INTERMEDIATE": "Intermediate",
+      "ADVANCED": "Advanced"
+    }
   }
 }

@@ -4,27 +4,41 @@ import { Suspense, useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
+import { ArrowLeft, Gift } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
+import { toast } from 'sonner';
+import { BillingForm } from '@/components/checkout/BillingForm';
+import { CheckoutSteps } from '@/components/checkout/CheckoutSteps';
+import { CouponBox } from '@/components/checkout/CouponBox';
+import { OrderTotals } from '@/components/checkout/OrderTotals';
+import { PayosButton } from '@/components/checkout/PayosButton';
 import { useCart } from '@/hooks/useCart';
 import { useCartBundleMatches } from '@/hooks/useCartBundleMatches';
 import { paymentsApi } from '@/lib/api/payments';
 import { getReferralCodesFor } from '@/lib/referral';
 import { couponsApi } from '@/lib/api/coupons';
 import { ApiError } from '@/lib/api/client';
+import { formatMoney } from '@/lib/shop/money';
 import type { CouponPriceRes } from '@/types/domain';
-import { toast } from 'sonner';
 
 /**
- * Giỏ hàng (06/09/2026) — TÍNH NĂNG MỞ RỘNG, không nằm trong 49 use case đặc tả gốc. Thanh
- * toán GỘP các khóa học học viên đã chọn từ trang `/cart` (truyền qua query `courseIds`,
- * dạng "10,20,30") — khác `/checkout/[slug]` (luôn đúng 1 khóa, luồng "Mua ngay" cũ giữ
- * nguyên). Đọc lại giỏ hàng thật (`useCart`) rồi lọc theo `courseIds` thay vì gọi thêm 1 API
- * riêng — dữ liệu hiển thị (giá/tên/ảnh) vốn đã có sẵn trong giỏ hàng, không cần trùng lặp.
+ * Thanh toán GỘP (06/09/2026) — TÍNH NĂNG MỞ RỘNG, không nằm trong 49 use case đặc tả gốc. Thanh
+ * toán các khóa học viên đã chọn từ trang `/cart` (truyền qua query `courseIds`, dạng "10,20,30") —
+ * khác `/checkout/[slug]` (luôn đúng 1 khóa, luồng "Mua khóa học" trực tiếp). Đọc lại giỏ hàng thật
+ * (`useCart`) rồi lọc theo `courseIds` thay vì gọi thêm 1 API riêng — dữ liệu hiển thị (giá/tên/ảnh)
+ * vốn đã có sẵn trong giỏ hàng, không cần trùng lặp.
  */
-function formatPrice(price: number): string {
-  return `${price.toLocaleString('vi-VN')}đ`;
+function Spinner() {
+  return (
+    <div className="flex h-[60vh] items-center justify-center">
+      <div className="h-8 w-8 animate-spin rounded-full border-4 border-accent border-t-transparent" />
+    </div>
+  );
 }
 
 function CartCheckoutContent() {
+  const t = useTranslations('shop');
+  const locale = useLocale();
   const router = useRouter();
   const searchParams = useSearchParams();
   const { data: cartItems, isLoading } = useCart();
@@ -68,14 +82,14 @@ function CartCheckoutContent() {
       const results = await couponsApi.previewMany(items.map((item) => item.courseId), trimmed);
       const anyValid = [...results.values()].some((r) => r.enteredCodeValid);
       if (!anyValid) {
-        toast.error('Mã giảm giá không áp dụng được cho các khóa này.');
+        toast.error(t('coupon.invalidMany'));
         return;
       }
       setPriceMap(results);
       setAppliedCode(trimmed);
-      toast.success('Đã áp dụng mã giảm giá.');
+      toast.success(t('coupon.applied'));
     } catch (err) {
-      toast.error(err instanceof ApiError ? err.message : 'Không áp dụng được mã giảm giá, thử lại sau.');
+      toast.error(err instanceof ApiError ? err.message : t('coupon.failed'));
     } finally {
       setApplying(false);
     }
@@ -103,202 +117,124 @@ function CartCheckoutContent() {
       window.location.href = res.paymentUrl;
     } catch (err: unknown) {
       // Cùng bug với checkout/[slug]/page.tsx — `ApiError` không có field `.detail`, chỉ `.message`.
-      toast.error(err instanceof ApiError ? err.message : 'Có lỗi xảy ra khi thực hiện thanh toán');
+      toast.error(err instanceof ApiError ? err.message : t('pay.error'));
       setPayingMethod(null);
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex h-[60vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-accent border-t-transparent" />
-      </div>
-    );
-  }
+  if (isLoading) return <Spinner />;
 
   if (courseIds.length === 0 || items.length === 0) {
     return (
       <div className="shell flex flex-col items-center gap-3 py-20 text-center">
-        <p className="text-sm text-ink-muted">Không có khóa học nào để thanh toán — có thể đã bị xoá khỏi giỏ hàng.</p>
-        <Link href="/cart" className="text-sm font-semibold text-accent hover:underline">← Quay lại giỏ hàng</Link>
+        <p className="text-sm text-ink-muted">{t('checkout.noItems')}</p>
+        <Link href="/cart" className="text-sm font-semibold text-accent-dark hover:underline">
+          ← {t('checkout.backToCart')}
+        </Link>
       </div>
     );
   }
 
   return (
-    <main className="min-h-screen bg-surface py-12">
-      <div className="mx-auto max-w-4xl px-4 md:px-8">
-        <div className="mb-8 flex items-center justify-between">
-          <h1 className="font-display text-3xl font-bold text-ink">Thanh toán {items.length > 1 ? `${items.length} khóa học` : 'khóa học'}</h1>
+    <div className="bg-surface py-10">
+      <div className="shell">
+        <div className="mb-2 flex flex-wrap items-center justify-between gap-3">
+          <h1 className="font-display text-3xl font-bold text-ink">
+            {items.length > 1 ? t('checkout.titleMany', { count: items.length }) : t('checkout.titleOne')}
+          </h1>
           <button
+            type="button"
             onClick={() => (window.history.length > 1 ? router.back() : router.push('/cart'))}
-            className="flex items-center gap-2 rounded-full border border-line bg-white px-4 py-2 text-sm font-medium text-ink-muted transition-colors hover:bg-surface-hover hover:text-ink"
+            className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-4 py-2 text-sm font-medium text-ink-muted transition-colors hover:bg-tint hover:text-ink"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
-            Quay lại giỏ hàng
+            <ArrowLeft size={16} aria-hidden />
+            {t('checkout.backToCart')}
           </button>
         </div>
+        <CheckoutSteps current="payment" />
 
-        <div className="grid gap-8 md:grid-cols-3">
-          {/* Cột trái: danh sách khóa học + thông tin bổ sung */}
-          <div className="space-y-6 md:col-span-2">
-            <div className="rounded-card border border-line bg-white p-6 shadow-card">
-              <h2 className="mb-4 text-lg font-bold text-ink">
-                {items.length > 1 ? `${items.length} khóa học đã chọn` : 'Khóa học'}
+        <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
+          <div className="space-y-6">
+            <div className="card p-6">
+              <h2 className="mb-4 font-display text-lg font-bold text-ink">
+                {items.length > 1 ? t('checkout.coursesChosen', { count: items.length }) : t('checkout.course')}
               </h2>
               <div className="flex flex-col gap-4">
-                {items.map((item) => (
-                  <div key={item.courseId} className="flex flex-col gap-4 border-b border-line-soft pb-4 last:border-0 last:pb-0 sm:flex-row">
-                    <div className="relative h-24 w-full shrink-0 overflow-hidden rounded-xl sm:w-36">
-                      {item.thumbnailUrl ? (
-                        <Image src={item.thumbnailUrl} alt={item.courseTitle} fill className="object-cover" />
-                      ) : (
-                        <div className="h-full w-full bg-accent/10" />
-                      )}
-                    </div>
-                    <div className="flex flex-1 flex-col justify-center">
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-display text-base font-bold text-ink">{item.courseTitle}</h3>
-                        {bundleMatch.bundleByCartCourseId.has(item.courseId) && (
-                          <span className="shrink-0 rounded-full bg-cyan-600 px-2 py-0.5 text-[10px] font-bold text-white">
-                            🎁 Gói combo -{bundleMatch.bundleByCartCourseId.get(item.courseId)?.discountPercent}%
-                          </span>
+                {items.map((item) => {
+                  const bundle = bundleMatch.bundleByCartCourseId.get(item.courseId);
+                  return (
+                    <div key={item.courseId} className="flex flex-col gap-4 border-b border-line-soft pb-4 last:border-0 last:pb-0 sm:flex-row">
+                      <div className="relative h-24 w-full shrink-0 overflow-hidden rounded-xl bg-tint sm:w-36">
+                        {item.thumbnailUrl && <Image src={item.thumbnailUrl} alt="" fill sizes="144px" className="object-cover" />}
+                      </div>
+                      <div className="flex flex-1 flex-col justify-center">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h3 className="font-display text-base font-bold text-ink">{item.courseTitle}</h3>
+                          {bundle && (
+                            <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-cyan px-2 py-0.5 text-[10px] font-bold text-cyan-ink">
+                              <Gift size={11} aria-hidden />
+                              {t('cart.bundleBadge', { percent: bundle.discountPercent })}
+                            </span>
+                          )}
+                        </div>
+                        <p className="mt-1 text-sm text-ink-muted">{t('cart.instructor', { name: item.instructorName })}</p>
+                      </div>
+                      <div className="flex shrink-0 flex-col items-end justify-center font-display text-base font-bold text-ink">
+                        <span>{formatMoney(finalPriceFor(item), locale)}</span>
+                        {finalPriceFor(item) < item.price && (
+                          <span className="text-xs font-normal text-ink-muted line-through">{formatMoney(item.price, locale)}</span>
                         )}
                       </div>
-                      <p className="mt-1 text-sm text-ink-muted">GV. {item.instructorName}</p>
                     </div>
-                    <div className="flex shrink-0 flex-col items-end justify-center font-display text-base font-bold text-ink">
-                      <span>{formatPrice(finalPriceFor(item))}</span>
-                      {finalPriceFor(item) < item.price && (
-                        <span className="text-xs font-normal text-ink-faint line-through">{formatPrice(item.price)}</span>
-                      )}
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
-            <div className="rounded-card border border-line bg-white p-6 shadow-card">
-              <h2 className="mb-4 text-lg font-bold text-ink">Thông tin bổ sung</h2>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <label className="mb-1.5 block text-sm font-semibold text-ink-muted">Họ và tên</label>
-                  <input
-                    type="text"
-                    placeholder="Tên của bạn"
-                    className="w-full rounded-xl border border-line px-4 py-2.5 text-sm outline-none focus:border-accent focus:ring-1 focus:ring-accent"
-                    value={billingName}
-                    onChange={(e) => setBillingName(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <label className="mb-1.5 block text-sm font-semibold text-ink-muted">Số điện thoại</label>
-                  <input
-                    type="text"
-                    placeholder="Số điện thoại liên hệ"
-                    className="w-full rounded-xl border border-line px-4 py-2.5 text-sm outline-none focus:border-accent focus:ring-1 focus:ring-accent"
-                    value={billingPhone}
-                    onChange={(e) => setBillingPhone(e.target.value)}
-                  />
-                </div>
-              </div>
-              <p className="mt-3 text-xs text-ink-muted">* Thông tin trên chỉ dùng để liên hệ hỗ trợ khi cần thiết, không ảnh hưởng đến tài khoản thanh toán của bạn.</p>
-            </div>
+            <BillingForm name={billingName} phone={billingPhone} onNameChange={setBillingName} onPhoneChange={setBillingPhone} />
           </div>
 
-          {/* Cột phải: phương thức thanh toán */}
-          <div className="space-y-6 md:col-span-1">
-            <div className="sticky top-24 rounded-card border border-line bg-white p-6 shadow-card">
-              <h2 className="mb-4 text-lg font-bold text-ink">Tóm tắt đơn hàng</h2>
+          <div>
+            <div className="card sticky top-24 p-6">
+              <h2 className="mb-4 font-display text-lg font-bold text-ink">{t('summary.title')}</h2>
+              <OrderTotals count={items.length} original={totalOriginal} total={total} />
 
-              <div className="flex justify-between border-b border-line-soft pb-4">
-                <span className="text-ink-muted">Tạm tính ({items.length} khóa học)</span>
-                <span className="font-semibold text-ink">{formatPrice(totalOriginal)}</span>
+              <div className="my-4 border-t border-line-soft pt-4">
+                <CouponBox
+                  value={couponCode}
+                  appliedCode={appliedCode}
+                  applying={applying}
+                  onChange={setCouponCode}
+                  onApply={() => void applyCoupon(couponCode)}
+                  onRemove={() => {
+                    setAppliedCode(null);
+                    setPriceMap(new Map());
+                  }}
+                />
               </div>
 
-              {total < totalOriginal && (
-                <div className="flex justify-between pt-4 text-sm text-ink-muted">
-                  <span>Đã giảm</span>
-                  <span className="font-semibold text-danger">-{formatPrice(totalOriginal - total)}</span>
-                </div>
-              )}
-
-              <div className="mb-4 border-b border-line-soft pb-4 pt-2">
-                {appliedCode ? (
-                  <div className="flex items-center justify-between rounded-lg bg-success/5 border border-success/20 px-3 py-2 text-sm">
-                    <span className="font-mono font-bold text-success">{appliedCode.toUpperCase()}</span>
-                    <button
-                      type="button"
-                      onClick={() => { setAppliedCode(null); setPriceMap(new Map()); }}
-                      className="text-xs font-semibold text-ink-muted hover:text-ink"
-                    >
-                      Bỏ mã
-                    </button>
-                  </div>
-                ) : (
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={couponCode}
-                      onChange={(e) => setCouponCode(e.target.value)}
-                      onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); void applyCoupon(couponCode); } }}
-                      placeholder="Mã giảm giá"
-                      className="w-full min-w-0 rounded-lg border border-line px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:border-accent focus:outline-none"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => void applyCoupon(couponCode)}
-                      disabled={applying}
-                      className="shrink-0 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-dark disabled:opacity-60"
-                    >
-                      {applying ? '...' : 'Áp dụng'}
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              <div className="flex justify-between py-4">
-                <span className="text-base font-bold text-ink">Tổng cộng</span>
-                <span className="text-xl font-bold text-accent">{formatPrice(total)}</span>
-              </div>
-
-              <div className="mt-6 flex flex-col gap-3">
-                <button
-                  onClick={() => handlePay('PAYOS')}
-                  disabled={payingMethod !== null}
-                  className={`flex w-full items-center justify-between rounded-xl border-2 px-4 py-3 transition-colors ${
-                    payingMethod === 'PAYOS' ? 'border-ink bg-surface' : 'border-line bg-white hover:border-ink'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-ink font-bold text-white">P</div>
-                    <span className="font-semibold text-ink">Chuyển khoản QR (PayOS)</span>
-                  </div>
-                  {payingMethod === 'PAYOS' && <div className="h-4 w-4 animate-spin rounded-full border-2 border-ink border-t-transparent" />}
-                </button>
-              </div>
+              <PayosButton paying={payingMethod === 'PAYOS'} disabled={payingMethod !== null} onPay={() => handlePay('PAYOS')} />
 
               <p className="mt-4 text-center text-xs text-ink-muted">
-                Bằng việc thanh toán, bạn đồng ý với{' '}
-                <Link href="/legal/terms" className="underline hover:text-accent">Điều khoản dịch vụ</Link> của LinguaLearn.
+                {t.rich('summary.terms', {
+                  link: (chunks) => (
+                    <Link href="/legal/terms" className="underline hover:text-accent-dark">
+                      {chunks}
+                    </Link>
+                  ),
+                })}
               </p>
             </div>
           </div>
         </div>
       </div>
-    </main>
+    </div>
   );
 }
 
 export default function CartCheckoutPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="flex h-[60vh] items-center justify-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-accent border-t-transparent" />
-        </div>
-      }
-    >
+    <Suspense fallback={<Spinner />}>
       <CartCheckoutContent />
     </Suspense>
   );

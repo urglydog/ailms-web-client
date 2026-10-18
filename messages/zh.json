@@ -480,5 +480,101 @@
       "showMore": "显示更多（{count}）",
       "showLess": "收起"
     }
+  },
+  "shop": {
+    "steps": {
+      "aria": "购买进度",
+      "cart": "购物车",
+      "payment": "付款"
+    },
+    "coupon": {
+      "title": "优惠码",
+      "placeholder": "输入优惠码",
+      "apply": "使用",
+      "checking": "检查中...",
+      "remove": "移除优惠码",
+      "invalidMany": "该优惠码不适用于所选课程。",
+      "invalidOne": "该优惠码不适用于此课程。",
+      "applied": "已使用优惠码。",
+      "failed": "无法使用优惠码，请稍后再试。",
+      "selectOne": "请至少选择 1 门课程再使用优惠码。"
+    },
+    "summary": {
+      "title": "订单摘要",
+      "selected": "已选",
+      "selectedOf": "{selected} / {total} 门课程",
+      "subtotal": "小计（{count} 门课程）",
+      "subtotalOne": "小计",
+      "discount": "已优惠",
+      "total": "合计",
+      "terms": "付款即表示你同意 LinguaLearn 的<link>服务条款</link>。"
+    },
+    "billing": {
+      "title": "补充信息",
+      "name": "姓名",
+      "namePh": "你的姓名",
+      "phone": "电话号码",
+      "phonePh": "联系电话",
+      "note": "* 以上信息仅用于必要时联系你提供支持，不影响你的付款账户。"
+    },
+    "pay": {
+      "payos": "二维码转账（PayOS）",
+      "error": "付款时出错",
+      "proceed": "前往付款"
+    },
+    "cart": {
+      "title": "购物车",
+      "loading": "正在加载购物车...",
+      "selectAll": "全选（{count} 门课程）",
+      "removeSelected": "删除所选（{count}）",
+      "remove": "删除",
+      "selectCourse": "选择 {title}",
+      "instructor": "讲师 {name}",
+      "meta": "{hours} 小时课程 · {lessons} 节课 · {level}",
+      "bundleBadge": "组合 -{percent}%",
+      "bundleSuggest": "再加入 <b>{title}</b>（+{price}），即可享受“{bundle}”组合 <b>{percent}%</b> 折扣",
+      "addToCart": "加入购物车",
+      "emptyTitle": "你的购物车是空的。",
+      "emptyCta": "探索课程"
+    },
+    "checkout": {
+      "titleOne": "课程付款",
+      "titleMany": "{count} 门课程付款",
+      "backToCart": "返回购物车",
+      "backToCourse": "返回课程",
+      "courseInfo": "课程信息",
+      "coursesChosen": "已选 {count} 门课程",
+      "course": "课程",
+      "instructor": "讲师：",
+      "updating": "更新中",
+      "noItems": "没有可付款的课程，可能已从购物车中移除。",
+      "loadError": "无法加载课程信息",
+      "passwordTitle": "报名密码",
+      "passwordNote": "这是私密课程，需输入讲师提供的正确密码才能付款。",
+      "passwordPh": "输入报名密码"
+    },
+    "wishlist": {
+      "loading": "加载中…",
+      "search": "在收藏中搜索…",
+      "searchLabel": "搜索",
+      "empty": "你还没有收藏任何课程。",
+      "explore": "探索课程",
+      "noMatch": "没有找到合适的课程",
+      "noMatchHint": "换个关键词试试。",
+      "remove": "取消收藏",
+      "signUp": "报名",
+      "inCart": "✓ 已在购物车",
+      "adding": "添加中...",
+      "addCart": "加入购物车",
+      "free": "免费",
+      "signedUp": "报名成功！",
+      "signUpFailed": "报名失败，请稍后再试。",
+      "instructor": "讲师 {name}"
+    },
+    "courseLevel": {
+      "BEGINNER": "入门",
+      "INTERMEDIATE": "中级",
+      "ADVANCED": "高级"
+    }
   }
 }

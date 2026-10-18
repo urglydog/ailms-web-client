@@ -480,5 +480,101 @@
       "showMore": "もっと見る（{count}）",
       "showLess": "閉じる"
     }
+  },
+  "shop": {
+    "steps": {
+      "aria": "購入の進行状況",
+      "cart": "カート",
+      "payment": "お支払い"
+    },
+    "coupon": {
+      "title": "クーポンコード",
+      "placeholder": "クーポンコードを入力",
+      "apply": "適用",
+      "checking": "確認中...",
+      "remove": "コードを外す",
+      "invalidMany": "このコードは選択した講座には使えません。",
+      "invalidOne": "このコードはこの講座には使えません。",
+      "applied": "クーポンを適用しました。",
+      "failed": "クーポンを適用できませんでした。後でもう一度お試しください。",
+      "selectOne": "クーポンを適用するには講座を 1 つ以上選んでください。"
+    },
+    "summary": {
+      "title": "注文の概要",
+      "selected": "選択中",
+      "selectedOf": "{selected} / {total} 講座",
+      "subtotal": "小計（{count} 講座）",
+      "subtotalOne": "小計",
+      "discount": "割引",
+      "total": "合計",
+      "terms": "お支払いにより、LinguaLearn の<link>利用規約</link>に同意したものとみなされます。"
+    },
+    "billing": {
+      "title": "追加情報",
+      "name": "氏名",
+      "namePh": "お名前",
+      "phone": "電話番号",
+      "phonePh": "連絡用の電話番号",
+      "note": "※ この情報は必要時のサポート連絡にのみ使用し、お支払いアカウントには影響しません。"
+    },
+    "pay": {
+      "payos": "QR 銀行振込（PayOS）",
+      "error": "お支払い中にエラーが発生しました",
+      "proceed": "お支払いへ進む"
+    },
+    "cart": {
+      "title": "カート",
+      "loading": "カートを読み込み中...",
+      "selectAll": "すべて選択（{count} 講座）",
+      "removeSelected": "選択を削除（{count}）",
+      "remove": "削除",
+      "selectCourse": "{title} を選択",
+      "instructor": "講師 {name}",
+      "meta": "{hours} 時間 · {lessons} レッスン · {level}",
+      "bundleBadge": "セット -{percent}%",
+      "bundleSuggest": "<b>{title}</b>（+{price}）を追加すると、「{bundle}」セットで <b>{percent}%</b> 割引になります",
+      "addToCart": "カートに追加",
+      "emptyTitle": "カートは空です。",
+      "emptyCta": "講座を探す"
+    },
+    "checkout": {
+      "titleOne": "講座のお支払い",
+      "titleMany": "{count} 講座のお支払い",
+      "backToCart": "カートに戻る",
+      "backToCourse": "講座に戻る",
+      "courseInfo": "講座の情報",
+      "coursesChosen": "{count} 講座を選択中",
+      "course": "講座",
+      "instructor": "講師：",
+      "updating": "更新中",
+      "noItems": "お支払いできる講座がありません。カートから削除された可能性があります。",
+      "loadError": "講座の情報を読み込めませんでした",
+      "passwordTitle": "登録パスワード",
+      "passwordNote": "この講座は非公開です。講師から伝えられたパスワードを入力するとお支払いできます。",
+      "passwordPh": "登録パスワードを入力"
+    },
+    "wishlist": {
+      "loading": "読み込み中…",
+      "search": "お気に入りを検索…",
+      "searchLabel": "検索",
+      "empty": "お気に入りの講座はまだありません。",
+      "explore": "講座を探す",
+      "noMatch": "条件に合う講座がありません",
+      "noMatchHint": "別のキーワードをお試しください。",
+      "remove": "お気に入りから削除",
+      "signUp": "登録する",
+      "inCart": "✓ カートに追加済み",
+      "adding": "追加中...",
+      "addCart": "カートに追加",
+      "free": "無料",
+      "signedUp": "登録しました！",
+      "signUpFailed": "登録できませんでした。後でもう一度お試しください。",
+      "instructor": "講師 {name}"
+    },
+    "courseLevel": {
+      "BEGINNER": "初級",
+      "INTERMEDIATE": "中級",
+      "ADVANCED": "上級"
+    }
   }
 }

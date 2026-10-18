@@ -480,5 +480,101 @@
       "showMore": "Hiện thêm ({count})",
       "showLess": "Hiện ít hơn"
     }
+  },
+  "shop": {
+    "steps": {
+      "aria": "Tiến trình mua hàng",
+      "cart": "Giỏ hàng",
+      "payment": "Thanh toán"
+    },
+    "coupon": {
+      "title": "Mã giảm giá",
+      "placeholder": "Nhập mã giảm giá",
+      "apply": "Áp dụng",
+      "checking": "Đang kiểm tra...",
+      "remove": "Bỏ mã",
+      "invalidMany": "Mã giảm giá không áp dụng được cho các khóa đã chọn.",
+      "invalidOne": "Mã giảm giá không áp dụng được cho khóa học này.",
+      "applied": "Đã áp dụng mã giảm giá.",
+      "failed": "Không áp dụng được mã giảm giá, thử lại sau.",
+      "selectOne": "Chọn ít nhất 1 khóa học để áp dụng mã giảm giá."
+    },
+    "summary": {
+      "title": "Tóm tắt đơn hàng",
+      "selected": "Đã chọn",
+      "selectedOf": "{selected} / {total} khóa học",
+      "subtotal": "Tạm tính ({count} khóa học)",
+      "subtotalOne": "Tạm tính",
+      "discount": "Đã giảm",
+      "total": "Tổng cộng",
+      "terms": "Bằng việc thanh toán, bạn đồng ý với <link>Điều khoản dịch vụ</link> của LinguaLearn."
+    },
+    "billing": {
+      "title": "Thông tin bổ sung",
+      "name": "Họ và tên",
+      "namePh": "Tên của bạn",
+      "phone": "Số điện thoại",
+      "phonePh": "Số điện thoại liên hệ",
+      "note": "* Thông tin trên chỉ dùng để liên hệ hỗ trợ khi cần thiết, không ảnh hưởng đến tài khoản thanh toán của bạn."
+    },
+    "pay": {
+      "payos": "Chuyển khoản QR (PayOS)",
+      "error": "Có lỗi xảy ra khi thực hiện thanh toán",
+      "proceed": "Tiến hành thanh toán"
+    },
+    "cart": {
+      "title": "Giỏ hàng",
+      "loading": "Đang tải giỏ hàng...",
+      "selectAll": "Chọn tất cả ({count} khóa học)",
+      "removeSelected": "Xóa đã chọn ({count})",
+      "remove": "Xóa",
+      "selectCourse": "Chọn {title}",
+      "instructor": "GV. {name}",
+      "meta": "{hours} giờ học · {lessons} bài giảng · {level}",
+      "bundleBadge": "Gói combo -{percent}%",
+      "bundleSuggest": "Thêm <b>{title}</b> (+{price}) để được giảm <b>{percent}%</b> theo gói \"{bundle}\"",
+      "addToCart": "Thêm vào giỏ",
+      "emptyTitle": "Giỏ hàng của bạn đang trống.",
+      "emptyCta": "Khám phá khóa học"
+    },
+    "checkout": {
+      "titleOne": "Thanh toán khóa học",
+      "titleMany": "Thanh toán {count} khóa học",
+      "backToCart": "Quay lại giỏ hàng",
+      "backToCourse": "Quay lại khóa học",
+      "courseInfo": "Thông tin khóa học",
+      "coursesChosen": "{count} khóa học đã chọn",
+      "course": "Khóa học",
+      "instructor": "Giảng viên:",
+      "updating": "Đang cập nhật",
+      "noItems": "Không có khóa học nào để thanh toán, có thể đã bị xóa khỏi giỏ hàng.",
+      "loadError": "Không thể tải thông tin khóa học",
+      "passwordTitle": "Mật khẩu đăng ký",
+      "passwordNote": "Khóa học này là khóa riêng tư, bạn cần nhập đúng mật khẩu do Giảng viên cung cấp mới thanh toán được.",
+      "passwordPh": "Nhập mật khẩu đăng ký"
+    },
+    "wishlist": {
+      "loading": "Đang tải…",
+      "search": "Tìm trong danh sách yêu thích…",
+      "searchLabel": "Tìm kiếm",
+      "empty": "Bạn chưa lưu khóa học nào vào danh sách yêu thích.",
+      "explore": "Khám phá khóa học",
+      "noMatch": "Không tìm thấy khóa học phù hợp",
+      "noMatchHint": "Thử đổi từ khóa khác.",
+      "remove": "Bỏ khỏi danh sách yêu thích",
+      "signUp": "Đăng ký",
+      "inCart": "✓ Đã có trong giỏ",
+      "adding": "Đang thêm...",
+      "addCart": "Thêm vào giỏ hàng",
+      "free": "Miễn phí",
+      "signedUp": "Đăng ký thành công!",
+      "signUpFailed": "Không đăng ký được, thử lại sau.",
+      "instructor": "GV. {name}"
+    },
+    "courseLevel": {
+      "BEGINNER": "Cơ bản",
+      "INTERMEDIATE": "Trung cấp",
+      "ADVANCED": "Nâng cao"
+    }
   }
 }
