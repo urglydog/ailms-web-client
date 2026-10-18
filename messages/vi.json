@@ -368,5 +368,58 @@
     "loading": "Đang tải...",
     "notFound": "Không tìm thấy chứng chỉ này.",
     "loadError": "Không tải được chứng chỉ, thử lại sau."
+  },
+  "courseDetail": {
+    "breadcrumbAria": "Đường dẫn",
+    "allCourses": "Kho khóa học",
+    "learners": "{count} học viên",
+    "level": {
+      "BEGINNER": "Cơ bản",
+      "INTERMEDIATE": "Trung cấp",
+      "ADVANCED": "Nâng cao"
+    },
+    "instructor": "Giảng viên:",
+    "updated": "Cập nhật {date}",
+    "dubbed": "Đã lồng tiếng:",
+    "dubPanel": {
+      "title": "Học bằng ngôn ngữ của bạn",
+      "body": "Mỗi bài giảng được AI lồng tiếng, đồng bộ với video gốc. Chọn giọng bạn muốn ngay trong khi học, phụ đề đổi theo."
+    },
+    "content": {
+      "title": "Nội dung khóa học",
+      "summary": "{chapters} chương · {lessons} bài",
+      "lessons": "{count} bài",
+      "preview": "Học thử"
+    },
+    "reviews": "Đánh giá từ học viên",
+    "price": {
+      "free": "Miễn phí",
+      "lifetime": "Sở hữu vĩnh viễn"
+    },
+    "includes": [
+      "{count} bài giảng có lồng tiếng AI",
+      "Trợ lý Socratic AI Tutor",
+      "Sơ đồ tư duy, thẻ ghi nhớ, quiz tự sinh",
+      "Truy cập vĩnh viễn sau khi sở hữu"
+    ],
+    "related": {
+      "title": "Khóa học liên quan",
+      "subtitle": "Cùng chủ đề với khóa này"
+    },
+    "enroll": {
+      "free": "Đăng ký",
+      "buy": "Mua khóa học",
+      "learnNow": "Học ngay",
+      "processing": "Đang xử lý...",
+      "addCart": "Thêm vào giỏ hàng",
+      "inCart": "Đã có trong giỏ hàng ✓",
+      "adding": "Đang thêm...",
+      "passwordPlaceholder": "Nhập mật khẩu đăng ký",
+      "privateNote": "Khóa học riêng tư, nhập mật khẩu ở bước thanh toán để mua trực tiếp.",
+      "wishlistAdd": "Thêm vào danh sách yêu thích",
+      "wishlistRemove": "Bỏ khỏi danh sách yêu thích",
+      "toastSuccess": "Đăng ký thành công!",
+      "toastError": "Có lỗi xảy ra khi thực hiện"
+    }
   }
 }

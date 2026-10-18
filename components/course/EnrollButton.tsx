@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { enrollmentsApi } from '@/lib/api/enrollments';
 import { ApiError } from '@/lib/api/client';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 import { useAddToCart, useCart } from '@/hooks/useCart';
 import { useAddToWishlist, useRemoveFromWishlist, useWishlist } from '@/hooks/useWishlist';
 
@@ -28,6 +29,7 @@ export function EnrollButton({
   firstLessonId,
   requiresPassword,
 }: EnrollButtonProps) {
+  const t = useTranslations('courseDetail.enroll');
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [enrolled, setEnrolled] = useState(initialEnrolled);
@@ -70,9 +72,9 @@ export function EnrollButton({
         // theo đúng thứ tự chương/bài (BR-COURSE-01 đảm bảo khoá đã publish có ≥1 bài).
         onClick={() => firstLessonId != null && router.push(`/learn/${firstLessonId}`)}
         disabled={firstLessonId == null}
-        className="w-full rounded-full bg-success px-6 py-3 font-display text-base font-semibold text-white hover:bg-success/90 disabled:cursor-not-allowed disabled:opacity-50"
+        className="w-full rounded-full bg-success px-6 py-3 font-display text-base font-semibold text-white hover:bg-success/90 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
       >
-        Học ngay
+        {t('learnNow')}
       </button>
     );
   }
@@ -81,12 +83,12 @@ export function EnrollButton({
     try {
       setLoading(true);
       await enrollmentsApi.enrollFree(courseId, requiresPassword ? accessPassword : undefined);
-      toast.success('Ghi danh thành công!');
+      toast.success(t('toastSuccess'));
       router.refresh();
     } catch (err: unknown) {
       // BUG THẬT (25/09/2026): `ApiError` không có field `.detail`, chỉ `.message` — cùng
       // pattern lỗi với checkout/[slug]/page.tsx và checkout/cart/page.tsx.
-      toast.error(err instanceof ApiError ? err.message : 'Có lỗi xảy ra khi thực hiện');
+      toast.error(err instanceof ApiError ? err.message : t('toastError'));
     } finally {
       setLoading(false);
     }
@@ -100,7 +102,7 @@ export function EnrollButton({
             type="text"
             value={accessPassword}
             onChange={(e) => setAccessPassword(e.target.value)}
-            placeholder="Nhập mật khẩu đăng ký"
+            placeholder={t('passwordPlaceholder')}
             className="rounded-full border-2 border-accent/30 px-4 py-2 text-sm focus:border-accent focus:outline-none"
           />
         )}
@@ -113,7 +115,7 @@ export function EnrollButton({
               loading ? 'opacity-50 cursor-not-allowed' : ''
             }`}
           >
-            {loading ? 'Đang xử lý...' : 'Đăng ký học ngay'}
+            {loading ? t('processing') : t('free')}
           </button>
           <WishlistHeartButton inWishlist={inWishlist} pending={wishlistPending} onClick={toggleWishlist} />
         </div>
@@ -137,14 +139,14 @@ export function EnrollButton({
             disabled={inCart || addToCart.isPending}
             className="flex-1 rounded-full border-2 border-accent bg-white px-6 py-3 font-display text-base font-bold text-accent hover:bg-accent/5 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {inCart ? 'Đã có trong giỏ hàng ✓' : addToCart.isPending ? 'Đang thêm...' : 'Thêm vào giỏ hàng'}
+            {inCart ? t('inCart') : addToCart.isPending ? t('adding') : t('addCart')}
           </button>
           <WishlistHeartButton inWishlist={inWishlist} pending={wishlistPending} onClick={toggleWishlist} />
         </div>
       )}
       {requiresPassword && (
         <p className="text-center text-[12.5px] text-ink-muted">
-          Khóa học riêng tư — nhập mật khẩu ở bước thanh toán để mua trực tiếp.
+          {t('privateNote')}
         </p>
       )}
       <button
@@ -152,7 +154,7 @@ export function EnrollButton({
         onClick={() => router.push(`/checkout/${courseSlug}`)}
         className="w-full rounded-full bg-accent px-6 py-3 font-display text-base font-bold text-white hover:bg-accent-dark"
       >
-        Mua ngay
+        {t('buy')}
       </button>
     </div>
   );
@@ -168,12 +170,13 @@ function WishlistHeartButton({
 }: {
   inWishlist: boolean; pending: boolean; onClick: () => void;
 }) {
+  const t = useTranslations('courseDetail.enroll');
   return (
     <button
       type="button"
       onClick={onClick}
       disabled={pending}
-      aria-label={inWishlist ? 'Bỏ khỏi danh sách yêu thích' : 'Thêm vào danh sách yêu thích'}
+      aria-label={inWishlist ? t('wishlistRemove') : t('wishlistAdd')}
       aria-pressed={inWishlist}
       className={`flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-full border-2 transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
         inWishlist ? 'border-red-500 bg-red-50 text-red-500' : 'border-accent bg-white text-accent hover:bg-accent/5'

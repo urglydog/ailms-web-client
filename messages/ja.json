@@ -368,5 +368,58 @@
     "loading": "読み込み中...",
     "notFound": "証明書が見つかりません。",
     "loadError": "証明書を読み込めませんでした。"
+  },
+  "courseDetail": {
+    "breadcrumbAria": "パンくず",
+    "allCourses": "講座一覧",
+    "learners": "受講生 {count} 人",
+    "level": {
+      "BEGINNER": "初級",
+      "INTERMEDIATE": "中級",
+      "ADVANCED": "上級"
+    },
+    "instructor": "講師：",
+    "updated": "{date} 更新",
+    "dubbed": "吹き替え済み：",
+    "dubPanel": {
+      "title": "あなたの言語で学ぶ",
+      "body": "すべてのレッスンを AI が吹き替え、元の動画と同期します。学習中に好きな音声を選ぶと字幕も切り替わります。"
+    },
+    "content": {
+      "title": "講座の内容",
+      "summary": "{chapters} 章 · {lessons} レッスン",
+      "lessons": "{count} レッスン",
+      "preview": "試聴"
+    },
+    "reviews": "受講生のレビュー",
+    "price": {
+      "free": "無料",
+      "lifetime": "永久に利用可能"
+    },
+    "includes": [
+      "AI 吹き替え付きレッスン {count} 本",
+      "ソクラテス式 AI チューター",
+      "マインドマップ、フラッシュカード、クイズを自動生成",
+      "購入後は永久にアクセス可能"
+    ],
+    "related": {
+      "title": "関連講座",
+      "subtitle": "この講座と同じテーマ"
+    },
+    "enroll": {
+      "free": "登録する",
+      "buy": "講座を購入",
+      "learnNow": "学習を始める",
+      "processing": "処理中...",
+      "addCart": "カートに追加",
+      "inCart": "カートに追加済み ✓",
+      "adding": "追加中...",
+      "passwordPlaceholder": "登録パスワードを入力",
+      "privateNote": "非公開講座：購入手続きでパスワードを入力してください。",
+      "wishlistAdd": "お気に入りに追加",
+      "wishlistRemove": "お気に入りから削除",
+      "toastSuccess": "登録しました！",
+      "toastError": "エラーが発生しました"
+    }
   }
 }

@@ -368,5 +368,58 @@
     "loading": "加载中...",
     "notFound": "找不到该证书。",
     "loadError": "无法加载证书，请稍后再试。"
+  },
+  "courseDetail": {
+    "breadcrumbAria": "路径",
+    "allCourses": "课程库",
+    "learners": "{count} 名学员",
+    "level": {
+      "BEGINNER": "入门",
+      "INTERMEDIATE": "中级",
+      "ADVANCED": "高级"
+    },
+    "instructor": "讲师：",
+    "updated": "更新于 {date}",
+    "dubbed": "已配音：",
+    "dubPanel": {
+      "title": "用你自己的语言学习",
+      "body": "每节课都由 AI 配音，并与原视频同步。学习时可随时切换声音，字幕也会随之改变。"
+    },
+    "content": {
+      "title": "课程内容",
+      "summary": "{chapters} 章 · {lessons} 节",
+      "lessons": "{count} 节",
+      "preview": "试看"
+    },
+    "reviews": "学员评价",
+    "price": {
+      "free": "免费",
+      "lifetime": "永久拥有"
+    },
+    "includes": [
+      "{count} 节带 AI 配音的课程",
+      "苏格拉底式 AI 导师",
+      "自动生成思维导图、记忆卡片和测验",
+      "购买后永久访问"
+    ],
+    "related": {
+      "title": "相关课程",
+      "subtitle": "与本课程同主题"
+    },
+    "enroll": {
+      "free": "报名",
+      "buy": "购买课程",
+      "learnNow": "开始学习",
+      "processing": "处理中...",
+      "addCart": "加入购物车",
+      "inCart": "已在购物车 ✓",
+      "adding": "添加中...",
+      "passwordPlaceholder": "输入报名密码",
+      "privateNote": "私密课程：请在结算时输入密码以直接购买。",
+      "wishlistAdd": "加入收藏",
+      "wishlistRemove": "取消收藏",
+      "toastSuccess": "报名成功！",
+      "toastError": "操作出错"
+    }
   }
 }

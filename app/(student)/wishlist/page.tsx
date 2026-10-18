@@ -133,7 +133,7 @@ function WishlistCard({ item }: { item: WishlistItem }) {
   const handleEnrollFree = async () => {
     try {
       await enrollmentsApi.enrollFree(item.courseId);
-      toast.success('Ghi danh thành công!');
+      toast.success('Đăng ký thành công!');
       void queryClient.invalidateQueries({ queryKey: ['enrollments', 'mine'] });
       removeFromWishlist.mutate(item.courseId);
     } catch (err) {

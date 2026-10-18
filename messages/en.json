@@ -368,5 +368,58 @@
     "loading": "Loading...",
     "notFound": "Certificate not found.",
     "loadError": "Could not load the certificate, try again later."
+  },
+  "courseDetail": {
+    "breadcrumbAria": "Breadcrumb",
+    "allCourses": "Course catalog",
+    "learners": "{count} learners",
+    "level": {
+      "BEGINNER": "Beginner",
+      "INTERMEDIATE": "Intermediate",
+      "ADVANCED": "Advanced"
+    },
+    "instructor": "Instructor:",
+    "updated": "Updated {date}",
+    "dubbed": "Dubbed in:",
+    "dubPanel": {
+      "title": "Learn in your own language",
+      "body": "Every lesson is dubbed by AI and synced with the original video. Pick the voice you want while you learn, and the subtitles follow."
+    },
+    "content": {
+      "title": "Course content",
+      "summary": "{chapters} chapters · {lessons} lessons",
+      "lessons": "{count} lessons",
+      "preview": "Preview"
+    },
+    "reviews": "Learner reviews",
+    "price": {
+      "free": "Free",
+      "lifetime": "Lifetime access"
+    },
+    "includes": [
+      "{count} lessons with AI dubbing",
+      "Socratic AI Tutor assistant",
+      "Auto-generated mind maps, flashcards and quizzes",
+      "Lifetime access once you own it"
+    ],
+    "related": {
+      "title": "Related courses",
+      "subtitle": "Same topic as this course"
+    },
+    "enroll": {
+      "free": "Sign up",
+      "buy": "Buy course",
+      "learnNow": "Start learning",
+      "processing": "Processing...",
+      "addCart": "Add to cart",
+      "inCart": "In your cart ✓",
+      "adding": "Adding...",
+      "passwordPlaceholder": "Enter the sign-up password",
+      "privateNote": "Private course: enter the password at checkout to buy it directly.",
+      "wishlistAdd": "Add to wishlist",
+      "wishlistRemove": "Remove from wishlist",
+      "toastSuccess": "Signed up successfully!",
+      "toastError": "Something went wrong"
+    }
   }
 }
