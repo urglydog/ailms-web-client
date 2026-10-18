@@ -63,13 +63,13 @@ function BundleForm({ editing, onClose }: BundleFormProps) {
       <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white rounded-2xl shadow-2xl flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b bg-gradient-to-r from-cyan-50 to-blue-50 rounded-t-2xl">
-          <h2 className="text-lg font-bold text-gray-900">
+          <h2 className="text-lg font-bold text-ink">
             {editing ? '✏️ Sửa gói khóa học' : '✨ Tạo gói khóa học mới'}
           </h2>
           <button
             type="button"
             onClick={onClose}
-            className="h-8 w-8 rounded-full hover:bg-gray-200 flex items-center justify-center text-gray-500 hover:text-gray-700 transition-colors"
+            className="h-8 w-8 rounded-full hover:bg-gray-200 flex items-center justify-center text-ink-muted hover:text-gray-700 transition-colors"
           >
             ✕
           </button>
@@ -78,7 +78,7 @@ function BundleForm({ editing, onClose }: BundleFormProps) {
         <form onSubmit={handleSubmit} className="flex flex-col gap-5 p-6">
           {/* Tên gói */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+            <label className="block text-sm font-semibold text-ink mb-1.5">
               Tên gói <span className="text-red-500">*</span>
             </label>
             <input
@@ -86,25 +86,25 @@ function BundleForm({ editing, onClose }: BundleFormProps) {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="VD: Combo Lập trình Web Full-stack"
-              className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 bg-gray-50"
+              className="w-full rounded-xl border border-line px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 bg-surface"
             />
           </div>
 
           {/* Mô tả */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Mô tả ngắn</label>
+            <label className="block text-sm font-semibold text-ink mb-1.5">Mô tả ngắn</label>
             <textarea
               rows={2}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Mô tả lợi ích khi mua gói..."
-              className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 bg-gray-50 resize-none"
+              className="w-full rounded-xl border border-line px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 bg-surface resize-none"
             />
           </div>
 
           {/* Giảm giá % */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+            <label className="block text-sm font-semibold text-ink mb-1.5">
               Mức giảm giá Bundle
             </label>
             <div className="flex items-center gap-3">
@@ -117,7 +117,7 @@ function BundleForm({ editing, onClose }: BundleFormProps) {
                 onChange={(e) => setDiscountPercent(Number(e.target.value))}
                 className="flex-1 accent-cyan-500"
               />
-              <span className="w-16 rounded-lg bg-cyan-100 text-cyan-700 font-bold text-sm text-center py-1.5">
+              <span className="w-16 rounded-lg bg-cyan-100 text-accent-dark font-bold text-sm text-center py-1.5">
                 {discountPercent}%
               </span>
             </div>
@@ -125,21 +125,21 @@ function BundleForm({ editing, onClose }: BundleFormProps) {
 
           {/* Chọn khóa học */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+            <label className="block text-sm font-semibold text-ink mb-1.5">
               Chọn khóa học ({selectedIds.length} đã chọn — cần ít nhất 2)
             </label>
             {publishedCourses.length === 0 ? (
-              <p className="text-sm text-gray-400 py-3 text-center">
+              <p className="text-sm text-ink-muted py-3 text-center">
                 Bạn chưa có khóa học nào đã xuất bản.
               </p>
             ) : (
-              <div className="rounded-xl border border-gray-200 divide-y max-h-48 overflow-y-auto">
+              <div className="rounded-xl border border-line divide-y max-h-48 overflow-y-auto">
                 {publishedCourses.map((course) => {
                   const selected = selectedIds.includes(course.id);
                   return (
                     <label
                       key={course.id}
-                      className={`flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors ${selected ? 'bg-cyan-50' : ''}`}
+                      className={`flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-surface transition-colors ${selected ? 'bg-tint' : ''}`}
                     >
                       <input
                         type="checkbox"
@@ -147,9 +147,9 @@ function BundleForm({ editing, onClose }: BundleFormProps) {
                         onChange={() => toggleCourse(course.id)}
                         className="h-4 w-4 rounded accent-cyan-600 flex-shrink-0"
                       />
-                      <span className="flex-1 text-sm text-gray-800 truncate">{course.title}</span>
+                      <span className="flex-1 text-sm text-ink truncate">{course.title}</span>
                       {course.price != null && (
-                        <span className="text-sm font-semibold text-gray-500 flex-shrink-0">
+                        <span className="text-sm font-semibold text-ink-muted flex-shrink-0">
                           {fmt(course.price)}
                         </span>
                       )}
@@ -184,13 +184,13 @@ function BundleForm({ editing, onClose }: BundleFormProps) {
             <label className="flex items-center gap-3 cursor-pointer">
               <div
                 onClick={() => setIsActive((v) => !v)}
-                className={`relative w-10 h-6 rounded-full transition-colors ${isActive ? 'bg-cyan-500' : 'bg-gray-300'}`}
+                className={`relative w-10 h-6 rounded-full transition-colors ${isActive ? 'bg-accent' : 'bg-gray-300'}`}
               >
                 <span
                   className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white shadow transition-transform ${isActive ? 'translate-x-4' : 'translate-x-0'}`}
                 />
               </div>
-              <span className="text-sm font-medium text-gray-700">
+              <span className="text-sm font-medium text-ink">
                 {isActive ? 'Đang hoạt động' : 'Đã tắt'}
               </span>
             </label>
@@ -201,14 +201,14 @@ function BundleForm({ editing, onClose }: BundleFormProps) {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 rounded-xl border border-gray-200 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors"
+              className="flex-1 rounded-xl border border-line py-2.5 text-sm font-semibold text-ink-muted hover:bg-surface transition-colors"
             >
               Hủy
             </button>
             <button
               type="submit"
               disabled={isPending || selectedIds.length < 2}
-              className="flex-1 rounded-xl bg-cyan-600 py-2.5 text-sm font-bold text-white hover:bg-cyan-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="flex-1 rounded-xl bg-accent py-2.5 text-sm font-bold text-white hover:bg-accent-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {isPending ? 'Đang lưu...' : editing ? 'Cập nhật gói' : 'Tạo gói'}
             </button>
@@ -233,26 +233,26 @@ function BundleCard({ bundle, onEdit }: { bundle: CourseBundle; onEdit: () => vo
         <div className="flex items-start justify-between gap-3 mb-3">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="inline-flex items-center gap-1 rounded-full bg-cyan-100 px-2.5 py-0.5 text-xs font-bold text-cyan-700">
+              <span className="inline-flex items-center gap-1 rounded-full bg-cyan-100 px-2.5 py-0.5 text-xs font-bold text-accent-dark">
                 -{bundle.discountPercent}%
               </span>
               {!bundle.isActive && (
-                <span className="inline-flex rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold text-gray-500">
+                <span className="inline-flex rounded-full bg-line-soft px-2.5 py-0.5 text-xs font-semibold text-ink-muted">
                   Đã tắt
                 </span>
               )}
             </div>
-            <h3 className="mt-1.5 text-[15px] font-bold text-gray-900 leading-tight line-clamp-2">
+            <h3 className="mt-1.5 text-[15px] font-bold text-ink leading-tight line-clamp-2">
               {bundle.title}
             </h3>
             {bundle.description && (
-              <p className="mt-1 text-xs text-gray-500 line-clamp-1">{bundle.description}</p>
+              <p className="mt-1 text-xs text-ink-muted line-clamp-1">{bundle.description}</p>
             )}
           </div>
           <button
             type="button"
             onClick={onEdit}
-            className="shrink-0 rounded-xl border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-50 hover:border-cyan-300 hover:text-cyan-600 transition-colors"
+            className="shrink-0 rounded-xl border border-line px-3 py-1.5 text-xs font-semibold text-ink-muted hover:bg-surface hover:border-cyan-300 hover:text-cyan-600 transition-colors"
           >
             Sửa
           </button>
@@ -261,21 +261,21 @@ function BundleCard({ bundle, onEdit }: { bundle: CourseBundle; onEdit: () => vo
         {/* Courses list */}
         <ul className="space-y-1.5 mb-4">
           {bundle.courses.map((c) => (
-            <li key={c.id} className="flex items-center gap-2 text-xs text-gray-600">
+            <li key={c.id} className="flex items-center gap-2 text-xs text-ink-muted">
               <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 flex-shrink-0" />
               <span className="flex-1 truncate">{c.title}</span>
-              <span className="font-semibold text-gray-400 flex-shrink-0">{fmt(c.price)}</span>
+              <span className="font-semibold text-ink-muted flex-shrink-0">{fmt(c.price)}</span>
             </li>
           ))}
         </ul>
 
         {/* Price summary */}
-        <div className="rounded-xl bg-gray-50 px-4 py-3 flex items-center justify-between border border-gray-100">
-          <div className="text-xs text-gray-500">
+        <div className="rounded-xl bg-surface px-4 py-3 flex items-center justify-between border border-line-soft">
+          <div className="text-xs text-ink-muted">
             <span className="line-through">{fmt(bundle.originalPrice)}</span>
             <span className="ml-2 text-red-500 font-semibold">-{fmt(bundle.discountAmount)}</span>
           </div>
-          <div className="text-base font-bold text-cyan-700">{fmt(bundle.finalPrice)}</div>
+          <div className="text-base font-bold text-accent-dark">{fmt(bundle.finalPrice)}</div>
         </div>
       </div>
     </div>
@@ -296,8 +296,8 @@ export function BundleManager() {
       {/* Page header */}
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">🎁 Gói Khóa Học</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <h1 className="text-2xl font-bold text-ink">🎁 Gói Khóa Học</h1>
+          <p className="mt-1 text-sm text-ink-muted">
             Tạo combo khóa học với giá ưu đãi hơn để tăng doanh thu.
           </p>
         </div>
@@ -315,7 +315,7 @@ export function BundleManager() {
       {isLoading && (
         <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-5">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-48 rounded-2xl bg-gray-100 animate-pulse" />
+            <div key={i} className="h-48 rounded-2xl bg-line-soft animate-pulse" />
           ))}
         </div>
       )}
@@ -323,14 +323,14 @@ export function BundleManager() {
       {!isLoading && bundles.length === 0 && (
         <div className="flex flex-col items-center justify-center py-20 text-center">
           <div className="text-6xl mb-4">🎁</div>
-          <h2 className="text-lg font-bold text-gray-700">Chưa có gói nào</h2>
-          <p className="mt-1 text-sm text-gray-400 max-w-sm">
+          <h2 className="text-lg font-bold text-ink">Chưa có gói nào</h2>
+          <p className="mt-1 text-sm text-ink-muted max-w-sm">
             Tạo gói đầu tiên để tăng tỷ lệ chuyển đổi và doanh thu trung bình mỗi đơn hàng.
           </p>
           <button
             type="button"
             onClick={() => { setEditing(null); setShowForm(true); }}
-            className="mt-5 rounded-xl bg-cyan-600 px-6 py-2.5 text-sm font-bold text-white hover:bg-cyan-700 transition-colors"
+            className="mt-5 rounded-xl bg-accent px-6 py-2.5 text-sm font-bold text-white hover:bg-accent-dark transition-colors"
           >
             Tạo gói đầu tiên
           </button>

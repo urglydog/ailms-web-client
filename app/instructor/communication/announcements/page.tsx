@@ -20,26 +20,26 @@ export default function InstructorAnnouncementsPage() {
   return (
     <>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="m-0 font-display text-[20px] font-bold text-gray-900">Thông báo</h1>
+        <h1 className="m-0 font-display text-[20px] font-bold text-ink">Thông báo</h1>
         <CourseFilterDropdown courses={courses ?? []} value={filterCourseId} onChange={setFilterCourseId} />
       </div>
 
       <CreateAnnouncementForm courses={courses ?? []} />
 
-      {isLoading && <div className="p-10 text-center text-sm text-gray-500">Đang tải...</div>}
+      {isLoading && <div className="p-10 text-center text-sm text-ink-muted">Đang tải...</div>}
       {!isLoading && (!announcements || announcements.length === 0) && (
-        <div className="rounded-xl border border-gray-200 bg-white p-10 text-center text-sm text-gray-500 shadow-sm">
+        <div className="rounded-xl border border-line bg-white p-10 text-center text-sm text-ink-muted shadow-sm">
           Chưa có thông báo nào.
         </div>
       )}
 
       <div className="flex flex-col gap-3">
         {announcements?.map((a) => (
-          <div key={a.id} className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+          <div key={a.id} className="rounded-xl border border-line bg-white p-4 shadow-sm">
             <div className="mb-1 flex items-start justify-between gap-3">
               <div>
-                <p className="text-[13.5px] font-bold text-gray-900">{a.title}</p>
-                <p className="text-[11.5px] text-gray-400">{a.courseTitle} · {new Date(a.createdAt).toLocaleString('vi-VN')}</p>
+                <p className="text-[13.5px] font-bold text-ink">{a.title}</p>
+                <p className="text-[11.5px] text-ink-muted">{a.courseTitle} · {new Date(a.createdAt).toLocaleString('vi-VN')}</p>
               </div>
               <button
                 type="button"
@@ -49,7 +49,7 @@ export default function InstructorAnnouncementsPage() {
                 Xóa
               </button>
             </div>
-            <p className="whitespace-pre-line text-[13px] text-gray-700">{a.content}</p>
+            <p className="whitespace-pre-line text-[13px] text-ink">{a.content}</p>
           </div>
         ))}
       </div>
@@ -82,8 +82,8 @@ function CreateAnnouncementForm({ courses }: { courses: InstructorCourseOption[]
   };
 
   return (
-    <div className="flex flex-col gap-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-      <p className="font-display text-[14px] font-bold text-gray-900">Gửi thông báo mới</p>
+    <div className="flex flex-col gap-3 rounded-xl border border-line bg-white p-4 shadow-sm">
+      <p className="font-display text-[14px] font-bold text-ink">Gửi thông báo mới</p>
       <CourseFilterDropdown
         courses={courses}
         value={courseId}
@@ -97,20 +97,20 @@ function CreateAnnouncementForm({ courses }: { courses: InstructorCourseOption[]
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         placeholder="Tiêu đề thông báo"
-        className="rounded-lg border border-gray-200 px-3 py-2 text-[13px] focus:border-cyan-400 focus:outline-none"
+        className="rounded-lg border border-line px-3 py-2 text-[13px] focus:border-accent focus:outline-none"
       />
       <textarea
         value={content}
         onChange={(e) => setContent(e.target.value)}
         rows={3}
         placeholder="Nội dung thông báo gửi tới toàn bộ học viên đã ghi danh khóa học này..."
-        className="resize-none rounded-lg border border-gray-200 px-3 py-2 text-[13px] focus:border-cyan-400 focus:outline-none"
+        className="resize-none rounded-lg border border-line px-3 py-2 text-[13px] focus:border-accent focus:outline-none"
       />
       <button
         type="button"
         onClick={handleSubmit}
         disabled={!courseId || !title.trim() || !content.trim() || createAnnouncement.isPending}
-        className="self-end rounded-lg bg-cyan-600 px-4 py-2 text-[13px] font-bold text-white hover:bg-cyan-700 disabled:cursor-not-allowed disabled:opacity-50"
+        className="self-end rounded-lg bg-accent px-4 py-2 text-[13px] font-bold text-white hover:bg-accent-dark disabled:cursor-not-allowed disabled:opacity-50"
       >
         Gửi thông báo
       </button>

@@ -879,6 +879,56 @@
         "hard": "有 {count} 道题超过 60% 的学员答错，建议回顾相关内容。",
         "lowRating": "{student} 在“{course}”给出了新的 {rating}★ 评价，建议尽快回复。"
       }
+    },
+    "communication": {
+      "tabsAria": "沟通栏目",
+      "tabs": {
+        "qa": "问答",
+        "messages": "消息",
+        "assignments": "作业",
+        "announcements": "公告"
+      }
+    },
+    "tools": {
+      "title": "工具",
+      "subtitle": "帮助你管理和发展课程的工具。",
+      "open": "打开",
+      "items": {
+        "live": {
+          "title": "直播",
+          "description": "创建并管理在线直播授课，查看已结束场次的统计。"
+        },
+        "coupons": {
+          "title": "优惠码",
+          "description": "创建适用于一门、多门或全部课程的优惠码。"
+        },
+        "bundles": {
+          "title": "课程组合",
+          "description": "把多门课程打包并给出优惠，方便学员整套购买。"
+        }
+      }
+    },
+    "live": {
+      "title": "直播课堂",
+      "create": "创建直播",
+      "loading": "加载中...",
+      "loadError": "无法加载直播列表。",
+      "status": {
+        "SCHEDULED": "即将开始",
+        "LIVE": "直播中",
+        "ENDED": "已结束"
+      },
+      "columns": {
+        "title": "标题",
+        "course": "课程",
+        "status": "状态"
+      },
+      "enter": "进入直播间",
+      "details": "查看详情",
+      "empty": {
+        "title": "还没有直播",
+        "body": "创建第一场直播，与学员在线授课。"
+      }
     }
   }
 }

@@ -879,6 +879,56 @@
         "hard": "{count} questions are answered wrong by over 60% of learners, so review the related content.",
         "lowRating": "A new {rating}★ review from {student} on \"{course}\", worth replying to soon."
       }
+    },
+    "communication": {
+      "tabsAria": "Communication sections",
+      "tabs": {
+        "qa": "Q&A",
+        "messages": "Messages",
+        "assignments": "Assignments",
+        "announcements": "Announcements"
+      }
+    },
+    "tools": {
+      "title": "Tools",
+      "subtitle": "Tools to help you manage and grow your courses.",
+      "open": "Open",
+      "items": {
+        "live": {
+          "title": "Live",
+          "description": "Create and manage live teaching sessions and review stats of past sessions."
+        },
+        "coupons": {
+          "title": "Discount codes",
+          "description": "Create discount codes for one, several or all of your courses."
+        },
+        "bundles": {
+          "title": "Course bundles",
+          "description": "Group several courses into a bundle with an attractive discount so learners buy the whole set."
+        }
+      }
+    },
+    "live": {
+      "title": "Live Classroom",
+      "create": "Create a live session",
+      "loading": "Loading...",
+      "loadError": "Could not load your live sessions.",
+      "status": {
+        "SCHEDULED": "Upcoming",
+        "LIVE": "Live now",
+        "ENDED": "Ended"
+      },
+      "columns": {
+        "title": "Title",
+        "course": "Course",
+        "status": "Status"
+      },
+      "enter": "Enter room",
+      "details": "View details",
+      "empty": {
+        "title": "No live sessions yet",
+        "body": "Create your first live session to teach online with your learners."
+      }
     }
   }
 }

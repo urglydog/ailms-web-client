@@ -879,6 +879,56 @@
         "hard": "{count} 問が受講生の 60% 超に間違えられています。関連する内容を見直しましょう。",
         "lowRating": "{student} さんから「{course}」に新しい {rating}★ のレビューがあります。早めに返信しましょう。"
       }
+    },
+    "communication": {
+      "tabsAria": "コミュニケーションのセクション",
+      "tabs": {
+        "qa": "Q&A",
+        "messages": "メッセージ",
+        "assignments": "課題",
+        "announcements": "お知らせ"
+      }
+    },
+    "tools": {
+      "title": "ツール",
+      "subtitle": "講座の管理と成長に役立つツールです。",
+      "open": "開く",
+      "items": {
+        "live": {
+          "title": "ライブ",
+          "description": "オンライン授業を作成・管理し、終了した授業の統計を確認できます。"
+        },
+        "coupons": {
+          "title": "クーポン",
+          "description": "1 つ、複数、またはすべての講座に使えるクーポンを作成します。"
+        },
+        "bundles": {
+          "title": "講座セット",
+          "description": "複数の講座をお得な割引つきのセットにして、まとめて購入してもらえます。"
+        }
+      }
+    },
+    "live": {
+      "title": "ライブ教室",
+      "create": "ライブを作成",
+      "loading": "読み込み中...",
+      "loadError": "ライブ一覧を読み込めませんでした。",
+      "status": {
+        "SCHEDULED": "開始前",
+        "LIVE": "配信中",
+        "ENDED": "終了"
+      },
+      "columns": {
+        "title": "タイトル",
+        "course": "講座",
+        "status": "状態"
+      },
+      "enter": "ルームに入る",
+      "details": "詳細を見る",
+      "empty": {
+        "title": "ライブはまだありません",
+        "body": "最初のライブを作成して、受講生とオンラインで授業しましょう。"
+      }
     }
   }
 }

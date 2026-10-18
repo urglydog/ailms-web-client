@@ -39,7 +39,7 @@ export default function InstructorQaPage() {
   return (
     <>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="m-0 font-display text-[20px] font-bold text-gray-900">Hỏi đáp</h1>
+        <h1 className="m-0 font-display text-[20px] font-bold text-ink">Hỏi đáp</h1>
         <div className="flex items-center gap-2">
           <CourseFilterDropdown courses={courses ?? []} value={courseId} onChange={setCourseId} />
 
@@ -47,20 +47,20 @@ export default function InstructorQaPage() {
             <button
               type="button"
               onClick={() => setShowSortMenu((v) => !v)}
-              className="rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-[13px] font-semibold text-gray-700 hover:border-gray-300"
+              className="rounded-lg border border-line bg-white px-3.5 py-2 text-[13px] font-semibold text-ink hover:border-accent"
             >
               Sắp xếp: {sort === 'newest' ? 'Mới nhất' : 'Cũ nhất'} ▾
             </button>
             {showSortMenu && (
               <>
                 <div className="fixed inset-0 z-10" onClick={() => setShowSortMenu(false)} />
-                <div className="absolute right-0 top-full z-20 mt-1 w-36 overflow-hidden rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
+                <div className="absolute right-0 top-full z-20 mt-1 w-36 overflow-hidden rounded-lg border border-line bg-white py-1 shadow-lg">
                   {(['newest', 'oldest'] as SortOption[]).map((option) => (
                     <button
                       key={option}
                       type="button"
                       onClick={() => { setSort(option); setShowSortMenu(false); }}
-                      className={`block w-full px-3 py-1.5 text-left text-[12.5px] hover:bg-gray-50 ${sort === option ? 'font-bold text-cyan-700' : 'text-gray-700'}`}
+                      className={`block w-full px-3 py-1.5 text-left text-[12.5px] hover:bg-surface ${sort === option ? 'font-bold text-accent-dark' : 'text-ink'}`}
                     >
                       {option === 'newest' ? 'Mới nhất' : 'Cũ nhất'}
                     </button>
@@ -70,12 +70,12 @@ export default function InstructorQaPage() {
             )}
           </div>
 
-          <div className="flex overflow-hidden rounded-lg border border-gray-200">
+          <div className="flex overflow-hidden rounded-lg border border-line">
             <button
               type="button"
               onClick={() => setViewMode('double')}
               title="Xem 2 cột"
-              className={`flex items-center px-2.5 py-2 ${viewMode === 'double' ? 'bg-cyan-600 text-white' : 'bg-white text-gray-500 hover:bg-gray-50'}`}
+              className={`flex items-center px-2.5 py-2 ${viewMode === 'double' ? 'bg-accent text-white' : 'bg-white text-ink-muted hover:bg-surface'}`}
             >
               <ColumnsIcon />
             </button>
@@ -83,7 +83,7 @@ export default function InstructorQaPage() {
               type="button"
               onClick={() => setViewMode('single')}
               title="Xem 1 cột"
-              className={`flex items-center px-2.5 py-2 ${viewMode === 'single' ? 'bg-cyan-600 text-white' : 'bg-white text-gray-500 hover:bg-gray-50'}`}
+              className={`flex items-center px-2.5 py-2 ${viewMode === 'single' ? 'bg-accent text-white' : 'bg-white text-ink-muted hover:bg-surface'}`}
             >
               <ListIcon />
             </button>
@@ -91,7 +91,7 @@ export default function InstructorQaPage() {
         </div>
       </div>
 
-      <label className="flex w-fit items-center gap-1.5 text-[13px] font-semibold text-gray-600">
+      <label className="flex w-fit items-center gap-1.5 text-[13px] font-semibold text-ink-muted">
         <input
           type="checkbox"
           checked={onlyUnanswered}
@@ -101,9 +101,9 @@ export default function InstructorQaPage() {
         Chỉ hiện câu hỏi chưa có câu trả lời
       </label>
 
-      {isLoading && <div className="p-10 text-center text-sm text-gray-500">Đang tải...</div>}
+      {isLoading && <div className="p-10 text-center text-sm text-ink-muted">Đang tải...</div>}
       {!isLoading && questions.length === 0 && (
-        <div className="rounded-xl border border-gray-200 bg-white p-10 text-center text-sm text-gray-500 shadow-sm">
+        <div className="rounded-xl border border-line bg-white p-10 text-center text-sm text-ink-muted shadow-sm">
           Chưa có câu hỏi nào.
         </div>
       )}
@@ -129,11 +129,11 @@ export default function InstructorQaPage() {
               />
             ))}
           </div>
-          <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
+          <div className="rounded-xl border border-line bg-white shadow-sm">
             {selectedInDoubleView ? (
               <QaThreadPanel questionId={selectedInDoubleView} />
             ) : (
-              <div className="flex h-full items-center justify-center p-10 text-[13px] text-gray-400">
+              <div className="flex h-full items-center justify-center p-10 text-[13px] text-ink-muted">
                 Chọn 1 câu hỏi để xem chi tiết
               </div>
             )}
@@ -144,9 +144,9 @@ export default function InstructorQaPage() {
       {viewMode === 'single' && activeQuestionId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="flex max-h-[85vh] w-full max-w-lg flex-col overflow-hidden rounded-xl bg-white shadow-xl">
-            <div className="flex items-center justify-between border-b border-gray-100 px-5 py-3.5">
-              <span className="font-display text-[15px] font-bold text-gray-900">Chi tiết câu hỏi</span>
-              <button type="button" onClick={() => setActiveQuestionId(null)} className="text-xl text-gray-400 hover:text-gray-600">×</button>
+            <div className="flex items-center justify-between border-b border-line-soft px-5 py-3.5">
+              <span className="font-display text-[15px] font-bold text-ink">Chi tiết câu hỏi</span>
+              <button type="button" onClick={() => setActiveQuestionId(null)} className="text-xl text-ink-muted hover:text-gray-600">×</button>
             </div>
             <QaThreadPanel questionId={activeQuestionId} />
           </div>
@@ -162,23 +162,23 @@ function QuestionRow({ question: q, active, onClick }: { question: QaQuestion; a
       type="button"
       onClick={onClick}
       className={`flex flex-col gap-1 rounded-xl border bg-white p-4 text-left shadow-sm transition-colors ${
-        active ? 'border-cyan-400 ring-1 ring-cyan-200' : 'border-gray-200 hover:border-cyan-300'
+        active ? 'border-cyan-400 ring-1 ring-cyan-200' : 'border-line hover:border-cyan-300'
       }`}
     >
       <div className="flex items-center justify-between gap-3">
-        <span className="truncate text-[12px] font-semibold text-cyan-700">{q.courseTitle} · {q.lessonTitle}</span>
-        <span className="shrink-0 text-[11.5px] text-gray-400">{new Date(q.createdAt).toLocaleDateString('vi-VN')}</span>
+        <span className="truncate text-[12px] font-semibold text-accent-dark">{q.courseTitle} · {q.lessonTitle}</span>
+        <span className="shrink-0 text-[11.5px] text-ink-muted">{new Date(q.createdAt).toLocaleDateString('vi-VN')}</span>
       </div>
-      <p className="line-clamp-2 flex items-start gap-1.5 text-[13.5px] text-gray-800">
+      <p className="line-clamp-2 flex items-start gap-1.5 text-[13.5px] text-ink">
         <Avatar name={q.userName} avatarUrl={q.userAvatarUrl} size={18} />
         <span><span className="font-semibold">{q.userName}: </span>{q.content}</span>
       </p>
       <div className="flex items-center gap-2 text-[11.5px]">
-        <span className={`rounded-full px-2 py-0.5 font-semibold ${q.answerCount === 0 ? 'bg-amber-50 text-amber-700' : 'bg-gray-100 text-gray-600'}`}>
+        <span className={`rounded-full px-2 py-0.5 font-semibold ${q.answerCount === 0 ? 'bg-white text-ink' : 'bg-line-soft text-ink-muted'}`}>
           {q.answerCount === 0 ? 'Chưa có câu trả lời' : `${q.answerCount} câu trả lời`}
         </span>
         {q.hasInstructorAnswer && (
-          <span className="rounded-full bg-cyan-50 px-2 py-0.5 font-semibold text-cyan-700">Bạn đã trả lời</span>
+          <span className="rounded-full bg-tint px-2 py-0.5 font-semibold text-accent-dark">Bạn đã trả lời</span>
         )}
       </div>
     </button>
@@ -198,32 +198,32 @@ function QaThreadPanel({ questionId }: { questionId: string }) {
   return (
     <div className="flex h-full flex-col">
       <div className="flex-1 overflow-y-auto p-5">
-        {isLoading && <p className="text-sm text-gray-500">Đang tải...</p>}
+        {isLoading && <p className="text-sm text-ink-muted">Đang tải...</p>}
         {thread && (
           <div className="flex flex-col gap-3">
-            <div className="flex items-start gap-2 rounded-lg bg-gray-50 p-3">
+            <div className="flex items-start gap-2 rounded-lg bg-surface p-3">
               <Avatar name={thread.question.userName} avatarUrl={thread.question.userAvatarUrl} size={26} />
               <div className="min-w-0 flex-1">
-                <div className="mb-1 flex items-center justify-between text-[12px] text-gray-500">
-                  <span className="font-semibold text-gray-800">{thread.question.userName}</span>
+                <div className="mb-1 flex items-center justify-between text-[12px] text-ink-muted">
+                  <span className="font-semibold text-ink">{thread.question.userName}</span>
                   <span>{new Date(thread.question.createdAt).toLocaleString('vi-VN')}</span>
                 </div>
-                <p className="text-[13.5px] text-gray-800">{thread.question.content}</p>
-                <p className="mt-1.5 text-[11.5px] text-gray-400">{thread.question.courseTitle} · {thread.question.lessonTitle}</p>
+                <p className="text-[13.5px] text-ink">{thread.question.content}</p>
+                <p className="mt-1.5 text-[11.5px] text-ink-muted">{thread.question.courseTitle} · {thread.question.lessonTitle}</p>
               </div>
             </div>
 
             {thread.answers.map((a) => (
-              <div key={a.id} className={`flex items-start gap-2 rounded-lg p-3 ${a.isInstructor ? 'bg-cyan-50' : 'bg-gray-50'}`}>
+              <div key={a.id} className={`flex items-start gap-2 rounded-lg p-3 ${a.isInstructor ? 'bg-tint' : 'bg-surface'}`}>
                 <Avatar name={a.userName} avatarUrl={a.userAvatarUrl} size={26} />
                 <div className="min-w-0 flex-1">
-                  <div className="mb-1 flex items-center justify-between text-[12px] text-gray-500">
-                    <span className={`font-semibold ${a.isInstructor ? 'text-cyan-700' : 'text-gray-800'}`}>
+                  <div className="mb-1 flex items-center justify-between text-[12px] text-ink-muted">
+                    <span className={`font-semibold ${a.isInstructor ? 'text-accent-dark' : 'text-ink'}`}>
                       {a.userName}{a.isInstructor ? ' (Giảng viên)' : ''}
                     </span>
                     <span>{new Date(a.createdAt).toLocaleString('vi-VN')}</span>
                   </div>
-                  <p className="text-[13.5px] text-gray-800">{a.content}</p>
+                  <p className="text-[13.5px] text-ink">{a.content}</p>
                 </div>
               </div>
             ))}
@@ -231,19 +231,19 @@ function QaThreadPanel({ questionId }: { questionId: string }) {
         )}
       </div>
 
-      <div className="flex items-end gap-2 border-t border-gray-100 p-4">
+      <div className="flex items-end gap-2 border-t border-line-soft p-4">
         <textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
           rows={2}
           placeholder="Trả lời học viên..."
-          className="flex-1 resize-none rounded-lg border border-gray-200 px-3 py-2 text-[13px] focus:border-cyan-400 focus:outline-none"
+          className="flex-1 resize-none rounded-lg border border-line px-3 py-2 text-[13px] focus:border-accent focus:outline-none"
         />
         <button
           type="button"
           onClick={handleReply}
           disabled={!content.trim() || replyMutation.isPending}
-          className="shrink-0 rounded-lg bg-cyan-600 px-4 py-2 text-[13px] font-bold text-white hover:bg-cyan-700 disabled:cursor-not-allowed disabled:opacity-50"
+          className="shrink-0 rounded-lg bg-accent px-4 py-2 text-[13px] font-bold text-white hover:bg-accent-dark disabled:cursor-not-allowed disabled:opacity-50"
         >
           Gửi
         </button>

@@ -879,6 +879,56 @@
         "hard": "Có {count} câu hỏi đang bị hơn 60% học viên trả lời sai, nên xem lại nội dung liên quan.",
         "lowRating": "Có đánh giá {rating}★ mới từ {student} ở khóa \"{course}\", nên phản hồi sớm."
       }
+    },
+    "communication": {
+      "tabsAria": "Các mục giao tiếp",
+      "tabs": {
+        "qa": "Hỏi đáp",
+        "messages": "Tin nhắn",
+        "assignments": "Bài tập",
+        "announcements": "Thông báo"
+      }
+    },
+    "tools": {
+      "title": "Công cụ",
+      "subtitle": "Các công cụ hỗ trợ quản lý và phát triển khóa học của bạn.",
+      "open": "Mở",
+      "items": {
+        "live": {
+          "title": "Live",
+          "description": "Tạo và quản lý các buổi dạy trực tuyến, xem lại thống kê buổi đã diễn ra."
+        },
+        "coupons": {
+          "title": "Mã giảm giá",
+          "description": "Tạo mã giảm giá áp dụng cho một, nhiều hoặc toàn bộ khóa học của bạn."
+        },
+        "bundles": {
+          "title": "Gói khóa học",
+          "description": "Gộp nhiều khóa thành một gói với mức giảm giá hấp dẫn để học viên mua trọn bộ."
+        }
+      }
+    },
+    "live": {
+      "title": "Live Classroom",
+      "create": "Tạo buổi live mới",
+      "loading": "Đang tải...",
+      "loadError": "Không tải được danh sách buổi live.",
+      "status": {
+        "SCHEDULED": "Sắp live",
+        "LIVE": "Đang live",
+        "ENDED": "Đã kết thúc"
+      },
+      "columns": {
+        "title": "Tiêu đề",
+        "course": "Khóa học",
+        "status": "Trạng thái"
+      },
+      "enter": "Vào phòng",
+      "details": "Xem chi tiết",
+      "empty": {
+        "title": "Chưa có buổi live nào",
+        "body": "Tạo buổi live đầu tiên để dạy trực tuyến cùng học viên của bạn."
+      }
     }
   }
 }
