@@ -24,14 +24,6 @@ interface AdminDashboardData {
   totalRevenue: number;
 }
 
-const AI_WORKER_URL = process.env.NEXT_PUBLIC_AI_WORKER_URL || 'http://localhost:8002';
-
-async function fetchAiHealth(): Promise<HealthData> {
-  const res = await fetch(`${AI_WORKER_URL}/health`);
-  if (!res.ok) throw new Error(`${res.status}`);
-  return res.json();
-}
-
 const QUOTAS = [
   { id: 'dubStudent', value: 15, rule: 'BR-DUB-06' },
   { id: 'dubInstructor', value: 30, rule: 'BR-DUB-06' },
@@ -90,7 +82,8 @@ export default function AdminSettingsPage() {
 
   const { data: aiHealth, isError: aiError } = useQuery({
     queryKey: ['settings', 'ai-health'],
-    queryFn: fetchAiHealth,
+    queryFn: () => api.get<HealthData>('/api/v1/admin/ai-worker/health', { token }),
+    enabled: !!token,
     refetchInterval: 30000,
   });
 
@@ -129,7 +122,6 @@ export default function AdminSettingsPage() {
             <ConfigRow label={t('worker.gemini')} value={aiHealth?.gemini_model ?? '—'} description={t('worker.geminiDesc')} badge="Live" />
             <ConfigRow label={t('worker.asr')} value={aiHealth?.asr_backend ?? '—'} description={t('worker.asrDesc')} />
             <ConfigRow label={t('worker.chunk')} value={aiHealth ? t('worker.minutes', { count: aiHealth.chunk_minutes }) : '—'} description={t('worker.chunkDesc')} />
-            <ConfigRow label={t('worker.url')} value={AI_WORKER_URL} description={t('worker.urlDesc')} />
           </div>
 
           <h2 className="m-0 mt-2 font-display text-[15px] font-bold text-ink">{t('quotas.title')}</h2>

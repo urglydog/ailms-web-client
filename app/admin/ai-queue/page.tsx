@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl';
 import { AiJobQueueManager } from '@/components/admin/AiJobQueueManager';
 import { MetricCard } from '@/components/instructor/performance/MetricCard';
 import { PageHeader } from '@/components/instructor/ui/PageHeader';
+import { api } from '@/lib/api/client';
 import { getAccessToken } from '@/lib/auth/token';
 
 interface QueueStats {
@@ -25,24 +26,6 @@ interface HealthData {
   chunk_minutes: number;
 }
 
-const AI_WORKER_URL = process.env.NEXT_PUBLIC_AI_WORKER_URL || 'http://localhost:8002';
-
-async function fetchQueueStats(_token: string): Promise<QueueStats> {
-  const res = await fetch(`${AI_WORKER_URL}/admin/queue-stats`, {
-    headers: {
-      'x-internal-token': 'dev-internal-token',
-    },
-  });
-  if (!res.ok) throw new Error(`${res.status}`);
-  return res.json();
-}
-
-async function fetchAiHealth(): Promise<HealthData> {
-  const res = await fetch(`${AI_WORKER_URL}/health`);
-  if (!res.ok) throw new Error(`${res.status}`);
-  return res.json();
-}
-
 /** Lịch Celery Beat: tên job, mã quy tắc nghiệp vụ và trạng thái triển khai; mô tả/lịch chạy lấy từ `admin.queue.beat.<id>`. */
 const BEAT_JOBS = [
   { id: 'cleanupTemp', name: 'cleanup-temp-files', rule: 'BR-STORAGE-01', active: true },
@@ -58,14 +41,15 @@ export default function AiQueuePage() {
 
   const { data: stats, isLoading, isError, refetch } = useQuery({
     queryKey: ['admin', 'queue-stats'],
-    queryFn: () => fetchQueueStats(token),
+    queryFn: () => api.get<QueueStats>('/api/v1/admin/ai-worker/queue-stats', { token }),
     enabled: !!token,
     refetchInterval: 8000,
   });
 
   const { data: health } = useQuery({
     queryKey: ['admin', 'ai-health'],
-    queryFn: fetchAiHealth,
+    queryFn: () => api.get<HealthData>('/api/v1/admin/ai-worker/health', { token }),
+    enabled: !!token,
     refetchInterval: 15000,
   });
 
@@ -122,7 +106,7 @@ export default function AiQueuePage() {
             {isLoading && <div className="flex h-32 items-center justify-center text-sm text-ink-muted">{t('loading')}</div>}
             {isError && (
               <div role="alert" className="flex h-32 items-center justify-center px-4 text-center text-sm text-danger">
-                {t('connectError')} <code className="ml-1 font-mono">{AI_WORKER_URL}</code>
+                {t('connectError')}
               </div>
             )}
             {stats && Object.keys(stats.queues).length === 0 && (
