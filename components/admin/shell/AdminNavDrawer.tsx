@@ -12,10 +12,11 @@ interface AdminNavDrawerProps {
   onClose: () => void;
   pathname: string;
   pendingCourses: number;
+  openDisputes?: number;
 }
 
 /** Ngăn kéo điều hướng khu Quản trị cho điện thoại: trượt từ trái, khóa cuộn nền, đóng bằng Escape/nền mờ/nút đóng. */
-export function AdminNavDrawer({ open, onClose, pathname, pendingCourses }: AdminNavDrawerProps) {
+export function AdminNavDrawer({ open, onClose, pathname, pendingCourses, openDisputes = 0 }: AdminNavDrawerProps) {
   const t = useTranslations('admin');
   const closeRef = useRef<HTMLButtonElement>(null);
   const [shown, setShown] = useState(false);
@@ -87,7 +88,7 @@ export function AdminNavDrawer({ open, onClose, pathname, pendingCourses }: Admi
               {group.items.map((item) => {
                 const isActive = active?.id === item.id;
                 const Icon = ADMIN_NAV_ICONS[item.id];
-                const badge = item.id === 'moderation' ? pendingCourses : 0;
+                const badge = item.id === 'moderation' ? pendingCourses : item.id === 'disputes' ? openDisputes : 0;
                 return (
                   <Link
                     key={item.id}
