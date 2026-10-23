@@ -1443,7 +1443,8 @@
         "active": "AI access granted",
         "locked": "AI access locked",
         "lock": "Lock AI",
-        "unlock": "Unlock AI"
+        "unlock": "Unlock AI",
+        "disabledWhileLocked": "Account is locked — the AI flag follows the account lock state; unlock the account to edit it separately."
       },
       "spam": {
         "title": "Spam/scam flag",
@@ -1452,7 +1453,8 @@
         "reasonPh": "Reason for flagging as spam/scam...",
         "none": "No reason given",
         "flag": "Flag as spam",
-        "unflag": "Remove flag"
+        "unflag": "Remove flag",
+        "disabledWhileLocked": "Account is locked — the spam flag follows the account lock state; unlock the account to edit it separately."
       },
       "resetLink": {
         "title": "Password reset assistance",

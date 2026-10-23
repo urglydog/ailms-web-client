@@ -162,20 +162,32 @@ export default function AdminUserDetailPage() {
             label={t('aiLock.status')}
             value={user.isAiLocked ? t('aiLock.locked') : t('aiLock.active')}
           />
-          <button
-            type="button"
-            disabled={toggleAiLock.isPending}
-            onClick={() => setPending(user.isAiLocked ? 'ai-unlock' : 'ai-lock')}
-            className="w-fit rounded-lg border border-line px-3 py-1.5 text-xs font-bold text-ink hover:bg-tint"
-          >
-            {user.isAiLocked ? t('aiLock.unlock') : t('aiLock.lock')}
-          </button>
+          {/* (23/10/2026, sửa bug thật) — tài khoản bị khóa thì cờ AI chỉ là HỆ QUẢ, không còn
+           * ý nghĩa độc lập; sửa riêng lúc này tạo trạng thái vô lý (isActive=false nhưng
+           * isAiLocked=false). BE giờ cũng chặn (422), nhưng disable thẳng ở đây cho rõ ràng. */}
+          {!user.isActive ? (
+            <p className="m-0 text-xs text-ink-muted">{t('aiLock.disabledWhileLocked')}</p>
+          ) : (
+            <button
+              type="button"
+              disabled={toggleAiLock.isPending}
+              onClick={() => setPending(user.isAiLocked ? 'ai-unlock' : 'ai-lock')}
+              className="w-fit rounded-lg border border-line px-3 py-1.5 text-xs font-bold text-ink hover:bg-tint"
+            >
+              {user.isAiLocked ? t('aiLock.unlock') : t('aiLock.lock')}
+            </button>
+          )}
         </section>
 
         <section className="flex flex-col gap-3 rounded-xl border border-line bg-white p-5 shadow-sm">
           <h2 className="m-0 font-display text-[15px] font-bold text-ink">{t('spam.title')}</h2>
           <p className="m-0 text-xs text-ink-muted">{t('spam.hint')}</p>
-          {user.isSpamFlagged ? (
+          {!user.isActive ? (
+            <>
+              <Row label={t('spam.reason')} value={user.spamFlagReason || t('spam.none')} />
+              <p className="m-0 text-xs text-ink-muted">{t('spam.disabledWhileLocked')}</p>
+            </>
+          ) : user.isSpamFlagged ? (
             <>
               <Row label={t('spam.reason')} value={user.spamFlagReason || t('spam.none')} />
               <button

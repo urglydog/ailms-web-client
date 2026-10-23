@@ -23,6 +23,20 @@ export function LoginForm() {
     if (searchParams.get('registered') === 'true') setRegistered(true);
   }, [searchParams]);
 
+  // (23/10/2026, sửa bug thật) — trước đây bị văng về /login giữa phiên (vd tài khoản vừa bị
+  // Admin khóa) hoàn toàn im lặng, không một lời giải thích — xem lib/api/client.ts#fetchWithRefresh.
+  useEffect(() => {
+    try {
+      const reason = sessionStorage.getItem('loginKickReason');
+      if (reason) {
+        sessionStorage.removeItem('loginKickReason');
+        toast.error(reason);
+      }
+    } catch {
+      /* Safari riêng tư chặn sessionStorage — bỏ qua */
+    }
+  }, []);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setRegistered(false);
