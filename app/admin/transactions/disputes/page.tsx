@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { Suspense, useEffect, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
@@ -17,7 +17,17 @@ const STATUS_CLASS: Record<DisputeStatus, string> = {
   RESOLVED_REJECTED: 'bg-line-soft text-ink-muted border-line',
 };
 
+/** `useSearchParams()` bắt buộc nằm trong Suspense khi build static export (Next.js prerender) —
+ * dev server không báo lỗi này, chỉ `next build`/Vercel production build mới bắt được. */
 export default function AdminDisputesPage() {
+  return (
+    <Suspense fallback={null}>
+      <AdminDisputesContent />
+    </Suspense>
+  );
+}
+
+function AdminDisputesContent() {
   const t = useTranslations('admin.disputes');
   const searchParams = useSearchParams();
   const highlightRef = searchParams.get('ref');

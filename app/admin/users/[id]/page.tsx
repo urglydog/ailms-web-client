@@ -1,8 +1,9 @@
 'use client';
 
-import { use, useState } from 'react';
+import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 import { ArrowLeft, Copy } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
@@ -12,8 +13,9 @@ import { api, ApiError } from '@/lib/api/client';
 import { getAccessToken } from '@/lib/auth/token';
 import type { AdminUserDetail, ResetLinkRes } from '@/types/domain';
 
-export default function AdminUserDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params);
+export default function AdminUserDetailPage() {
+  const params = useParams<{ id: string }>();
+  const id = params.id;
   const t = useTranslations('admin.userDetail');
   const queryClient = useQueryClient();
   const token = getAccessToken() ?? '';
