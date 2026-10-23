@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { isSameDay } from 'date-fns';
 import { ArrowDown, ArrowUp, ArrowUpDown, RefreshCw, X } from 'lucide-react';
+import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { PageHeader } from '@/components/instructor/ui/PageHeader';
@@ -321,12 +322,12 @@ export default function AdminPaymentsPage() {
 
             <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line bg-surface px-6 py-4">
               <div className="flex gap-2">
-                <button type="button" onClick={() => toast.info(t('detail.refundSoon'))} className="rounded-lg bg-white px-3 py-1.5 text-sm font-semibold text-danger ring-1 ring-inset ring-danger/40 hover:bg-danger/5">
-                  {t('detail.refund')}
-                </button>
-                <button type="button" onClick={() => toast.info(t('detail.disputeMarked'))} className="rounded-lg border border-line bg-white px-3 py-1.5 text-sm font-semibold text-ink hover:bg-tint">
+                <Link
+                  href={`/admin/transactions/disputes?ref=${selectedPayment.txnRef}`}
+                  className="rounded-lg border border-line bg-white px-3 py-1.5 text-sm font-semibold text-ink hover:bg-tint"
+                >
                   {t('detail.dispute')}
-                </button>
+                </Link>
               </div>
               <button ref={closeRef} type="button" onClick={() => setSelectedPayment(null)} className="rounded-lg bg-accent px-5 py-2 font-semibold text-white hover:bg-accent-dark">
                 {t('detail.close')}

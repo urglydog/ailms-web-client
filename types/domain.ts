@@ -737,6 +737,69 @@ export interface CreateBatchPaymentReq {
   bundleIds?: number[];
 }
 
+/** Chi tiết 1 user cho trang `/admin/users/[id]` — khớp `UserDto.UserRes` (23/10/2026, mở rộng
+ * thêm isAiLocked/isSpamFlagged/spamFlagReason, chỉ có ý nghĩa khi Admin gọi). */
+export interface AdminUserDetail {
+  id: number;
+  email: string;
+  fullName: string;
+  avatarUrl: string | null;
+  headline: string | null;
+  bio: string | null;
+  role: 'STUDENT' | 'INSTRUCTOR' | 'ADMIN';
+  authProvider: string;
+  preferredLanguage: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string | null;
+  coursesPublic: boolean;
+  wishlistPublic: boolean;
+  isAiLocked: boolean;
+  isSpamFlagged: boolean;
+  spamFlagReason: string | null;
+}
+
+/** Khiếu nại/hoàn tiền giao dịch (23/10/2026) — thay nút "Hoàn tiền"/"Khiếu nại" vốn chỉ hiện
+ * toast, không gọi API nào. */
+export type DisputeStatus = 'OPEN' | 'RESOLVED_REFUNDED' | 'RESOLVED_REJECTED';
+
+export interface FileDisputeReq {
+  paymentTxnRef: string;
+  reason: string;
+  description?: string;
+  refundBankAccount?: string;
+}
+
+export interface DisputeRes {
+  id: number;
+  paymentTxnRef: string;
+  courseTitle: string;
+  amount: number;
+  reason: string;
+  description: string | null;
+  status: DisputeStatus;
+  filedByEmail: string;
+  createdAt: string;
+}
+
+export interface DisputeAdminRes extends DisputeRes {
+  refundBankAccount: string | null;
+  adminNote: string | null;
+  resolvedByEmail: string | null;
+  resolvedAt: string | null;
+}
+
+export interface ResolveDisputeReq {
+  status: 'RESOLVED_REFUNDED' | 'RESOLVED_REJECTED';
+  note: string;
+}
+
+/** Link reset mật khẩu Admin tự gửi thủ công cho user (23/10/2026). */
+export interface ResetLinkRes {
+  resetLink: string;
+  expiresAt: string;
+}
+
 /** 1 dòng trong giỏ hàng — đủ dữ liệu để hiển thị trực tiếp, không cần gọi thêm API chi tiết
  * khóa học. */
 export interface CartItem {

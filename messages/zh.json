@@ -661,6 +661,16 @@
       "generic": "出错了",
       "loading": "加载中...",
       "backToLogin": "返回登录"
+    },
+    "resetByToken": {
+      "title": "Reset password",
+      "backToLogin": "Back to login",
+      "missingToken": "Missing a valid link — please use the exact link your Admin sent you.",
+      "newPassword": "New password",
+      "submit": "Reset password",
+      "submitting": "Processing...",
+      "success": "Password changed successfully! Please log in again.",
+      "genericError": "This link has expired or is invalid."
     }
   },
   "community": {
@@ -1279,7 +1289,8 @@
       "transactions": "交易对账",
       "coupons": "优惠券",
       "announcements": "系统公告",
-      "settings": "系统设置"
+      "settings": "系统设置",
+      "disputes": "Payment disputes"
     },
     "shell": {
       "brand": "LinguaLearn",
@@ -1338,7 +1349,8 @@
         "STUDENT": "学员",
         "INSTRUCTOR": "讲师",
         "ADMIN": "管理员",
-        "LOCKED": "已锁定"
+        "LOCKED": "已锁定",
+        "SPAM": "Spam flagged"
       },
       "searchLabel": "搜索用户",
       "searchPh": "姓名或邮箱...",
@@ -1484,8 +1496,6 @@
       },
       "beat": {
         "title": "Celery Beat — 定时任务",
-        "running": "✓ 运行中",
-        "planned": "○ 待部署",
         "cleanupTemp": {
           "desc": "清理超过 24 小时的中间文件（.wav、视频分块）",
           "schedule": "每小时（整点）"
@@ -1501,7 +1511,11 @@
         "reportAudio": {
           "desc": "报告超过 180 天未使用的音频",
           "schedule": "每周一凌晨 4:00"
-        }
+        },
+        "staticBadge": "Static, not live data",
+        "staticNote": "Reference list hardcoded in the AI Worker code — unlike the two tables above, it does not update in real time.",
+        "configured": "✓ Configured",
+        "notConfigured": "○ Not deployed"
       },
       "jobs": "配音任务列表"
     },
@@ -1585,28 +1599,36 @@
       }
     },
     "jobs": {
-      "filterLabel": "按状态筛选",
+      "filterLabel": "Filter by status",
+      "searchLabel": "Search by lesson or language",
+      "searchPh": "Search by lesson title or language...",
       "status": {
-        "ALL": "全部",
-        "PENDING": "等待中",
-        "PROCESSING": "处理中",
-        "COMPLETED": "已完成",
-        "FAILED": "失败",
-        "SKIPPED": "已跳过"
+        "ALL": "All",
+        "PENDING": "Pending",
+        "PROCESSING": "Processing",
+        "COMPLETED": "Completed",
+        "FAILED": "Failed",
+        "SKIPPED": "Skipped"
       },
       "cols": {
-        "lesson": "课时",
-        "language": "语言",
-        "status": "状态",
-        "progress": "进度",
-        "retry": "重试",
-        "error": "错误",
-        "actions": "操作"
+        "lesson": "Lesson",
+        "language": "Language",
+        "status": "Status",
+        "progress": "Progress",
+        "retry": "Retries",
+        "error": "Error",
+        "actions": "Actions"
       },
-      "loading": "加载中...",
-      "empty": "没有任务。",
-      "retry": "重试",
-      "retryError": "无法重试此任务。"
+      "loading": "Loading...",
+      "empty": "No jobs.",
+      "retry": "Retry",
+      "retryError": "Could not retry this job.",
+      "pager": {
+        "aria": "Dubbing job pagination",
+        "prev": "Previous",
+        "next": "Next",
+        "page": "Page {page} of {total}"
+      }
     },
     "payments": {
       "title": "支付对账",
@@ -1653,36 +1675,33 @@
         "page": "第 {page} / {total} 页"
       },
       "detail": {
-        "title": "交易详情",
-        "close": "关闭",
-        "course": "课程",
-        "account": "购买账户",
-        "billingName": "付款姓名",
-        "phone": "电话号码",
-        "none": "无",
-        "source": "收入来源",
-        "sourceReferral": "讲师专属推荐链接",
-        "sourceOrganic": "学员在平台上自行发现",
-        "fee": "平台费用（{percent}%）",
-        "earning": "讲师所得（{percent}%）",
-        "coupon": "已使用的优惠码",
-        "couponMath": "原价 {original} − 优惠 {discount}",
-        "method": "支付方式",
-        "status": "状态",
-        "failReason": "失败原因",
-        "failText": "被支付网关取消，或由用户自行取消。",
-        "ref": "参考编号",
-        "gateway": "网关编号",
-        "notYet": "暂无",
-        "refund": "退款",
-        "refundSoon": "退款功能正在开发中。",
-        "dispute": "处理投诉",
-        "disputeMarked": "已标记为处理完成！"
+        "title": "Transaction details",
+        "close": "Close",
+        "course": "Course",
+        "account": "Purchasing account",
+        "billingName": "Billing name",
+        "phone": "Phone number",
+        "none": "None",
+        "source": "Revenue source",
+        "sourceReferral": "Instructor’s own referral link",
+        "sourceOrganic": "Found by the learner on the platform",
+        "fee": "Platform fee ({percent}%)",
+        "earning": "Instructor receives ({percent}%)",
+        "coupon": "Coupon used",
+        "couponMath": "Original {original} − Discount {discount}",
+        "method": "Payment method",
+        "status": "Status",
+        "failReason": "Failure reason",
+        "failText": "Cancelled by the payment gateway or by the user.",
+        "ref": "Reference code",
+        "gateway": "Gateway code",
+        "notYet": "Not yet",
+        "dispute": "View/handle dispute"
       }
     },
     "settings": {
       "title": "系统设置",
-      "subtitle": "关于 AI Worker、业务配额和服务器资源的只读信息。",
+      "subtitle": "AI Worker and server resources are read-only; business quotas can be edited and saved.",
       "worker": {
         "title": "AI Worker",
         "up": "运行中",
@@ -1698,17 +1717,18 @@
         "urlDesc": "与 FastAPI 服务通信的内部地址"
       },
       "quotas": {
-        "title": "业务配额",
-        "dubStudent": "配音 / 学员 / 天",
-        "dubStudentUnit": "{count} 次",
-        "dubInstructor": "配音 / 讲师 / 天",
-        "dubInstructorUnit": "{count} 次",
-        "materials": "生成学习资料 / 天",
-        "materialsUnit": "{count} 次",
-        "tutor": "AI 助教消息 / 天",
-        "tutorUnit": "{count} 条",
-        "guestSearch": "AI 搜索（访客）/ 小时",
-        "guestSearchUnit": "{count} 次"
+        "title": "Business quotas",
+        "dubStudent": "Dubbing / learner / day",
+        "dubInstructor": "Dubbing / instructor / day",
+        "materials": "Generated materials / day",
+        "tutor": "AI Tutor messages / day",
+        "guestSearch": "AI search (guest) / hour",
+        "loading": "Loading...",
+        "save": "Save",
+        "saving": "Saving...",
+        "cancel": "Cancel",
+        "saved": "Configuration saved.",
+        "saveError": "Could not save configuration."
       },
       "resources": {
         "title": "后端资源",
@@ -1837,6 +1857,92 @@
         "HIGH": "高",
         "MEDIUM": "中",
         "LOW": "低"
+      }
+    },
+    "disputes": {
+      "title": "Payment disputes",
+      "subtitle": "Disputes/refund requests filed by learners or instructors.",
+      "loadError": "Could not load the dispute list.",
+      "empty": "No disputes yet.",
+      "filters": {
+        "status": "Status",
+        "all": "All"
+      },
+      "status": {
+        "OPEN": "Open",
+        "RESOLVED_REFUNDED": "Refunded",
+        "RESOLVED_REJECTED": "Rejected"
+      },
+      "cols": {
+        "ref": "Transaction ID",
+        "user": "Filed by",
+        "reason": "Reason",
+        "amount": "Amount",
+        "status": "Status",
+        "time": "Time",
+        "actions": "Actions"
+      },
+      "process": "Process",
+      "detail": {
+        "title": "Process dispute",
+        "course": "Course",
+        "amount": "Amount",
+        "reason": "Reason",
+        "description": "Description",
+        "bankAccount": "Refund bank account",
+        "none": "None",
+        "note": "Resolution note *",
+        "notePh": "Explain the decision...",
+        "markRefunded": "Mark as refunded",
+        "reject": "Reject dispute",
+        "cancel": "Close",
+        "resolvedBy": "Resolved by {email}",
+        "error": "Could not process this dispute."
+      },
+      "fileSuccess": "Dispute filed."
+    },
+    "userDetail": {
+      "back": "Back",
+      "genericError": "Something went wrong, please try again.",
+      "toggleBlockSuccess": "Account status updated.",
+      "toggleAiLockSuccess": "AI access updated.",
+      "spamFlagSuccess": "Spam flag updated.",
+      "linkCopied": "Link copied.",
+      "profile": {
+        "title": "Profile",
+        "role": "Role",
+        "authProvider": "Signed in with",
+        "createdAt": "Created at",
+        "status": "Status",
+        "active": "Active",
+        "locked": "Locked",
+        "lock": "Lock account",
+        "unlock": "Unlock"
+      },
+      "aiLock": {
+        "title": "AI access",
+        "status": "Status",
+        "active": "AI access granted",
+        "locked": "AI access locked",
+        "lock": "Lock AI",
+        "unlock": "Unlock AI"
+      },
+      "spam": {
+        "title": "Spam/scam flag",
+        "hint": "Admin-only — does not auto-lock the account, never shown publicly.",
+        "reason": "Reason",
+        "reasonPh": "Reason for flagging as spam/scam...",
+        "none": "No reason given",
+        "flag": "Flag as spam",
+        "unflag": "Remove flag"
+      },
+      "resetLink": {
+        "title": "Password reset assistance",
+        "hint": "Use when a user forgot their password but isn't receiving the email/OTP — generates a separate link (expires in 30 minutes) for you to send through another channel.",
+        "generate": "Generate reset link",
+        "generating": "Generating...",
+        "copy": "Copy link",
+        "expiresAt": "Expires at {time}"
       }
     }
   }

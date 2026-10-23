@@ -661,6 +661,16 @@
       "generic": "エラーが発生しました",
       "loading": "読み込み中...",
       "backToLogin": "ログインに戻る"
+    },
+    "resetByToken": {
+      "title": "Reset password",
+      "backToLogin": "Back to login",
+      "missingToken": "Missing a valid link — please use the exact link your Admin sent you.",
+      "newPassword": "New password",
+      "submit": "Reset password",
+      "submitting": "Processing...",
+      "success": "Password changed successfully! Please log in again.",
+      "genericError": "This link has expired or is invalid."
     }
   },
   "community": {
@@ -1279,7 +1289,8 @@
       "transactions": "取引の照合",
       "coupons": "クーポン",
       "announcements": "システムのお知らせ",
-      "settings": "システム設定"
+      "settings": "システム設定",
+      "disputes": "Payment disputes"
     },
     "shell": {
       "brand": "LinguaLearn",
@@ -1338,7 +1349,8 @@
         "STUDENT": "受講生",
         "INSTRUCTOR": "講師",
         "ADMIN": "管理者",
-        "LOCKED": "ロック中"
+        "LOCKED": "ロック中",
+        "SPAM": "Spam flagged"
       },
       "searchLabel": "ユーザーを検索",
       "searchPh": "名前またはメール...",
@@ -1484,8 +1496,6 @@
       },
       "beat": {
         "title": "Celery Beat — 定期ジョブ",
-        "running": "✓ 実行中",
-        "planned": "○ 未導入",
         "cleanupTemp": {
           "desc": "24 時間を超えた中間ファイル（.wav、動画チャンク）を削除",
           "schedule": "毎時（0 分）"
@@ -1501,7 +1511,11 @@
         "reportAudio": {
           "desc": "180 日以上使われていない音声をレポート",
           "schedule": "毎週月曜 午前 4:00"
-        }
+        },
+        "staticBadge": "Static, not live data",
+        "staticNote": "Reference list hardcoded in the AI Worker code — unlike the two tables above, it does not update in real time.",
+        "configured": "✓ Configured",
+        "notConfigured": "○ Not deployed"
       },
       "jobs": "吹き替えジョブ一覧"
     },
@@ -1585,28 +1599,36 @@
       }
     },
     "jobs": {
-      "filterLabel": "状態で絞り込み",
+      "filterLabel": "Filter by status",
+      "searchLabel": "Search by lesson or language",
+      "searchPh": "Search by lesson title or language...",
       "status": {
-        "ALL": "すべて",
-        "PENDING": "待機中",
-        "PROCESSING": "処理中",
-        "COMPLETED": "完了",
-        "FAILED": "失敗",
-        "SKIPPED": "スキップ"
+        "ALL": "All",
+        "PENDING": "Pending",
+        "PROCESSING": "Processing",
+        "COMPLETED": "Completed",
+        "FAILED": "Failed",
+        "SKIPPED": "Skipped"
       },
       "cols": {
-        "lesson": "レッスン",
-        "language": "言語",
-        "status": "状態",
-        "progress": "進捗",
-        "retry": "再試行",
-        "error": "エラー",
-        "actions": "操作"
+        "lesson": "Lesson",
+        "language": "Language",
+        "status": "Status",
+        "progress": "Progress",
+        "retry": "Retries",
+        "error": "Error",
+        "actions": "Actions"
       },
-      "loading": "読み込み中...",
-      "empty": "ジョブはありません。",
-      "retry": "再試行",
-      "retryError": "このジョブを再試行できませんでした。"
+      "loading": "Loading...",
+      "empty": "No jobs.",
+      "retry": "Retry",
+      "retryError": "Could not retry this job.",
+      "pager": {
+        "aria": "Dubbing job pagination",
+        "prev": "Previous",
+        "next": "Next",
+        "page": "Page {page} of {total}"
+      }
     },
     "payments": {
       "title": "支払いの照合",
@@ -1653,36 +1675,33 @@
         "page": "{page} / {total} ページ"
       },
       "detail": {
-        "title": "取引の詳細",
-        "close": "閉じる",
-        "course": "講座",
-        "account": "購入アカウント",
-        "billingName": "支払者名",
-        "phone": "電話番号",
-        "none": "なし",
-        "source": "収益の流入元",
-        "sourceReferral": "講師専用の紹介リンク",
-        "sourceOrganic": "受講生がプラットフォームで自分で見つけた",
-        "fee": "プラットフォーム手数料（{percent}%）",
-        "earning": "講師の受取額（{percent}%）",
-        "coupon": "使用したクーポン",
-        "couponMath": "定価 {original} − 割引 {discount}",
-        "method": "支払い方法",
-        "status": "状態",
-        "failReason": "失敗の理由",
-        "failText": "決済ゲートウェイまたはユーザーによりキャンセルされました。",
-        "ref": "参照コード",
-        "gateway": "ゲートウェイのコード",
-        "notYet": "まだありません",
-        "refund": "返金",
-        "refundSoon": "返金機能は開発中です。",
-        "dispute": "問い合わせ対応",
-        "disputeMarked": "対応済みとして記録しました！"
+        "title": "Transaction details",
+        "close": "Close",
+        "course": "Course",
+        "account": "Purchasing account",
+        "billingName": "Billing name",
+        "phone": "Phone number",
+        "none": "None",
+        "source": "Revenue source",
+        "sourceReferral": "Instructor’s own referral link",
+        "sourceOrganic": "Found by the learner on the platform",
+        "fee": "Platform fee ({percent}%)",
+        "earning": "Instructor receives ({percent}%)",
+        "coupon": "Coupon used",
+        "couponMath": "Original {original} − Discount {discount}",
+        "method": "Payment method",
+        "status": "Status",
+        "failReason": "Failure reason",
+        "failText": "Cancelled by the payment gateway or by the user.",
+        "ref": "Reference code",
+        "gateway": "Gateway code",
+        "notYet": "Not yet",
+        "dispute": "View/handle dispute"
       }
     },
     "settings": {
       "title": "システム設定",
-      "subtitle": "AI Worker、業務上の上限、サーバーリソースの閲覧専用情報です。",
+      "subtitle": "AI Worker and server resources are read-only; business quotas can be edited and saved.",
       "worker": {
         "title": "AI Worker",
         "up": "稼働中",
@@ -1698,17 +1717,18 @@
         "urlDesc": "FastAPI サービスとの内部通信用アドレス"
       },
       "quotas": {
-        "title": "業務上の上限",
-        "dubStudent": "吹き替え / 受講生 / 日",
-        "dubStudentUnit": "{count} 回",
-        "dubInstructor": "吹き替え / 講師 / 日",
-        "dubInstructorUnit": "{count} 回",
-        "materials": "教材の生成 / 日",
-        "materialsUnit": "{count} 回",
-        "tutor": "AI チューターのメッセージ / 日",
-        "tutorUnit": "{count} 件",
-        "guestSearch": "AI 検索（ゲスト）/ 時間",
-        "guestSearchUnit": "{count} 回"
+        "title": "Business quotas",
+        "dubStudent": "Dubbing / learner / day",
+        "dubInstructor": "Dubbing / instructor / day",
+        "materials": "Generated materials / day",
+        "tutor": "AI Tutor messages / day",
+        "guestSearch": "AI search (guest) / hour",
+        "loading": "Loading...",
+        "save": "Save",
+        "saving": "Saving...",
+        "cancel": "Cancel",
+        "saved": "Configuration saved.",
+        "saveError": "Could not save configuration."
       },
       "resources": {
         "title": "バックエンドのリソース",
@@ -1837,6 +1857,92 @@
         "HIGH": "高",
         "MEDIUM": "中",
         "LOW": "低"
+      }
+    },
+    "disputes": {
+      "title": "Payment disputes",
+      "subtitle": "Disputes/refund requests filed by learners or instructors.",
+      "loadError": "Could not load the dispute list.",
+      "empty": "No disputes yet.",
+      "filters": {
+        "status": "Status",
+        "all": "All"
+      },
+      "status": {
+        "OPEN": "Open",
+        "RESOLVED_REFUNDED": "Refunded",
+        "RESOLVED_REJECTED": "Rejected"
+      },
+      "cols": {
+        "ref": "Transaction ID",
+        "user": "Filed by",
+        "reason": "Reason",
+        "amount": "Amount",
+        "status": "Status",
+        "time": "Time",
+        "actions": "Actions"
+      },
+      "process": "Process",
+      "detail": {
+        "title": "Process dispute",
+        "course": "Course",
+        "amount": "Amount",
+        "reason": "Reason",
+        "description": "Description",
+        "bankAccount": "Refund bank account",
+        "none": "None",
+        "note": "Resolution note *",
+        "notePh": "Explain the decision...",
+        "markRefunded": "Mark as refunded",
+        "reject": "Reject dispute",
+        "cancel": "Close",
+        "resolvedBy": "Resolved by {email}",
+        "error": "Could not process this dispute."
+      },
+      "fileSuccess": "Dispute filed."
+    },
+    "userDetail": {
+      "back": "Back",
+      "genericError": "Something went wrong, please try again.",
+      "toggleBlockSuccess": "Account status updated.",
+      "toggleAiLockSuccess": "AI access updated.",
+      "spamFlagSuccess": "Spam flag updated.",
+      "linkCopied": "Link copied.",
+      "profile": {
+        "title": "Profile",
+        "role": "Role",
+        "authProvider": "Signed in with",
+        "createdAt": "Created at",
+        "status": "Status",
+        "active": "Active",
+        "locked": "Locked",
+        "lock": "Lock account",
+        "unlock": "Unlock"
+      },
+      "aiLock": {
+        "title": "AI access",
+        "status": "Status",
+        "active": "AI access granted",
+        "locked": "AI access locked",
+        "lock": "Lock AI",
+        "unlock": "Unlock AI"
+      },
+      "spam": {
+        "title": "Spam/scam flag",
+        "hint": "Admin-only — does not auto-lock the account, never shown publicly.",
+        "reason": "Reason",
+        "reasonPh": "Reason for flagging as spam/scam...",
+        "none": "No reason given",
+        "flag": "Flag as spam",
+        "unflag": "Remove flag"
+      },
+      "resetLink": {
+        "title": "Password reset assistance",
+        "hint": "Use when a user forgot their password but isn't receiving the email/OTP — generates a separate link (expires in 30 minutes) for you to send through another channel.",
+        "generate": "Generate reset link",
+        "generating": "Generating...",
+        "copy": "Copy link",
+        "expiresAt": "Expires at {time}"
       }
     }
   }
