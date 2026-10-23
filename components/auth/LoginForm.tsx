@@ -95,6 +95,23 @@ export function LoginForm() {
       || t('login.generic')
     : null;
 
+  // (23/10/2026, sửa theo yêu cầu) — khi đã biết chắc vừa bị văng vì lý do xác thực (vd tài
+  // khoản bị khóa), không để form trông như "thử lại là được" — ẩn hẳn input/nút đăng nhập,
+  // chỉ còn khung đỏ + nút "Thử lại" rõ ràng (user tự bấm khi chắc chắn vấn đề đã được xử lý,
+  // thay vì gõ lại email/password vô ích).
+  if (kickReason) {
+    return (
+      <div className="flex flex-col gap-4">
+        <div role="alert" className="rounded-lg border border-danger/30 bg-danger/5 px-4 py-3 text-center text-sm font-medium text-danger">
+          {kickReason}
+        </div>
+        <Button type="button" onClick={() => setKickReason(null)} className="w-full" size="lg">
+          {t('login.tryAgain')}
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-4">
       {registered && (
@@ -103,9 +120,9 @@ export function LoginForm() {
           {t('login.registered')}
         </div>
       )}
-      {(kickReason || errorDetail) && (
+      {errorDetail && (
         <div role="alert" className="rounded-lg border border-danger/30 bg-danger/5 px-3 py-2 text-center text-sm font-medium text-danger">
-          {kickReason || errorDetail}
+          {errorDetail}
         </div>
       )}
 
