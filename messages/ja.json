@@ -54,7 +54,8 @@
       "becomeInstructor": "講師になる",
       "language": "言語",
       "logout": "ログアウト",
-      "certificates": "証明書と実績"
+      "certificates": "証明書と実績",
+      "requestRefund": "Request a refund"
     },
     "auth": {
       "login": "ログイン",
@@ -1897,7 +1898,9 @@
         "reject": "Reject dispute",
         "cancel": "Close",
         "resolvedBy": "Resolved by {email}",
-        "error": "Could not process this dispute."
+        "error": "Could not process this dispute.",
+        "attachments": "Attached evidence",
+        "viewVideo": "View video"
       },
       "fileSuccess": "Dispute filed."
     },

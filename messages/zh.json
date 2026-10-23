@@ -54,7 +54,8 @@
       "becomeInstructor": "成为讲师",
       "language": "语言",
       "logout": "退出登录",
-      "certificates": "证书与成就"
+      "certificates": "证书与成就",
+      "requestRefund": "Request a refund"
     },
     "auth": {
       "login": "登录",
@@ -1897,7 +1898,9 @@
         "reject": "Reject dispute",
         "cancel": "Close",
         "resolvedBy": "Resolved by {email}",
-        "error": "Could not process this dispute."
+        "error": "Could not process this dispute.",
+        "attachments": "Attached evidence",
+        "viewVideo": "View video"
       },
       "fileSuccess": "Dispute filed."
     },
