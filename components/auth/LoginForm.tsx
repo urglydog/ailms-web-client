@@ -18,6 +18,7 @@ export function LoginForm() {
   const [password, setPassword] = useState('');
   const [registered, setRegistered] = useState(false);
   const { mutate: login, isPending, error } = useLogin();
+  const [kickReason, setKickReason] = useState<string | null>(null);
 
   useEffect(() => {
     if (searchParams.get('registered') === 'true') setRegistered(true);
@@ -25,12 +26,14 @@ export function LoginForm() {
 
   // (23/10/2026, sửa bug thật) — trước đây bị văng về /login giữa phiên (vd tài khoản vừa bị
   // Admin khóa) hoàn toàn im lặng, không một lời giải thích — xem lib/api/client.ts#fetchWithRefresh.
+  // Hiện NGAY thành khung đỏ cố định trong form, KHÔNG phải toast — phải thấy được trước khi
+  // user kịp bấm đăng nhập lại, không phải chờ bấm xong mới biết (toast tự biến mất, dễ bỏ lỡ).
   useEffect(() => {
     try {
       const reason = sessionStorage.getItem('loginKickReason');
       if (reason) {
         sessionStorage.removeItem('loginKickReason');
-        toast.error(reason);
+        setKickReason(reason);
       }
     } catch {
       /* Safari riêng tư chặn sessionStorage — bỏ qua */
@@ -40,6 +43,7 @@ export function LoginForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setRegistered(false);
+    setKickReason(null);
     login({ email, password }, {
       onSuccess: (data: { accessToken?: string; refreshToken?: string }) => {
         // Lưu token vào localStorage (Giai đoạn 1)
@@ -79,15 +83,16 @@ export function LoginForm() {
         // Cập nhật lại giao diện (reload) và chuyển hướng
         window.location.href = targetUrl;
       },
-      onError: (err: unknown) => {
-        const error = err as { response?: { data?: { detail?: string, message?: string } } };
-        toast.error(error.response?.data?.message || error.response?.data?.detail || t('login.failed'));
-      }
     });
   };
 
+  // (23/10/2026, sửa bug thật) — trước đây VỪA hiện khung đỏ này VỪA bắn toast.error trùng lặp
+  // y hệt nội dung cho cùng 1 lỗi đăng nhập sai — chỉ cần 1 chỗ hiện, dùng khung cố định trong
+  // form (không tự biến mất như toast) theo đúng yêu cầu.
   const errorDetail = error
-    ? ((error as unknown) as { response?: { data?: { detail?: string } } })?.response?.data?.detail || t('login.generic')
+    ? ((error as unknown) as { response?: { data?: { detail?: string, message?: string } } })?.response?.data?.message
+      || ((error as unknown) as { response?: { data?: { detail?: string } } })?.response?.data?.detail
+      || t('login.generic')
     : null;
 
   return (
@@ -98,7 +103,11 @@ export function LoginForm() {
           {t('login.registered')}
         </div>
       )}
-      {errorDetail && <div role="alert" className="text-center text-sm text-danger">{errorDetail}</div>}
+      {(kickReason || errorDetail) && (
+        <div role="alert" className="rounded-lg border border-danger/30 bg-danger/5 px-3 py-2 text-center text-sm font-medium text-danger">
+          {kickReason || errorDetail}
+        </div>
+      )}
 
       {/* Google Sign-In Button */}
       <GoogleSignInButton />
