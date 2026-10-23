@@ -627,7 +627,8 @@
       "generic": "出了点问题",
       "loading": "正在加载表单...",
       "noAccount": "还没有账号？",
-      "signUpNow": "立即注册"
+      "signUpNow": "立即注册",
+      "tryAgain": "Try again"
     },
     "register": {
       "title": "注册账号",

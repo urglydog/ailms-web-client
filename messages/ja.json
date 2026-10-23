@@ -627,7 +627,8 @@
       "generic": "エラーが発生しました",
       "loading": "フォームを読み込み中...",
       "noAccount": "アカウントをお持ちでないですか？",
-      "signUpNow": "今すぐ登録"
+      "signUpNow": "今すぐ登録",
+      "tryAgain": "Try again"
     },
     "register": {
       "title": "アカウント登録",
