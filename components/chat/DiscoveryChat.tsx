@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { toast } from 'sonner';
-import { api } from '@/lib/api/client';
+import { api, ApiError } from '@/lib/api/client';
 import { getAccessToken } from '@/lib/auth/token';
 import { MarkdownRenderer } from '@/components/ui/MarkdownRenderer';
 
@@ -81,8 +81,14 @@ export function DiscoveryChat() {
         text: data.reply || 'Không có phản hồi.', 
         courses: data.courses 
       }]);
-    } catch {
-      setMessages(prev => [...prev, { role: 'assistant', text: 'Xin lỗi, tôi đang gặp sự cố kết nối tới AI. Vui lòng kiểm tra lại.' }]);
+    } catch (err) {
+      // (23/10/2026, sửa bug thật) — trước đây nuốt mọi lỗi thành 1 câu "sự cố kết nối" chung
+      // chung, kể cả khi lý do thật là bị khóa AI/đánh dấu spam (403) — user tưởng hệ thống lỗi,
+      // không biết mình bị hạn chế. Giờ hiện đúng lý do thật khi là lỗi nghiệp vụ từ BE.
+      const text = err instanceof ApiError
+        ? err.message
+        : 'Xin lỗi, tôi đang gặp sự cố kết nối tới AI. Vui lòng kiểm tra lại.';
+      setMessages(prev => [...prev, { role: 'assistant', text }]);
     } finally {
       setLoading(false);
     }
