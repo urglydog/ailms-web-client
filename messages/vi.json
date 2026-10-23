@@ -661,6 +661,16 @@
       "generic": "Có lỗi xảy ra",
       "loading": "Đang tải...",
       "backToLogin": "Quay lại đăng nhập"
+    },
+    "resetByToken": {
+      "title": "Đặt lại mật khẩu",
+      "backToLogin": "Quay lại đăng nhập",
+      "missingToken": "Thiếu link hợp lệ — vui lòng dùng đúng link Admin đã gửi cho bạn.",
+      "newPassword": "Mật khẩu mới",
+      "submit": "Đặt lại mật khẩu",
+      "submitting": "Đang xử lý...",
+      "success": "Đổi mật khẩu thành công! Vui lòng đăng nhập lại.",
+      "genericError": "Link đã hết hạn hoặc không hợp lệ."
     }
   },
   "community": {
@@ -1277,6 +1287,7 @@
       "voicemappings": "Giọng đọc lồng tiếng",
       "tutorsecurity": "Bảo mật AI Tutor",
       "transactions": "Đối soát giao dịch",
+      "disputes": "Khiếu nại giao dịch",
       "coupons": "Mã giảm giá",
       "announcements": "Thông báo hệ thống",
       "settings": "Cấu hình hệ thống"
@@ -1338,7 +1349,8 @@
         "STUDENT": "Học viên",
         "INSTRUCTOR": "Giảng viên",
         "ADMIN": "Quản trị",
-        "LOCKED": "Bị khóa"
+        "LOCKED": "Bị khóa",
+        "SPAM": "Bị gắn cờ spam"
       },
       "searchLabel": "Tìm người dùng",
       "searchPh": "Tên hoặc email...",
@@ -1386,6 +1398,50 @@
         "prev": "Trước",
         "next": "Sau",
         "page": "Trang {page} / {total}"
+      }
+    },
+    "userDetail": {
+      "back": "Quay lại",
+      "genericError": "Có lỗi xảy ra, vui lòng thử lại.",
+      "toggleBlockSuccess": "Đã cập nhật trạng thái tài khoản.",
+      "toggleAiLockSuccess": "Đã cập nhật quyền dùng AI.",
+      "spamFlagSuccess": "Đã cập nhật cờ spam.",
+      "linkCopied": "Đã sao chép link.",
+      "profile": {
+        "title": "Hồ sơ",
+        "role": "Vai trò",
+        "authProvider": "Đăng nhập bằng",
+        "createdAt": "Ngày tạo",
+        "status": "Trạng thái",
+        "active": "Hoạt động",
+        "locked": "Bị khóa",
+        "lock": "Khóa tài khoản",
+        "unlock": "Mở khóa"
+      },
+      "aiLock": {
+        "title": "Quyền dùng AI",
+        "status": "Trạng thái",
+        "active": "Được dùng AI",
+        "locked": "Bị khóa AI",
+        "lock": "Khóa AI",
+        "unlock": "Mở khóa AI"
+      },
+      "spam": {
+        "title": "Cờ Spam/Scam",
+        "hint": "Chỉ Admin nhìn thấy — không tự động khóa tài khoản, không hiển thị công khai.",
+        "reason": "Lý do",
+        "reasonPh": "Lý do đánh dấu spam/scam...",
+        "none": "Không có lý do",
+        "flag": "Đánh dấu spam",
+        "unflag": "Bỏ đánh dấu"
+      },
+      "resetLink": {
+        "title": "Hỗ trợ đặt lại mật khẩu",
+        "hint": "Dùng khi user quên mật khẩu nhưng không nhận được email/OTP — sinh link riêng (hết hạn sau 30 phút) để bạn tự gửi qua kênh khác.",
+        "generate": "Tạo link đặt lại mật khẩu",
+        "generating": "Đang tạo...",
+        "copy": "Sao chép link",
+        "expiresAt": "Hết hạn lúc {time}"
       }
     },
     "moderation": {
@@ -1484,8 +1540,10 @@
       },
       "beat": {
         "title": "Celery Beat — Lịch job định kỳ",
-        "running": "✓ Đang chạy",
-        "planned": "○ Chờ triển khai",
+        "staticBadge": "Tĩnh, không phải dữ liệu trực tiếp",
+        "staticNote": "Danh sách tham khảo khai báo sẵn trong code AI Worker — không tự cập nhật theo thời gian thực như 2 bảng phía trên.",
+        "configured": "✓ Đã cấu hình",
+        "notConfigured": "○ Chưa triển khai",
         "cleanupTemp": {
           "desc": "Dọn file trung gian (.wav, chunk video) quá 24 giờ",
           "schedule": "Mỗi giờ (phút :00)"
@@ -1586,6 +1644,8 @@
     },
     "jobs": {
       "filterLabel": "Lọc theo trạng thái",
+      "searchLabel": "Tìm theo bài học hoặc ngôn ngữ",
+      "searchPh": "Tìm theo tên bài học hoặc ngôn ngữ...",
       "status": {
         "ALL": "Tất cả",
         "PENDING": "Đang chờ",
@@ -1606,7 +1666,13 @@
       "loading": "Đang tải...",
       "empty": "Không có job nào.",
       "retry": "Thử lại",
-      "retryError": "Không thử lại được job này."
+      "retryError": "Không thử lại được job này.",
+      "pager": {
+        "aria": "Phân trang job lồng tiếng",
+        "prev": "Trước",
+        "next": "Sau",
+        "page": "Trang {page} / {total}"
+      }
     },
     "payments": {
       "title": "Đối soát thanh toán",
@@ -1674,15 +1740,54 @@
         "ref": "Mã tham chiếu",
         "gateway": "Mã cổng thanh toán",
         "notYet": "Chưa có",
-        "refund": "Hoàn tiền",
-        "refundSoon": "Tính năng hoàn tiền đang được phát triển.",
-        "dispute": "Xử lý khiếu nại",
-        "disputeMarked": "Đã đánh dấu báo cáo thành công!"
+        "dispute": "Xem/xử lý khiếu nại"
       }
+    },
+    "disputes": {
+      "title": "Khiếu nại giao dịch",
+      "subtitle": "Khiếu nại/yêu cầu hoàn tiền do học viên, giảng viên gửi lên.",
+      "loadError": "Không tải được danh sách khiếu nại.",
+      "empty": "Chưa có khiếu nại nào.",
+      "filters": {
+        "status": "Trạng thái",
+        "all": "Tất cả"
+      },
+      "status": {
+        "OPEN": "Chưa xử lý",
+        "RESOLVED_REFUNDED": "Đã hoàn tiền",
+        "RESOLVED_REJECTED": "Đã từ chối"
+      },
+      "cols": {
+        "ref": "Mã giao dịch",
+        "user": "Người gửi",
+        "reason": "Lý do",
+        "amount": "Số tiền",
+        "status": "Trạng thái",
+        "time": "Thời gian",
+        "actions": "Thao tác"
+      },
+      "process": "Xử lý",
+      "detail": {
+        "title": "Xử lý khiếu nại",
+        "course": "Khóa học",
+        "amount": "Số tiền",
+        "reason": "Lý do",
+        "description": "Mô tả",
+        "bankAccount": "STK nhận hoàn tiền",
+        "none": "Không có",
+        "note": "Ghi chú xử lý *",
+        "notePh": "Ghi rõ lý do quyết định...",
+        "markRefunded": "Đánh dấu đã hoàn tiền",
+        "reject": "Từ chối khiếu nại",
+        "cancel": "Đóng",
+        "resolvedBy": "Đã xử lý bởi {email}",
+        "error": "Không xử lý được khiếu nại này."
+      },
+      "fileSuccess": "Đã gửi khiếu nại."
     },
     "settings": {
       "title": "Cấu hình hệ thống",
-      "subtitle": "Thông tin chỉ xem về AI Worker, hạn ngạch nghiệp vụ và tài nguyên máy chủ.",
+      "subtitle": "AI Worker và tài nguyên máy chủ chỉ xem; hạn ngạch nghiệp vụ sửa và lưu được.",
       "worker": {
         "title": "AI Worker",
         "up": "Đang hoạt động",
@@ -1700,15 +1805,16 @@
       "quotas": {
         "title": "Hạn ngạch nghiệp vụ",
         "dubStudent": "Lồng tiếng / học viên / ngày",
-        "dubStudentUnit": "{count} lượt",
         "dubInstructor": "Lồng tiếng / giảng viên / ngày",
-        "dubInstructorUnit": "{count} lượt",
         "materials": "Sinh học liệu / ngày",
-        "materialsUnit": "{count} lượt",
         "tutor": "Tin nhắn AI Tutor / ngày",
-        "tutorUnit": "{count} tin",
         "guestSearch": "Tìm kiếm AI (khách) / giờ",
-        "guestSearchUnit": "{count} lượt"
+        "loading": "Đang tải...",
+        "save": "Lưu",
+        "saving": "Đang lưu...",
+        "cancel": "Hủy",
+        "saved": "Đã lưu cấu hình.",
+        "saveError": "Không lưu được cấu hình."
       },
       "resources": {
         "title": "Tài nguyên Backend",
