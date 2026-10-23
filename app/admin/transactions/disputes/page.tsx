@@ -186,6 +186,25 @@ function AdminDisputesContent() {
                     <dd className="m-0 text-ink">{selected.description}</dd>
                   </div>
                 )}
+                {selected.attachments.length > 0 && (
+                  <div className="col-span-2">
+                    <dt className="mb-1.5 text-sm font-medium text-ink-muted">{t('detail.attachments')}</dt>
+                    <dd className="m-0 flex flex-wrap gap-2">
+                      {selected.attachments.map((a) =>
+                        a.fileType === 'mp4' || a.fileType === 'webm' ? (
+                          <a key={a.id} href={a.fileUrl} target="_blank" rel="noreferrer" className="flex h-20 w-20 items-center justify-center rounded-lg border border-line bg-surface text-xs font-semibold text-accent-dark hover:bg-tint">
+                            {t('detail.viewVideo')}
+                          </a>
+                        ) : (
+                          <a key={a.id} href={a.fileUrl} target="_blank" rel="noreferrer" className="block h-20 w-20 overflow-hidden rounded-lg border border-line">
+                            {/* eslint-disable-next-line @next/next/no-img-element -- ảnh minh chứng từ B2, domain động */}
+                            <img src={a.fileUrl} alt="" className="h-full w-full object-cover" />
+                          </a>
+                        ),
+                      )}
+                    </dd>
+                  </div>
+                )}
               </dl>
 
               {selected.status === 'OPEN' ? (

@@ -768,6 +768,14 @@ export interface FileDisputeReq {
   reason: string;
   description?: string;
   refundBankAccount?: string;
+  termsAccepted: boolean;
+}
+
+export interface DisputeAttachment {
+  id: number;
+  fileUrl: string;
+  /** jpg / png / webp / mp4 / webm */
+  fileType: string;
 }
 
 export interface DisputeRes {
@@ -780,6 +788,7 @@ export interface DisputeRes {
   status: DisputeStatus;
   filedByEmail: string;
   createdAt: string;
+  attachments: DisputeAttachment[];
 }
 
 export interface DisputeAdminRes extends DisputeRes {

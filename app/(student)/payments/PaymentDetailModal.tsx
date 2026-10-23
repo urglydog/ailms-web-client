@@ -1,10 +1,8 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import type { PaymentRes } from '@/types/domain';
 import { format } from 'date-fns';
-import FileDisputeModal from './FileDisputeModal';
 
 interface PaymentDetailModalProps {
   payment: PaymentRes;
@@ -12,7 +10,6 @@ interface PaymentDetailModalProps {
 }
 
 export default function PaymentDetailModal({ payment, onClose }: PaymentDetailModalProps) {
-  const [showDisputeModal, setShowDisputeModal] = useState(false);
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'PAID':
@@ -123,12 +120,12 @@ export default function PaymentDetailModal({ payment, onClose }: PaymentDetailMo
         <div className="px-6 py-4 bg-surface-raised border-t border-line flex justify-between items-center">
           <div className="flex gap-3">
             {payment.status === 'PAID' ? (
-              <button
-                onClick={() => setShowDisputeModal(true)}
+              <Link
+                href={`/disputes/new?ref=${payment.txnRef}`}
                 className="text-sm font-semibold text-danger hover:text-danger-dark transition-colors"
               >
                 Báo cáo vấn đề
-              </button>
+              </Link>
             ) : (
               <span className="text-sm font-semibold text-ink-muted" title="Chỉ khiếu nại được giao dịch đã thanh toán thành công">
                 Báo cáo vấn đề
@@ -149,17 +146,6 @@ export default function PaymentDetailModal({ payment, onClose }: PaymentDetailMo
           </button>
         </div>
       </div>
-
-      {showDisputeModal && (
-        <FileDisputeModal
-          paymentTxnRef={payment.txnRef}
-          onClose={() => setShowDisputeModal(false)}
-          onFiled={() => {
-            setShowDisputeModal(false);
-            onClose();
-          }}
-        />
-      )}
     </div>
   );
 }

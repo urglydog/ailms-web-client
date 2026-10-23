@@ -12,6 +12,7 @@ export type AccountIcon =
   | 'certificate'
   | 'profile'
   | 'receipt'
+  | 'dispute'
   | 'settings'
   | 'admin'
   | 'instructor';
@@ -62,6 +63,7 @@ export function buildAccountMenu(user: { id: number | null; role: Role | undefin
   }
   account.push(
     { id: 'payments', href: '/payments', labelKey: 'account.paymentHistory', icon: 'receipt' },
+    { id: 'disputes', href: '/disputes/new', labelKey: 'account.requestRefund', icon: 'dispute' },
     { id: 'profile', href: '/profile', labelKey: 'account.profile', icon: 'settings' },
   );
   groups.push({ id: 'account', items: account });

@@ -1,10 +1,17 @@
-import { api } from '@/lib/api/client';
+import { api, apiFormData } from '@/lib/api/client';
 import { getAccessToken } from '@/lib/auth/token';
 import type { DisputeAdminRes, DisputeRes, DisputeStatus, FileDisputeReq, ResolveDisputeReq } from '@/types/domain';
 
 export const disputesApi = {
-  file: (req: FileDisputeReq) =>
-    api.post<DisputeRes>('/api/v1/disputes', req, { token: getAccessToken() ?? undefined }),
+  /** multipart (23/10/2026) — cho đính kèm minh chứng ảnh/video, field "request" là 1 phần JSON
+   * (Blob content-type application/json) khớp `@RequestPart("request") DisputeDto.FileReq` phía
+   * BE, field "files" (0-5 file) khớp `@RequestPart(value = "files", required = false)`. */
+  file: (req: FileDisputeReq, files: File[] = []) => {
+    const formData = new FormData();
+    formData.append('request', new Blob([JSON.stringify(req)], { type: 'application/json' }));
+    files.forEach((file) => formData.append('files', file));
+    return apiFormData<DisputeRes>('/api/v1/disputes', formData);
+  },
 
   listMine: () =>
     api.get<DisputeRes[]>('/api/v1/disputes/mine', { token: getAccessToken() ?? undefined }),
