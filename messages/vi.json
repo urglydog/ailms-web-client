@@ -1443,7 +1443,8 @@
         "active": "Được dùng AI",
         "locked": "Bị khóa AI",
         "lock": "Khóa AI",
-        "unlock": "Mở khóa AI"
+        "unlock": "Mở khóa AI",
+        "disabledWhileLocked": "Tài khoản đang bị khóa — cờ AI đi theo trạng thái khóa tài khoản, mở khóa tài khoản để sửa riêng."
       },
       "spam": {
         "title": "Cờ Spam/Scam",
@@ -1452,7 +1453,8 @@
         "reasonPh": "Lý do đánh dấu spam/scam...",
         "none": "Không có lý do",
         "flag": "Đánh dấu spam",
-        "unflag": "Bỏ đánh dấu"
+        "unflag": "Bỏ đánh dấu",
+        "disabledWhileLocked": "Tài khoản đang bị khóa — cờ spam đi theo trạng thái khóa tài khoản, mở khóa tài khoản để sửa riêng."
       },
       "resetLink": {
         "title": "Hỗ trợ đặt lại mật khẩu",
