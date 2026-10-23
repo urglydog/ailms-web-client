@@ -7,11 +7,14 @@ import { useParams } from 'next/navigation';
 import { ArrowLeft, Copy } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
+import { ConfirmDialog } from '@/components/admin/ui/ConfirmDialog';
 import { PageHeader } from '@/components/instructor/ui/PageHeader';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { api, ApiError } from '@/lib/api/client';
 import { getAccessToken } from '@/lib/auth/token';
 import type { AdminUserDetail, ResetLinkRes } from '@/types/domain';
+
+type PendingAction = 'lock' | 'unlock' | 'ai-lock' | 'ai-unlock' | 'spam-flag' | 'spam-unflag' | null;
 
 export default function AdminUserDetailPage() {
   const params = useParams<{ id: string }>();
@@ -21,6 +24,7 @@ export default function AdminUserDetailPage() {
   const token = getAccessToken() ?? '';
   const [spamReason, setSpamReason] = useState('');
   const [resetLink, setResetLink] = useState<ResetLinkRes | null>(null);
+  const [pending, setPending] = useState<PendingAction>(null);
 
   const { data: user, isLoading } = useQuery({
     queryKey: ['admin', 'user-detail', id],
@@ -37,29 +41,32 @@ export default function AdminUserDetailPage() {
     mutationFn: () =>
       api.put(`/api/v1/users/${id}`, { fullName: user!.fullName, role: user!.role, isActive: !user!.isActive }, { token }),
     onSuccess: () => {
-      toast.success(t('toggleBlockSuccess'));
+      toast.success(user!.isActive ? t('lockedToast') : t('unlockedToast'));
       invalidate();
     },
     onError: (err) => toast.error(err instanceof ApiError ? err.message : t('genericError')),
+    onSettled: () => setPending(null),
   });
 
   const toggleAiLock = useMutation({
     mutationFn: () => api.put(`/api/v1/admin/users/${id}/toggle-ai-lock?isLocked=${!user!.isAiLocked}`, undefined, { token }),
     onSuccess: () => {
-      toast.success(t('toggleAiLockSuccess'));
+      toast.success(user!.isAiLocked ? t('aiUnlockedToast') : t('aiLockedToast'));
       invalidate();
     },
     onError: (err) => toast.error(err instanceof ApiError ? err.message : t('genericError')),
+    onSettled: () => setPending(null),
   });
 
   const setSpamFlag = useMutation({
     mutationFn: (flagged: boolean) => api.put(`/api/v1/admin/users/${id}/spam-flag`, { flagged, reason: spamReason }, { token }),
-    onSuccess: () => {
-      toast.success(t('spamFlagSuccess'));
+    onSuccess: (_data, flagged) => {
+      toast.success(flagged ? t('spamFlagSuccess') : t('spamUnflagSuccess'));
       setSpamReason('');
       invalidate();
     },
     onError: (err) => toast.error(err instanceof ApiError ? err.message : t('genericError')),
+    onSettled: () => setPending(null),
   });
 
   const sendResetLink = useMutation({
@@ -82,6 +89,34 @@ export default function AdminUserDetailPage() {
       </div>
     );
   }
+
+  const confirmCopy: Record<Exclude<PendingAction, null>, { title: string; body: string; confirmLabel: string; tone: 'danger' | 'primary' }> = {
+    lock: { title: t('confirm.lockTitle'), body: t('confirm.lockBody'), confirmLabel: t('profile.lock'), tone: 'danger' },
+    unlock: { title: t('confirm.unlockTitle'), body: t('confirm.unlockBody'), confirmLabel: t('profile.unlock'), tone: 'primary' },
+    'ai-lock': { title: t('confirm.aiLockTitle'), body: t('confirm.aiLockBody'), confirmLabel: t('aiLock.lock'), tone: 'danger' },
+    'ai-unlock': { title: t('confirm.aiUnlockTitle'), body: t('confirm.aiUnlockBody'), confirmLabel: t('aiLock.unlock'), tone: 'primary' },
+    'spam-flag': { title: t('confirm.spamFlagTitle'), body: t('confirm.spamFlagBody'), confirmLabel: t('spam.flag'), tone: 'danger' },
+    'spam-unflag': { title: t('confirm.spamUnflagTitle'), body: t('confirm.spamUnflagBody'), confirmLabel: t('spam.unflag'), tone: 'primary' },
+  };
+
+  const runConfirmed = () => {
+    switch (pending) {
+      case 'lock':
+      case 'unlock':
+        toggleBlock.mutate();
+        break;
+      case 'ai-lock':
+      case 'ai-unlock':
+        toggleAiLock.mutate();
+        break;
+      case 'spam-flag':
+        setSpamFlag.mutate(true);
+        break;
+      case 'spam-unflag':
+        setSpamFlag.mutate(false);
+        break;
+    }
+  };
 
   return (
     <>
@@ -114,7 +149,7 @@ export default function AdminUserDetailPage() {
           <button
             type="button"
             disabled={toggleBlock.isPending}
-            onClick={() => toggleBlock.mutate()}
+            onClick={() => setPending(user.isActive ? 'lock' : 'unlock')}
             className={`mt-1 w-fit rounded-lg px-3 py-1.5 text-xs font-bold ${user.isActive ? 'text-danger hover:bg-danger/10' : 'text-success-ink hover:bg-success-tint'}`}
           >
             {user.isActive ? t('profile.lock') : t('profile.unlock')}
@@ -130,7 +165,7 @@ export default function AdminUserDetailPage() {
           <button
             type="button"
             disabled={toggleAiLock.isPending}
-            onClick={() => toggleAiLock.mutate()}
+            onClick={() => setPending(user.isAiLocked ? 'ai-unlock' : 'ai-lock')}
             className="w-fit rounded-lg border border-line px-3 py-1.5 text-xs font-bold text-ink hover:bg-tint"
           >
             {user.isAiLocked ? t('aiLock.unlock') : t('aiLock.lock')}
@@ -146,7 +181,7 @@ export default function AdminUserDetailPage() {
               <button
                 type="button"
                 disabled={setSpamFlag.isPending}
-                onClick={() => setSpamFlag.mutate(false)}
+                onClick={() => setPending('spam-unflag')}
                 className="w-fit rounded-lg border border-line px-3 py-1.5 text-xs font-bold text-ink hover:bg-tint"
               >
                 {t('spam.unflag')}
@@ -164,7 +199,7 @@ export default function AdminUserDetailPage() {
               <button
                 type="button"
                 disabled={setSpamFlag.isPending || !spamReason.trim()}
-                onClick={() => setSpamFlag.mutate(true)}
+                onClick={() => setPending('spam-flag')}
                 className="w-fit rounded-lg bg-danger px-3 py-1.5 text-xs font-bold text-white hover:opacity-90 disabled:opacity-50"
               >
                 {t('spam.flag')}
@@ -197,6 +232,14 @@ export default function AdminUserDetailPage() {
           )}
         </section>
       </div>
+
+      <ConfirmDialog
+        open={pending !== null}
+        {...(pending ? confirmCopy[pending] : { title: '', body: '', confirmLabel: '' })}
+        cancelLabel={t('confirm.cancel')}
+        onConfirm={runConfirmed}
+        onCancel={() => setPending(null)}
+      />
     </>
   );
 }
