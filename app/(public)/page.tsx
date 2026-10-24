@@ -14,14 +14,29 @@ import { TRENDING_FETCH_SIZE } from '@/lib/home/trending';
  */
 export const dynamic = 'force-dynamic';
 
+/**
+ * Backend tự host (VPS) thỉnh thoảng có network blip (ISP/route quốc tế) khiến fetch lúc SSR
+ * timeout/fail. Không bọc try/catch thì 1 trong 4 API lỗi là Promise.all reject, kéo sập TOÀN BỘ
+ * trang chủ với "Application error: a server-side exception has occurred" (đã xảy ra thật
+ * 24/10/2026, digest 3227098399) — dù 3 API còn lại vẫn gọi được bình thường. Bắt lỗi riêng từng
+ * API để API nào lỗi thì mục đó rỗng, không ảnh hưởng các mục khác.
+ */
+async function safeSearch(...args: Parameters<typeof publicCoursesApi.search>) {
+  try {
+    return await publicCoursesApi.search(...args);
+  } catch {
+    return [];
+  }
+}
+
 /** Trang chủ (spec mục 4): hero chia đôi, rồi "Đang thịnh hành" và các hàng Mới ra mắt / Miễn phí / Người mới / Chủ đề. Banner xếp hạng cộng đồng (có sẵn)
  * đặt cuối để không tranh chú ý với hero. */
 export default async function HomePage() {
   const [courses, newest, free, beginner] = await Promise.all([
-    publicCoursesApi.search(EMPTY_FILTERS, 'rating', TRENDING_FETCH_SIZE),
-    publicCoursesApi.search(EMPTY_FILTERS, 'newest', TRENDING_FETCH_SIZE),
-    publicCoursesApi.search({ ...EMPTY_FILTERS, priceType: 'free' }, 'reviews', TRENDING_FETCH_SIZE),
-    publicCoursesApi.search({ ...EMPTY_FILTERS, level: 'BEGINNER', priceType: 'paid' }, 'rating', TRENDING_FETCH_SIZE),
+    safeSearch(EMPTY_FILTERS, 'rating', TRENDING_FETCH_SIZE),
+    safeSearch(EMPTY_FILTERS, 'newest', TRENDING_FETCH_SIZE),
+    safeSearch({ ...EMPTY_FILTERS, priceType: 'free' }, 'reviews', TRENDING_FETCH_SIZE),
+    safeSearch({ ...EMPTY_FILTERS, level: 'BEGINNER', priceType: 'paid' }, 'rating', TRENDING_FETCH_SIZE),
   ]);
 
   return (
