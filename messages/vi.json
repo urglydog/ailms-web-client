@@ -1776,6 +1776,7 @@
       },
       "status": {
         "OPEN": "Chưa xử lý",
+        "REOPENED": "Mở lại - ưu tiên",
         "RESOLVED_REFUNDED": "Đã hoàn tiền",
         "RESOLVED_REJECTED": "Đã từ chối"
       },
@@ -1805,7 +1806,10 @@
         "reject": "Từ chối khiếu nại",
         "cancel": "Đóng",
         "resolvedBy": "Đã xử lý bởi {email}",
-        "error": "Không xử lý được khiếu nại này."
+        "error": "Không xử lý được khiếu nại này.",
+        "reopenReason": "Lý do mở lại khiếu nại",
+        "previousNote": "Ghi chú xử lý lần trước",
+        "noteOverwriteWarning": "Ghi chú mới sẽ được lưu lại, ghi chú cũ đã lưu ở trên."
       },
       "fileSuccess": "Đã gửi khiếu nại."
     },

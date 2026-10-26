@@ -1,6 +1,13 @@
 import { api, apiFormData } from '@/lib/api/client';
 import { getAccessToken } from '@/lib/auth/token';
-import type { DisputeAdminRes, DisputeRes, DisputeStatus, FileDisputeReq, ResolveDisputeReq } from '@/types/domain';
+import type {
+  DisputeAdminRes,
+  DisputeRes,
+  DisputeStatus,
+  FileDisputeReq,
+  ReopenDisputeReq,
+  ResolveDisputeReq,
+} from '@/types/domain';
 
 export const disputesApi = {
   /** multipart (23/10/2026) — cho đính kèm minh chứng ảnh/video, field "request" là 1 phần JSON
@@ -23,4 +30,8 @@ export const disputesApi = {
 
   resolve: (id: number, req: ResolveDisputeReq) =>
     api.post<DisputeAdminRes>(`/api/v1/disputes/admin/${id}/resolve`, req, { token: getAccessToken() ?? undefined }),
+
+  /** User báo "chưa nhận được tiền" sau khi admin đã đánh dấu hoàn tiền (26/10/2026). */
+  reopen: (id: number, req: ReopenDisputeReq) =>
+    api.post<DisputeRes>(`/api/v1/disputes/mine/${id}/reopen`, req, { token: getAccessToken() ?? undefined }),
 };
