@@ -1776,6 +1776,7 @@
       },
       "status": {
         "OPEN": "Open",
+        "REOPENED": "Reopened - priority",
         "RESOLVED_REFUNDED": "Refunded",
         "RESOLVED_REJECTED": "Rejected"
       },
@@ -1805,7 +1806,10 @@
         "reject": "Reject dispute",
         "cancel": "Close",
         "resolvedBy": "Resolved by {email}",
-        "error": "Could not process this dispute."
+        "error": "Could not process this dispute.",
+        "reopenReason": "Reason for reopening",
+        "previousNote": "Previous resolution note",
+        "noteOverwriteWarning": "The new note will be saved; the previous note is kept above."
       },
       "fileSuccess": "Dispute filed."
     },

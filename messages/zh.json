@@ -1872,6 +1872,7 @@
       },
       "status": {
         "OPEN": "Open",
+        "REOPENED": "Reopened - priority",
         "RESOLVED_REFUNDED": "Refunded",
         "RESOLVED_REJECTED": "Rejected"
       },
@@ -1901,7 +1902,10 @@
         "resolvedBy": "Resolved by {email}",
         "error": "Could not process this dispute.",
         "attachments": "Attached evidence",
-        "viewVideo": "View video"
+        "viewVideo": "View video",
+        "reopenReason": "Reason for reopening",
+        "previousNote": "Previous resolution note",
+        "noteOverwriteWarning": "The new note will be saved; the previous note is kept above."
       },
       "fileSuccess": "Dispute filed."
     },

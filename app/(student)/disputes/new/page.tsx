@@ -13,14 +13,19 @@ const STATUS_LABEL: Record<DisputeRes['status'], string> = {
   OPEN: 'Chưa xử lý',
   RESOLVED_REFUNDED: 'Đã hoàn tiền',
   RESOLVED_REJECTED: 'Đã từ chối',
+  REOPENED: 'Đang chờ xử lý lại',
 };
 const STATUS_CLASS: Record<DisputeRes['status'], string> = {
   OPEN: 'bg-white text-ink border-warning',
   RESOLVED_REFUNDED: 'bg-success/10 text-success border-success/20',
   RESOLVED_REJECTED: 'bg-line text-ink-muted border-line',
+  REOPENED: 'bg-danger/10 text-danger border-danger/30',
 };
 const MAX_FILES = 5;
 const ACCEPTED_TYPES = 'image/jpeg,image/png,image/webp,video/mp4,video/webm';
+/** Phải khớp `lms.rules.dispute-reopen-window-days` ở BE (application.yml) — đây chỉ là ước
+ * lượng hiển thị cho UI (ẩn/hiện nút), BE luôn là nơi validate thật khi gọi API. */
+const REOPEN_WINDOW_DAYS = 7;
 
 /** `useSearchParams()` bắt buộc nằm trong Suspense khi build production (bài học từ lần build
  * Vercel trước bị lỗi ở trang disputes admin vì thiếu bọc này). */
@@ -49,6 +54,10 @@ function RequestRefundContent() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const [reopeningId, setReopeningId] = useState<number | null>(null);
+  const [reopenReason, setReopenReason] = useState('');
+  const [reopenSubmitting, setReopenSubmitting] = useState(false);
+
   useEffect(() => {
     Promise.all([paymentsApi.listMine(), disputesApi.listMine()])
       .then(([p, d]) => {
@@ -61,6 +70,28 @@ function RequestRefundContent() {
 
   const selectedPayment = payments.find((p) => p.txnRef === selectedRef) ?? null;
   const alreadyDisputed = (txnRef: string) => myDisputes.some((d) => d.paymentTxnRef === txnRef && d.status === 'OPEN');
+
+  const canReopen = (d: DisputeRes) =>
+    d.status === 'RESOLVED_REFUNDED' &&
+    !d.reopenedAt &&
+    d.resolvedAt != null &&
+    Date.now() - new Date(d.resolvedAt).getTime() < REOPEN_WINDOW_DAYS * 24 * 60 * 60 * 1000;
+
+  const handleReopenSubmit = async (disputeId: number) => {
+    if (!reopenReason.trim()) return;
+    setReopenSubmitting(true);
+    try {
+      const updated = await disputesApi.reopen(disputeId, { reopenReason: reopenReason.trim() });
+      setMyDisputes((prev) => prev.map((d) => (d.id === disputeId ? updated : d)));
+      toast.success('Đã gửi yêu cầu xem xét lại, đội ngũ hỗ trợ sẽ xử lý sớm nhất.');
+      setReopeningId(null);
+      setReopenReason('');
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : 'Không gửi được yêu cầu, vui lòng thử lại.');
+    } finally {
+      setReopenSubmitting(false);
+    }
+  };
 
   const handleFilesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const picked = Array.from(e.target.files ?? []);
@@ -245,16 +276,62 @@ function RequestRefundContent() {
           <h2 className="m-0 font-display text-lg font-bold text-ink">Khiếu nại của tôi</h2>
           <div className="flex flex-col gap-2">
             {myDisputes.map((d) => (
-              <div key={d.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-line bg-white p-4">
-                <div className="min-w-0">
-                  <div className="truncate font-semibold text-ink">{d.courseTitle}</div>
-                  <div className="text-xs text-ink-muted">
-                    Mã GD: <span className="font-mono">{d.paymentTxnRef}</span> — {d.reason}
+              <div key={d.id} className="flex flex-col gap-3 rounded-xl border border-line bg-white p-4">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="min-w-0">
+                    <div className="truncate font-semibold text-ink">{d.courseTitle}</div>
+                    <div className="text-xs text-ink-muted">
+                      Mã GD: <span className="font-mono">{d.paymentTxnRef}</span> — {d.reason}
+                    </div>
                   </div>
+                  <span className={`shrink-0 rounded-full border px-2.5 py-1 text-xs font-semibold ${STATUS_CLASS[d.status]}`}>
+                    {STATUS_LABEL[d.status]}
+                  </span>
                 </div>
-                <span className={`shrink-0 rounded-full border px-2.5 py-1 text-xs font-semibold ${STATUS_CLASS[d.status]}`}>
-                  {STATUS_LABEL[d.status]}
-                </span>
+
+                {canReopen(d) && reopeningId !== d.id && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setReopeningId(d.id);
+                      setReopenReason('');
+                    }}
+                    className="w-fit text-sm font-semibold text-danger hover:text-danger-dark"
+                  >
+                    Tôi chưa nhận được tiền
+                  </button>
+                )}
+
+                {reopeningId === d.id && (
+                  <div className="flex flex-col gap-2 rounded-lg border border-danger/30 bg-danger/5 p-3">
+                    <label className="flex flex-col gap-1.5">
+                      <span className="text-sm font-semibold text-ink">Vui lòng mô tả rõ hơn (vd: ngân hàng, thời điểm kiểm tra)</span>
+                      <textarea
+                        value={reopenReason}
+                        onChange={(e) => setReopenReason(e.target.value)}
+                        rows={3}
+                        className="w-full rounded-lg border border-line bg-white p-2.5 text-sm text-ink outline-none focus:border-accent"
+                      />
+                    </label>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        disabled={reopenSubmitting || !reopenReason.trim()}
+                        onClick={() => handleReopenSubmit(d.id)}
+                        className="rounded-lg bg-danger px-4 py-2 text-sm font-semibold text-white hover:bg-danger-dark disabled:opacity-50"
+                      >
+                        {reopenSubmitting ? 'Đang gửi...' : 'Gửi yêu cầu xem xét lại'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setReopeningId(null)}
+                        className="rounded-lg border border-line px-4 py-2 text-sm font-semibold text-ink-muted hover:text-ink"
+                      >
+                        Hủy
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
           </div>

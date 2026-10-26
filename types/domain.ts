@@ -760,8 +760,9 @@ export interface AdminUserDetail {
 }
 
 /** Khiếu nại/hoàn tiền giao dịch (23/10/2026) — thay nút "Hoàn tiền"/"Khiếu nại" vốn chỉ hiện
- * toast, không gọi API nào. */
-export type DisputeStatus = 'OPEN' | 'RESOLVED_REFUNDED' | 'RESOLVED_REJECTED';
+ * toast, không gọi API nào. REOPENED (26/10/2026): user báo "chưa nhận được tiền" sau khi đã
+ * RESOLVED_REFUNDED. */
+export type DisputeStatus = 'OPEN' | 'RESOLVED_REFUNDED' | 'RESOLVED_REJECTED' | 'REOPENED';
 
 export interface FileDisputeReq {
   paymentTxnRef: string;
@@ -789,18 +790,28 @@ export interface DisputeRes {
   filedByEmail: string;
   createdAt: string;
   attachments: DisputeAttachment[];
+  resolvedAt: string | null;
+  /** != null nghĩa là đã dùng hết lượt mở lại (tối đa 1 lần). */
+  reopenedAt: string | null;
 }
 
 export interface DisputeAdminRes extends DisputeRes {
   refundBankAccount: string | null;
   adminNote: string | null;
   resolvedByEmail: string | null;
-  resolvedAt: string | null;
+  reopenReason: string | null;
+  /** Note của lần resolve đầu, snapshot trước khi bị ghi đè bởi lần resolve sau reopen. */
+  previousAdminNote: string | null;
 }
 
 export interface ResolveDisputeReq {
   status: 'RESOLVED_REFUNDED' | 'RESOLVED_REJECTED';
   note: string;
+}
+
+/** User báo "chưa nhận được tiền" sau khi admin đã đánh dấu hoàn tiền (26/10/2026). */
+export interface ReopenDisputeReq {
+  reopenReason: string;
 }
 
 /** Link reset mật khẩu Admin tự gửi thủ công cho user (23/10/2026). */

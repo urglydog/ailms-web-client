@@ -10,9 +10,10 @@ import { ApiError } from '@/lib/api/client';
 import { disputesApi } from '@/lib/api/disputes';
 import type { DisputeAdminRes, DisputeStatus } from '@/types/domain';
 
-const STATUSES: DisputeStatus[] = ['OPEN', 'RESOLVED_REFUNDED', 'RESOLVED_REJECTED'];
+const STATUSES: DisputeStatus[] = ['OPEN', 'REOPENED', 'RESOLVED_REFUNDED', 'RESOLVED_REJECTED'];
 const STATUS_CLASS: Record<DisputeStatus, string> = {
   OPEN: 'bg-white text-ink border-warning',
+  REOPENED: 'bg-danger/10 text-danger border-danger/30',
   RESOLVED_REFUNDED: 'bg-success-tint text-success-ink border-success/30',
   RESOLVED_REJECTED: 'bg-line-soft text-ink-muted border-line',
 };
@@ -126,7 +127,10 @@ function AdminDisputesContent() {
             </thead>
             <tbody className="divide-y divide-line-soft">
               {filtered.map((d) => (
-                <tr key={d.id} className={`hover:bg-surface ${d.paymentTxnRef === highlightRef ? 'bg-tint/40' : ''}`}>
+                <tr
+                  key={d.id}
+                  className={`hover:bg-surface ${d.paymentTxnRef === highlightRef ? 'bg-tint/40' : ''} ${d.status === 'REOPENED' ? 'border-l-4 border-l-danger' : ''}`}
+                >
                   <td className="px-4 py-3 font-mono text-ink">{d.paymentTxnRef.substring(0, 8)}</td>
                   <td className="px-4 py-3 text-ink">{d.filedByEmail}</td>
                   <td className="max-w-[220px] truncate px-4 py-3 text-ink-muted" title={d.reason}>{d.reason}</td>
@@ -136,7 +140,7 @@ function AdminDisputesContent() {
                   </td>
                   <td className="whitespace-nowrap px-4 py-3 text-ink-muted">{dateTime(d.createdAt)}</td>
                   <td className="px-4 py-3 text-right">
-                    {d.status === 'OPEN' ? (
+                    {d.status === 'OPEN' || d.status === 'REOPENED' ? (
                       <button type="button" onClick={() => openResolve(d)} className="rounded-lg px-2.5 py-1.5 text-xs font-bold text-accent-dark hover:bg-tint">
                         {t('process')}
                       </button>
@@ -207,8 +211,24 @@ function AdminDisputesContent() {
                 )}
               </dl>
 
-              {selected.status === 'OPEN' ? (
+              {selected.status === 'REOPENED' && (
+                <div className="mt-5 rounded-lg border border-danger/40 bg-danger/5 p-4">
+                  <p className="m-0 text-sm font-semibold text-danger">{t('detail.reopenReason')}</p>
+                  <p className="m-0 mt-1 text-sm text-ink">{selected.reopenReason}</p>
+                  {selected.previousAdminNote && (
+                    <>
+                      <p className="m-0 mt-3 text-sm font-semibold text-ink-muted">{t('detail.previousNote')}</p>
+                      <p className="m-0 mt-1 text-sm text-ink">{selected.previousAdminNote}</p>
+                    </>
+                  )}
+                </div>
+              )}
+
+              {selected.status === 'OPEN' || selected.status === 'REOPENED' ? (
                 <div className="mt-5 flex flex-col gap-2">
+                  {selected.status === 'REOPENED' && (
+                    <p className="m-0 text-xs text-ink-muted">{t('detail.noteOverwriteWarning')}</p>
+                  )}
                   <label className="flex flex-col gap-1.5">
                     <span className="text-sm font-semibold text-ink">{t('detail.note')}</span>
                     <textarea
