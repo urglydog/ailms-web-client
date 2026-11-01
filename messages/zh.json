@@ -192,6 +192,9 @@
       "beginner": {
         "title": "适合初学者",
         "subtitle": "基础课程，零基础也能跟上"
+      },
+      "byCategory": {
+        "subtitle": "{name} 热门课程"
       }
     },
     "topics": {

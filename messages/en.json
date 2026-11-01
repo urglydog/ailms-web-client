@@ -192,6 +192,9 @@
       "beginner": {
         "title": "For beginners",
         "subtitle": "Foundational courses, easy to follow from scratch"
+      },
+      "byCategory": {
+        "subtitle": "Top courses in {name}"
       }
     },
     "topics": {

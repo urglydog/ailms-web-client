@@ -192,6 +192,9 @@
       "beginner": {
         "title": "Dành cho người mới bắt đầu",
         "subtitle": "Khóa cơ bản, dễ theo kịp từ con số 0"
+      },
+      "byCategory": {
+        "subtitle": "Những khóa học nổi bật về {name}"
       }
     },
     "topics": {

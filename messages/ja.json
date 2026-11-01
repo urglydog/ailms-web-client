@@ -192,6 +192,9 @@
       "beginner": {
         "title": "初心者向け",
         "subtitle": "ゼロから学べる基礎講座"
+      },
+      "byCategory": {
+        "subtitle": "{name}の人気コース"
       }
     },
     "topics": {

@@ -52,7 +52,35 @@ export default function CommunityPage() {
       </div>
 
       <div className="shell py-8">
-        <div className="grid gap-6 lg:grid-cols-[1fr_280px]">
+        {/* Một cột căn giữa dưới dải tiêu đề (cũng căn giữa) — thẻ vị trí/streak/đăng nhập nằm phía trên bục. */}
+        <div className="mx-auto flex max-w-3xl flex-col gap-6">
+          {mounted && (showMyRankCard || (currentUser && streakData) || !currentUser) && (
+            <div className="grid gap-4 sm:grid-cols-2">
+              {showMyRankCard && myRanking && (
+                <div className="card flex flex-col gap-1.5 border-dashed border-accent p-5">
+                  <span className="text-xs font-semibold text-ink-muted">{t('yourRank')}</span>
+                  <span className="font-display text-xl font-bold text-accent-dark">#{myRanking.rank}</span>
+                  <span className="text-sm font-semibold text-ink">{t('xp', { xp: myRanking.totalXp })}</span>
+                </div>
+              )}
+
+              {currentUser && streakData && <StreakCard streak={streakData} />}
+
+              {!currentUser && (
+                <div className="card flex flex-col gap-2 p-5 text-center sm:col-span-2">
+                  <Flame className="mx-auto h-6 w-6 text-accent" aria-hidden />
+                  <p className="text-sm text-ink-muted">{t('loginHint')}</p>
+                  <Link
+                    href="/login"
+                    className="mx-auto rounded-full bg-accent px-4 py-2 text-sm font-semibold text-white no-underline hover:bg-accent-dark hover:text-white"
+                  >
+                    {t('login')}
+                  </Link>
+                </div>
+              )}
+            </div>
+          )}
+
           <div>
             <Podium entries={entries} currentUserId={currentUser?.id} />
 
@@ -69,31 +97,6 @@ export default function CommunityPage() {
                 </ul>
               ) : null}
             </div>
-          </div>
-
-          <div className="flex flex-col gap-4">
-            {mounted && showMyRankCard && myRanking && (
-              <div className="card flex flex-col gap-1.5 border-dashed border-accent p-5">
-                <span className="text-xs font-semibold text-ink-muted">{t('yourRank')}</span>
-                <span className="font-display text-xl font-bold text-accent-dark">#{myRanking.rank}</span>
-                <span className="text-sm font-semibold text-ink">{t('xp', { xp: myRanking.totalXp })}</span>
-              </div>
-            )}
-
-            {mounted && currentUser && streakData && <StreakCard streak={streakData} />}
-
-            {mounted && !currentUser && (
-              <div className="card flex flex-col gap-2 p-5 text-center">
-                <Flame className="mx-auto h-6 w-6 text-accent" aria-hidden />
-                <p className="text-sm text-ink-muted">{t('loginHint')}</p>
-                <Link
-                  href="/login"
-                  className="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-white no-underline hover:bg-accent-dark hover:text-white"
-                >
-                  {t('login')}
-                </Link>
-              </div>
-            )}
           </div>
         </div>
       </div>
