@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Globe, Star } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import type { CourseDetail } from '@/types/domain';
+import { plainSummary } from '@/lib/text/richText';
 
 /** Phần đầu trang chi tiết khóa học: đường dẫn, tên, mô tả, đánh giá, giảng viên và các ngôn ngữ đã lồng tiếng. */
 export function CourseHero({ course }: { course: CourseDetail }) {
@@ -23,7 +24,7 @@ export function CourseHero({ course }: { course: CourseDetail }) {
         </nav>
 
         <h1 className="max-w-3xl font-display text-3xl font-extrabold leading-tight text-ink">{course.title}</h1>
-        <p className="max-w-2xl text-[15px] leading-relaxed text-ink-muted">{course.description}</p>
+        <p className="max-w-2xl text-[15px] leading-relaxed text-ink-muted">{plainSummary(course.description)}</p>
 
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
           <span className="flex items-center gap-1.5 font-bold text-ink">

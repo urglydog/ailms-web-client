@@ -2,7 +2,9 @@ import { HomeHero } from '@/components/home/HomeHero';
 import { HomeShelves } from '@/components/home/HomeShelves';
 import { TrendingCourses } from '@/components/home/TrendingCourses';
 import { RankingBanner } from '@/components/ranking/RankingBanner';
+import { categoriesApi } from '@/lib/api/categories';
 import { publicCoursesApi, EMPTY_FILTERS } from '@/lib/api/publicCourses';
+import { pickCategoryShelves } from '@/lib/home/categoryShelves';
 import { TRENDING_FETCH_SIZE } from '@/lib/home/trending';
 
 /**
@@ -39,11 +41,18 @@ export default async function HomePage() {
     safeSearch({ ...EMPTY_FILTERS, level: 'BEGINNER', priceType: 'paid' }, 'rating', TRENDING_FETCH_SIZE),
   ]);
 
+  // Mỗi danh mục một kệ "nổi bật": lỗi ở danh mục nào thì bỏ riêng kệ đó, không làm hỏng cả trang chủ.
+  const categories = await categoriesApi.list().catch(() => []);
+  const perCategory = await Promise.all(
+    categories.map((c) => safeSearch({ ...EMPTY_FILTERS, category: c.slug }, 'rating', TRENDING_FETCH_SIZE)),
+  );
+  const categoryShelves = pickCategoryShelves(categories, perCategory);
+
   return (
     <>
       <HomeHero />
       <TrendingCourses initialCourses={courses} />
-      <HomeShelves newest={newest} free={free} beginner={beginner} />
+      <HomeShelves newest={newest} free={free} beginner={beginner} categoryShelves={categoryShelves} />
       <RankingBanner />
     </>
   );

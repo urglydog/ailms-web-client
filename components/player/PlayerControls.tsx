@@ -59,6 +59,8 @@ export interface PlayerControlsProps {
    * → Cài đặt phụ đề, học viên phản ánh khó bấm) — `*Available = false` disable nút khi bài học
    * chưa có phụ đề loại đó. */
   showOriginalSub: boolean;
+  /** Gợi ý (tooltip) khi nút Gốc đang điều khiển nguồn phụ đề khác mặc định, vd phụ đề CC của YouTube. */
+  originalSubtitleHint?: string;
   onToggleShowOriginalSub: () => void;
   originalSubtitleAvailable: boolean;
   showTranslatedSub: boolean;
@@ -119,6 +121,7 @@ export function PlayerControls({
   showTranscript,
   onToggleTranscript,
   showOriginalSub,
+  originalSubtitleHint,
   onToggleShowOriginalSub,
   originalSubtitleAvailable,
   showTranslatedSub,
@@ -291,7 +294,7 @@ export function PlayerControls({
               onClick={onToggleShowOriginalSub}
               disabled={!originalSubtitleAvailable}
               aria-pressed={showOriginalSub}
-              title={originalSubtitleAvailable ? 'Phụ đề gốc' : 'Bài học chưa có phụ đề gốc'}
+              title={originalSubtitleAvailable ? (originalSubtitleHint ?? 'Phụ đề gốc') : 'Bài học chưa có phụ đề gốc'}
               className={`rounded border px-1.5 py-0.5 text-[11px] font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-30 ${
                 showOriginalSub ? 'border-accent bg-accent text-white' : 'border-white/30 text-white/85 hover:border-white'
               }`}
