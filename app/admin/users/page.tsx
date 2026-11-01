@@ -28,7 +28,7 @@ interface AiLockProposal {
   aiLockProposedReason: string;
 }
 
-const FILTERS: UserFilter[] = ['ALL', 'STUDENT', 'INSTRUCTOR', 'ADMIN', 'LOCKED'];
+const FILTERS: UserFilter[] = ['ALL', 'STUDENT', 'INSTRUCTOR', 'ADMIN', 'LOCKED', 'SPAM'];
 const PAGE_SIZE = 10;
 
 /** Quản lý người dùng: bộ lọc nhanh có đếm, tìm kiếm, bảng sắp xếp được, phân trang; khóa/mở khóa luôn hỏi xác nhận. */

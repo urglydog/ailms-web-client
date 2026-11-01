@@ -93,6 +93,20 @@ function processQueue(error: Error | null, token: string | null = null) {
   failedQueue = [];
 }
 
+/** Dùng bởi {@link fetchWithRefresh} khi phiên bị thu hồi giữa chừng (vd tài khoản vừa bị Admin
+ * khóa) — lưu lý do vào `sessionStorage` để trang `/login` đọc và hiện toast, thay vì văng về
+ * /login im lặng không một lời giải thích. */
+function redirectToLoginWithReason(reason: string | null) {
+  if (reason) {
+    try {
+      sessionStorage.setItem('loginKickReason', reason);
+    } catch {
+      /* Safari riêng tư chặn sessionStorage — bỏ qua, chỉ mất phần thông báo lý do */
+    }
+  }
+  window.location.href = '/login';
+}
+
 /**
  * Fetch có tự refresh access token khi 401/403 — lõi dùng chung cho {@link request} (JSON) và
  * {@link apiBlob} (tải file nhị phân, vd PDF). Tách riêng để 2 nơi không lặp lại y hệt logic
@@ -148,16 +162,20 @@ async function fetchWithRefresh(
 
             response = await fetch(`${resolveBaseUrl()}${path}`, { ...init, headers: buildHeaders(data.accessToken) });
           } else {
+            // (23/10/2026, sửa bug thật) — trước đây văng thẳng về /login không kèm lý do gì cả
+            // (vd tài khoản vừa bị Admin khóa giữa phiên) — user tưởng web lỗi vặt, không biết
+            // vì sao bị đăng xuất. Lưu lý do thật (nếu BE trả được) để trang /login hiển thị.
+            const reason = await parseProblem(refreshRes).then((p) => p.detail).catch(() => null);
             processQueue(new Error('Refresh failed'));
             localStorage.removeItem('accessToken');
             localStorage.removeItem('refreshToken');
-            window.location.href = '/login';
+            redirectToLoginWithReason(reason);
           }
         } catch (err) {
           processQueue(err as Error);
           localStorage.removeItem('accessToken');
           localStorage.removeItem('refreshToken');
-          window.location.href = '/login';
+          redirectToLoginWithReason(null);
         } finally {
           isRefreshing = false;
         }

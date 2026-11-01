@@ -1,6 +1,7 @@
 'use client';
 
-import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
+import { ArrowDown, ArrowUp, ArrowUpDown, TriangleAlert } from 'lucide-react';
+import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import type { AdminUser, SortOrder, UserSortField } from '@/lib/admin/users';
 
@@ -63,12 +64,18 @@ export function UsersTable({ users, sortField, sortOrder, onSort, onToggleBlock 
             users.map((user) => (
               <tr key={user.id} className="hover:bg-surface">
                 <td className="px-4 py-3">
-                  <div className="flex items-center gap-3">
+                  <Link href={`/admin/users/${user.id}`} className="flex items-center gap-3 no-underline hover:underline">
                     <span aria-hidden className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-tint font-display text-[13px] font-bold text-accent-dark">
                       {user.fullName.trim().charAt(0).toUpperCase() || '?'}
                     </span>
                     <span className="font-semibold text-ink">{user.fullName}</span>
-                  </div>
+                    {user.isSpamFlagged && (
+                      <span title={t('filter.SPAM')} className="flex items-center gap-1 rounded-full bg-danger/10 px-2 py-0.5 text-[10px] font-bold text-danger">
+                        <TriangleAlert size={11} aria-hidden />
+                        {t('filter.SPAM')}
+                      </span>
+                    )}
+                  </Link>
                 </td>
                 <td className="px-4 py-3 text-ink-muted">{user.email}</td>
                 <td className="px-4 py-3 text-ink-muted">{user.createdAt ? new Date(user.createdAt).toLocaleDateString(locale) : '-'}</td>

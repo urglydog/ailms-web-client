@@ -119,12 +119,18 @@ export default function PaymentDetailModal({ payment, onClose }: PaymentDetailMo
 
         <div className="px-6 py-4 bg-surface-raised border-t border-line flex justify-between items-center">
           <div className="flex gap-3">
-            <button
-              onClick={() => alert('Tính năng Báo cáo vấn đề sẽ được ra mắt trong tương lai!')}
-              className="text-sm font-semibold text-danger hover:text-danger-dark transition-colors"
-            >
-              Báo cáo vấn đề
-            </button>
+            {payment.status === 'PAID' ? (
+              <Link
+                href={`/disputes/new?ref=${payment.txnRef}`}
+                className="text-sm font-semibold text-danger hover:text-danger-dark transition-colors"
+              >
+                Báo cáo vấn đề
+              </Link>
+            ) : (
+              <span className="text-sm font-semibold text-ink-muted" title="Chỉ khiếu nại được giao dịch đã thanh toán thành công">
+                Báo cáo vấn đề
+              </span>
+            )}
             <Link
               href="/legal/refund"
               className="text-sm font-semibold text-ink-muted hover:text-ink transition-colors"

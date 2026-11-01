@@ -739,6 +739,89 @@ export interface CreateBatchPaymentReq {
   bundleIds?: number[];
 }
 
+/** Chi tiết 1 user cho trang `/admin/users/[id]` — khớp `UserDto.UserRes` (23/10/2026, mở rộng
+ * thêm isAiLocked/isSpamFlagged/spamFlagReason, chỉ có ý nghĩa khi Admin gọi). */
+export interface AdminUserDetail {
+  id: number;
+  email: string;
+  fullName: string;
+  avatarUrl: string | null;
+  headline: string | null;
+  bio: string | null;
+  role: 'STUDENT' | 'INSTRUCTOR' | 'ADMIN';
+  authProvider: string;
+  preferredLanguage: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string | null;
+  coursesPublic: boolean;
+  wishlistPublic: boolean;
+  isAiLocked: boolean;
+  isSpamFlagged: boolean;
+  spamFlagReason: string | null;
+}
+
+/** Khiếu nại/hoàn tiền giao dịch (23/10/2026) — thay nút "Hoàn tiền"/"Khiếu nại" vốn chỉ hiện
+ * toast, không gọi API nào. REOPENED (26/10/2026): user báo "chưa nhận được tiền" sau khi đã
+ * RESOLVED_REFUNDED. */
+export type DisputeStatus = 'OPEN' | 'RESOLVED_REFUNDED' | 'RESOLVED_REJECTED' | 'REOPENED';
+
+export interface FileDisputeReq {
+  paymentTxnRef: string;
+  reason: string;
+  description?: string;
+  refundBankAccount?: string;
+  termsAccepted: boolean;
+}
+
+export interface DisputeAttachment {
+  id: number;
+  fileUrl: string;
+  /** jpg / png / webp / mp4 / webm */
+  fileType: string;
+}
+
+export interface DisputeRes {
+  id: number;
+  paymentTxnRef: string;
+  courseTitle: string;
+  amount: number;
+  reason: string;
+  description: string | null;
+  status: DisputeStatus;
+  filedByEmail: string;
+  createdAt: string;
+  attachments: DisputeAttachment[];
+  resolvedAt: string | null;
+  /** != null nghĩa là đã dùng hết lượt mở lại (tối đa 1 lần). */
+  reopenedAt: string | null;
+}
+
+export interface DisputeAdminRes extends DisputeRes {
+  refundBankAccount: string | null;
+  adminNote: string | null;
+  resolvedByEmail: string | null;
+  reopenReason: string | null;
+  /** Note của lần resolve đầu, snapshot trước khi bị ghi đè bởi lần resolve sau reopen. */
+  previousAdminNote: string | null;
+}
+
+export interface ResolveDisputeReq {
+  status: 'RESOLVED_REFUNDED' | 'RESOLVED_REJECTED';
+  note: string;
+}
+
+/** User báo "chưa nhận được tiền" sau khi admin đã đánh dấu hoàn tiền (26/10/2026). */
+export interface ReopenDisputeReq {
+  reopenReason: string;
+}
+
+/** Link reset mật khẩu Admin tự gửi thủ công cho user (23/10/2026). */
+export interface ResetLinkRes {
+  resetLink: string;
+  expiresAt: string;
+}
+
 /** 1 dòng trong giỏ hàng — đủ dữ liệu để hiển thị trực tiếp, không cần gọi thêm API chi tiết
  * khóa học. */
 export interface CartItem {

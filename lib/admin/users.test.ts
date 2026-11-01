@@ -13,7 +13,7 @@ const users = [
 
 describe('countUsers', () => {
   it('đếm theo vai trò và số tài khoản bị khóa', () => {
-    expect(countUsers(users)).toEqual({ ALL: 4, STUDENT: 2, INSTRUCTOR: 1, ADMIN: 1, LOCKED: 1 });
+    expect(countUsers(users)).toEqual({ ALL: 4, STUDENT: 2, INSTRUCTOR: 1, ADMIN: 1, LOCKED: 1, SPAM: 0 });
   });
 });
 

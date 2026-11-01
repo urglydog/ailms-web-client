@@ -19,7 +19,7 @@ describe('buildAccountMenu', () => {
     const groups = buildAccountMenu({ id: 7, role: 'STUDENT' });
     expect(ids(groups)).toEqual([
       'myCourses', 'wishlist', 'certificates',
-      'publicProfile', 'payments', 'profile',
+      'publicProfile', 'payments', 'disputes', 'profile',
       'becomeInstructor',
     ]);
   });

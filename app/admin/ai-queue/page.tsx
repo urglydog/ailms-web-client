@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl';
 import { AiJobQueueManager } from '@/components/admin/AiJobQueueManager';
 import { MetricCard } from '@/components/instructor/performance/MetricCard';
 import { PageHeader } from '@/components/instructor/ui/PageHeader';
+import { api } from '@/lib/api/client';
 import { getAccessToken } from '@/lib/auth/token';
 
 interface QueueStats {
@@ -25,25 +26,10 @@ interface HealthData {
   chunk_minutes: number;
 }
 
-const AI_WORKER_URL = process.env.NEXT_PUBLIC_AI_WORKER_URL || 'http://localhost:8002';
-
-async function fetchQueueStats(_token: string): Promise<QueueStats> {
-  const res = await fetch(`${AI_WORKER_URL}/admin/queue-stats`, {
-    headers: {
-      'x-internal-token': 'dev-internal-token',
-    },
-  });
-  if (!res.ok) throw new Error(`${res.status}`);
-  return res.json();
-}
-
-async function fetchAiHealth(): Promise<HealthData> {
-  const res = await fetch(`${AI_WORKER_URL}/health`);
-  if (!res.ok) throw new Error(`${res.status}`);
-  return res.json();
-}
-
-/** Lịch Celery Beat: tên job, mã quy tắc nghiệp vụ và trạng thái triển khai; mô tả/lịch chạy lấy từ `admin.queue.beat.<id>`. */
+/** Lịch Celery Beat: danh sách TĨNH khai báo trong code AI Worker (`celery beat schedule`), KHÔNG
+ * fetch từ backend — khác với phần "Chi tiết Queue"/"Nhóm khóa Gemini" ở trên vốn là dữ liệu sống.
+ * Cập nhật tay mảng này khi lịch Celery Beat thật trong code thay đổi. Mô tả/lịch chạy lấy từ
+ * `admin.queue.beat.<id>`. */
 const BEAT_JOBS = [
   { id: 'cleanupTemp', name: 'cleanup-temp-files', rule: 'BR-STORAGE-01', active: true },
   { id: 'cleanupNotifications', name: 'cleanup-old-notifications', rule: 'BR-NOTIFY-01', active: false },
@@ -58,14 +44,15 @@ export default function AiQueuePage() {
 
   const { data: stats, isLoading, isError, refetch } = useQuery({
     queryKey: ['admin', 'queue-stats'],
-    queryFn: () => fetchQueueStats(token),
+    queryFn: () => api.get<QueueStats>('/api/v1/admin/ai-worker/queue-stats', { token }),
     enabled: !!token,
     refetchInterval: 8000,
   });
 
   const { data: health } = useQuery({
     queryKey: ['admin', 'ai-health'],
-    queryFn: fetchAiHealth,
+    queryFn: () => api.get<HealthData>('/api/v1/admin/ai-worker/health', { token }),
+    enabled: !!token,
     refetchInterval: 15000,
   });
 
@@ -122,7 +109,7 @@ export default function AiQueuePage() {
             {isLoading && <div className="flex h-32 items-center justify-center text-sm text-ink-muted">{t('loading')}</div>}
             {isError && (
               <div role="alert" className="flex h-32 items-center justify-center px-4 text-center text-sm text-danger">
-                {t('connectError')} <code className="ml-1 font-mono">{AI_WORKER_URL}</code>
+                {t('connectError')}
               </div>
             )}
             {stats && Object.keys(stats.queues).length === 0 && (
@@ -190,9 +177,13 @@ export default function AiQueuePage() {
       </div>
 
       <section className="flex flex-col gap-2.5" aria-labelledby="beat-title">
-        <h2 id="beat-title" className="m-0 font-display text-[15px] font-bold text-ink">
-          {t('beat.title')}
-        </h2>
+        <div className="flex flex-wrap items-center gap-2">
+          <h2 id="beat-title" className="m-0 font-display text-[15px] font-bold text-ink">
+            {t('beat.title')}
+          </h2>
+          <span className="rounded-full bg-line-soft px-2.5 py-0.5 text-[11px] font-bold text-ink-muted">{t('beat.staticBadge')}</span>
+        </div>
+        <p className="m-0 text-xs text-ink-muted">{t('beat.staticNote')}</p>
         <div className="overflow-hidden rounded-xl border border-line bg-white shadow-sm">
           {BEAT_JOBS.map((job) => (
             <div key={job.name} className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-line-soft px-5 py-3.5 last:border-0">
@@ -206,10 +197,10 @@ export default function AiQueuePage() {
               <span className="whitespace-nowrap text-xs text-ink-muted">{t(`beat.${job.id}.schedule`)}</span>
               <span
                 className={`whitespace-nowrap rounded-full px-2.5 py-1 text-[11px] font-bold ${
-                  job.active ? 'bg-success-tint text-success-ink' : 'bg-line-soft text-ink-muted'
+                  job.active ? 'bg-tint text-accent-dark' : 'bg-line-soft text-ink-muted'
                 }`}
               >
-                {job.active ? t('beat.running') : t('beat.planned')}
+                {job.active ? t('beat.configured') : t('beat.notConfigured')}
               </span>
             </div>
           ))}

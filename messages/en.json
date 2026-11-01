@@ -49,6 +49,7 @@
       "wishlist": "Wishlist",
       "publicProfile": "Profile & achievements",
       "paymentHistory": "Payment history",
+      "requestRefund": "Request a refund",
       "profile": "Account settings",
       "instructorChannel": "Instructor Channel",
       "becomeInstructor": "Become an Instructor",
@@ -625,6 +626,7 @@
       "forgotNeedEmail": "Please enter your email to reset your password",
       "submit": "Sign in",
       "submitting": "Processing...",
+      "tryAgain": "Try again",
       "failed": "Sign-in failed",
       "generic": "Something went wrong",
       "loading": "Loading form...",
@@ -664,6 +666,16 @@
       "generic": "Something went wrong",
       "loading": "Loading...",
       "backToLogin": "Back to sign in"
+    },
+    "resetByToken": {
+      "title": "Reset password",
+      "backToLogin": "Back to login",
+      "missingToken": "Missing a valid link — please use the exact link your Admin sent you.",
+      "newPassword": "New password",
+      "submit": "Reset password",
+      "submitting": "Processing...",
+      "success": "Password changed successfully! Please log in again.",
+      "genericError": "This link has expired or is invalid."
     }
   },
   "community": {
@@ -1280,6 +1292,7 @@
       "voicemappings": "Dubbing voices",
       "tutorsecurity": "AI Tutor security",
       "transactions": "Payment reconciliation",
+      "disputes": "Payment disputes",
       "coupons": "Coupons",
       "announcements": "System announcements",
       "settings": "System settings"
@@ -1341,7 +1354,8 @@
         "STUDENT": "Learners",
         "INSTRUCTOR": "Instructors",
         "ADMIN": "Admins",
-        "LOCKED": "Locked"
+        "LOCKED": "Locked",
+        "SPAM": "Spam flagged"
       },
       "searchLabel": "Search users",
       "searchPh": "Name or email...",
@@ -1389,6 +1403,70 @@
         "prev": "Previous",
         "next": "Next",
         "page": "Page {page} of {total}"
+      }
+    },
+    "userDetail": {
+      "back": "Back",
+      "genericError": "Something went wrong, please try again.",
+      "lockedToast": "Account locked.",
+      "unlockedToast": "Account unlocked.",
+      "aiLockedToast": "AI access locked.",
+      "aiUnlockedToast": "AI access unlocked.",
+      "spamFlagSuccess": "Flagged as spam.",
+      "spamUnflagSuccess": "Spam flag removed.",
+      "linkCopied": "Link copied.",
+      "confirm": {
+        "cancel": "Cancel",
+        "lockTitle": "Lock this account?",
+        "lockBody": "The user will no longer be able to log in (the current session is revoked immediately too). This also automatically locks AI access and flags the account as spam.",
+        "unlockTitle": "Unlock this account?",
+        "unlockBody": "The user can log in and use the system normally again. The AI-lock/spam flags are NOT cleared automatically — remove them separately if needed.",
+        "aiLockTitle": "Lock AI access?",
+        "aiLockBody": "The user won't be able to use AI Tutor, AI Discovery, material generation... until unlocked. No effect on other features.",
+        "aiUnlockTitle": "Unlock AI access?",
+        "aiUnlockBody": "The user can use AI features normally again.",
+        "spamFlagTitle": "Flag this account as spam?",
+        "spamFlagBody": "This also automatically locks AI access and blocks the user from writing course reviews.",
+        "spamUnflagTitle": "Remove spam flag?",
+        "spamUnflagBody": "The user can write reviews again. The AI-lock flag is NOT cleared automatically — remove it separately under AI Access if needed."
+      },
+      "profile": {
+        "title": "Profile",
+        "role": "Role",
+        "authProvider": "Signed in with",
+        "createdAt": "Created at",
+        "status": "Status",
+        "active": "Active",
+        "locked": "Locked",
+        "lock": "Lock account",
+        "unlock": "Unlock"
+      },
+      "aiLock": {
+        "title": "AI access",
+        "status": "Status",
+        "active": "AI access granted",
+        "locked": "AI access locked",
+        "lock": "Lock AI",
+        "unlock": "Unlock AI",
+        "disabledWhileLocked": "Account is locked — the AI flag follows the account lock state; unlock the account to edit it separately."
+      },
+      "spam": {
+        "title": "Spam/scam flag",
+        "hint": "Flagging as spam automatically locks AI access and blocks writing course reviews — does not lock the whole account, never shown publicly to others.",
+        "reason": "Reason",
+        "reasonPh": "Reason for flagging as spam/scam...",
+        "none": "No reason given",
+        "flag": "Flag as spam",
+        "unflag": "Remove flag",
+        "disabledWhileLocked": "Account is locked — the spam flag follows the account lock state; unlock the account to edit it separately."
+      },
+      "resetLink": {
+        "title": "Password reset assistance",
+        "hint": "Use when a user forgot their password but isn't receiving the email/OTP — generates a separate link (expires in 30 minutes) for you to send through another channel.",
+        "generate": "Generate reset link",
+        "generating": "Generating...",
+        "copy": "Copy link",
+        "expiresAt": "Expires at {time}"
       }
     },
     "moderation": {
@@ -1487,8 +1565,10 @@
       },
       "beat": {
         "title": "Celery Beat — scheduled jobs",
-        "running": "✓ Running",
-        "planned": "○ Planned",
+        "staticBadge": "Static, not live data",
+        "staticNote": "Reference list hardcoded in the AI Worker code — unlike the two tables above, it does not update in real time.",
+        "configured": "✓ Configured",
+        "notConfigured": "○ Not deployed",
         "cleanupTemp": {
           "desc": "Clean intermediate files (.wav, video chunks) older than 24h",
           "schedule": "Hourly (at :00)"
@@ -1589,6 +1669,8 @@
     },
     "jobs": {
       "filterLabel": "Filter by status",
+      "searchLabel": "Search by lesson or language",
+      "searchPh": "Search by lesson title or language...",
       "status": {
         "ALL": "All",
         "PENDING": "Pending",
@@ -1609,7 +1691,13 @@
       "loading": "Loading...",
       "empty": "No jobs.",
       "retry": "Retry",
-      "retryError": "Could not retry this job."
+      "retryError": "Could not retry this job.",
+      "pager": {
+        "aria": "Dubbing job pagination",
+        "prev": "Previous",
+        "next": "Next",
+        "page": "Page {page} of {total}"
+      }
     },
     "payments": {
       "title": "Payment reconciliation",
@@ -1677,15 +1765,60 @@
         "ref": "Reference code",
         "gateway": "Gateway code",
         "notYet": "Not yet",
-        "refund": "Refund",
-        "refundSoon": "Refunds are still under development.",
-        "dispute": "Handle dispute",
-        "disputeMarked": "Report marked as handled!"
+        "dispute": "View/handle dispute"
       }
+    },
+    "disputes": {
+      "title": "Payment disputes",
+      "subtitle": "Disputes/refund requests filed by learners or instructors.",
+      "loadError": "Could not load the dispute list.",
+      "empty": "No disputes yet.",
+      "filters": {
+        "status": "Status",
+        "all": "All"
+      },
+      "status": {
+        "OPEN": "Open",
+        "REOPENED": "Reopened - priority",
+        "RESOLVED_REFUNDED": "Refunded",
+        "RESOLVED_REJECTED": "Rejected"
+      },
+      "cols": {
+        "ref": "Transaction ID",
+        "user": "Filed by",
+        "reason": "Reason",
+        "amount": "Amount",
+        "status": "Status",
+        "time": "Time",
+        "actions": "Actions"
+      },
+      "process": "Process",
+      "detail": {
+        "title": "Process dispute",
+        "course": "Course",
+        "amount": "Amount",
+        "reason": "Reason",
+        "description": "Description",
+        "bankAccount": "Refund bank account",
+        "none": "None",
+        "attachments": "Attached evidence",
+        "viewVideo": "View video",
+        "note": "Resolution note *",
+        "notePh": "Explain the decision...",
+        "markRefunded": "Mark as refunded",
+        "reject": "Reject dispute",
+        "cancel": "Close",
+        "resolvedBy": "Resolved by {email}",
+        "error": "Could not process this dispute.",
+        "reopenReason": "Reason for reopening",
+        "previousNote": "Previous resolution note",
+        "noteOverwriteWarning": "The new note will be saved; the previous note is kept above."
+      },
+      "fileSuccess": "Dispute filed."
     },
     "settings": {
       "title": "System settings",
-      "subtitle": "Read-only information about the AI Worker, business quotas and server resources.",
+      "subtitle": "AI Worker and server resources are read-only; business quotas can be edited and saved.",
       "worker": {
         "title": "AI Worker",
         "up": "Running",
@@ -1703,15 +1836,16 @@
       "quotas": {
         "title": "Business quotas",
         "dubStudent": "Dubbing / learner / day",
-        "dubStudentUnit": "{count} requests",
         "dubInstructor": "Dubbing / instructor / day",
-        "dubInstructorUnit": "{count} requests",
         "materials": "Generated materials / day",
-        "materialsUnit": "{count} requests",
         "tutor": "AI Tutor messages / day",
-        "tutorUnit": "{count} messages",
         "guestSearch": "AI search (guest) / hour",
-        "guestSearchUnit": "{count} requests"
+        "loading": "Loading...",
+        "save": "Save",
+        "saving": "Saving...",
+        "cancel": "Cancel",
+        "saved": "Configuration saved.",
+        "saveError": "Could not save configuration."
       },
       "resources": {
         "title": "Backend resources",

@@ -3,10 +3,10 @@ import { aiJobsApi } from '@/lib/api/aiJobs';
 import { getAccessToken } from '@/lib/auth/token';
 import type { JobStatus } from '@/types/domain';
 
-export function useAiJobs(status?: JobStatus) {
+export function useAiJobs(status?: JobStatus, search?: string, page = 0) {
   return useQuery({
-    queryKey: ['ai-jobs', status ?? 'ALL'],
-    queryFn: () => aiJobsApi.list(status),
+    queryKey: ['ai-jobs', status ?? 'ALL', search ?? '', page],
+    queryFn: () => aiJobsApi.list(status, search, page),
     enabled: !!getAccessToken(),
   });
 }
