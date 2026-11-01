@@ -144,6 +144,9 @@ export interface YouTubePlayerLike {
   getAvailableQualityLevels(): string[];
   setPlaybackQuality(quality: string): void;
   getPlaybackQuality(): string;
+  /** Module phụ đề CC của YouTube (API không chính thức nhưng được dùng rộng rãi) — có thể vắng ở bản giả lập. */
+  loadModule?(name: string): void;
+  unloadModule?(name: string): void;
 }
 
 /** Mã trạng thái của YouTube IFrame Player API. */
@@ -248,6 +251,10 @@ export interface YouTubePlayerController {
   setVolumeLevel: (volume: number) => void;
   toggleMute: () => void;
   setQuality: (quality: string) => void;
+  /** Phụ đề CC của chính YouTube đang bật (mặc định tắt). */
+  captionsOn: boolean;
+  setCaptions: (on: boolean) => void;
+  toggleCaptions: () => void;
 }
 
 /**
@@ -289,10 +296,15 @@ export function useYouTubeDualPlayerSync(
   const [muted, setMuted] = useState(false);
   const [qualities, setQualities] = useState<string[]>([]);
   const [quality, setQualityState] = useState('auto');
+  const [captionsOn, setCaptionsOn] = useState(false);
   // Đọc được giá trị MỚI NHẤT bên trong closure của sự kiện YT (tạo 1 lần lúc mount) mà không phải
   // gỡ/gắn lại player mỗi khi học viên chỉnh âm lượng — cùng khuôn với `offsetRef`/`dubActiveRef`.
   const volumeRef = useRef(volume);
   const mutedRef = useRef(muted);
+  // YouTube có thể tự nạp lại CC (theo cài đặt tài khoản người xem) SAU `onReady` — nên ngoài lúc sẵn sàng còn phải
+  // gỡ thêm ở lần PLAYING đầu tiên; `captionsOnRef` để closure sự kiện đọc được trạng thái mới nhất.
+  const captionsOnRef = useRef(false);
+  const captionsResetRef = useRef(false);
 
   useEffect(() => {
     offsetRef.current = timeOffsetSec;
@@ -338,6 +350,9 @@ export function useYouTubeDualPlayerSync(
 
     let cancelled = false;
     let player: (YouTubePlayerLike & { destroy(): void }) | null = null;
+    setCaptionsOn(false); // bài mới → phụ đề YouTube về mặc định tắt
+    captionsOnRef.current = false;
+    captionsResetRef.current = false;
 
     loadYouTubeIframeApi().then((YT) => {
       if (cancelled || !containerRef.current) {
@@ -347,7 +362,9 @@ export function useYouTubeDualPlayerSync(
         videoId: youtubeId,
         // Giao diện tham khảo Udemy (06/09/2026) — `controls: 0` để tự vẽ thanh điều khiển riêng
         // (`PlayerControls.tsx`) thay UI mặc định của YouTube, đồng bộ giao diện với nguồn UPLOAD.
-        playerVars: { controls: 0, modestbranding: 1, rel: 0, disablekb: 1 },
+        // `cc_load_policy: 0` + gỡ module captions lúc sẵn sàng: phụ đề YouTube mặc định TẮT dù tài khoản YouTube
+        // của người xem bật CC tự động — nút "Gốc" mới là nơi bật (xem `toggleCaptions`).
+        playerVars: { controls: 0, modestbranding: 1, rel: 0, disablekb: 1, cc_load_policy: 0 },
         events: {
           onReady: (event) => {
             if (dubActiveRef.current) {
@@ -361,9 +378,14 @@ export function useYouTubeDualPlayerSync(
             setQualities(event.target.getAvailableQualityLevels());
             setQualityState(event.target.getPlaybackQuality());
             playerRef.current = event.target;
+            event.target.unloadModule?.('captions');
             if (autoPlay) event.target.playVideo();
           },
           onStateChange: (event) => {
+            if (event.data === YT_STATE.PLAYING && !captionsResetRef.current) {
+              captionsResetRef.current = true;
+              if (!captionsOnRef.current) event.target.unloadModule?.('captions');
+            }
             setIsPlaying(event.data === YT_STATE.PLAYING || event.data === YT_STATE.BUFFERING);
             setQualities(event.target.getAvailableQualityLevels());
             setQualityState(event.target.getPlaybackQuality());
@@ -493,6 +515,23 @@ export function useYouTubeDualPlayerSync(
     setQualityState(q);
   }, []);
 
+  const setCaptions = useCallback((on: boolean) => {
+    if (on) playerRef.current?.loadModule?.('captions');
+    else playerRef.current?.unloadModule?.('captions');
+    captionsOnRef.current = on;
+    setCaptionsOn(on);
+  }, []);
+
+  const toggleCaptions = useCallback(() => {
+    setCaptionsOn((prev) => {
+      const next = !prev;
+      if (next) playerRef.current?.loadModule?.('captions');
+      else playerRef.current?.unloadModule?.('captions');
+      captionsOnRef.current = next;
+      return next;
+    });
+  }, []);
+
   return {
     currentSec,
     duration,
@@ -510,5 +549,8 @@ export function useYouTubeDualPlayerSync(
     setVolumeLevel,
     toggleMute,
     setQuality,
+    captionsOn,
+    setCaptions,
+    toggleCaptions,
   };
 }

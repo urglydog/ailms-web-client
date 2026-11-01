@@ -5,6 +5,7 @@ import { useDualPlayerSync, useYouTubeDualPlayerSync } from '@/hooks/useDualPlay
 import { KeyboardShortcutsModal } from '@/components/player/KeyboardShortcutsModal';
 import { PlayerControls, SPEED_OPTIONS } from '@/components/player/PlayerControls';
 import { SubtitlePositionEditor } from '@/components/player/SubtitlePositionEditor';
+import { resolveOriginalCaption } from '@/lib/player/captionMode';
 import { SubtitleSettingsModal } from '@/components/player/SubtitleSettingsModal';
 import {
   buildSubtitleAppearance,
@@ -189,6 +190,8 @@ export const DualPlayer = forwardRef<DualPlayerHandle, DualPlayerProps>(function
   const [uploadMuted, setUploadMuted] = useState(false);
 
   const isYoutube = videoSource === 'YOUTUBE' && !!youtubeId;
+  // Nút "Gốc": transcript của project nếu đã có; chưa có mà là video YouTube thì bật/tắt phụ đề CC của YouTube.
+  const originalCaption = resolveOriginalCaption({ isYoutube, projectSubtitleCount: originalSubtitles.length });
   const { src: audioSrc, offsetSec } = resolveAudio(track, currentSec);
 
   const handleEnded = () => onEnded?.();
@@ -225,6 +228,12 @@ export const DualPlayer = forwardRef<DualPlayerHandle, DualPlayerProps>(function
     // trị này ở ngoài `DualPlayer`, tránh trang cha (cây component lớn) re-render nhiều lần/giây
     // một cách vô ích lúc panel đang ẩn (mặc định).
   }, [currentSec, onTimeUpdate]);
+
+  // Đã có transcript của project (hoặc không phải YouTube) thì phụ đề CC của YouTube phải tắt để không chồng 2 lớp.
+  const { setCaptions: setYoutubeCaptions } = youtube;
+  useEffect(() => {
+    if (isYoutube && originalCaption !== 'youtube') setYoutubeCaptions(false);
+  }, [isYoutube, originalCaption, setYoutubeCaptions]);
 
   const { seekTo: youtubeSeekTo } = youtube;
   const seekTo = useCallback(
@@ -551,9 +560,10 @@ export const DualPlayer = forwardRef<DualPlayerHandle, DualPlayerProps>(function
         onToggleFullscreen={toggleFullscreen}
         showTranscript={showTranscript}
         onToggleTranscript={onToggleTranscript}
-        showOriginalSub={showOriginalSub}
-        onToggleShowOriginalSub={onToggleShowOriginalSub}
-        originalSubtitleAvailable={originalSubtitles.length > 0}
+        showOriginalSub={originalCaption === 'youtube' ? youtube.captionsOn : showOriginalSub}
+        onToggleShowOriginalSub={originalCaption === 'youtube' ? youtube.toggleCaptions : onToggleShowOriginalSub}
+        originalSubtitleAvailable={originalCaption !== 'none'}
+        originalSubtitleHint={originalCaption === 'youtube' ? 'Phụ đề của YouTube (chưa có transcript của khóa học)' : undefined}
         showTranslatedSub={showTranslatedSub}
         onToggleShowTranslatedSub={onToggleShowTranslatedSub}
         translatedSubtitleAvailable={translatedSubtitles.length > 0}
