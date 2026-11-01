@@ -137,6 +137,8 @@ export interface CourseSummary {
 
 export interface CourseDetail extends CourseSummary {
   description: string;
+  /** Ảnh đại diện giảng viên; null/undefined khi chưa đặt. */
+  instructorAvatarUrl?: string | null;
   status: CourseStatus;
   chapters: Chapter[];
   /** true khi người dùng hiện tại đã sở hữu khoá học (BR-ENROLL-01) */

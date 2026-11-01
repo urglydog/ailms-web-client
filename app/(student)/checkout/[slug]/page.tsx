@@ -8,6 +8,7 @@ import { ArrowLeft } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { BillingForm } from '@/components/checkout/BillingForm';
+import { plainSummary } from '@/lib/text/richText';
 import { CheckoutSteps } from '@/components/checkout/CheckoutSteps';
 import { CouponBox } from '@/components/checkout/CouponBox';
 import { OrderTotals } from '@/components/checkout/OrderTotals';
@@ -147,7 +148,7 @@ function CheckoutPageContent() {
                 </div>
                 <div className="flex flex-col justify-center">
                   <h3 className="font-display text-xl font-bold text-ink">{course.title}</h3>
-                  <p className="mt-2 line-clamp-2 text-sm text-ink-muted">{course.description}</p>
+                  <p className="mt-2 line-clamp-2 text-sm text-ink-muted">{plainSummary(course.description)}</p>
                   <div className="mt-3 flex items-center gap-2 text-sm font-medium text-ink-muted">
                     <span>{t('checkout.instructor')}</span>
                     <span className="text-accent-dark">{course.instructorName || t('checkout.updating')}</span>

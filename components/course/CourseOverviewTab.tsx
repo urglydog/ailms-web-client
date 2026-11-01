@@ -4,6 +4,8 @@ import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { publicCoursesApi } from '@/lib/api/publicCourses';
 import { StarRating } from '@/components/ui/StarRating';
+import { Avatar } from '@/components/ui/Avatar';
+import { RichText } from '@/components/ui/RichText';
 import { useCourseAnnouncements, useStartConversationAsStudent } from '@/hooks/useCommunication';
 import type { CourseSummary } from '@/types/domain';
 
@@ -54,18 +56,16 @@ export function CourseOverviewTab({
         <StarRating rating={course.avgRating} reviewCount={course.reviewCount} levelLabel={LEVEL_LABEL[course.level]} />
       </div>
 
-      <p className="whitespace-pre-line text-[14.5px] leading-relaxed text-ink">{course.description}</p>
+      <RichText text={course.description} />
 
       <div className="flex flex-wrap gap-x-6 gap-y-2 border-t border-line-soft pt-4 text-sm text-ink-muted">
         <span>{course.chapters.length} chương · {totalLessons} bài giảng</span>
-        <span>Có thể lồng tiếng sang {course.langs.length} ngôn ngữ</span>
+        {course.langs.length > 0 && <span>Có thể lồng tiếng sang {course.langs.length} ngôn ngữ</span>}
       </div>
 
       <div className="flex items-center justify-between gap-3 border-t border-line-soft pt-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-accent/10 font-display text-base font-bold text-accent">
-            {course.instructorName.charAt(0).toUpperCase()}
-          </div>
+          <Avatar name={course.instructorName} avatarUrl={course.instructorAvatarUrl} size={44} />
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-wide text-ink-faint">Giảng viên</p>
             <p className="text-sm font-semibold text-ink">{course.instructorName}</p>

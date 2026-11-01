@@ -10,6 +10,7 @@ import { RejectReasonModal } from '@/components/admin/RejectReasonModal';
 import { ConfirmDialog } from '@/components/admin/ui/ConfirmDialog';
 import { CourseStatusBadge } from '@/components/course/CourseStatusBadge';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { RichText } from '@/components/ui/RichText';
 import { useApproveCourse, useModerationDetail, useRejectCourse } from '@/hooks/useCourses';
 import { ApiError } from '@/lib/api/client';
 import { formatMoney } from '@/lib/shop/money';
@@ -112,7 +113,7 @@ export default function AdminModerationDetailPage() {
               // eslint-disable-next-line @next/next/no-img-element
               <img src={course.thumbnailUrl} alt={course.title} className="mb-3 h-40 w-full rounded-lg object-cover" />
             )}
-            <p className="m-0 whitespace-pre-line text-[13.5px] text-ink">{course.description}</p>
+            <RichText text={course.description} className="text-[13.5px]" />
           </div>
 
           <div className="flex flex-col gap-3">
