@@ -8,6 +8,7 @@ export interface AdminUser {
   isActive: boolean;
   createdAt: string;
   isSpamFlagged?: boolean;
+  authProvider?: string;
 }
 
 export type UserFilter = 'ALL' | UserRoleName | 'LOCKED' | 'SPAM';

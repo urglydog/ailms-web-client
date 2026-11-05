@@ -675,7 +675,9 @@
       "submit": "Reset password",
       "submitting": "Processing...",
       "success": "Password changed successfully! Please log in again.",
-      "genericError": "This link has expired or is invalid."
+      "genericError": "This link has expired or is invalid.",
+      "confirmPassword": "Confirm password",
+      "mismatch": "Passwords do not match."
     }
   },
   "community": {
@@ -1365,7 +1367,8 @@
         "createdAt": "创建时间",
         "role": "角色",
         "status": "状态",
-        "actions": "操作"
+        "actions": "操作",
+        "authProvider": "Sign-in method"
       },
       "role": {
         "STUDENT": "学员",
@@ -1403,7 +1406,8 @@
         "prev": "上一页",
         "next": "下一页",
         "page": "第 {page} / {total} 页"
-      }
+      },
+      "authLocal": "Email"
     },
     "moderation": {
       "title": "课程审核",
@@ -1974,7 +1978,8 @@
         "generating": "Generating...",
         "copy": "Copy link",
         "expiresAt": "Expires at {time}",
-        "sent": "Reset link emailed to the user"
+        "sent": "Reset link emailed to the user",
+        "googleBlocked": "This account signs in with Google and has no password to reset."
       }
     }
   }

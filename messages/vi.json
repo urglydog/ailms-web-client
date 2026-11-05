@@ -675,7 +675,9 @@
       "submit": "Đặt lại mật khẩu",
       "submitting": "Đang xử lý...",
       "success": "Đổi mật khẩu thành công! Vui lòng đăng nhập lại.",
-      "genericError": "Link đã hết hạn hoặc không hợp lệ."
+      "genericError": "Link đã hết hạn hoặc không hợp lệ.",
+      "confirmPassword": "Xác nhận mật khẩu",
+      "mismatch": "Mật khẩu xác nhận không khớp."
     }
   },
   "community": {
@@ -1365,7 +1367,8 @@
         "createdAt": "Ngày tạo",
         "role": "Vai trò",
         "status": "Trạng thái",
-        "actions": "Hành động"
+        "actions": "Hành động",
+        "authProvider": "Đăng nhập bằng"
       },
       "role": {
         "STUDENT": "Học viên",
@@ -1403,7 +1406,8 @@
         "prev": "Trước",
         "next": "Sau",
         "page": "Trang {page} / {total}"
-      }
+      },
+      "authLocal": "Email"
     },
     "userDetail": {
       "back": "Quay lại",
@@ -1467,7 +1471,8 @@
         "generating": "Đang tạo...",
         "copy": "Sao chép link",
         "expiresAt": "Hết hạn lúc {time}",
-        "sent": "Đã gửi email link đặt lại mật khẩu cho user"
+        "sent": "Đã gửi email link đặt lại mật khẩu cho user",
+        "googleBlocked": "Tài khoản đăng nhập bằng Google, không có mật khẩu để đặt lại."
       }
     },
     "moderation": {
