@@ -19,7 +19,7 @@ describe('HelpCenter', () => {
   it('chọn nhóm rồi gửi yêu cầu trên 1 vấn đề: tiêu đề tự điền theo mục đã chọn và bị khóa', () => {
     renderWithIntl(<HelpCenter />);
     fireEvent.click(screen.getByRole('button', { name: /Tài khoản & đăng nhập/ }));
-    fireEvent.click(screen.getAllByRole('button', { name: /Vấn đề này chưa được giải quyết\? Gửi yêu cầu/ })[2]!);
+    fireEvent.click(screen.getAllByRole('button', { name: /Vấn đề này chưa được giải quyết\? Gửi yêu cầu/ })[1]!);
 
     expect(screen.getByText('Tài khoản & đăng nhập › Không nhận được mã OTP')).toBeInTheDocument();
     // tiêu đề đã chốt nên không có ô nhập tiêu đề / chọn nhóm

@@ -816,7 +816,9 @@ export interface ReopenDisputeReq {
   reopenReason: string;
 }
 
-export type SupportCategory = 'ACCOUNT' | 'PAYMENT' | 'COURSE' | 'EXAM' | 'TECHNICAL' | 'OTHER';
+export type SupportCategory =
+  | 'ACCOUNT' | 'PAYMENT' | 'COURSE' | 'LEARNING' | 'AI_FEATURES' | 'EXAM' | 'CERTIFICATE'
+  | 'COMMUNITY' | 'LIVE' | 'INSTRUCTOR' | 'PRIVACY' | 'TECHNICAL' | 'OTHER';
 export type SupportStatus = 'OPEN' | 'IN_PROGRESS' | 'RESOLVED';
 
 /** Ticket hỗ trợ (05/11/2026) — khách chưa đăng nhập cũng gửi được. */
@@ -839,19 +841,40 @@ export interface SupportTicketAdminRes {
   subject: string;
   message: string;
   status: SupportStatus;
+  /** Bản text phẳng của phản hồi gần nhất. */
   adminReply: string | null;
-  adminSteps: string[];
+  /** Nội dung email phản hồi gần nhất ở dạng có cấu trúc (placeholder chưa thay), null nếu chưa có. */
+  adminContent: SupportEmailContent | null;
   resolvedByEmail: string | null;
   resolvedAt: string | null;
   createdAt: string;
   attachments: { id: number; fileUrl: string; fileType: string }[];
 }
 
+export type SupportSectionType = 'TEXT' | 'LIST';
+
+/** 1 mục trong email phản hồi: tiêu đề tùy ý + (đoạn văn hoặc danh sách đánh số). */
+export interface SupportSection {
+  title: string;
+  type: SupportSectionType;
+  text: string | null;
+  items: string[] | null;
+}
+
+/** Toàn bộ nội dung email phản hồi Admin tự soạn; hỗ trợ placeholder {name} {code} {subject} {category}. */
+export interface SupportEmailContent {
+  greeting?: string | null;
+  intro?: string | null;
+  sections: SupportSection[];
+  closing?: string | null;
+  signatureName?: string | null;
+  signatureTeam?: string | null;
+  includeOriginal?: boolean | null;
+}
+
 export interface UpdateSupportTicketReq {
   status: SupportStatus;
-  reply?: string;
-  /** Các bước hướng dẫn, hiện dạng danh sách đánh số trong email. */
-  steps?: string[];
+  content?: SupportEmailContent;
 }
 
 /** Link reset mật khẩu Admin tự gửi thủ công cho user (23/10/2026). */
