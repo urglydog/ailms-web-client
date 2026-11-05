@@ -1,25 +1,38 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { ChevronDown, CircleUser, CreditCard, GraduationCap, HelpCircle, MonitorCog, Send, ShieldCheck } from 'lucide-react';
+import {
+  Award, BookOpen, ChevronDown, CircleUser, CreditCard, HelpCircle, Lock, MessagesSquare, MonitorCog, NotebookPen, Presentation,
+  Send, ShieldCheck, Sparkles, Video,
+} from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { SupportTicketForm } from '@/components/help/SupportTicketForm';
+import { SUPPORT_CATEGORIES } from '@/lib/support/categories';
 import type { SupportCategory } from '@/types/domain';
 
-const CATEGORIES: { id: SupportCategory; icon: LucideIcon }[] = [
-  { id: 'ACCOUNT', icon: CircleUser },
-  { id: 'PAYMENT', icon: CreditCard },
-  { id: 'COURSE', icon: GraduationCap },
-  { id: 'EXAM', icon: ShieldCheck },
-  { id: 'TECHNICAL', icon: MonitorCog },
-  { id: 'OTHER', icon: HelpCircle },
-];
+const CATEGORY_ICONS: Record<SupportCategory, LucideIcon> = {
+  ACCOUNT: CircleUser,
+  PAYMENT: CreditCard,
+  COURSE: BookOpen,
+  LEARNING: NotebookPen,
+  AI_FEATURES: Sparkles,
+  EXAM: ShieldCheck,
+  CERTIFICATE: Award,
+  COMMUNITY: MessagesSquare,
+  LIVE: Video,
+  INSTRUCTOR: Presentation,
+  PRIVACY: Lock,
+  TECHNICAL: MonitorCog,
+  OTHER: HelpCircle,
+};
 
 interface Faq {
   q: string;
   a: string;
+  /** Gợi ý nên nêu gì trong mô tả ticket cho đúng vấn đề này. */
+  hint: string;
 }
 
 /** Chủ đề ticket đang soạn. `subject` có giá trị = tiêu đề đã chốt theo mục người dùng chọn (khóa, không cho sửa);
@@ -27,12 +40,13 @@ interface Faq {
 interface Topic {
   category: SupportCategory;
   subject?: string;
+  hint?: string;
 }
 
 const SUBJECT_MAX = 200;
 
 function parseCategory(value: string | null): SupportCategory | null {
-  return CATEGORIES.find((c) => c.id === value)?.id ?? null;
+  return SUPPORT_CATEGORIES.find((c) => c === value) ?? null;
 }
 
 /** Trung tâm trợ giúp: chọn nhóm → chọn vấn đề cụ thể (FAQ) → "Gửi yêu cầu" ngay trên chính vấn đề đó, tiêu đề
@@ -62,7 +76,9 @@ export function HelpCenter() {
       <section aria-labelledby="help-pick" className="flex flex-col gap-3">
         <h2 id="help-pick" className="m-0 font-display text-base font-bold text-ink">{t('pickCategory')}</h2>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {CATEGORIES.map(({ id, icon: Icon }) => (
+          {SUPPORT_CATEGORIES.map((id) => {
+            const Icon = CATEGORY_ICONS[id];
+            return (
             <button
               key={id}
               type="button"
@@ -81,7 +97,8 @@ export function HelpCenter() {
                 <span className="text-xs text-ink-muted">{t(`categories.${id}.desc`)}</span>
               </span>
             </button>
-          ))}
+            );
+          })}
         </div>
       </section>
 
@@ -98,7 +115,7 @@ export function HelpCenter() {
                 <p className="m-0 mt-2 text-sm leading-[1.7] text-ink-muted">{faq.a}</p>
                 <button
                   type="button"
-                  onClick={() => setTopic({ category: selected, subject: buildSubject(selected, faq.q) })}
+                  onClick={() => setTopic({ category: selected, subject: buildSubject(selected, faq.q), hint: faq.hint })}
                   className="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-line bg-white px-3 py-1.5 text-xs font-bold text-accent-dark hover:bg-tint"
                 >
                   <Send size={13} aria-hidden />
@@ -138,7 +155,7 @@ export function HelpCenter() {
             </button>
           )}
         </div>
-        {topic && <SupportTicketForm key={`${topic.category}|${topic.subject ?? ''}`} initialCategory={topic.category} lockedSubject={topic.subject} />}
+        {topic && <SupportTicketForm key={`${topic.category}|${topic.subject ?? ''}`} initialCategory={topic.category} lockedSubject={topic.subject} hint={topic.hint} />}
       </section>
     </div>
   );

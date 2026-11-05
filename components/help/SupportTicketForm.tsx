@@ -5,9 +5,9 @@ import { ImagePlus, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { ApiError } from '@/lib/api/client';
 import { supportApi } from '@/lib/api/support';
+import { SUPPORT_CATEGORIES } from '@/lib/support/categories';
 import type { SupportCategory } from '@/types/domain';
 
-const CATEGORIES: SupportCategory[] = ['ACCOUNT', 'PAYMENT', 'COURSE', 'EXAM', 'TECHNICAL', 'OTHER'];
 /** Khớp `lms.rules.max-support-ticket-files` / `max-support-ticket-size-mb` phía BE — BE vẫn kiểm tra lại, đây chỉ để báo sớm. */
 const MAX_FILES = 3;
 const MAX_SIZE_MB = 5;
@@ -20,10 +20,12 @@ interface Props {
   initialEmail?: string;
   /** Tiêu đề đã chốt theo mục người dùng chọn ở Trung tâm trợ giúp (vd "Tài khoản › Không nhận được OTP") — khóa, không cho sửa. */
   lockedSubject?: string;
+  /** Gợi ý nên nêu những gì trong mô tả cho đúng vấn đề đã chọn (mã giao dịch, thiết bị, ảnh chụp...). */
+  hint?: string;
 }
 
 /** Form gửi ticket hỗ trợ — gửi được cả khi chưa đăng nhập. Hiện mã ticket sau khi gửi thành công. */
-export function SupportTicketForm({ initialCategory, initialEmail = '', lockedSubject }: Props) {
+export function SupportTicketForm({ initialCategory, initialEmail = '', lockedSubject, hint }: Props) {
   const t = useTranslations('supportHelp');
   const fileInput = useRef<HTMLInputElement>(null);
   const [email, setEmail] = useState(initialEmail);
@@ -113,7 +115,7 @@ export function SupportTicketForm({ initialCategory, initialEmail = '', lockedSu
           <label className="flex flex-col gap-1.5">
             <span className="text-sm font-semibold text-ink">{t('form.category')}</span>
             <select value={category} onChange={(e) => setCategory(e.target.value as SupportCategory)} className={INPUT_CLASS}>
-              {CATEGORIES.map((c) => (
+              {SUPPORT_CATEGORIES.map((c) => (
                 <option key={c} value={c}>
                   {t(`categories.${c}.title`)}
                 </option>
@@ -131,7 +133,7 @@ export function SupportTicketForm({ initialCategory, initialEmail = '', lockedSu
       <label className="flex flex-col gap-1.5">
         <span className="text-sm font-semibold text-ink">{lockedSubject ? t('form.messageGuided') : t('form.message')}</span>
         <textarea required minLength={10} maxLength={3000} rows={5} value={message} onChange={(e) => setMessage(e.target.value)} className={INPUT_CLASS} />
-        <span className="text-xs text-ink-muted">{t('form.messageHint')}</span>
+        <span className="text-xs text-ink-muted">{hint ? `${t('form.shouldInclude')} ${hint}` : t('form.messageHint')}</span>
       </label>
 
       <div className="flex flex-col gap-2">
