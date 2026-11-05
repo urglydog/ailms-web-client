@@ -74,7 +74,8 @@
       "more": "KHÁM PHÁ THÊM",
       "liveNow": "Đang diễn ra"
     },
-    "skipToContent": "Bỏ qua tới nội dung"
+    "skipToContent": "Bỏ qua tới nội dung",
+    "help": "Trợ giúp & Hỗ trợ"
   },
   "footer": {
     "tagline": "Hệ thống quản lý học tập và thi cử trực tuyến chuẩn học thuật.",
@@ -2029,7 +2030,72 @@
         "error": "Không cập nhật được yêu cầu.",
         "openUser": "Mở trang người dùng",
         "noUser": "Email này chưa có tài khoản",
-        "previousReply": "Phản hồi trước đó"
+        "previousReply": "Phản hồi trước đó",
+        "template": "Mẫu phản hồi",
+        "templatePh": "Chọn mẫu để điền sẵn nội dung...",
+        "replyLabel": "Nội dung phản hồi",
+        "steps": "Các bước hướng dẫn",
+        "stepPh": "Nhập nội dung bước {n}...",
+        "addStep": "Thêm bước",
+        "removeStep": "Xóa bước",
+        "maxSteps": "Tối đa 10 bước.",
+        "previewTitle": "Xem trước email gửi cho người dùng",
+        "replyRequired": "Nhập nội dung phản hồi trước khi lưu.",
+        "form": "Soạn phản hồi",
+        "preview": {
+          "greeting": "Kính gửi {name},",
+          "about": "Về yêu cầu hỗ trợ {code}, chúng tôi xin phản hồi như sau.",
+          "reply": "Phản hồi",
+          "steps": "Hướng dẫn thực hiện",
+          "closing": "Trân trọng,",
+          "team": "Đội ngũ hỗ trợ LinguaLearn",
+          "empty": "(Chưa có nội dung phản hồi)"
+        },
+        "templates": {
+          "received": {
+            "label": "Đã tiếp nhận yêu cầu",
+            "status": "IN_PROGRESS",
+            "reply": "Chúng tôi đã tiếp nhận yêu cầu của bạn và đang tiến hành xử lý. Kết quả sẽ được gửi tới bạn qua email này trong vòng 24 giờ làm việc.",
+            "steps": []
+          },
+          "resetPassword": {
+            "label": "Hướng dẫn đặt lại mật khẩu",
+            "status": "RESOLVED",
+            "reply": "Quản trị viên đã tạo liên kết đặt lại mật khẩu và gửi riêng tới email của bạn. Vui lòng thực hiện theo các bước dưới đây.",
+            "steps": [
+              "Mở email có tiêu đề \"Đặt lại mật khẩu - LinguaLearn\" (kiểm tra cả thư mục Spam).",
+              "Bấm nút \"Đặt lại mật khẩu\" trong email. Liên kết có hiệu lực 30 phút và chỉ dùng được 1 lần.",
+              "Nhập mật khẩu mới hai lần để xác nhận.",
+              "Quay lại trang Đăng nhập và đăng nhập bằng mật khẩu mới."
+            ]
+          },
+          "googleAccount": {
+            "label": "Tài khoản đăng nhập bằng Google",
+            "status": "RESOLVED",
+            "reply": "Tài khoản của bạn được đăng ký bằng Google nên không có mật khẩu riêng để đặt lại.",
+            "steps": [
+              "Vào trang Đăng nhập.",
+              "Bấm nút \"Đăng nhập bằng Google\".",
+              "Chọn đúng tài khoản Google đã dùng để đăng ký."
+            ]
+          },
+          "needMoreInfo": {
+            "label": "Cần bổ sung thông tin",
+            "status": "IN_PROGRESS",
+            "reply": "Để xử lý yêu cầu, chúng tôi cần thêm một số thông tin từ bạn.",
+            "steps": [
+              "Mô tả chính xác các bước dẫn tới lỗi.",
+              "Cung cấp ảnh chụp màn hình lỗi.",
+              "Cho biết thiết bị và trình duyệt bạn đang dùng."
+            ]
+          },
+          "resolved": {
+            "label": "Đã giải quyết",
+            "status": "RESOLVED",
+            "reply": "Yêu cầu của bạn đã được giải quyết. Cảm ơn bạn đã kiên nhẫn chờ đợi.",
+            "steps": []
+          }
+        }
       }
     }
   },
@@ -2144,9 +2210,15 @@
       "genericError": "Không gửi được yêu cầu, vui lòng thử lại.",
       "successTitle": "Đã gửi yêu cầu",
       "successBody": "Mã yêu cầu của bạn là {code}. Chúng tôi đã gửi email xác nhận và sẽ phản hồi trong 24-48 giờ. Nếu không thấy email, hãy kiểm tra thư mục Spam.",
-      "newRequest": "Gửi yêu cầu khác"
+      "newRequest": "Gửi yêu cầu khác",
+      "topic": "Chủ đề",
+      "topicHint": "Chủ đề được điền tự động theo mục bạn đã chọn.",
+      "messageGuided": "Mô tả thêm tình huống của bạn"
     },
     "forgotHint": "Không nhận được mã OTP?",
-    "forgotLink": "Gửi yêu cầu hỗ trợ"
+    "forgotLink": "Gửi yêu cầu hỗ trợ",
+    "requestThis": "Vấn đề này chưa được giải quyết? Gửi yêu cầu",
+    "otherInGroup": "Vấn đề khác trong nhóm này",
+    "otherLabel": "Vấn đề khác"
   }
 }

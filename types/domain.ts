@@ -833,11 +833,14 @@ export interface SupportTicketAdminRes {
   email: string;
   /** null nếu email chưa có tài khoản. */
   userId: number | null;
+  /** Tên dùng trong lời chào email: họ tên nếu có tài khoản, không thì phần trước @. */
+  senderName: string;
   category: SupportCategory;
   subject: string;
   message: string;
   status: SupportStatus;
   adminReply: string | null;
+  adminSteps: string[];
   resolvedByEmail: string | null;
   resolvedAt: string | null;
   createdAt: string;
@@ -847,6 +850,8 @@ export interface SupportTicketAdminRes {
 export interface UpdateSupportTicketReq {
   status: SupportStatus;
   reply?: string;
+  /** Các bước hướng dẫn, hiện dạng danh sách đánh số trong email. */
+  steps?: string[];
 }
 
 /** Link reset mật khẩu Admin tự gửi thủ công cho user (23/10/2026). */
