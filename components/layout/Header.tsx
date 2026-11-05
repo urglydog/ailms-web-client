@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState, useRef, type KeyboardEvent, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { CircleHelp } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { useNotification } from '@/components/providers/NotificationProvider';
@@ -330,6 +331,16 @@ export function Header() {
                 )}
               </div>
             )}
+
+            {/* Trợ giúp & Hỗ trợ (05/11/2026) — icon "?" luôn hiện, kể cả khách chưa đăng nhập (vd quên mật khẩu) */}
+            <Link
+              href="/help"
+              aria-label={t('help')}
+              title={t('help')}
+              className="relative flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-surface text-ink hover:bg-surface-hover"
+            >
+              <CircleHelp size={17} aria-hidden />
+            </Link>
 
             {/* Wishlist Icon + dropdown xem nhanh (14/09/2026, mở rộng ngoài đặc tả gốc) */}
             <div

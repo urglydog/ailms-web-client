@@ -18,15 +18,17 @@ const INPUT_CLASS = 'w-full rounded-lg border border-line bg-white p-2.5 text-sm
 interface Props {
   initialCategory: SupportCategory;
   initialEmail?: string;
+  /** Tiêu đề đã chốt theo mục người dùng chọn ở Trung tâm trợ giúp (vd "Tài khoản › Không nhận được OTP") — khóa, không cho sửa. */
+  lockedSubject?: string;
 }
 
 /** Form gửi ticket hỗ trợ — gửi được cả khi chưa đăng nhập. Hiện mã ticket sau khi gửi thành công. */
-export function SupportTicketForm({ initialCategory, initialEmail = '' }: Props) {
+export function SupportTicketForm({ initialCategory, initialEmail = '', lockedSubject }: Props) {
   const t = useTranslations('supportHelp');
   const fileInput = useRef<HTMLInputElement>(null);
   const [email, setEmail] = useState(initialEmail);
   const [category, setCategory] = useState<SupportCategory>(initialCategory);
-  const [subject, setSubject] = useState('');
+  const [subject, setSubject] = useState(lockedSubject ?? '');
   const [message, setMessage] = useState('');
   const [files, setFiles] = useState<File[]>([]);
   const [fileError, setFileError] = useState<string | null>(null);
@@ -73,7 +75,7 @@ export function SupportTicketForm({ initialCategory, initialEmail = '' }: Props)
 
   const reset = () => {
     setCode(null);
-    setSubject('');
+    setSubject(lockedSubject ?? '');
     setMessage('');
     setFiles([]);
   };
@@ -100,24 +102,34 @@ export function SupportTicketForm({ initialCategory, initialEmail = '' }: Props)
         <input type="email" required maxLength={255} value={email} onChange={(e) => setEmail(e.target.value)} className={INPUT_CLASS} />
       </label>
 
-      <label className="flex flex-col gap-1.5">
-        <span className="text-sm font-semibold text-ink">{t('form.category')}</span>
-        <select value={category} onChange={(e) => setCategory(e.target.value as SupportCategory)} className={INPUT_CLASS}>
-          {CATEGORIES.map((c) => (
-            <option key={c} value={c}>
-              {t(`categories.${c}.title`)}
-            </option>
-          ))}
-        </select>
-      </label>
+      {lockedSubject ? (
+        <div className="flex flex-col gap-1.5">
+          <span className="text-sm font-semibold text-ink">{t('form.topic')}</span>
+          <p className="m-0 rounded-lg border border-line bg-surface p-2.5 text-sm font-medium text-ink">{lockedSubject}</p>
+          <span className="text-xs text-ink-muted">{t('form.topicHint')}</span>
+        </div>
+      ) : (
+        <>
+          <label className="flex flex-col gap-1.5">
+            <span className="text-sm font-semibold text-ink">{t('form.category')}</span>
+            <select value={category} onChange={(e) => setCategory(e.target.value as SupportCategory)} className={INPUT_CLASS}>
+              {CATEGORIES.map((c) => (
+                <option key={c} value={c}>
+                  {t(`categories.${c}.title`)}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="flex flex-col gap-1.5">
+            <span className="text-sm font-semibold text-ink">{t('form.subject')}</span>
+            <input type="text" required maxLength={200} value={subject} onChange={(e) => setSubject(e.target.value)} className={INPUT_CLASS} />
+          </label>
+        </>
+      )}
 
       <label className="flex flex-col gap-1.5">
-        <span className="text-sm font-semibold text-ink">{t('form.subject')}</span>
-        <input type="text" required maxLength={200} value={subject} onChange={(e) => setSubject(e.target.value)} className={INPUT_CLASS} />
-      </label>
-
-      <label className="flex flex-col gap-1.5">
-        <span className="text-sm font-semibold text-ink">{t('form.message')}</span>
+        <span className="text-sm font-semibold text-ink">{lockedSubject ? t('form.messageGuided') : t('form.message')}</span>
         <textarea required minLength={10} maxLength={3000} rows={5} value={message} onChange={(e) => setMessage(e.target.value)} className={INPUT_CLASS} />
         <span className="text-xs text-ink-muted">{t('form.messageHint')}</span>
       </label>

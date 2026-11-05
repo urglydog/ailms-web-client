@@ -74,7 +74,8 @@
       "more": "MORE",
       "liveNow": "Live now"
     },
-    "skipToContent": "Skip to content"
+    "skipToContent": "Skip to content",
+    "help": "Help & Support"
   },
   "footer": {
     "tagline": "An academic-grade online learning and examination management system.",
@@ -2029,7 +2030,72 @@
         "error": "Couldn't update the request.",
         "openUser": "Open user page",
         "noUser": "No account uses this email",
-        "previousReply": "Previous reply"
+        "previousReply": "Previous reply",
+        "template": "Reply template",
+        "templatePh": "Pick a template to pre-fill...",
+        "replyLabel": "Reply content",
+        "steps": "Instruction steps",
+        "stepPh": "Step {n} text...",
+        "addStep": "Add step",
+        "removeStep": "Remove step",
+        "maxSteps": "Up to 10 steps.",
+        "previewTitle": "Preview of the email sent to the user",
+        "replyRequired": "Enter the reply content before saving.",
+        "form": "Compose reply",
+        "preview": {
+          "greeting": "Dear {name},",
+          "about": "Regarding support request {code}, here is our response.",
+          "reply": "Response",
+          "steps": "Instructions",
+          "closing": "Best regards,",
+          "team": "LinguaLearn Support Team",
+          "empty": "(No reply content yet)"
+        },
+        "templates": {
+          "received": {
+            "label": "Request received",
+            "status": "IN_PROGRESS",
+            "reply": "We have received your request and are working on it. You will get the result by email within 24 working hours.",
+            "steps": []
+          },
+          "resetPassword": {
+            "label": "Password reset instructions",
+            "status": "RESOLVED",
+            "reply": "An administrator has created a password reset link and sent it to your email separately. Please follow the steps below.",
+            "steps": [
+              "Open the email titled \"Reset password - LinguaLearn\" (also check your Spam folder).",
+              "Click the \"Reset password\" button. The link is valid for 30 minutes and can be used once.",
+              "Enter your new password twice to confirm.",
+              "Go back to Sign in and use your new password."
+            ]
+          },
+          "googleAccount": {
+            "label": "Google sign-in account",
+            "status": "RESOLVED",
+            "reply": "Your account was registered with Google, so it has no separate password to reset.",
+            "steps": [
+              "Go to the Sign in page.",
+              "Click \"Sign in with Google\".",
+              "Choose the Google account you registered with."
+            ]
+          },
+          "needMoreInfo": {
+            "label": "More information needed",
+            "status": "IN_PROGRESS",
+            "reply": "To handle your request we need some more information from you.",
+            "steps": [
+              "Describe the exact steps that lead to the problem.",
+              "Provide a screenshot of the error.",
+              "Tell us which device and browser you are using."
+            ]
+          },
+          "resolved": {
+            "label": "Resolved",
+            "status": "RESOLVED",
+            "reply": "Your request has been resolved. Thank you for your patience.",
+            "steps": []
+          }
+        }
       }
     }
   },
@@ -2144,9 +2210,15 @@
       "genericError": "Couldn't send the request, please try again.",
       "successTitle": "Request sent",
       "successBody": "Your request code is {code}. We sent a confirmation email and will reply within 24-48 hours. If you don't see it, check your Spam folder.",
-      "newRequest": "Send another request"
+      "newRequest": "Send another request",
+      "topic": "Topic",
+      "topicHint": "The topic is filled in from the item you picked.",
+      "messageGuided": "Describe your situation"
     },
     "forgotHint": "Didn't receive the OTP?",
-    "forgotLink": "Send a support request"
+    "forgotLink": "Send a support request",
+    "requestThis": "Didn't solve it? Send a request",
+    "otherInGroup": "Something else in this topic",
+    "otherLabel": "Other issue"
   }
 }
