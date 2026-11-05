@@ -1297,7 +1297,8 @@
       "disputes": "Payment disputes",
       "coupons": "Coupons",
       "announcements": "System announcements",
-      "settings": "System settings"
+      "settings": "System settings",
+      "support": "Support requests"
     },
     "shell": {
       "brand": "LinguaLearn",
@@ -1981,6 +1982,171 @@
         "MEDIUM": "Medium",
         "LOW": "Low"
       }
+    },
+    "support": {
+      "title": "Support requests",
+      "subtitle": "Requests from users (including signed-out visitors). Replies are emailed to the sender.",
+      "filters": {
+        "status": "Status",
+        "all": "All"
+      },
+      "status": {
+        "OPEN": "Open",
+        "IN_PROGRESS": "In progress",
+        "RESOLVED": "Resolved"
+      },
+      "category": {
+        "ACCOUNT": "Account",
+        "PAYMENT": "Payment",
+        "COURSE": "Course",
+        "EXAM": "Exam",
+        "TECHNICAL": "Technical",
+        "OTHER": "Other"
+      },
+      "cols": {
+        "code": "Code",
+        "sender": "Sender",
+        "subject": "Subject",
+        "category": "Topic",
+        "status": "Status",
+        "time": "Time",
+        "actions": "Actions"
+      },
+      "empty": "No support requests yet.",
+      "loadError": "Couldn't load support requests.",
+      "view": "View",
+      "detail": {
+        "close": "Close",
+        "message": "Message",
+        "attachments": "Screenshots",
+        "noAttachments": "No attachments.",
+        "reply": "Reply to the user",
+        "replyPh": "This text will be emailed to the sender...",
+        "status": "Status",
+        "save": "Save & send reply",
+        "saving": "Saving...",
+        "saved": "Request updated.",
+        "error": "Couldn't update the request.",
+        "openUser": "Open user page",
+        "noUser": "No account uses this email",
+        "previousReply": "Previous reply"
+      }
     }
+  },
+  "supportHelp": {
+    "title": "Help & Support",
+    "subtitle": "Pick the topic you need help with to see quick answers. If that doesn't solve it, send a request and our support team will reply by email.",
+    "pickCategory": "What do you need help with?",
+    "faqTitle": "Frequently asked questions",
+    "stillNeedHelp": "Still need help?",
+    "openForm": "Send a support request",
+    "closeForm": "Close form",
+    "categories": {
+      "ACCOUNT": {
+        "title": "Account & sign-in",
+        "desc": "Forgot password, no OTP, Google sign-in"
+      },
+      "PAYMENT": {
+        "title": "Payments & refunds",
+        "desc": "Paid but no access, refunds, disputes"
+      },
+      "COURSE": {
+        "title": "Courses & learning",
+        "desc": "Video won't play, certificates, progress"
+      },
+      "EXAM": {
+        "title": "Exams & proctoring",
+        "desc": "Camera, submission, exam errors"
+      },
+      "TECHNICAL": {
+        "title": "Technical issues",
+        "desc": "Page errors, slow loading, broken features"
+      },
+      "OTHER": {
+        "title": "Other",
+        "desc": "Anything else"
+      }
+    },
+    "faq": {
+      "ACCOUNT": [
+        {
+          "q": "I forgot my password. What should I do?",
+          "a": "Go to Sign in, choose Forgot password and enter your email to receive an OTP (valid for 5 minutes). If you don't see the email, check your Spam folder."
+        },
+        {
+          "q": "I sign in with Google. Can I change my password?",
+          "a": "Accounts that sign in with Google have no separate password. Use the Sign in with Google button each time."
+        },
+        {
+          "q": "I didn't receive the OTP",
+          "a": "Wait a few minutes and check your Spam folder. If it still doesn't arrive, send a support request below with your account email — an administrator will verify you and help reset your password."
+        }
+      ],
+      "PAYMENT": [
+        {
+          "q": "I paid but can't access the course",
+          "a": "The system may take a few minutes to confirm the payment. If the course still isn't in My courses after 15 minutes, send a request with the transaction code and a screenshot of the receipt."
+        },
+        {
+          "q": "I want a refund",
+          "a": "Read the Refund policy, then file a dispute under Request a refund in your account menu."
+        }
+      ],
+      "COURSE": [
+        {
+          "q": "The lesson video won't play",
+          "a": "Check your connection, reload the page or try another browser. If it still fails, send a request with the course name, lesson name and a screenshot."
+        },
+        {
+          "q": "I finished a course but see no certificate",
+          "a": "Send a request with the course name so an administrator can check your progress."
+        }
+      ],
+      "EXAM": [
+        {
+          "q": "The camera won't start during an exam",
+          "a": "Allow the browser to use your camera and microphone, close other apps using the camera, then reload the page."
+        },
+        {
+          "q": "The exam freezes when I submit",
+          "a": "Don't close the page. Wait about a minute; if it is still frozen, take a screenshot and send a request right away."
+        }
+      ],
+      "TECHNICAL": [
+        {
+          "q": "The site shows errors or loads very slowly",
+          "a": "Reload the page, clear your browser cache or switch browsers. If it still fails, send a request with a screenshot."
+        }
+      ],
+      "OTHER": [
+        {
+          "q": "My issue isn't in any of the topics above",
+          "a": "Send a support request describing the problem clearly and our team will reply by email."
+        }
+      ]
+    },
+    "form": {
+      "title": "Send a support request",
+      "email": "Email for the reply",
+      "category": "Topic",
+      "subject": "Subject",
+      "message": "Details",
+      "messageHint": "At least 10 characters. The clearer the description, the faster we can help.",
+      "attach": "Screenshots (optional)",
+      "attachHint": "Up to {count} jpg/png/webp images, {size}MB each.",
+      "addFiles": "Choose images",
+      "remove": "Remove",
+      "tooMany": "You can attach at most {count} images.",
+      "tooBig": "Image \"{name}\" exceeds {size}MB.",
+      "badType": "\"{name}\" is not a jpg/png/webp image.",
+      "submit": "Send request",
+      "submitting": "Sending...",
+      "genericError": "Couldn't send the request, please try again.",
+      "successTitle": "Request sent",
+      "successBody": "Your request code is {code}. We sent a confirmation email and will reply within 24-48 hours. If you don't see it, check your Spam folder.",
+      "newRequest": "Send another request"
+    },
+    "forgotHint": "Didn't receive the OTP?",
+    "forgotLink": "Send a support request"
   }
 }

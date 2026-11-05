@@ -816,6 +816,39 @@ export interface ReopenDisputeReq {
   reopenReason: string;
 }
 
+export type SupportCategory = 'ACCOUNT' | 'PAYMENT' | 'COURSE' | 'EXAM' | 'TECHNICAL' | 'OTHER';
+export type SupportStatus = 'OPEN' | 'IN_PROGRESS' | 'RESOLVED';
+
+/** Ticket hỗ trợ (05/11/2026) — khách chưa đăng nhập cũng gửi được. */
+export interface CreateSupportTicketReq {
+  email: string;
+  category: SupportCategory;
+  subject: string;
+  message: string;
+}
+
+export interface SupportTicketAdminRes {
+  id: number;
+  code: string;
+  email: string;
+  /** null nếu email chưa có tài khoản. */
+  userId: number | null;
+  category: SupportCategory;
+  subject: string;
+  message: string;
+  status: SupportStatus;
+  adminReply: string | null;
+  resolvedByEmail: string | null;
+  resolvedAt: string | null;
+  createdAt: string;
+  attachments: { id: number; fileUrl: string; fileType: string }[];
+}
+
+export interface UpdateSupportTicketReq {
+  status: SupportStatus;
+  reply?: string;
+}
+
 /** Link reset mật khẩu Admin tự gửi thủ công cho user (23/10/2026). */
 export interface ResetLinkRes {
   resetLink: string;

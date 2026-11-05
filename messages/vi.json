@@ -1297,7 +1297,8 @@
       "disputes": "Khiếu nại giao dịch",
       "coupons": "Mã giảm giá",
       "announcements": "Thông báo hệ thống",
-      "settings": "Cấu hình hệ thống"
+      "settings": "Cấu hình hệ thống",
+      "support": "Yêu cầu hỗ trợ"
     },
     "shell": {
       "brand": "LinguaLearn",
@@ -1981,6 +1982,171 @@
         "MEDIUM": "Trung bình",
         "LOW": "Thấp"
       }
+    },
+    "support": {
+      "title": "Yêu cầu hỗ trợ",
+      "subtitle": "Yêu cầu từ người dùng (kể cả khách chưa đăng nhập). Phản hồi sẽ được gửi qua email cho người gửi.",
+      "filters": {
+        "status": "Trạng thái",
+        "all": "Tất cả"
+      },
+      "status": {
+        "OPEN": "Chưa xử lý",
+        "IN_PROGRESS": "Đang xử lý",
+        "RESOLVED": "Đã xử lý"
+      },
+      "category": {
+        "ACCOUNT": "Tài khoản",
+        "PAYMENT": "Thanh toán",
+        "COURSE": "Khóa học",
+        "EXAM": "Thi cử",
+        "TECHNICAL": "Kỹ thuật",
+        "OTHER": "Khác"
+      },
+      "cols": {
+        "code": "Mã",
+        "sender": "Người gửi",
+        "subject": "Tiêu đề",
+        "category": "Nhóm",
+        "status": "Trạng thái",
+        "time": "Thời gian",
+        "actions": "Thao tác"
+      },
+      "empty": "Chưa có yêu cầu hỗ trợ nào.",
+      "loadError": "Không tải được danh sách yêu cầu.",
+      "view": "Xem",
+      "detail": {
+        "close": "Đóng",
+        "message": "Nội dung",
+        "attachments": "Ảnh minh chứng",
+        "noAttachments": "Không có ảnh đính kèm.",
+        "reply": "Phản hồi cho người dùng",
+        "replyPh": "Nội dung này sẽ được gửi qua email tới người gửi...",
+        "status": "Trạng thái",
+        "save": "Lưu & gửi phản hồi",
+        "saving": "Đang lưu...",
+        "saved": "Đã cập nhật yêu cầu.",
+        "error": "Không cập nhật được yêu cầu.",
+        "openUser": "Mở trang người dùng",
+        "noUser": "Email này chưa có tài khoản",
+        "previousReply": "Phản hồi trước đó"
+      }
     }
+  },
+  "supportHelp": {
+    "title": "Trợ giúp & Hỗ trợ",
+    "subtitle": "Chọn nhóm vấn đề bạn gặp phải để xem câu trả lời nhanh. Nếu chưa giải quyết được, hãy gửi yêu cầu để đội ngũ hỗ trợ phản hồi qua email.",
+    "pickCategory": "Bạn cần giúp về vấn đề nào?",
+    "faqTitle": "Câu hỏi thường gặp",
+    "stillNeedHelp": "Vẫn cần hỗ trợ?",
+    "openForm": "Gửi yêu cầu hỗ trợ",
+    "closeForm": "Đóng biểu mẫu",
+    "categories": {
+      "ACCOUNT": {
+        "title": "Tài khoản & đăng nhập",
+        "desc": "Quên mật khẩu, không nhận được OTP, đăng nhập Google"
+      },
+      "PAYMENT": {
+        "title": "Thanh toán & hoàn tiền",
+        "desc": "Đã trả tiền nhưng chưa vào khóa, hoàn tiền, khiếu nại"
+      },
+      "COURSE": {
+        "title": "Khóa học & học tập",
+        "desc": "Video không phát, chứng chỉ, tiến độ học"
+      },
+      "EXAM": {
+        "title": "Thi & giám sát",
+        "desc": "Camera, nộp bài, lỗi khi làm bài thi"
+      },
+      "TECHNICAL": {
+        "title": "Lỗi kỹ thuật",
+        "desc": "Trang lỗi, tải chậm, không dùng được tính năng"
+      },
+      "OTHER": {
+        "title": "Vấn đề khác",
+        "desc": "Các nội dung còn lại"
+      }
+    },
+    "faq": {
+      "ACCOUNT": [
+        {
+          "q": "Tôi quên mật khẩu, phải làm sao?",
+          "a": "Vào trang Đăng nhập, chọn Quên mật khẩu và nhập email để nhận mã OTP (hiệu lực 5 phút). Nếu không thấy email, hãy kiểm tra thư mục Spam."
+        },
+        {
+          "q": "Tôi đăng nhập bằng Google, có đổi mật khẩu được không?",
+          "a": "Tài khoản đăng nhập bằng Google không có mật khẩu riêng. Hãy dùng nút Đăng nhập bằng Google mỗi lần vào."
+        },
+        {
+          "q": "Không nhận được mã OTP",
+          "a": "Chờ vài phút và kiểm tra thư mục Spam. Nếu vẫn không có, hãy gửi yêu cầu hỗ trợ bên dưới kèm email tài khoản — quản trị viên sẽ xác minh và hỗ trợ đặt lại mật khẩu."
+        }
+      ],
+      "PAYMENT": [
+        {
+          "q": "Tôi đã thanh toán nhưng chưa vào được khóa học",
+          "a": "Hệ thống có thể mất vài phút để xác nhận giao dịch. Nếu sau 15 phút vẫn chưa thấy khóa học trong mục Khóa học của tôi, hãy gửi yêu cầu kèm mã giao dịch và ảnh chụp biên lai."
+        },
+        {
+          "q": "Tôi muốn được hoàn tiền",
+          "a": "Xem Chính sách hoàn tiền, sau đó gửi khiếu nại tại mục Yêu cầu hoàn tiền trong menu tài khoản của bạn."
+        }
+      ],
+      "COURSE": [
+        {
+          "q": "Video bài học không phát",
+          "a": "Kiểm tra kết nối mạng, thử tải lại trang hoặc dùng trình duyệt khác. Nếu vẫn lỗi, hãy gửi yêu cầu kèm tên khóa học, tên bài học và ảnh chụp màn hình."
+        },
+        {
+          "q": "Tôi hoàn thành khóa học nhưng chưa thấy chứng chỉ",
+          "a": "Gửi yêu cầu kèm tên khóa học để quản trị viên kiểm tra tiến độ học của bạn."
+        }
+      ],
+      "EXAM": [
+        {
+          "q": "Camera không bật khi làm bài thi",
+          "a": "Cho phép trình duyệt truy cập camera và micro, đồng thời đóng các ứng dụng khác đang dùng camera rồi tải lại trang."
+        },
+        {
+          "q": "Bài thi bị treo khi nộp bài",
+          "a": "Không đóng trang. Chờ khoảng 1 phút, nếu vẫn treo hãy chụp màn hình và gửi yêu cầu ngay."
+        }
+      ],
+      "TECHNICAL": [
+        {
+          "q": "Trang web báo lỗi hoặc tải rất chậm",
+          "a": "Thử tải lại trang, xóa bộ nhớ đệm của trình duyệt hoặc đổi sang trình duyệt khác. Nếu vẫn lỗi, hãy gửi yêu cầu kèm ảnh chụp màn hình."
+        }
+      ],
+      "OTHER": [
+        {
+          "q": "Tôi có vấn đề không thuộc các nhóm trên",
+          "a": "Hãy gửi yêu cầu hỗ trợ và mô tả rõ vấn đề của bạn, đội ngũ sẽ phản hồi qua email."
+        }
+      ]
+    },
+    "form": {
+      "title": "Gửi yêu cầu hỗ trợ",
+      "email": "Email nhận phản hồi",
+      "category": "Nhóm vấn đề",
+      "subject": "Tiêu đề",
+      "message": "Mô tả chi tiết",
+      "messageHint": "Tối thiểu 10 ký tự. Mô tả càng rõ, chúng tôi xử lý càng nhanh.",
+      "attach": "Ảnh minh chứng (không bắt buộc)",
+      "attachHint": "Tối đa {count} ảnh jpg/png/webp, mỗi ảnh {size}MB.",
+      "addFiles": "Chọn ảnh",
+      "remove": "Xóa",
+      "tooMany": "Chỉ được đính kèm tối đa {count} ảnh.",
+      "tooBig": "Ảnh \"{name}\" vượt quá {size}MB.",
+      "badType": "\"{name}\" không phải ảnh jpg/png/webp.",
+      "submit": "Gửi yêu cầu",
+      "submitting": "Đang gửi...",
+      "genericError": "Không gửi được yêu cầu, vui lòng thử lại.",
+      "successTitle": "Đã gửi yêu cầu",
+      "successBody": "Mã yêu cầu của bạn là {code}. Chúng tôi đã gửi email xác nhận và sẽ phản hồi trong 24-48 giờ. Nếu không thấy email, hãy kiểm tra thư mục Spam.",
+      "newRequest": "Gửi yêu cầu khác"
+    },
+    "forgotHint": "Không nhận được mã OTP?",
+    "forgotLink": "Gửi yêu cầu hỗ trợ"
   }
 }

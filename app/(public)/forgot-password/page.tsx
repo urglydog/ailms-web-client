@@ -10,6 +10,7 @@ import { ForgotResetStep } from '@/components/auth/ForgotResetStep';
 
 function ForgotPasswordContent() {
   const t = useTranslations('auth');
+  const th = useTranslations('supportHelp');
   const searchParams = useSearchParams();
   const initialEmail = searchParams.get('email') || '';
   const [step, setStep] = useState<1 | 2>(1);
@@ -19,9 +20,17 @@ function ForgotPasswordContent() {
     <AuthLayout
       title={t('forgot.title')}
       footer={
-        <Link href="/login" className="font-semibold text-accent-dark no-underline hover:underline">
-          {t('forgot.backToLogin')}
-        </Link>
+        <div className="flex flex-col items-center gap-2">
+          <Link href="/login" className="font-semibold text-accent-dark no-underline hover:underline">
+            {t('forgot.backToLogin')}
+          </Link>
+          <span className="text-xs text-ink-muted">
+            {th('forgotHint')}{' '}
+            <Link href="/help?category=ACCOUNT" className="font-semibold text-accent-dark no-underline hover:underline">
+              {th('forgotLink')}
+            </Link>
+          </span>
+        </div>
       }
     >
       {step === 1 ? (
