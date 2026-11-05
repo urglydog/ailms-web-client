@@ -71,7 +71,10 @@ export default function AdminUserDetailPage() {
 
   const sendResetLink = useMutation({
     mutationFn: () => api.post<ResetLinkRes>(`/api/v1/admin/users/${id}/send-reset-link`, undefined, { token }),
-    onSuccess: setResetLink,
+    onSuccess: (data) => {
+      setResetLink(data);
+      toast.success(t('resetLink.sent'));
+    },
     onError: (err) => toast.error(err instanceof ApiError ? err.message : t('genericError')),
   });
 

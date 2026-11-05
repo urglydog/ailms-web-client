@@ -1969,11 +1969,12 @@
       },
       "resetLink": {
         "title": "Password reset assistance",
-        "hint": "Use when a user forgot their password but isn't receiving the email/OTP — generates a separate link (expires in 30 minutes) for you to send through another channel.",
-        "generate": "Generate reset link",
+        "hint": "Use when a user forgot their password but isn't receiving the OTP — the system emails the link (expires in 30 minutes) to the user. The link is also shown below so you can send it manually if the email doesn't arrive or lands in spam.",
+        "generate": "Generate & email reset link",
         "generating": "Generating...",
         "copy": "Copy link",
-        "expiresAt": "Expires at {time}"
+        "expiresAt": "Expires at {time}",
+        "sent": "Reset link emailed to the user"
       }
     }
   }

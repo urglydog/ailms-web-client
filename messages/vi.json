@@ -1462,11 +1462,12 @@
       },
       "resetLink": {
         "title": "Hỗ trợ đặt lại mật khẩu",
-        "hint": "Dùng khi user quên mật khẩu nhưng không nhận được email/OTP — sinh link riêng (hết hạn sau 30 phút) để bạn tự gửi qua kênh khác.",
-        "generate": "Tạo link đặt lại mật khẩu",
+        "hint": "Dùng khi user quên mật khẩu nhưng không nhận được OTP — hệ thống tự gửi link (hết hạn sau 30 phút) qua email cho user. Link cũng hiện bên dưới để bạn gửi tay nếu email không tới hoặc vào spam.",
+        "generate": "Tạo & gửi link đặt lại mật khẩu",
         "generating": "Đang tạo...",
         "copy": "Sao chép link",
-        "expiresAt": "Hết hạn lúc {time}"
+        "expiresAt": "Hết hạn lúc {time}",
+        "sent": "Đã gửi email link đặt lại mật khẩu cho user"
       }
     },
     "moderation": {
