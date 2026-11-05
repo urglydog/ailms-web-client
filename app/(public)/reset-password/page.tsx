@@ -14,12 +14,17 @@ function ResetPasswordContent() {
   const searchParams = useSearchParams();
   const token = searchParams.get('token') ?? '';
   const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (newPassword !== confirmPassword) {
+      setError(t('mismatch'));
+      return;
+    }
     setSubmitting(true);
     setError(null);
     try {
@@ -60,6 +65,17 @@ function ResetPasswordContent() {
             minLength={8}
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
+            className="w-full rounded-lg border border-line bg-white p-2.5 text-sm text-ink outline-none focus:border-accent"
+          />
+        </label>
+        <label className="flex flex-col gap-1.5">
+          <span className="text-sm font-semibold text-ink">{t('confirmPassword')}</span>
+          <input
+            type="password"
+            required
+            minLength={8}
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
             className="w-full rounded-lg border border-line bg-white p-2.5 text-sm text-ink outline-none focus:border-accent"
           />
         </label>

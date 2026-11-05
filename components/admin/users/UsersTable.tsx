@@ -46,6 +46,9 @@ export function UsersTable({ users, sortField, sortOrder, onSort, onToggleBlock 
               );
             })}
             <th scope="col" className="px-4 py-3 font-semibold">
+              {t('cols.authProvider')}
+            </th>
+            <th scope="col" className="px-4 py-3 font-semibold">
               {t('cols.status')}
             </th>
             <th scope="col" className="px-4 py-3 text-right font-semibold">
@@ -56,7 +59,7 @@ export function UsersTable({ users, sortField, sortOrder, onSort, onToggleBlock 
         <tbody className="divide-y divide-line-soft">
           {users.length === 0 ? (
             <tr>
-              <td colSpan={6} className="px-4 py-10 text-center text-ink-muted">
+              <td colSpan={7} className="px-4 py-10 text-center text-ink-muted">
                 {t('empty')}
               </td>
             </tr>
@@ -84,6 +87,7 @@ export function UsersTable({ users, sortField, sortOrder, onSort, onToggleBlock 
                     {t(`role.${user.role}`)}
                   </span>
                 </td>
+                <td className="px-4 py-3 text-ink-muted">{user.authProvider === 'GOOGLE' ? 'Google' : t('authLocal')}</td>
                 <td className="px-4 py-3">
                   <span className={`inline-flex items-center gap-1.5 text-xs font-semibold ${user.isActive ? 'text-success-ink' : 'text-danger'}`}>
                     <span aria-hidden className={`h-2 w-2 rounded-full ${user.isActive ? 'bg-success' : 'bg-danger'}`} />

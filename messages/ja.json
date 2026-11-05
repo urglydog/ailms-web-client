@@ -675,7 +675,9 @@
       "submit": "Reset password",
       "submitting": "Processing...",
       "success": "Password changed successfully! Please log in again.",
-      "genericError": "This link has expired or is invalid."
+      "genericError": "This link has expired or is invalid.",
+      "confirmPassword": "Confirm password",
+      "mismatch": "Passwords do not match."
     }
   },
   "community": {
@@ -1365,7 +1367,8 @@
         "createdAt": "作成日",
         "role": "ロール",
         "status": "状態",
-        "actions": "操作"
+        "actions": "操作",
+        "authProvider": "Sign-in method"
       },
       "role": {
         "STUDENT": "受講生",
@@ -1403,7 +1406,8 @@
         "prev": "前へ",
         "next": "次へ",
         "page": "{page} / {total} ページ"
-      }
+      },
+      "authLocal": "Email"
     },
     "moderation": {
       "title": "講座の審査",
@@ -1974,7 +1978,8 @@
         "generating": "Generating...",
         "copy": "Copy link",
         "expiresAt": "Expires at {time}",
-        "sent": "Reset link emailed to the user"
+        "sent": "Reset link emailed to the user",
+        "googleBlocked": "This account signs in with Google and has no password to reset."
       }
     }
   }
