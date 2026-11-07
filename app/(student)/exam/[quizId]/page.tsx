@@ -397,6 +397,37 @@ export default function AntiCheatExamPage() {
     return () => window.removeEventListener('beforeunload', onBeforeUnload);
   }, [isStarted, result]);
 
+  // Reset toàn bộ state theo từng lượt thi. Trang KHÔNG unmount giữa 2 lượt (cùng route /exam/{id}), nên
+  // nếu không reset thì lượt mới thừa hưởng đáp án cũ, `isSubmitting=true` (nút nộp/lớp phủ kẹt mãi),
+  // `hasAutoSubmittedRef=true` (chặn tự nộp), số vi phạm cũ... — đúng lỗi "bấm Bắt đầu lại vẫn vào phiên
+  // vừa nộp, thời gian vẫn trôi, phải nộp lần nữa".
+  const resetAttemptState = useCallback(() => {
+    setResult(null);
+    setIsStarted(false);
+    setAttemptData(null);
+    setAnswers({});
+    setFlagged({});
+    setExplanations({});
+    setCurrentPage(1);
+    setReviewPage(1);
+    setResultPage(1);
+    setViolationCount(0);
+    setIsSubmitting(false);
+    setSubmitTime(null);
+    setElapsedSeconds(0);
+    setTimeLeft(null);
+    setShowReviewConfirm(false);
+    setFaceStatus('DETECTING');
+    hasAutoSubmittedRef.current = false;
+    abnormalStreakRef.current = 0;
+    headPoseBaselineRef.current = null;
+    headPoseSamplesRef.current = [];
+    mediaRecorderRef.current = null;
+    recordedChunksRef.current = [];
+    recordingStartRef.current = null;
+    startExamLockRef.current = false;
+  }, []);
+
   // Hàm nộp bài
   const submitExam = useCallback((_isAuto = false) => {
     if (!attemptData || isSubmitting || hasAutoSubmittedRef.current) return;
@@ -709,6 +740,13 @@ export default function AntiCheatExamPage() {
     }
   }, [attemptData, analyzeProctorFrameMutation, submitExam, getVideoOffsetSec]);
 
+  // `sendProctorFrame` đổi identity mỗi khi học viên chọn đáp án (phụ thuộc submitExam → answers). Đưa
+  // vào deps của 2 effect bên dưới từng làm chúng chạy lại mỗi lần chọn đáp án: effect nhận diện khuôn
+  // mặt bị clear interval rồi chỉ chờ sự kiện 'play' (video ĐÃ đang phát nên không bao giờ bắn lại) →
+  // trạng thái camera đóng băng ở lần quét cuối; effect gửi khung random thì bị dời lịch liên tục.
+  const sendProctorFrameRef = useRef(sendProctorFrame);
+  useEffect(() => { sendProctorFrameRef.current = sendProctorFrame; }, [sendProctorFrame]);
+
   // 2. Face API Detection Loop — quét mỗi 2s (client-side, có thể bị bypass, chỉ để hiện badge
   // UX). Đồng thời làm "cò súng" sự kiện: nếu NO_FACE/MULTIPLE_FACES liên tục 3 chu kỳ (6s), lập
   // tức chụp 1 khung hình gửi khẩn lên Gemini xác minh (bypass chu kỳ random chờ ở mục 2b), thay
@@ -782,7 +820,7 @@ export default function AntiCheatExamPage() {
 
           abnormalStreakRef.current += 1;
           if (abnormalStreakRef.current >= 3) {
-            sendProctorFrame(15_000);
+            sendProctorFrameRef.current(15_000);
             abnormalStreakRef.current = 0;
           }
         } catch (err) {
@@ -792,11 +830,13 @@ export default function AntiCheatExamPage() {
     };
 
     video.addEventListener('play', startDetection);
+    // Video có thể ĐÃ đang phát lúc effect chạy (sự kiện 'play' đã bắn trước đó) — bật quét ngay.
+    if (!video.paused && !video.ended) startDetection();
     return () => {
       video.removeEventListener('play', startDetection);
       if (detectInterval.current) clearInterval(detectInterval.current);
     };
-  }, [isStarted, isProctored, isModelLoaded, result, sendProctorFrame]);
+  }, [isStarted, isProctored, isModelLoaded, result]);
 
   // 2b. Random polling (gaze/head-turn) — face-api không bắt được hướng nhìn, nên vẫn cần 1 chu kỳ
   // gửi ảnh ngẫu nhiên (30-60s, không cố định) để học viên không thể căn giờ gian lận.
@@ -806,14 +846,14 @@ export default function AntiCheatExamPage() {
     const scheduleNext = () => {
       const delay = 30_000 + Math.random() * 30_000; // random 30s-60s
       proctorFrameInterval.current = setTimeout(() => {
-        sendProctorFrame(0); // chu kỳ random tự thân đã cách nhau 30-60s, không cần throttle thêm
+        sendProctorFrameRef.current(0); // chu kỳ random tự thân đã cách nhau 30-60s, không cần throttle thêm
         scheduleNext();
       }, delay);
     };
     scheduleNext();
 
     return () => { if (proctorFrameInterval.current) clearTimeout(proctorFrameInterval.current); };
-  }, [isStarted, isProctored, result, attemptData, sendProctorFrame]);
+  }, [isStarted, isProctored, result, attemptData]);
 
   // Yêu cầu bật Camera + Micro (nếu proctored)
   const startExam = useCallback(async () => {
@@ -1016,9 +1056,7 @@ export default function AntiCheatExamPage() {
               </button>
               <button
                 onClick={() => {
-                  setResult(null);
-                  setIsStarted(false);
-                  setAttemptData(null);
+                  resetAttemptState();
                   router.replace(`/exam/${quizId}${returnUrl ? `?returnUrl=${returnUrl}` : ''}`);
                 }}
                 className="bg-surface-hover text-ink px-6 py-2 rounded-lg font-semibold text-sm shadow-sm border border-line hover:bg-line transition-all"
