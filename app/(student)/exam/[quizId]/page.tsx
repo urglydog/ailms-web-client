@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { useMutation } from '@tanstack/react-query';
 import { useStartQuiz, useSubmitQuiz, useExplainWrongAnswer, useQuizHistory, useRecordViolation, useAnalyzeProctorFrame } from '@/hooks/useQuizzes';
 import { StartRes, SubmitRes, ViolationType, quizApi } from '@/lib/api/quizzes';
+import { ApiError } from '@/lib/api/client';
 import Link from 'next/link';
 import { MarkdownRenderer } from '@/components/ui/MarkdownRenderer';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -433,9 +434,9 @@ export default function AntiCheatExamPage() {
         // vì gây race với video (xem comment ở effect "Gắn stream"), nên dừng tường minh ở đây.
         mediaStream?.getTracks().forEach(t => t.stop());
         screenStreamRef.current?.getTracks().forEach(t => t.stop());
-        const error = err as { response?: { status?: number, data?: { code?: string, message?: string } } };
-        if (error.response?.status === 410 || error.response?.data?.code === 'QUIZ_ARCHIVED') {
-          setArchivedError({ show: true, message: error.response?.data?.message || 'Bài tập này đã được giảng viên thu hồi.' });
+        const apiErr = err instanceof ApiError ? err : null;
+        if (apiErr?.status === 410 || apiErr?.code === 'QUIZ_ARCHIVED') {
+          setArchivedError({ show: true, message: apiErr.message || 'Bài tập này đã được giảng viên thu hồi.' });
           if (userId && quizId) {
             try {
               localStorage.removeItem(`exam_draft_${userId}_${quizId}`);
@@ -443,7 +444,7 @@ export default function AntiCheatExamPage() {
             } catch {}
           }
           router.replace(`/exam/${quizId}${returnUrl ? `?returnUrl=${returnUrl}` : ''}`);
-        } else if (error.response?.status === 404 || error.response?.status === 500) {
+        } else if (apiErr?.status === 404) {
           setArchivedError({ show: true, message: 'Bài tập này đã được giảng viên gỡ bỏ hoặc cập nhật. Phiên làm bài kết thúc.' });
           router.replace(`/exam/${quizId}${returnUrl ? `?returnUrl=${returnUrl}` : ''}`);
         } else {
@@ -811,11 +812,10 @@ export default function AntiCheatExamPage() {
         router.push(url);
       },
       onError: (err: unknown) => {
-        const error = err as { message?: string; response?: { data?: { message?: string; detail?: string }, status?: number } };
-        if (error.response?.status === 404 || error.response?.status === 500) {
+        if (err instanceof ApiError && (err.status === 404 || err.status === 500)) {
           toast.error('Bài tập này đã được giảng viên gỡ bỏ hoặc cập nhật.');
         } else {
-          toast.error(error.message || error.response?.data?.message || error.response?.data?.detail || 'Không thể tải bài thi.');
+          toast.error(err instanceof ApiError && err.message ? err.message : 'Không thể tải bài thi.');
         }
         if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
       }
@@ -926,22 +926,22 @@ export default function AntiCheatExamPage() {
       <div className="min-h-dvh bg-surface p-8">
         <div className="max-w-4xl mx-auto">
           {/* Kết quả chính */}
-          <div className={`card p-6 text-center mb-8 border-t-4 ${isPassed ? 'border-green-500' : 'border-red-500'}`}>
+          <div className={`card p-6 text-center mb-8 border-t-4 ${isPassed ? 'border-success' : 'border-danger'}`}>
             <div className={`text-4xl mb-2 ${isPassed ? '' : ''}`}>{isPassed ? '🎉' : '📝'}</div>
-            <h2 className={`text-xl font-bold mb-1 ${isPassed ? 'text-green-600' : 'text-red-600'}`}>
+            <h2 className={`text-xl font-bold mb-1 ${isPassed ? 'text-success' : 'text-danger'}`}>
               {isPassed ? 'Xuất sắc! Bài thi hoàn thành' : 'Bài thi đã nộp'}
             </h2>
-            <div className={`text-3xl font-extrabold my-2 ${isPassed ? 'text-green-600' : 'text-red-500'}`}>
+            <div className={`text-3xl font-extrabold my-2 ${isPassed ? 'text-success' : 'text-danger'}`}>
               {Number(result.score).toFixed(2).replace(/\.?0+$/, '')}/10
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4 text-xs">
               <div className="bg-surface-hover rounded-xl p-3">
                 <div className="text-ink-muted text-xs font-semibold uppercase mb-1">Câu đúng</div>
-                <div className="text-2xl font-bold text-green-600">{result.correctCount}</div>
+                <div className="text-2xl font-bold text-success">{result.correctCount}</div>
               </div>
               <div className="bg-surface-hover rounded-xl p-3">
                 <div className="text-ink-muted text-xs font-semibold uppercase mb-1">Câu sai</div>
-                <div className="text-2xl font-bold text-red-500">{result.totalQuestions - result.correctCount}</div>
+                <div className="text-2xl font-bold text-danger">{result.totalQuestions - result.correctCount}</div>
               </div>
               <div className="bg-surface-hover rounded-xl p-3">
                 <div className="text-ink-muted text-xs font-semibold uppercase mb-1">Tổng câu</div>
@@ -994,13 +994,13 @@ export default function AntiCheatExamPage() {
               return (
                 <>
                 {result.details?.slice(rStart, rEnd).map((detail, idx) => (
-              <div key={detail.questionId} className={`card p-4 border-l-4 ${detail.isCorrect === null ? 'border-line bg-surface' : (detail.isCorrect ? 'border-green-500' : 'border-red-500')}`}>
+              <div key={detail.questionId} className={`card p-4 border-l-4 ${detail.isCorrect === null ? 'border-line bg-surface' : (detail.isCorrect ? 'border-success' : 'border-danger')}`}>
                 <div className="flex justify-between items-start mb-2">
                   <h4 className="font-bold text-sm">Câu {rStart + idx + 1}</h4>
                   {detail.isCorrect === true ? (
-                    <span className="text-green-600 font-bold bg-green-50 px-2 py-0.5 rounded text-xs">Đúng ✓</span>
+                    <span className="text-success font-bold bg-success-tint px-2 py-0.5 rounded text-xs">Đúng ✓</span>
                   ) : detail.isCorrect === false ? (
-                    <span className="text-red-600 font-bold bg-red-50 px-2 py-0.5 rounded text-xs">Sai ✕</span>
+                    <span className="text-danger font-bold bg-danger/5 px-2 py-0.5 rounded text-xs">Sai ✕</span>
                   ) : (
                     <span className="text-ink-muted font-bold bg-surface-hover px-2 py-0.5 rounded border border-line text-xs">{detail.selectedOptionIds?.length ? 'Đã ghi nhận' : 'Bỏ trống'}</span>
                   )}
@@ -1018,8 +1018,8 @@ export default function AntiCheatExamPage() {
                     const isSelected = detail.selectedOptionIds?.includes(opt.id);
                     const isCorrect = detail.isCorrect !== null && detail.correctOptionIds?.includes(opt.id);
                     let style = "p-3 border rounded-lg text-sm ";
-                    if (isCorrect) style += "border-green-500 bg-green-50 text-green-900 font-medium";
-                    else if (isSelected) style += detail.isCorrect === null ? "border-accent bg-accent/5 text-accent-dark font-medium" : "border-red-500 bg-red-50 text-red-900";
+                    if (isCorrect) style += "border-success bg-success-tint text-success-ink font-medium";
+                    else if (isSelected) style += detail.isCorrect === null ? "border-accent bg-accent/5 text-accent-dark font-medium" : "border-danger bg-danger/5 text-danger";
                     else style += "border-line text-ink-muted opacity-70";
 
                     return (
@@ -1175,8 +1175,8 @@ export default function AntiCheatExamPage() {
               </div>
 
               {isProctored && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-4 mt-6">
-                  <p className="text-red-700 font-semibold text-sm flex items-center gap-2">
+                <div className="bg-danger/5 border border-danger/30 rounded-lg p-4 mt-6">
+                  <p className="text-danger font-semibold text-sm flex items-center gap-2">
                     Để thực hiện bài trắc nghiệm này bạn cần bật Camera để AI giám sát. Không được chuyển tab hay rời khỏi màn hình.
                   </p>
                 </div>
@@ -1186,14 +1186,14 @@ export default function AntiCheatExamPage() {
 
           <div className="mb-8">
             {highestAttempt && (
-              <div className="mb-8 p-6 bg-emerald-50 border border-emerald-200 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
+              <div className="mb-8 p-6 bg-success-tint border border-success/30 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
                 <div>
                   <h3 className="text-emerald-950 font-extrabold text-xl">Điểm chính thức của bạn</h3>
-                  <p className="text-emerald-700 text-sm mt-1 font-medium">Hệ thống ghi nhận điểm cao nhất trong số các lần thi của bạn.</p>
+                  <p className="text-success-ink text-sm mt-1 font-medium">Hệ thống ghi nhận điểm cao nhất trong số các lần thi của bạn.</p>
                 </div>
                 <div className="text-left sm:text-right bg-white px-6 py-3 rounded-xl shadow-sm border border-emerald-100 min-w-[140px]">
-                  <div className="text-3xl font-black text-emerald-600">{highestAttempt.correctCount} <span className="text-emerald-400 text-xl">/ {highestAttempt.totalQuestions}</span></div>
-                  <div className="text-emerald-800 font-bold mt-1 text-sm">{Number(highestAttempt.score).toFixed(2).replace(/\.?0+$/, '')} điểm (Hệ 10)</div>
+                  <div className="text-3xl font-black text-success">{highestAttempt.correctCount} <span className="text-emerald-400 text-xl">/ {highestAttempt.totalQuestions}</span></div>
+                  <div className="text-success-ink font-bold mt-1 text-sm">{Number(highestAttempt.score).toFixed(2).replace(/\.?0+$/, '')} điểm (Hệ 10)</div>
                 </div>
               </div>
             )}
@@ -1234,7 +1234,7 @@ export default function AntiCheatExamPage() {
                         <tr key={h.id} className="hover:bg-surface-hover transition-colors">
                           <td className="px-6 py-4 font-bold text-ink">{index + 1}</td>
                           <td className="px-6 py-4">
-                            <div className="font-medium text-green-600">Đã xong</div>
+                            <div className="font-medium text-success">Đã xong</div>
                             <div className="text-ink-muted text-xs mt-1">Đã nộp {formatSubmittedAt(h.submittedAt)}</div>
                           </td>
                           <td className="px-6 py-4 text-center">
@@ -1270,22 +1270,22 @@ export default function AntiCheatExamPage() {
                 {isStarting ? 'Đang chuẩn bị...' : 'Tiếp tục làm bài'}
               </button>
             ) : isNotOpenYet ? (
-              <div className="text-amber-600 font-bold p-4 bg-amber-50 rounded-lg">
+              <div className="text-warning font-bold p-4 bg-streak-bg rounded-lg">
                 Bài thi chưa mở. Vui lòng quay lại sau.
               </div>
             ) : isClosed ? (
-              <div className="text-red-500 font-bold p-4 bg-red-50 rounded-lg">
+              <div className="text-danger font-bold p-4 bg-danger/5 rounded-lg">
                 Bài thi đã đóng. Bạn không thể làm bài nữa.
               </div>
             ) : isArchivedQuiz ? (
-              <div className="text-red-500 font-bold p-4 bg-red-50 rounded-lg border border-red-200 shadow-sm text-center">
+              <div className="text-danger font-bold p-4 bg-danger/5 rounded-lg border border-danger/30 shadow-sm text-center">
                 Bài thi này đã bị giảng viên thu hồi hoặc xóa.<br/>
                 <span className="text-sm font-normal">Bạn chỉ có thể xem lại lịch sử làm bài.</span>
               </div>
             ) : !canStartNewAttempt ? (
               <button
                 disabled
-                className="bg-gray-300 text-gray-500 font-bold py-3 px-8 rounded-full cursor-not-allowed shadow-none"
+                className="bg-gray-300 text-ink-muted font-bold py-3 px-8 rounded-full cursor-not-allowed shadow-none"
               >
                 Đã hết số lượt làm bài ({completedCount}/{maxAtt})
               </button>
@@ -1321,7 +1321,7 @@ export default function AntiCheatExamPage() {
         <div className="flex justify-between items-center mb-8 border-b border-line pb-4">
           <div>
             <h1 className="font-display text-2xl font-bold text-ink flex items-center gap-2">
-              {isProctored ? <><span className="text-red-600">🔴</span> Phòng Thi Trực Tuyến (Có giám sát)</> : <>📄 Bài Thi Trắc Nghiệm</>}
+              {isProctored ? <><span className="text-danger">🔴</span> Phòng Thi Trực Tuyến (Có giám sát)</> : <>📄 Bài Thi Trắc Nghiệm</>}
             </h1>
             <p className="text-sm text-ink-muted mt-1">Mã đề thi: {quizId}</p>
           </div>
@@ -1329,7 +1329,7 @@ export default function AntiCheatExamPage() {
             {isProctored && (
               <div className="text-right">
                 <div className="text-sm font-semibold text-ink-muted">Cảnh báo vi phạm</div>
-                <div className={`text-xl font-bold ${violationCount >= (attemptData?.maxViolations || 3) - 1 ? 'text-red-600' : 'text-amber-600'}`}>
+                <div className={`text-xl font-bold ${violationCount >= (attemptData?.maxViolations || 3) - 1 ? 'text-danger' : 'text-warning'}`}>
                   {violationCount} / {attemptData?.maxViolations || 3}
                 </div>
               </div>
@@ -1347,12 +1347,12 @@ export default function AntiCheatExamPage() {
           return (
           <div className="card p-5 max-w-2xl mx-auto w-full">
             <h2 className="text-base font-bold mb-1 text-center">Xác nhận nộp bài</h2>
-            <p className="text-xs text-ink-muted text-center mb-3">Đã trả lời: <strong className={answeredTotal < totalQ ? 'text-red-600' : 'text-green-600'}>{answeredTotal}/{totalQ}</strong> câu</p>
+            <p className="text-xs text-ink-muted text-center mb-3">Đã trả lời: <strong className={answeredTotal < totalQ ? 'text-danger' : 'text-success'}>{answeredTotal}/{totalQ}</strong> câu</p>
             <div className="space-y-1.5 mb-4">
               {attemptData?.questions.slice(reviewStart, reviewEnd).map((q, idx) => {
                 const isAnswered = answers[q.id] && (answers[q.id]?.length || 0) > 0;
                 return (
-                  <div key={q.id} className={`py-2 px-3 border rounded flex items-center justify-between text-xs ${isAnswered ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
+                  <div key={q.id} className={`py-2 px-3 border rounded flex items-center justify-between text-xs ${isAnswered ? 'bg-success-tint border-success/30' : 'bg-danger/5 border-danger/30'}`}>
                     <span className="font-bold">Câu {reviewStart + idx + 1}</span>
                     <span className="font-semibold">{isAnswered ? '✅ Đã trả lời' : '❌ Chưa trả lời'}</span>
                   </div>
@@ -1388,7 +1388,7 @@ export default function AntiCheatExamPage() {
                   <h3 className="font-bold text-lg">Câu hỏi {(currentPage - 1) * questionsPerPage + idx + 1}</h3>
                   <button 
                     onClick={() => setFlagged(prev => ({ ...prev, [q.id]: !prev[q.id] }))}
-                    className={`text-xl ${flagged[q.id] ? 'text-red-500' : 'text-line-soft hover:text-red-200'}`}
+                    className={`text-xl ${flagged[q.id] ? 'text-danger' : 'text-line-soft hover:text-red-200'}`}
                     title="Đánh dấu xem lại"
                   >
                     🚩
@@ -1454,8 +1454,8 @@ export default function AntiCheatExamPage() {
             <div className="sticky top-24 w-full flex flex-col gap-3" style={{ maxHeight: "calc(100vh - 7rem)", overflowY: "auto" }}>
             {isProctored && (
               <div className="card overflow-hidden">
-                <div className={`text-white text-xs font-bold p-2 text-center transition-colors ${faceStatus === 'DETECTING' ? 'bg-amber-500' :
-                  faceStatus === 'FACE_FOUND' ? 'bg-green-600' : 'bg-red-600 animate-pulse'
+                <div className={`text-white text-xs font-bold p-2 text-center transition-colors ${faceStatus === 'DETECTING' ? 'bg-warning' :
+                  faceStatus === 'FACE_FOUND' ? 'bg-success' : 'bg-danger animate-pulse'
                   }`}>
                   {faceStatus === 'DETECTING' && 'Đang quét khuôn mặt...'}
                   {faceStatus === 'FACE_FOUND' && 'Camera Giám Sát AI (Bình thường)'}
@@ -1475,8 +1475,8 @@ export default function AntiCheatExamPage() {
 
             {/* Đồng hồ đếm ngược */}
             {isStarted && timeLeft !== null && (
-              <div className={`flex items-center justify-center gap-2 font-mono text-2xl font-bold px-4 py-3 rounded-xl border-2 shadow-sm ${timeLeft <= 60 ? 'border-red-500 text-red-600 bg-red-50 animate-pulse' :
-                timeLeft <= 180 ? 'border-amber-400 text-amber-600 bg-amber-50' :
+              <div className={`flex items-center justify-center gap-2 font-mono text-2xl font-bold px-4 py-3 rounded-xl border-2 shadow-sm ${timeLeft <= 60 ? 'border-danger text-danger bg-danger/5 animate-pulse' :
+                timeLeft <= 180 ? 'border-amber-400 text-warning bg-streak-bg' :
                   'border-line text-ink bg-surface'
                 }`}>
                 <span>⏱</span>
@@ -1510,7 +1510,7 @@ export default function AntiCheatExamPage() {
                       <div className="h-[70%] w-full flex items-center justify-center bg-surface text-ink border-b border-line/50">
                         {idx + 1}
                       </div>
-                      <div className={`h-[30%] w-full flex items-center justify-center text-white text-[8px] ${isAnswered ? 'bg-green-500' : 'bg-red-500'}`}>
+                      <div className={`h-[30%] w-full flex items-center justify-center text-white text-[8px] ${isAnswered ? 'bg-success' : 'bg-danger'}`}>
                         {isAnswered ? '✓' : '✗'}
                       </div>
                       {isFlagged && <span className="absolute -top-1 -right-1 text-[10px] z-10">🚩</span>}

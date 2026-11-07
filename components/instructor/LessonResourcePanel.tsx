@@ -53,18 +53,18 @@ export function LessonResourcePanel({ lessonId }: { lessonId: number }) {
     <div
       draggable={false}
       onDragStart={(e) => e.stopPropagation()}
-      className="mt-2 flex flex-col gap-3 rounded-lg border border-gray-200 bg-gray-50/60 p-3"
+      className="mt-2 flex flex-col gap-3 rounded-lg border border-line bg-surface/60 p-3"
     >
       <div className="flex items-center justify-between">
-        <h4 className="text-[12.5px] font-bold text-gray-800">Tài nguyên</h4>
-        <span className="text-[11px] text-gray-400">{docs.length}/{MAX_DOCUMENTS}</span>
+        <h4 className="text-[12.5px] font-bold text-ink">Tài nguyên</h4>
+        <span className="text-[11px] text-ink-faint">{docs.length}/{MAX_DOCUMENTS}</span>
       </div>
       {/* Text giải thích nhỏ — cùng tinh thần chú thích của Udemy dưới mỗi mục thêm nội dung. */}
-      <p className="text-[11.5px] leading-relaxed text-gray-400">
+      <p className="text-[11.5px] leading-relaxed text-ink-faint">
         Tệp hoặc liên kết tham khảo hỗ trợ học viên trong bài giảng này. Đảm bảo tệp dễ đọc, tối đa 50MB.
       </p>
 
-      {isLoading && <p className="text-[12px] text-gray-400">Đang tải...</p>}
+      {isLoading && <p className="text-[12px] text-ink-faint">Đang tải...</p>}
 
       <div className="flex flex-col gap-1.5">
         {docs.map((doc) => (
@@ -84,32 +84,32 @@ export function LessonResourcePanel({ lessonId }: { lessonId: number }) {
                 🔗 {doc.fileName}
               </a>
             ) : (
-              <span className="min-w-0 flex-1 truncate text-gray-700">📄 {doc.fileName}</span>
+              <span className="min-w-0 flex-1 truncate text-ink">📄 {doc.fileName}</span>
             )}
-            {doc.fileType !== 'LINK' && <span className="shrink-0 text-gray-400">{formatFileSize(doc.fileSize)}</span>}
+            {doc.fileType !== 'LINK' && <span className="shrink-0 text-ink-faint">{formatFileSize(doc.fileSize)}</span>}
             <button
               type="button"
               draggable={false}
               onClick={() => deleteDocument.mutate(doc.id)}
-              className="shrink-0 text-[11.5px] font-bold text-red-500 hover:text-red-700"
+              className="shrink-0 text-[11.5px] font-bold text-danger hover:text-danger"
             >
               Xóa
             </button>
           </div>
         ))}
         {docs.length === 0 && !isLoading && (
-          <p className="text-[12px] text-gray-400">Chưa có tài nguyên nào.</p>
+          <p className="text-[12px] text-ink-faint">Chưa có tài nguyên nào.</p>
         )}
       </div>
 
       {docs.length < MAX_DOCUMENTS ? (
         <div className="flex flex-col gap-2" draggable={false}>
-          <div className="flex gap-1 rounded-lg bg-gray-100 p-1 text-[12px] font-semibold">
+          <div className="flex gap-1 rounded-lg bg-tint p-1 text-[12px] font-semibold">
             <button
               type="button"
               draggable={false}
               onClick={() => setMode('file')}
-              className={`flex-1 rounded-md py-1.5 ${mode === 'file' ? 'bg-white text-cyan-700 shadow-sm' : 'text-gray-500'}`}
+              className={`flex-1 rounded-md py-1.5 ${mode === 'file' ? 'bg-white text-cyan-700 shadow-sm' : 'text-ink-muted'}`}
             >
               Thêm tệp từ máy
             </button>
@@ -117,7 +117,7 @@ export function LessonResourcePanel({ lessonId }: { lessonId: number }) {
               type="button"
               draggable={false}
               onClick={() => setMode('link')}
-              className={`flex-1 rounded-md py-1.5 ${mode === 'link' ? 'bg-white text-cyan-700 shadow-sm' : 'text-gray-500'}`}
+              className={`flex-1 rounded-md py-1.5 ${mode === 'link' ? 'bg-white text-cyan-700 shadow-sm' : 'text-ink-muted'}`}
             >
               Dán link
             </button>
@@ -131,12 +131,12 @@ export function LessonResourcePanel({ lessonId }: { lessonId: number }) {
                 onChange={handleFileChange}
                 disabled={docTask?.status === 'uploading'}
                 draggable={false}
-                className="text-[12px] file:mr-3 file:rounded-md file:border-0 file:bg-gray-100 file:px-3 file:py-1.5 file:text-[11.5px] file:font-semibold"
+                className="text-[12px] file:mr-3 file:rounded-md file:border-0 file:bg-tint file:px-3 file:py-1.5 file:text-[11.5px] file:font-semibold"
               />
               {docTask?.status === 'uploading' && (
                 <UploadProgressBar percent={docTask.percent} label="Đang tải tài liệu lên..." />
               )}
-              {docTask?.status === 'error' && <p className="text-[11.5px] text-red-600">{docTask.errorMessage}</p>}
+              {docTask?.status === 'error' && <p className="text-[11.5px] text-danger">{docTask.errorMessage}</p>}
             </div>
           ) : (
             <form onSubmit={handleLinkSubmit} className="flex flex-col gap-2" draggable={false}>
@@ -145,14 +145,14 @@ export function LessonResourcePanel({ lessonId }: { lessonId: number }) {
                 onChange={(e) => setLinkTitle(e.target.value)}
                 placeholder="Tên hiển thị"
                 draggable={false}
-                className="rounded-lg border border-gray-200 px-3 py-1.5 text-[12.5px] focus:border-cyan-400 focus:outline-none"
+                className="rounded-lg border border-line px-3 py-1.5 text-[12.5px] focus:border-accent focus:outline-none"
               />
               <input
                 value={linkUrl}
                 onChange={(e) => setLinkUrl(e.target.value)}
                 placeholder="https://..."
                 draggable={false}
-                className="rounded-lg border border-gray-200 px-3 py-1.5 text-[12.5px] focus:border-cyan-400 focus:outline-none"
+                className="rounded-lg border border-line px-3 py-1.5 text-[12.5px] focus:border-accent focus:outline-none"
               />
               <button
                 type="submit"
@@ -166,7 +166,7 @@ export function LessonResourcePanel({ lessonId }: { lessonId: number }) {
           )}
         </div>
       ) : (
-        <p className="text-[11.5px] text-amber-600">Đã đạt tối đa {MAX_DOCUMENTS} tài nguyên — xóa bớt để thêm mới.</p>
+        <p className="text-[11.5px] text-warning">Đã đạt tối đa {MAX_DOCUMENTS} tài nguyên — xóa bớt để thêm mới.</p>
       )}
     </div>
   );

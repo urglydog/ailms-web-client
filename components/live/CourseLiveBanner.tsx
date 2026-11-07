@@ -28,10 +28,10 @@ export function CourseLiveBanner({ courseId }: { courseId: number }) {
   return (
     <Link
       href={`/live/${session.id}`}
-      className="card flex items-center justify-between gap-3 border-red-200 bg-red-50 px-5 py-4 no-underline hover:border-red-300"
+      className="card flex items-center justify-between gap-3 border-danger/30 bg-danger/5 px-5 py-4 no-underline hover:border-danger/40"
     >
       <div className="flex items-center gap-3">
-        <span className={liveNow ? 'text-red-600' : 'text-ink-muted'} aria-hidden>
+        <span className={liveNow ? 'text-danger' : 'text-ink-muted'} aria-hidden>
           {liveNow ? (
             '●'
           ) : (

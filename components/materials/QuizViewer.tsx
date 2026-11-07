@@ -197,9 +197,9 @@ export function QuizViewer({ questions, quizId }: { questions: QuizQuestion[], q
               buttonClass += isSelected ? "border-accent bg-accent/5 ring-2 ring-accent/20" : "border-line hover:border-ink-muted hover:bg-surface-hover";
             } else {
               if (option.isCorrect) {
-                buttonClass += "border-green-500 bg-green-50 text-green-900"; // Hiện đáp án đúng
+                buttonClass += "border-success bg-success-tint text-success-ink"; // Hiện đáp án đúng
               } else if (isSelected && !option.isCorrect) {
-                buttonClass += "border-red-500 bg-red-50 text-red-900"; // Hiện đáp án sai nếu user chọn
+                buttonClass += "border-danger bg-danger/5 text-danger"; // Hiện đáp án sai nếu user chọn
               } else {
                 buttonClass += "border-line opacity-50"; // Các đáp án khác mờ đi
               }
@@ -213,7 +213,7 @@ export function QuizViewer({ questions, quizId }: { questions: QuizQuestion[], q
                 className={buttonClass}
               >
                 <div className="flex items-center">
-                  <div className={`w-6 h-6 rounded-full border flex items-center justify-center mr-4 flex-shrink-0 ${isAnswered ? (option.isCorrect ? 'bg-green-500 border-green-500' : (isSelected ? 'bg-red-500 border-red-500' : 'border-line')) : (isSelected ? 'border-accent border-4' : 'border-ink-muted')}`}>
+                  <div className={`w-6 h-6 rounded-full border flex items-center justify-center mr-4 flex-shrink-0 ${isAnswered ? (option.isCorrect ? 'bg-success border-success' : (isSelected ? 'bg-danger border-danger' : 'border-line')) : (isSelected ? 'border-accent border-4' : 'border-ink-muted')}`}>
                     {isAnswered && option.isCorrect && <span className="text-white text-xs">✓</span>}
                     {isAnswered && !option.isCorrect && isSelected && <span className="text-white text-xs">✕</span>}
                   </div>

@@ -100,7 +100,7 @@ export default function EditProfileModal({ user, onClose, onSuccess }: EditProfi
               <option value="ja">日本語</option>
             </select>
           </div>
-          {error && <p className="text-red-600 text-sm">{error}</p>}
+          {error && <p className="text-danger text-sm">{error}</p>}
           <div className="flex gap-2 pt-4">
             <button
               type="submit"

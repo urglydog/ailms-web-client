@@ -17,10 +17,10 @@ export function Input({ label, error, className = '', id, ...rest }: InputProps)
         id={id}
         className={`rounded-lg border border-line bg-white px-4 py-2.5 text-sm text-ink 
                     placeholder:text-ink-faint focus:border-accent focus:outline-none 
-                    focus:ring-1 focus:ring-accent ${error ? 'border-red-500' : ''} ${className}`}
+                    focus:ring-1 focus:ring-accent ${error ? 'border-danger' : ''} ${className}`}
         {...rest}
       />
-      {error && <span className="text-xs text-red-500">{error}</span>}
+      {error && <span className="text-xs text-danger">{error}</span>}
     </div>
   );
 }

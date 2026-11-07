@@ -132,7 +132,7 @@ export function MessageInstructorFloatingButton({ courseId }: { courseId: number
             </svg>
           )}
           {!open && unreadCount > 0 && (
-            <span className="absolute -right-1 -top-1 flex min-w-[20px] h-5 items-center justify-center rounded-full bg-red-500 px-1 text-[11px] font-bold text-white">
+            <span className="absolute -right-1 -top-1 flex min-w-[20px] h-5 items-center justify-center rounded-full bg-danger px-1 text-[11px] font-bold text-white">
               {unreadCount > 9 ? '9+' : unreadCount}
             </span>
           )}
@@ -277,7 +277,7 @@ function FloatingConversationThread({ conversationId }: { conversationId: number
               <path d="M12 5v14M5 12l7 7 7-7" />
             </svg>
             {newCount > 0 && (
-              <span className="absolute -top-2 -right-1.5 flex min-w-[19px] h-[19px] items-center justify-center rounded-full bg-red-500 px-1 text-[10.5px] font-bold text-white">
+              <span className="absolute -top-2 -right-1.5 flex min-w-[19px] h-[19px] items-center justify-center rounded-full bg-danger px-1 text-[10.5px] font-bold text-white">
                 {newCount > 99 ? '99' : newCount}
               </span>
             )}

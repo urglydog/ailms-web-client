@@ -17,7 +17,7 @@ const parseDate = (d: string | number[]) => {
 
 const RISK_BADGE: Record<string, string> = {
   HIGH: 'bg-danger/10 text-danger border-danger/30',
-  MEDIUM: 'bg-amber-50 text-amber-700 border-amber-300',
+  MEDIUM: 'bg-streak-bg text-streak-ink border-warning/40',
 };
 
 /** UC-ANTICHEAT (26/09/2026, rút gọn theo phản hồi thật) — 1 bảng phẳng, gộp mọi lượt thi có

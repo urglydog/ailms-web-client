@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { useLogin } from '@/hooks/useAuthMutations';
+import { ApiError } from '@/lib/api/client';
 import { useSearchParams } from 'next/navigation';
 import { GoogleSignInButton } from './GoogleSignInButton';
 import { PasswordField } from './PasswordField';
@@ -90,9 +91,7 @@ export function LoginForm() {
   // y hệt nội dung cho cùng 1 lỗi đăng nhập sai — chỉ cần 1 chỗ hiện, dùng khung cố định trong
   // form (không tự biến mất như toast) theo đúng yêu cầu.
   const errorDetail = error
-    ? ((error as unknown) as { response?: { data?: { detail?: string, message?: string } } })?.response?.data?.message
-      || ((error as unknown) as { response?: { data?: { detail?: string } } })?.response?.data?.detail
-      || t('login.generic')
+    ? (error instanceof ApiError && error.message ? error.message : t('login.generic'))
     : null;
 
   // (23/10/2026, sửa theo yêu cầu) — khi đã biết chắc vừa bị văng vì lý do xác thực (vd tài

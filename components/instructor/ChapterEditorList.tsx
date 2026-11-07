@@ -167,22 +167,22 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
             } ${
               dropTargetChapterId === chapter.id && draggedChapterId !== chapter.id
                 ? 'border-cyan-300 bg-cyan-50/40'
-                : 'border-gray-200'
+                : 'border-line'
             }`}
           >
             {isEditing ? (
               <div className="mb-3 flex flex-col gap-2" draggable={false} onDragStart={(e) => e.preventDefault()}>
                 <label className="flex flex-col gap-1">
-                  <span className="text-[11.5px] font-bold text-gray-500">Phần {chapterIndex + 1}:</span>
+                  <span className="text-[11.5px] font-bold text-ink-muted">Phần {chapterIndex + 1}:</span>
                   <input
                     value={editChapterTitle}
                     onChange={(e) => setEditChapterTitle(e.target.value)}
                     draggable={false}
-                    className="rounded-lg border border-gray-200 px-3 py-1.5 font-display text-[14.5px] font-bold focus:border-cyan-400 focus:outline-none"
+                    className="rounded-lg border border-line px-3 py-1.5 font-display text-[14.5px] font-bold focus:border-accent focus:outline-none"
                   />
                 </label>
                 <label className="flex flex-col gap-1">
-                  <span className="text-[11.5px] text-gray-500">
+                  <span className="text-[11.5px] text-ink-muted">
                     Sau khi hoàn thành phần này, học viên sẽ có thể làm được những gì?
                   </span>
                   <textarea
@@ -191,7 +191,7 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
                     rows={2}
                     placeholder="Nhập mục tiêu học tập..."
                     draggable={false}
-                    className="rounded-lg border border-gray-200 px-3 py-1.5 text-[12.5px] focus:border-cyan-400 focus:outline-none"
+                    className="rounded-lg border border-line px-3 py-1.5 text-[12.5px] focus:border-accent focus:outline-none"
                   />
                 </label>
                 <div className="flex justify-end gap-2">
@@ -199,7 +199,7 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
                     type="button"
                     draggable={false}
                     onClick={() => setEditingChapterId(null)}
-                    className="rounded-lg px-3 py-1.5 text-[12px] font-semibold text-gray-500 hover:bg-gray-100"
+                    className="rounded-lg px-3 py-1.5 text-[12px] font-semibold text-ink-muted hover:bg-tint"
                   >
                     Hủy bỏ
                   </button>
@@ -232,7 +232,7 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
                   <ChevronDownIcon expanded={isExpanded} />
                 </button>
                 <div className="flex min-w-0 flex-1 items-center gap-1.5">
-                  <span className="truncate font-display text-[14.5px] font-bold text-gray-900">
+                  <span className="truncate font-display text-[14.5px] font-bold text-ink">
                     Phần {chapterIndex + 1}: {chapter.title}
                   </span>
                   <span className="shrink-0 text-[11px] font-semibold text-ink-faint">
@@ -243,7 +243,7 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
                     draggable={false}
                     onClick={() => openChapterEdit(chapter)}
                     title="Đổi tên/mô tả phần"
-                    className="shrink-0 text-gray-400 opacity-0 hover:text-gray-700 group-hover:opacity-100"
+                    className="shrink-0 text-ink-faint opacity-0 hover:text-ink group-hover:opacity-100"
                   >
                     <PencilIcon />
                   </button>
@@ -252,7 +252,7 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
                     draggable={false}
                     onClick={() => setConfirmDeleteChapterId(chapter.id)}
                     title="Xóa chương"
-                    className="shrink-0 text-gray-400 opacity-0 hover:text-red-600 group-hover:opacity-100"
+                    className="shrink-0 text-ink-faint opacity-0 hover:text-danger group-hover:opacity-100"
                   >
                     <TrashIcon />
                   </button>
@@ -260,14 +260,14 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
                 <span
                   aria-hidden
                   title="Kéo để đổi thứ tự"
-                  className="shrink-0 select-none text-gray-300 opacity-0 group-hover:opacity-100"
+                  className="shrink-0 select-none text-ink-faint opacity-0 group-hover:opacity-100"
                 >
                   <DragHandleIcon />
                 </span>
               </div>
             )}
             {!isEditing && chapter.description && (
-              <p className="mb-3 text-[12px] text-gray-400">{chapter.description}</p>
+              <p className="mb-3 text-[12px] text-ink-faint">{chapter.description}</p>
             )}
             {!isEditing && !chapter.description && <div className="mb-3" />}
 
@@ -326,13 +326,13 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
                     </div>
                   ))}
                   {lessons.length === 0 && (
-                    <p className="px-1 text-[12.5px] text-gray-400">Chương này chưa có bài học nào.</p>
+                    <p className="px-1 text-[12.5px] text-ink-faint">Chương này chưa có bài học nào.</p>
                   )}
                 </div>
 
                 {addLessonFormOpenFor === chapter.id ? (
                   <form
-                    className="ml-1 mt-3 flex flex-col gap-2 rounded-lg border border-gray-200 bg-gray-50/60 p-3"
+                    className="ml-1 mt-3 flex flex-col gap-2 rounded-lg border border-line bg-surface/60 p-3"
                     draggable={false}
                     onDragStart={(e) => e.preventDefault()}
                     onSubmit={(e) => {
@@ -344,7 +344,7 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
                       setAddLessonFormOpenFor(null);
                     }}
                   >
-                    <span className="text-[11.5px] font-bold text-gray-500">Bài giảng {lessons.length + 1}:</span>
+                    <span className="text-[11.5px] font-bold text-ink-muted">Bài giảng {lessons.length + 1}:</span>
                     <input
                       autoFocus
                       value={newLessonTitleByChapter[chapter.id] ?? ''}
@@ -353,9 +353,9 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
                       }
                       placeholder="Nhập tiêu đề bài giảng"
                       draggable={false}
-                      className="rounded-lg border border-gray-200 px-3 py-1.5 text-[13px] focus:border-cyan-400 focus:outline-none"
+                      className="rounded-lg border border-line px-3 py-1.5 text-[13px] focus:border-accent focus:outline-none"
                     />
-                    <p className="text-[11px] text-gray-400">
+                    <p className="text-[11px] text-ink-faint">
                       Sau khi thêm, bấm &quot;+ Nội dung&quot; ở hàng bài giảng để tải video hoặc dán link YouTube.
                     </p>
                     <div className="flex justify-end gap-2">
@@ -363,7 +363,7 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
                         type="button"
                         draggable={false}
                         onClick={() => setAddLessonFormOpenFor(null)}
-                        className="rounded-lg px-3 py-1.5 text-[12px] font-semibold text-gray-500 hover:bg-gray-100"
+                        className="rounded-lg px-3 py-1.5 text-[12px] font-semibold text-ink-muted hover:bg-tint"
                       >
                         Hủy bỏ
                       </button>
@@ -381,7 +381,7 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
                     type="button"
                     draggable={false}
                     onClick={() => setAddLessonFormOpenFor(chapter.id)}
-                    className="ml-1 mt-3 flex w-[calc(100%-0.25rem)] items-center justify-center gap-1.5 rounded-lg border border-dashed border-gray-300 py-2 text-[12.5px] font-bold text-gray-600 hover:border-cyan-300 hover:text-cyan-700"
+                    className="ml-1 mt-3 flex w-[calc(100%-0.25rem)] items-center justify-center gap-1.5 rounded-lg border border-dashed border-line py-2 text-[12.5px] font-bold text-ink-muted hover:border-cyan-300 hover:text-cyan-700"
                   >
                     + Mục trong chương trình giảng dạy
                   </button>
@@ -393,28 +393,28 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
       })}
 
       {sortedChapters.length === 0 && (
-        <p className="rounded-xl border border-dashed border-gray-300 p-6 text-center text-[13px] text-gray-400">
+        <p className="rounded-xl border border-dashed border-line p-6 text-center text-[13px] text-ink-faint">
           Chưa có chương nào — thêm chương đầu tiên bên dưới.
         </p>
       )}
 
       {showAddChapterForm ? (
         <form
-          className="flex flex-col gap-2 rounded-xl border border-gray-200 bg-white p-4 shadow-sm"
+          className="flex flex-col gap-2 rounded-xl border border-line bg-white p-4 shadow-sm"
           onSubmit={(e) => {
             e.preventDefault();
             handleCreateChapter();
           }}
         >
-          <span className="text-[11.5px] font-bold text-gray-500">Phần mới:</span>
+          <span className="text-[11.5px] font-bold text-ink-muted">Phần mới:</span>
           <input
             autoFocus
             value={newChapterTitle}
             onChange={(e) => setNewChapterTitle(e.target.value)}
             placeholder="Nhập tiêu đề"
-            className="rounded-lg border border-gray-200 px-3 py-2 text-[13px] focus:border-cyan-400 focus:outline-none"
+            className="rounded-lg border border-line px-3 py-2 text-[13px] focus:border-accent focus:outline-none"
           />
-          <span className="text-[11.5px] text-gray-500">
+          <span className="text-[11.5px] text-ink-muted">
             Sau khi hoàn thành phần này, học viên sẽ có thể làm được những gì?
           </span>
           <textarea
@@ -422,7 +422,7 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
             onChange={(e) => setNewChapterDescription(e.target.value)}
             rows={2}
             placeholder="Nhập mục tiêu học tập..."
-            className="rounded-lg border border-gray-200 px-3 py-1.5 text-[12.5px] focus:border-cyan-400 focus:outline-none"
+            className="rounded-lg border border-line px-3 py-1.5 text-[12.5px] focus:border-accent focus:outline-none"
           />
           <div className="flex justify-end gap-2">
             <button
@@ -432,7 +432,7 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
                 setNewChapterTitle('');
                 setNewChapterDescription('');
               }}
-              className="rounded-lg px-3 py-1.5 text-[12px] font-semibold text-gray-500 hover:bg-gray-100"
+              className="rounded-lg px-3 py-1.5 text-[12px] font-semibold text-ink-muted hover:bg-tint"
             >
               Hủy bỏ
             </button>
@@ -448,7 +448,7 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
         <button
           type="button"
           onClick={() => setShowAddChapterForm(true)}
-          className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-gray-300 py-3 text-[13px] font-bold text-gray-600 hover:border-cyan-300 hover:text-cyan-700"
+          className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-line py-3 text-[13px] font-bold text-ink-muted hover:border-cyan-300 hover:text-cyan-700"
         >
           + Phần
         </button>

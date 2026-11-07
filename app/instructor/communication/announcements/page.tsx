@@ -47,7 +47,7 @@ export default function InstructorAnnouncementsPage() {
               <button
                 type="button"
                 onClick={() => setDeleteId(a.id)}
-                className="shrink-0 text-[12px] font-semibold text-red-500 hover:text-red-700"
+                className="shrink-0 text-[12px] font-semibold text-danger hover:text-danger"
               >
                 {t('announcements.delete')}
               </button>

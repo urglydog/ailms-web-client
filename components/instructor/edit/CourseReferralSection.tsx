@@ -29,11 +29,11 @@ export function CourseReferralSection({ course }: { course: CourseEditDetail }) 
   };
 
   return (
-    <div className="flex flex-col gap-3 border-b border-gray-100 p-6">
-      <h3 className="m-0 text-[14px] font-bold text-gray-900">Liên kết giới thiệu</h3>
-      <p className="text-[12px] text-gray-500">
+    <div className="flex flex-col gap-3 border-b border-line-soft p-6">
+      <h3 className="m-0 text-[14px] font-bold text-ink">Liên kết giới thiệu</h3>
+      <p className="text-[12px] text-ink-muted">
         Chia sẻ đúng liên kết này trên kênh của bạn (Facebook, YouTube...) — học viên mua qua
-        đây, bạn hưởng <span className="font-bold text-gray-700">97%</span> doanh thu thay vì
+        đây, bạn hưởng <span className="font-bold text-ink">97%</span> doanh thu thay vì
         37% khi học viên tự tìm thấy khóa học qua tìm kiếm trên nền tảng.
       </p>
 
@@ -43,7 +43,7 @@ export function CourseReferralSection({ course }: { course: CourseEditDetail }) 
           readOnly
           value={referralUrl}
           onFocus={(e) => e.target.select()}
-          className="flex-1 truncate rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-[12.5px] text-gray-700"
+          className="flex-1 truncate rounded-lg border border-line bg-surface px-3 py-2 text-[12.5px] text-ink"
         />
         <button
           type="button"

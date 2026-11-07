@@ -73,9 +73,9 @@ export function CourseBasicsForm({ courseId }: { courseId: number }) {
     // (26/09/2026, sửa lỗi) — cột phải 320px cố định không co giãn dưới `lg`, bóp cả form chính.
     // Dưới `lg` xếp dọc (form trước, cột phụ sau); từ `lg:` giữ nguyên 2 cột cũ.
     <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_320px]">
-      <form onSubmit={handleSave} className="flex flex-col gap-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+      <form onSubmit={handleSave} className="flex flex-col gap-4 rounded-xl border border-line bg-white p-5 shadow-sm">
         {updateCourse.error instanceof ApiError && (
-          <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-[12.5px] text-red-700">
+          <div className="rounded-xl border border-danger/30 bg-danger/5 p-3 text-[12.5px] text-danger">
             {updateCourse.error.message}
           </div>
         )}
@@ -84,7 +84,7 @@ export function CourseBasicsForm({ courseId }: { courseId: number }) {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
-            className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-cyan-400 focus:outline-none"
+            className="w-full rounded-lg border border-line px-3 py-2 text-sm focus:border-accent focus:outline-none"
           />
         </Field>
         <Field label="Mô tả">
@@ -92,7 +92,7 @@ export function CourseBasicsForm({ courseId }: { courseId: number }) {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={5}
-            className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-cyan-400 focus:outline-none"
+            className="w-full rounded-lg border border-line px-3 py-2 text-sm focus:border-accent focus:outline-none"
           />
         </Field>
         <Field label="Ảnh bìa">
@@ -105,12 +105,12 @@ export function CourseBasicsForm({ courseId }: { courseId: number }) {
             accept="image/jpeg,image/png,image/webp"
             onChange={handleThumbnailFileChange}
             disabled={thumbnailTask?.status === 'uploading'}
-            className="text-[12.5px] file:mr-3 file:rounded-md file:border-0 file:bg-gray-100 file:px-3 file:py-1.5 file:text-[12px] file:font-semibold"
+            className="text-[12.5px] file:mr-3 file:rounded-md file:border-0 file:bg-tint file:px-3 file:py-1.5 file:text-[12px] file:font-semibold"
           />
           {thumbnailTask?.status === 'uploading' && (
             <UploadProgressBar percent={thumbnailTask.percent} label="Đang tải ảnh bìa lên..." />
           )}
-          {thumbnailTask?.status === 'error' && <p className="text-[11.5px] text-red-600">{thumbnailTask.errorMessage}</p>}
+          {thumbnailTask?.status === 'error' && <p className="text-[11.5px] text-danger">{thumbnailTask.errorMessage}</p>}
         </Field>
         <div className="grid grid-cols-2 gap-3">
           <Field label="Danh mục">
@@ -118,7 +118,7 @@ export function CourseBasicsForm({ courseId }: { courseId: number }) {
               value={categoryId}
               onChange={(e) => setCategoryId(e.target.value ? Number(e.target.value) : '')}
               required
-              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-cyan-400 focus:outline-none"
+              className="w-full rounded-lg border border-line px-3 py-2 text-sm focus:border-accent focus:outline-none"
             >
               <option value="">-- Chọn danh mục --</option>
               {categories?.map((c) => (
@@ -132,7 +132,7 @@ export function CourseBasicsForm({ courseId }: { courseId: number }) {
             <select
               value={level}
               onChange={(e) => setLevel(e.target.value as CourseLevel)}
-              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-cyan-400 focus:outline-none"
+              className="w-full rounded-lg border border-line px-3 py-2 text-sm focus:border-accent focus:outline-none"
             >
               {LEVEL_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>
@@ -145,7 +145,7 @@ export function CourseBasicsForm({ courseId }: { courseId: number }) {
         <button
           type="submit"
           disabled={updateCourse.isPending}
-          className="self-start rounded-full bg-gray-900 px-6 py-3 text-[13.5px] font-bold text-white hover:bg-gray-700 disabled:opacity-50"
+          className="self-start rounded-full bg-ink px-6 py-3 text-[13.5px] font-bold text-white hover:bg-ink/90 disabled:opacity-50"
         >
           {updateCourse.isPending ? 'Đang lưu...' : 'Lưu thay đổi'}
         </button>
@@ -161,7 +161,7 @@ export function CourseBasicsForm({ courseId }: { courseId: number }) {
 function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
     <label className="flex flex-col gap-1.5">
-      <span className="text-[12.5px] font-semibold text-gray-600">{label}</span>
+      <span className="text-[12.5px] font-semibold text-ink-muted">{label}</span>
       {children}
     </label>
   );

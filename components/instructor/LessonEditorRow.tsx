@@ -101,19 +101,19 @@ export function LessonEditorRow({
       onDragStart={handleDragStart}
       onDragEnd={onDragEnd}
       title="Kéo để đổi thứ tự bài học"
-      className={`flex flex-col gap-2 rounded-lg border bg-gray-50/60 px-3 py-2 transition-colors cursor-move ${
-        isDropTarget ? 'border-cyan-300 bg-cyan-50/60' : 'border-gray-100'
+      className={`flex flex-col gap-2 rounded-lg border bg-surface/60 px-3 py-2 transition-colors cursor-move ${
+        isDropTarget ? 'border-cyan-300 bg-cyan-50/60' : 'border-line-soft'
       }`}
     >
       {editing ? (
         <div className="flex flex-col gap-2" draggable={false} onDragStart={(e) => e.preventDefault()}>
-          <span className="text-[11.5px] font-bold text-gray-500">Bài giảng {index + 1}:</span>
+          <span className="text-[11.5px] font-bold text-ink-muted">Bài giảng {index + 1}:</span>
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Nhập tiêu đề"
             draggable={false}
-            className="rounded-lg border border-gray-200 px-3 py-1.5 text-[13px] font-medium focus:border-cyan-400 focus:outline-none"
+            className="rounded-lg border border-line px-3 py-1.5 text-[13px] font-medium focus:border-accent focus:outline-none"
           />
           <textarea
             value={description}
@@ -121,7 +121,7 @@ export function LessonEditorRow({
             rows={2}
             placeholder="Mô tả bài giảng — nêu rõ học viên sẽ làm được gì sau bài này."
             draggable={false}
-            className="rounded-lg border border-gray-200 px-3 py-1.5 text-[12.5px] focus:border-cyan-400 focus:outline-none"
+            className="rounded-lg border border-line px-3 py-1.5 text-[12.5px] focus:border-accent focus:outline-none"
           />
           <div className="flex justify-end gap-2">
             <button
@@ -132,7 +132,7 @@ export function LessonEditorRow({
                 setDescription(lesson.description ?? '');
                 setEditing(false);
               }}
-              className="rounded-lg px-3 py-1.5 text-[12px] font-semibold text-gray-500 hover:bg-gray-100"
+              className="rounded-lg px-3 py-1.5 text-[12px] font-semibold text-ink-muted hover:bg-tint"
             >
               Hủy bỏ
             </button>
@@ -151,10 +151,10 @@ export function LessonEditorRow({
           <span
             className={`shrink-0 whitespace-nowrap rounded-full px-2 py-0.5 text-[10.5px] font-bold ${
               lesson.status === 'READY'
-                ? 'bg-green-50 text-green-600'
+                ? 'bg-success-tint text-success'
                 : lesson.status === 'UNAVAILABLE'
-                  ? 'bg-red-50 text-red-600'
-                  : 'bg-gray-100 text-gray-500'
+                  ? 'bg-danger/5 text-danger'
+                  : 'bg-tint text-ink-muted'
             }`}
           >
             {lesson.status === 'READY' ? '✓' : '○'}
@@ -164,7 +164,7 @@ export function LessonEditorRow({
               chữ, vị trí trôi theo độ dài tên. `group` đặt NGAY TRÊN HÀNG NÀY (không phải cả thẻ
               Phần cha) nên hover đúng hàng bài giảng mới hiện, không lộ nhầm icon của Phần. */}
           <div className="flex min-w-0 flex-1 items-center gap-1.5">
-            <span className="truncate text-[13px] font-medium text-gray-800">
+            <span className="truncate text-[13px] font-medium text-ink">
               Bài giảng {index + 1}: {lesson.title}
             </span>
             <button
@@ -172,7 +172,7 @@ export function LessonEditorRow({
               draggable={false}
               onClick={() => setEditing(true)}
               title="Đổi tên/mô tả bài giảng"
-              className="shrink-0 text-gray-400 opacity-0 hover:text-gray-700 group-hover:opacity-100"
+              className="shrink-0 text-ink-faint opacity-0 hover:text-ink group-hover:opacity-100"
             >
               <PencilIcon />
             </button>
@@ -181,15 +181,15 @@ export function LessonEditorRow({
               draggable={false}
               onClick={() => setConfirmDelete(true)}
               title="Xóa bài giảng"
-              className="shrink-0 text-gray-400 opacity-0 hover:text-red-600 group-hover:opacity-100"
+              className="shrink-0 text-ink-faint opacity-0 hover:text-danger group-hover:opacity-100"
             >
               <TrashIcon />
             </button>
           </div>
 
-          <span className="shrink-0 text-[11px] text-gray-400">{LESSON_STATUS_LABEL[lesson.status]}</span>
+          <span className="shrink-0 text-[11px] text-ink-faint">{LESSON_STATUS_LABEL[lesson.status]}</span>
 
-          <label className="flex shrink-0 cursor-pointer items-center gap-1.5 text-[11.5px] font-semibold text-gray-500">
+          <label className="flex shrink-0 cursor-pointer items-center gap-1.5 text-[11.5px] font-semibold text-ink-muted">
             <input
               type="checkbox"
               draggable={false}
@@ -215,7 +215,7 @@ export function LessonEditorRow({
             draggable={false}
             onClick={() => setExpanded((v) => !v)}
             title={expanded ? 'Thu gọn' : 'Mở rộng'}
-            className="shrink-0 text-gray-500 hover:text-gray-800"
+            className="shrink-0 text-ink-muted hover:text-ink"
           >
             <ChevronDownIcon expanded={expanded} />
           </button>
@@ -223,7 +223,7 @@ export function LessonEditorRow({
           <span
             aria-hidden
             title="Kéo để đổi thứ tự"
-            className="shrink-0 select-none text-gray-300 opacity-0 group-hover:opacity-100"
+            className="shrink-0 select-none text-ink-faint opacity-0 group-hover:opacity-100"
           >
             <DragHandleIcon />
           </span>
@@ -231,17 +231,17 @@ export function LessonEditorRow({
       )}
 
       {!editing && lesson.description && !showDescriptionPanel && (
-        <p className="truncate pl-[26px] text-[11.5px] text-gray-400">{lesson.description}</p>
+        <p className="truncate pl-[26px] text-[11.5px] text-ink-faint">{lesson.description}</p>
       )}
 
       {expanded && (
         <div
           draggable={false}
           onDragStart={(e) => e.stopPropagation()}
-          className="flex flex-col gap-2.5 rounded-lg border border-gray-200 bg-white p-3"
+          className="flex flex-col gap-2.5 rounded-lg border border-line bg-white p-3"
         >
           {lesson.videoUrl && (
-            <div className="flex items-center gap-3 border-b border-gray-100 pb-2.5">
+            <div className="flex items-center gap-3 border-b border-line-soft pb-2.5">
               <div className="flex h-11 w-16 shrink-0 items-center justify-center overflow-hidden rounded bg-black">
                 {lesson.videoSource === 'YOUTUBE' && lesson.youtubeId ? (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -255,8 +255,8 @@ export function LessonEditorRow({
                 )}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-[12.5px] font-medium text-gray-800">{deriveVideoDisplayName(lesson)}</p>
-                <p className="text-[11px] text-gray-400">
+                <p className="truncate text-[12.5px] font-medium text-ink">{deriveVideoDisplayName(lesson)}</p>
+                <p className="text-[11px] text-ink-faint">
                   {formatDuration(lesson.durationSec)} · {LESSON_STATUS_LABEL[lesson.status]}
                 </p>
                 <button
@@ -281,7 +281,7 @@ export function LessonEditorRow({
                   {showPreviewMenu && (
                     <div
                       draggable={false}
-                      className="absolute right-0 top-full z-10 mt-1 w-52 flex-col overflow-hidden rounded-lg border border-gray-200 bg-white py-1 shadow-lg"
+                      className="absolute right-0 top-full z-10 mt-1 w-52 flex-col overflow-hidden rounded-lg border border-line bg-white py-1 shadow-lg"
                     >
                       <button
                         type="button"
@@ -290,7 +290,7 @@ export function LessonEditorRow({
                           setShowVideoPreview(true);
                           setShowPreviewMenu(false);
                         }}
-                        className="block w-full px-3 py-1.5 text-left text-[12px] text-gray-700 hover:bg-gray-50"
+                        className="block w-full px-3 py-1.5 text-left text-[12px] text-ink hover:bg-surface"
                       >
                         Với tư cách là Giảng viên
                       </button>
@@ -301,7 +301,7 @@ export function LessonEditorRow({
                           window.open(`/courses/${courseSlug}`, '_blank', 'noopener,noreferrer');
                           setShowPreviewMenu(false);
                         }}
-                        className="block w-full px-3 py-1.5 text-left text-[12px] text-gray-700 hover:bg-gray-50"
+                        className="block w-full px-3 py-1.5 text-left text-[12px] text-ink hover:bg-surface"
                       >
                         Với tư cách là học viên
                       </button>
@@ -321,8 +321,8 @@ export function LessonEditorRow({
             + Sự miêu tả
           </button>
           {showDescriptionPanel && (
-            <div className="flex flex-col gap-2 rounded-lg border border-gray-200 bg-gray-50/60 p-3">
-              <p className="text-[11.5px] text-gray-400">
+            <div className="flex flex-col gap-2 rounded-lg border border-line bg-surface/60 p-3">
+              <p className="text-[11.5px] text-ink-faint">
                 Thêm phần mô tả. Nêu rõ những điều học viên sẽ làm được sau khi hoàn thành bài giảng.
               </p>
               <textarea
@@ -330,7 +330,7 @@ export function LessonEditorRow({
                 onChange={(e) => setDescription(e.target.value)}
                 rows={3}
                 draggable={false}
-                className="rounded-lg border border-gray-200 px-3 py-1.5 text-[12.5px] focus:border-cyan-400 focus:outline-none"
+                className="rounded-lg border border-line px-3 py-1.5 text-[12.5px] focus:border-accent focus:outline-none"
               />
               <div className="flex justify-end gap-2">
                 <button
@@ -340,7 +340,7 @@ export function LessonEditorRow({
                     setDescription(lesson.description ?? '');
                     setShowDescriptionPanel(false);
                   }}
-                  className="rounded-lg px-3 py-1.5 text-[12px] font-semibold text-gray-500 hover:bg-gray-100"
+                  className="rounded-lg px-3 py-1.5 text-[12px] font-semibold text-ink-muted hover:bg-tint"
                 >
                   Hủy bỏ
                 </button>

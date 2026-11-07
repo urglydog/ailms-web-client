@@ -37,7 +37,7 @@ export default function InstructorGradebookPage() {
     return (
       <div className="min-h-dvh bg-surface p-8">
         <div className="card p-8 text-center max-w-md mx-auto">
-          <h2 className="text-lg font-bold text-red-600 mb-2">Không thể tải Bảng điểm</h2>
+          <h2 className="text-lg font-bold text-danger mb-2">Không thể tải Bảng điểm</h2>
           <p className="text-sm text-ink-muted mb-4">Bạn có thể không có quyền truy cập hoặc khóa học này chưa có dữ liệu.</p>
           <button 
             onClick={() => router.back()}
@@ -69,7 +69,7 @@ export default function InstructorGradebookPage() {
           </div>
           <button
             onClick={() => router.push(`/instructor/courses/${courseId}/edit/materials`)}
-            className="bg-ink text-white px-4 py-2 rounded-xl text-sm font-bold shadow hover:bg-gray-800 transition-all"
+            className="bg-ink text-white px-4 py-2 rounded-xl text-sm font-bold shadow hover:bg-ink/90 transition-all"
           >
             Kho Học Liệu & Đề Thi
           </button>
@@ -81,13 +81,13 @@ export default function InstructorGradebookPage() {
             <div className="text-xs font-bold uppercase tracking-wider text-ink-muted">Tổng học viên ghi danh</div>
             <div className="text-3xl font-extrabold text-ink mt-2">{gradebook.totalStudents} <span className="text-sm font-normal text-ink-muted">học viên</span></div>
           </div>
-          <div className="card p-6 border-l-4 border-emerald-500">
+          <div className="card p-6 border-l-4 border-success">
             <div className="text-xs font-bold uppercase tracking-wider text-ink-muted">Điểm trung bình lớp</div>
-            <div className="text-3xl font-extrabold text-emerald-600 mt-2">{gradebook.averageScore} <span className="text-sm font-normal text-ink-muted">/10</span></div>
+            <div className="text-3xl font-extrabold text-success mt-2">{gradebook.averageScore} <span className="text-sm font-normal text-ink-muted">/10</span></div>
           </div>
-          <div className="card p-6 border-l-4 border-amber-500">
+          <div className="card p-6 border-l-4 border-warning">
             <div className="text-xs font-bold uppercase tracking-wider text-ink-muted">Tỷ lệ Đạt (Pass Rate)</div>
-            <div className="text-3xl font-extrabold text-amber-600 mt-2">{gradebook.passRatePercentage}%</div>
+            <div className="text-3xl font-extrabold text-warning mt-2">{gradebook.passRatePercentage}%</div>
           </div>
           <div className="card p-6 border-l-4 border-purple-500">
             <div className="text-xs font-bold uppercase tracking-wider text-ink-muted">Tổng số lượt làm bài</div>
@@ -100,7 +100,7 @@ export default function InstructorGradebookPage() {
           <div className="p-6 border-b border-line flex justify-between items-center bg-surface-hover">
             <h2 className="font-display font-bold text-lg text-ink">Danh Sách Bảng Điểm Chi Tiết</h2>
             {!gradebook.hasOfficialQuiz && (
-              <span className="text-xs font-semibold text-amber-600 bg-amber-50 px-3 py-1 rounded-full border border-amber-200">
+              <span className="text-xs font-semibold text-warning bg-streak-bg px-3 py-1 rounded-full border border-warning/30">
                 Khóa học chưa xuất bản Quiz chính thức
               </span>
             )}
@@ -137,7 +137,7 @@ export default function InstructorGradebookPage() {
                     </td>
                     <td className="px-6 py-4 text-center font-bold text-base">
                       {student.attemptCount > 0 ? (
-                        <span className={student.passed ? 'text-emerald-600' : 'text-red-500'}>
+                        <span className={student.passed ? 'text-success' : 'text-danger'}>
                           {student.highestScore}
                         </span>
                       ) : (
@@ -152,11 +152,11 @@ export default function InstructorGradebookPage() {
                     </td>
                     <td className="px-6 py-4 text-center">
                       {student.attemptCount === 0 ? (
-                        <span className="bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full text-xs font-semibold">Chưa tham gia</span>
+                        <span className="bg-tint text-ink-muted px-2.5 py-1 rounded-full text-xs font-semibold">Chưa tham gia</span>
                       ) : student.passed ? (
-                        <span className="bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full text-xs font-bold border border-emerald-200">Đạt (Passed) ✓</span>
+                        <span className="bg-success-tint text-success-ink px-2.5 py-1 rounded-full text-xs font-bold border border-success/30">Đạt (Passed) ✓</span>
                       ) : (
-                        <span className="bg-red-50 text-red-700 px-2.5 py-1 rounded-full text-xs font-bold border border-red-200">Chưa đạt ✕</span>
+                        <span className="bg-danger/5 text-danger px-2.5 py-1 rounded-full text-xs font-bold border border-danger/30">Chưa đạt ✕</span>
                       )}
                     </td>
                     <td className="px-6 py-4 text-right">
@@ -219,7 +219,7 @@ export default function InstructorGradebookPage() {
                   <div className="h-8 w-px bg-line"></div>
                   <div className="text-center">
                     <div className="text-xs font-semibold text-ink-muted uppercase">Số câu đúng</div>
-                    <div className="text-2xl font-extrabold text-emerald-600">{attemptDetail.correctCount}/{attemptDetail.totalQuestions}</div>
+                    <div className="text-2xl font-extrabold text-success">{attemptDetail.correctCount}/{attemptDetail.totalQuestions}</div>
                   </div>
                 </div>
 
@@ -227,13 +227,13 @@ export default function InstructorGradebookPage() {
                 <div className="space-y-4">
                   <h4 className="font-bold text-sm text-ink uppercase tracking-wider">Chi Tiết Lựa Chọn Từng Câu Hỏi</h4>
                   {attemptDetail.answers.map((q, idx) => (
-                    <div key={q.questionId} className={`p-4 rounded-xl border-l-4 ${q.isCorrect ? 'border-emerald-500 bg-emerald-50/20' : 'border-red-500 bg-red-50/20'} border border-line`}>
+                    <div key={q.questionId} className={`p-4 rounded-xl border-l-4 ${q.isCorrect ? 'border-success bg-success-tint/20' : 'border-danger bg-danger/5'} border border-line`}>
                       <div className="flex justify-between items-start mb-2">
                         <div className="font-bold text-sm text-ink">Câu {idx + 1}: {q.questionContent}</div>
                         {q.isCorrect ? (
-                          <span className="text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full text-xs font-bold">Đúng ✓</span>
+                          <span className="text-success-ink bg-success-tint px-2.5 py-0.5 rounded-full text-xs font-bold">Đúng ✓</span>
                         ) : (
-                          <span className="text-red-700 bg-red-100 px-2.5 py-0.5 rounded-full text-xs font-bold">Sai ✕</span>
+                          <span className="text-danger bg-danger/10 px-2.5 py-0.5 rounded-full text-xs font-bold">Sai ✕</span>
                         )}
                       </div>
 
@@ -244,11 +244,11 @@ export default function InstructorGradebookPage() {
 
                           let style = "p-3 rounded-lg text-xs font-medium border transition-colors flex items-center justify-between ";
                           if (isCorrect && isSelected) {
-                            style += "border-emerald-500 bg-emerald-100 text-emerald-900 font-bold";
+                            style += "border-success bg-success-tint text-success-ink font-bold";
                           } else if (isCorrect) {
-                            style += "border-emerald-400 bg-emerald-50 text-emerald-900 font-semibold";
+                            style += "border-emerald-400 bg-success-tint text-success-ink font-semibold";
                           } else if (isSelected) {
-                            style += "border-red-400 bg-red-100 text-red-900 font-bold";
+                            style += "border-danger bg-danger/10 text-danger font-bold";
                           } else {
                             style += "border-line bg-surface text-ink-muted opacity-70";
                           }
@@ -258,7 +258,7 @@ export default function InstructorGradebookPage() {
                               <span>{opt.content}</span>
                               <div className="flex items-center gap-1 text-[11px]">
                                 {isSelected && <span className="bg-ink text-white px-2 py-0.5 rounded font-bold">Lựa chọn của học viên</span>}
-                                {isCorrect && <span className="bg-emerald-600 text-white px-2 py-0.5 rounded font-bold">Đáp án đúng ✓</span>}
+                                {isCorrect && <span className="bg-success text-white px-2 py-0.5 rounded font-bold">Đáp án đúng ✓</span>}
                               </div>
                             </div>
                           );
@@ -273,7 +273,7 @@ export default function InstructorGradebookPage() {
             <div className="mt-6 pt-4 border-t border-line text-right">
               <button 
                 onClick={() => setSelectedAttemptId(null)}
-                className="bg-ink text-white font-bold px-6 py-2 rounded-xl text-sm hover:bg-gray-800"
+                className="bg-ink text-white font-bold px-6 py-2 rounded-xl text-sm hover:bg-ink/90"
               >
                 Đóng
               </button>

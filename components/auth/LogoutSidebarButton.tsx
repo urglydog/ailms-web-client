@@ -20,7 +20,7 @@ export function LogoutSidebarButton() {
   const modalContent = showConfirm && mounted ? (
     <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
           <div className="w-full max-w-sm rounded-2xl bg-slate-900 border border-slate-800 p-6 shadow-2xl text-white">
-            <div className="flex items-center gap-3 text-red-400 mb-3">
+            <div className="flex items-center gap-3 text-danger mb-3">
               <span className="text-2xl">⚠️</span>
               <h3 className="font-bold text-base text-white">Xác nhận đăng xuất</h3>
             </div>
@@ -36,7 +36,7 @@ export function LogoutSidebarButton() {
               </button>
               <button
                 onClick={handleLogout}
-                className="rounded-xl bg-red-600 px-4 py-2 text-xs font-bold text-white shadow hover:bg-red-500 transition-all"
+                className="rounded-xl bg-danger px-4 py-2 text-xs font-bold text-white shadow hover:bg-danger transition-all"
               >
                 Đăng xuất
               </button>
@@ -49,7 +49,7 @@ export function LogoutSidebarButton() {
     <>
       <button
         onClick={() => setShowConfirm(true)}
-        className="mt-4 px-2 text-left text-xs font-semibold text-red-400 no-underline hover:text-red-300 w-full flex items-center gap-2"
+        className="mt-4 px-2 text-left text-xs font-semibold text-danger no-underline hover:text-danger w-full flex items-center gap-2"
       >
         <span>🚪</span> Đăng xuất
       </button>

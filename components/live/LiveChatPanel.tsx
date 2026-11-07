@@ -91,7 +91,7 @@ export function LiveChatPanel({ isAuthenticated }: { isAuthenticated: boolean })
             return (
               <div key={m.id} className="group flex items-start justify-between gap-2 text-[13px]">
                 <p className="min-w-0 break-words text-ink">
-                  <span className={`font-semibold ${senderIsInstructor ? 'text-red-600' : 'text-ink'}`}>
+                  <span className={`font-semibold ${senderIsInstructor ? 'text-danger' : 'text-ink'}`}>
                     {senderIsInstructor ? 'Giảng viên' : (m.from?.name ?? 'Ẩn danh')}
                   </span>{' '}
                   <span className="text-[10.5px] text-ink-faint">{formatTime(m.timestamp)}</span>
@@ -103,7 +103,7 @@ export function LiveChatPanel({ isAuthenticated }: { isAuthenticated: boolean })
                     type="button"
                     onClick={() => handleHide(m.id)}
                     title="Ẩn tin nhắn này"
-                    className="shrink-0 text-[11px] text-ink-faint opacity-0 hover:text-red-500 group-hover:opacity-100"
+                    className="shrink-0 text-[11px] text-ink-faint opacity-0 hover:text-danger group-hover:opacity-100"
                   >
                     Ẩn
                   </button>

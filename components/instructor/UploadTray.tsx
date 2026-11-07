@@ -28,11 +28,11 @@ export function UploadTray() {
         : 'Đã tải xong';
 
   return (
-    <div className="fixed bottom-4 right-4 z-40 w-80 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-2xl">
+    <div className="fixed bottom-4 right-4 z-40 w-80 overflow-hidden rounded-xl border border-line bg-white shadow-2xl">
       <button
         type="button"
         onClick={toggleOpen}
-        className="flex w-full items-center justify-between gap-2 bg-gray-900 px-4 py-2.5 text-left text-[13px] font-semibold text-white"
+        className="flex w-full items-center justify-between gap-2 bg-ink px-4 py-2.5 text-left text-[13px] font-semibold text-white"
       >
         <span className="truncate">{summary}</span>
         <span aria-hidden className="shrink-0">
@@ -43,7 +43,7 @@ export function UploadTray() {
       {isOpen && (
         <div className="max-h-72 overflow-y-auto">
           {tasks.map((task) => (
-            <div key={task.id} className="border-b border-gray-100 px-4 py-2.5 last:border-0">
+            <div key={task.id} className="border-b border-line-soft px-4 py-2.5 last:border-0">
               {task.status === 'uploading' && (
                 <div className="flex items-end gap-2">
                   <div className="min-w-0 flex-1">
@@ -53,7 +53,7 @@ export function UploadTray() {
                     <button
                       type="button"
                       onClick={() => cancelTask(task.id)}
-                      className="shrink-0 pb-0.5 text-[11px] font-bold text-red-500 hover:text-red-700"
+                      className="shrink-0 pb-0.5 text-[11px] font-bold text-danger hover:text-danger"
                     >
                       Hủy
                     </button>
@@ -62,28 +62,28 @@ export function UploadTray() {
               )}
 
               {task.status === 'success' && (
-                <div className="flex items-center gap-2 text-[12.5px] text-green-700">
+                <div className="flex items-center gap-2 text-[12.5px] text-success-ink">
                   <span aria-hidden>✓</span>
                   <span className="min-w-0 flex-1 truncate">{task.label}</span>
-                  <span className="shrink-0 text-gray-400">Xong</span>
+                  <span className="shrink-0 text-ink-faint">Xong</span>
                 </div>
               )}
 
               {task.status === 'error' && (
                 <div className="flex flex-col gap-1">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="min-w-0 flex-1 truncate text-[12.5px] font-semibold text-red-700">
+                    <span className="min-w-0 flex-1 truncate text-[12.5px] font-semibold text-danger">
                       {task.label}
                     </span>
                     <button
                       type="button"
                       onClick={() => dismissTask(task.id)}
-                      className="shrink-0 text-[11px] font-bold text-red-500 hover:text-red-700"
+                      className="shrink-0 text-[11px] font-bold text-danger hover:text-danger"
                     >
                       Đóng
                     </button>
                   </div>
-                  <span className="text-[11.5px] text-red-600">{task.errorMessage}</span>
+                  <span className="text-[11.5px] text-danger">{task.errorMessage}</span>
                 </div>
               )}
             </div>

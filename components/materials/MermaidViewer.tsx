@@ -150,7 +150,7 @@ export function MermaidViewer({ chart, readOnly = false }: MermaidViewerProps) {
   return (
     <div className="flex flex-col gap-4">
       {/* Thanh công cụ điều khiển sơ đồ */}
-      <div className="flex flex-wrap items-center justify-between gap-4 bg-gray-50 p-2 rounded-xl border border-line">
+      <div className="flex flex-wrap items-center justify-between gap-4 bg-surface p-2 rounded-xl border border-line">
         {!readOnly ? (
           <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-line">
             {DIRECTIONS.map(dir => (
@@ -172,14 +172,14 @@ export function MermaidViewer({ chart, readOnly = false }: MermaidViewerProps) {
           <div className="flex items-center gap-2">
             <button 
               onClick={handleCopyCode}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-accent text-ink hover:text-white rounded-lg text-sm font-medium transition-all border border-line"
+              className="flex items-center gap-2 px-4 py-2 bg-tint hover:bg-accent text-ink hover:text-white rounded-lg text-sm font-medium transition-all border border-line"
               title="Sao chép mã Mermaid"
             >
               Copy Code
             </button>
             <button 
               onClick={handleDownloadSVG}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-accent text-ink hover:text-white rounded-lg text-sm font-medium transition-all border border-line"
+              className="flex items-center gap-2 px-4 py-2 bg-tint hover:bg-accent text-ink hover:text-white rounded-lg text-sm font-medium transition-all border border-line"
               title="Tải sơ đồ dưới dạng ảnh SVG"
             >
               Tải ảnh (SVG)
@@ -196,9 +196,9 @@ export function MermaidViewer({ chart, readOnly = false }: MermaidViewerProps) {
           </div>
         )}
         {error ? (
-          <div className="flex flex-col items-center justify-center w-full h-full bg-red-50/50 rounded-2xl border border-red-200 text-red-600 p-8 text-center">
+          <div className="flex flex-col items-center justify-center w-full h-full bg-danger/5 rounded-2xl border border-danger/30 text-danger p-8 text-center">
             <p className="mb-4 text-sm font-medium">{error}</p>
-            <pre className="text-xs text-left w-full overflow-auto p-4 bg-gray-50 rounded-xl border border-gray-200">{chart}</pre>
+            <pre className="text-xs text-left w-full overflow-auto p-4 bg-surface rounded-xl border border-line">{chart}</pre>
           </div>
         ) : (
           <div 

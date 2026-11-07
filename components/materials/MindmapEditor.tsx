@@ -854,21 +854,21 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
           panOnScrollMode={PanOnScrollMode.Free}
         >
           {readOnly && (
-              <Panel position="bottom-center" className="bg-white/90 backdrop-blur border border-gray-200 px-4 py-2 rounded-full shadow-lg mb-4 flex gap-4 text-xs font-bold text-gray-600">
+              <Panel position="bottom-center" className="bg-white/90 backdrop-blur border border-line px-4 py-2 rounded-full shadow-lg mb-4 flex gap-4 text-xs font-bold text-ink-muted">
                   <span className="flex items-center gap-1"><MousePointer2 className="w-3.5 h-3.5" strokeWidth={1.75} /> Shift+Scroll to pan</span>
                   <span className="flex items-center gap-1"><Move className="w-3.5 h-3.5" strokeWidth={1.75} /> Drag/Pinch to zoom</span>
               </Panel>
           )}
-          <Controls className="bg-white border-gray-200 shadow-md" />
-          <MiniMap className="bg-white border-gray-200 shadow-md rounded-lg overflow-hidden" zoomable pannable nodeStrokeColor="#E2E8F0" nodeColor="#F1F5F9" />
+          <Controls className="bg-white border-line shadow-md" />
+          <MiniMap className="bg-white border-line shadow-md rounded-lg overflow-hidden" zoomable pannable nodeStrokeColor="#E2E8F0" nodeColor="#F1F5F9" />
           <Background gap={20} size={1} color="#E2E8F0" />
         </ReactFlow>
 
         {/* Editing Node Modal */}
         {editingNode && (
           <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm">
-            <div className="bg-white p-6 rounded-2xl shadow-2xl border border-gray-100 w-96 max-w-[90%] animate-in zoom-in-95">
-              <h3 className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2"><Pencil className="w-4 h-4" strokeWidth={1.75} /> Nhập nội dung</h3>
+            <div className="bg-white p-6 rounded-2xl shadow-2xl border border-line-soft w-96 max-w-[90%] animate-in zoom-in-95">
+              <h3 className="text-sm font-bold text-ink mb-3 flex items-center gap-2"><Pencil className="w-4 h-4" strokeWidth={1.75} /> Nhập nội dung</h3>
               <textarea
                 autoFocus
                 value={editingNode.label}
@@ -884,10 +884,10 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
                         setEditingNode(null);
                     }
                 }}
-                className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-accent/20 focus:border-accent resize-none h-28 text-gray-700 outline-none transition-all font-medium"
+                className="w-full border border-line rounded-xl p-3 text-sm focus:ring-2 focus:ring-accent/20 focus:border-accent resize-none h-28 text-ink outline-none transition-all font-medium"
               />
               <div className="flex gap-2 justify-end mt-5">
-                <button onClick={() => setEditingNode(null)} className="px-4 py-2.5 bg-gray-50 text-gray-600 rounded-xl text-xs font-bold hover:bg-gray-100">Hủy</button>
+                <button onClick={() => setEditingNode(null)} className="px-4 py-2.5 bg-surface text-ink-muted rounded-xl text-xs font-bold hover:bg-tint">Hủy</button>
                 <button onClick={() => {
                     setNodes((nds) => {
                         const newNodes = nds.map((n) => n.id === editingNode.id ? { ...n, data: { ...n.data, label: editingNode.label.trim() } } : n);

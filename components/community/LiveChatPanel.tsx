@@ -125,7 +125,7 @@ export function LiveChatPanel({ lessonId, userName, currentUserId }: LiveChatPan
                   setReplyingTo(null);
                   setInputValue('');
                 }}
-                className="text-red-500 hover:underline font-semibold"
+                className="text-danger hover:underline font-semibold"
               >
                 Hủy
               </button>

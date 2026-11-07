@@ -43,7 +43,7 @@ function renderFormattedMessage(text: string) {
             {parts.map((part, pIdx) => {
               if (part.startsWith('**') && part.endsWith('**')) {
                 return (
-                  <strong key={pIdx} className="font-bold text-gray-900">
+                  <strong key={pIdx} className="font-bold text-ink">
                     {part.slice(2, -2)}
                   </strong>
                 );
@@ -165,9 +165,9 @@ export function InstructorChat() {
         </div>
 
         {/* Message Container */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-3.5 bg-gray-50/50">
+        <div className="flex-1 overflow-y-auto p-4 space-y-3.5 bg-surface/50">
           {messages.length === 0 && (
-            <div className="text-center text-sm text-gray-500 mt-4">
+            <div className="text-center text-sm text-ink-muted mt-4">
               Xin chào! Tôi có thể giúp bạn phân tích số liệu học viên, xem đánh giá, hoặc gợi ý cải thiện khóa học. Bạn cần hỗ trợ gì?
             </div>
           )}
@@ -185,7 +185,7 @@ export function InstructorChat() {
                 className={`px-4 py-2.5 rounded-2xl text-sm ${
                   msg.role === 'user'
                     ? 'bg-blue-600 text-white rounded-br-none shadow-sm'
-                    : 'bg-white text-gray-800 border border-gray-100 rounded-bl-none shadow-sm'
+                    : 'bg-white text-ink border border-line-soft rounded-bl-none shadow-sm'
                 }`}
               >
                 {msg.role === 'assistant' ? renderFormattedMessage(msg.text) : msg.text}
@@ -193,23 +193,23 @@ export function InstructorChat() {
 
               {/* Enhanced UI Card for Assistant Data Payload */}
               {msg.data && (
-                <div className="mt-2 w-full rounded-xl bg-white p-3 border border-gray-200 text-xs shadow-sm space-y-1.5">
+                <div className="mt-2 w-full rounded-xl bg-white p-3 border border-line text-xs shadow-sm space-y-1.5">
                   {msg.data.data && (
-                    <div className="flex justify-between items-center border-b border-gray-100 pb-1.5">
-                      <span className="text-gray-500 font-medium">Doanh thu:</span>
-                      <span className="font-bold text-emerald-600">{msg.data.data.totalRevenue?.toLocaleString('vi-VN')} đ</span>
+                    <div className="flex justify-between items-center border-b border-line-soft pb-1.5">
+                      <span className="text-ink-muted font-medium">Doanh thu:</span>
+                      <span className="font-bold text-success">{msg.data.data.totalRevenue?.toLocaleString('vi-VN')} đ</span>
                     </div>
                   )}
                   {msg.data.average_rating !== undefined && (
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-500 font-medium">Đánh giá trung bình:</span>
-                      <span className="font-bold text-amber-500">⭐ {msg.data.average_rating}</span>
+                      <span className="text-ink-muted font-medium">Đánh giá trung bình:</span>
+                      <span className="font-bold text-warning">⭐ {msg.data.average_rating}</span>
                     </div>
                   )}
                   {msg.data.positive_count !== undefined && (
                     <div className="flex justify-between items-center text-[11px]">
-                      <span className="text-emerald-600 font-medium">Tích cực: {msg.data.positive_count}</span>
-                      <span className="text-red-500 font-medium">Tiêu cực: {msg.data.negative_count}</span>
+                      <span className="text-success font-medium">Tích cực: {msg.data.positive_count}</span>
+                      <span className="text-danger font-medium">Tiêu cực: {msg.data.negative_count}</span>
                     </div>
                   )}
                 </div>
@@ -218,7 +218,7 @@ export function InstructorChat() {
           ))}
 
           {loading && (
-            <div className="flex items-center gap-1.5 bg-white border border-gray-100 p-3 rounded-2xl rounded-bl-none w-20 shadow-sm">
+            <div className="flex items-center gap-1.5 bg-white border border-line-soft p-3 rounded-2xl rounded-bl-none w-20 shadow-sm">
               <span className="h-2 w-2 rounded-full bg-blue-600 animate-bounce" />
               <span className="h-2 w-2 rounded-full bg-blue-600 animate-bounce [animation-delay:0.2s]" />
               <span className="h-2 w-2 rounded-full bg-blue-600 animate-bounce [animation-delay:0.4s]" />
@@ -228,7 +228,7 @@ export function InstructorChat() {
         </div>
 
         {/* Input Footer */}
-        <div className="p-3 bg-white border-t border-gray-100 shrink-0">
+        <div className="p-3 bg-white border-t border-line-soft shrink-0">
           <form 
             onSubmit={(e: React.FormEvent) => { e.preventDefault(); sendMessage(); }}
             className="flex items-center gap-2"
@@ -239,7 +239,7 @@ export function InstructorChat() {
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange(e.target.value)}
               placeholder="Hỏi trợ lý (VD: Doanh thu tháng này?)..."
               maxLength={MAX_MESSAGE_LENGTH}
-              className="flex-1 bg-gray-50 border border-gray-200 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-gray-800"
+              className="flex-1 bg-surface border border-line rounded-full px-4 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-ink"
               disabled={loading}
             />
             <button

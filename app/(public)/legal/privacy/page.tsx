@@ -43,7 +43,7 @@ export default function PrivacyPolicyPage() {
       <LegalSection title="4. Chia sẻ dữ liệu với bên thứ ba">
         <p>
           LinguaLearn không bán hoặc chia sẻ dữ liệu cá nhân cho bên thứ ba ngoài mục đích xử lý
-          thanh toán (cổng thanh toán VNPay/PayOS) và xác thực đăng nhập (Google OAuth, nếu bạn
+          thanh toán (cổng thanh toán PayOS) và xác thực đăng nhập (Google OAuth, nếu bạn
           chọn sử dụng).
         </p>
       </LegalSection>

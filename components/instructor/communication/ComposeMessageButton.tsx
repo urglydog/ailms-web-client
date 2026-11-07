@@ -57,7 +57,7 @@ export function ComposeMessageButton() {
               value={studentId}
               disabled={!courseId}
               onChange={(e) => setStudentId(e.target.value ? Number(e.target.value) : '')}
-              className="mb-4 w-full rounded-lg border border-line px-3 py-2 text-[13px] focus:border-accent focus:outline-none disabled:bg-gray-50"
+              className="mb-4 w-full rounded-lg border border-line px-3 py-2 text-[13px] focus:border-accent focus:outline-none disabled:bg-surface"
             >
               <option value="">{courseId ? t('pickStudent') : t('pickCourseFirst')}</option>
               {students?.map((s) => (

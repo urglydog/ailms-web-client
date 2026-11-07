@@ -74,7 +74,7 @@ function BundleForm({ editing, onClose }: BundleFormProps) {
             type="button"
             onClick={onClose}
             aria-label={t('form.close')}
-            className="h-8 w-8 rounded-full hover:bg-gray-200 flex items-center justify-center text-ink-muted hover:text-gray-700 transition-colors"
+            className="h-8 w-8 rounded-full hover:bg-line-soft flex items-center justify-center text-ink-muted hover:text-ink transition-colors"
           >
             ✕
           </button>
@@ -84,14 +84,14 @@ function BundleForm({ editing, onClose }: BundleFormProps) {
           {/* Tên gói */}
           <div>
             <label className="block text-sm font-semibold text-ink mb-1.5">
-              {t('form.name')} <span className="text-red-500">*</span>
+              {t('form.name')} <span className="text-danger">*</span>
             </label>
             <input
               required
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder={t('form.namePh')}
-              className="w-full rounded-xl border border-line px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 bg-surface"
+              className="w-full rounded-xl border border-line px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent bg-surface"
             />
           </div>
 
@@ -103,7 +103,7 @@ function BundleForm({ editing, onClose }: BundleFormProps) {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder={t('form.descPh')}
-              className="w-full rounded-xl border border-line px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 bg-surface resize-none"
+              className="w-full rounded-xl border border-line px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent bg-surface resize-none"
             />
           </div>
 
@@ -175,7 +175,7 @@ function BundleForm({ editing, onClose }: BundleFormProps) {
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-slate-300">{t('form.discountLine', { percent: discountPercent })}</span>
-                <span className="text-red-400 font-semibold">- {fmt(discountAmt)}</span>
+                <span className="text-danger font-semibold">- {fmt(discountAmt)}</span>
               </div>
               <div className="flex justify-between text-base font-bold border-t border-white/10 pt-2 mt-1">
                 <span>{t('form.learnerPays')}</span>
@@ -281,7 +281,7 @@ function BundleCard({ bundle, onEdit }: { bundle: CourseBundle; onEdit: () => vo
         <div className="rounded-xl bg-surface px-4 py-3 flex items-center justify-between border border-line-soft">
           <div className="text-xs text-ink-muted">
             <span className="line-through">{fmt(bundle.originalPrice)}</span>
-            <span className="ml-2 text-red-500 font-semibold">-{fmt(bundle.discountAmount)}</span>
+            <span className="ml-2 text-danger font-semibold">-{fmt(bundle.discountAmount)}</span>
           </div>
           <div className="text-base font-bold text-accent-dark">{fmt(bundle.finalPrice)}</div>
         </div>
