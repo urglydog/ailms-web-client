@@ -72,8 +72,10 @@
       "allCourses": "Tất cả khóa học",
       "categories": "DANH MỤC",
       "more": "KHÁM PHÁ THÊM",
-      "liveNow": "Đang diễn ra"
+      "liveNow": "Đang diễn ra",
+      "groups": { "it": "Công nghệ thông tin", "soft": "Kỹ năng mềm", "other": "Lĩnh vực khác" }
     },
+    "theme": { "toDark": "Chuyển sang giao diện tối", "toLight": "Chuyển sang giao diện sáng", "label": "Giao diện", "dark": "Tối", "light": "Sáng" },
     "skipToContent": "Bỏ qua tới nội dung"
   },
   "footer": {

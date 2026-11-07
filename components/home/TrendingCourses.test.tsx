@@ -1,4 +1,4 @@
-import { fireEvent, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { makeCourse } from '@/test/fixtures';
 import { renderWithIntl } from '@/test/renderWithIntl';
@@ -8,9 +8,6 @@ const useTrending = vi.fn();
 
 vi.mock('@/hooks/useTrendingCourses', () => ({
   useTrendingCourses: (slug: string | null, initial?: unknown) => useTrending(slug, initial),
-}));
-vi.mock('@/hooks/useCategories', () => ({
-  useCategories: () => ({ data: [{ id: 1, name: 'Lập trình', slug: 'lap-trinh' }] }),
 }));
 vi.mock('@/hooks/useEnrollments', () => ({
   useMyEnrollments: () => ({ data: [{ courseId: 2 }] }),
@@ -23,19 +20,19 @@ const ALL = [1, 2, 3, 4, 5].map((id) => makeCourse(id));
 
 beforeEach(() => {
   useTrending.mockReset();
-  useTrending.mockImplementation((slug: string | null) =>
-    slug === 'lap-trinh'
-      ? { data: [makeCourse(9, { title: 'Chỉ lập trình' })], isLoading: false }
-      : { data: ALL, isLoading: false },
-  );
+  useTrending.mockImplementation(() => ({ data: ALL, isLoading: false }));
 });
 
 describe('TrendingCourses', () => {
-  it('hiện tiêu đề, chip Tất cả đang chọn và chip danh mục', () => {
+  it('hiện tiêu đề và không có chip lọc danh mục', () => {
     renderWithIntl(<TrendingCourses initialCourses={ALL} />);
     expect(screen.getByText('Đang thịnh hành')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Tất cả' })).toHaveAttribute('aria-pressed', 'true');
-    expect(screen.getByRole('button', { name: 'Lập trình' })).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.queryByRole('button')).toBeNull();
+  });
+
+  it('luôn lấy khóa thịnh hành của toàn bộ danh mục', () => {
+    renderWithIntl(<TrendingCourses initialCourses={ALL} />);
+    expect(useTrending).toHaveBeenLastCalledWith(null, expect.anything());
   });
 
   it('bỏ khóa đã sở hữu và hiện tối đa 4 thẻ', () => {
@@ -44,15 +41,7 @@ describe('TrendingCourses', () => {
     expect(titles).toEqual(['Khóa học 1', 'Khóa học 3', 'Khóa học 4', 'Khóa học 5']);
   });
 
-  it('bấm chip danh mục thì truy vấn theo slug và đổi thẻ', () => {
-    renderWithIntl(<TrendingCourses initialCourses={ALL} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Lập trình' }));
-    expect(useTrending).toHaveBeenLastCalledWith('lap-trinh', expect.anything());
-    expect(screen.getAllByTestId('card').map((c) => c.textContent)).toEqual(['Chỉ lập trình']);
-    expect(screen.getByRole('button', { name: 'Lập trình' })).toHaveAttribute('aria-pressed', 'true');
-  });
-
-  it('danh mục rỗng thì báo chưa có khóa học', () => {
+  it('chưa có khóa nào thì báo trống', () => {
     useTrending.mockImplementation(() => ({ data: [], isLoading: false }));
     renderWithIntl(<TrendingCourses initialCourses={[]} />);
     expect(screen.getByText('Chưa có khóa học nào trong danh mục này.')).toBeInTheDocument();

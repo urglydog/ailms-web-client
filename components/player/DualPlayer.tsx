@@ -191,8 +191,12 @@ export const DualPlayer = forwardRef<DualPlayerHandle, DualPlayerProps>(function
 
   const isYoutube = videoSource === 'YOUTUBE' && !!youtubeId;
   // Nút "Gốc": transcript của project nếu đã có; chưa có mà là video YouTube thì bật/tắt phụ đề CC của YouTube.
-  const originalCaption = resolveOriginalCaption({ isYoutube, projectSubtitleCount: originalSubtitles.length });
   const { src: audioSrc, offsetSec } = resolveAudio(track, currentSec);
+  const originalCaption = resolveOriginalCaption({
+    isYoutube,
+    projectSubtitleCount: originalSubtitles.length,
+    dubActive: audioSrc !== null,
+  });
 
   const handleEnded = () => onEnded?.();
 
@@ -562,7 +566,7 @@ export const DualPlayer = forwardRef<DualPlayerHandle, DualPlayerProps>(function
         onToggleTranscript={onToggleTranscript}
         showOriginalSub={originalCaption === 'youtube' ? youtube.captionsOn : showOriginalSub}
         onToggleShowOriginalSub={originalCaption === 'youtube' ? youtube.toggleCaptions : onToggleShowOriginalSub}
-        originalSubtitleAvailable={originalCaption !== 'none'}
+        originalSubtitleAvailable={originalCaption !== 'none' && !(originalCaption === 'youtube' && youtube.captionsUnavailable)}
         originalSubtitleHint={originalCaption === 'youtube' ? 'Phụ đề của YouTube (chưa có transcript của khóa học)' : undefined}
         showTranslatedSub={showTranslatedSub}
         onToggleShowTranslatedSub={onToggleShowTranslatedSub}

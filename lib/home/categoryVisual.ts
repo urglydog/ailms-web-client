@@ -24,6 +24,9 @@ const KNOWN: Record<string, CategoryVisual> = {
   'kinh-doanh-tai-chinh': { icon: 'wallet', gradient: 'from-success to-ink', image: photo('1579621970563-ebec7560ff3e') },
   'tin-hoc-van-phong': { icon: 'sheet', gradient: 'from-accent to-success', image: photo('1460925895917-afdab827c52f') },
   'ky-nang-mem': { icon: 'users', gradient: 'from-accent-dark to-success', image: photo('1552664730-d307ca884978') },
+  'giao-tiep-thuyet-trinh': { icon: 'users', gradient: 'from-accent to-accent-dark', image: photo('1475721027785-f74eccf877e2') },
+  'lanh-dao-quan-ly': { icon: 'users', gradient: 'from-ink to-accent-dark', image: photo('1552664730-d307ca884978') },
+  'phat-trien-ban-than': { icon: 'brain', gradient: 'from-success to-accent', image: photo('1506784983877-45594efa4cbe') },
   'phat-trien-game': { icon: 'game', gradient: 'from-ink to-success', image: photo('1542751371-adc38448a05e') },
 };
 

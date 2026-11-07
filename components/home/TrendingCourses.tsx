@@ -1,25 +1,23 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
 import type { CSSProperties } from 'react';
 import { useTranslations } from 'next-intl';
 import { CourseCard } from '@/components/course/CourseCard';
-import { Chip } from '@/components/ui/Chip';
 import { Skeleton } from '@/components/ui/Skeleton';
-import { useCategories } from '@/hooks/useCategories';
 import { useMyEnrollments } from '@/hooks/useEnrollments';
 import { useReveal } from '@/hooks/useReveal';
 import { useTrendingCourses } from '@/hooks/useTrendingCourses';
 import { TRENDING_LIMIT, pickTrending } from '@/lib/home/trending';
 import type { CourseSummary } from '@/types/domain';
 
-/** Hàng "Đang thịnh hành" (spec mục 4): chip lọc danh mục + lưới 4 thẻ, xuất hiện lần lượt khi cuộn tới. */
+/**
+ * Hàng "Đang thịnh hành" (spec mục 4): lưới 4 thẻ, xuất hiện lần lượt khi cuộn tới.
+ * Không còn chip lọc danh mục — trang chủ đã có các kệ theo danh mục bên dưới, thêm chip ở đây làm rối.
+ */
 export function TrendingCourses({ initialCourses }: { initialCourses: CourseSummary[] }) {
   const t = useTranslations('home.trending');
-  const [slug, setSlug] = useState<string | null>(null);
-  const { data: categories } = useCategories();
-  const { data: courses, isLoading } = useTrendingCourses(slug, initialCourses);
+  const { data: courses, isLoading } = useTrendingCourses(null, initialCourses);
   const { data: enrollments } = useMyEnrollments();
   const [ref, shown] = useReveal<HTMLDivElement>();
 
@@ -31,19 +29,9 @@ export function TrendingCourses({ initialCourses }: { initialCourses: CourseSumm
       <div className="shell py-10">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <h2 className="m-0 font-display text-lg font-semibold text-ink">{t('title')}</h2>
-          <div className="flex flex-wrap items-center gap-1.5">
-            <Chip active={slug === null} onClick={() => setSlug(null)}>
-              {t('all')}
-            </Chip>
-            {(categories ?? []).map((c) => (
-              <Chip key={c.id} active={slug === c.slug} onClick={() => setSlug(c.slug)}>
-                {c.name}
-              </Chip>
-            ))}
-            <Link href="/courses" className="ml-2 text-sm font-semibold text-accent-dark no-underline hover:underline">
-              {t('viewAll')} →
-            </Link>
-          </div>
+          <Link href="/courses" className="text-sm font-semibold text-accent-dark no-underline hover:underline">
+            {t('viewAll')} →
+          </Link>
         </div>
 
         {isLoading ? (

@@ -72,8 +72,10 @@
       "allCourses": "全部课程",
       "categories": "分类",
       "more": "更多",
-      "liveNow": "直播中"
+      "liveNow": "直播中",
+      "groups": { "it": "信息技术", "soft": "软技能", "other": "其他领域" }
     },
+    "theme": { "toDark": "切换到深色模式", "toLight": "切换到浅色模式", "label": "外观", "dark": "深色", "light": "浅色" },
     "skipToContent": "跳到主要内容"
   },
   "footer": {

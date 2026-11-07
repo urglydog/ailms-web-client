@@ -72,8 +72,10 @@
       "allCourses": "すべての講座",
       "categories": "カテゴリ",
       "more": "その他",
-      "liveNow": "配信中"
+      "liveNow": "配信中",
+      "groups": { "it": "情報技術", "soft": "ソフトスキル", "other": "その他の分野" }
     },
+    "theme": { "toDark": "ダークモードに切り替え", "toLight": "ライトモードに切り替え", "label": "表示", "dark": "ダーク", "light": "ライト" },
     "skipToContent": "本文へスキップ"
   },
   "footer": {
