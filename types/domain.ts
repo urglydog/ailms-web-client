@@ -719,6 +719,8 @@ export interface PaymentRes {
   originalAmount: number | null;
   discountAmount: number;
   couponCode: string | null;
+  /** Mã nhóm khi thanh toán giỏ hàng (null với đơn lẻ). */
+  orderGroupRef?: string | null;
 }
 
 /** Giỏ hàng (06/09/2026) — TÍNH NĂNG MỞ RỘNG, không nằm trong 49 use case đặc tả gốc. Gộp
