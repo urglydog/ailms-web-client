@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { useMutation } from '@tanstack/react-query';
 import { useStartQuiz, useSubmitQuiz, useExplainWrongAnswer, useQuizHistory, useRecordViolation, useAnalyzeProctorFrame } from '@/hooks/useQuizzes';
 import { StartRes, SubmitRes, ViolationType, quizApi } from '@/lib/api/quizzes';
+import { ApiError } from '@/lib/api/client';
 import Link from 'next/link';
 import { MarkdownRenderer } from '@/components/ui/MarkdownRenderer';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -433,9 +434,9 @@ export default function AntiCheatExamPage() {
         // vì gây race với video (xem comment ở effect "Gắn stream"), nên dừng tường minh ở đây.
         mediaStream?.getTracks().forEach(t => t.stop());
         screenStreamRef.current?.getTracks().forEach(t => t.stop());
-        const error = err as { response?: { status?: number, data?: { code?: string, message?: string } } };
-        if (error.response?.status === 410 || error.response?.data?.code === 'QUIZ_ARCHIVED') {
-          setArchivedError({ show: true, message: error.response?.data?.message || 'Bài tập này đã được giảng viên thu hồi.' });
+        const apiErr = err instanceof ApiError ? err : null;
+        if (apiErr?.status === 410 || apiErr?.code === 'QUIZ_ARCHIVED') {
+          setArchivedError({ show: true, message: apiErr.message || 'Bài tập này đã được giảng viên thu hồi.' });
           if (userId && quizId) {
             try {
               localStorage.removeItem(`exam_draft_${userId}_${quizId}`);
@@ -443,7 +444,7 @@ export default function AntiCheatExamPage() {
             } catch {}
           }
           router.replace(`/exam/${quizId}${returnUrl ? `?returnUrl=${returnUrl}` : ''}`);
-        } else if (error.response?.status === 404 || error.response?.status === 500) {
+        } else if (apiErr?.status === 404) {
           setArchivedError({ show: true, message: 'Bài tập này đã được giảng viên gỡ bỏ hoặc cập nhật. Phiên làm bài kết thúc.' });
           router.replace(`/exam/${quizId}${returnUrl ? `?returnUrl=${returnUrl}` : ''}`);
         } else {
@@ -811,11 +812,10 @@ export default function AntiCheatExamPage() {
         router.push(url);
       },
       onError: (err: unknown) => {
-        const error = err as { message?: string; response?: { data?: { message?: string; detail?: string }, status?: number } };
-        if (error.response?.status === 404 || error.response?.status === 500) {
+        if (err instanceof ApiError && (err.status === 404 || err.status === 500)) {
           toast.error('Bài tập này đã được giảng viên gỡ bỏ hoặc cập nhật.');
         } else {
-          toast.error(error.message || error.response?.data?.message || error.response?.data?.detail || 'Không thể tải bài thi.');
+          toast.error(err instanceof ApiError && err.message ? err.message : 'Không thể tải bài thi.');
         }
         if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
       }

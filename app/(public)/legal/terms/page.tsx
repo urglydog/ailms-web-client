@@ -44,7 +44,7 @@ export default function TermsPage() {
 
       <LegalSection title="3. Thanh toán & học phí">
         <p>
-          Học phí được thanh toán một lần qua VNPay hoặc PayOS. Sau khi thanh toán thành công, học
+          Học phí được thanh toán một lần qua PayOS. Sau khi thanh toán thành công, học
           viên được cấp quyền truy cập khóa học ngay lập tức và không giới hạn thời gian. Xem chi
           tiết chính sách hoàn tiền tại <Link href="/legal/refund">Chính sách hoàn tiền</Link>.
         </p>
