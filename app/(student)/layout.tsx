@@ -1,6 +1,5 @@
-import { Footer } from '@/components/layout/Footer';
-import { Header } from '@/components/layout/Header';
-import { DiscoveryChat } from '@/components/chat/DiscoveryChat';
+import { Suspense } from 'react';
+import { StudentChrome } from '@/components/layout/StudentChrome';
 
 /**
  * Layout dùng chung cho các trang cần đăng nhập (giỏ hàng, thanh toán, bài thi, tài liệu,
@@ -10,11 +9,8 @@ import { DiscoveryChat } from '@/components/chat/DiscoveryChat';
  */
 export default function StudentLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-dvh flex-col">
-      <Header />
-      <main id="main-content" tabIndex={-1} className="flex-1">{children}</main>
-      <Footer />
-      <DiscoveryChat />
-    </div>
+    <Suspense fallback={<main id="main-content" className="min-h-dvh">{children}</main>}>
+      <StudentChrome>{children}</StudentChrome>
+    </Suspense>
   );
 }

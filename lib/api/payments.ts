@@ -10,6 +10,10 @@ export const paymentsApi = {
   createBatch: (req: CreateBatchPaymentReq) =>
     api.post<PaymentUrlRes>('/api/v1/payments/create-batch', req, { token: getAccessToken() ?? undefined }),
 
+  /** Học viên hủy ở PayOS — đánh dấu đơn PENDING của chính mình thành FAILED. */
+  cancel: (orderCode: string) =>
+    api.post<{ status: string }>(`/api/v1/payments/cancel?orderCode=${encodeURIComponent(orderCode)}`, {}, { token: getAccessToken() ?? undefined }),
+
   listMine: () =>
     api.get<PaymentRes[]>('/api/v1/payments/mine', { token: getAccessToken() ?? undefined }),
 

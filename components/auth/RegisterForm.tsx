@@ -7,7 +7,6 @@ import { ApiError } from '@/lib/api/client';
 import { useRouter } from 'next/navigation';
 import { Check, Mail } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { toast } from 'sonner';
 import { MIN_ACCEPTED_SCORE, passwordStrength } from '@/lib/auth/passwordStrength';
 import { PasswordField } from './PasswordField';
 import { PasswordMatchHint, PasswordStrengthMeter } from './PasswordStrengthMeter';
@@ -76,7 +75,6 @@ export function RegisterForm() {
       { fullName: formData.fullName, email: formData.email, password: formData.password },
       {
         onSuccess: () => setStep('otp'),
-        onError: (err: unknown) => toast.error(serverMessage(err) || t('register.serverError')),
       },
     );
   };
@@ -88,7 +86,6 @@ export function RegisterForm() {
         // Tự động chuyển hướng không dùng alert block
         router.push('/login?registered=true');
       },
-      onError: (err: unknown) => toast.error(serverMessage(err) || t('register.otpInvalid')),
     });
   };
 
