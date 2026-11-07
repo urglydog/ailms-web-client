@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { toast } from 'sonner';
+import { paymentsApi } from '@/lib/api/payments';
 import Link from 'next/link';
 
 function PayosReturnContent() {
@@ -23,13 +23,13 @@ function PayosReturnContent() {
 
     if ((customStatus === 'success' || customStatus === 'PAID') && !isCancelled) {
       setStatus('success');
-      toast.success('Thanh toán thành công! Hệ thống đang xử lý ghi danh.');
       
       // Ở đây LUÔN KHÔNG GỌI /ipn-mock vì chúng ta phải tuân thủ nguyên tắc chạy thật.
       // Database sẽ được update khi Backend nhận được webhook thực sự từ PayOS.
     } else {
       setStatus('error');
-      toast.error('Thanh toán thất bại hoặc bị hủy!');
+      // Báo BE đánh dấu đơn PENDING của chính mình là FAILED (best-effort — lỗi không chặn UI).
+      paymentsApi.cancel(orderCode).catch(() => {});
     }
   }, [searchParams]);
 

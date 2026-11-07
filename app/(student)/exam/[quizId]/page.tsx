@@ -108,6 +108,11 @@ export default function AntiCheatExamPage() {
   // UC-ANTICHEAT (1.7) — video bằng chứng: ghép màn hình (trái) + webcam (phải) qua canvas mỗi
   // frame, MediaRecorder ghi lại stream ghép thành 1 file .webm duy nhất, upload lúc nộp bài.
   const screenStreamRef = useRef<MediaStream | null>(null);
+  // Giữ ref song song với state `mediaStream` để dọn dẹp được MỌI luồng (kể cả luồng cũ còn sót lại
+  // khi người dùng rời trang rồi quay lại) — không phụ thuộc closure/state đã cũ.
+  const mediaStreamRef = useRef<MediaStream | null>(null);
+  // Chặn `startExam` chạy chồng 2 lần (xin Camera/Mic + chia sẻ màn hình lần 2 khi vào lại trang).
+  const startExamLockRef = useRef(false);
   const screenVideoElRef = useRef<HTMLVideoElement | null>(null);
   const compositeCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const compositeRafRef = useRef<number | null>(null);
@@ -332,6 +337,13 @@ export default function AntiCheatExamPage() {
     }
   }, []);
 
+  const stopAllMedia = useCallback(() => {
+    mediaStreamRef.current?.getTracks().forEach((t) => t.stop());
+    mediaStreamRef.current = null;
+    screenStreamRef.current?.getTracks().forEach((t) => t.stop());
+    screenStreamRef.current = null;
+  }, []);
+
   const stopCompositeRecording = useCallback((): Promise<{ blob: Blob; durationSec: number } | null> => {
     return new Promise((resolve) => {
       const recorder = mediaRecorderRef.current;
@@ -360,6 +372,30 @@ export default function AntiCheatExamPage() {
       recorder.stop();
     });
   }, []);
+
+  // Rời trang giữa chừng (back, đóng tab, điều hướng) → tắt hẳn Camera/Mic/chia sẻ màn hình và
+  // dừng ghi hình; trước đây các luồng này bị bỏ rơi (đèn camera sáng treo, lần vào lại xin thêm
+  // 1 bộ luồng nữa).
+  useEffect(() => {
+    return () => {
+      if (compositeRafRef.current) cancelAnimationFrame(compositeRafRef.current);
+      const recorder = mediaRecorderRef.current;
+      if (recorder && recorder.state !== 'inactive') {
+        recorder.onstop = null;
+        try { recorder.stop(); } catch {}
+      }
+      mediaStreamRef.current?.getTracks().forEach((t) => t.stop());
+      screenStreamRef.current?.getTracks().forEach((t) => t.stop());
+    };
+  }, []);
+
+  // Cảnh báo của trình duyệt khi cố đóng/tải lại tab giữa lúc đang làm bài.
+  useEffect(() => {
+    if (!isStarted || result) return;
+    const onBeforeUnload = (e: BeforeUnloadEvent) => { e.preventDefault(); e.returnValue = ''; };
+    window.addEventListener('beforeunload', onBeforeUnload);
+    return () => window.removeEventListener('beforeunload', onBeforeUnload);
+  }, [isStarted, result]);
 
   // Hàm nộp bài
   const submitExam = useCallback((_isAuto = false) => {
@@ -420,7 +456,7 @@ export default function AntiCheatExamPage() {
           } catch {}
         }
         // Dừng stream
-        if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
+        stopAllMedia();
         
         if (data && data.isArchived) {
           setArchivedError({ show: true, message: 'Bài nộp đã được lưu vào Bảng điểm. Bài thi này hiện đã được giảng viên lưu trữ.' });
@@ -432,8 +468,7 @@ export default function AntiCheatExamPage() {
         // phụ của effect "Gắn stream" (dựa vào `result`), nhưng `result` không bao giờ được set
         // ở nhánh lỗi nên camera/mic thực ra bị rò rỉ (đèn camera sáng treo). Effect đó đã bị bỏ
         // vì gây race với video (xem comment ở effect "Gắn stream"), nên dừng tường minh ở đây.
-        mediaStream?.getTracks().forEach(t => t.stop());
-        screenStreamRef.current?.getTracks().forEach(t => t.stop());
+        stopAllMedia();
         const apiErr = err instanceof ApiError ? err : null;
         if (apiErr?.status === 410 || apiErr?.code === 'QUIZ_ARCHIVED') {
           setArchivedError({ show: true, message: apiErr.message || 'Bài tập này đã được giảng viên thu hồi.' });
@@ -453,7 +488,7 @@ export default function AntiCheatExamPage() {
         setIsSubmitting(false);
       }
     });
-  }, [attemptData, answers, isSubmitting, submitQuiz, mediaStream, userId, quizId, router, returnUrl, stopCompositeRecording, uploadRecordingMutation]);
+  }, [attemptData, answers, isSubmitting, submitQuiz, stopAllMedia, userId, quizId, router, returnUrl, stopCompositeRecording, uploadRecordingMutation]);
 
   // UC-ANTICHEAT (25/09/2026) — Composite Behavioral Risk Engine.
   // Hàm xử lý vi phạm DUY NHẤT (đã gộp 2 bản trùng lặp cũ) — ghi nhận SERVER-SIDE qua
@@ -779,9 +814,12 @@ export default function AntiCheatExamPage() {
 
   // Yêu cầu bật Camera + Micro (nếu proctored)
   const startExam = useCallback(async () => {
+    if (startExamLockRef.current) return;
+    startExamLockRef.current = true;
     if (isProctored) {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        mediaStreamRef.current = stream;
         setMediaStream(stream);
 
         try {
@@ -792,12 +830,14 @@ export default function AntiCheatExamPage() {
         }
       } catch {
         toast.error('Bạn phải cấp quyền sử dụng Camera & Micro để làm bài thi này!');
+        startExamLockRef.current = false;
         return;
       }
     }
 
     startQuiz(Number(quizId), {
       onSuccess: (data) => {
+        startExamLockRef.current = false;
         setAttemptData(data);
         if (!isTakingMode) {
           if (isProctored) {
@@ -817,10 +857,11 @@ export default function AntiCheatExamPage() {
         } else {
           toast.error(err instanceof ApiError && err.message ? err.message : 'Không thể tải bài thi.');
         }
-        if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
+        stopAllMedia();
+        startExamLockRef.current = false;
       }
     });
-  }, [isProctored, quizId, startQuiz, mediaStream, proctoredParam, returnUrl, router, isTakingMode]);
+  }, [isProctored, quizId, startQuiz, stopAllMedia, proctoredParam, returnUrl, router, isTakingMode]);
 
   // Cập nhật isStarted dựa trên mode=taking và attemptData
   useEffect(() => {

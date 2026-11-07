@@ -46,6 +46,14 @@ function CartCheckoutContent() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   const [payingMethod, setPayingMethod] = useState<string | null>(null);
+
+  // Bấm Back từ trang PayOS: trình duyệt khôi phục trang này từ bfcache với `payingMethod` còn
+  // nguyên → nút PayOS quay mãi, không bấm được. Reset khi trang được hiện lại.
+  useEffect(() => {
+    const onPageShow = (e: PageTransitionEvent) => { if (e.persisted) setPayingMethod(null); };
+    window.addEventListener('pageshow', onPageShow);
+    return () => window.removeEventListener('pageshow', onPageShow);
+  }, []);
   const [billingName, setBillingName] = useState('');
   const [billingPhone, setBillingPhone] = useState('');
 

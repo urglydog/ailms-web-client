@@ -48,23 +48,23 @@ export function Providers({ children }: { children: React.ReactNode }) {
           <SystemBanner />
           {children}
           <Toaster
-            position="top-center"
+            position="top-right"
             toastOptions={{
               unstyled: true,
               classNames: {
                 toast:
-                  'flex items-start gap-3 w-full rounded-card border px-4 py-3 shadow-card-hover font-sans text-sm bg-surface-raised border-line text-ink',
+                  'flex items-start gap-3 w-full rounded-none border px-4 py-3 shadow-card-hover font-sans text-sm bg-surface-raised border-line text-ink',
                 title: 'font-bold',
-                description: 'text-ink-muted text-xs mt-0.5',
-                actionButton: 'bg-accent text-white rounded-card px-2.5 py-1 text-xs font-semibold',
-                cancelButton: 'bg-surface text-ink-muted rounded-card px-2.5 py-1 text-xs font-semibold',
+                description: 'text-current opacity-90 text-xs mt-0.5',
+                actionButton: 'bg-accent text-white rounded-none px-2.5 py-1 text-xs font-semibold',
+                cancelButton: 'bg-surface text-ink-muted rounded-none px-2.5 py-1 text-xs font-semibold',
                 closeButton: 'bg-surface-raised border-line text-ink-muted hover:text-ink',
                 // 4 loại thông báo phải khác màu/rõ ràng — trước đây dùng `richColors` mặc định
                 // của sonner, cho success/warning màu pastel gần giống nhau, khó phân biệt.
-                success: 'border-success bg-success/10 text-success',
-                error: 'border-danger bg-danger/10 text-danger',
-                warning: 'border-warning bg-warning/10 text-ink',
-                info: 'border-accent bg-accent/10 text-accent',
+                success: 'border-success bg-success text-white',
+                error: 'border-danger bg-danger text-white',
+                warning: 'border-warning bg-warning text-white',
+                info: 'border-accent bg-accent text-white',
               },
             }}
           />
