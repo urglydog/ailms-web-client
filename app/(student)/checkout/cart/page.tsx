@@ -16,6 +16,7 @@ import { PayosButton } from '@/components/checkout/PayosButton';
 import { useCart } from '@/hooks/useCart';
 import { useCartBundleMatches } from '@/hooks/useCartBundleMatches';
 import { paymentsApi } from '@/lib/api/payments';
+import { rememberPayosReturn, takePayosCancelledNotice } from '@/lib/payosReturn';
 import { getReferralCodesFor } from '@/lib/referral';
 import { couponsApi } from '@/lib/api/coupons';
 import { ApiError } from '@/lib/api/client';
@@ -51,7 +52,12 @@ function CartCheckoutContent() {
   // Bấm Back từ trang PayOS: trình duyệt khôi phục trang này từ bfcache với `payingMethod` còn
   // nguyên → nút PayOS quay mãi, không bấm được. Reset khi trang được hiện lại.
   useEffect(() => {
-    const onPageShow = (e: PageTransitionEvent) => { if (e.persisted) setPayingMethod(null); };
+    const notifyCancelled = () => { if (takePayosCancelledNotice()) toast.info('Đã hủy thanh toán.'); };
+    notifyCancelled();
+    const onPageShow = (e: PageTransitionEvent) => {
+      if (e.persisted) setPayingMethod(null);
+      notifyCancelled();
+    };
     window.addEventListener('pageshow', onPageShow);
     return () => window.removeEventListener('pageshow', onPageShow);
   }, []);
@@ -154,6 +160,7 @@ function CartCheckoutContent() {
         referralCodes: getReferralCodesFor(items.map((item) => item.courseId)),
         bundleIds: bundleIds.length > 0 ? bundleIds : undefined,
       });
+      rememberPayosReturn();
       window.location.href = res.paymentUrl;
     } catch (err: unknown) {
       // Cùng bug với checkout/[slug]/page.tsx — `ApiError` không có field `.detail`, chỉ `.message`.
