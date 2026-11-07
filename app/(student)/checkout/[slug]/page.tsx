@@ -18,6 +18,7 @@ import { publicCoursesApi } from '@/lib/api/publicCourses';
 import { couponsApi } from '@/lib/api/coupons';
 import { ApiError } from '@/lib/api/client';
 import { paymentsApi } from '@/lib/api/payments';
+import { rememberPayosReturn, takePayosCancelledNotice } from '@/lib/payosReturn';
 import { getReferralCode } from '@/lib/referral';
 import type { AvailableCoupon, CourseDetail } from '@/types/domain';
 
@@ -44,7 +45,12 @@ function CheckoutPageContent() {
   // Bấm Back từ trang PayOS: trình duyệt khôi phục trang này từ bfcache với `payingMethod` còn
   // nguyên → nút PayOS quay mãi, không bấm được. Reset khi trang được hiện lại.
   useEffect(() => {
-    const onPageShow = (e: PageTransitionEvent) => { if (e.persisted) setPayingMethod(null); };
+    const notifyCancelled = () => { if (takePayosCancelledNotice()) toast.info('Đã hủy thanh toán.'); };
+    notifyCancelled();
+    const onPageShow = (e: PageTransitionEvent) => {
+      if (e.persisted) setPayingMethod(null);
+      notifyCancelled();
+    };
     window.addEventListener('pageshow', onPageShow);
     return () => window.removeEventListener('pageshow', onPageShow);
   }, []);
@@ -155,6 +161,7 @@ function CheckoutPageContent() {
         courseAccessPassword: course.requiresPassword ? courseAccessPassword : undefined,
         referralCode: getReferralCode(course.id),
       });
+      rememberPayosReturn();
       window.location.href = res.paymentUrl;
     } catch (err: unknown) {
       // BUG THẬT (25/09/2026): `ApiError` không có field `.detail` (chỉ có `.message`, xem

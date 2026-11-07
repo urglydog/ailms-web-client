@@ -414,6 +414,10 @@ export default function AntiCheatExamPage() {
       onSuccess: async (data: SubmitRes) => {
         setResult(data);
         setSubmitTime(new Date());
+        // Thoát toàn màn hình + bỏ `mode=taking` NGAY (trả lại Header/Footer) — trước đây chờ xong
+        // dừng ghi hình/upload mới điều hướng nên màn kết quả vẫn dính fullscreen + ẩn menu.
+        if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+        router.replace(`/exam/${quizId}${returnUrl ? `?returnUrl=${returnUrl}` : ''}`);
 
         // UC-ANTICHEAT (1.7) — dừng ghi hình + upload video bằng chứng TRƯỚC khi điều hướng
         // trang (router.replace bên dưới có thể unmount component, huỷ request đang bay).
@@ -461,7 +465,6 @@ export default function AntiCheatExamPage() {
         if (data && data.isArchived) {
           setArchivedError({ show: true, message: 'Bài nộp đã được lưu vào Bảng điểm. Bài thi này hiện đã được giảng viên lưu trữ.' });
         }
-        router.replace(`/exam/${quizId}${returnUrl ? `?returnUrl=${returnUrl}` : ''}`);
       },
       onError: (err: unknown) => {
         // Trước đây không có nhánh nào dừng camera/mic khi nộp bài lỗi — "ăn theo" hiệu ứng
@@ -1358,6 +1361,13 @@ export default function AntiCheatExamPage() {
 
   return (
     <div className="min-h-dvh bg-surface p-8">
+      {/* Đang nộp bài: chặn mọi thao tác (không cho đổi đáp án/chuyển trang trong lúc chờ BE). */}
+      {isSubmitting && (
+        <div role="alertdialog" aria-live="assertive" className="fixed inset-0 z-[200] flex cursor-wait flex-col items-center justify-center gap-4 bg-ink/70 text-white">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-white/30 border-t-white" />
+          <p className="text-lg font-bold">Đang nộp bài, vui lòng đợi...</p>
+        </div>
+      )}
       <div className="shell max-w-4xl mx-auto">
         <div className="flex justify-between items-center mb-8 border-b border-line pb-4">
           <div>
