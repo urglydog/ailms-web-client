@@ -106,7 +106,7 @@ function FeedList({
 
   if (error) {
     return (
-      <div className="card p-4 text-sm text-red-600">
+      <div className="card p-4 text-sm text-danger">
         {error instanceof ApiError ? error.message : 'Không tải được danh sách buổi live.'}
       </div>
     );

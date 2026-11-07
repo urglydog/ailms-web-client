@@ -18,7 +18,7 @@ function formatBytes(bytes: number) {
 function getFileVisual(fileType: string): { Icon: typeof FileText; bg: string; text: string; label: string } {
   if (fileType.includes('pdf')) return { Icon: FileText, bg: 'bg-danger/10', text: 'text-danger', label: 'PDF' };
   if (fileType.includes('word') || fileType.includes('document')) return { Icon: FileText, bg: 'bg-blue-500/10', text: 'text-blue-600', label: 'Word' };
-  if (fileType.includes('powerpoint') || fileType.includes('presentation')) return { Icon: Presentation, bg: 'bg-orange-500/10', text: 'text-orange-600', label: 'PowerPoint' };
+  if (fileType.includes('powerpoint') || fileType.includes('presentation')) return { Icon: Presentation, bg: 'bg-warning/10', text: 'text-warning', label: 'PowerPoint' };
   if (fileType.includes('zip') || fileType.includes('rar')) return { Icon: FileArchive, bg: 'bg-purple-500/10', text: 'text-purple-600', label: 'Nén' };
   return { Icon: FileIcon, bg: 'bg-surface-hover', text: 'text-ink-muted', label: fileType.split('/')[1] || fileType };
 }

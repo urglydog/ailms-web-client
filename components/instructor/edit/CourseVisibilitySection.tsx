@@ -48,19 +48,19 @@ export function CourseVisibilitySection({ courseId, course }: { courseId: number
   };
 
   return (
-    <div className="flex flex-col gap-3 border-b border-gray-100 p-6">
-      <h3 className="m-0 text-[14px] font-bold text-gray-900">Đăng ký (Quyền riêng tư)</h3>
+    <div className="flex flex-col gap-3 border-b border-line-soft p-6">
+      <h3 className="m-0 text-[14px] font-bold text-ink">Đăng ký (Quyền riêng tư)</h3>
 
       <select
         value={visibility}
         onChange={(e) => setVisibility(e.target.value as CourseVisibility)}
-        className="rounded-lg border border-gray-200 px-3 py-2 text-[13px] focus:border-cyan-400 focus:outline-none"
+        className="rounded-lg border border-line px-3 py-2 text-[13px] focus:border-accent focus:outline-none"
       >
         {VISIBILITY_OPTIONS.map((opt) => (
           <option key={opt.value} value={opt.value}>{opt.label}</option>
         ))}
       </select>
-      <p className="text-[12px] text-gray-500">
+      <p className="text-[12px] text-ink-muted">
         {VISIBILITY_OPTIONS.find((opt) => opt.value === visibility)?.helper}
       </p>
 
@@ -70,15 +70,15 @@ export function CourseVisibilitySection({ courseId, course }: { courseId: number
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder={course.hasEnrollPassword ? 'Để trống để giữ nguyên mật khẩu cũ' : 'Nhập mật khẩu đăng ký'}
-          className="rounded-lg border border-gray-200 px-3 py-2 text-[13px] focus:border-cyan-400 focus:outline-none"
+          className="rounded-lg border border-line px-3 py-2 text-[13px] focus:border-accent focus:outline-none"
         />
       )}
 
       {updateVisibility.error instanceof ApiError && (
-        <p className="text-[12px] text-red-600">{updateVisibility.error.message}</p>
+        <p className="text-[12px] text-danger">{updateVisibility.error.message}</p>
       )}
       {updateVisibility.isSuccess && (
-        <p className="text-[12px] text-green-600">Đã lưu cài đặt quyền riêng tư.</p>
+        <p className="text-[12px] text-success">Đã lưu cài đặt quyền riêng tư.</p>
       )}
 
       <button
@@ -91,8 +91,8 @@ export function CourseVisibilitySection({ courseId, course }: { courseId: number
       </button>
 
       {visibility === 'PRIVATE_INVITE' && (
-        <div className="mt-2 flex flex-col gap-2 border-t border-gray-100 pt-3">
-          <span className="text-[12.5px] font-semibold text-gray-700">Danh sách email được mời</span>
+        <div className="mt-2 flex flex-col gap-2 border-t border-line-soft pt-3">
+          <span className="text-[12.5px] font-semibold text-ink">Danh sách email được mời</span>
           <div className="flex gap-2">
             <input
               type="email"
@@ -100,7 +100,7 @@ export function CourseVisibilitySection({ courseId, course }: { courseId: number
               onChange={(e) => setInviteEmail(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleAddInvite()}
               placeholder="email@vidu.com"
-              className="flex-1 rounded-lg border border-gray-200 px-3 py-1.5 text-[12.5px] focus:border-cyan-400 focus:outline-none"
+              className="flex-1 rounded-lg border border-line px-3 py-1.5 text-[12.5px] focus:border-accent focus:outline-none"
             />
             <button
               type="button"
@@ -112,18 +112,18 @@ export function CourseVisibilitySection({ courseId, course }: { courseId: number
             </button>
           </div>
 
-          {invitesLoading && <p className="text-[12px] text-gray-400">Đang tải...</p>}
+          {invitesLoading && <p className="text-[12px] text-ink-faint">Đang tải...</p>}
           {!invitesLoading && (!invites || invites.length === 0) && (
-            <p className="text-[12px] text-gray-400">Chưa mời email nào.</p>
+            <p className="text-[12px] text-ink-faint">Chưa mời email nào.</p>
           )}
           <div className="flex flex-col gap-1">
             {invites?.map((email) => (
-              <div key={email} className="flex items-center justify-between gap-2 rounded-lg bg-gray-50 px-3 py-1.5 text-[12.5px]">
-                <span className="truncate text-gray-700">{email}</span>
+              <div key={email} className="flex items-center justify-between gap-2 rounded-lg bg-surface px-3 py-1.5 text-[12.5px]">
+                <span className="truncate text-ink">{email}</span>
                 <button
                   type="button"
                   onClick={() => removeInvite.mutate(email)}
-                  className="shrink-0 text-[11.5px] font-bold text-red-500 hover:text-red-700"
+                  className="shrink-0 text-[11.5px] font-bold text-danger hover:text-danger"
                 >
                   Xóa
                 </button>

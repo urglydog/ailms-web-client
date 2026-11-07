@@ -156,7 +156,7 @@ export default function BecomeInstructorWizard() {
 
             <div>
               <label className="mb-1.5 block text-sm font-semibold text-ink">
-                Số CCCD/CMND <span className="text-red-500">*</span>
+                Số CCCD/CMND <span className="text-danger">*</span>
               </label>
               <input
                 type="text"
@@ -167,7 +167,7 @@ export default function BecomeInstructorWizard() {
             </div>
             <div>
               <label className="mb-1.5 block text-sm font-semibold text-ink">
-                Địa chỉ thường trú <span className="text-red-500">*</span>
+                Địa chỉ thường trú <span className="text-danger">*</span>
               </label>
               <input
                 type="text"
@@ -186,7 +186,7 @@ export default function BecomeInstructorWizard() {
               <span>Tôi xác nhận đây là thông tin của chính mình và tôi sở hữu/có quyền chia sẻ nội dung khóa học sẽ đăng tải.</span>
             </label>
 
-            {submitError && <p className="text-[13px] text-red-600">{submitError}</p>}
+            {submitError && <p className="text-[13px] text-danger">{submitError}</p>}
           </div>
         )}
       </main>

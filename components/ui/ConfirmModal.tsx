@@ -29,17 +29,17 @@ export function ConfirmModal({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-3 flex items-center justify-between gap-3">
-          <h3 className="font-display text-base font-bold text-gray-900">{title}</h3>
-          <button type="button" onClick={onCancel} className="shrink-0 text-gray-400 hover:text-gray-700">
+          <h3 className="font-display text-base font-bold text-ink">{title}</h3>
+          <button type="button" onClick={onCancel} className="shrink-0 text-ink-faint hover:text-ink">
             ✕
           </button>
         </div>
-        <p className="mb-6 text-sm text-gray-600">{message}</p>
+        <p className="mb-6 text-sm text-ink-muted">{message}</p>
         <div className="flex justify-end gap-3">
           <button
             type="button"
             onClick={onCancel}
-            className="rounded-lg px-4 py-2 text-sm font-semibold text-cyan-700 hover:bg-gray-100"
+            className="rounded-lg px-4 py-2 text-sm font-semibold text-cyan-700 hover:bg-tint"
           >
             {cancelLabel}
           </button>

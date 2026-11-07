@@ -251,10 +251,10 @@ function LiveRoomContent({
         </div>
 
         {audioSelection.error instanceof ApiError && (
-          <p className="text-[12.5px] text-red-600">{audioSelection.error.message}</p>
+          <p className="text-[12.5px] text-danger">{audioSelection.error.message}</p>
         )}
         {subtitleSelection.error instanceof ApiError && (
-          <p className="text-[12.5px] text-red-600">{subtitleSelection.error.message}</p>
+          <p className="text-[12.5px] text-danger">{subtitleSelection.error.message}</p>
         )}
       </div>
       <LiveChatPanel isAuthenticated={isAuthenticated} />

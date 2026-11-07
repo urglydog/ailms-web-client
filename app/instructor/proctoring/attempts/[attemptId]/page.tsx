@@ -32,7 +32,7 @@ const AI_ANALYZED_TYPES = new Set(['NO_FACE', 'MULTIPLE_FACES', 'HEAD_TURNED', '
 
 const RISK_STYLE: Record<string, string> = {
   LOW: 'text-success border-success/30 bg-success/5',
-  MEDIUM: 'text-amber-600 border-amber-300 bg-amber-50',
+  MEDIUM: 'text-warning border-warning/40 bg-streak-bg',
   HIGH: 'text-danger border-danger/30 bg-danger/5',
 };
 

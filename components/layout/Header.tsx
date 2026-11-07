@@ -312,8 +312,8 @@ export function Header() {
                               {['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'][d.getDay()]}
                             </div>
                             <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[12px] ${
-                              isStudied ? 'bg-red-500 text-white font-bold' : 
-                              isToday ? 'border-2 border-red-200 text-ink-muted' : 'bg-surface text-ink-muted'
+                              isStudied ? 'bg-danger text-white font-bold' : 
+                              isToday ? 'border-2 border-danger/30 text-ink-muted' : 'bg-surface text-ink-muted'
                             }`}>
                               {isStudied ? '✓' : ''}
                             </div>
@@ -558,7 +558,7 @@ export function Header() {
               </button>
               <button
                 onClick={handleLogoutConfirm}
-                className="rounded-full bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 transition-colors"
+                className="rounded-full bg-danger px-4 py-2 text-sm font-semibold text-white hover:bg-danger/90 transition-colors"
               >
                 {t('logoutModal.confirm')}
               </button>

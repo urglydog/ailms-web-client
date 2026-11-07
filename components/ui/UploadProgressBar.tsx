@@ -2,7 +2,7 @@
 export function UploadProgressBar({ percent, label }: { percent: number; label: string }) {
   return (
     <div className="flex flex-col gap-1">
-      <span className="text-[11.5px] text-gray-500">
+      <span className="text-[11.5px] text-ink-muted">
         {label} {percent}%
       </span>
       <div
@@ -11,7 +11,7 @@ export function UploadProgressBar({ percent, label }: { percent: number; label: 
         aria-valuemin={0}
         aria-valuemax={100}
         aria-label={label}
-        className="h-1.5 w-full overflow-hidden rounded-full bg-gray-200"
+        className="h-1.5 w-full overflow-hidden rounded-full bg-line-soft"
       >
         <div className="h-full rounded-full bg-cyan-600 transition-[width] duration-300" style={{ width: `${percent}%` }} />
       </div>

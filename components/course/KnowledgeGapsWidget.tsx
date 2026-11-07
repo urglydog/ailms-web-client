@@ -46,10 +46,10 @@ function getGapColorTheme(errorRate: number) {
   }
   if (errorRate >= 0.4) {
     return {
-      text: 'text-amber-600',
-      bg: 'bg-amber-500',
-      border: 'border-amber-500/20',
-      lightBg: 'bg-amber-50',
+      text: 'text-warning',
+      bg: 'bg-warning',
+      border: 'border-warning/20',
+      lightBg: 'bg-streak-bg',
     };
   }
   return {

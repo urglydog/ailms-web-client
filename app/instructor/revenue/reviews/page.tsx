@@ -77,7 +77,7 @@ export default function InstructorReviewsPage() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-[220px_1fr]">
           <div className="rounded-xl border border-line bg-white p-4 shadow-sm">
             <span className="text-[11.5px] font-semibold text-ink-muted">{t('reviews.average')}</span>
-            <div className="mt-1 font-display text-[28px] font-extrabold text-amber-500">{stats.avg.toFixed(1)}/5</div>
+            <div className="mt-1 font-display text-[28px] font-extrabold text-warning">{stats.avg.toFixed(1)}/5</div>
             <span className="text-[12px] text-ink-muted">{t('reviews.count', { count: stats.total })}</span>
           </div>
           <div className="rounded-xl border border-line bg-white p-4 shadow-sm">
@@ -127,14 +127,14 @@ export default function InstructorReviewsPage() {
                   disabled={reportingId === r.id}
                   title={t('reviews.reportTitle')}
                   aria-label={t('reviews.reportTitle')}
-                  className="flex items-center gap-1 text-[11px] font-semibold text-ink-muted hover:text-red-500 disabled:opacity-50"
+                  className="flex items-center gap-1 text-[11px] font-semibold text-ink-muted hover:text-danger disabled:opacity-50"
                 >
                   <Flag size={13} />
                 </button>
               </div>
             </div>
             <div className="mb-2 flex items-center gap-2">
-              <span className="text-amber-500">{'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)}</span>
+              <span className="text-warning">{'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)}</span>
               <span className="text-[12px] text-ink-muted">{r.courseTitle}</span>
             </div>
             {r.comment && <p className="text-[13px] text-ink">{r.comment}</p>}

@@ -128,7 +128,7 @@ export function CourseCard({ course }: { course: CourseSummary }) {
             aria-label={inWishlist ? 'Bỏ khỏi danh sách yêu thích' : 'Thêm vào danh sách yêu thích'}
             aria-pressed={inWishlist}
             className={`absolute right-2.5 top-2.5 flex h-9 w-9 items-center justify-center rounded-full shadow-sm transition-colors ${
-              inWishlist ? 'bg-white text-red-500' : 'bg-white/90 text-ink-faint hover:text-red-500'
+              inWishlist ? 'bg-white text-danger' : 'bg-white/90 text-ink-faint hover:text-danger'
             }`}
           >
             {/* SVG duy nhất cho cả 2 trạng thái, chỉ đổi fill — tránh lệch hình dạng như 2 ký tự Unicode ♥/♡ cũ. */}

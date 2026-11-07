@@ -13,7 +13,7 @@ export default function CourseCurriculumPage() {
 
   return (
     <div className="flex flex-col gap-3">
-      <h2 className="m-0 font-display text-[16px] font-bold text-gray-900">Chương trình giảng dạy</h2>
+      <h2 className="m-0 font-display text-[16px] font-bold text-ink">Chương trình giảng dạy</h2>
       <ChapterEditorList courseId={course.id} courseSlug={course.slug} chapters={course.chapters} />
     </div>
   );

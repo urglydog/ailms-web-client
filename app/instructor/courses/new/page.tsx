@@ -97,13 +97,13 @@ export default function NewCoursePage() {
             <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-400 to-cyan-600 font-display text-[13px] font-bold text-white">
               L
             </span>
-            <span className="text-[13.5px] font-semibold text-gray-500">Bước {step + 1}/{TOTAL_STEPS}</span>
+            <span className="text-[13.5px] font-semibold text-ink-muted">Bước {step + 1}/{TOTAL_STEPS}</span>
           </div>
           <Link href="/instructor/courses" className="text-[13.5px] font-semibold text-cyan-700 no-underline hover:underline">
             Ra
           </Link>
         </div>
-        <div className="h-[3px] w-full bg-gray-100">
+        <div className="h-[3px] w-full bg-tint">
           <div
             className="h-full bg-cyan-600 transition-[width] duration-300"
             style={{ width: `${((step + 1) / TOTAL_STEPS) * 100}%` }}
@@ -114,8 +114,8 @@ export default function NewCoursePage() {
       <main className="flex flex-1 flex-col items-center overflow-y-auto px-4 pt-20">
         {step === 0 && (
           <div className="flex w-full max-w-lg flex-col items-center gap-2 text-center">
-            <h1 className="m-0 font-display text-2xl font-bold text-gray-900">Vậy thì sao không chọn một tựa đề tạm thời?</h1>
-            <p className="text-[13.5px] text-gray-500">
+            <h1 className="m-0 font-display text-2xl font-bold text-ink">Vậy thì sao không chọn một tựa đề tạm thời?</h1>
+            <p className="text-[13.5px] text-ink-muted">
               Không sao nếu bạn chưa nghĩ ra được tiêu đề hay ngay bây giờ. Bạn có thể thay đổi sau.
             </p>
             <input
@@ -124,20 +124,20 @@ export default function NewCoursePage() {
               onKeyDown={(e) => e.key === 'Enter' && goNext()}
               autoFocus
               placeholder="Ví dụ: Học Photoshop CS6 từ đầu"
-              className="mt-4 w-full rounded-lg border border-gray-300 px-4 py-3 text-[14px] focus:border-cyan-500 focus:outline-none"
+              className="mt-4 w-full rounded-lg border border-line px-4 py-3 text-[14px] focus:border-cyan-500 focus:outline-none"
             />
           </div>
         )}
 
         {step === 1 && (
           <div className="flex w-full max-w-lg flex-col items-center gap-2 text-center">
-            <h1 className="m-0 font-display text-2xl font-bold text-gray-900">Loại kiến thức bạn sẽ chia sẻ phù hợp nhất với danh mục nào?</h1>
-            <p className="text-[13.5px] text-gray-500">Nếu bạn không chắc chắn về danh mục phù hợp, bạn có thể thay đổi sau.</p>
+            <h1 className="m-0 font-display text-2xl font-bold text-ink">Loại kiến thức bạn sẽ chia sẻ phù hợp nhất với danh mục nào?</h1>
+            <p className="text-[13.5px] text-ink-muted">Nếu bạn không chắc chắn về danh mục phù hợp, bạn có thể thay đổi sau.</p>
             <select
               value={categoryId}
               onChange={(e) => setCategoryId(e.target.value ? Number(e.target.value) : '')}
               autoFocus
-              className="mt-4 w-full rounded-lg border border-gray-300 px-4 py-3 text-[14px] focus:border-cyan-500 focus:outline-none"
+              className="mt-4 w-full rounded-lg border border-line px-4 py-3 text-[14px] focus:border-cyan-500 focus:outline-none"
             >
               <option value="">Chọn một danh mục</option>
               {categories?.map((c) => (
@@ -149,8 +149,8 @@ export default function NewCoursePage() {
 
         {step === 2 && (
           <div className="flex w-full max-w-lg flex-col items-center gap-2 text-center">
-            <h1 className="m-0 font-display text-2xl font-bold text-gray-900">Mỗi tuần bạn có thể dành bao nhiêu thời gian để tạo khóa học của mình?</h1>
-            <p className="text-[13.5px] text-gray-500">
+            <h1 className="m-0 font-display text-2xl font-bold text-ink">Mỗi tuần bạn có thể dành bao nhiêu thời gian để tạo khóa học của mình?</h1>
+            <p className="text-[13.5px] text-ink-muted">
               Không có câu trả lời sai. Chúng tôi có thể giúp bạn đạt được mục tiêu ngay cả khi bạn không có nhiều thời gian.
             </p>
             <div className="mt-4 flex w-full flex-col gap-2.5">
@@ -158,7 +158,7 @@ export default function NewCoursePage() {
                 <label
                   key={option}
                   className={`flex cursor-pointer items-center gap-3 rounded-lg border px-4 py-3 text-left text-[13.5px] font-semibold transition-colors ${
-                    weeklyTime === option ? 'border-cyan-500 ring-1 ring-cyan-500 text-gray-900' : 'border-gray-200 text-gray-700 hover:border-gray-300'
+                    weeklyTime === option ? 'border-cyan-500 ring-1 ring-cyan-500 text-ink' : 'border-line text-ink hover:border-line'
                   }`}
                 >
                   <input
@@ -176,13 +176,13 @@ export default function NewCoursePage() {
         )}
 
         {createCourse.error instanceof ApiError && (
-          <div className="mt-4 w-full max-w-lg rounded-lg border border-red-200 bg-red-50 p-3 text-[12.5px] text-red-700">
+          <div className="mt-4 w-full max-w-lg rounded-lg border border-danger/30 bg-danger/5 p-3 text-[12.5px] text-danger">
             {createCourse.error.message}
           </div>
         )}
       </main>
 
-      <footer className="flex shrink-0 items-center justify-between border-t border-gray-100 px-6 py-4">
+      <footer className="flex shrink-0 items-center justify-between border-t border-line-soft px-6 py-4">
         {step > 0 ? (
           <button
             type="button"
@@ -207,36 +207,36 @@ export default function NewCoursePage() {
       {showProfileModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="flex w-full max-w-md flex-col gap-4 rounded-xl bg-white p-6 shadow-xl">
-            <h2 className="m-0 text-lg font-bold text-gray-900">Hoàn thiện hồ sơ Giảng viên</h2>
-            <p className="text-sm text-gray-600">
+            <h2 className="m-0 text-lg font-bold text-ink">Hoàn thiện hồ sơ Giảng viên</h2>
+            <p className="text-sm text-ink-muted">
               Bạn cần cập nhật chức danh nghề nghiệp và tiểu sử trước khi tạo khóa học đầu tiên.
             </p>
 
             <label className="flex flex-col gap-1.5">
-              <span className="text-[12.5px] font-semibold text-gray-600">Chức danh nghề nghiệp</span>
+              <span className="text-[12.5px] font-semibold text-ink-muted">Chức danh nghề nghiệp</span>
               <input
                 value={headline}
                 onChange={(e) => setHeadline(e.target.value)}
                 placeholder="VD: Kỹ sư phần mềm / Giảng viên tiếng Anh"
-                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-cyan-400 focus:outline-none"
+                className="w-full rounded-lg border border-line px-3 py-2 text-sm focus:border-accent focus:outline-none"
               />
             </label>
 
             <label className="flex flex-col gap-1.5">
-              <span className="text-[12.5px] font-semibold text-gray-600">Tiểu sử ngắn (tối thiểu 20 ký tự)</span>
+              <span className="text-[12.5px] font-semibold text-ink-muted">Tiểu sử ngắn (tối thiểu 20 ký tự)</span>
               <textarea
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
                 rows={4}
-                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-cyan-400 focus:outline-none"
+                className="w-full rounded-lg border border-line px-3 py-2 text-sm focus:border-accent focus:outline-none"
               />
-              <span className="text-xs text-gray-400 text-right">{bio.length}/20</span>
+              <span className="text-xs text-ink-faint text-right">{bio.length}/20</span>
             </label>
 
             <div className="mt-2 flex justify-end gap-3">
               <button
                 onClick={() => setShowProfileModal(false)}
-                className="rounded-full px-4 py-2 text-[13px] font-bold text-gray-600 hover:bg-gray-100"
+                className="rounded-full px-4 py-2 text-[13px] font-bold text-ink-muted hover:bg-tint"
               >
                 Hủy bỏ
               </button>

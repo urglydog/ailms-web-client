@@ -63,7 +63,7 @@ export function PipelineProgress({ steps, percent, onWatchOriginal, onCancel, is
               className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px]
                 ${
                   step.failed
-                    ? 'bg-red-500 text-white'
+                    ? 'bg-danger text-white'
                     : step.done
                       ? 'bg-success text-white'
                       : step.active
@@ -80,7 +80,7 @@ export function PipelineProgress({ steps, percent, onWatchOriginal, onCancel, is
             <span
               className={`text-[13px] ${
                 step.failed
-                  ? 'text-red-600'
+                  ? 'text-danger'
                   : step.done
                     ? 'text-ink-faint'
                     : step.active
@@ -107,7 +107,7 @@ export function PipelineProgress({ steps, percent, onWatchOriginal, onCancel, is
           type="button"
           onClick={onCancel}
           disabled={isCancelling}
-          className="text-[13px] font-medium text-red-600 underline-offset-4 hover:underline disabled:cursor-not-allowed disabled:opacity-50"
+          className="text-[13px] font-medium text-danger underline-offset-4 hover:underline disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isCancelling ? 'Đang huỷ...' : 'Huỷ lồng tiếng'}
         </button>

@@ -179,7 +179,7 @@ function WishlistHeartButton({
       aria-label={inWishlist ? t('wishlistRemove') : t('wishlistAdd')}
       aria-pressed={inWishlist}
       className={`flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-full border-2 transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
-        inWishlist ? 'border-red-500 bg-red-50 text-red-500' : 'border-accent bg-white text-accent hover:bg-accent/5'
+        inWishlist ? 'border-danger bg-danger/5 text-danger' : 'border-accent bg-white text-accent hover:bg-accent/5'
       }`}
     >
       <svg width="20" height="20" viewBox="0 0 24 24" fill={inWishlist ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

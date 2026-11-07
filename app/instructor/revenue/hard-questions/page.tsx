@@ -13,7 +13,7 @@ type SortBy = 'wrongRate' | 'totalAnswers';
 const PAGE_SIZE = 10;
 
 function severityColor(percent: number): string {
-  return percent >= 80 ? 'bg-red-500' : 'bg-amber-500';
+  return percent >= 80 ? 'bg-danger' : 'bg-warning';
 }
 
 /** "Hiệu suất" > Câu hỏi khó (29/09/2026, xây mới; 30/09/2026 viết lại — bỏ BarChart ngang, đổi
@@ -130,7 +130,7 @@ export default function HardQuestionsPage() {
                 <div className="h-2 w-16 overflow-hidden rounded-full bg-line-soft">
                   <div className={`h-full rounded-full ${severityColor(row.wrongRatePercent)}`} style={{ width: `${row.wrongRatePercent}%` }} />
                 </div>
-                <span className={`text-[12px] font-bold ${row.wrongRatePercent >= 80 ? 'text-danger' : 'text-amber-600'}`}>
+                <span className={`text-[12px] font-bold ${row.wrongRatePercent >= 80 ? 'text-danger' : 'text-warning'}`}>
                   {row.wrongRatePercent.toFixed(0)}%
                 </span>
               </div>
