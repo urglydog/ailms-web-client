@@ -687,6 +687,9 @@ export interface CreatePaymentReq {
   /** Mã giảm giá học viên tự nhập (15/09/2026, mở rộng) — bỏ trống nếu không dùng mã (coupon
    * autoApply vẫn được xét dù không nhập gì, xem BR-COUPON-01/04). */
   couponCode?: string;
+  /** Coupon học viên tự chọn trong danh sách ở trang thanh toán (cần `manualCoupon: true`). */
+  couponId?: number;
+  manualCoupon?: boolean;
   /** "Đăng ký (Quyền riêng tư)" kiểu Udemy (19/09/2026) — chỉ cần khi khóa học ở chế độ
    * PRIVATE_PASSWORD (`CourseDetail.requiresPassword`), bỏ qua với mọi khóa khác. */
   courseAccessPassword?: string;
@@ -730,6 +733,8 @@ export interface CreateBatchPaymentReq {
    * toán, mỗi khóa vẫn tự tính coupon tốt nhất — có thể một khóa lại có coupon autoApply lời
    * hơn coupon nhập tay, xem `CouponService.resolveBestPrice`). */
   couponCode?: string;
+  couponId?: number;
+  manualCoupon?: boolean;
   /** Chia doanh thu 2 mức (20/09/2026) — mã giới thiệu RIÊNG cho từng khóa trong giỏ, khoá
    * theo `courseId` (xem `lib/referral.ts`). Khóa nào không có entry ở đây tính ORGANIC. */
   referralCodes?: Record<number, string>;
@@ -970,6 +975,21 @@ export interface UpdateCouponReq extends CreateCouponReq {
 export interface CouponPreviewReq {
   courseId: number;
   code?: string;
+  /** Học viên tự chọn coupon ở trang thanh toán — chỉ có hiệu lực khi `manualCoupon=true`. */
+  couponId?: number;
+  /** true = chế độ chọn thủ công: BE KHÔNG tự áp coupon autoApply. */
+  manualCoupon?: boolean;
+}
+
+/** Coupon học viên có thể chọn ở trang thanh toán (giảm nhiều nhất xếp trước). */
+export interface AvailableCoupon {
+  id: number;
+  discountType: 'PERCENTAGE' | 'FIXED_AMOUNT';
+  discountValue: number;
+  scopeType: string;
+  endAt: string;
+  savings: number;
+  applicableCourseIds: number[];
 }
 
 export interface CouponPriceRes {

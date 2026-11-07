@@ -510,7 +510,14 @@
       "invalidOne": "This code does not apply to this course.",
       "applied": "Discount code applied.",
       "failed": "Could not apply the code, please try again later.",
-      "selectOne": "Select at least one course to apply a discount code."
+      "selectOne": "Select at least one course to apply a discount code.",
+      "pickerTitle": "Offers for you",
+      "pickerNone": "Don't use an offer",
+      "pickerPercent": "{value}% off",
+      "pickerFixed": "{value} off",
+      "pickerSave": "Save {amount}",
+      "pickerExpires": "Ends {date}",
+      "pickerLoading": "Loading offers..."
     },
     "summary": {
       "title": "Order summary",
