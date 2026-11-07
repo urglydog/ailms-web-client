@@ -44,33 +44,33 @@ export function LessonAssignmentPanel({ lessonId }: { lessonId: number }) {
     <div
       draggable={false}
       onDragStart={(e) => e.stopPropagation()}
-      className="mt-2 flex flex-col gap-3 rounded-lg border border-gray-200 bg-gray-50/60 p-3"
+      className="mt-2 flex flex-col gap-3 rounded-lg border border-line bg-surface/60 p-3"
     >
-      <h4 className="text-[12.5px] font-bold text-gray-800">Bài tập</h4>
-      <p className="text-[11.5px] leading-relaxed text-gray-400">
+      <h4 className="text-[12.5px] font-bold text-ink">Bài tập</h4>
+      <p className="text-[11.5px] leading-relaxed text-ink-faint">
         Bài tập tự luận/nộp file cho bài giảng này — bạn chấm điểm và phản hồi thủ công ở mục
         &quot;Giao tiếp &gt; Bài tập&quot;.
       </p>
 
-      {isLoading && <p className="text-[12px] text-gray-400">Đang tải...</p>}
+      {isLoading && <p className="text-[12px] text-ink-faint">Đang tải...</p>}
 
       <div className="flex flex-col gap-1.5">
         {assignments?.map((a) => (
           <div key={a.id} className="flex items-center justify-between gap-2 rounded-lg bg-white px-3 py-1.5 text-[12.5px]">
-            <span className="min-w-0 flex-1 truncate text-gray-700">📝 {a.title}</span>
-            <span className="shrink-0 text-gray-400">{a.submissionCount} bài nộp</span>
+            <span className="min-w-0 flex-1 truncate text-ink">📝 {a.title}</span>
+            <span className="shrink-0 text-ink-faint">{a.submissionCount} bài nộp</span>
             <button
               type="button"
               draggable={false}
               onClick={() => deleteAssignment.mutate(a.id)}
-              className="shrink-0 text-[11.5px] font-bold text-red-500 hover:text-red-700"
+              className="shrink-0 text-[11.5px] font-bold text-danger hover:text-danger"
             >
               Xóa
             </button>
           </div>
         ))}
         {assignments?.length === 0 && !isLoading && (
-          <p className="text-[12px] text-gray-400">Chưa có bài tập nào.</p>
+          <p className="text-[12px] text-ink-faint">Chưa có bài tập nào.</p>
         )}
       </div>
 
@@ -90,7 +90,7 @@ export function LessonAssignmentPanel({ lessonId }: { lessonId: number }) {
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Tiêu đề bài tập"
             draggable={false}
-            className="rounded-lg border border-gray-200 px-3 py-1.5 text-[12.5px] focus:border-cyan-400 focus:outline-none"
+            className="rounded-lg border border-line px-3 py-1.5 text-[12.5px] focus:border-accent focus:outline-none"
           />
           <textarea
             value={instructions}
@@ -98,7 +98,7 @@ export function LessonAssignmentPanel({ lessonId }: { lessonId: number }) {
             rows={2}
             placeholder="Hướng dẫn làm bài..."
             draggable={false}
-            className="resize-none rounded-lg border border-gray-200 px-3 py-1.5 text-[12.5px] focus:border-cyan-400 focus:outline-none"
+            className="resize-none rounded-lg border border-line px-3 py-1.5 text-[12.5px] focus:border-accent focus:outline-none"
           />
           <div className="flex gap-2">
             <input
@@ -106,7 +106,7 @@ export function LessonAssignmentPanel({ lessonId }: { lessonId: number }) {
               value={dueDate}
               onChange={(e) => setDueDate(e.target.value)}
               draggable={false}
-              className="flex-1 rounded-lg border border-gray-200 px-3 py-1.5 text-[12.5px] focus:border-cyan-400 focus:outline-none"
+              className="flex-1 rounded-lg border border-line px-3 py-1.5 text-[12.5px] focus:border-accent focus:outline-none"
             />
             <input
               type="number"
@@ -114,7 +114,7 @@ export function LessonAssignmentPanel({ lessonId }: { lessonId: number }) {
               onChange={(e) => setMaxScore(e.target.value)}
               placeholder="Điểm tối đa"
               draggable={false}
-              className="w-28 rounded-lg border border-gray-200 px-3 py-1.5 text-[12.5px] focus:border-cyan-400 focus:outline-none"
+              className="w-28 rounded-lg border border-line px-3 py-1.5 text-[12.5px] focus:border-accent focus:outline-none"
             />
           </div>
           <div className="flex justify-end gap-2">
@@ -122,7 +122,7 @@ export function LessonAssignmentPanel({ lessonId }: { lessonId: number }) {
               type="button"
               draggable={false}
               onClick={() => setShowForm(false)}
-              className="rounded-lg px-3 py-1.5 text-[12px] font-semibold text-gray-500 hover:bg-gray-100"
+              className="rounded-lg px-3 py-1.5 text-[12px] font-semibold text-ink-muted hover:bg-tint"
             >
               Hủy bỏ
             </button>

@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { useRegister, useVerifyOtp } from '@/hooks/useAuthMutations';
+import { ApiError } from '@/lib/api/client';
 import { useRouter } from 'next/navigation';
 import { Check, Mail } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -11,11 +12,7 @@ import { MIN_ACCEPTED_SCORE, passwordStrength } from '@/lib/auth/passwordStrengt
 import { PasswordField } from './PasswordField';
 import { PasswordMatchHint, PasswordStrengthMeter } from './PasswordStrengthMeter';
 
-type ApiErr = { response?: { data?: { detail?: string; message?: string } } };
-const serverMessage = (err: unknown) => {
-  const data = (err as ApiErr | null)?.response?.data;
-  return data?.detail || data?.message;
-};
+const serverMessage = (err: unknown) => (err instanceof ApiError ? err.message || undefined : undefined);
 
 /** Thanh tiến trình 2 bước Đăng ký → Xác thực OTP — thuần hiển thị. */
 function StepIndicator({ step }: { step: 'register' | 'otp' }) {

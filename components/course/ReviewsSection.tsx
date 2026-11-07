@@ -70,7 +70,7 @@ export function ReviewsSection({ courseId }: { courseId: number }) {
                        placeholder:text-ink-faint focus:border-accent focus:outline-none"
           />
           {createReview.error instanceof ApiError && (
-            <p className="text-sm text-red-600">{createReview.error.message}</p>
+            <p className="text-sm text-danger">{createReview.error.message}</p>
           )}
           <button
             type="submit"

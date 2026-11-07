@@ -681,7 +681,7 @@ export interface TutorSession {
 
 export interface CreatePaymentReq {
   courseId: number;
-  paymentMethod: string; // 'PAYOS' | 'VNPAY'
+  paymentMethod: string; // 'PAYOS'
   billingName?: string;
   billingPhone?: string;
   /** Mã giảm giá học viên tự nhập (15/09/2026, mở rộng) — bỏ trống nếu không dùng mã (coupon
@@ -814,6 +814,67 @@ export interface ResolveDisputeReq {
 /** User báo "chưa nhận được tiền" sau khi admin đã đánh dấu hoàn tiền (26/10/2026). */
 export interface ReopenDisputeReq {
   reopenReason: string;
+}
+
+export type SupportCategory =
+  | 'ACCOUNT' | 'PAYMENT' | 'COURSE' | 'LEARNING' | 'AI_FEATURES' | 'EXAM' | 'CERTIFICATE'
+  | 'COMMUNITY' | 'LIVE' | 'INSTRUCTOR' | 'PRIVACY' | 'TECHNICAL' | 'OTHER';
+export type SupportStatus = 'OPEN' | 'IN_PROGRESS' | 'RESOLVED';
+
+/** Ticket hỗ trợ (05/11/2026) — khách chưa đăng nhập cũng gửi được. */
+export interface CreateSupportTicketReq {
+  email: string;
+  category: SupportCategory;
+  subject: string;
+  message: string;
+}
+
+export interface SupportTicketAdminRes {
+  id: number;
+  code: string;
+  email: string;
+  /** null nếu email chưa có tài khoản. */
+  userId: number | null;
+  /** Tên dùng trong lời chào email: họ tên nếu có tài khoản, không thì phần trước @. */
+  senderName: string;
+  category: SupportCategory;
+  subject: string;
+  message: string;
+  status: SupportStatus;
+  /** Bản text phẳng của phản hồi gần nhất. */
+  adminReply: string | null;
+  /** Nội dung email phản hồi gần nhất ở dạng có cấu trúc (placeholder chưa thay), null nếu chưa có. */
+  adminContent: SupportEmailContent | null;
+  resolvedByEmail: string | null;
+  resolvedAt: string | null;
+  createdAt: string;
+  attachments: { id: number; fileUrl: string; fileType: string }[];
+}
+
+export type SupportSectionType = 'TEXT' | 'LIST';
+
+/** 1 mục trong email phản hồi: tiêu đề tùy ý + (đoạn văn hoặc danh sách đánh số). */
+export interface SupportSection {
+  title: string;
+  type: SupportSectionType;
+  text: string | null;
+  items: string[] | null;
+}
+
+/** Toàn bộ nội dung email phản hồi Admin tự soạn; hỗ trợ placeholder {name} {code} {subject} {category}. */
+export interface SupportEmailContent {
+  greeting?: string | null;
+  intro?: string | null;
+  sections: SupportSection[];
+  closing?: string | null;
+  signatureName?: string | null;
+  signatureTeam?: string | null;
+  includeOriginal?: boolean | null;
+}
+
+export interface UpdateSupportTicketReq {
+  status: SupportStatus;
+  content?: SupportEmailContent;
 }
 
 /** Link reset mật khẩu Admin tự gửi thủ công cho user (23/10/2026). */

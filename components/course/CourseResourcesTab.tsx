@@ -26,7 +26,7 @@ export function CourseResourcesTab({ courseId }: { courseId: number }) {
   });
 
   if (isLoading) return <div className="py-10 text-center"><Spinner className="mx-auto" /></div>;
-  if (error) return <div className="py-10 text-center text-red-500">Lỗi khi tải tài nguyên khoá học.</div>;
+  if (error) return <div className="py-10 text-center text-danger">Lỗi khi tải tài nguyên khoá học.</div>;
   if (!resources || resources.length === 0) {
     return (
       <div className="py-12 text-center card bg-surface-hover border-dashed border-2">

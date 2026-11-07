@@ -139,7 +139,7 @@ export function QuizPersonalEditor({ questions, quizId }: { questions: QuizQuest
                 </button>
                 <button
                   onClick={() => handleDelete(q.id)}
-                  className="text-xs font-semibold bg-danger/10 text-danger px-3 py-1.5 rounded-card hover:bg-danger/20 border border-danger/20 transition-colors"
+                  className="text-xs font-semibold bg-danger/10 text-danger px-3 py-1.5 rounded-card hover:bg-danger/5 border border-danger/20 transition-colors"
                 >
                   Xóa
                 </button>

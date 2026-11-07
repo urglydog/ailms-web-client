@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState, useRef, type KeyboardEvent, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { CircleHelp } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { useNotification } from '@/components/providers/NotificationProvider';
@@ -312,8 +313,8 @@ export function Header() {
                               {['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'][d.getDay()]}
                             </div>
                             <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[12px] ${
-                              isStudied ? 'bg-red-500 text-white font-bold' : 
-                              isToday ? 'border-2 border-red-200 text-ink-muted' : 'bg-surface text-ink-muted'
+                              isStudied ? 'bg-danger text-white font-bold' : 
+                              isToday ? 'border-2 border-danger/30 text-ink-muted' : 'bg-surface text-ink-muted'
                             }`}>
                               {isStudied ? '✓' : ''}
                             </div>
@@ -334,6 +335,16 @@ export function Header() {
 
             {/* Đã đăng nhập: đổi giao diện trong menu avatar; khách: nút riêng ở đây */}
             {!isLoggedIn && <ThemeToggle />}
+
+            {/* Trợ giúp & Hỗ trợ (05/11/2026) — icon "?" luôn hiện, kể cả khách chưa đăng nhập (vd quên mật khẩu) */}
+            <Link
+              href="/help"
+              aria-label={t('help')}
+              title={t('help')}
+              className="relative flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-surface text-ink hover:bg-surface-hover"
+            >
+              <CircleHelp size={17} aria-hidden />
+            </Link>
 
             {/* Wishlist Icon + dropdown xem nhanh (14/09/2026, mở rộng ngoài đặc tả gốc) */}
             <div
@@ -551,7 +562,7 @@ export function Header() {
               </button>
               <button
                 onClick={handleLogoutConfirm}
-                className="rounded-full bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 transition-colors"
+                className="rounded-full bg-danger px-4 py-2 text-sm font-semibold text-white hover:bg-danger/90 transition-colors"
               >
                 {t('logoutModal.confirm')}
               </button>

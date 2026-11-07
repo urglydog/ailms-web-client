@@ -85,7 +85,7 @@ export default function LiveControlRoomPage() {
             accept="image/jpeg,image/png,image/webp"
             onChange={handleThumbnailFileChange}
             disabled={thumbnailTask?.status === 'uploading'}
-            className="text-[12.5px] file:mr-3 file:rounded-md file:border-0 file:bg-gray-100 file:px-3 file:py-1.5 file:text-[12px] file:font-semibold"
+            className="text-[12.5px] file:mr-3 file:rounded-md file:border-0 file:bg-tint file:px-3 file:py-1.5 file:text-[12px] file:font-semibold"
           />
           {!session.thumbnailUrl && (
             <p className="mt-1 text-[11px] text-ink-muted">
@@ -106,7 +106,7 @@ export default function LiveControlRoomPage() {
         <button
           onClick={() => startLive.mutate(sessionId, { onSuccess: setLiveKit })}
           disabled={startLive.isPending}
-          className="rounded-full bg-red-600 px-6 py-2.5 text-[13.5px] font-bold text-white hover:bg-red-700 disabled:opacity-50"
+          className="rounded-full bg-danger px-6 py-2.5 text-[13.5px] font-bold text-white hover:bg-danger/90 disabled:opacity-50"
         >
           {startLive.isPending ? t('connecting') : t('start')}
         </button>
@@ -163,14 +163,14 @@ function ControlRoomBody({
         <button
           onClick={onEnd}
           disabled={isEnding}
-          className="cursor-pointer rounded-full bg-gray-900 px-5 py-2 text-[12.5px] font-bold text-white hover:bg-black disabled:opacity-50"
+          className="cursor-pointer rounded-full bg-ink px-5 py-2 text-[12.5px] font-bold text-white hover:bg-black disabled:opacity-50"
         >
           {isEnding ? t('ending') : t('end')}
         </button>
       </div>
 
       {/* Chia sẻ màn hình làm nền, camera nổi Picture-in-Picture góc dưới (BR-LIVE-03) */}
-      <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-gray-900">
+      <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-ink">
         {screenTrack ? (
           <VideoTrack trackRef={screenTrack} className="h-full w-full object-contain" />
         ) : cameraTrack ? (
@@ -234,7 +234,7 @@ function ToggleButton({
     <button
       onClick={onClick}
       className={`cursor-pointer rounded-full px-4 py-2 text-[13px] font-semibold transition-colors ${
-        active ? 'bg-accent text-white' : 'bg-line-soft text-ink-muted hover:bg-gray-200'
+        active ? 'bg-accent text-white' : 'bg-line-soft text-ink-muted hover:bg-line-soft'
       }`}
     >
       {active ? '● ' : ''}

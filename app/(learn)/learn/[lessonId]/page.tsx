@@ -735,7 +735,7 @@ function LearnPageContent() {
                   onSelectVoice={setSelectedVoiceName}
                 />
                 {activateError && (
-                  <p className="mt-3 border-t border-line-soft pt-3 text-sm text-red-600">{activateError}</p>
+                  <p className="mt-3 border-t border-line-soft pt-3 text-sm text-danger">{activateError}</p>
                 )}
               </div>
             )}
@@ -750,7 +750,7 @@ function LearnPageContent() {
                   isCancelling={cancelDubbing.isPending}
                 />
                 {jobError && (
-                  <p className="mt-3 border-t border-line-soft pt-3 text-sm text-red-600">{jobError}</p>
+                  <p className="mt-3 border-t border-line-soft pt-3 text-sm text-danger">{jobError}</p>
                 )}
               </div>
             )}

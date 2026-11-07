@@ -76,7 +76,8 @@
       "groups": { "it": "信息技术", "soft": "软技能", "other": "其他领域" }
     },
     "theme": { "toDark": "切换到深色模式", "toLight": "切换到浅色模式", "label": "外观", "dark": "深色", "light": "浅色" },
-    "skipToContent": "跳到主要内容"
+    "skipToContent": "跳到主要内容",
+    "help": "Help & Support"
   },
   "footer": {
     "tagline": "学术级在线学习与考试管理系统。",
@@ -677,7 +678,9 @@
       "submit": "Reset password",
       "submitting": "Processing...",
       "success": "Password changed successfully! Please log in again.",
-      "genericError": "This link has expired or is invalid."
+      "genericError": "This link has expired or is invalid.",
+      "confirmPassword": "Confirm password",
+      "mismatch": "Passwords do not match."
     }
   },
   "community": {
@@ -1297,7 +1300,8 @@
       "coupons": "优惠券",
       "announcements": "系统公告",
       "settings": "系统设置",
-      "disputes": "Payment disputes"
+      "disputes": "Payment disputes",
+      "support": "Support requests"
     },
     "shell": {
       "brand": "LinguaLearn",
@@ -1367,7 +1371,8 @@
         "createdAt": "创建时间",
         "role": "角色",
         "status": "状态",
-        "actions": "操作"
+        "actions": "操作",
+        "authProvider": "Sign-in method"
       },
       "role": {
         "STUDENT": "学员",
@@ -1405,7 +1410,8 @@
         "prev": "上一页",
         "next": "下一页",
         "page": "第 {page} / {total} 页"
-      }
+      },
+      "authLocal": "Email"
     },
     "moderation": {
       "title": "课程审核",
@@ -1971,12 +1977,1159 @@
       },
       "resetLink": {
         "title": "Password reset assistance",
-        "hint": "Use when a user forgot their password but isn't receiving the email/OTP — generates a separate link (expires in 30 minutes) for you to send through another channel.",
-        "generate": "Generate reset link",
+        "hint": "Use when a user forgot their password but isn't receiving the OTP — the system emails the link (expires in 30 minutes) to the user. The link is also shown below so you can send it manually if the email doesn't arrive or lands in spam.",
+        "generate": "Generate & email reset link",
         "generating": "Generating...",
         "copy": "Copy link",
-        "expiresAt": "Expires at {time}"
+        "expiresAt": "Expires at {time}",
+        "sent": "Reset link emailed to the user",
+        "googleBlocked": "This account signs in with Google and has no password to reset."
+      }
+    },
+    "support": {
+      "title": "Support requests",
+      "subtitle": "Requests from users (including signed-out visitors). Replies are emailed to the sender.",
+      "filters": {
+        "status": "Status",
+        "all": "All"
+      },
+      "status": {
+        "OPEN": "Open",
+        "IN_PROGRESS": "In progress",
+        "RESOLVED": "Resolved"
+      },
+      "category": {
+        "ACCOUNT": "Account & sign-in",
+        "PAYMENT": "Payments & refunds",
+        "COURSE": "Courses & content",
+        "LEARNING": "Learning: quizzes, flashcards, materials",
+        "AI_FEATURES": "AI features",
+        "EXAM": "Exams & proctoring",
+        "CERTIFICATE": "Certificates",
+        "COMMUNITY": "Community & reviews",
+        "LIVE": "Live sessions",
+        "INSTRUCTOR": "For instructors",
+        "PRIVACY": "Privacy & data",
+        "TECHNICAL": "Technical issues",
+        "OTHER": "Other"
+      },
+      "cols": {
+        "code": "Code",
+        "sender": "Sender",
+        "subject": "Subject",
+        "category": "Topic",
+        "status": "Status",
+        "time": "Time",
+        "actions": "Actions"
+      },
+      "empty": "No support requests yet.",
+      "loadError": "Couldn't load support requests.",
+      "view": "View",
+      "detail": {
+        "close": "Close",
+        "message": "Message",
+        "attachments": "Screenshots",
+        "noAttachments": "No attachments.",
+        "status": "Status",
+        "save": "Save & send reply",
+        "saving": "Saving...",
+        "saved": "Request updated.",
+        "error": "Couldn't update the request.",
+        "openUser": "Open user page",
+        "noUser": "No account uses this email",
+        "previousReply": "Previous reply",
+        "template": "Reply template",
+        "templatePh": "Pick a template to pre-fill...",
+        "previewTitle": "Preview of the email sent to the user",
+        "replyRequired": "Write at least one section with content before saving.",
+        "form": "Compose reply email",
+        "greetingLabel": "Greeting",
+        "introLabel": "Opening line",
+        "sectionsLabel": "Content sections",
+        "sectionTitle": "Section title",
+        "sectionTitlePh": "e.g. Steps to follow",
+        "typeText": "Paragraph",
+        "typeList": "Numbered list",
+        "sectionText": "Content",
+        "itemPh": "Line {n} text...",
+        "addItem": "Add line",
+        "removeItem": "Remove line",
+        "addSection": "Add section",
+        "removeSection": "Remove section",
+        "moveUp": "Move up",
+        "moveDown": "Move down",
+        "maxSections": "Up to 8 sections.",
+        "maxItems": "Up to 10 lines.",
+        "closingLabel": "Closing",
+        "signatureNameLabel": "Signed by",
+        "teamLabel": "Team",
+        "includeOriginal": "Include the original request in the email",
+        "placeholderHint": "You can use {name}, {code}, {subject}, {category} in any field — they are filled in when sent.",
+        "defaults": {
+          "greeting": "Dear {name},",
+          "intro": "Regarding support request {code}, here is our response.",
+          "closing": "Best regards,",
+          "team": "LinguaLearn Support Team"
+        },
+        "typeLabel": "Section content type",
+        "preview": {
+          "empty": "(No reply content yet)",
+          "original": "Original request",
+          "code": "Request code",
+          "category": "Topic",
+          "subject": "Subject",
+          "status": "Status",
+          "footer": "Automated email from the LinguaLearn support system, please do not reply directly."
+        },
+        "templates": {
+          "received": {
+            "label": "General · Request received",
+            "status": "IN_PROGRESS",
+            "sections": [
+              {
+                "title": "Request status",
+                "type": "TEXT",
+                "text": "We have received your request and are working on it. You will get the result by email within 24 working hours."
+              }
+            ]
+          },
+          "needMoreInfo": {
+            "label": "General · More information needed",
+            "status": "IN_PROGRESS",
+            "sections": [
+              {
+                "title": "We need more information",
+                "type": "TEXT",
+                "text": "To handle your request we need you to provide a bit more information below."
+              },
+              {
+                "title": "Please provide",
+                "type": "LIST",
+                "items": [
+                  "The exact steps that lead to the problem.",
+                  "A screenshot of the error (if any).",
+                  "The device and browser you are using."
+                ]
+              },
+              {
+                "title": "How to send it",
+                "type": "TEXT",
+                "text": "Please submit a new request in the Help Center quoting the request code so we can continue."
+              }
+            ]
+          },
+          "resolved": {
+            "label": "General · Resolved",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Outcome",
+                "type": "TEXT",
+                "text": "Your request has been resolved. Thank you for your patience."
+              }
+            ]
+          },
+          "cannotReproduce": {
+            "label": "General · Cannot reproduce",
+            "status": "IN_PROGRESS",
+            "sections": [
+              {
+                "title": "Findings",
+                "type": "TEXT",
+                "text": "Our technical team checked but could not reproduce the problem you described."
+              },
+              {
+                "title": "You can try",
+                "type": "LIST",
+                "items": [
+                  "Reload and clear your browser cache.",
+                  "Try another browser or device.",
+                  "If it persists, send a screenshot or a screen recording of the steps."
+                ]
+              }
+            ]
+          },
+          "duplicate": {
+            "label": "General · Duplicate request",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Notice",
+                "type": "TEXT",
+                "text": "This request duplicates an earlier one from you, so we are handling them together. Please follow the reply on the original request."
+              }
+            ]
+          },
+          "outOfScope": {
+            "label": "General · Out of scope",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Scope of support",
+                "type": "TEXT",
+                "text": "Unfortunately the matter you raised is outside what the platform can support, so we can't handle it directly."
+              },
+              {
+                "title": "Suggestion",
+                "type": "TEXT",
+                "text": "You can contact the relevant party or send feedback so we can consider improving in the future."
+              }
+            ]
+          },
+          "feedbackThanks": {
+            "label": "General · Thanks for the feedback",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Thank you",
+                "type": "TEXT",
+                "text": "Thank you for taking the time to share feedback. We have logged it and passed it to the product team for upcoming updates."
+              }
+            ]
+          },
+          "resetPassword": {
+            "label": "Account · Password reset instructions",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Outcome",
+                "type": "TEXT",
+                "text": "An administrator verified your request and sent a password reset link to your email separately."
+              },
+              {
+                "title": "Steps to follow",
+                "type": "LIST",
+                "items": [
+                  "Open the email titled \"Reset password - LinguaLearn\" (also check Spam).",
+                  "Click \"Reset password\". The link is valid for 30 minutes and can be used once.",
+                  "Enter your new password twice to confirm.",
+                  "Return to Sign in and use your new password."
+                ]
+              }
+            ]
+          },
+          "googleAccount": {
+            "label": "Account · Google sign-in",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Findings",
+                "type": "TEXT",
+                "text": "Your account was registered with Google, so it has no separate password to reset."
+              },
+              {
+                "title": "How to sign in",
+                "type": "LIST",
+                "items": [
+                  "Open the Sign in page.",
+                  "Click \"Sign in with Google\".",
+                  "Choose the Google account you registered with."
+                ]
+              }
+            ]
+          },
+          "accountLocked": {
+            "label": "Account · Locked account under review",
+            "status": "IN_PROGRESS",
+            "sections": [
+              {
+                "title": "Status",
+                "type": "TEXT",
+                "text": "We received your request about the locked account and are reviewing its activity."
+              },
+              {
+                "title": "What we need from you",
+                "type": "LIST",
+                "items": [
+                  "The email of the locked account.",
+                  "When you noticed the account was locked.",
+                  "A short explanation of your recent activity."
+                ]
+              }
+            ]
+          },
+          "paymentActivated": {
+            "label": "Payment · Course activated",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Reconciliation result",
+                "type": "TEXT",
+                "text": "We reconciled and confirmed your transaction, and the course has been activated for your account."
+              },
+              {
+                "title": "How to access the course",
+                "type": "LIST",
+                "items": [
+                  "Sign out and back in.",
+                  "Open \"My courses\".",
+                  "Pick the course you just bought to start learning."
+                ]
+              }
+            ]
+          },
+          "paymentNotFound": {
+            "label": "Payment · Transaction not found",
+            "status": "IN_PROGRESS",
+            "sections": [
+              {
+                "title": "Findings",
+                "type": "TEXT",
+                "text": "We could not find a transaction matching the information you provided."
+              },
+              {
+                "title": "Please resend",
+                "type": "LIST",
+                "items": [
+                  "The transaction code or transfer note.",
+                  "A screenshot of the receipt or balance change.",
+                  "The exact time of payment."
+                ]
+              }
+            ]
+          },
+          "refundGuide": {
+            "label": "Payment · How to file a refund dispute",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Refund process",
+                "type": "TEXT",
+                "text": "Refunds are handled through the transaction dispute feature so that all details and evidence are captured."
+              },
+              {
+                "title": "Steps to follow",
+                "type": "LIST",
+                "items": [
+                  "Read the Refund policy.",
+                  "Open your account menu, choose \"Request a refund\" and pick the transaction.",
+                  "Enter the reason, receiving account and attach evidence.",
+                  "Accept the policy and submit; the result will be emailed to you."
+                ]
+              }
+            ]
+          },
+          "refundNotEligible": {
+            "label": "Payment · Not eligible for refund",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Review result",
+                "type": "TEXT",
+                "text": "After review, your transaction does not meet the refund conditions of the current Refund policy."
+              },
+              {
+                "title": "Please note",
+                "type": "TEXT",
+                "text": "If you have new evidence, file a follow-up dispute and we will review it again."
+              }
+            ]
+          },
+          "couponIssue": {
+            "label": "Payment · Coupon code",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Findings",
+                "type": "TEXT",
+                "text": "We checked your coupon code and the result is below."
+              },
+              {
+                "title": "Conditions",
+                "type": "LIST",
+                "items": [
+                  "The code is within its validity period and has uses left.",
+                  "It applies to the course or bundle you chose.",
+                  "Each code can only be used the allowed number of times."
+                ]
+              }
+            ]
+          },
+          "courseAccessFixed": {
+            "label": "Course · Access restored",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Outcome",
+                "type": "TEXT",
+                "text": "We checked and restored your access to the course."
+              },
+              {
+                "title": "To apply the change",
+                "type": "LIST",
+                "items": [
+                  "Sign out and back in.",
+                  "Open \"My courses\" and pick the course."
+                ]
+              }
+            ]
+          },
+          "videoTroubleshoot": {
+            "label": "Course · Video troubleshooting",
+            "status": "IN_PROGRESS",
+            "sections": [
+              {
+                "title": "Troubleshooting",
+                "type": "LIST",
+                "items": [
+                  "Check your connection and reload the page.",
+                  "Try another browser (a current Chrome, Edge or Safari).",
+                  "Disable ad blockers for LinguaLearn.",
+                  "If it still fails, send a screenshot and the lesson name so we can check the video file."
+                ]
+              }
+            ]
+          },
+          "contentReported": {
+            "label": "Course · Content issue forwarded",
+            "status": "IN_PROGRESS",
+            "sections": [
+              {
+                "title": "Status",
+                "type": "TEXT",
+                "text": "We logged the content issue you reported and forwarded it to the instructor and moderators for review."
+              }
+            ]
+          },
+          "quizReview": {
+            "label": "Learning · Quiz answer review",
+            "status": "IN_PROGRESS",
+            "sections": [
+              {
+                "title": "Status",
+                "type": "TEXT",
+                "text": "We forwarded the question you raised to the instructor to review the answer key. If it is corrected, your result will be updated."
+              }
+            ]
+          },
+          "streakRestored": {
+            "label": "Learning · Streak restored",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Outcome",
+                "type": "TEXT",
+                "text": "We checked your study history and corrected your learning streak."
+              }
+            ]
+          },
+          "aiKnownIssue": {
+            "label": "AI · AI issue logged",
+            "status": "IN_PROGRESS",
+            "sections": [
+              {
+                "title": "Status",
+                "type": "TEXT",
+                "text": "We logged the issue with the AI feature and passed it to the technical team."
+              },
+              {
+                "title": "In the meantime",
+                "type": "LIST",
+                "items": [
+                  "Try again in a few minutes.",
+                  "Use the course materials and lectures as a reference.",
+                  "Send another screenshot if it keeps happening."
+                ]
+              }
+            ]
+          },
+          "aiLockExplained": {
+            "label": "AI · AI access lock explained",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Review result",
+                "type": "TEXT",
+                "text": "AI access on your account was restricted because it had been flagged for violations or spam. We reviewed your request."
+              },
+              {
+                "title": "You can",
+                "type": "LIST",
+                "items": [
+                  "Keep using all other learning features.",
+                  "Send more details if you believe the flag was a mistake."
+                ]
+              }
+            ]
+          },
+          "examIncident": {
+            "label": "Exam · Incident logged",
+            "status": "IN_PROGRESS",
+            "sections": [
+              {
+                "title": "Status",
+                "type": "TEXT",
+                "text": "We logged the incident during your exam and passed it to the responsible instructor, who will decide the appropriate action."
+              },
+              {
+                "title": "In the meantime",
+                "type": "LIST",
+                "items": [
+                  "Keep any screenshots and error messages.",
+                  "Do not retake the exam until the instructor advises."
+                ]
+              }
+            ]
+          },
+          "proctorFalseFlag": {
+            "label": "Exam · Proctoring flag review",
+            "status": "IN_PROGRESS",
+            "sections": [
+              {
+                "title": "Status",
+                "type": "TEXT",
+                "text": "We received your request to review the proctoring warnings on your exam and forwarded it to the instructor to check the proctoring images."
+              }
+            ]
+          },
+          "certificateIssued": {
+            "label": "Certificate · Issued",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Findings",
+                "type": "TEXT",
+                "text": "We checked your progress and issued the certificate for your course."
+              },
+              {
+                "title": "How to view and download",
+                "type": "LIST",
+                "items": [
+                  "Open your profile, Certificates section.",
+                  "Pick the course certificate.",
+                  "Click download to save the PDF."
+                ]
+              }
+            ]
+          },
+          "certificateIncomplete": {
+            "label": "Certificate · Not yet eligible",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Findings",
+                "type": "TEXT",
+                "text": "Your course isn't eligible for a certificate yet because some content is incomplete."
+              },
+              {
+                "title": "To complete",
+                "type": "LIST",
+                "items": [
+                  "The remaining lessons in the course.",
+                  "The mandatory quizzes/tests of the course."
+                ]
+              }
+            ]
+          },
+          "communityReport": {
+            "label": "Community · Report received",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Outcome",
+                "type": "TEXT",
+                "text": "Thank you for reporting. Moderators reviewed the content and took appropriate action under the community rules."
+              },
+              {
+                "title": "If it happens again",
+                "type": "TEXT",
+                "text": "Please send another request with new screenshots so we can act faster."
+              }
+            ]
+          },
+          "reviewHidden": {
+            "label": "Community · Review hidden",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Review result",
+                "type": "TEXT",
+                "text": "Your review was hidden because it doesn't comply with the platform's content rules."
+              },
+              {
+                "title": "You can",
+                "type": "LIST",
+                "items": [
+                  "Edit it into constructive feedback without offensive language.",
+                  "Post the review again after editing."
+                ]
+              }
+            ]
+          },
+          "liveIssue": {
+            "label": "Live · Live session issue logged",
+            "status": "IN_PROGRESS",
+            "sections": [
+              {
+                "title": "Status",
+                "type": "TEXT",
+                "text": "We logged the issue in the live session and are checking with the instructor."
+              },
+              {
+                "title": "You can try",
+                "type": "LIST",
+                "items": [
+                  "Reload and rejoin the session.",
+                  "Check your network and prefer a stable connection.",
+                  "Watch the recording later if the instructor publishes one."
+                ]
+              }
+            ]
+          },
+          "instructorRejected": {
+            "label": "Instructor · After a course rejection",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Outcome",
+                "type": "TEXT",
+                "text": "Your course was not approved. The specific reason appears on your course management page."
+              },
+              {
+                "title": "How to fix and resubmit",
+                "type": "LIST",
+                "items": [
+                  "Read the moderators' feedback carefully.",
+                  "Edit the content accordingly.",
+                  "Resubmit the course for review."
+                ]
+              }
+            ]
+          },
+          "instructorPayout": {
+            "label": "Instructor · Revenue reconciliation",
+            "status": "IN_PROGRESS",
+            "sections": [
+              {
+                "title": "Status",
+                "type": "TEXT",
+                "text": "We received your revenue reconciliation request and are checking the transactions in the period you named."
+              },
+              {
+                "title": "Information needed",
+                "type": "LIST",
+                "items": [
+                  "The payout period that looks wrong.",
+                  "The related course.",
+                  "The amount you expected and the one shown."
+                ]
+              }
+            ]
+          },
+          "privacyRequest": {
+            "label": "Privacy · Personal data request",
+            "status": "IN_PROGRESS",
+            "sections": [
+              {
+                "title": "Status",
+                "type": "TEXT",
+                "text": "We received your personal data request. To protect your account, we must verify your identity before acting."
+              },
+              {
+                "title": "Next steps",
+                "type": "LIST",
+                "items": [
+                  "Send the request from the exact account email.",
+                  "We verify and process it as soon as possible.",
+                  "The result will be emailed to you."
+                ]
+              }
+            ]
+          },
+          "technicalGeneric": {
+            "label": "Technical · General troubleshooting",
+            "status": "IN_PROGRESS",
+            "sections": [
+              {
+                "title": "Troubleshooting",
+                "type": "LIST",
+                "items": [
+                  "Reload and sign in again.",
+                  "Clear the cache or use a private window.",
+                  "Try another browser or device.",
+                  "If it still fails, send a screenshot with the page link."
+                ]
+              }
+            ]
+          },
+          "notificationHelp": {
+            "label": "Technical · Not receiving notifications/emails",
+            "status": "IN_PROGRESS",
+            "sections": [
+              {
+                "title": "What to check",
+                "type": "LIST",
+                "items": [
+                  "Check the Spam and Promotions folders.",
+                  "Allow notifications for LinguaLearn in the browser/app.",
+                  "Add the LinguaLearn sender address to your contacts."
+                ]
+              }
+            ]
+          }
+        }
       }
     }
+  },
+  "supportHelp": {
+    "title": "Help & Support",
+    "subtitle": "Pick the topic you need help with to see quick answers. If that doesn't solve it, send a request and our support team will reply by email.",
+    "pickCategory": "What do you need help with?",
+    "faqTitle": "Frequently asked questions",
+    "stillNeedHelp": "Still need help?",
+    "openForm": "Send a support request",
+    "closeForm": "Close form",
+    "categories": {
+      "ACCOUNT": {
+        "title": "Account & sign-in",
+        "desc": "Forgot password, OTP, locked account, Google sign-in"
+      },
+      "PAYMENT": {
+        "title": "Payments & refunds",
+        "desc": "Paid but no access, double charge, refunds, coupons"
+      },
+      "COURSE": {
+        "title": "Courses & content",
+        "desc": "Can't open a course, video, documents, wrong content"
+      },
+      "LEARNING": {
+        "title": "Learning: quizzes, flashcards, materials",
+        "desc": "Quiz grading, flashcards, AI materials, assignments, streak"
+      },
+      "AI_FEATURES": {
+        "title": "AI features",
+        "desc": "AI Tutor, AI study plan, AI lock, AI dubbing"
+      },
+      "EXAM": {
+        "title": "Exams & proctoring",
+        "desc": "Camera, disconnects, submission, false violations, scores"
+      },
+      "CERTIFICATE": {
+        "title": "Certificates",
+        "desc": "Missing certificate, wrong name, verification code, PDF download"
+      },
+      "COMMUNITY": {
+        "title": "Community & reviews",
+        "desc": "Report abuse, harassment, hidden reviews, Q&A, messages"
+      },
+      "LIVE": {
+        "title": "Live sessions",
+        "desc": "Can't join, lost audio/video, translated captions, cancelled sessions"
+      },
+      "INSTRUCTOR": {
+        "title": "For instructors",
+        "desc": "Course approval, revenue, uploads, reports, becoming an instructor"
+      },
+      "PRIVACY": {
+        "title": "Privacy & data",
+        "desc": "Delete account, export data, public profile, suspected breach"
+      },
+      "TECHNICAL": {
+        "title": "Technical issues",
+        "desc": "Page errors, slow loading, mobile app, notifications, display"
+      },
+      "OTHER": {
+        "title": "Other",
+        "desc": "Feedback, partnerships, anything else"
+      }
+    },
+    "faq": {
+      "ACCOUNT": [
+        {
+          "q": "I forgot my password",
+          "a": "Go to Sign in, choose Forgot password and enter your email to receive an OTP (valid for 5 minutes). If you don't see the email, check your Spam folder.",
+          "hint": "The email you registered with and when you tried to reset."
+        },
+        {
+          "q": "I didn't receive the OTP",
+          "a": "Wait a few minutes and check your Spam folder. If it still doesn't arrive, send a request: an administrator will verify you and email a password reset link (valid for 30 minutes).",
+          "hint": "Your account email, when you tried and whether you checked Spam."
+        },
+        {
+          "q": "I sign in with Google. Can I change my password?",
+          "a": "Accounts that sign in with Google have no separate password, so there is nothing to reset. Use the Sign in with Google button each time.",
+          "hint": "The Google email you use and the error you see when signing in."
+        },
+        {
+          "q": "My account is locked",
+          "a": "An account can be locked for rule violations or unusual activity. Send a request with your account email and the message you see so it can be reviewed.",
+          "hint": "Account email, when it was locked and the on-screen message."
+        },
+        {
+          "q": "An unknown device signed in, or I keep getting signed out",
+          "a": "Open Account settings, sign out of all other devices and change your password right away. If you still see unusual activity, send a request so we can check.",
+          "hint": "The unfamiliar device/IP you saw and when it happened."
+        },
+        {
+          "q": "I want to change my email or account details",
+          "a": "Your name, avatar and profile details can be edited in Account settings. To change your sign-in email, send a request so an administrator can verify you and help.",
+          "hint": "Current email, the email you want to switch to and why."
+        }
+      ],
+      "PAYMENT": [
+        {
+          "q": "I paid but can't access the course",
+          "a": "The system may take a few minutes to confirm the payment. If the course is still missing from My courses after 15 minutes, send a request so we can reconcile it.",
+          "hint": "Transaction code, amount, payment time and a screenshot of the receipt/balance change."
+        },
+        {
+          "q": "I was charged twice for the same course",
+          "a": "Keep both receipts and send a request. We will reconcile and refund the duplicate payment if it matches your description.",
+          "hint": "Both transaction codes, amount of each, times and a balance-change screenshot."
+        },
+        {
+          "q": "Payment failed or the QR code expired",
+          "a": "The payment QR code is valid for a short time; go back to your cart to generate a new one. If money was deducted but the order failed, send a request with the receipt.",
+          "hint": "Course you wanted, payment time and receipt screenshot (if charged)."
+        },
+        {
+          "q": "I want a refund",
+          "a": "Read the Refund policy, then file a dispute under Request a refund in your account menu (with your reason and evidence). Refunds are handled separately there.",
+          "hint": "Course, transaction code and why you want a refund."
+        },
+        {
+          "q": "I haven't received my refund",
+          "a": "How long the money takes depends on your bank. If the expected time has passed, reopen the dispute under Request a refund (only possible within the allowed window) or send a request here.",
+          "hint": "Dispute/transaction code, refund confirmation date and receiving account (mask digits)."
+        },
+        {
+          "q": "My coupon doesn't apply",
+          "a": "A code may be expired, used up or not valid for the course/bundle you chose. Check its conditions; if it still fails send a request with the code name.",
+          "hint": "Coupon code, the course/bundle and the error message."
+        },
+        {
+          "q": "I need an invoice or payment receipt",
+          "a": "Send a request with the details to put on the invoice and we will help.",
+          "hint": "Transaction code, name/company and details for the invoice."
+        }
+      ],
+      "COURSE": [
+        {
+          "q": "I can't open a course I enrolled in",
+          "a": "Sign out and back in, then check My courses. If the course is still missing or won't open, send a request.",
+          "hint": "Course name, when you enrolled and the error message."
+        },
+        {
+          "q": "The lesson video won't play",
+          "a": "Check your connection, reload the page or try another browser. If it still fails, send a request with the lesson name and a screenshot.",
+          "hint": "Course, lesson, browser/device and a screenshot."
+        },
+        {
+          "q": "Lesson documents won't download",
+          "a": "Reload the page or try another browser. If the file still fails, send a request so we can check it.",
+          "hint": "Course, lesson and document name."
+        },
+        {
+          "q": "Course content is wrong, missing or outdated",
+          "a": "Send a request describing exactly what's wrong; we will pass it to the instructor and moderators. You can also ask in the lesson's Q&A.",
+          "hint": "Course, lesson, location (video timestamp) and what is wrong."
+        },
+        {
+          "q": "My progress isn't updating",
+          "a": "Progress is recorded when you finish a lesson; try reloading after studying. If it's still missing, send a request so we can check.",
+          "hint": "Course, lessons you finished that aren't counted and a progress screenshot."
+        },
+        {
+          "q": "A course I bought was removed or is no longer accessible",
+          "a": "A course may be hidden temporarily for edits or moderation. Send a request so we can confirm its status and your access.",
+          "hint": "Course name, transaction code and when it disappeared."
+        }
+      ],
+      "LEARNING": [
+        {
+          "q": "A quiz was graded wrong or the answer key is incorrect",
+          "a": "Send a request naming the question you think is wrong; we will ask the instructor to review the answer key.",
+          "hint": "Quiz name, question number, your answer and why you think it's wrong."
+        },
+        {
+          "q": "I can't retake a quiz or lost my result",
+          "a": "Some quizzes limit attempts. If a result disappeared unexpectedly, send a request so we can check your attempt history.",
+          "hint": "Quiz name, when you took it and the message you see."
+        },
+        {
+          "q": "Flashcards won't sync or review is broken",
+          "a": "Reload or sign in again to sync. If cards still show the wrong schedule or vanish, send a request.",
+          "hint": "Flashcard set, device you use and a description of the problem."
+        },
+        {
+          "q": "AI-generated materials (quiz/flashcards/mind map) are broken or empty",
+          "a": "Try generating again after a few minutes. If it still fails or the content is off, send a request with the lesson you used.",
+          "hint": "Material type, source lesson and an error screenshot."
+        },
+        {
+          "q": "My learning streak was lost or miscounted",
+          "a": "The streak counts days you finish a lesson or quiz. If you studied but it still broke, send a request.",
+          "hint": "Days you studied, your current streak and a screenshot."
+        },
+        {
+          "q": "I submitted an assignment but see no grade, or it won't submit",
+          "a": "Check the file size and format and try again. If a submitted assignment doesn't show or stays ungraded for long, send a request.",
+          "hint": "Course, assignment name, submission time and file name."
+        }
+      ],
+      "AI_FEATURES": [
+        {
+          "q": "The AI Tutor gave a wrong or inappropriate answer",
+          "a": "AI can be wrong; compare it with the lesson. If an answer is seriously wrong or inappropriate, send a request with the conversation so we can improve.",
+          "hint": "Lesson, your question and the AI's answer (or a screenshot)."
+        },
+        {
+          "q": "The AI shows an error or doesn't respond",
+          "a": "Try again in a few minutes. If it persists, send a request with the error so the tech team can check.",
+          "hint": "Which AI feature, when it failed and the message shown."
+        },
+        {
+          "q": "My AI access is locked",
+          "a": "AI access can be locked when an account is flagged for violations or spam. Send a request with your account email to be reviewed.",
+          "hint": "Your account email and the message shown when using AI."
+        },
+        {
+          "q": "The AI study plan is unreasonable or can't be generated",
+          "a": "Update your goal and study time, then generate again. If the plan is still off or fails, send a request.",
+          "hint": "The goal you entered, related course and a screenshot of the plan."
+        },
+        {
+          "q": "My review or comment was wrongly blocked by the AI filter",
+          "a": "The automatic filter can block normal content by mistake. Send a request with what you posted so we can review it.",
+          "hint": "What you posted, where (course/lesson) and when."
+        },
+        {
+          "q": "AI dubbing or captions are wrong or out of sync",
+          "a": "Send a request with the lesson, language and the timestamp that is wrong so we can pass it to the dubbing team.",
+          "hint": "Lesson, language and the incorrect video timestamp."
+        }
+      ],
+      "EXAM": [
+        {
+          "q": "The camera won't start during an exam",
+          "a": "Allow the browser to use your camera and microphone, close other apps using the camera and reload. On a phone, try a computer or the mobile app instead.",
+          "hint": "Device, browser and the camera error message."
+        },
+        {
+          "q": "The exam froze or disconnected while I was taking it",
+          "a": "Stay on the page and check your network; don't reload repeatedly. Send a request right away with the time so we can log the incident with the instructor.",
+          "hint": "Exam name, when it froze/disconnected and a screenshot."
+        },
+        {
+          "q": "Exam submission failed",
+          "a": "Don't close the page. Wait about a minute; if it is still stuck, take a screenshot and send a request immediately so your work can be checked.",
+          "hint": "Exam name, when you pressed submit and a screenshot."
+        },
+        {
+          "q": "I was flagged for a proctoring violation by mistake",
+          "a": "The proctoring system can misjudge (low light, someone walking by...). Send a request with the context so the instructor and admins can review.",
+          "hint": "Exam name, when you were flagged and the circumstances."
+        },
+        {
+          "q": "My exam score is wrong or missing",
+          "a": "Some exams need instructor grading so results may not show instantly. If the expected time has passed or the score looks wrong, send a request.",
+          "hint": "Exam name, submission time and the score you expected."
+        },
+        {
+          "q": "The exam has problems on my phone",
+          "a": "Phone browsers can restrict camera access or recording. Try a computer or the LinguaLearn mobile app.",
+          "hint": "Phone model, browser and a description of the issue."
+        }
+      ],
+      "CERTIFICATE": [
+        {
+          "q": "I finished a course but see no certificate",
+          "a": "Send a request with the course name so an administrator can check your progress and eligibility.",
+          "hint": "Course name, when you finished and a progress screenshot."
+        },
+        {
+          "q": "The name on my certificate is wrong",
+          "a": "Certificates print the name from your profile. Update your name in Account settings or send a request so we can reissue it correctly.",
+          "hint": "Correct name, name currently printed and the course name."
+        },
+        {
+          "q": "The certificate verification code doesn't work",
+          "a": "Re-check the code (case-sensitive) and the verification link. If it still can't be verified, send a request with the certificate code.",
+          "hint": "Certificate code and the verification link/screenshot."
+        },
+        {
+          "q": "I can't download the certificate PDF",
+          "a": "Reload or try another browser. If it still fails, send a request with the course name.",
+          "hint": "Course name, browser/device and the error message."
+        }
+      ],
+      "COMMUNITY": [
+        {
+          "q": "I want to report violating content",
+          "a": "Send a request with a link or screenshot of the content (comment, question, message, course). Moderators will review and act.",
+          "hint": "Link/screenshot, the poster's name and why it violates the rules."
+        },
+        {
+          "q": "I'm being harassed or receiving spam messages",
+          "a": "Take screenshots of the messages and send a request. We will review and may act on the offending account.",
+          "hint": "Sender name/email, message screenshots and times."
+        },
+        {
+          "q": "My review was hidden or rejected",
+          "a": "A review can be hidden if it breaks content rules or is caught by the automatic filter. Send a request with what you wrote to be reviewed.",
+          "hint": "Course, the review text and when you posted it."
+        },
+        {
+          "q": "My question hasn't been answered by the instructor",
+          "a": "Instructors need time to respond. If it stays unanswered for too long, send a request with a link to the question.",
+          "hint": "Course, lesson and the question text."
+        },
+        {
+          "q": "I can't message my instructor",
+          "a": "You can only message instructors of courses you are enrolled in. If you qualify and it still fails, send a request.",
+          "hint": "Instructor name, course and the error message."
+        }
+      ],
+      "LIVE": [
+        {
+          "q": "I can't join the live session",
+          "a": "Check you are signed in and allowed to watch, then reload. If you still can't join, send a request with the session name.",
+          "hint": "Session name, start time, device and the error message."
+        },
+        {
+          "q": "I lose video or audio during a live session",
+          "a": "Check your network, reload and try another browser. If it keeps happening, send a request with the time.",
+          "hint": "Session name, when video/audio dropped, network and device."
+        },
+        {
+          "q": "Real-time translated captions are wrong or missing",
+          "a": "Pick the caption language again in the session. If captions are still wrong or missing, send a request.",
+          "hint": "Session name, the language you chose and when it failed."
+        },
+        {
+          "q": "A live session was cancelled or rescheduled",
+          "a": "Instructors can change the schedule. If you didn't get a notice or need help, send a request.",
+          "hint": "Session name, course and the schedule you saw."
+        }
+      ],
+      "INSTRUCTOR": [
+        {
+          "q": "My course was rejected",
+          "a": "The rejection reason is shown on your course management page. Edit per the feedback and resubmit; if you need clarification, send a request.",
+          "hint": "Course name and the feedback/reason you see."
+        },
+        {
+          "q": "My course has been pending review too long",
+          "a": "Review time depends on the queue. If it has been unusually long, send a request with the course name.",
+          "hint": "Course name and the date you submitted it."
+        },
+        {
+          "q": "Instructor revenue or payout looks wrong",
+          "a": "Send a request naming the period and amount that looks wrong so we can reconcile.",
+          "hint": "Payout period, related course, expected vs shown amount."
+        },
+        {
+          "q": "I can't upload a video or document",
+          "a": "Check size, format and your connection, then retry. If it still fails, send a request with the file name.",
+          "hint": "File name, size, format and the error message."
+        },
+        {
+          "q": "My course or content was reported",
+          "a": "Send a request to add context and your explanation; moderators will review fairly.",
+          "hint": "Course name, the reported content and your explanation."
+        },
+        {
+          "q": "I want to become an instructor",
+          "a": "Open Become an Instructor in your account menu and complete the sign-up. If you hit an error or need help, send a request.",
+          "hint": "Account email and the step you're stuck on."
+        }
+      ],
+      "PRIVACY": [
+        {
+          "q": "I want to delete my account and data",
+          "a": "Send a request from your account email. We will verify your identity before acting and tell you the result by email.",
+          "hint": "Account email and the scope of data you want deleted."
+        },
+        {
+          "q": "I want a copy of my personal data",
+          "a": "Send a request from your account email naming the data you need. We will verify and reply by email.",
+          "hint": "Account email and the type of data you need."
+        },
+        {
+          "q": "My public profile shows information I don't want",
+          "a": "Open Account settings to hide your courses or wishlist on your public profile. If information still shows, send a request.",
+          "hint": "Public profile link and the information shown."
+        },
+        {
+          "q": "I suspect my account was breached or data leaked",
+          "a": "Change your password and sign out of all other devices in Account settings right away, then send a request so we can check for unusual activity.",
+          "hint": "What looked unusual, when you noticed and any unfamiliar device/IP."
+        }
+      ],
+      "TECHNICAL": [
+        {
+          "q": "The site shows errors, a blank page or loads very slowly",
+          "a": "Reload, clear your cache or switch browsers. If it still fails, send a request with the page link and a screenshot.",
+          "hint": "Page link, browser/device and a screenshot."
+        },
+        {
+          "q": "The mobile app has errors or closes suddenly",
+          "a": "Update Expo Go/the app to the latest version and sign in again. If it still fails, send a request with your device and the screen where it happens.",
+          "hint": "Phone model, OS version and the screen where it fails."
+        },
+        {
+          "q": "I'm not receiving notifications or emails",
+          "a": "Check your Spam folder and the browser/app notification permission. If you still don't get them, send a request with your account email.",
+          "hint": "Account email, which notification is missing and when."
+        },
+        {
+          "q": "The layout looks broken on my device or browser",
+          "a": "Send a request with a screenshot, device and browser so we can reproduce it.",
+          "hint": "Device, OS, browser, screen size and a screenshot."
+        },
+        {
+          "q": "The interface text or translation is wrong",
+          "a": "Send a request naming the screen and the text that is wrong so we can fix the translation.",
+          "hint": "Selected language, screen and the incorrect text."
+        }
+      ],
+      "OTHER": [
+        {
+          "q": "I have feedback about a feature or the experience",
+          "a": "We value all feedback. Send a request describing what you'd like improved.",
+          "hint": "The related screen/feature and what you'd like."
+        },
+        {
+          "q": "I'd like to partner or discuss business",
+          "a": "Send a request with your organization and the proposal; we will reply by email.",
+          "hint": "Organization, contact person and your proposal."
+        },
+        {
+          "q": "My issue isn't in any of the topics above",
+          "a": "Send a request describing the problem clearly and our team will reply by email.",
+          "hint": "A detailed description, when it happened and a screenshot if you have one."
+        }
+      ]
+    },
+    "form": {
+      "title": "Send a support request",
+      "email": "Email for the reply",
+      "category": "Topic",
+      "subject": "Subject",
+      "message": "Details",
+      "messageHint": "At least 10 characters. The clearer the description, the faster we can help.",
+      "attach": "Screenshots (optional)",
+      "attachHint": "Up to {count} jpg/png/webp images, {size}MB each.",
+      "addFiles": "Choose images",
+      "remove": "Remove",
+      "tooMany": "You can attach at most {count} images.",
+      "tooBig": "Image \"{name}\" exceeds {size}MB.",
+      "badType": "\"{name}\" is not a jpg/png/webp image.",
+      "submit": "Send request",
+      "submitting": "Sending...",
+      "genericError": "Couldn't send the request, please try again.",
+      "successTitle": "Request sent",
+      "successBody": "Your request code is {code}. We sent a confirmation email and will reply within 24-48 hours. If you don't see it, check your Spam folder.",
+      "newRequest": "Send another request",
+      "topic": "Topic",
+      "topicHint": "The topic is filled in from the item you picked.",
+      "messageGuided": "Describe your situation",
+      "shouldInclude": "Please include:"
+    },
+    "forgotHint": "Didn't receive the OTP?",
+    "forgotLink": "Send a support request",
+    "requestThis": "Didn't solve it? Send a request",
+    "otherInGroup": "Something else in this topic",
+    "otherLabel": "Other issue"
   }
 }

@@ -89,7 +89,7 @@ export default function MaterialDetailPage() {
     return (
       <div className="min-h-dvh bg-surface p-8 flex items-center justify-center">
         <div className="shell max-w-md text-center py-12 px-6 bg-white rounded-2xl shadow-sm border border-line">
-          <div className="w-16 h-16 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+          <div className="w-16 h-16 bg-streak-bg text-warning rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
             {isNotFound ? '📦' : '⚠️'}
           </div>
           <h2 className="text-lg font-bold text-ink mb-2">
@@ -102,7 +102,7 @@ export default function MaterialDetailPage() {
             <button
               type="button"
               onClick={() => router.back()}
-              className="px-5 py-2 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors"
+              className="px-5 py-2 text-sm font-semibold text-ink bg-tint hover:bg-line-soft rounded-xl transition-colors"
             >
               ← Quay lại
             </button>
@@ -142,7 +142,7 @@ export default function MaterialDetailPage() {
               {material.materialType === 'MINDMAP' ? 'Sơ đồ tư duy' : material.materialType === 'FLASHCARD' ? 'Bộ thẻ Flashcard' : material.materialType} - Phiên bản {material.versionNo}
             </h1>
             <p className="text-sm text-ink-muted mt-1">
-              Trạng thái: <span className="font-semibold text-green-600">{material.status}</span>
+              Trạng thái: <span className="font-semibold text-success">{material.status}</span>
               <span className="mx-2">•</span>
               Ngày tạo: {new Date(material.createdAt).toLocaleString('vi-VN')}
             </p>

@@ -1,3 +1,6 @@
+import { ApiError } from './client';
+import type { ProblemDetail } from '@/types/domain';
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
 const fetchApi = async (endpoint: string, data: Record<string, unknown>) => {
@@ -12,9 +15,18 @@ const fetchApi = async (endpoint: string, data: Record<string, unknown>) => {
   });
   
   if (!res.ok) {
-    const errorData = await res.json().catch(() => ({}));
-    // Tạo cấu trúc lỗi giống axios để không phải sửa UI
-    throw { response: { data: errorData } }; 
+    const errorData = (await res.json().catch(() => ({}))) as Partial<ProblemDetail>;
+    // Cùng ApiError với lib/api/client.ts — UI chỉ cần `err instanceof ApiError ? err.message : ...`.
+    throw new ApiError({
+      type: errorData.type ?? 'about:blank',
+      title: errorData.title ?? '',
+      status: errorData.status ?? res.status,
+      detail: errorData.detail ?? '',
+      instance: errorData.instance ?? '',
+      code: errorData.code ?? 'UNKNOWN',
+      timestamp: errorData.timestamp ?? '',
+      fieldErrors: errorData.fieldErrors,
+    });
   }
   return res.json();
 };

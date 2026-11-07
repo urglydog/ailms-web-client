@@ -850,7 +850,7 @@ function MaterialWorkspaceViewer({
           {!readOnly && onDelete && (
             <button
               onClick={onDelete}
-              className="inline-flex items-center rounded-card px-3 py-1.5 text-xs font-bold bg-danger/10 text-danger border border-danger/20 hover:bg-danger/20 transition-all"
+              className="inline-flex items-center rounded-card px-3 py-1.5 text-xs font-bold bg-danger/10 text-danger border border-danger/20 hover:bg-danger/5 transition-all"
               title="Xóa toàn bộ học liệu này"
             >
               Xóa
@@ -935,7 +935,7 @@ function MaterialWorkspaceViewer({
                         {!readOnly && (
                           <div className="flex gap-2 shrink-0">
                             <button onClick={() => setEditingQuestion(q)} className="text-xs font-semibold bg-surface-hover text-ink px-3 py-1.5 rounded-card hover:bg-line-soft border border-line transition-colors">Sửa</button>
-                            <button onClick={() => deleteQuestionMutation.mutate(q.id)} className="text-xs font-semibold bg-danger/10 text-danger px-3 py-1.5 rounded-card hover:bg-danger/20 border border-danger/20 transition-colors">Xóa</button>
+                            <button onClick={() => deleteQuestionMutation.mutate(q.id)} className="text-xs font-semibold bg-danger/10 text-danger px-3 py-1.5 rounded-card hover:bg-danger/5 border border-danger/20 transition-colors">Xóa</button>
                           </div>
                         )}
                       </div>
@@ -1074,7 +1074,7 @@ function MaterialWorkspaceViewer({
                         {!readOnly && (
                           <div className="flex gap-2">
                             <button onClick={(e) => { e.stopPropagation(); setEditingFlashcard(card); }} className={`text-[11px] font-bold px-2.5 py-1 rounded-card border transition-colors ${isFlipped ? 'bg-white/10 hover:bg-white/20 text-white border-white/20' : 'bg-surface-hover hover:bg-line-soft text-ink border-line'}`}>Sửa</button>
-                            <button onClick={(e) => { e.stopPropagation(); deleteFlashcardMutation.mutate(card.id); }} className={`text-[11px] font-bold px-2.5 py-1 rounded-card border transition-colors ${isFlipped ? 'bg-white/10 hover:bg-white/20 text-white border-white/20' : 'bg-danger/10 hover:bg-danger/20 text-danger border-danger/20'}`}>Xóa</button>
+                            <button onClick={(e) => { e.stopPropagation(); deleteFlashcardMutation.mutate(card.id); }} className={`text-[11px] font-bold px-2.5 py-1 rounded-card border transition-colors ${isFlipped ? 'bg-white/10 hover:bg-white/20 text-white border-white/20' : 'bg-danger/10 hover:bg-danger/5 text-danger border-danger/20'}`}>Xóa</button>
                           </div>
                         )}
                       </div>
@@ -1202,7 +1202,7 @@ function CustomDateTimePicker({ value, onChange, label, onClear, hint }: { value
           {hint && <span className="font-normal text-[11px] text-ink-muted mt-0.5 block">{hint}</span>}
         </div>
         {onClear && value && (
-          <button type="button" onClick={onClear} className="text-[11px] text-danger hover:text-danger/80 font-semibold bg-danger/10 hover:bg-danger/20 px-2 py-0.5 rounded-card transition-colors">Xóa</button>
+          <button type="button" onClick={onClear} className="text-[11px] text-danger hover:text-danger/80 font-semibold bg-danger/10 hover:bg-danger/5 px-2 py-0.5 rounded-card transition-colors">Xóa</button>
         )}
       </div>
       <div className="flex items-stretch rounded-card border border-line focus-within:border-accent focus-within:ring-1 focus-within:ring-accent overflow-hidden bg-surface-raised shadow-card transition-all">

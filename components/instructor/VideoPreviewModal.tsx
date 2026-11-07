@@ -13,10 +13,10 @@ export function VideoPreviewModal({ lesson, onClose }: { lesson: LessonEditItem;
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between gap-3 px-5 py-3">
-          <h2 className="min-w-0 truncate font-display text-base font-bold text-gray-900">
+          <h2 className="min-w-0 truncate font-display text-base font-bold text-ink">
             Xem trước — {lesson.title}
           </h2>
-          <button type="button" onClick={onClose} className="shrink-0 text-gray-400 hover:text-gray-700">
+          <button type="button" onClick={onClose} className="shrink-0 text-ink-faint hover:text-ink">
             ✕
           </button>
         </div>

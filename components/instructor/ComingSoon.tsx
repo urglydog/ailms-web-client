@@ -7,10 +7,10 @@ interface ComingSoonProps {
 export function ComingSoon({ title, description }: ComingSoonProps) {
   return (
     <>
-      <h1 className="m-0 font-display text-[22px] font-bold text-gray-900">{title}</h1>
-      <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-gray-300 bg-white p-16 text-center shadow-sm">
+      <h1 className="m-0 font-display text-[22px] font-bold text-ink">{title}</h1>
+      <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-line bg-white p-16 text-center shadow-sm">
         <span className="text-3xl">🛠️</span>
-        <p className="max-w-md text-[13.5px] text-gray-500">{description}</p>
+        <p className="max-w-md text-[13.5px] text-ink-muted">{description}</p>
       </div>
     </>
   );

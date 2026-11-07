@@ -14,6 +14,7 @@ import { useModerationQueue } from '@/hooks/useCourses';
 import { getCurrentRole, getAccessToken } from '@/lib/auth/token';
 import { activeAdminItem } from '@/lib/admin/nav';
 import { disputesApi } from '@/lib/api/disputes';
+import { supportApi } from '@/lib/api/support';
 
 const COLLAPSED_KEY = 'admin-sidebar-collapsed';
 
@@ -81,13 +82,21 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   });
   const openDisputes = openDisputesList?.length ?? 0;
 
+  const { data: openSupportCount } = useQuery({
+    queryKey: ['admin', 'support', 'open-count'],
+    queryFn: () => supportApi.openCount(),
+    enabled: !!getAccessToken(),
+    refetchInterval: 30000,
+  });
+  const openSupport = openSupportCount?.open ?? 0;
+
   const active = activeAdminItem(pathname);
   const title = active ? t(`nav.${active.id}`) : t('shell.panel');
 
   return (
     <div className="flex min-h-dvh bg-surface font-sans text-ink">
-      <AdminSidebar pathname={pathname} collapsed={collapsed} onToggleCollapsed={toggleCollapsed} pendingCourses={pendingCourses} openDisputes={openDisputes} />
-      <AdminNavDrawer open={mobileNavOpen} onClose={closeMobileNav} pathname={pathname} pendingCourses={pendingCourses} openDisputes={openDisputes} />
+      <AdminSidebar pathname={pathname} collapsed={collapsed} onToggleCollapsed={toggleCollapsed} pendingCourses={pendingCourses} openDisputes={openDisputes} openSupport={openSupport} />
+      <AdminNavDrawer open={mobileNavOpen} onClose={closeMobileNav} pathname={pathname} pendingCourses={pendingCourses} openDisputes={openDisputes} openSupport={openSupport} />
 
       <div className="flex min-w-0 flex-1 flex-col">
         <AdminTopbar

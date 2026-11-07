@@ -71,7 +71,10 @@ export default function AdminUserDetailPage() {
 
   const sendResetLink = useMutation({
     mutationFn: () => api.post<ResetLinkRes>(`/api/v1/admin/users/${id}/send-reset-link`, undefined, { token }),
-    onSuccess: setResetLink,
+    onSuccess: (data) => {
+      setResetLink(data);
+      toast.success(t('resetLink.sent'));
+    },
     onError: (err) => toast.error(err instanceof ApiError ? err.message : t('genericError')),
   });
 
@@ -225,12 +228,13 @@ export default function AdminUserDetailPage() {
           <p className="m-0 text-xs text-ink-muted">{t('resetLink.hint')}</p>
           <button
             type="button"
-            disabled={sendResetLink.isPending}
+            disabled={sendResetLink.isPending || user.authProvider === 'GOOGLE'}
             onClick={() => sendResetLink.mutate()}
             className="w-fit rounded-lg bg-accent px-3 py-1.5 text-xs font-bold text-white hover:bg-accent-dark disabled:opacity-50"
           >
             {sendResetLink.isPending ? t('resetLink.generating') : t('resetLink.generate')}
           </button>
+          {user.authProvider === 'GOOGLE' && <p className="m-0 text-xs text-danger">{t('resetLink.googleBlocked')}</p>}
           {resetLink && (
             <div className="flex flex-col gap-1.5 rounded-lg border border-line bg-surface p-3">
               <div className="flex items-center justify-between gap-2">

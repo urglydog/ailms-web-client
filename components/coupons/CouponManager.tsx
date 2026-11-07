@@ -251,7 +251,7 @@ export function CouponManager({ role }: CouponManagerProps) {
               {!form.autoApply && (
                 <div>
                   <label className="mb-1.5 block text-sm font-semibold text-ink">
-                    {t('form.code')} <span className="text-red-500">*</span>
+                    {t('form.code')} <span className="text-danger">*</span>
                   </label>
                   <input
                     required
@@ -279,7 +279,7 @@ export function CouponManager({ role }: CouponManagerProps) {
                 </div>
                 <div>
                   <label className="mb-1.5 block text-sm font-semibold text-ink">
-                    {form.discountType === 'PERCENTAGE' ? t('form.valuePct') : t('form.valueFixed')} <span className="text-red-500">*</span>
+                    {form.discountType === 'PERCENTAGE' ? t('form.valuePct') : t('form.valueFixed')} <span className="text-danger">*</span>
                   </label>
                   <input
                     required
@@ -324,7 +324,7 @@ export function CouponManager({ role }: CouponManagerProps) {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="mb-1.5 block text-sm font-semibold text-ink">
-                    {t('form.start')} <span className="text-red-500">*</span>
+                    {t('form.start')} <span className="text-danger">*</span>
                   </label>
                   <input
                     required
@@ -336,7 +336,7 @@ export function CouponManager({ role }: CouponManagerProps) {
                 </div>
                 <div>
                   <label className="mb-1.5 block text-sm font-semibold text-ink">
-                    {t('form.end')} <span className="text-red-500">*</span>
+                    {t('form.end')} <span className="text-danger">*</span>
                   </label>
                   <input
                     required
@@ -454,7 +454,7 @@ function CoursePicker({
   return (
     <div>
       <label className="mb-1.5 block text-sm font-semibold text-ink">
-        {t('label')} <span className="text-red-500">*</span>
+        {t('label')} <span className="text-danger">*</span>
       </label>
       {role === 'admin' && (
         <div className="mb-2 flex gap-2">

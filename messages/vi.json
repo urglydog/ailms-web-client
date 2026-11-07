@@ -76,7 +76,8 @@
       "groups": { "it": "Công nghệ thông tin", "soft": "Kỹ năng mềm", "other": "Lĩnh vực khác" }
     },
     "theme": { "toDark": "Chuyển sang giao diện tối", "toLight": "Chuyển sang giao diện sáng", "label": "Giao diện", "dark": "Tối", "light": "Sáng" },
-    "skipToContent": "Bỏ qua tới nội dung"
+    "skipToContent": "Bỏ qua tới nội dung",
+    "help": "Trợ giúp & Hỗ trợ"
   },
   "footer": {
     "tagline": "Hệ thống quản lý học tập và thi cử trực tuyến chuẩn học thuật.",
@@ -677,7 +678,9 @@
       "submit": "Đặt lại mật khẩu",
       "submitting": "Đang xử lý...",
       "success": "Đổi mật khẩu thành công! Vui lòng đăng nhập lại.",
-      "genericError": "Link đã hết hạn hoặc không hợp lệ."
+      "genericError": "Link đã hết hạn hoặc không hợp lệ.",
+      "confirmPassword": "Xác nhận mật khẩu",
+      "mismatch": "Mật khẩu xác nhận không khớp."
     }
   },
   "community": {
@@ -1297,7 +1300,8 @@
       "disputes": "Khiếu nại giao dịch",
       "coupons": "Mã giảm giá",
       "announcements": "Thông báo hệ thống",
-      "settings": "Cấu hình hệ thống"
+      "settings": "Cấu hình hệ thống",
+      "support": "Yêu cầu hỗ trợ"
     },
     "shell": {
       "brand": "LinguaLearn",
@@ -1367,7 +1371,8 @@
         "createdAt": "Ngày tạo",
         "role": "Vai trò",
         "status": "Trạng thái",
-        "actions": "Hành động"
+        "actions": "Hành động",
+        "authProvider": "Đăng nhập bằng"
       },
       "role": {
         "STUDENT": "Học viên",
@@ -1405,7 +1410,8 @@
         "prev": "Trước",
         "next": "Sau",
         "page": "Trang {page} / {total}"
-      }
+      },
+      "authLocal": "Email"
     },
     "userDetail": {
       "back": "Quay lại",
@@ -1464,11 +1470,13 @@
       },
       "resetLink": {
         "title": "Hỗ trợ đặt lại mật khẩu",
-        "hint": "Dùng khi user quên mật khẩu nhưng không nhận được email/OTP — sinh link riêng (hết hạn sau 30 phút) để bạn tự gửi qua kênh khác.",
-        "generate": "Tạo link đặt lại mật khẩu",
+        "hint": "Dùng khi user quên mật khẩu nhưng không nhận được OTP — hệ thống tự gửi link (hết hạn sau 30 phút) qua email cho user. Link cũng hiện bên dưới để bạn gửi tay nếu email không tới hoặc vào spam.",
+        "generate": "Tạo & gửi link đặt lại mật khẩu",
         "generating": "Đang tạo...",
         "copy": "Sao chép link",
-        "expiresAt": "Hết hạn lúc {time}"
+        "expiresAt": "Hết hạn lúc {time}",
+        "sent": "Đã gửi email link đặt lại mật khẩu cho user",
+        "googleBlocked": "Tài khoản đăng nhập bằng Google, không có mật khẩu để đặt lại."
       }
     },
     "moderation": {
@@ -1977,6 +1985,1151 @@
         "MEDIUM": "Trung bình",
         "LOW": "Thấp"
       }
+    },
+    "support": {
+      "title": "Yêu cầu hỗ trợ",
+      "subtitle": "Yêu cầu từ người dùng (kể cả khách chưa đăng nhập). Phản hồi sẽ được gửi qua email cho người gửi.",
+      "filters": {
+        "status": "Trạng thái",
+        "all": "Tất cả"
+      },
+      "status": {
+        "OPEN": "Chưa xử lý",
+        "IN_PROGRESS": "Đang xử lý",
+        "RESOLVED": "Đã xử lý"
+      },
+      "category": {
+        "ACCOUNT": "Tài khoản & đăng nhập",
+        "PAYMENT": "Thanh toán & hoàn tiền",
+        "COURSE": "Khóa học & nội dung",
+        "LEARNING": "Học tập: quiz, flashcard, học liệu",
+        "AI_FEATURES": "Tính năng AI",
+        "EXAM": "Thi & giám sát",
+        "CERTIFICATE": "Chứng chỉ",
+        "COMMUNITY": "Cộng đồng & đánh giá",
+        "LIVE": "Buổi học trực tiếp",
+        "INSTRUCTOR": "Dành cho giảng viên",
+        "PRIVACY": "Quyền riêng tư & dữ liệu",
+        "TECHNICAL": "Lỗi kỹ thuật",
+        "OTHER": "Vấn đề khác"
+      },
+      "cols": {
+        "code": "Mã",
+        "sender": "Người gửi",
+        "subject": "Tiêu đề",
+        "category": "Nhóm",
+        "status": "Trạng thái",
+        "time": "Thời gian",
+        "actions": "Thao tác"
+      },
+      "empty": "Chưa có yêu cầu hỗ trợ nào.",
+      "loadError": "Không tải được danh sách yêu cầu.",
+      "view": "Xem",
+      "detail": {
+        "close": "Đóng",
+        "message": "Nội dung",
+        "attachments": "Ảnh minh chứng",
+        "noAttachments": "Không có ảnh đính kèm.",
+        "status": "Trạng thái",
+        "save": "Lưu & gửi phản hồi",
+        "saving": "Đang lưu...",
+        "saved": "Đã cập nhật yêu cầu.",
+        "error": "Không cập nhật được yêu cầu.",
+        "openUser": "Mở trang người dùng",
+        "noUser": "Email này chưa có tài khoản",
+        "previousReply": "Phản hồi trước đó",
+        "template": "Mẫu phản hồi",
+        "templatePh": "Chọn mẫu để điền sẵn nội dung...",
+        "previewTitle": "Xem trước email gửi cho người dùng",
+        "replyRequired": "Soạn ít nhất một mục có nội dung trước khi lưu.",
+        "form": "Soạn email phản hồi",
+        "greetingLabel": "Lời chào",
+        "introLabel": "Câu mở đầu",
+        "sectionsLabel": "Các mục nội dung",
+        "sectionTitle": "Tiêu đề mục",
+        "sectionTitlePh": "Ví dụ: Các bước thực hiện",
+        "typeText": "Đoạn văn",
+        "typeList": "Danh sách đánh số",
+        "sectionText": "Nội dung",
+        "itemPh": "Nội dung dòng {n}...",
+        "addItem": "Thêm dòng",
+        "removeItem": "Xóa dòng",
+        "addSection": "Thêm mục",
+        "removeSection": "Xóa mục",
+        "moveUp": "Chuyển lên",
+        "moveDown": "Chuyển xuống",
+        "maxSections": "Tối đa 8 mục.",
+        "maxItems": "Tối đa 10 dòng.",
+        "closingLabel": "Lời kết",
+        "signatureNameLabel": "Người ký",
+        "teamLabel": "Đơn vị",
+        "includeOriginal": "Đính kèm nội dung yêu cầu ban đầu trong email",
+        "placeholderHint": "Có thể dùng {name}, {code}, {subject}, {category} ở mọi ô — hệ thống tự thay khi gửi.",
+        "defaults": {
+          "greeting": "Kính gửi {name},",
+          "intro": "Về yêu cầu hỗ trợ {code}, chúng tôi xin phản hồi như sau.",
+          "closing": "Trân trọng,",
+          "team": "Đội ngũ hỗ trợ LinguaLearn"
+        },
+        "typeLabel": "Kiểu nội dung mục",
+        "preview": {
+          "empty": "(Chưa có nội dung phản hồi)",
+          "original": "Nội dung yêu cầu ban đầu",
+          "code": "Mã yêu cầu",
+          "category": "Nhóm vấn đề",
+          "subject": "Tiêu đề",
+          "status": "Trạng thái",
+          "footer": "Email tự động từ hệ thống hỗ trợ LinguaLearn, vui lòng không trả lời trực tiếp email này."
+        },
+        "templates": {
+          "received": {
+            "label": "Chung · Đã tiếp nhận yêu cầu",
+            "status": "IN_PROGRESS",
+            "sections": [
+              {
+                "title": "Tình trạng yêu cầu",
+                "type": "TEXT",
+                "text": "Chúng tôi đã tiếp nhận yêu cầu của bạn và đang tiến hành xử lý. Kết quả sẽ được gửi tới bạn qua email này trong vòng 24 giờ làm việc."
+              }
+            ]
+          },
+          "needMoreInfo": {
+            "label": "Chung · Cần bổ sung thông tin",
+            "status": "IN_PROGRESS",
+            "sections": [
+              {
+                "title": "Chúng tôi cần thêm thông tin",
+                "type": "TEXT",
+                "text": "Để xử lý yêu cầu, chúng tôi cần bạn cung cấp thêm một số thông tin dưới đây."
+              },
+              {
+                "title": "Vui lòng cung cấp",
+                "type": "LIST",
+                "items": [
+                  "Mô tả chính xác các bước dẫn tới vấn đề.",
+                  "Ảnh chụp màn hình lỗi (nếu có).",
+                  "Thiết bị và trình duyệt bạn đang dùng."
+                ]
+              },
+              {
+                "title": "Cách gửi thông tin",
+                "type": "TEXT",
+                "text": "Vui lòng gửi yêu cầu mới tại Trung tâm trợ giúp, ghi rõ mã yêu cầu để chúng tôi nối tiếp xử lý."
+              }
+            ]
+          },
+          "resolved": {
+            "label": "Chung · Đã giải quyết",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Kết quả xử lý",
+                "type": "TEXT",
+                "text": "Yêu cầu của bạn đã được giải quyết. Cảm ơn bạn đã kiên nhẫn chờ đợi."
+              }
+            ]
+          },
+          "cannotReproduce": {
+            "label": "Chung · Chưa tái hiện được lỗi",
+            "status": "IN_PROGRESS",
+            "sections": [
+              {
+                "title": "Kết quả kiểm tra",
+                "type": "TEXT",
+                "text": "Đội kỹ thuật đã kiểm tra nhưng chưa tái hiện được vấn đề bạn gặp."
+              },
+              {
+                "title": "Bạn có thể thử",
+                "type": "LIST",
+                "items": [
+                  "Tải lại trang và xóa bộ nhớ đệm của trình duyệt.",
+                  "Thử bằng trình duyệt hoặc thiết bị khác.",
+                  "Nếu lỗi còn, gửi ảnh chụp màn hình hoặc video quay lại thao tác."
+                ]
+              }
+            ]
+          },
+          "duplicate": {
+            "label": "Chung · Yêu cầu trùng lặp",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Thông báo",
+                "type": "TEXT",
+                "text": "Yêu cầu này trùng với một yêu cầu trước đó của bạn nên chúng tôi gộp xử lý chung. Vui lòng theo dõi phản hồi ở yêu cầu ban đầu."
+              }
+            ]
+          },
+          "outOfScope": {
+            "label": "Chung · Ngoài phạm vi hỗ trợ",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Phạm vi hỗ trợ",
+                "type": "TEXT",
+                "text": "Rất tiếc, nội dung bạn nêu nằm ngoài phạm vi hỗ trợ của hệ thống nên chúng tôi chưa thể xử lý trực tiếp."
+              },
+              {
+                "title": "Gợi ý",
+                "type": "TEXT",
+                "text": "Bạn có thể liên hệ đơn vị liên quan hoặc gửi góp ý để chúng tôi cân nhắc cải thiện trong tương lai."
+              }
+            ]
+          },
+          "feedbackThanks": {
+            "label": "Chung · Cảm ơn góp ý",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Lời cảm ơn",
+                "type": "TEXT",
+                "text": "Cảm ơn bạn đã dành thời gian góp ý. Chúng tôi đã ghi nhận và chuyển tới đội sản phẩm để cân nhắc trong các cập nhật tới."
+              }
+            ]
+          },
+          "resetPassword": {
+            "label": "Tài khoản · Hướng dẫn đặt lại mật khẩu",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Kết quả xử lý",
+                "type": "TEXT",
+                "text": "Quản trị viên đã xác minh yêu cầu và gửi riêng một liên kết đặt lại mật khẩu tới email của bạn."
+              },
+              {
+                "title": "Các bước thực hiện",
+                "type": "LIST",
+                "items": [
+                  "Mở email có tiêu đề \"Đặt lại mật khẩu - LinguaLearn\" (kiểm tra cả thư mục Spam).",
+                  "Bấm nút \"Đặt lại mật khẩu\". Liên kết có hiệu lực 30 phút và chỉ dùng được 1 lần.",
+                  "Nhập mật khẩu mới hai lần để xác nhận.",
+                  "Quay lại trang Đăng nhập và đăng nhập bằng mật khẩu mới."
+                ]
+              }
+            ]
+          },
+          "googleAccount": {
+            "label": "Tài khoản · Đăng nhập bằng Google",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Kết quả kiểm tra",
+                "type": "TEXT",
+                "text": "Tài khoản của bạn được đăng ký bằng Google nên không có mật khẩu riêng để đặt lại."
+              },
+              {
+                "title": "Cách đăng nhập",
+                "type": "LIST",
+                "items": [
+                  "Vào trang Đăng nhập.",
+                  "Bấm nút \"Đăng nhập bằng Google\".",
+                  "Chọn đúng tài khoản Google đã dùng để đăng ký."
+                ]
+              }
+            ]
+          },
+          "accountLocked": {
+            "label": "Tài khoản · Đang xem xét khóa tài khoản",
+            "status": "IN_PROGRESS",
+            "sections": [
+              {
+                "title": "Tình trạng",
+                "type": "TEXT",
+                "text": "Chúng tôi đã tiếp nhận yêu cầu về việc tài khoản bị khóa và đang xem xét lại hoạt động của tài khoản."
+              },
+              {
+                "title": "Thông tin cần bạn xác nhận",
+                "type": "LIST",
+                "items": [
+                  "Email của tài khoản bị khóa.",
+                  "Thời điểm bạn phát hiện tài khoản bị khóa.",
+                  "Giải trình ngắn gọn về hoạt động gần đây của bạn."
+                ]
+              }
+            ]
+          },
+          "paymentActivated": {
+            "label": "Thanh toán · Đã kích hoạt khóa học",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Kết quả đối soát",
+                "type": "TEXT",
+                "text": "Chúng tôi đã đối soát và xác nhận giao dịch của bạn, khóa học đã được kích hoạt cho tài khoản."
+              },
+              {
+                "title": "Cách truy cập khóa học",
+                "type": "LIST",
+                "items": [
+                  "Đăng xuất rồi đăng nhập lại.",
+                  "Vào mục \"Khóa học của tôi\".",
+                  "Chọn khóa học vừa mua để bắt đầu học."
+                ]
+              }
+            ]
+          },
+          "paymentNotFound": {
+            "label": "Thanh toán · Chưa tìm thấy giao dịch",
+            "status": "IN_PROGRESS",
+            "sections": [
+              {
+                "title": "Kết quả kiểm tra",
+                "type": "TEXT",
+                "text": "Chúng tôi chưa tìm thấy giao dịch khớp với thông tin bạn cung cấp."
+              },
+              {
+                "title": "Vui lòng gửi lại",
+                "type": "LIST",
+                "items": [
+                  "Mã giao dịch hoặc nội dung chuyển khoản.",
+                  "Ảnh chụp biên lai hoặc biến động số dư.",
+                  "Thời điểm thanh toán chính xác."
+                ]
+              }
+            ]
+          },
+          "refundGuide": {
+            "label": "Thanh toán · Hướng dẫn gửi khiếu nại hoàn tiền",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Quy trình hoàn tiền",
+                "type": "TEXT",
+                "text": "Yêu cầu hoàn tiền được xử lý qua chức năng khiếu nại giao dịch để đảm bảo có đủ thông tin và minh chứng."
+              },
+              {
+                "title": "Các bước thực hiện",
+                "type": "LIST",
+                "items": [
+                  "Đọc Chính sách hoàn tiền.",
+                  "Vào menu tài khoản, chọn \"Yêu cầu hoàn tiền\" và chọn giao dịch.",
+                  "Nhập lý do, số tài khoản nhận hoàn và đính kèm minh chứng.",
+                  "Xác nhận chính sách rồi gửi; kết quả sẽ được thông báo qua email."
+                ]
+              }
+            ]
+          },
+          "refundNotEligible": {
+            "label": "Thanh toán · Không đủ điều kiện hoàn tiền",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Kết quả xem xét",
+                "type": "TEXT",
+                "text": "Sau khi xem xét, giao dịch của bạn chưa đáp ứng điều kiện hoàn tiền theo Chính sách hoàn tiền hiện hành."
+              },
+              {
+                "title": "Lưu ý",
+                "type": "TEXT",
+                "text": "Nếu bạn có thêm minh chứng mới, hãy gửi khiếu nại bổ sung và chúng tôi sẽ xem xét lại."
+              }
+            ]
+          },
+          "couponIssue": {
+            "label": "Thanh toán · Mã giảm giá",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Kết quả kiểm tra",
+                "type": "TEXT",
+                "text": "Chúng tôi đã kiểm tra mã giảm giá của bạn và gửi kết quả bên dưới."
+              },
+              {
+                "title": "Điều kiện áp dụng",
+                "type": "LIST",
+                "items": [
+                  "Mã còn hạn sử dụng và còn lượt dùng.",
+                  "Mã áp dụng cho đúng khóa học hoặc gói bạn chọn.",
+                  "Mỗi mã chỉ dùng được theo số lần quy định."
+                ]
+              }
+            ]
+          },
+          "courseAccessFixed": {
+            "label": "Khóa học · Đã khôi phục quyền truy cập",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Kết quả xử lý",
+                "type": "TEXT",
+                "text": "Chúng tôi đã kiểm tra và khôi phục quyền truy cập khóa học cho tài khoản của bạn."
+              },
+              {
+                "title": "Để áp dụng thay đổi",
+                "type": "LIST",
+                "items": [
+                  "Đăng xuất rồi đăng nhập lại.",
+                  "Mở mục \"Khóa học của tôi\" và chọn khóa học."
+                ]
+              }
+            ]
+          },
+          "videoTroubleshoot": {
+            "label": "Khóa học · Khắc phục video không phát",
+            "status": "IN_PROGRESS",
+            "sections": [
+              {
+                "title": "Hướng dẫn khắc phục",
+                "type": "LIST",
+                "items": [
+                  "Kiểm tra kết nối mạng và thử tải lại trang.",
+                  "Thử bằng trình duyệt khác (Chrome, Edge, Safari bản mới).",
+                  "Tắt tiện ích chặn quảng cáo cho trang LinguaLearn.",
+                  "Nếu vẫn lỗi, gửi ảnh chụp màn hình và tên bài học để chúng tôi kiểm tra tệp video."
+                ]
+              }
+            ]
+          },
+          "contentReported": {
+            "label": "Khóa học · Đã chuyển lỗi nội dung cho giảng viên",
+            "status": "IN_PROGRESS",
+            "sections": [
+              {
+                "title": "Tình trạng",
+                "type": "TEXT",
+                "text": "Chúng tôi đã ghi nhận lỗi nội dung bạn phản ánh và chuyển cho giảng viên cùng đội kiểm duyệt xem xét."
+              }
+            ]
+          },
+          "quizReview": {
+            "label": "Học tập · Xem lại đáp án quiz",
+            "status": "IN_PROGRESS",
+            "sections": [
+              {
+                "title": "Tình trạng",
+                "type": "TEXT",
+                "text": "Chúng tôi đã chuyển câu hỏi bạn nêu cho giảng viên để xem xét lại đáp án. Nếu đáp án được điều chỉnh, kết quả của bạn sẽ được cập nhật."
+              }
+            ]
+          },
+          "streakRestored": {
+            "label": "Học tập · Đã khôi phục chuỗi ngày học",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Kết quả xử lý",
+                "type": "TEXT",
+                "text": "Chúng tôi đã đối chiếu lịch sử học và điều chỉnh lại chuỗi ngày học của bạn."
+              }
+            ]
+          },
+          "aiKnownIssue": {
+            "label": "AI · Đã ghi nhận lỗi tính năng AI",
+            "status": "IN_PROGRESS",
+            "sections": [
+              {
+                "title": "Tình trạng",
+                "type": "TEXT",
+                "text": "Chúng tôi đã ghi nhận lỗi ở tính năng AI bạn gặp và chuyển cho đội kỹ thuật xử lý."
+              },
+              {
+                "title": "Trong thời gian chờ",
+                "type": "LIST",
+                "items": [
+                  "Thử lại sau ít phút.",
+                  "Dùng tài liệu và bài giảng của khóa học để đối chiếu.",
+                  "Gửi thêm ảnh chụp màn hình nếu lỗi lặp lại."
+                ]
+              }
+            ]
+          },
+          "aiLockExplained": {
+            "label": "AI · Giải thích khóa quyền dùng AI",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Kết quả xem xét",
+                "type": "TEXT",
+                "text": "Quyền dùng AI của tài khoản bị hạn chế do tài khoản từng bị gắn cờ vi phạm hoặc spam. Chúng tôi đã xem xét yêu cầu của bạn."
+              },
+              {
+                "title": "Bạn có thể",
+                "type": "LIST",
+                "items": [
+                  "Tiếp tục dùng đầy đủ các tính năng học tập khác.",
+                  "Gửi thêm giải trình nếu bạn cho rằng việc gắn cờ là nhầm lẫn."
+                ]
+              }
+            ]
+          },
+          "examIncident": {
+            "label": "Thi · Đã ghi nhận sự cố bài thi",
+            "status": "IN_PROGRESS",
+            "sections": [
+              {
+                "title": "Tình trạng",
+                "type": "TEXT",
+                "text": "Chúng tôi đã ghi nhận sự cố trong lúc bạn làm bài thi và chuyển cho giảng viên phụ trách xem xét. Giảng viên sẽ quyết định cách xử lý phù hợp."
+              },
+              {
+                "title": "Trong thời gian chờ",
+                "type": "LIST",
+                "items": [
+                  "Giữ lại ảnh chụp màn hình và thông báo lỗi nếu có.",
+                  "Không làm lại bài khi chưa có hướng dẫn từ giảng viên."
+                ]
+              }
+            ]
+          },
+          "proctorFalseFlag": {
+            "label": "Thi · Xem xét báo vi phạm giám sát",
+            "status": "IN_PROGRESS",
+            "sections": [
+              {
+                "title": "Tình trạng",
+                "type": "TEXT",
+                "text": "Chúng tôi đã tiếp nhận yêu cầu xem lại các cảnh báo vi phạm trong bài thi của bạn và chuyển cho giảng viên đối chiếu hình ảnh giám sát."
+              }
+            ]
+          },
+          "certificateIssued": {
+            "label": "Chứng chỉ · Đã cấp chứng chỉ",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Kết quả kiểm tra",
+                "type": "TEXT",
+                "text": "Chúng tôi đã kiểm tra tiến độ và cấp chứng chỉ cho khóa học của bạn."
+              },
+              {
+                "title": "Cách xem và tải chứng chỉ",
+                "type": "LIST",
+                "items": [
+                  "Vào hồ sơ cá nhân, mục Chứng chỉ.",
+                  "Chọn chứng chỉ của khóa học.",
+                  "Bấm tải xuống để lưu file PDF."
+                ]
+              }
+            ]
+          },
+          "certificateIncomplete": {
+            "label": "Chứng chỉ · Chưa đủ điều kiện cấp",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Kết quả kiểm tra",
+                "type": "TEXT",
+                "text": "Khóa học của bạn chưa đủ điều kiện cấp chứng chỉ do còn nội dung chưa hoàn thành."
+              },
+              {
+                "title": "Cần hoàn thành",
+                "type": "LIST",
+                "items": [
+                  "Các bài học còn thiếu trong khóa học.",
+                  "Các bài kiểm tra/quiz bắt buộc của khóa học."
+                ]
+              }
+            ]
+          },
+          "communityReport": {
+            "label": "Cộng đồng · Đã tiếp nhận báo cáo vi phạm",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Kết quả xử lý",
+                "type": "TEXT",
+                "text": "Cảm ơn bạn đã báo cáo. Đội kiểm duyệt đã xem xét nội dung và áp dụng biện pháp phù hợp theo quy tắc cộng đồng."
+              },
+              {
+                "title": "Nếu bạn gặp lại",
+                "type": "TEXT",
+                "text": "Vui lòng gửi thêm yêu cầu kèm ảnh chụp mới để chúng tôi xử lý nhanh hơn."
+              }
+            ]
+          },
+          "reviewHidden": {
+            "label": "Cộng đồng · Đánh giá bị ẩn",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Kết quả xem xét",
+                "type": "TEXT",
+                "text": "Đánh giá của bạn bị ẩn vì chưa phù hợp với quy tắc nội dung của hệ thống."
+              },
+              {
+                "title": "Bạn có thể",
+                "type": "LIST",
+                "items": [
+                  "Chỉnh sửa nội dung theo hướng góp ý mang tính xây dựng, không dùng ngôn từ xúc phạm.",
+                  "Đăng lại đánh giá sau khi chỉnh sửa."
+                ]
+              }
+            ]
+          },
+          "liveIssue": {
+            "label": "Live · Đã ghi nhận sự cố buổi live",
+            "status": "IN_PROGRESS",
+            "sections": [
+              {
+                "title": "Tình trạng",
+                "type": "TEXT",
+                "text": "Chúng tôi đã ghi nhận sự cố ở buổi học trực tiếp và đang kiểm tra cùng giảng viên."
+              },
+              {
+                "title": "Bạn có thể thử",
+                "type": "LIST",
+                "items": [
+                  "Tải lại trang và vào lại buổi live.",
+                  "Kiểm tra mạng, ưu tiên mạng ổn định.",
+                  "Xem lại bản ghi buổi live (nếu giảng viên có đăng)."
+                ]
+              }
+            ]
+          },
+          "instructorRejected": {
+            "label": "Giảng viên · Hướng dẫn sau khi bị từ chối duyệt",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Kết quả xử lý",
+                "type": "TEXT",
+                "text": "Khóa học của bạn chưa được duyệt. Lý do cụ thể hiển thị trong trang quản lý khóa học."
+              },
+              {
+                "title": "Cách chỉnh sửa và gửi lại",
+                "type": "LIST",
+                "items": [
+                  "Đọc kỹ góp ý của đội kiểm duyệt.",
+                  "Chỉnh sửa nội dung theo góp ý.",
+                  "Gửi duyệt lại khóa học."
+                ]
+              }
+            ]
+          },
+          "instructorPayout": {
+            "label": "Giảng viên · Đối soát doanh thu",
+            "status": "IN_PROGRESS",
+            "sections": [
+              {
+                "title": "Tình trạng",
+                "type": "TEXT",
+                "text": "Chúng tôi đã tiếp nhận yêu cầu đối soát doanh thu và đang kiểm tra các giao dịch trong kỳ bạn nêu."
+              },
+              {
+                "title": "Thông tin cần bổ sung",
+                "type": "LIST",
+                "items": [
+                  "Kỳ thanh toán bạn thấy chưa đúng.",
+                  "Khóa học liên quan.",
+                  "Số tiền bạn mong đợi và số đang hiển thị."
+                ]
+              }
+            ]
+          },
+          "privacyRequest": {
+            "label": "Quyền riêng tư · Xử lý yêu cầu dữ liệu cá nhân",
+            "status": "IN_PROGRESS",
+            "sections": [
+              {
+                "title": "Tình trạng",
+                "type": "TEXT",
+                "text": "Chúng tôi đã tiếp nhận yêu cầu liên quan đến dữ liệu cá nhân của bạn. Để bảo vệ tài khoản, chúng tôi cần xác minh danh tính trước khi thực hiện."
+              },
+              {
+                "title": "Các bước tiếp theo",
+                "type": "LIST",
+                "items": [
+                  "Gửi yêu cầu từ đúng email của tài khoản.",
+                  "Chúng tôi xác minh và xử lý trong thời gian sớm nhất.",
+                  "Kết quả được thông báo qua email này."
+                ]
+              }
+            ]
+          },
+          "technicalGeneric": {
+            "label": "Kỹ thuật · Hướng dẫn khắc phục chung",
+            "status": "IN_PROGRESS",
+            "sections": [
+              {
+                "title": "Hướng dẫn khắc phục",
+                "type": "LIST",
+                "items": [
+                  "Tải lại trang và đăng nhập lại.",
+                  "Xóa bộ nhớ đệm hoặc dùng cửa sổ ẩn danh.",
+                  "Thử trình duyệt hoặc thiết bị khác.",
+                  "Nếu vẫn lỗi, gửi ảnh chụp màn hình cùng đường dẫn trang."
+                ]
+              }
+            ]
+          },
+          "notificationHelp": {
+            "label": "Kỹ thuật · Không nhận được thông báo/email",
+            "status": "IN_PROGRESS",
+            "sections": [
+              {
+                "title": "Hướng dẫn kiểm tra",
+                "type": "LIST",
+                "items": [
+                  "Kiểm tra thư mục Spam và Quảng cáo trong hộp thư.",
+                  "Cho phép thông báo cho LinguaLearn trong trình duyệt/ứng dụng.",
+                  "Thêm địa chỉ gửi của LinguaLearn vào danh bạ email."
+                ]
+              }
+            ]
+          }
+        }
+      }
     }
+  },
+  "supportHelp": {
+    "title": "Trợ giúp & Hỗ trợ",
+    "subtitle": "Chọn nhóm vấn đề bạn gặp phải để xem câu trả lời nhanh. Nếu chưa giải quyết được, hãy gửi yêu cầu để đội ngũ hỗ trợ phản hồi qua email.",
+    "pickCategory": "Bạn cần giúp về vấn đề nào?",
+    "faqTitle": "Câu hỏi thường gặp",
+    "stillNeedHelp": "Vẫn cần hỗ trợ?",
+    "openForm": "Gửi yêu cầu hỗ trợ",
+    "closeForm": "Đóng biểu mẫu",
+    "categories": {
+      "ACCOUNT": {
+        "title": "Tài khoản & đăng nhập",
+        "desc": "Quên mật khẩu, OTP, tài khoản bị khóa, đăng nhập Google"
+      },
+      "PAYMENT": {
+        "title": "Thanh toán & hoàn tiền",
+        "desc": "Đã trả tiền chưa vào khóa, trừ tiền hai lần, hoàn tiền, mã giảm giá"
+      },
+      "COURSE": {
+        "title": "Khóa học & nội dung",
+        "desc": "Không vào được khóa học, video, tài liệu, nội dung sai"
+      },
+      "LEARNING": {
+        "title": "Học tập: quiz, flashcard, học liệu",
+        "desc": "Chấm điểm quiz, flashcard, học liệu AI, bài tập, chuỗi ngày học"
+      },
+      "AI_FEATURES": {
+        "title": "Tính năng AI",
+        "desc": "AI Tutor, lộ trình học AI, bị khóa AI, lồng tiếng AI"
+      },
+      "EXAM": {
+        "title": "Thi & giám sát",
+        "desc": "Camera, mất kết nối, nộp bài, báo vi phạm nhầm, điểm thi"
+      },
+      "CERTIFICATE": {
+        "title": "Chứng chỉ",
+        "desc": "Chưa có chứng chỉ, sai tên, mã xác minh, tải PDF"
+      },
+      "COMMUNITY": {
+        "title": "Cộng đồng & đánh giá",
+        "desc": "Báo cáo vi phạm, quấy rối, đánh giá bị ẩn, hỏi đáp, tin nhắn"
+      },
+      "LIVE": {
+        "title": "Buổi học trực tiếp",
+        "desc": "Không vào được live, mất hình/tiếng, phụ đề dịch, buổi live bị hủy"
+      },
+      "INSTRUCTOR": {
+        "title": "Dành cho giảng viên",
+        "desc": "Duyệt khóa học, doanh thu, tải lên, bị báo cáo, đăng ký giảng viên"
+      },
+      "PRIVACY": {
+        "title": "Quyền riêng tư & dữ liệu",
+        "desc": "Xóa tài khoản, xuất dữ liệu, hồ sơ công khai, nghi bị xâm nhập"
+      },
+      "TECHNICAL": {
+        "title": "Lỗi kỹ thuật",
+        "desc": "Trang lỗi, tải chậm, app di động, thông báo, hiển thị"
+      },
+      "OTHER": {
+        "title": "Vấn đề khác",
+        "desc": "Góp ý, hợp tác, các nội dung còn lại"
+      }
+    },
+    "faq": {
+      "ACCOUNT": [
+        {
+          "q": "Tôi quên mật khẩu",
+          "a": "Vào trang Đăng nhập, chọn Quên mật khẩu và nhập email để nhận mã OTP (hiệu lực 5 phút). Nếu không thấy email, hãy kiểm tra thư mục Spam.",
+          "hint": "Email đăng ký tài khoản và thời điểm bạn thử đặt lại."
+        },
+        {
+          "q": "Không nhận được mã OTP",
+          "a": "Chờ vài phút và kiểm tra thư mục Spam. Nếu vẫn không có, hãy gửi yêu cầu: quản trị viên sẽ xác minh và gửi liên kết đặt lại mật khẩu (hiệu lực 30 phút) tới email của bạn.",
+          "hint": "Email tài khoản, thời điểm đã thử và bạn đã kiểm tra thư mục Spam chưa."
+        },
+        {
+          "q": "Tôi đăng nhập bằng Google, có đổi mật khẩu được không?",
+          "a": "Tài khoản đăng nhập bằng Google không có mật khẩu riêng nên không đặt lại mật khẩu được. Hãy dùng nút Đăng nhập bằng Google mỗi lần vào.",
+          "hint": "Email Google bạn đang dùng và lỗi bạn gặp khi đăng nhập."
+        },
+        {
+          "q": "Tài khoản của tôi bị khóa",
+          "a": "Tài khoản có thể bị khóa khi vi phạm quy định hoặc có dấu hiệu bất thường. Hãy gửi yêu cầu kèm email tài khoản và nội dung thông báo bạn thấy để được xem xét.",
+          "hint": "Email tài khoản, thời điểm bị khóa và thông báo hiển thị trên màn hình."
+        },
+        {
+          "q": "Có thiết bị lạ đăng nhập hoặc tôi bị đăng xuất liên tục",
+          "a": "Vào Cài đặt tài khoản, chọn đăng xuất khỏi tất cả thiết bị khác rồi đổi mật khẩu ngay. Nếu vẫn thấy hoạt động lạ, hãy gửi yêu cầu để chúng tôi kiểm tra.",
+          "hint": "Thiết bị/địa chỉ IP lạ bạn thấy và thời điểm xảy ra."
+        },
+        {
+          "q": "Tôi muốn đổi email hoặc thông tin tài khoản",
+          "a": "Họ tên, ảnh đại diện và thông tin hồ sơ chỉnh được trong Cài đặt tài khoản. Nếu cần đổi email đăng nhập, hãy gửi yêu cầu để quản trị viên xác minh danh tính và hỗ trợ.",
+          "hint": "Email hiện tại, email muốn đổi sang và lý do."
+        }
+      ],
+      "PAYMENT": [
+        {
+          "q": "Tôi đã thanh toán nhưng chưa vào được khóa học",
+          "a": "Hệ thống có thể mất vài phút để xác nhận giao dịch. Nếu sau 15 phút khóa học vẫn chưa xuất hiện trong mục Khóa học của tôi, hãy gửi yêu cầu để chúng tôi đối soát.",
+          "hint": "Mã giao dịch, số tiền, thời điểm thanh toán và ảnh chụp biên lai/biến động số dư."
+        },
+        {
+          "q": "Tôi bị trừ tiền hai lần cho cùng một khóa học",
+          "a": "Hãy giữ lại cả hai biên lai và gửi yêu cầu. Chúng tôi sẽ đối soát và hoàn lại khoản thanh toán trùng nếu đúng như bạn mô tả.",
+          "hint": "Hai mã giao dịch, số tiền từng lần, thời điểm và ảnh biến động số dư."
+        },
+        {
+          "q": "Thanh toán thất bại hoặc mã QR hết hạn",
+          "a": "Mã QR thanh toán chỉ có hiệu lực trong thời gian ngắn; hãy quay lại giỏ hàng để tạo mã mới. Nếu tiền đã bị trừ mà đơn vẫn thất bại, hãy gửi yêu cầu kèm biên lai.",
+          "hint": "Khóa học muốn mua, thời điểm thanh toán và ảnh biên lai (nếu đã bị trừ tiền)."
+        },
+        {
+          "q": "Tôi muốn được hoàn tiền",
+          "a": "Xem Chính sách hoàn tiền, sau đó gửi khiếu nại tại mục Yêu cầu hoàn tiền trong menu tài khoản của bạn (kèm lý do và minh chứng). Yêu cầu hoàn tiền được xử lý riêng ở mục đó.",
+          "hint": "Khóa học, mã giao dịch và lý do bạn muốn hoàn tiền."
+        },
+        {
+          "q": "Tôi chưa nhận được tiền hoàn",
+          "a": "Thời gian tiền về tài khoản phụ thuộc ngân hàng. Nếu đã quá thời hạn dự kiến, hãy mở lại khiếu nại tại mục Yêu cầu hoàn tiền (chỉ mở lại được trong thời hạn cho phép) hoặc gửi yêu cầu tại đây.",
+          "hint": "Mã khiếu nại/giao dịch, ngày được xác nhận hoàn tiền và số tài khoản nhận (che bớt số)."
+        },
+        {
+          "q": "Mã giảm giá không áp dụng được",
+          "a": "Mã có thể hết hạn, hết lượt dùng hoặc không áp dụng cho khóa học/gói bạn chọn. Kiểm tra điều kiện của mã; nếu vẫn lỗi hãy gửi yêu cầu kèm tên mã.",
+          "hint": "Tên mã giảm giá, khóa học/gói bạn mua và thông báo lỗi."
+        },
+        {
+          "q": "Tôi cần hóa đơn hoặc biên lai thanh toán",
+          "a": "Hãy gửi yêu cầu kèm thông tin cần xuất hóa đơn để được hỗ trợ.",
+          "hint": "Mã giao dịch, họ tên/đơn vị và thông tin cần ghi trên hóa đơn."
+        }
+      ],
+      "COURSE": [
+        {
+          "q": "Tôi không vào được khóa học đã đăng ký",
+          "a": "Đăng xuất rồi đăng nhập lại và kiểm tra mục Khóa học của tôi. Nếu khóa học vẫn không xuất hiện hoặc không mở được, hãy gửi yêu cầu.",
+          "hint": "Tên khóa học, thời điểm đăng ký và thông báo lỗi."
+        },
+        {
+          "q": "Video bài học không phát",
+          "a": "Kiểm tra kết nối mạng, tải lại trang hoặc thử trình duyệt khác. Nếu vẫn lỗi, hãy gửi yêu cầu kèm tên bài học và ảnh chụp màn hình.",
+          "hint": "Tên khóa học, tên bài học, trình duyệt/thiết bị và ảnh chụp màn hình."
+        },
+        {
+          "q": "Tài liệu bài học không tải được",
+          "a": "Thử tải lại trang hoặc tải bằng trình duyệt khác. Nếu file vẫn lỗi, hãy gửi yêu cầu để chúng tôi kiểm tra tệp.",
+          "hint": "Tên khóa học, tên bài học và tên tài liệu."
+        },
+        {
+          "q": "Nội dung khóa học bị sai, thiếu hoặc lỗi thời",
+          "a": "Hãy gửi yêu cầu mô tả đúng chỗ sai, chúng tôi sẽ chuyển cho giảng viên và đội kiểm duyệt. Bạn cũng có thể đặt câu hỏi trong mục Hỏi đáp của bài học.",
+          "hint": "Tên khóa học, bài học, vị trí (mốc thời gian video) và nội dung bị sai."
+        },
+        {
+          "q": "Tiến độ học của tôi không được cập nhật",
+          "a": "Tiến độ được ghi khi bạn xem hết bài; thử tải lại trang sau khi học. Nếu vẫn thiếu, hãy gửi yêu cầu để chúng tôi kiểm tra.",
+          "hint": "Tên khóa học, các bài đã học nhưng chưa được tính và ảnh chụp tiến độ."
+        },
+        {
+          "q": "Khóa học tôi đã mua bị gỡ hoặc không còn truy cập được",
+          "a": "Khóa học có thể bị ẩn tạm thời để chỉnh sửa hoặc kiểm duyệt. Hãy gửi yêu cầu để chúng tôi xác nhận tình trạng và quyền truy cập của bạn.",
+          "hint": "Tên khóa học, mã giao dịch và thời điểm bạn thấy khóa học biến mất."
+        }
+      ],
+      "LEARNING": [
+        {
+          "q": "Quiz chấm điểm sai hoặc đáp án chưa đúng",
+          "a": "Hãy gửi yêu cầu nêu rõ câu hỏi bạn cho là sai, chúng tôi sẽ chuyển cho giảng viên xem xét lại đáp án.",
+          "hint": "Tên quiz, số câu, đáp án bạn chọn và lý do bạn cho là chấm sai."
+        },
+        {
+          "q": "Tôi không làm lại được quiz hoặc mất kết quả",
+          "a": "Một số quiz giới hạn số lần làm. Nếu kết quả bị mất bất thường, hãy gửi yêu cầu để chúng tôi kiểm tra lịch sử làm bài.",
+          "hint": "Tên quiz, thời điểm làm bài và thông báo bạn thấy."
+        },
+        {
+          "q": "Flashcard không đồng bộ hoặc lỗi ôn tập",
+          "a": "Tải lại trang hoặc đăng nhập lại để đồng bộ. Nếu thẻ ôn tập vẫn sai lịch hoặc mất, hãy gửi yêu cầu.",
+          "hint": "Tên bộ flashcard, thiết bị đang dùng và mô tả lỗi."
+        },
+        {
+          "q": "Học liệu AI tạo ra (quiz/flashcard/sơ đồ tư duy) bị lỗi hoặc trống",
+          "a": "Thử tạo lại sau ít phút. Nếu vẫn lỗi hoặc nội dung sai lệch, hãy gửi yêu cầu kèm bài học bạn dùng để tạo.",
+          "hint": "Loại học liệu, bài học nguồn và ảnh chụp màn hình lỗi."
+        },
+        {
+          "q": "Chuỗi ngày học (streak) bị mất hoặc tính sai",
+          "a": "Chuỗi được tính theo ngày bạn hoàn thành bài học hoặc quiz. Nếu bạn đã học mà chuỗi vẫn bị ngắt, hãy gửi yêu cầu.",
+          "hint": "Các ngày bạn đã học, chuỗi hiện tại và ảnh chụp màn hình."
+        },
+        {
+          "q": "Bài tập đã nộp nhưng không thấy điểm hoặc không nộp được",
+          "a": "Kiểm tra dung lượng và định dạng tệp, thử nộp lại. Nếu bài đã nộp mà không hiện hoặc chưa có điểm lâu, hãy gửi yêu cầu.",
+          "hint": "Tên khóa học, tên bài tập, thời điểm nộp và tên tệp."
+        }
+      ],
+      "AI_FEATURES": [
+        {
+          "q": "AI Tutor trả lời sai hoặc không phù hợp",
+          "a": "AI có thể nhầm lẫn; hãy đối chiếu với bài giảng. Nếu câu trả lời sai nghiêm trọng hoặc không phù hợp, hãy gửi yêu cầu kèm đoạn hội thoại để chúng tôi cải thiện.",
+          "hint": "Bài học, câu hỏi bạn hỏi và câu trả lời của AI (hoặc ảnh chụp màn hình)."
+        },
+        {
+          "q": "AI báo lỗi hoặc không phản hồi",
+          "a": "Thử lại sau ít phút. Nếu lỗi kéo dài, hãy gửi yêu cầu kèm thông báo lỗi để đội kỹ thuật kiểm tra.",
+          "hint": "Tính năng AI đang dùng, thời điểm lỗi và thông báo hiển thị."
+        },
+        {
+          "q": "Tôi bị khóa quyền dùng AI",
+          "a": "Quyền dùng AI có thể bị khóa khi tài khoản bị gắn cờ vi phạm hoặc spam. Hãy gửi yêu cầu kèm email tài khoản để được xem xét.",
+          "hint": "Email tài khoản và thông báo bạn thấy khi dùng AI."
+        },
+        {
+          "q": "Lộ trình học AI không hợp lý hoặc không tạo được",
+          "a": "Cập nhật mục tiêu và thời gian học rồi tạo lại. Nếu lộ trình vẫn sai lệch hoặc không tạo được, hãy gửi yêu cầu.",
+          "hint": "Mục tiêu học bạn nhập, khóa học liên quan và ảnh chụp lộ trình."
+        },
+        {
+          "q": "Đánh giá hoặc bình luận của tôi bị bộ lọc AI chặn nhầm",
+          "a": "Bộ lọc tự động có thể chặn nhầm nội dung bình thường. Hãy gửi yêu cầu kèm nội dung bạn đã đăng để chúng tôi xem lại.",
+          "hint": "Nội dung bạn đã đăng, nơi đăng (khóa học/bài học) và thời điểm."
+        },
+        {
+          "q": "Lồng tiếng hoặc phụ đề AI sai, lệch tiếng",
+          "a": "Hãy gửi yêu cầu nêu bài học, ngôn ngữ và mốc thời gian bị sai để chúng tôi chuyển cho đội xử lý lồng tiếng.",
+          "hint": "Bài học, ngôn ngữ và mốc thời gian video bị sai."
+        }
+      ],
+      "EXAM": [
+        {
+          "q": "Camera không bật khi làm bài thi",
+          "a": "Cho phép trình duyệt truy cập camera và micro, đóng các ứng dụng khác đang dùng camera rồi tải lại trang. Trên điện thoại, bạn có thể thử làm bài bằng máy tính hoặc ứng dụng di động.",
+          "hint": "Thiết bị, trình duyệt và thông báo lỗi camera."
+        },
+        {
+          "q": "Bài thi bị treo hoặc mất kết nối khi đang làm",
+          "a": "Giữ nguyên trang và kiểm tra mạng, đừng tải lại liên tục. Hãy gửi yêu cầu ngay kèm thời điểm xảy ra để chúng tôi ghi nhận sự cố với giảng viên.",
+          "hint": "Tên bài thi, thời điểm treo/mất kết nối và ảnh chụp màn hình."
+        },
+        {
+          "q": "Nộp bài thi không thành công",
+          "a": "Không đóng trang. Chờ khoảng 1 phút; nếu vẫn treo hãy chụp màn hình và gửi yêu cầu ngay để bài làm của bạn được kiểm tra.",
+          "hint": "Tên bài thi, thời điểm bấm nộp và ảnh chụp màn hình."
+        },
+        {
+          "q": "Tôi bị báo vi phạm giám sát nhầm",
+          "a": "Hệ thống giám sát có thể nhận diện sai (ánh sáng yếu, người khác đi ngang...). Hãy gửi yêu cầu kèm bối cảnh để giảng viên và quản trị viên xem lại.",
+          "hint": "Tên bài thi, thời điểm bị báo vi phạm và hoàn cảnh lúc đó."
+        },
+        {
+          "q": "Điểm bài thi không đúng hoặc chưa có kết quả",
+          "a": "Một số bài cần giảng viên chấm nên kết quả có thể chưa hiện ngay. Nếu đã quá thời hạn dự kiến hoặc điểm có vẻ sai, hãy gửi yêu cầu.",
+          "hint": "Tên bài thi, thời điểm nộp và điểm bạn mong đợi."
+        },
+        {
+          "q": "Làm bài thi trên điện thoại bị lỗi",
+          "a": "Trình duyệt trên điện thoại có thể hạn chế camera hoặc ghi hình. Hãy thử làm bài bằng máy tính hoặc ứng dụng di động của LinguaLearn.",
+          "hint": "Hãng/đời điện thoại, trình duyệt và mô tả lỗi."
+        }
+      ],
+      "CERTIFICATE": [
+        {
+          "q": "Tôi hoàn thành khóa học nhưng chưa thấy chứng chỉ",
+          "a": "Gửi yêu cầu kèm tên khóa học để quản trị viên kiểm tra tiến độ và điều kiện cấp chứng chỉ của bạn.",
+          "hint": "Tên khóa học, thời điểm hoàn thành và ảnh chụp tiến độ học."
+        },
+        {
+          "q": "Tên trên chứng chỉ bị sai",
+          "a": "Chứng chỉ in họ tên theo hồ sơ. Hãy cập nhật họ tên trong Cài đặt tài khoản hoặc gửi yêu cầu để chúng tôi cấp lại bản đúng tên.",
+          "hint": "Họ tên đúng, họ tên đang in trên chứng chỉ và tên khóa học."
+        },
+        {
+          "q": "Mã xác minh chứng chỉ không dùng được",
+          "a": "Kiểm tra lại mã (phân biệt chữ hoa/thường) và đường dẫn xác minh. Nếu vẫn không xác minh được, hãy gửi yêu cầu kèm mã chứng chỉ.",
+          "hint": "Mã chứng chỉ và đường dẫn/ảnh chụp trang xác minh."
+        },
+        {
+          "q": "Không tải được file PDF chứng chỉ",
+          "a": "Thử tải lại trang hoặc dùng trình duyệt khác. Nếu vẫn lỗi, hãy gửi yêu cầu kèm tên khóa học.",
+          "hint": "Tên khóa học, trình duyệt/thiết bị và thông báo lỗi."
+        }
+      ],
+      "COMMUNITY": [
+        {
+          "q": "Tôi muốn báo cáo nội dung vi phạm",
+          "a": "Hãy gửi yêu cầu kèm đường dẫn hoặc ảnh chụp nội dung vi phạm (bình luận, câu hỏi, tin nhắn, khóa học). Đội kiểm duyệt sẽ xem xét và xử lý.",
+          "hint": "Đường dẫn/ảnh chụp nội dung, tên người đăng và lý do bạn cho là vi phạm."
+        },
+        {
+          "q": "Tôi bị quấy rối hoặc nhận tin nhắn spam",
+          "a": "Hãy chụp lại các tin nhắn và gửi yêu cầu. Chúng tôi sẽ xem xét và có thể xử lý tài khoản vi phạm.",
+          "hint": "Tên/email người gửi, ảnh chụp tin nhắn và thời điểm."
+        },
+        {
+          "q": "Đánh giá của tôi bị ẩn hoặc bị từ chối",
+          "a": "Đánh giá có thể bị ẩn nếu vi phạm quy tắc nội dung hoặc bị bộ lọc tự động chặn. Hãy gửi yêu cầu kèm nội dung bạn đã viết để xem xét lại.",
+          "hint": "Khóa học, nội dung đánh giá và thời điểm đăng."
+        },
+        {
+          "q": "Câu hỏi của tôi chưa được giảng viên trả lời",
+          "a": "Giảng viên cần thời gian để phản hồi. Nếu câu hỏi tồn đọng quá lâu, hãy gửi yêu cầu kèm đường dẫn câu hỏi.",
+          "hint": "Khóa học, bài học và nội dung câu hỏi."
+        },
+        {
+          "q": "Tôi không nhắn tin được với giảng viên",
+          "a": "Bạn chỉ nhắn được giảng viên của khóa học bạn đang theo học. Nếu đã đủ điều kiện mà vẫn lỗi, hãy gửi yêu cầu.",
+          "hint": "Tên giảng viên, khóa học và thông báo lỗi."
+        }
+      ],
+      "LIVE": [
+        {
+          "q": "Tôi không vào được buổi học trực tiếp",
+          "a": "Kiểm tra bạn đã đăng nhập và có quyền xem buổi live, rồi tải lại trang. Nếu vẫn không vào được, hãy gửi yêu cầu kèm tên buổi live.",
+          "hint": "Tên buổi live, giờ bắt đầu, thiết bị và thông báo lỗi."
+        },
+        {
+          "q": "Bị mất hình hoặc mất tiếng khi đang học live",
+          "a": "Kiểm tra mạng, tải lại trang và thử trình duyệt khác. Nếu lỗi lặp lại, hãy gửi yêu cầu kèm thời điểm xảy ra.",
+          "hint": "Tên buổi live, thời điểm mất hình/tiếng, mạng và thiết bị."
+        },
+        {
+          "q": "Phụ đề dịch thời gian thực sai hoặc không hiện",
+          "a": "Chọn lại ngôn ngữ phụ đề trong buổi live. Nếu phụ đề vẫn sai hoặc không xuất hiện, hãy gửi yêu cầu.",
+          "hint": "Tên buổi live, ngôn ngữ bạn chọn và thời điểm gặp lỗi."
+        },
+        {
+          "q": "Buổi live bị hủy hoặc đổi giờ",
+          "a": "Giảng viên có thể thay đổi lịch buổi live. Nếu bạn không nhận được thông báo hoặc cần được hỗ trợ, hãy gửi yêu cầu.",
+          "hint": "Tên buổi live, khóa học và lịch bạn đã thấy."
+        }
+      ],
+      "INSTRUCTOR": [
+        {
+          "q": "Khóa học của tôi bị từ chối duyệt",
+          "a": "Lý do từ chối hiển thị ở trang quản lý khóa học của bạn. Chỉnh sửa theo góp ý rồi gửi duyệt lại; nếu cần làm rõ, hãy gửi yêu cầu.",
+          "hint": "Tên khóa học và phần góp ý/lý do từ chối bạn thấy."
+        },
+        {
+          "q": "Khóa học của tôi chờ duyệt quá lâu",
+          "a": "Thời gian duyệt phụ thuộc số lượng khóa học đang chờ. Nếu đã chờ lâu bất thường, hãy gửi yêu cầu kèm tên khóa học.",
+          "hint": "Tên khóa học và ngày bạn gửi duyệt."
+        },
+        {
+          "q": "Doanh thu hoặc thanh toán cho giảng viên không đúng",
+          "a": "Hãy gửi yêu cầu nêu kỳ và khoản bạn thấy chưa đúng để chúng tôi đối soát.",
+          "hint": "Kỳ thanh toán, khóa học liên quan, số tiền bạn mong đợi và số đang hiển thị."
+        },
+        {
+          "q": "Tôi không tải được video hoặc tài liệu lên",
+          "a": "Kiểm tra dung lượng, định dạng và kết nối mạng, rồi thử lại. Nếu vẫn lỗi, hãy gửi yêu cầu kèm tên tệp.",
+          "hint": "Tên tệp, dung lượng, định dạng và thông báo lỗi."
+        },
+        {
+          "q": "Khóa học hoặc nội dung của tôi bị báo cáo",
+          "a": "Hãy gửi yêu cầu để cung cấp thêm thông tin và giải trình; đội kiểm duyệt sẽ xem xét công bằng.",
+          "hint": "Tên khóa học, nội dung bị báo cáo và giải trình của bạn."
+        },
+        {
+          "q": "Tôi muốn trở thành giảng viên",
+          "a": "Vào mục Trở thành Giảng viên trong menu tài khoản và hoàn tất đăng ký. Nếu gặp lỗi hoặc cần hỗ trợ, hãy gửi yêu cầu.",
+          "hint": "Email tài khoản và bước bạn gặp khó khăn."
+        }
+      ],
+      "PRIVACY": [
+        {
+          "q": "Tôi muốn xóa tài khoản và dữ liệu của mình",
+          "a": "Hãy gửi yêu cầu từ email của tài khoản. Chúng tôi sẽ xác minh danh tính trước khi xử lý và thông báo kết quả qua email.",
+          "hint": "Email tài khoản và phạm vi dữ liệu bạn muốn xóa."
+        },
+        {
+          "q": "Tôi muốn nhận bản sao dữ liệu cá nhân",
+          "a": "Hãy gửi yêu cầu từ email tài khoản nêu loại dữ liệu cần xuất. Chúng tôi sẽ xác minh và phản hồi qua email.",
+          "hint": "Email tài khoản và loại dữ liệu bạn cần."
+        },
+        {
+          "q": "Hồ sơ công khai hiển thị thông tin tôi không muốn",
+          "a": "Vào Cài đặt tài khoản để tắt hiển thị khóa học hoặc danh sách yêu thích trên hồ sơ công khai. Nếu thông tin vẫn lộ, hãy gửi yêu cầu.",
+          "hint": "Đường dẫn hồ sơ công khai và thông tin đang hiển thị ngoài ý muốn."
+        },
+        {
+          "q": "Tôi nghi ngờ tài khoản bị xâm nhập hoặc lộ thông tin",
+          "a": "Đổi mật khẩu ngay và đăng xuất khỏi mọi thiết bị khác trong Cài đặt tài khoản, sau đó gửi yêu cầu để chúng tôi kiểm tra hoạt động bất thường.",
+          "hint": "Dấu hiệu bất thường, thời điểm phát hiện và thiết bị/địa chỉ IP lạ (nếu có)."
+        }
+      ],
+      "TECHNICAL": [
+        {
+          "q": "Trang web báo lỗi, trắng trang hoặc tải rất chậm",
+          "a": "Tải lại trang, xóa bộ nhớ đệm hoặc đổi trình duyệt. Nếu vẫn lỗi, hãy gửi yêu cầu kèm đường dẫn trang và ảnh chụp màn hình.",
+          "hint": "Đường dẫn trang, trình duyệt/thiết bị và ảnh chụp màn hình."
+        },
+        {
+          "q": "Ứng dụng di động bị lỗi hoặc đóng đột ngột",
+          "a": "Cập nhật Expo Go/ứng dụng lên bản mới nhất và đăng nhập lại. Nếu vẫn lỗi, hãy gửi yêu cầu kèm thiết bị và màn hình xảy ra lỗi.",
+          "hint": "Hãng/đời điện thoại, phiên bản hệ điều hành và màn hình gặp lỗi."
+        },
+        {
+          "q": "Tôi không nhận được thông báo hoặc email",
+          "a": "Kiểm tra thư mục Spam và quyền thông báo của trình duyệt/ứng dụng. Nếu vẫn không nhận được, hãy gửi yêu cầu kèm email tài khoản.",
+          "hint": "Email tài khoản, loại thông báo thiếu và thời điểm."
+        },
+        {
+          "q": "Giao diện hiển thị sai trên thiết bị hoặc trình duyệt của tôi",
+          "a": "Hãy gửi yêu cầu kèm ảnh chụp màn hình, thiết bị và trình duyệt để chúng tôi tái hiện lỗi.",
+          "hint": "Thiết bị, hệ điều hành, trình duyệt, kích thước màn hình và ảnh chụp."
+        },
+        {
+          "q": "Nội dung giao diện bị sai ngôn ngữ hoặc bản dịch",
+          "a": "Hãy gửi yêu cầu nêu màn hình và đoạn chữ bị sai để chúng tôi chỉnh lại bản dịch.",
+          "hint": "Ngôn ngữ đang chọn, màn hình và đoạn chữ bị sai."
+        }
+      ],
+      "OTHER": [
+        {
+          "q": "Tôi muốn góp ý về tính năng hoặc trải nghiệm",
+          "a": "Chúng tôi trân trọng mọi góp ý. Hãy gửi yêu cầu mô tả điều bạn muốn cải thiện.",
+          "hint": "Màn hình/tính năng liên quan và điều bạn mong muốn."
+        },
+        {
+          "q": "Tôi muốn hợp tác hoặc liên hệ về kinh doanh",
+          "a": "Hãy gửi yêu cầu kèm thông tin đơn vị và nội dung hợp tác, chúng tôi sẽ phản hồi qua email.",
+          "hint": "Tên đơn vị, người liên hệ và đề xuất hợp tác."
+        },
+        {
+          "q": "Vấn đề của tôi không thuộc nhóm nào ở trên",
+          "a": "Hãy gửi yêu cầu và mô tả rõ vấn đề của bạn, đội ngũ sẽ phản hồi qua email.",
+          "hint": "Mô tả chi tiết vấn đề, thời điểm và ảnh chụp màn hình (nếu có)."
+        }
+      ]
+    },
+    "form": {
+      "title": "Gửi yêu cầu hỗ trợ",
+      "email": "Email nhận phản hồi",
+      "category": "Nhóm vấn đề",
+      "subject": "Tiêu đề",
+      "message": "Mô tả chi tiết",
+      "messageHint": "Tối thiểu 10 ký tự. Mô tả càng rõ, chúng tôi xử lý càng nhanh.",
+      "attach": "Ảnh minh chứng (không bắt buộc)",
+      "attachHint": "Tối đa {count} ảnh jpg/png/webp, mỗi ảnh {size}MB.",
+      "addFiles": "Chọn ảnh",
+      "remove": "Xóa",
+      "tooMany": "Chỉ được đính kèm tối đa {count} ảnh.",
+      "tooBig": "Ảnh \"{name}\" vượt quá {size}MB.",
+      "badType": "\"{name}\" không phải ảnh jpg/png/webp.",
+      "submit": "Gửi yêu cầu",
+      "submitting": "Đang gửi...",
+      "genericError": "Không gửi được yêu cầu, vui lòng thử lại.",
+      "successTitle": "Đã gửi yêu cầu",
+      "successBody": "Mã yêu cầu của bạn là {code}. Chúng tôi đã gửi email xác nhận và sẽ phản hồi trong 24-48 giờ. Nếu không thấy email, hãy kiểm tra thư mục Spam.",
+      "newRequest": "Gửi yêu cầu khác",
+      "topic": "Chủ đề",
+      "topicHint": "Chủ đề được điền tự động theo mục bạn đã chọn.",
+      "messageGuided": "Mô tả thêm tình huống của bạn",
+      "shouldInclude": "Nên nêu rõ:"
+    },
+    "forgotHint": "Không nhận được mã OTP?",
+    "forgotLink": "Gửi yêu cầu hỗ trợ",
+    "requestThis": "Vấn đề này chưa được giải quyết? Gửi yêu cầu",
+    "otherInGroup": "Vấn đề khác trong nhóm này",
+    "otherLabel": "Vấn đề khác"
   }
 }

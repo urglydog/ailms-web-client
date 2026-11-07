@@ -54,7 +54,7 @@ export function LiveFeedCard({ item }: { item: LiveFeedItem }) {
 
         <div className="absolute left-2 top-2">
           {isLive ? (
-            <span className="flex items-center gap-1 rounded-full bg-red-600 px-2 py-0.5 text-[11px] font-bold text-white shadow">
+            <span className="flex items-center gap-1 rounded-full bg-danger px-2 py-0.5 text-[11px] font-bold text-white shadow">
               <span className="h-1.5 w-1.5 rounded-full bg-white" aria-hidden /> LIVE
             </span>
           ) : (

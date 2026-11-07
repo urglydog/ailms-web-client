@@ -82,8 +82,8 @@ export default function ChangePasswordModal({ onClose, onSuccess }: ChangePasswo
               className="w-full px-3 py-2 border border-line rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
             />
           </div>
-          {error && <p className="text-red-600 text-sm">{error}</p>}
-          {success && <p className="text-green-600 text-sm font-semibold">{success}</p>}
+          {error && <p className="text-danger text-sm">{error}</p>}
+          {success && <p className="text-success text-sm font-semibold">{success}</p>}
           <div className="flex gap-2 pt-4">
             <button
               type="submit"

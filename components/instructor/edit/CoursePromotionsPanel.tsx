@@ -103,19 +103,19 @@ export function CoursePromotionsPanel({ courseId }: { courseId: number }) {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-        <h2 className="mb-1 font-display text-[16px] font-bold text-gray-900">Giới thiệu sinh viên</h2>
-        <p className="text-[12.5px] text-gray-500">
+      <div className="rounded-xl border border-line bg-white p-5 shadow-sm">
+        <h2 className="mb-1 font-display text-[16px] font-bold text-ink">Giới thiệu sinh viên</h2>
+        <p className="text-[12.5px] text-ink-muted">
           Tính năng chia sẻ link giới thiệu và ghi nhận doanh số riêng đang được lên kế hoạch, chưa có ở
           phiên bản này.
         </p>
       </div>
 
-      <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+      <div className="rounded-xl border border-line bg-white p-5 shadow-sm">
         <div className="mb-4 flex items-center justify-between">
           <div>
-            <h2 className="font-display text-[16px] font-bold text-gray-900">Mã giảm giá cho khóa học này</h2>
-            <p className="mt-1 text-[12.5px] text-gray-500">
+            <h2 className="font-display text-[16px] font-bold text-ink">Mã giảm giá cho khóa học này</h2>
+            <p className="mt-1 text-[12.5px] text-ink-muted">
               Áp dụng riêng cho khóa này. Mã &quot;tự động&quot; hiện giá đã giảm ngay trên trang khóa học, không
               cần học viên nhập mã.
             </p>
@@ -130,9 +130,9 @@ export function CoursePromotionsPanel({ courseId }: { courseId: number }) {
         </div>
 
         {isLoading ? (
-          <p className="text-[12.5px] text-gray-400">Đang tải...</p>
+          <p className="text-[12.5px] text-ink-faint">Đang tải...</p>
         ) : relevantCoupons.length === 0 ? (
-          <p className="rounded-lg border border-dashed border-gray-300 p-6 text-center text-[12.5px] text-gray-400">
+          <p className="rounded-lg border border-dashed border-line p-6 text-center text-[12.5px] text-ink-faint">
             Chưa có mã giảm giá nào cho khóa học này.
           </p>
         ) : (
@@ -140,13 +140,13 @@ export function CoursePromotionsPanel({ courseId }: { courseId: number }) {
             {relevantCoupons.map((coupon) => (
               <div
                 key={coupon.id}
-                className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-gray-100 bg-gray-50/60 px-4 py-2.5"
+                className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-line-soft bg-surface/60 px-4 py-2.5"
               >
                 <div className="flex items-center gap-3">
-                  <span className="font-mono text-[13px] font-bold text-gray-900">
-                    {coupon.code ?? <span className="italic font-sans font-normal text-gray-500">Tự động</span>}
+                  <span className="font-mono text-[13px] font-bold text-ink">
+                    {coupon.code ?? <span className="italic font-sans font-normal text-ink-muted">Tự động</span>}
                   </span>
-                  <span className="text-[12.5px] text-gray-600">
+                  <span className="text-[12.5px] text-ink-muted">
                     {coupon.discountType === 'PERCENTAGE'
                       ? `-${coupon.discountValue}%`
                       : `-${coupon.discountValue.toLocaleString('vi-VN')}đ`}
@@ -158,12 +158,12 @@ export function CoursePromotionsPanel({ courseId }: { courseId: number }) {
                   )}
                   <span
                     className={`rounded-full px-2 py-0.5 text-[10.5px] font-bold ${
-                      coupon.isActive ? 'bg-green-50 text-green-600' : 'bg-gray-100 text-gray-500'
+                      coupon.isActive ? 'bg-success-tint text-success' : 'bg-tint text-ink-muted'
                     }`}
                   >
                     {coupon.isActive ? 'Đang bật' : 'Đã tắt'}
                   </span>
-                  <span className="text-[11.5px] text-gray-400">
+                  <span className="text-[11.5px] text-ink-faint">
                     {new Date(coupon.startAt).toLocaleDateString('vi-VN')} – {new Date(coupon.endAt).toLocaleDateString('vi-VN')}
                   </span>
                 </div>
@@ -179,7 +179,7 @@ export function CoursePromotionsPanel({ courseId }: { courseId: number }) {
                     <button
                       type="button"
                       onClick={() => deleteCoupon.mutate(coupon.id)}
-                      className="text-[11.5px] font-bold text-red-500 hover:underline"
+                      className="text-[11.5px] font-bold text-danger hover:underline"
                     >
                       Xóa
                     </button>
@@ -194,11 +194,11 @@ export function CoursePromotionsPanel({ courseId }: { courseId: number }) {
       {editing && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
           <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
-            <h2 className="mb-4 font-display text-lg font-bold text-gray-900">
+            <h2 className="mb-4 font-display text-lg font-bold text-ink">
               {editing === 'new' ? 'Tạo mã giảm giá' : 'Sửa mã giảm giá'}
             </h2>
             <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-              <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+              <label className="flex items-center gap-2 text-sm font-medium text-ink">
                 <input
                   type="checkbox"
                   checked={form.autoApply}
@@ -213,14 +213,14 @@ export function CoursePromotionsPanel({ courseId }: { courseId: number }) {
                   placeholder="Mã giảm giá, VD: SALE50"
                   value={form.code}
                   onChange={(e) => setForm((f) => ({ ...f, code: e.target.value }))}
-                  className="rounded-lg border border-gray-200 px-3 py-2 text-sm uppercase focus:border-cyan-400 focus:outline-none"
+                  className="rounded-lg border border-line px-3 py-2 text-sm uppercase focus:border-accent focus:outline-none"
                 />
               )}
               <div className="grid grid-cols-2 gap-3">
                 <select
                   value={form.discountType}
                   onChange={(e) => setForm((f) => ({ ...f, discountType: e.target.value as DiscountType }))}
-                  className="rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-cyan-400 focus:outline-none"
+                  className="rounded-lg border border-line px-3 py-2 text-sm focus:border-accent focus:outline-none"
                 >
                   {Object.entries(DISCOUNT_TYPE_LABEL).map(([value, label]) => (
                     <option key={value} value={value}>{label}</option>
@@ -235,28 +235,28 @@ export function CoursePromotionsPanel({ courseId }: { courseId: number }) {
                   placeholder="Giá trị"
                   value={form.discountValue}
                   onChange={(e) => setForm((f) => ({ ...f, discountValue: e.target.value }))}
-                  className="rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-cyan-400 focus:outline-none"
+                  className="rounded-lg border border-line px-3 py-2 text-sm focus:border-accent focus:outline-none"
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <label className="flex flex-col gap-1">
-                  <span className="text-[11.5px] font-semibold text-gray-600">Bắt đầu</span>
+                  <span className="text-[11.5px] font-semibold text-ink-muted">Bắt đầu</span>
                   <input
                     required
                     type="datetime-local"
                     value={form.startAt}
                     onChange={(e) => setForm((f) => ({ ...f, startAt: e.target.value }))}
-                    className="rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-cyan-400 focus:outline-none"
+                    className="rounded-lg border border-line px-3 py-2 text-sm focus:border-accent focus:outline-none"
                   />
                 </label>
                 <label className="flex flex-col gap-1">
-                  <span className="text-[11.5px] font-semibold text-gray-600">Kết thúc</span>
+                  <span className="text-[11.5px] font-semibold text-ink-muted">Kết thúc</span>
                   <input
                     required
                     type="datetime-local"
                     value={form.endAt}
                     onChange={(e) => setForm((f) => ({ ...f, endAt: e.target.value }))}
-                    className="rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-cyan-400 focus:outline-none"
+                    className="rounded-lg border border-line px-3 py-2 text-sm focus:border-accent focus:outline-none"
                   />
                 </label>
               </div>
@@ -267,7 +267,7 @@ export function CoursePromotionsPanel({ courseId }: { courseId: number }) {
                   placeholder="Giới hạn lượt dùng"
                   value={form.maxUsageCount}
                   onChange={(e) => setForm((f) => ({ ...f, maxUsageCount: e.target.value }))}
-                  className="rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-cyan-400 focus:outline-none"
+                  className="rounded-lg border border-line px-3 py-2 text-sm focus:border-accent focus:outline-none"
                 />
                 <input
                   type="number"
@@ -275,14 +275,14 @@ export function CoursePromotionsPanel({ courseId }: { courseId: number }) {
                   placeholder="Giới hạn / học viên"
                   value={form.maxUsagePerUser}
                   onChange={(e) => setForm((f) => ({ ...f, maxUsagePerUser: e.target.value }))}
-                  className="rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-cyan-400 focus:outline-none"
+                  className="rounded-lg border border-line px-3 py-2 text-sm focus:border-accent focus:outline-none"
                 />
               </div>
               <div className="flex justify-end gap-2 pt-2">
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="rounded-lg px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-100"
+                  className="rounded-lg px-4 py-2 text-sm font-semibold text-ink-muted hover:bg-tint"
                 >
                   Hủy
                 </button>

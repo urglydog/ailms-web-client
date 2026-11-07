@@ -122,7 +122,7 @@ function AttemptHistoryContent() {
         </div>
 
         {historyError ? (
-          <div className="bg-red-50 text-red-600 p-4 rounded-md text-sm">
+          <div className="bg-danger/5 text-danger p-4 rounded-md text-sm">
             {historyError instanceof ApiError ? historyError.message : 'Có lỗi xảy ra khi tải lịch sử'}
           </div>
         ) : isLoadingHistory ? (
@@ -150,21 +150,21 @@ function AttemptHistoryContent() {
                       const hasAnswer = q.selectedOptionIds && q.selectedOptionIds.length > 0;
                       const showCorrectness = q.isCorrect !== null && q.correctOptionIds && q.correctOptionIds.length > 0;
                       // Border: green if correct, red if wrong or unanswered, neutral if allowReview is false
-                      const cardBorder = q.isCorrect === null ? 'border-line bg-white' : (q.isCorrect ? 'border-green-400 bg-green-50/30' : 'border-red-400 bg-red-50/30');
+                      const cardBorder = q.isCorrect === null ? 'border-line bg-white' : (q.isCorrect ? 'border-green-400 bg-success-tint/30' : 'border-danger bg-danger/5');
 
                       return (
                         <div key={q.questionId} id={`question-${q.questionId}`} className={`border-2 rounded-lg p-4 ${cardBorder}`}>
                           <h3 className="font-bold text-xs flex items-center gap-2 mb-2">
-                            <span className={`w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center text-[10px] text-white font-bold ${q.isCorrect ? 'bg-green-500' : 'bg-red-500'}`}>
+                            <span className={`w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center text-[10px] text-white font-bold ${q.isCorrect ? 'bg-success' : 'bg-danger'}`}>
                               {hStart + qIdx + 1}
                             </span>
                             <span className="text-ink">{q.content}</span>
                             {q.isCorrect === true
-                              ? <span className="ml-auto flex items-center gap-1 text-green-600 text-[10px] font-bold whitespace-nowrap"><CheckCircle2 className="w-3 h-3" /> Đúng</span>
+                              ? <span className="ml-auto flex items-center gap-1 text-success text-[10px] font-bold whitespace-nowrap"><CheckCircle2 className="w-3 h-3" /> Đúng</span>
                               : q.isCorrect === false && hasAnswer
-                                ? <span className="ml-auto flex items-center gap-1 text-red-600 text-[10px] font-bold whitespace-nowrap"><XCircle className="w-3 h-3" /> Sai</span>
+                                ? <span className="ml-auto flex items-center gap-1 text-danger text-[10px] font-bold whitespace-nowrap"><XCircle className="w-3 h-3" /> Sai</span>
                                 : q.isCorrect === false && !hasAnswer
-                                  ? <span className="ml-auto flex items-center gap-1 text-red-600 text-[10px] font-bold whitespace-nowrap"><MinusCircle className="w-3 h-3" /> Bỏ trống</span>
+                                  ? <span className="ml-auto flex items-center gap-1 text-danger text-[10px] font-bold whitespace-nowrap"><MinusCircle className="w-3 h-3" /> Bỏ trống</span>
                                   : <span className="ml-auto text-ink-muted text-[10px] font-bold whitespace-nowrap">{hasAnswer ? 'Đã trả lời' : 'Bỏ trống'}</span>
                             }
                           </h3>
@@ -180,15 +180,15 @@ function AttemptHistoryContent() {
                               if (showCorrectness) {
                                 if (isCorrectAnswer && isSelected) {
                                   // Picked correct
-                                  optClass = "bg-green-50 border-green-300 text-green-800 font-medium";
+                                  optClass = "bg-success-tint border-success/40 text-success-ink font-medium";
                                   Icon = CheckCircle2;
                                 } else if (isCorrectAnswer) {
                                   // Correct but not picked
-                                  optClass = "bg-green-50 border-green-300 border-dashed text-green-700";
+                                  optClass = "bg-success-tint border-success/40 border-dashed text-success-ink";
                                   Icon = CheckCircle2;
                                 } else if (isSelected) {
                                   // Picked wrong
-                                  optClass = "bg-red-50 border-red-300 text-red-800 font-medium";
+                                  optClass = "bg-danger/5 border-danger/40 text-danger font-medium";
                                   Icon = XCircle;
                                 }
                               } else {
@@ -219,7 +219,7 @@ function AttemptHistoryContent() {
                   </div>
                   );
                 })() : (
-                  <div className="bg-white border border-line rounded-lg p-8 text-center text-red-500 shadow-sm text-sm">
+                  <div className="bg-white border border-line rounded-lg p-8 text-center text-danger shadow-sm text-sm">
                     Không tải được chi tiết
                   </div>
                 )
@@ -252,7 +252,7 @@ function AttemptHistoryContent() {
                             <div className="h-[70%] w-full flex items-center justify-center bg-surface text-ink border-b border-line/50">
                               {idx + 1}
                             </div>
-                            <div className={`h-[30%] w-full flex items-center justify-center text-white text-[8px] ${isCorrect === null ? (q.selectedOptionIds?.length ? 'bg-accent/80' : 'bg-surface text-ink-muted') : (isCorrect ? 'bg-green-500' : 'bg-red-500')}`}>
+                            <div className={`h-[30%] w-full flex items-center justify-center text-white text-[8px] ${isCorrect === null ? (q.selectedOptionIds?.length ? 'bg-accent/80' : 'bg-surface text-ink-muted') : (isCorrect ? 'bg-success' : 'bg-danger')}`}>
                               {isCorrect === null
                                 ? (q.selectedOptionIds?.length ? <CheckCircle2 className="w-2.5 h-2.5" /> : <MinusCircle className="w-2.5 h-2.5" />)
                                 : (isCorrect ? <CheckCircle2 className="w-2.5 h-2.5" /> : <XCircle className="w-2.5 h-2.5" />)}

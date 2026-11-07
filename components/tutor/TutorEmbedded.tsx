@@ -130,7 +130,7 @@ function SessionRow({
           <button
             type="button"
             onClick={onDelete}
-            className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50"
+            className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-danger hover:bg-danger/5"
           >
             Xoá
           </button>
@@ -430,7 +430,7 @@ export function TutorEmbedded({ courseId, lessonId, onSeek, lessonTitleById }: T
                       type="button"
                       onClick={() => removePendingFile(i)}
                       aria-label={`Bỏ đính kèm ${file.name}`}
-                      className="text-ink-faint hover:text-red-600"
+                      className="text-ink-faint hover:text-danger"
                     >
                       ✕
                     </button>
