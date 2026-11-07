@@ -6,6 +6,8 @@ import { Providers } from './providers';
 import { SkipLink } from '@/components/layout/SkipLink';
 import { ServiceWorkerRegister } from '@/components/providers/ServiceWorkerRegister';
 import { COLORS } from '@/lib/theme/colors';
+import { themeCss } from '@/lib/theme/cssVars';
+import { THEME_INIT_SCRIPT } from '@/lib/theme/themeMode';
 
 /**
  * Font tự lưu trữ (`.woff2` trong `app/fonts/`) thay vì `next/font/google`: file build ra
@@ -71,8 +73,11 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="vi" className={`${outfit.variable} ${jakarta.variable} ${plexMono.variable}`}>
+    <html lang="vi" suppressHydrationWarning className={`${outfit.variable} ${jakarta.variable} ${plexMono.variable}`}>
       <head>
+        {/* Biến màu sáng/tối (sinh từ lib/theme/colors.ts) + gắn lớp `dark` trước khi vẽ để không chớp trắng */}
+        <style dangerouslySetInnerHTML={{ __html: themeCss() }} />
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
         <Script
           src="https://accounts.google.com/gsi/client"
           async

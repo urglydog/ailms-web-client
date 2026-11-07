@@ -900,6 +900,7 @@ function LearnPageContent() {
                         currentLessonId={lesson.lessonId}
                         officialMaterials={officialMaterials || []}
                         resources={courseResources || []}
+                        sourceLanguage={lesson.sourceLanguage}
                       />
                     ) : (
                       <p className="text-sm text-ink-muted">

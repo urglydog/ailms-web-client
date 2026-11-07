@@ -1,13 +1,15 @@
 import type { Config } from 'tailwindcss';
-import { COLORS } from './lib/theme/colors';
+import { tw } from './lib/theme/cssVars';
 
 /**
  * Design system giao diện học viên (spec: doc/feat/uiux/DacTa_CaiTienUIUX_HocVien.md, mục 3).
- * Màu lấy từ `lib/theme/colors.ts` — KHÔNG ghi cứng mã hex ở đây.
+ * Màu lấy từ `lib/theme/colors.ts` qua biến CSS (`lib/theme/cssVars.ts`) — KHÔNG ghi cứng mã hex ở đây.
+ * Chế độ tối: lớp `dark` trên <html> đổi giá trị biến, mọi lớp `bg-surface`, `text-ink`… tự đổi theo.
  * Phong cách: sáng, đơn giản, chuyên nghiệp; bóng chỉ xuất hiện khi hover; điểm nhấn cyan
  * dành riêng cho tính năng lồng tiếng AI, vàng chỉ dùng tô nền cụm chữ nhấn.
  */
 const config: Config = {
+  darkMode: 'class',
   content: [
     './app/**/*.{ts,tsx}',
     './components/**/*.{ts,tsx}',
@@ -18,43 +20,44 @@ const config: Config = {
     extend: {
       colors: {
         accent: {
-          DEFAULT: COLORS.accent,
-          dark: COLORS.accentDark, // cũng là màu chữ accent trên nền tint/surface (đạt AA)
+          DEFAULT: tw('accent'),
+          dark: tw('accentDark'), // cũng là màu chữ accent trên nền tint/surface (đạt AA)
           glow: 'transparent',
         },
         ink: {
-          DEFAULT: COLORS.ink,
-          muted: COLORS.inkMuted,
-          faint: COLORS.inkFaint,
+          DEFAULT: tw('ink'),
+          muted: tw('inkMuted'),
+          faint: tw('inkFaint'),
         },
         line: {
-          DEFAULT: COLORS.line,
-          soft: COLORS.lineSoft,
-          dot: COLORS.lineDot,
+          DEFAULT: tw('line'),
+          soft: tw('lineSoft'),
+          dot: tw('lineDot'),
         },
         surface: {
-          DEFAULT: COLORS.surface,
-          raised: COLORS.surfaceRaised,
-          hover: COLORS.tint,
+          DEFAULT: tw('surface'),
+          raised: tw('surfaceRaised'),
+          hover: tw('tint'),
         },
-        tint: COLORS.tint,
+        tint: tw('tint'),
         cyan: {
-          DEFAULT: COLORS.cyan,
-          ink: COLORS.cyanInk, // chữ trên nền cyan
+          DEFAULT: tw('cyan'),
+          ink: tw('cyanInk'), // chữ trên nền cyan
         },
-        highlight: COLORS.highlight, // tô nền cụm chữ nhấn, chữ trên đó là `ink`
+        highlight: tw('highlight'), // tô nền cụm chữ nhấn, chữ trên đó là `ink`
         success: {
-          DEFAULT: COLORS.success,
-          ink: COLORS.successInk, // chữ xanh lá trên nền success-tint
-          tint: COLORS.successTint,
+          DEFAULT: tw('success'),
+          ink: tw('successInk'), // chữ xanh lá trên nền success-tint
+          tint: tw('successTint'),
         },
         streak: {
-          bg: COLORS.streakBg,
-          ink: COLORS.streakInk,
+          bg: tw('streakBg'),
+          ink: tw('streakInk'),
         },
-        danger: COLORS.danger,
-        warning: COLORS.warning,
-        star: COLORS.star,
+        danger: tw('danger'),
+        warning: tw('warning'),
+        star: tw('star'),
+        night: tw('night'), // nền tối cố định ở cả 2 chế độ (lớp phủ, thanh điều khiển video)
       },
       fontFamily: {
         display: ['var(--font-outfit)', 'sans-serif'],

@@ -7,7 +7,6 @@ import { useTranslations } from 'next-intl';
 import { CourseCard } from '@/components/course/CourseCard';
 import { CourseFilters } from '@/components/course/CourseFilters';
 import { ActiveFilters } from '@/components/course/list/ActiveFilters';
-import { CategoryChips } from '@/components/course/list/CategoryChips';
 import { CourseRowCard } from '@/components/course/list/CourseRowCard';
 import { ViewToggle, type CourseListView } from '@/components/course/list/ViewToggle';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -32,7 +31,7 @@ const VIEW_KEY = 'courses-view';
  * qua `useSearchParams`. `useSearchParams` bắt buộc nằm trong `<Suspense>`, nên nội dung thật tách ra
  * `CoursesPageContent`.
  *
- * Bố cục: dải đầu trang sáng có chip danh mục lọc nhanh, dải chip bộ lọc đang bật, thanh công cụ (số kết quả, sắp
+ * Bố cục: dải đầu trang sáng (tiêu đề), dải chip bộ lọc đang bật, thanh công cụ (số kết quả, sắp
  * xếp, đổi dạng thẻ/danh sách), cột bộ lọc bên trái (trên điện thoại thu gọn sau nút "Bộ lọc").
  */
 export default function CoursesPage() {
@@ -111,12 +110,7 @@ function CoursesPageContent() {
       <div className="border-b border-line bg-tint">
         <div className="shell py-8">
           <h1 className="mb-1 font-display text-3xl font-bold text-ink">{t('title')}</h1>
-          <p className="mb-5 text-sm text-ink-muted">{t('subtitle')}</p>
-          <CategoryChips
-            categories={categories ?? []}
-            selected={filters.category}
-            onSelect={(slug) => setFilters((prev) => ({ ...prev, category: slug }))}
-          />
+          <p className="text-sm text-ink-muted">{t('subtitle')}</p>
         </div>
       </div>
 

@@ -147,7 +147,13 @@ export interface YouTubePlayerLike {
   /** Module phụ đề CC của YouTube (API không chính thức nhưng được dùng rộng rãi) — có thể vắng ở bản giả lập. */
   loadModule?(name: string): void;
   unloadModule?(name: string): void;
+  getOption?(module: string, option: string): unknown;
+  setOption?(module: string, option: string, value: unknown): void;
 }
+
+/** Số lần thử đọc phụ đề KHI VIDEO ĐANG PHÁT (mỗi lần 150ms, tổng 6 giây) trước khi kết luận video không có phụ đề. */
+const CAPTION_MAX_PLAYING_TRIES = 40;
+const CAPTION_RETRY_MS = 150;
 
 /** Mã trạng thái của YouTube IFrame Player API. */
 export const YT_STATE = {
@@ -253,6 +259,8 @@ export interface YouTubePlayerController {
   setQuality: (quality: string) => void;
   /** Phụ đề CC của chính YouTube đang bật (mặc định tắt). */
   captionsOn: boolean;
+  /** Video đã phát mà YouTube không trả về phụ đề nào — nút bật phụ đề không còn tác dụng. */
+  captionsUnavailable: boolean;
   setCaptions: (on: boolean) => void;
   toggleCaptions: () => void;
 }
@@ -301,10 +309,58 @@ export function useYouTubeDualPlayerSync(
   // gỡ/gắn lại player mỗi khi học viên chỉnh âm lượng — cùng khuôn với `offsetRef`/`dubActiveRef`.
   const volumeRef = useRef(volume);
   const mutedRef = useRef(muted);
-  // YouTube có thể tự nạp lại CC (theo cài đặt tài khoản người xem) SAU `onReady` — nên ngoài lúc sẵn sàng còn phải
-  // gỡ thêm ở lần PLAYING đầu tiên; `captionsOnRef` để closure sự kiện đọc được trạng thái mới nhất.
+  // `captionsOnRef` để closure sự kiện đọc được trạng thái mới nhất.
   const captionsOnRef = useRef(false);
-  const captionsResetRef = useRef(false);
+  const captionRetryRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [captionsUnavailable, setCaptionsUnavailable] = useState(false);
+
+  // Track mặc định của video (ngôn ngữ gốc), đọc được 1 lần lúc đầu — xem `discoverCaptionTrack`.
+  const captionTrackRef = useRef<unknown>(null);
+
+  /**
+   * Bật/tắt CC độc lập với cài đặt trên tài khoản YouTube của người xem: tắt = gỡ module; bật = nạp module VÀ chọn hẳn
+   * track bằng `setOption` (chỉ nạp module thì tài khoản đang tắt CC vẫn không hiện gì). Chưa biết track thì chưa bật
+   * được: `discoverCaptionTrack` sẽ áp lại trạng thái mong muốn ngay khi biết.
+   */
+  const applyCaptions = useCallback((on: boolean) => {
+    const p = playerRef.current;
+    if (!p) return;
+    if (!on) {
+      p.setOption?.('captions', 'track', {});
+      p.unloadModule?.('captions');
+    } else if (captionTrackRef.current) {
+      p.loadModule?.('captions');
+      p.setOption?.('captions', 'track', captionTrackRef.current);
+    }
+  }, []);
+
+  /**
+   * `getOption('captions','tracklist')` luôn rỗng ở player nhúng (đã kiểm tra thực tế), nên không liệt kê được phụ đề.
+   * Cách dùng được: tạo player với `cc_load_policy: 1` để YouTube tự chọn track mặc định, đọc `getOption('captions','track')`
+   * một lần rồi lưu lại, sau đó tắt ngay nếu người học chưa bật. Sau khi tắt, giá trị đọc được không còn đáng tin.
+   */
+  const discoverCaptionTrack = useCallback((p: YouTubePlayerLike) => {
+    let playingTries = 0;
+    const attempt = () => {
+      captionRetryRef.current = null;
+      const track = p.getOption?.('captions', 'track') as { languageCode?: string } | undefined;
+      if (track?.languageCode) {
+        captionTrackRef.current = track;
+        applyCaptions(captionsOnRef.current);
+        return;
+      }
+      // Video chưa phát thì chưa có track là bình thường: chờ tiếp, chỉ đếm số lần thử khi đang phát.
+      if (p.getPlayerState() === YT_STATE.PLAYING) playingTries += 1;
+      if (playingTries >= CAPTION_MAX_PLAYING_TRIES) {
+        captionsOnRef.current = false;
+        setCaptionsOn(false);
+        setCaptionsUnavailable(true);
+        return;
+      }
+      captionRetryRef.current = setTimeout(attempt, CAPTION_RETRY_MS);
+    };
+    attempt();
+  }, [applyCaptions]);
 
   useEffect(() => {
     offsetRef.current = timeOffsetSec;
@@ -352,7 +408,8 @@ export function useYouTubeDualPlayerSync(
     let player: (YouTubePlayerLike & { destroy(): void }) | null = null;
     setCaptionsOn(false); // bài mới → phụ đề YouTube về mặc định tắt
     captionsOnRef.current = false;
-    captionsResetRef.current = false;
+    captionTrackRef.current = null;
+    setCaptionsUnavailable(false);
 
     loadYouTubeIframeApi().then((YT) => {
       if (cancelled || !containerRef.current) {
@@ -362,9 +419,9 @@ export function useYouTubeDualPlayerSync(
         videoId: youtubeId,
         // Giao diện tham khảo Udemy (06/09/2026) — `controls: 0` để tự vẽ thanh điều khiển riêng
         // (`PlayerControls.tsx`) thay UI mặc định của YouTube, đồng bộ giao diện với nguồn UPLOAD.
-        // `cc_load_policy: 0` + gỡ module captions lúc sẵn sàng: phụ đề YouTube mặc định TẮT dù tài khoản YouTube
-        // của người xem bật CC tự động — nút "Gốc" mới là nơi bật (xem `toggleCaptions`).
-        playerVars: { controls: 0, modestbranding: 1, rel: 0, disablekb: 1, cc_load_policy: 0 },
+        // `cc_load_policy: 1` chỉ để đọc được track mặc định (xem `discoverCaptionTrack`); phụ đề được tắt ngay sau đó,
+        // nút "Gốc" mới là nơi bật, bất kể cài đặt CC trên tài khoản YouTube của người xem.
+        playerVars: { controls: 0, modestbranding: 1, rel: 0, disablekb: 1, cc_load_policy: 1 },
         events: {
           onReady: (event) => {
             if (dubActiveRef.current) {
@@ -378,14 +435,10 @@ export function useYouTubeDualPlayerSync(
             setQualities(event.target.getAvailableQualityLevels());
             setQualityState(event.target.getPlaybackQuality());
             playerRef.current = event.target;
-            event.target.unloadModule?.('captions');
+            discoverCaptionTrack(event.target);
             if (autoPlay) event.target.playVideo();
           },
           onStateChange: (event) => {
-            if (event.data === YT_STATE.PLAYING && !captionsResetRef.current) {
-              captionsResetRef.current = true;
-              if (!captionsOnRef.current) event.target.unloadModule?.('captions');
-            }
             setIsPlaying(event.data === YT_STATE.PLAYING || event.data === YT_STATE.BUFFERING);
             setQualities(event.target.getAvailableQualityLevels());
             setQualityState(event.target.getPlaybackQuality());
@@ -431,6 +484,10 @@ export function useYouTubeDualPlayerSync(
 
     return () => {
       cancelled = true;
+      if (captionRetryRef.current !== null) {
+        clearTimeout(captionRetryRef.current);
+        captionRetryRef.current = null;
+      }
       if (intervalRef.current !== null) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
@@ -515,22 +572,18 @@ export function useYouTubeDualPlayerSync(
     setQualityState(q);
   }, []);
 
-  const setCaptions = useCallback((on: boolean) => {
-    if (on) playerRef.current?.loadModule?.('captions');
-    else playerRef.current?.unloadModule?.('captions');
-    captionsOnRef.current = on;
-    setCaptionsOn(on);
-  }, []);
+  const setCaptions = useCallback(
+    (on: boolean) => {
+      captionsOnRef.current = on;
+      setCaptionsOn(on);
+      applyCaptions(on);
+    },
+    [applyCaptions],
+  );
 
   const toggleCaptions = useCallback(() => {
-    setCaptionsOn((prev) => {
-      const next = !prev;
-      if (next) playerRef.current?.loadModule?.('captions');
-      else playerRef.current?.unloadModule?.('captions');
-      captionsOnRef.current = next;
-      return next;
-    });
-  }, []);
+    setCaptions(!captionsOnRef.current);
+  }, [setCaptions]);
 
   return {
     currentSec,
@@ -550,6 +603,7 @@ export function useYouTubeDualPlayerSync(
     toggleMute,
     setQuality,
     captionsOn,
+    captionsUnavailable,
     setCaptions,
     toggleCaptions,
   };

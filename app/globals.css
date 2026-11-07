@@ -12,12 +12,23 @@
     @apply bg-surface text-ink font-sans antialiased;
   }
 
+  /* Ghi màu trực tiếp thay vì `@apply text-accent`: @apply sẽ kéo cả quy tắc `.dark .text-accent`
+   * bên dưới vào thành `.dark a` (độ ưu tiên cao hơn `.text-white`), làm sai màu chữ trên nút. */
   a {
-    @apply text-accent no-underline;
+    color: rgb(var(--c-accent));
+    text-decoration: none;
   }
 
   a:hover {
-    @apply text-accent-dark;
+    color: rgb(var(--c-accent-dark));
+  }
+
+  :where(.dark) a {
+    color: rgb(var(--c-text-accent));
+  }
+
+  :where(.dark) a:hover {
+    color: rgb(var(--c-text-accent-dark));
   }
 
   /* Vòng focus nhìn thấy rõ — yêu cầu a11y, không được bỏ outline mà không thay thế */
@@ -64,9 +75,9 @@
     @apply rounded-md bg-tint;
     background-image: linear-gradient(
       90deg,
-      theme('colors.tint') 25%,
-      theme('colors.surface.DEFAULT') 50%,
-      theme('colors.tint') 75%
+      rgb(var(--c-tint)) 25%,
+      rgb(var(--c-surface)) 50%,
+      rgb(var(--c-tint)) 75%
     );
     background-size: 200% 100%;
     animation: skeleton-shimmer 1.2s linear infinite;
@@ -221,4 +232,119 @@
     opacity: 1;
     transform: none;
   }
+}
+
+/* ───────── Chế độ tối (lớp `dark` trên <html>, xem components/theme/ThemeToggle.tsx) ─────────
+ * Biến màu của từng chế độ sinh từ lib/theme/colors.ts (lib/theme/cssVars.ts) — ở đây KHÔNG ghi mã hex.
+ * 1) accent/success/danger/warning là màu NỀN nút (chữ trắng đạt AA) nên giữ độ đậm; khi dùng làm CHỮ
+ *    trên nền tối thì đổi sang bản sáng (--c-text-*) để vẫn đạt AA.
+ * 2) Lớp phủ và khối "nền tối" (bg-ink, bg-ink/50…) luôn tối ở cả hai chế độ.
+ * 3) Nền vàng (highlight) / cam (warning) luôn đi với chữ tối.
+ * 4) Lớp màu cứng cũ (bg-white, text-gray-*) ở các trang chưa chuyển sang token được ánh xạ về token. */
+.dark .text-accent,
+.dark .hover\:text-accent:hover,
+.dark .group:hover .group-hover\:text-accent,
+.dark .focus\:text-accent:focus {
+  color: rgb(var(--c-text-accent));
+}
+.dark .text-accent-dark,
+.dark .hover\:text-accent-dark:hover,
+.dark .group:hover .group-hover\:text-accent-dark,
+.dark .focus\:text-accent-dark:focus {
+  color: rgb(var(--c-text-accent-dark));
+}
+.dark .text-success,
+.dark .hover\:text-success:hover,
+.dark .group:hover .group-hover\:text-success,
+.dark .focus\:text-success:focus {
+  color: rgb(var(--c-text-success));
+}
+.dark .text-danger,
+.dark .hover\:text-danger:hover,
+.dark .group:hover .group-hover\:text-danger,
+.dark .focus\:text-danger:focus {
+  color: rgb(var(--c-text-danger));
+}
+.dark .text-warning,
+.dark .hover\:text-warning:hover,
+.dark .group:hover .group-hover\:text-warning,
+.dark .focus\:text-warning:focus {
+  color: rgb(var(--c-text-warning));
+}
+.dark .bg-ink,
+.dark .bg-ink\/40,
+.dark .bg-ink\/50,
+.dark .bg-ink\/60,
+.dark .bg-ink\/70,
+.dark .bg-ink\/80,
+.dark .bg-ink\/90,
+.dark .bg-ink\/95 {
+  --tw-bg-opacity: 1;
+}
+.dark .bg-ink { background-color: rgb(var(--c-night) / 1); }
+.dark .bg-ink\/40 { background-color: rgb(var(--c-night) / 0.40); }
+.dark .bg-ink\/50 { background-color: rgb(var(--c-night) / 0.50); }
+.dark .bg-ink\/60 { background-color: rgb(var(--c-night) / 0.60); }
+.dark .bg-ink\/70 { background-color: rgb(var(--c-night) / 0.70); }
+.dark .bg-ink\/80 { background-color: rgb(var(--c-night) / 0.80); }
+.dark .bg-ink\/90 { background-color: rgb(var(--c-night) / 0.90); }
+.dark .bg-ink\/95 { background-color: rgb(var(--c-night) / 0.95); }
+.dark .bg-highlight,
+.dark .bg-warning {
+  --c-ink: var(--c-night);
+}
+.dark .bg-white,
+.dark .hover\:bg-white:hover {
+  background-color: rgb(var(--c-surface-raised));
+}
+.dark .bg-white\/90 {
+  background-color: rgb(var(--c-surface-raised) / 0.9);
+}
+.dark .bg-gray-50,
+.dark .bg-gray-50\/60,
+.dark .bg-slate-50,
+.dark .hover\:bg-gray-50:hover {
+  background-color: rgb(var(--c-surface));
+}
+.dark .bg-gray-100,
+.dark .bg-gray-200,
+.dark .bg-slate-100,
+.dark .hover\:bg-gray-100:hover {
+  background-color: rgb(var(--c-tint));
+}
+.dark .text-gray-900,
+.dark .text-gray-800,
+.dark .text-gray-700,
+.dark .text-slate-900,
+.dark .text-slate-800,
+.dark .text-slate-700,
+.dark .text-black {
+  color: rgb(var(--c-ink));
+}
+.dark .text-gray-600,
+.dark .text-gray-500,
+.dark .text-slate-600,
+.dark .text-slate-500 {
+  color: rgb(var(--c-ink-muted));
+}
+.dark .text-gray-400,
+.dark .text-slate-400 {
+  color: rgb(var(--c-ink-faint));
+}
+.dark .border-gray-100,
+.dark .border-gray-200,
+.dark .border-gray-300,
+.dark .border-slate-200,
+.dark .divide-gray-100 > * + *,
+.dark .divide-gray-200 > * + * {
+  border-color: rgb(var(--c-line));
+}
+/* Ảnh, video giữ nguyên; bóng đổ đậm hơn một chút trên nền tối */
+.dark .shadow-card-hover,
+.dark .hover\:shadow-card-hover:hover {
+  box-shadow: 0 10px 24px rgb(0 0 0 / 0.45);
+}
+.dark .badge-active,
+.dark .badge-active:hover {
+  color: rgb(var(--c-white));
 }
