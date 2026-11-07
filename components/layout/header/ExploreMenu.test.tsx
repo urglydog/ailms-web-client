@@ -10,7 +10,24 @@ const CATEGORIES = [
   { id: 2, name: 'Ngoại ngữ', slug: 'ngoai-ngu' },
 ];
 
+const GROUPED = [
+  { id: 1, name: 'Lập trình Web', slug: 'lap-trinh-web' },
+  { id: 2, name: 'Lãnh đạo & Quản lý', slug: 'lanh-dao-quan-ly' },
+];
+
+const openMore = () => fireEvent.click(screen.getByRole('button', { name: /Khám phá thêm/i }));
+
 describe('ExploreMenu', () => {
+  it('chia danh mục theo nhóm; rê chuột vào nhóm khác thì đổi các mục hiển thị', () => {
+    renderWithIntl(<ExploreMenu categories={GROUPED} liveNow={false} />);
+    fireEvent.click(screen.getByRole('button', { name: /^Khám phá$/ }));
+    expect(screen.getByRole('link', { name: 'Lập trình Web' })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /Lãnh đạo/ })).toBeNull();
+    fireEvent.mouseEnter(screen.getByRole('button', { name: /Kỹ năng mềm/ }));
+    expect(screen.getByRole('link', { name: /Lãnh đạo/ })).toHaveAttribute('href', '/courses?category=lanh-dao-quan-ly');
+    expect(screen.queryByRole('link', { name: 'Lập trình Web' })).toBeNull();
+  });
+
   it('đóng lúc đầu, bấm nút Khám phá thì mở và liệt kê danh mục', () => {
     renderWithIntl(<ExploreMenu categories={CATEGORIES} liveNow={false} />);
     expect(screen.queryByRole('link', { name: 'Lập trình' })).toBeNull();
@@ -22,7 +39,8 @@ describe('ExploreMenu', () => {
 
   it('có liên kết Live, Cộng đồng, Về chúng tôi', () => {
     renderWithIntl(<ExploreMenu categories={CATEGORIES} liveNow={false} />);
-    fireEvent.click(screen.getByRole('button', { name: /Khám phá/ }));
+    fireEvent.click(screen.getByRole('button', { name: /^Khám phá$/ }));
+    openMore();
     expect(screen.getByRole('link', { name: /Live/ })).toHaveAttribute('href', '/live');
     expect(screen.getByRole('link', { name: 'Cộng đồng' })).toHaveAttribute('href', '/community');
     expect(screen.getByRole('link', { name: 'Về chúng tôi' })).toHaveAttribute('href', '/about');
@@ -30,11 +48,13 @@ describe('ExploreMenu', () => {
 
   it('chỉ hiện nhãn Đang diễn ra khi có buổi live', () => {
     const { unmount } = renderWithIntl(<ExploreMenu categories={CATEGORIES} liveNow={false} />);
-    fireEvent.click(screen.getByRole('button', { name: /Khám phá/ }));
+    fireEvent.click(screen.getByRole('button', { name: /^Khám phá$/ }));
+    openMore();
     expect(screen.queryByText('Đang diễn ra')).toBeNull();
     unmount();
     renderWithIntl(<ExploreMenu categories={CATEGORIES} liveNow />);
-    fireEvent.click(screen.getByRole('button', { name: /Khám phá/ }));
+    fireEvent.click(screen.getByRole('button', { name: /^Khám phá$/ }));
+    openMore();
     expect(screen.getByText('Đang diễn ra')).toBeInTheDocument();
   });
 

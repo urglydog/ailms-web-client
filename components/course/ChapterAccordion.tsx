@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Badge } from '@/components/ui/Badge';
 import { formatDuration } from '@/lib/format';
+import { detectOutlineLang, lessonLabel, sectionLabel } from '@/lib/course/outlineLabel';
 import type { Chapter } from '@/types/domain';
 
 /**
@@ -20,10 +21,22 @@ interface ChapterAccordionProps {
   chapters: Chapter[];
   /** Người dùng hiện tại đã sở hữu khoá học chưa (BR-ENROLL-01). */
   enrolled: boolean;
+  /** Mã/nhãn ngôn ngữ gốc của khóa — quyết định nhãn "Phần/Bài" hay "Section/Lesson". */
+  sourceLanguage?: string | null;
 }
 
-export function ChapterAccordion({ chapters, enrolled }: ChapterAccordionProps) {
+export function ChapterAccordion({ chapters, enrolled, sourceLanguage }: ChapterAccordionProps) {
   const t = useTranslations('courseDetail.content');
+  const lang = detectOutlineLang(
+    sourceLanguage,
+    chapters.flatMap((c) => [c.title, ...c.lessons.map((l) => l.title)]),
+  );
+  // Số bài đếm liên tục xuyên suốt khóa.
+  const lessonOffsets: number[] = [];
+  chapters.reduce((acc, c) => {
+    lessonOffsets.push(acc);
+    return acc + c.lessons.length;
+  }, 0);
   // Mở chương đầu tiên sẵn để người xem thấy ngay cấu trúc bài học
   const [openIds, setOpenIds] = useState<number[]>(() =>
     chapters[0] ? [chapters[0].id] : [],
@@ -34,7 +47,7 @@ export function ChapterAccordion({ chapters, enrolled }: ChapterAccordionProps) 
 
   return (
     <div className="flex flex-col gap-3">
-      {chapters.map((chapter) => {
+      {chapters.map((chapter, chapterIdx) => {
         const isOpen = openIds.includes(chapter.id);
         const totalSec = chapter.lessons.reduce((sum, l) => sum + l.durationSec, 0);
 
@@ -46,7 +59,7 @@ export function ChapterAccordion({ chapters, enrolled }: ChapterAccordionProps) 
               aria-expanded={isOpen}
               className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left"
             >
-              <span className="font-display text-[15px] font-semibold text-ink">{chapter.title}</span>
+              <span className="font-display text-[15px] font-semibold text-ink">{sectionLabel(lang, chapterIdx + 1, chapter.title)}</span>
               <span className="flex shrink-0 items-center gap-3 text-[13px] text-ink-muted">
                 <span>
                   {t('lessons', { count: chapter.lessons.length })} · {formatDuration(totalSec)}
@@ -59,8 +72,9 @@ export function ChapterAccordion({ chapters, enrolled }: ChapterAccordionProps) 
 
             {isOpen && (
               <ul className="border-t border-line-soft">
-                {chapter.lessons.map((lesson) => {
+                {chapter.lessons.map((lesson, lessonIdx) => {
                   const accessible = enrolled || lesson.isPreview;
+                  const label = lessonLabel(lang, (lessonOffsets[chapterIdx] ?? 0) + lessonIdx + 1, lesson.title);
 
                   return (
                     <li
@@ -80,10 +94,10 @@ export function ChapterAccordion({ chapters, enrolled }: ChapterAccordionProps) 
                             href={`/learn/${lesson.id}`}
                             className="truncate text-sm font-medium no-underline"
                           >
-                            {lesson.title}
+                            {label}
                           </Link>
                         ) : (
-                          <span className="truncate text-sm text-ink-muted">{lesson.title}</span>
+                          <span className="truncate text-sm text-ink-muted">{label}</span>
                         )}
                         {lesson.isPreview && (
                           <Badge tone="accent" className="shrink-0">

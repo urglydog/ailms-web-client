@@ -3,11 +3,14 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
+import { useThemeMode } from '@/components/theme/ThemeToggle';
 import {
   Award,
   BookOpen,
   Heart,
   Languages,
+  Moon,
+  Sun,
   LogOut,
   MessageSquareWarning,
   Presentation,
@@ -49,6 +52,8 @@ const ROW =
 /** Bảng menu avatar chia nhóm (spec mục 5). Không tự giữ trạng thái mở/đóng. */
 export function AccountMenu({ user, languageName, onNavigate, onOpenLanguage, onLogout }: AccountMenuProps) {
   const t = useTranslations('header');
+  const { mode, toggle } = useThemeMode();
+  const isDark = mode === 'dark';
   const groups = buildAccountMenu({ id: user.id, role: user.role });
   const initial = user.fullName ? user.fullName.charAt(0) : 'U';
 
@@ -92,6 +97,15 @@ export function AccountMenu({ user, languageName, onNavigate, onOpenLanguage, on
           <Languages size={16} aria-hidden className="shrink-0 text-ink-muted" />
           <span>{t('account.language')}</span>
           <span className="ml-auto text-ink-muted">{languageName}</span>
+        </button>
+        <button type="button" onClick={toggle} aria-pressed={isDark} className={ROW}>
+          {isDark ? (
+            <Sun size={16} aria-hidden className="shrink-0 text-ink-muted" />
+          ) : (
+            <Moon size={16} aria-hidden className="shrink-0 text-ink-muted" />
+          )}
+          <span>{t('theme.label')}</span>
+          <span className="ml-auto text-ink-muted">{isDark ? t('theme.dark') : t('theme.light')}</span>
         </button>
       </div>
 

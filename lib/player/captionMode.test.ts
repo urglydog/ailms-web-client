@@ -2,6 +2,11 @@ import { describe, expect, it } from 'vitest';
 import { resolveOriginalCaption } from './captionMode';
 
 describe('resolveOriginalCaption', () => {
+  it('đang lồng tiếng → không bao giờ dùng phụ đề CC của YouTube', () => {
+    expect(resolveOriginalCaption({ isYoutube: true, projectSubtitleCount: 0, dubActive: true })).toBe('none');
+    expect(resolveOriginalCaption({ isYoutube: true, projectSubtitleCount: 5, dubActive: true })).toBe('project');
+  });
+
   it('video YouTube chưa có transcript của project → dùng phụ đề CC của YouTube', () => {
     expect(resolveOriginalCaption({ isYoutube: true, projectSubtitleCount: 0 })).toBe('youtube');
   });

@@ -53,7 +53,7 @@ export function CourseDetailView({ course }: { course: CourseDetail }) {
                   {t('content.summary', { chapters: course.chapters.length, lessons: totalLessons })}
                 </span>
               </h2>
-              <ChapterAccordion chapters={course.chapters} enrolled={course.enrolled} />
+              <ChapterAccordion chapters={course.chapters} enrolled={course.enrolled} sourceLanguage={course.sourceLanguage} />
             </section>
 
             <section>

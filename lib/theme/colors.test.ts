@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import config from '@/tailwind.config';
 import { contrastRatio } from '@/lib/a11y/contrast';
-import { COLORS } from './colors';
+import { COLORS, DARK_COLORS, DARK_TEXT, NIGHT } from './colors';
+import { cssVarName, hexToRgbChannels, themeCss } from './cssVars';
 
 const AA = 4.5;
 
@@ -31,18 +32,59 @@ const PAIRS: Array<[string, string, string]> = [
   ['ink trên warning (ô hạng 3 trên bục)', COLORS.ink, COLORS.warning],
 ];
 
+const D = DARK_COLORS;
+const DARK_PAIRS: Array<[string, string, string]> = [
+  ['chữ trắng trên accent (nút chính)', D.white, D.accent],
+  ['chữ trắng trên accent-dark (hover nút chính)', D.white, D.accentDark],
+  ['ink trên surface-raised', D.ink, D.surfaceRaised],
+  ['ink trên surface', D.ink, D.surface],
+  ['ink trên tint', D.ink, D.tint],
+  ['ink-muted trên surface-raised', D.inkMuted, D.surfaceRaised],
+  ['ink-muted trên surface', D.inkMuted, D.surface],
+  ['ink-muted trên tint', D.inkMuted, D.tint],
+  ['ink-muted trên line-soft', D.inkMuted, D.lineSoft],
+  ['ink-faint trên surface-raised', D.inkFaint, D.surfaceRaised],
+  ['chữ accent trên surface', DARK_TEXT.accent, D.surface],
+  ['chữ accent trên surface-raised', DARK_TEXT.accent, D.surfaceRaised],
+  ['chữ accent-dark trên tint (tab đang chọn, chip)', DARK_TEXT.accentDark, D.tint],
+  ['chữ success trên surface-raised', DARK_TEXT.success, D.surfaceRaised],
+  ['chữ danger trên surface-raised', DARK_TEXT.danger, D.surfaceRaised],
+  ['chữ warning trên surface-raised', DARK_TEXT.warning, D.surfaceRaised],
+  ['chữ trắng trên success', D.white, D.success],
+  ['chữ trắng trên danger', D.white, D.danger],
+  ['success-ink trên success-tint', D.successInk, D.successTint],
+  ['streak-ink trên streak-bg', D.streakInk, D.streakBg],
+  ['cyan-ink trên cyan', D.cyanInk, D.cyan],
+  ['chữ tối cố định trên highlight', NIGHT, D.highlight],
+  ['chữ tối cố định trên warning', NIGHT, D.warning],
+];
+
 describe('bảng màu', () => {
-  it.each(PAIRS)('%s đạt tương phản AA', (_ten, fg, bg) => {
+  it.each(PAIRS)('sáng: %s đạt tương phản AA', (_ten, fg, bg) => {
     expect(contrastRatio(fg, bg)).toBeGreaterThanOrEqual(AA);
   });
 
-  it('tailwind.config dùng đúng giá trị từ COLORS', () => {
+  it.each(DARK_PAIRS)('tối: %s đạt tương phản AA', (_ten, fg, bg) => {
+    expect(contrastRatio(fg, bg)).toBeGreaterThanOrEqual(AA);
+  });
+
+  it('bảng màu tối có đủ mọi token của bảng sáng', () => {
+    expect(Object.keys(DARK_COLORS).sort()).toEqual(Object.keys(COLORS).sort());
+  });
+
+  it('tailwind.config trỏ màu vào biến CSS để đổi theme', () => {
     const colors = config.theme?.extend?.colors as unknown as Record<string, Record<string, string> | string>;
-    const accent = colors.accent as Record<string, string>;
-    const ink = colors.ink as Record<string, string>;
-    expect(accent.DEFAULT).toBe(COLORS.accent);
-    expect(accent.dark).toBe(COLORS.accentDark);
-    expect(ink.DEFAULT).toBe(COLORS.ink);
-    expect(colors.tint).toBe(COLORS.tint);
+    expect((colors.accent as Record<string, string>).DEFAULT).toBe('rgb(var(--c-accent) / <alpha-value>)');
+    expect((colors.ink as Record<string, string>).DEFAULT).toBe('rgb(var(--c-ink) / <alpha-value>)');
+    expect(colors.tint).toBe('rgb(var(--c-tint) / <alpha-value>)');
+  });
+
+  it('themeCss sinh biến cho cả hai chế độ từ đúng bảng màu', () => {
+    const css = themeCss();
+    expect(css).toContain(`:root{${cssVarName('white')}:255 255 255;`);
+    expect(css).toContain(`${cssVarName('ink')}:${hexToRgbChannels(COLORS.ink)};`);
+    expect(css).toContain(`.dark{${cssVarName('white')}:255 255 255;`);
+    expect(css).toContain(`--c-text-accent:${hexToRgbChannels(DARK_TEXT.accent)};`);
+    expect(cssVarName('accentDark')).toBe('--c-accent-dark');
   });
 });

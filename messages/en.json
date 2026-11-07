@@ -72,8 +72,10 @@
       "allCourses": "All courses",
       "categories": "CATEGORIES",
       "more": "MORE",
-      "liveNow": "Live now"
+      "liveNow": "Live now",
+      "groups": { "it": "Information technology", "soft": "Soft skills", "other": "Other fields" }
     },
+    "theme": { "toDark": "Switch to dark mode", "toLight": "Switch to light mode", "label": "Appearance", "dark": "Dark", "light": "Light" },
     "skipToContent": "Skip to content",
     "help": "Help & Support"
   },
