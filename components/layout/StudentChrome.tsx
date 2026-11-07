@@ -15,20 +15,15 @@ export function StudentChrome({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams();
   const isTakingExam = /^\/exam\/[^/]+\/?$/.test(pathname ?? '') && searchParams.get('mode') === 'taking';
 
-  if (isTakingExam) {
-    return (
-      <div className="flex min-h-dvh flex-col">
-        <main id="main-content" tabIndex={-1} className="flex-1">{children}</main>
-      </div>
-    );
-  }
-
+  // GIỮ NGUYÊN cấu trúc cây (Header/Footer/chat chỉ chuyển true/false trong cùng vị trí): nếu trả
+  // 2 cây khác nhau thì `children` (trang thi) bị unmount rồi mount lại ngay khi chuyển sang
+  // mode=taking → mất state, dừng camera/màn hình vừa xin, học viên phải bấm "Bắt đầu" lần nữa.
   return (
     <div className="flex min-h-dvh flex-col">
-      <Header />
+      {!isTakingExam && <Header />}
       <main id="main-content" tabIndex={-1} className="flex-1">{children}</main>
-      <Footer />
-      <DiscoveryChat />
+      {!isTakingExam && <Footer />}
+      {!isTakingExam && <DiscoveryChat />}
     </div>
   );
 }

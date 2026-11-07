@@ -1229,11 +1229,11 @@ export default function AntiCheatExamPage() {
             {highestAttempt && (
               <div className="mb-8 p-6 bg-success-tint border border-success/30 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
                 <div>
-                  <h3 className="text-emerald-950 font-extrabold text-xl">Điểm chính thức của bạn</h3>
+                  <h3 className="text-success-ink font-extrabold text-xl">Điểm chính thức của bạn</h3>
                   <p className="text-success-ink text-sm mt-1 font-medium">Hệ thống ghi nhận điểm cao nhất trong số các lần thi của bạn.</p>
                 </div>
-                <div className="text-left sm:text-right bg-white px-6 py-3 rounded-xl shadow-sm border border-emerald-100 min-w-[140px]">
-                  <div className="text-3xl font-black text-success">{highestAttempt.correctCount} <span className="text-emerald-400 text-xl">/ {highestAttempt.totalQuestions}</span></div>
+                <div className="text-left sm:text-right bg-white px-6 py-3 rounded-xl shadow-sm border border-success/30 min-w-[140px]">
+                  <div className="text-3xl font-black text-success">{highestAttempt.correctCount} <span className="text-success text-xl">/ {highestAttempt.totalQuestions}</span></div>
                   <div className="text-success-ink font-bold mt-1 text-sm">{Number(highestAttempt.score).toFixed(2).replace(/\.?0+$/, '')} điểm (Hệ 10)</div>
                 </div>
               </div>

@@ -510,7 +510,14 @@
       "invalidOne": "Mã giảm giá không áp dụng được cho khóa học này.",
       "applied": "Đã áp dụng mã giảm giá.",
       "failed": "Không áp dụng được mã giảm giá, thử lại sau.",
-      "selectOne": "Chọn ít nhất 1 khóa học để áp dụng mã giảm giá."
+      "selectOne": "Chọn ít nhất 1 khóa học để áp dụng mã giảm giá.",
+      "pickerTitle": "Khuyến mãi dành cho bạn",
+      "pickerNone": "Không dùng khuyến mãi",
+      "pickerPercent": "Giảm {value}%",
+      "pickerFixed": "Giảm {value}",
+      "pickerSave": "Tiết kiệm {amount}",
+      "pickerExpires": "HSD {date}",
+      "pickerLoading": "Đang tải khuyến mãi..."
     },
     "summary": {
       "title": "Tóm tắt đơn hàng",

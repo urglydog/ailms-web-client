@@ -1,6 +1,6 @@
 import { api } from '@/lib/api/client';
 import { getAccessToken } from '@/lib/auth/token';
-import type { Coupon, CouponPreviewReq, CouponPriceRes, CreateCouponReq, UpdateCouponReq } from '@/types/domain';
+import type { AvailableCoupon, Coupon, CouponPreviewReq, CouponPriceRes, CreateCouponReq, UpdateCouponReq } from '@/types/domain';
 
 /**
  * Mã giảm giá kiểu Udemy (15/09/2026, mở rộng ngoài đặc tả gốc — UC55/UC56/UC57). Dùng
@@ -9,6 +9,10 @@ import type { Coupon, CouponPreviewReq, CouponPriceRes, CreateCouponReq, UpdateC
  * nhập (BR-COUPON-02/03/06), FE không cần biết đang là ai khi gọi API này.
  */
 export const couponsApi = {
+  /** Coupon học viên có thể chọn cho các khóa đang thanh toán, giảm nhiều nhất lên đầu. */
+  available: (courseIds: number[]) =>
+    api.get<AvailableCoupon[]>(`/api/v1/coupons/available?courseIds=${courseIds.join(',')}`, { token: getAccessToken() ?? undefined }),
+
   listMine: () => api.get<Coupon[]>('/api/v1/coupons/mine', { token: getAccessToken() ?? undefined }),
 
   create: (req: CreateCouponReq) =>
@@ -30,9 +34,9 @@ export const couponsApi = {
    * gọi `resolveBestPrice` riêng lẻ cho từng khóa trong vòng lặp). Gọi song song vì các preview
    * độc lập nhau, không có giao dịch nào được tạo.
    */
-  previewMany: async (courseIds: number[], code: string): Promise<Map<number, CouponPriceRes>> => {
+  previewMany: async (courseIds: number[], code: string, couponId?: number): Promise<Map<number, CouponPriceRes>> => {
     const entries = await Promise.all(
-      courseIds.map(async (courseId) => [courseId, await couponsApi.preview({ courseId, code })] as const),
+      courseIds.map(async (courseId) => [courseId, await couponsApi.preview({ courseId, code: code || undefined, couponId, manualCoupon: true })] as const),
     );
     return new Map(entries);
   },

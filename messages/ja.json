@@ -510,7 +510,14 @@
       "invalidOne": "このコードはこの講座には使えません。",
       "applied": "クーポンを適用しました。",
       "failed": "クーポンを適用できませんでした。後でもう一度お試しください。",
-      "selectOne": "クーポンを適用するには講座を 1 つ以上選んでください。"
+      "selectOne": "クーポンを適用するには講座を 1 つ以上選んでください。",
+      "pickerTitle": "あなたへのおすすめクーポン",
+      "pickerNone": "クーポンを使わない",
+      "pickerPercent": "{value}% オフ",
+      "pickerFixed": "{value} オフ",
+      "pickerSave": "{amount} お得",
+      "pickerExpires": "期限 {date}",
+      "pickerLoading": "クーポンを読み込み中..."
     },
     "summary": {
       "title": "注文の概要",

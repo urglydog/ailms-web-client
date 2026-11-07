@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { BillingForm } from '@/components/checkout/BillingForm';
 import { CheckoutSteps } from '@/components/checkout/CheckoutSteps';
 import { CouponBox } from '@/components/checkout/CouponBox';
+import { CouponPicker } from '@/components/checkout/CouponPicker';
 import { OrderTotals } from '@/components/checkout/OrderTotals';
 import { PayosButton } from '@/components/checkout/PayosButton';
 import { useCart } from '@/hooks/useCart';
@@ -19,7 +20,7 @@ import { getReferralCodesFor } from '@/lib/referral';
 import { couponsApi } from '@/lib/api/coupons';
 import { ApiError } from '@/lib/api/client';
 import { formatMoney } from '@/lib/shop/money';
-import type { CouponPriceRes } from '@/types/domain';
+import type { AvailableCoupon, CouponPriceRes } from '@/types/domain';
 
 /**
  * Thanh toán GỘP (06/09/2026) — TÍNH NĂNG MỞ RỘNG, không nằm trong 49 use case đặc tả gốc. Thanh
@@ -76,6 +77,32 @@ function CartCheckoutContent() {
   const [appliedCode, setAppliedCode] = useState<string | null>(null);
   const [priceMap, setPriceMap] = useState<Map<number, CouponPriceRes>>(new Map());
   const [applying, setApplying] = useState(false);
+  // Khuyến mãi học viên TỰ CHỌN (không áp ngầm): undefined = chưa quyết định (sẽ chọn sẵn mức giảm
+  // nhiều nhất khi tải xong), null = chủ động không dùng.
+  const [availableCoupons, setAvailableCoupons] = useState<AvailableCoupon[]>([]);
+  const [couponsLoading, setCouponsLoading] = useState(true);
+  const [selectedCouponId, setSelectedCouponId] = useState<number | null | undefined>(undefined);
+  const itemIdsKey = items.map((item) => item.courseId).sort((a, b) => a - b).join(',');
+
+  useEffect(() => {
+    if (!itemIdsKey) return;
+    setCouponsLoading(true);
+    couponsApi.available(itemIdsKey.split(',').map(Number))
+      .then((list) => {
+        setAvailableCoupons(list);
+        setSelectedCouponId((prev) => (prev === undefined ? (list[0]?.id ?? null) : prev));
+      })
+      .catch(() => setSelectedCouponId((prev) => (prev === undefined ? null : prev)))
+      .finally(() => setCouponsLoading(false));
+  }, [itemIdsKey]);
+
+  // Tính lại giá từng khóa mỗi khi đổi khuyến mãi đã chọn hoặc mã nhập tay.
+  useEffect(() => {
+    if (!itemIdsKey || selectedCouponId === undefined) return;
+    couponsApi.previewMany(itemIdsKey.split(',').map(Number), appliedCode ?? '', selectedCouponId ?? undefined)
+      .then(setPriceMap)
+      .catch(() => setPriceMap(new Map()));
+  }, [itemIdsKey, selectedCouponId, appliedCode]);
 
   useEffect(() => {
     const preset = searchParams.get('coupon');
@@ -90,7 +117,7 @@ function CartCheckoutContent() {
     if (!trimmed || items.length === 0) return;
     setApplying(true);
     try {
-      const results = await couponsApi.previewMany(items.map((item) => item.courseId), trimmed);
+      const results = await couponsApi.previewMany(items.map((item) => item.courseId), trimmed, selectedCouponId ?? undefined);
       const anyValid = [...results.values()].some((r) => r.enteredCodeValid);
       if (!anyValid) {
         toast.error(t('coupon.invalidMany'));
@@ -107,7 +134,7 @@ function CartCheckoutContent() {
   };
 
   const finalPriceFor = (item: (typeof items)[number]) =>
-    bundleMatch.priceByCartCourseId.get(item.courseId) ?? priceMap.get(item.courseId)?.finalPrice ?? item.finalPrice;
+    bundleMatch.priceByCartCourseId.get(item.courseId) ?? priceMap.get(item.courseId)?.finalPrice ?? item.price;
   const total = items.reduce((sum, item) => sum + finalPriceFor(item), 0);
   const totalOriginal = items.reduce((sum, item) => sum + item.price, 0);
 
@@ -122,6 +149,8 @@ function CartCheckoutContent() {
         billingName,
         billingPhone,
         couponCode: appliedCode ?? undefined,
+        couponId: selectedCouponId ?? undefined,
+        manualCoupon: true,
         referralCodes: getReferralCodesFor(items.map((item) => item.courseId)),
         bundleIds: bundleIds.length > 0 ? bundleIds : undefined,
       });
@@ -210,7 +239,13 @@ function CartCheckoutContent() {
               <h2 className="mb-4 font-display text-lg font-bold text-ink">{t('summary.title')}</h2>
               <OrderTotals count={items.length} original={totalOriginal} total={total} />
 
-              <div className="my-4 border-t border-line-soft pt-4">
+              <div className="my-4 flex flex-col gap-4 border-t border-line-soft pt-4">
+                <CouponPicker
+                  coupons={availableCoupons}
+                  loading={couponsLoading}
+                  selectedId={selectedCouponId ?? null}
+                  onSelect={setSelectedCouponId}
+                />
                 <CouponBox
                   value={couponCode}
                   appliedCode={appliedCode}
@@ -219,7 +254,6 @@ function CartCheckoutContent() {
                   onApply={() => void applyCoupon(couponCode)}
                   onRemove={() => {
                     setAppliedCode(null);
-                    setPriceMap(new Map());
                   }}
                 />
               </div>

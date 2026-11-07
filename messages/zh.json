@@ -510,7 +510,14 @@
       "invalidOne": "该优惠码不适用于此课程。",
       "applied": "已使用优惠码。",
       "failed": "无法使用优惠码，请稍后再试。",
-      "selectOne": "请至少选择 1 门课程再使用优惠码。"
+      "selectOne": "请至少选择 1 门课程再使用优惠码。",
+      "pickerTitle": "为你推荐的优惠",
+      "pickerNone": "不使用优惠",
+      "pickerPercent": "立减 {value}%",
+      "pickerFixed": "立减 {value}",
+      "pickerSave": "节省 {amount}",
+      "pickerExpires": "截止 {date}",
+      "pickerLoading": "正在加载优惠..."
     },
     "summary": {
       "title": "订单摘要",
