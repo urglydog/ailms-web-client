@@ -110,6 +110,11 @@ export default function AntiCheatExamPage() {
   // UC-ANTICHEAT (1.7) — video bằng chứng: ghép màn hình (trái) + webcam (phải) qua canvas mỗi
   // frame, MediaRecorder ghi lại stream ghép thành 1 file .webm duy nhất, upload lúc nộp bài.
   const screenStreamRef = useRef<MediaStream | null>(null);
+  // Giữ ref song song với state `mediaStream` để dọn dẹp được MỌI luồng (kể cả luồng cũ còn sót lại
+  // khi người dùng rời trang rồi quay lại) — không phụ thuộc closure/state đã cũ.
+  const mediaStreamRef = useRef<MediaStream | null>(null);
+  // Chặn `startExam` chạy chồng 2 lần (xin Camera/Mic + chia sẻ màn hình lần 2 khi vào lại trang).
+  const startExamLockRef = useRef(false);
   const screenVideoElRef = useRef<HTMLVideoElement | null>(null);
   const compositeCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const compositeRafRef = useRef<number | null>(null);
@@ -334,6 +339,13 @@ export default function AntiCheatExamPage() {
     }
   }, []);
 
+  const stopAllMedia = useCallback(() => {
+    mediaStreamRef.current?.getTracks().forEach((t) => t.stop());
+    mediaStreamRef.current = null;
+    screenStreamRef.current?.getTracks().forEach((t) => t.stop());
+    screenStreamRef.current = null;
+  }, []);
+
   const stopCompositeRecording = useCallback((): Promise<{ blob: Blob; durationSec: number } | null> => {
     return new Promise((resolve) => {
       const recorder = mediaRecorderRef.current;
@@ -363,6 +375,61 @@ export default function AntiCheatExamPage() {
     });
   }, []);
 
+  // Rời trang giữa chừng (back, đóng tab, điều hướng) → tắt hẳn Camera/Mic/chia sẻ màn hình và
+  // dừng ghi hình; trước đây các luồng này bị bỏ rơi (đèn camera sáng treo, lần vào lại xin thêm
+  // 1 bộ luồng nữa).
+  useEffect(() => {
+    return () => {
+      if (compositeRafRef.current) cancelAnimationFrame(compositeRafRef.current);
+      const recorder = mediaRecorderRef.current;
+      if (recorder && recorder.state !== 'inactive') {
+        recorder.onstop = null;
+        try { recorder.stop(); } catch {}
+      }
+      mediaStreamRef.current?.getTracks().forEach((t) => t.stop());
+      screenStreamRef.current?.getTracks().forEach((t) => t.stop());
+    };
+  }, []);
+
+  // Cảnh báo của trình duyệt khi cố đóng/tải lại tab giữa lúc đang làm bài.
+  useEffect(() => {
+    if (!isStarted || result) return;
+    const onBeforeUnload = (e: BeforeUnloadEvent) => { e.preventDefault(); e.returnValue = ''; };
+    window.addEventListener('beforeunload', onBeforeUnload);
+    return () => window.removeEventListener('beforeunload', onBeforeUnload);
+  }, [isStarted, result]);
+
+  // Reset toàn bộ state theo từng lượt thi. Trang KHÔNG unmount giữa 2 lượt (cùng route /exam/{id}), nên
+  // nếu không reset thì lượt mới thừa hưởng đáp án cũ, `isSubmitting=true` (nút nộp/lớp phủ kẹt mãi),
+  // `hasAutoSubmittedRef=true` (chặn tự nộp), số vi phạm cũ... — đúng lỗi "bấm Bắt đầu lại vẫn vào phiên
+  // vừa nộp, thời gian vẫn trôi, phải nộp lần nữa".
+  const resetAttemptState = useCallback(() => {
+    setResult(null);
+    setIsStarted(false);
+    setAttemptData(null);
+    setAnswers({});
+    setFlagged({});
+    setExplanations({});
+    setCurrentPage(1);
+    setReviewPage(1);
+    setResultPage(1);
+    setViolationCount(0);
+    setIsSubmitting(false);
+    setSubmitTime(null);
+    setElapsedSeconds(0);
+    setTimeLeft(null);
+    setShowReviewConfirm(false);
+    setFaceStatus('DETECTING');
+    hasAutoSubmittedRef.current = false;
+    abnormalStreakRef.current = 0;
+    headPoseBaselineRef.current = null;
+    headPoseSamplesRef.current = [];
+    mediaRecorderRef.current = null;
+    recordedChunksRef.current = [];
+    recordingStartRef.current = null;
+    startExamLockRef.current = false;
+  }, []);
+
   // Hàm nộp bài
   const submitExam = useCallback((_isAuto = false) => {
     if (!attemptData || isSubmitting || hasAutoSubmittedRef.current) return;
@@ -380,6 +447,10 @@ export default function AntiCheatExamPage() {
       onSuccess: async (data: SubmitRes) => {
         setResult(data);
         setSubmitTime(new Date());
+        // Thoát toàn màn hình + bỏ `mode=taking` NGAY (trả lại Header/Footer) — trước đây chờ xong
+        // dừng ghi hình/upload mới điều hướng nên màn kết quả vẫn dính fullscreen + ẩn menu.
+        if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+        router.replace(`/exam/${quizId}${returnUrl ? `?returnUrl=${returnUrl}` : ''}`);
 
         // UC-ANTICHEAT (1.7) — dừng ghi hình + upload video bằng chứng TRƯỚC khi điều hướng
         // trang (router.replace bên dưới có thể unmount component, huỷ request đang bay).
@@ -422,20 +493,18 @@ export default function AntiCheatExamPage() {
           } catch {}
         }
         // Dừng stream
-        if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
+        stopAllMedia();
         
         if (data && data.isArchived) {
           setArchivedError({ show: true, message: 'Bài nộp đã được lưu vào Bảng điểm. Bài thi này hiện đã được giảng viên lưu trữ.' });
         }
-        router.replace(`/exam/${quizId}${returnUrl ? `?returnUrl=${returnUrl}` : ''}`);
       },
       onError: (err: unknown) => {
         // Trước đây không có nhánh nào dừng camera/mic khi nộp bài lỗi — "ăn theo" hiệu ứng
         // phụ của effect "Gắn stream" (dựa vào `result`), nhưng `result` không bao giờ được set
         // ở nhánh lỗi nên camera/mic thực ra bị rò rỉ (đèn camera sáng treo). Effect đó đã bị bỏ
         // vì gây race với video (xem comment ở effect "Gắn stream"), nên dừng tường minh ở đây.
-        mediaStream?.getTracks().forEach(t => t.stop());
-        screenStreamRef.current?.getTracks().forEach(t => t.stop());
+        stopAllMedia();
         const apiErr = err instanceof ApiError ? err : null;
         if (apiErr?.status === 410 || apiErr?.code === 'QUIZ_ARCHIVED') {
           setArchivedError({ show: true, message: apiErr.message || 'Bài tập này đã được giảng viên thu hồi.' });
@@ -455,7 +524,7 @@ export default function AntiCheatExamPage() {
         setIsSubmitting(false);
       }
     });
-  }, [attemptData, answers, isSubmitting, submitQuiz, mediaStream, userId, quizId, router, returnUrl, stopCompositeRecording, uploadRecordingMutation]);
+  }, [attemptData, answers, isSubmitting, submitQuiz, stopAllMedia, userId, quizId, router, returnUrl, stopCompositeRecording, uploadRecordingMutation]);
 
   // UC-ANTICHEAT (25/09/2026) — Composite Behavioral Risk Engine.
   // Hàm xử lý vi phạm DUY NHẤT (đã gộp 2 bản trùng lặp cũ) — ghi nhận SERVER-SIDE qua
@@ -673,6 +742,13 @@ export default function AntiCheatExamPage() {
     }
   }, [attemptData, analyzeProctorFrameMutation, submitExam, getVideoOffsetSec]);
 
+  // `sendProctorFrame` đổi identity mỗi khi học viên chọn đáp án (phụ thuộc submitExam → answers). Đưa
+  // vào deps của 2 effect bên dưới từng làm chúng chạy lại mỗi lần chọn đáp án: effect nhận diện khuôn
+  // mặt bị clear interval rồi chỉ chờ sự kiện 'play' (video ĐÃ đang phát nên không bao giờ bắn lại) →
+  // trạng thái camera đóng băng ở lần quét cuối; effect gửi khung random thì bị dời lịch liên tục.
+  const sendProctorFrameRef = useRef(sendProctorFrame);
+  useEffect(() => { sendProctorFrameRef.current = sendProctorFrame; }, [sendProctorFrame]);
+
   // 2. Face API Detection Loop — quét mỗi 2s (client-side, có thể bị bypass, chỉ để hiện badge
   // UX). Đồng thời làm "cò súng" sự kiện: nếu NO_FACE/MULTIPLE_FACES liên tục 3 chu kỳ (6s), lập
   // tức chụp 1 khung hình gửi khẩn lên Gemini xác minh (bypass chu kỳ random chờ ở mục 2b), thay
@@ -746,7 +822,7 @@ export default function AntiCheatExamPage() {
 
           abnormalStreakRef.current += 1;
           if (abnormalStreakRef.current >= 3) {
-            sendProctorFrame(15_000);
+            sendProctorFrameRef.current(15_000);
             abnormalStreakRef.current = 0;
           }
         } catch (err) {
@@ -756,11 +832,13 @@ export default function AntiCheatExamPage() {
     };
 
     video.addEventListener('play', startDetection);
+    // Video có thể ĐÃ đang phát lúc effect chạy (sự kiện 'play' đã bắn trước đó) — bật quét ngay.
+    if (!video.paused && !video.ended) startDetection();
     return () => {
       video.removeEventListener('play', startDetection);
       if (detectInterval.current) clearInterval(detectInterval.current);
     };
-  }, [isStarted, isProctored, isModelLoaded, result, sendProctorFrame]);
+  }, [isStarted, isProctored, isModelLoaded, result]);
 
   // 2b. Random polling (gaze/head-turn) — face-api không bắt được hướng nhìn, nên vẫn cần 1 chu kỳ
   // gửi ảnh ngẫu nhiên (30-60s, không cố định) để học viên không thể căn giờ gian lận.
@@ -770,20 +848,23 @@ export default function AntiCheatExamPage() {
     const scheduleNext = () => {
       const delay = 30_000 + Math.random() * 30_000; // random 30s-60s
       proctorFrameInterval.current = setTimeout(() => {
-        sendProctorFrame(0); // chu kỳ random tự thân đã cách nhau 30-60s, không cần throttle thêm
+        sendProctorFrameRef.current(0); // chu kỳ random tự thân đã cách nhau 30-60s, không cần throttle thêm
         scheduleNext();
       }, delay);
     };
     scheduleNext();
 
     return () => { if (proctorFrameInterval.current) clearTimeout(proctorFrameInterval.current); };
-  }, [isStarted, isProctored, result, attemptData, sendProctorFrame]);
+  }, [isStarted, isProctored, result, attemptData]);
 
   // Yêu cầu bật Camera + Micro (nếu proctored)
   const startExam = useCallback(async () => {
+    if (startExamLockRef.current) return;
+    startExamLockRef.current = true;
     if (isProctored) {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        mediaStreamRef.current = stream;
         setMediaStream(stream);
 
         try {
@@ -794,12 +875,14 @@ export default function AntiCheatExamPage() {
         }
       } catch {
         toast.error('Bạn phải cấp quyền sử dụng Camera & Micro để làm bài thi này!');
+        startExamLockRef.current = false;
         return;
       }
     }
 
     startQuiz(Number(quizId), {
       onSuccess: (data) => {
+        startExamLockRef.current = false;
         setAttemptData(data);
         if (!isTakingMode) {
           if (isProctored) {
@@ -819,10 +902,11 @@ export default function AntiCheatExamPage() {
         } else {
           toast.error(err instanceof ApiError && err.message ? err.message : 'Không thể tải bài thi.');
         }
-        if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
+        stopAllMedia();
+        startExamLockRef.current = false;
       }
     });
-  }, [isProctored, quizId, startQuiz, mediaStream, proctoredParam, returnUrl, router, isTakingMode]);
+  }, [isProctored, quizId, startQuiz, stopAllMedia, proctoredParam, returnUrl, router, isTakingMode]);
 
   // Cập nhật isStarted dựa trên mode=taking và attemptData
   useEffect(() => {
@@ -974,9 +1058,7 @@ export default function AntiCheatExamPage() {
               </button>
               <button
                 onClick={() => {
-                  setResult(null);
-                  setIsStarted(false);
-                  setAttemptData(null);
+                  resetAttemptState();
                   router.replace(`/exam/${quizId}${returnUrl ? `?returnUrl=${returnUrl}` : ''}`);
                 }}
                 className="bg-surface-hover text-ink px-6 py-2 rounded-lg font-semibold text-sm shadow-sm border border-line hover:bg-line transition"
@@ -1193,8 +1275,8 @@ export default function AntiCheatExamPage() {
                   <h3 className="text-success-ink font-extrabold text-xl">Điểm chính thức của bạn</h3>
                   <p className="text-success-ink text-sm mt-1 font-medium">Hệ thống ghi nhận điểm cao nhất trong số các lần thi của bạn.</p>
                 </div>
-                <div className="text-left sm:text-right bg-surface-raised px-6 py-3 rounded-xl shadow-sm border border-success/20 min-w-[140px]">
-                  <div className="text-3xl font-black text-success">{highestAttempt.correctCount} <span className="text-emerald-400 text-xl">/ {highestAttempt.totalQuestions}</span></div>
+                <div className="text-left sm:text-right bg-surface-raised px-6 py-3 rounded-xl shadow-sm border border-success/30 min-w-[140px]">
+                  <div className="text-3xl font-black text-success">{highestAttempt.correctCount} <span className="text-success text-xl">/ {highestAttempt.totalQuestions}</span></div>
                   <div className="text-success-ink font-bold mt-1 text-sm">{Number(highestAttempt.score).toFixed(2).replace(/\.?0+$/, '')} điểm (Hệ 10)</div>
                 </div>
               </div>
@@ -1319,6 +1401,13 @@ export default function AntiCheatExamPage() {
 
   return (
     <div className="min-h-dvh bg-surface p-8">
+      {/* Đang nộp bài: chặn mọi thao tác (không cho đổi đáp án/chuyển trang trong lúc chờ BE). */}
+      {isSubmitting && (
+        <div role="alertdialog" aria-live="assertive" className="fixed inset-0 z-[200] flex cursor-wait flex-col items-center justify-center gap-4 bg-ink/70 text-white">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-white/30 border-t-white" />
+          <p className="text-lg font-bold">Đang nộp bài, vui lòng đợi...</p>
+        </div>
+      )}
       <div className="shell max-w-4xl mx-auto">
         <div className="flex justify-between items-center mb-8 border-b border-line pb-4">
           <div>

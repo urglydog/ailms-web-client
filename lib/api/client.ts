@@ -172,10 +172,11 @@ async function fetchWithRefresh(
             redirectToLoginWithReason(reason);
           }
         } catch (err) {
+          // Lỗi MẠNG khi refresh (vd "Failed to fetch" lúc BE đang khởi động lại / mất mạng thoáng
+          // qua) KHÔNG có nghĩa phiên hết hạn — không được xoá token/đẩy về /login, chỉ để yêu cầu
+          // này thất bại; lần gọi sau sẽ tự thử refresh lại. Chỉ khi BE TRẢ LỜI từ chối refresh
+          // (nhánh `!refreshRes.ok` ở trên) mới đăng xuất.
           processQueue(err as Error);
-          localStorage.removeItem('accessToken');
-          localStorage.removeItem('refreshToken');
-          redirectToLoginWithReason(null);
         } finally {
           isRefreshing = false;
         }

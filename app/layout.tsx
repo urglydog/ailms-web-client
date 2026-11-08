@@ -69,6 +69,9 @@ export const viewport: Viewport = {
   initialScale: 1,
   viewportFit: 'cover',
   themeColor: COLORS.accent,
+  // Site chỉ có giao diện sáng — khai báo rõ để trình duyệt (Edge/Chrome "tự động làm tối trang") không
+  // đảo màu nền nhưng giữ nguyên chữ tối cố định, làm 1 số chỗ (vd "Điểm chính thức") mất chữ.
+  colorScheme: 'only light',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
