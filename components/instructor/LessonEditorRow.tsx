@@ -102,7 +102,7 @@ export function LessonEditorRow({
       onDragEnd={onDragEnd}
       title="Kéo để đổi thứ tự bài học"
       className={`flex flex-col gap-2 rounded-lg border bg-surface/60 px-3 py-2 transition-colors cursor-move ${
-        isDropTarget ? 'border-cyan-300 bg-cyan-50/60' : 'border-line-soft'
+        isDropTarget ? 'border-accent/40 bg-tint/60' : 'border-line-soft'
       }`}
     >
       {editing ? (
@@ -140,7 +140,7 @@ export function LessonEditorRow({
               type="button"
               draggable={false}
               onClick={handleSaveEdit}
-              className="rounded-lg bg-cyan-600 px-3 py-1.5 text-[12px] font-bold text-white hover:bg-cyan-700"
+              className="rounded-lg bg-accent px-3 py-1.5 text-[12px] font-bold text-white hover:bg-accent-dark"
             >
               Lưu bài giảng
             </button>
@@ -204,7 +204,7 @@ export function LessonEditorRow({
             type="button"
             draggable={false}
             onClick={onManageVideo}
-            className="shrink-0 whitespace-nowrap rounded-full border border-cyan-200 px-2.5 py-1 text-[11px] font-bold text-cyan-700 hover:bg-cyan-50 transition-colors"
+            className="shrink-0 whitespace-nowrap rounded-full border border-line px-2.5 py-1 text-[11px] font-bold text-accent-dark hover:bg-tint transition-colors"
           >
             + Nội dung
           </button>
@@ -238,7 +238,7 @@ export function LessonEditorRow({
         <div
           draggable={false}
           onDragStart={(e) => e.stopPropagation()}
-          className="flex flex-col gap-2.5 rounded-lg border border-line bg-white p-3"
+          className="flex flex-col gap-2.5 rounded-lg border border-line bg-surface-raised p-3"
         >
           {lesson.videoUrl && (
             <div className="flex items-center gap-3 border-b border-line-soft pb-2.5">
@@ -263,7 +263,7 @@ export function LessonEditorRow({
                   type="button"
                   draggable={false}
                   onClick={onManageVideo}
-                  className="mt-0.5 inline-flex items-center gap-1 text-[11.5px] font-semibold text-purple-700 hover:underline"
+                  className="mt-0.5 inline-flex items-center gap-1 text-[11.5px] font-semibold text-purple-700 dark:text-purple-300 hover:underline"
                 >
                   <PencilIcon className="h-3 w-3" /> Chỉnh sửa nội dung
                 </button>
@@ -281,7 +281,7 @@ export function LessonEditorRow({
                   {showPreviewMenu && (
                     <div
                       draggable={false}
-                      className="absolute right-0 top-full z-10 mt-1 w-52 flex-col overflow-hidden rounded-lg border border-line bg-white py-1 shadow-lg"
+                      className="absolute right-0 top-full z-10 mt-1 w-52 flex-col overflow-hidden rounded-lg border border-line bg-surface-raised py-1 shadow-lg"
                     >
                       <button
                         type="button"
@@ -316,7 +316,7 @@ export function LessonEditorRow({
             type="button"
             draggable={false}
             onClick={() => setShowDescriptionPanel((v) => !v)}
-            className="self-start rounded-full border border-purple-200 px-3 py-1.5 text-[12px] font-bold text-purple-700 hover:bg-purple-50 transition-colors"
+            className="self-start rounded-full border border-line px-3 py-1.5 text-[12px] font-bold text-purple-700 dark:text-purple-300 hover:bg-tint transition-colors"
           >
             + Sự miêu tả
           </button>
@@ -351,7 +351,7 @@ export function LessonEditorRow({
                     onUpdateDescription(description.trim());
                     setShowDescriptionPanel(false);
                   }}
-                  className="rounded-lg bg-cyan-600 px-3 py-1.5 text-[12px] font-bold text-white hover:bg-cyan-700"
+                  className="rounded-lg bg-accent px-3 py-1.5 text-[12px] font-bold text-white hover:bg-accent-dark"
                 >
                   Lưu
                 </button>
@@ -363,7 +363,7 @@ export function LessonEditorRow({
             type="button"
             draggable={false}
             onClick={() => setShowResourcePanel((v) => !v)}
-            className="self-start rounded-full border border-purple-200 px-3 py-1.5 text-[12px] font-bold text-purple-700 hover:bg-purple-50 transition-colors"
+            className="self-start rounded-full border border-line px-3 py-1.5 text-[12px] font-bold text-purple-700 dark:text-purple-300 hover:bg-tint transition-colors"
           >
             + Tài nguyên
           </button>
@@ -373,7 +373,7 @@ export function LessonEditorRow({
             type="button"
             draggable={false}
             onClick={() => setShowAssignmentPanel((v) => !v)}
-            className="self-start rounded-full border border-purple-200 px-3 py-1.5 text-[12px] font-bold text-purple-700 hover:bg-purple-50 transition-colors"
+            className="self-start rounded-full border border-line px-3 py-1.5 text-[12px] font-bold text-purple-700 dark:text-purple-300 hover:bg-tint transition-colors"
           >
             + Bài tập
           </button>

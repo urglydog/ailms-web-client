@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { Modal } from '@/components/ui/Modal';
 
 interface RequireLoginModalProps {
   open: boolean;
@@ -19,19 +20,10 @@ interface RequireLoginModalProps {
  * chỉ là tham số chết. Muốn có, làm ở luồng auth chung, không phải việc riêng của Live.
  */
 export function RequireLoginModal({ open, onClose, actionLabel }: RequireLoginModalProps) {
-  if (!open) return null;
-
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-      onClick={onClose}
-    >
-      <div
-        className="card flex w-full max-w-sm flex-col gap-4 p-6 text-center"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <h2 className="font-display text-lg font-bold text-ink">Cần đăng nhập</h2>
-        <p className="text-sm text-ink-muted">
+    <Modal open={open} onClose={onClose} title="Cần đăng nhập" size="sm" hideClose>
+      <div className="flex flex-col gap-4 text-center">
+        <p className="m-0 text-sm text-ink-muted">
           Bạn cần đăng nhập để {actionLabel}. Xem buổi live thì không cần đăng nhập nhé.
         </p>
         <div className="flex flex-col gap-2">
@@ -55,6 +47,6 @@ export function RequireLoginModal({ open, onClose, actionLabel }: RequireLoginMo
           </button>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }

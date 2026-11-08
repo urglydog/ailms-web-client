@@ -1,5 +1,7 @@
 'use client';
 
+import { Modal } from '@/components/ui/Modal';
+
 import { useState, type ChangeEvent, type FormEvent } from 'react';
 import {
   useDeleteLessonDocument,
@@ -70,19 +72,7 @@ export function LessonMediaModal({ courseId, lesson, onClose }: LessonMediaModal
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={onClose}>
-      <div
-        className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-xl"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="mb-4 flex items-center justify-between gap-3">
-          <h2 className="min-w-0 truncate font-display text-lg font-bold text-ink">
-            Quản lý video — {lesson.title}
-          </h2>
-          <button type="button" onClick={onClose} className="shrink-0 text-ink-faint hover:text-ink">
-            ✕
-          </button>
-        </div>
+    <Modal open onClose={onClose} title={<>Quản lý video — {lesson.title}</>} closeOnBackdrop={false}>
 
         <div className="mb-5 flex flex-wrap items-center gap-2 rounded-lg bg-surface px-3 py-2 text-[12.5px] text-ink-muted">
           <span
@@ -130,7 +120,7 @@ export function LessonMediaModal({ courseId, lesson, onClose }: LessonMediaModal
               type="button"
               onClick={handleDeleteVideo}
               disabled={deleteVideo.isPending}
-              className="self-start rounded-lg border border-danger/40 bg-white px-3 py-1.5 text-[12px] font-bold text-danger hover:bg-danger/5 disabled:cursor-not-allowed disabled:opacity-50"
+              className="self-start rounded-lg border border-danger/40 bg-surface-raised px-3 py-1.5 text-[12px] font-bold text-danger hover:bg-danger/5 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {deleteVideo.isPending ? 'Đang xóa...' : 'Xóa video'}
             </button>
@@ -145,7 +135,7 @@ export function LessonMediaModal({ courseId, lesson, onClose }: LessonMediaModal
                 type="button"
                 onClick={() => setTab('upload')}
                 disabled={videoTask?.status === 'uploading'}
-                className={`flex-1 rounded-md py-1.5 disabled:cursor-not-allowed ${tab === 'upload' ? 'bg-white text-cyan-700 shadow-sm' : 'text-ink-muted'}`}
+                className={`flex-1 rounded-md py-1.5 disabled:cursor-not-allowed ${tab === 'upload' ? 'bg-surface-raised text-accent-dark shadow-sm' : 'text-ink-muted'}`}
               >
                 Tải MP4 lên
               </button>
@@ -153,7 +143,7 @@ export function LessonMediaModal({ courseId, lesson, onClose }: LessonMediaModal
                 type="button"
                 onClick={() => setTab('youtube')}
                 disabled={videoTask?.status === 'uploading'}
-                className={`flex-1 rounded-md py-1.5 disabled:cursor-not-allowed ${tab === 'youtube' ? 'bg-white text-cyan-700 shadow-sm' : 'text-ink-muted'}`}
+                className={`flex-1 rounded-md py-1.5 disabled:cursor-not-allowed ${tab === 'youtube' ? 'bg-surface-raised text-accent-dark shadow-sm' : 'text-ink-muted'}`}
               >
                 Dán link YouTube
               </button>
@@ -200,7 +190,7 @@ export function LessonMediaModal({ courseId, lesson, onClose }: LessonMediaModal
                 <button
                   type="submit"
                   disabled={setYoutube.isPending}
-                  className="self-start rounded-lg bg-cyan-600 px-4 py-1.5 text-[12.5px] font-bold text-white hover:bg-cyan-700 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="self-start rounded-lg bg-accent px-4 py-1.5 text-[12.5px] font-bold text-white hover:bg-accent-dark disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {setYoutube.isPending ? 'Đang kiểm tra...' : 'Lưu link YouTube'}
                 </button>
@@ -259,7 +249,6 @@ export function LessonMediaModal({ courseId, lesson, onClose }: LessonMediaModal
         ) : (
           <p className="text-[12px] text-warning">Đã đạt tối đa {MAX_DOCUMENTS} tài liệu — xóa bớt để thêm mới.</p>
         )}
-      </div>
-    </div>
+    </Modal>
   );
 }

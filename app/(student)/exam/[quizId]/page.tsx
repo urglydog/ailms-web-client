@@ -1,5 +1,7 @@
 'use client';
 
+import { Modal } from '@/components/ui/Modal';
+
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
@@ -966,7 +968,7 @@ export default function AntiCheatExamPage() {
                     router.push('/my-courses');
                   }
                 }}
-                className="bg-accent text-white px-6 py-2 rounded-lg font-semibold text-sm shadow-lg hover:bg-accent-hover transition-all"
+                className="bg-accent text-white px-6 py-2 rounded-lg font-semibold text-sm shadow-lg hover:bg-accent-hover transition"
               >
                 Quay lại khóa học
               </button>
@@ -977,7 +979,7 @@ export default function AntiCheatExamPage() {
                   setAttemptData(null);
                   router.replace(`/exam/${quizId}${returnUrl ? `?returnUrl=${returnUrl}` : ''}`);
                 }}
-                className="bg-surface-hover text-ink px-6 py-2 rounded-lg font-semibold text-sm shadow-sm border border-line hover:bg-line transition-all"
+                className="bg-surface-hover text-ink px-6 py-2 rounded-lg font-semibold text-sm shadow-sm border border-line hover:bg-line transition"
               >
                 Trở về lịch sử bài thi
               </button>
@@ -1046,7 +1048,7 @@ export default function AntiCheatExamPage() {
                           href={`/learn/${detail.referenceLessonId}${detail.videoTimestamp ? `?seek=${detail.videoTimestamp}` : ''}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-blue-500 text-sm font-semibold hover:underline flex items-center gap-1"
+                          className="text-accent text-sm font-semibold hover:underline flex items-center gap-1"
                         >
                           Ôn tập lại lý thuyết ↗
                         </a>
@@ -1188,10 +1190,10 @@ export default function AntiCheatExamPage() {
             {highestAttempt && (
               <div className="mb-8 p-6 bg-success-tint border border-success/30 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
                 <div>
-                  <h3 className="text-emerald-950 font-extrabold text-xl">Điểm chính thức của bạn</h3>
+                  <h3 className="text-success-ink font-extrabold text-xl">Điểm chính thức của bạn</h3>
                   <p className="text-success-ink text-sm mt-1 font-medium">Hệ thống ghi nhận điểm cao nhất trong số các lần thi của bạn.</p>
                 </div>
-                <div className="text-left sm:text-right bg-white px-6 py-3 rounded-xl shadow-sm border border-emerald-100 min-w-[140px]">
+                <div className="text-left sm:text-right bg-surface-raised px-6 py-3 rounded-xl shadow-sm border border-success/20 min-w-[140px]">
                   <div className="text-3xl font-black text-success">{highestAttempt.correctCount} <span className="text-emerald-400 text-xl">/ {highestAttempt.totalQuestions}</span></div>
                   <div className="text-success-ink font-bold mt-1 text-sm">{Number(highestAttempt.score).toFixed(2).replace(/\.?0+$/, '')} điểm (Hệ 10)</div>
                 </div>
@@ -1265,7 +1267,7 @@ export default function AntiCheatExamPage() {
               <button
                 onClick={startExam}
                 disabled={isStarting}
-                className="bg-accent hover:bg-accent-hover text-white font-bold py-3 px-8 rounded-full shadow-lg transition-all"
+                className="bg-accent hover:bg-accent-hover text-white font-bold py-3 px-8 rounded-full shadow-lg transition"
               >
                 {isStarting ? 'Đang chuẩn bị...' : 'Tiếp tục làm bài'}
               </button>
@@ -1285,7 +1287,7 @@ export default function AntiCheatExamPage() {
             ) : !canStartNewAttempt ? (
               <button
                 disabled
-                className="bg-gray-300 text-ink-muted font-bold py-3 px-8 rounded-full cursor-not-allowed shadow-none"
+                className="bg-line text-ink-muted font-bold py-3 px-8 rounded-full cursor-not-allowed shadow-none"
               >
                 Đã hết số lượt làm bài ({completedCount}/{maxAtt})
               </button>
@@ -1293,7 +1295,7 @@ export default function AntiCheatExamPage() {
               <button
                 onClick={startExam}
                 disabled={(!isProctored ? false : !isModelLoaded) || isStarting}
-                className="bg-accent hover:bg-accent-hover text-white font-bold py-3 px-8 rounded-full shadow-lg transition-all disabled:opacity-50"
+                className="bg-accent hover:bg-accent-hover text-white font-bold py-3 px-8 rounded-full shadow-lg transition disabled:opacity-50"
               >
                 {isStarting ? 'Đang chuẩn bị...' : (!isProctored ? 'Bắt đầu làm bài mới' : isModelLoaded ? 'Bật Camera & Bắt đầu thi' : 'Đang tải AI Model...')}
               </button>
@@ -1476,7 +1478,7 @@ export default function AntiCheatExamPage() {
             {/* Đồng hồ đếm ngược */}
             {isStarted && timeLeft !== null && (
               <div className={`flex items-center justify-center gap-2 font-mono text-2xl font-bold px-4 py-3 rounded-xl border-2 shadow-sm ${timeLeft <= 60 ? 'border-danger text-danger bg-danger/5 animate-pulse' :
-                timeLeft <= 180 ? 'border-amber-400 text-warning bg-streak-bg' :
+                timeLeft <= 180 ? 'border-warning text-warning bg-streak-bg' :
                   'border-line text-ink bg-surface'
                 }`}>
                 <span>⏱</span>
@@ -1526,8 +1528,7 @@ export default function AntiCheatExamPage() {
       </div>
 
       {archivedError.show && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        <Modal open onClose={() => router.push(returnUrl ? returnUrl : '/my-courses')} bare ariaLabel="Bài thi không còn khả dụng" role="alertdialog" closeOnBackdrop={false} className="bg-surface-raised rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
             <div className="p-6">
               <h3 className="text-xl font-bold mb-2">Bài thi không còn khả dụng</h3>
               <p className="text-ink-muted">{archivedError.message}</p>
@@ -1540,8 +1541,7 @@ export default function AntiCheatExamPage() {
                 </button>
               </div>
             </div>
-          </div>
-        </div>
+          </Modal>
       )}
 
     </div>

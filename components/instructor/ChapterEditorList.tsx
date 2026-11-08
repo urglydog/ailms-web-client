@@ -162,11 +162,11 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
               handleChapterDrop(chapter.id);
             }}
             title="Kéo để đổi thứ tự chương"
-            className={`rounded-xl border bg-white p-4 shadow-sm transition-colors ${
+            className={`rounded-xl border bg-surface-raised p-4 shadow-sm transition-colors ${
               isEditing ? '' : 'cursor-move'
             } ${
               dropTargetChapterId === chapter.id && draggedChapterId !== chapter.id
-                ? 'border-cyan-300 bg-cyan-50/40'
+                ? 'border-accent/40 bg-tint/40'
                 : 'border-line'
             }`}
           >
@@ -207,7 +207,7 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
                     type="button"
                     draggable={false}
                     onClick={handleSaveChapterEdit}
-                    className="rounded-lg bg-cyan-600 px-3 py-1.5 text-[12px] font-bold text-white hover:bg-cyan-700"
+                    className="rounded-lg bg-accent px-3 py-1.5 text-[12px] font-bold text-white hover:bg-accent-dark"
                   >
                     Lưu phần
                   </button>
@@ -276,7 +276,7 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
                 tới chiều cao "auto" mượt mà không cần đo `scrollHeight` bằng JS — không cần
                 thêm thư viện animation (dự án chưa có Framer Motion/Radix). */}
             <div
-              className={`grid transition-[grid-template-rows] duration-500 ease-in-out ${
+              className={`grid transition-[grid-template-rows] duration-200 ease-soft ${
                 isExpanded ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
               }`}
             >
@@ -370,7 +370,7 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
                       <button
                         type="submit"
                         draggable={false}
-                        className="rounded-lg bg-cyan-600 px-3 py-1.5 text-[12px] font-bold text-white hover:bg-cyan-700"
+                        className="rounded-lg bg-accent px-3 py-1.5 text-[12px] font-bold text-white hover:bg-accent-dark"
                       >
                         Thêm bài giảng
                       </button>
@@ -381,7 +381,7 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
                     type="button"
                     draggable={false}
                     onClick={() => setAddLessonFormOpenFor(chapter.id)}
-                    className="ml-1 mt-3 flex w-[calc(100%-0.25rem)] items-center justify-center gap-1.5 rounded-lg border border-dashed border-line py-2 text-[12.5px] font-bold text-ink-muted hover:border-cyan-300 hover:text-cyan-700"
+                    className="ml-1 mt-3 flex w-[calc(100%-0.25rem)] items-center justify-center gap-1.5 rounded-lg border border-dashed border-line py-2 text-[12.5px] font-bold text-ink-muted hover:border-accent/40 hover:text-accent-dark"
                   >
                     + Mục trong chương trình giảng dạy
                   </button>
@@ -400,7 +400,7 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
 
       {showAddChapterForm ? (
         <form
-          className="flex flex-col gap-2 rounded-xl border border-line bg-white p-4 shadow-sm"
+          className="flex flex-col gap-2 rounded-xl border border-line bg-surface-raised p-4 shadow-sm"
           onSubmit={(e) => {
             e.preventDefault();
             handleCreateChapter();
@@ -438,7 +438,7 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
             </button>
             <button
               type="submit"
-              className="rounded-lg bg-cyan-600 px-4 py-1.5 text-[12.5px] font-bold text-white hover:bg-cyan-700"
+              className="rounded-lg bg-accent px-4 py-1.5 text-[12.5px] font-bold text-white hover:bg-accent-dark"
             >
               Thêm phần
             </button>
@@ -448,7 +448,7 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
         <button
           type="button"
           onClick={() => setShowAddChapterForm(true)}
-          className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-line py-3 text-[13px] font-bold text-ink-muted hover:border-cyan-300 hover:text-cyan-700"
+          className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-line py-3 text-[13px] font-bold text-ink-muted hover:border-accent/40 hover:text-accent-dark"
         >
           + Phần
         </button>

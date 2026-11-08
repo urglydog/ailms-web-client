@@ -1,5 +1,7 @@
 'use client';
 
+import { Modal } from '@/components/ui/Modal';
+
 import { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useMyBundles, useCreateBundle, useUpdateBundle } from '@/hooks/useBundles';
@@ -63,10 +65,9 @@ function BundleForm({ editing, onClose }: BundleFormProps) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white rounded-2xl shadow-2xl flex flex-col">
+    <Modal open onClose={onClose} bare ariaLabel={String(editing ? t('form.editTitle') : t('form.createTitle'))} closeOnBackdrop={false} className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-surface-raised rounded-2xl shadow-2xl flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b bg-gradient-to-r from-cyan-50 to-blue-50 rounded-t-2xl">
+        <div className="flex items-center justify-between px-6 py-4 border-b bg-gradient-to-r from-tint to-tint rounded-t-2xl">
           <h2 className="text-lg font-bold text-ink">
             {editing ? `✏️ ${t('form.editTitle')}` : `✨ ${t('form.createTitle')}`}
           </h2>
@@ -122,7 +123,7 @@ function BundleForm({ editing, onClose }: BundleFormProps) {
                 onChange={(e) => setDiscountPercent(Number(e.target.value))}
                 className="flex-1 accent-cyan-500"
               />
-              <span className="w-16 rounded-lg bg-cyan-100 text-accent-dark font-bold text-sm text-center py-1.5">
+              <span className="w-16 rounded-lg bg-tint text-accent-dark font-bold text-sm text-center py-1.5">
                 {discountPercent}%
               </span>
             </div>
@@ -168,10 +169,10 @@ function BundleForm({ editing, onClose }: BundleFormProps) {
           {/* Preview giá */}
           {selectedIds.length >= 2 && (
             <div className="rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 text-white p-4 space-y-1.5">
-              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">{t('form.preview')}</p>
+              <p className="text-xs font-semibold text-ink-faint uppercase tracking-wider mb-2">{t('form.preview')}</p>
               <div className="flex justify-between text-sm">
                 <span className="text-slate-300">{t('form.originalSum')}</span>
-                <span className="line-through text-slate-400">{fmt(originalSum)}</span>
+                <span className="line-through text-ink-faint">{fmt(originalSum)}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-slate-300">{t('form.discountLine', { percent: discountPercent })}</span>
@@ -219,8 +220,7 @@ function BundleForm({ editing, onClose }: BundleFormProps) {
             </button>
           </div>
         </form>
-      </div>
-    </div>
+      </Modal>
   );
 }
 
@@ -232,16 +232,16 @@ function BundleCard({ bundle, onEdit }: { bundle: CourseBundle; onEdit: () => vo
   const fmt = (amount: number) => formatAmount(amount, locale);
   return (
     <div
-      className={`rounded-2xl border bg-white shadow-sm hover:shadow-md transition-shadow overflow-hidden ${!bundle.isActive ? 'opacity-60 grayscale' : ''}`}
+      className={`rounded-2xl border bg-surface-raised shadow-sm hover:shadow-md transition-shadow overflow-hidden ${!bundle.isActive ? 'opacity-60 grayscale' : ''}`}
     >
       {/* Header gradient bar */}
-      <div className="h-1.5 bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500" />
+      <div className="h-1.5 bg-gradient-to-r from-cyan-400 via-accent to-purple-500" />
 
       <div className="p-5">
         <div className="flex items-start justify-between gap-3 mb-3">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="inline-flex items-center gap-1 rounded-full bg-cyan-100 px-2.5 py-0.5 text-xs font-bold text-accent-dark">
+              <span className="inline-flex items-center gap-1 rounded-full bg-tint px-2.5 py-0.5 text-xs font-bold text-accent-dark">
                 -{bundle.discountPercent}%
               </span>
               {!bundle.isActive && (
@@ -260,7 +260,7 @@ function BundleCard({ bundle, onEdit }: { bundle: CourseBundle; onEdit: () => vo
           <button
             type="button"
             onClick={onEdit}
-            className="shrink-0 rounded-xl border border-line px-3 py-1.5 text-xs font-semibold text-ink-muted hover:bg-surface hover:border-cyan-300 hover:text-cyan-600 transition-colors"
+            className="shrink-0 rounded-xl border border-line px-3 py-1.5 text-xs font-semibold text-ink-muted hover:bg-surface hover:border-accent/40 hover:text-accent transition-colors"
           >
             {t('edit')}
           </button>
@@ -270,7 +270,7 @@ function BundleCard({ bundle, onEdit }: { bundle: CourseBundle; onEdit: () => vo
         <ul className="space-y-1.5 mb-4">
           {bundle.courses.map((c) => (
             <li key={c.id} className="flex items-center gap-2 text-xs text-ink-muted">
-              <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 flex-shrink-0" />
+              <span className="h-1.5 w-1.5 rounded-full bg-accent flex-shrink-0" />
               <span className="flex-1 truncate">{c.title}</span>
               <span className="font-semibold text-ink-muted flex-shrink-0">{fmt(c.price)}</span>
             </li>
@@ -313,7 +313,7 @@ export function BundleManager() {
         <button
           type="button"
           onClick={() => { setEditing(null); setShowForm(true); }}
-          className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-cyan-200 hover:from-cyan-700 hover:to-blue-700 transition-all active:scale-95"
+          className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-accent to-accent px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-cyan-200 hover:from-accent-dark hover:to-accent-dark transition active:scale-95"
         >
           <span className="text-lg leading-none">+</span>
           {t('createNew')}
@@ -359,11 +359,11 @@ export function BundleManager() {
       )}
 
       {/* Info box */}
-      <div className="rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm text-blue-700 flex gap-3">
+      <div className="rounded-xl border border-line bg-tint p-4 text-sm text-accent-dark flex gap-3">
         <span className="text-lg leading-tight flex-shrink-0">💡</span>
         <div>
           <p className="font-semibold mb-1">{t('info.title')}</p>
-          <ul className="list-disc pl-4 space-y-0.5 text-blue-600">
+          <ul className="list-disc pl-4 space-y-0.5 text-accent">
             <li>{t.rich('info.owned', { b: (c) => <strong>{c}</strong> })}</li>
             <li>{t.rich('info.coupon', { b: (c) => <strong>{c}</strong> })}</li>
             <li>{t.rich('info.price', { b: (c) => <strong>{c}</strong> })}</li>

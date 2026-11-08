@@ -183,7 +183,7 @@ export function FlashcardViewer({ flashcards, language, deckId, readOnly = false
           <div className="pt-4 flex justify-end">
             <button
               onClick={handleAddSave}
-              className="bg-accent hover:bg-accent-dark text-white font-bold px-6 py-2 rounded-card shadow-card transition-all"
+              className="bg-accent hover:bg-accent-dark text-white font-bold px-6 py-2 rounded-card shadow-card transition"
             >
               Thêm Thẻ
             </button>
@@ -224,7 +224,7 @@ export function FlashcardViewer({ flashcards, language, deckId, readOnly = false
           <div className="pt-4 flex justify-end">
             <button
               onClick={handleEditSave}
-              className="bg-accent hover:bg-accent-dark text-white font-bold px-6 py-2 rounded-card shadow-card transition-all"
+              className="bg-accent hover:bg-accent-dark text-white font-bold px-6 py-2 rounded-card shadow-card transition"
             >
               Lưu thay đổi
             </button>
@@ -331,7 +331,7 @@ export function FlashcardViewer({ flashcards, language, deckId, readOnly = false
         <button
           onClick={handlePrev}
           disabled={safeIdx === 0}
-          className={`w-11 h-11 rounded-card flex items-center justify-center transition-all ${safeIdx === 0 ? 'bg-surface border border-line text-ink-muted opacity-50 cursor-not-allowed' : 'bg-surface-raised border border-line shadow-card hover:border-accent hover:text-accent'}`}
+          className={`w-11 h-11 rounded-card flex items-center justify-center transition ${safeIdx === 0 ? 'bg-surface border border-line text-ink-muted opacity-50 cursor-not-allowed' : 'bg-surface-raised border border-line shadow-card hover:border-accent hover:text-accent'}`}
         >
           <ChevronLeft className="h-5 w-5" strokeWidth={1.75} />
         </button>
@@ -340,7 +340,7 @@ export function FlashcardViewer({ flashcards, language, deckId, readOnly = false
           {flashcards.map((_, i) => (
             <div
               key={i}
-              className={`h-2 rounded-full transition-all ${i === safeIdx ? 'w-6 bg-accent' : 'w-2 bg-line hover:bg-line-soft cursor-pointer'}`}
+              className={`h-2 rounded-full transition ${i === safeIdx ? 'w-6 bg-accent' : 'w-2 bg-line hover:bg-line-soft cursor-pointer'}`}
               onClick={() => {
                 setIsFlipped(false);
                 setCurrentIdx(i);
@@ -352,7 +352,7 @@ export function FlashcardViewer({ flashcards, language, deckId, readOnly = false
         <button
           onClick={handleNext}
           disabled={safeIdx === flashcards.length - 1}
-          className={`w-11 h-11 rounded-card flex items-center justify-center transition-all ${safeIdx === flashcards.length - 1 ? 'bg-surface border border-line text-ink-muted opacity-50 cursor-not-allowed' : 'bg-surface-raised border border-line shadow-card hover:border-accent hover:text-accent'}`}
+          className={`w-11 h-11 rounded-card flex items-center justify-center transition ${safeIdx === flashcards.length - 1 ? 'bg-surface border border-line text-ink-muted opacity-50 cursor-not-allowed' : 'bg-surface-raised border border-line shadow-card hover:border-accent hover:text-accent'}`}
         >
           <ChevronRight className="h-5 w-5" strokeWidth={1.75} />
         </button>

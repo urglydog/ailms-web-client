@@ -85,7 +85,7 @@ export function CourseVisibilitySection({ courseId, course }: { courseId: number
         type="button"
         onClick={handleSave}
         disabled={updateVisibility.isPending}
-        className="self-start rounded-lg bg-cyan-600 px-4 py-2 text-[13px] font-bold text-white hover:bg-cyan-700 disabled:cursor-not-allowed disabled:opacity-50"
+        className="self-start rounded-lg bg-accent px-4 py-2 text-[13px] font-bold text-white hover:bg-accent-dark disabled:cursor-not-allowed disabled:opacity-50"
       >
         {updateVisibility.isPending ? 'Đang lưu...' : 'Lưu'}
       </button>
@@ -106,7 +106,7 @@ export function CourseVisibilitySection({ courseId, course }: { courseId: number
               type="button"
               onClick={handleAddInvite}
               disabled={!inviteEmail.trim() || addInvite.isPending}
-              className="shrink-0 rounded-lg bg-cyan-600 px-3.5 py-1.5 text-[12.5px] font-bold text-white hover:bg-cyan-700 disabled:cursor-not-allowed disabled:opacity-50"
+              className="shrink-0 rounded-lg bg-accent px-3.5 py-1.5 text-[12.5px] font-bold text-white hover:bg-accent-dark disabled:cursor-not-allowed disabled:opacity-50"
             >
               + Mời
             </button>

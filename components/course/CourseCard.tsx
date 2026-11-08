@@ -111,7 +111,7 @@ export function CourseCard({ course }: { course: CourseSummary }) {
             alt={course.title}
             fill
             sizes="(min-width: 1280px) 25vw, (min-width: 640px) 33vw, 100vw"
-            className="object-cover transition-transform duration-[400ms] ease-soft group-hover:scale-105"
+            className="object-cover transition-transform duration-300 ease-soft group-hover:scale-[1.03]"
           />
         ) : (
           <span className="rounded-full bg-ink/35 px-2.5 py-1 font-mono text-[11px] tracking-wide text-white/85">
@@ -128,7 +128,7 @@ export function CourseCard({ course }: { course: CourseSummary }) {
             aria-label={inWishlist ? 'Bỏ khỏi danh sách yêu thích' : 'Thêm vào danh sách yêu thích'}
             aria-pressed={inWishlist}
             className={`absolute right-2.5 top-2.5 flex h-9 w-9 items-center justify-center rounded-full shadow-sm transition-colors ${
-              inWishlist ? 'bg-white text-danger' : 'bg-white/90 text-ink-faint hover:text-danger'
+              inWishlist ? 'bg-surface-raised text-danger' : 'bg-white/90 text-ink-faint hover:text-danger'
             }`}
           >
             {/* SVG duy nhất cho cả 2 trạng thái, chỉ đổi fill — tránh lệch hình dạng như 2 ký tự Unicode ♥/♡ cũ. */}
@@ -145,7 +145,7 @@ export function CourseCard({ course }: { course: CourseSummary }) {
               nên nhãn luôn hiện, chỉ có tooltip khi danh sách có dữ liệu. */}
           <span
             title={course.langs.length > 0 ? course.langs.map((l) => l.label).join(', ') : undefined}
-            className="rounded-full bg-white px-2 py-0.5 text-[11px] font-medium text-accent-dark shadow-sm"
+            className="rounded-full bg-surface-raised px-2 py-0.5 text-[11px] font-medium text-accent-dark shadow-sm"
           >
             AI lồng tiếng
           </span>

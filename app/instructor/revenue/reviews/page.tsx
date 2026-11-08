@@ -1,5 +1,7 @@
 'use client';
 
+import { useThemeColors } from '@/lib/theme/useThemeColors';
+
 import { useMemo, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
@@ -17,6 +19,8 @@ const LOW_RATING_ALERT_THRESHOLD = 2;
 /** "Hiệu suất" > Đánh giá (19/09/2026, xây mới; 29/09/2026 bổ sung điểm TB + phân bố sao +
  * insight — xem plan redesign) — đánh giá học viên để lại trên các khóa của giảng viên. */
 export default function InstructorReviewsPage() {
+  // Lưới/trục/tooltip theo theme sáng-tối (thuộc tính SVG không nhận biến CSS).
+  const palette = useThemeColors();
   const t = useTranslations('instructor.perf');
   const locale = useLocale();
   const [courseId, setCourseId] = useState<number | ''>('');
@@ -64,7 +68,7 @@ export default function InstructorReviewsPage() {
         <select
           value={courseId}
           onChange={(e) => setCourseId(e.target.value ? Number(e.target.value) : '')}
-          className="rounded-lg border border-line bg-white px-3 py-2 text-[13px] font-semibold text-ink focus:border-accent focus:outline-none"
+          className="rounded-lg border border-line bg-surface-raised px-3 py-2 text-[13px] font-semibold text-ink focus:border-accent focus:outline-none"
         >
           <option value="">{t('common.allCourses')}</option>
           {courses?.map((c) => (
@@ -75,20 +79,20 @@ export default function InstructorReviewsPage() {
 
       {stats && (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-[220px_1fr]">
-          <div className="rounded-xl border border-line bg-white p-4 shadow-sm">
+          <div className="rounded-xl border border-line bg-surface-raised p-4 shadow-sm">
             <span className="text-[11.5px] font-semibold text-ink-muted">{t('reviews.average')}</span>
             <div className="mt-1 font-display text-[28px] font-extrabold text-warning">{stats.avg.toFixed(1)}/5</div>
             <span className="text-[12px] text-ink-muted">{t('reviews.count', { count: stats.total })}</span>
           </div>
-          <div className="rounded-xl border border-line bg-white p-4 shadow-sm">
+          <div className="rounded-xl border border-line bg-surface-raised p-4 shadow-sm">
             <span className="mb-1 block text-[11.5px] font-semibold text-ink-muted">{t('reviews.distribution')}</span>
             <div className="h-32 w-full min-w-0">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={stats.distribution} layout="vertical">
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" horizontal={false} />
-                  <XAxis type="number" allowDecimals={false} tick={{ fontSize: 11 }} />
-                  <YAxis type="category" dataKey="star" width={32} tick={{ fontSize: 11 }} />
-                  <Tooltip formatter={(value) => [t('reviews.tooltip', { count: Number(value) }), '']} />
+                  <CartesianGrid strokeDasharray="3 3" stroke={palette.line} horizontal={false} />
+                  <XAxis type="number" allowDecimals={false} tick={{ fontSize: 11, fill: palette.inkMuted }} />
+                  <YAxis type="category" dataKey="star" width={32} tick={{ fontSize: 11, fill: palette.inkMuted }} />
+                  <Tooltip contentStyle={{ background: palette.surfaceRaised, borderColor: palette.line, color: palette.ink }} formatter={(value) => [t('reviews.tooltip', { count: Number(value) }), '']} />
                   <Bar dataKey="count" radius={[0, 4, 4, 0]}>
                     {stats.distribution.map((d) => (
                       <Cell key={d.star} fill={d.star === '1★' || d.star === '2★' ? '#dc2626' : '#f59e0b'} />
@@ -109,14 +113,14 @@ export default function InstructorReviewsPage() {
 
       {isLoading && <div className="p-10 text-center text-sm text-ink-muted">{t('common.loading')}</div>}
       {!isLoading && (!reviews || reviews.length === 0) && (
-        <div className="rounded-xl border border-line bg-white p-10 text-center text-sm text-ink-muted shadow-sm">
+        <div className="rounded-xl border border-line bg-surface-raised p-10 text-center text-sm text-ink-muted shadow-sm">
           {t('reviews.empty')}
         </div>
       )}
 
       <div className="flex flex-col gap-3">
         {reviews?.map((r) => (
-          <div key={r.id} className="rounded-xl border border-line bg-white p-4 shadow-sm">
+          <div key={r.id} className="rounded-xl border border-line bg-surface-raised p-4 shadow-sm">
             <div className="mb-1.5 flex items-center justify-between gap-3">
               <span className="font-semibold text-ink">{r.studentName}</span>
               <div className="flex items-center gap-3">

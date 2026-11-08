@@ -436,6 +436,8 @@
     }
   },
   "courseList": {
+    "loadMore": { "button": "Load more courses", "loading": "Loading more courses…", "end": "You've seen all matching courses." },
+    "pagination": { "nav": "Pagination", "prev": "Previous page", "next": "Next page", "page": "Page {page}" },
     "title": "Course catalog",
     "subtitle": "Every course can be dubbed into the language of your choice.",
     "all": "All",

@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import type { LiveSession, LiveSessionStatus } from '@/types/domain';
 
 const STATUS_CLASS: Record<LiveSessionStatus, string> = {
-  SCHEDULED: 'border border-highlight bg-white text-ink',
+  SCHEDULED: 'border border-highlight bg-surface-raised text-ink',
   LIVE: 'bg-danger text-white',
   ENDED: 'bg-line-soft text-ink-muted',
 };
@@ -22,7 +22,7 @@ export function LiveRow({ session }: { session: Pick<LiveSession, 'id' | 'title'
       <span className="truncate text-[13.5px] font-semibold text-ink">{session.title}</span>
       <span className="truncate text-[13px] text-ink-muted">{session.courseTitle}</span>
       <span className={`flex w-fit items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold ${STATUS_CLASS[session.status]}`}>
-        {live && <span aria-hidden className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" />}
+        {live && <span aria-hidden className="h-1.5 w-1.5 animate-pulse rounded-full bg-surface-raised" />}
         {t(`status.${session.status}`)}
       </span>
       <div className="sm:text-right">

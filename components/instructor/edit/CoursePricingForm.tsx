@@ -43,7 +43,7 @@ export function CoursePricingForm({ courseId }: { courseId: number }) {
   if (!course) return null;
 
   return (
-    <div className="max-w-xl rounded-xl border border-line bg-white p-5 shadow-sm">
+    <div className="max-w-xl rounded-xl border border-line bg-surface-raised p-5 shadow-sm">
       <h2 className="mb-1 font-display text-[16px] font-bold text-ink">Đặt giá cho khóa học của bạn</h2>
       <p className="mb-4 text-[12.5px] text-ink-muted">
         Để 0 nếu đây là khóa học miễn phí. Giá đã lưu sẽ được áp dụng ngay, kể cả khi khóa học đã xuất bản.

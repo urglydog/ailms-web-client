@@ -1,5 +1,7 @@
 'use client';
 
+import { Modal } from '@/components/ui/Modal';
+
 import { useMemo, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { ColumnsIcon, ListIcon } from '@/components/instructor/SidebarIcons';
@@ -49,14 +51,14 @@ export default function InstructorQaPage() {
             <button
               type="button"
               onClick={() => setShowSortMenu((v) => !v)}
-              className="rounded-lg border border-line bg-white px-3.5 py-2 text-[13px] font-semibold text-ink hover:border-accent"
+              className="rounded-lg border border-line bg-surface-raised px-3.5 py-2 text-[13px] font-semibold text-ink hover:border-accent"
             >
               {t('qa.sortLabel', { value: sort === 'newest' ? t('qa.newest') : t('qa.oldest') })} ▾
             </button>
             {showSortMenu && (
               <>
                 <div className="fixed inset-0 z-10" onClick={() => setShowSortMenu(false)} />
-                <div className="absolute right-0 top-full z-20 mt-1 w-36 overflow-hidden rounded-lg border border-line bg-white py-1 shadow-lg">
+                <div className="absolute right-0 top-full z-20 mt-1 w-36 overflow-hidden rounded-lg border border-line bg-surface-raised py-1 shadow-lg">
                   {(['newest', 'oldest'] as SortOption[]).map((option) => (
                     <button
                       key={option}
@@ -78,7 +80,7 @@ export default function InstructorQaPage() {
               onClick={() => setViewMode('double')}
               title={t('qa.twoCols')}
               aria-label={t('qa.twoCols')}
-              className={`flex items-center px-2.5 py-2 ${viewMode === 'double' ? 'bg-accent text-white' : 'bg-white text-ink-muted hover:bg-surface'}`}
+              className={`flex items-center px-2.5 py-2 ${viewMode === 'double' ? 'bg-accent text-white' : 'bg-surface-raised text-ink-muted hover:bg-surface'}`}
             >
               <ColumnsIcon />
             </button>
@@ -87,7 +89,7 @@ export default function InstructorQaPage() {
               onClick={() => setViewMode('single')}
               title={t('qa.oneCol')}
               aria-label={t('qa.oneCol')}
-              className={`flex items-center px-2.5 py-2 ${viewMode === 'single' ? 'bg-accent text-white' : 'bg-white text-ink-muted hover:bg-surface'}`}
+              className={`flex items-center px-2.5 py-2 ${viewMode === 'single' ? 'bg-accent text-white' : 'bg-surface-raised text-ink-muted hover:bg-surface'}`}
             >
               <ListIcon />
             </button>
@@ -107,7 +109,7 @@ export default function InstructorQaPage() {
 
       {isLoading && <div className="p-10 text-center text-sm text-ink-muted">{t('loading')}</div>}
       {!isLoading && questions.length === 0 && (
-        <div className="rounded-xl border border-line bg-white p-10 text-center text-sm text-ink-muted shadow-sm">
+        <div className="rounded-xl border border-line bg-surface-raised p-10 text-center text-sm text-ink-muted shadow-sm">
           {t('qa.empty')}
         </div>
       )}
@@ -133,7 +135,7 @@ export default function InstructorQaPage() {
               />
             ))}
           </div>
-          <div className="rounded-xl border border-line bg-white shadow-sm">
+          <div className="rounded-xl border border-line bg-surface-raised shadow-sm">
             {selectedInDoubleView ? (
               <QaThreadPanel questionId={selectedInDoubleView} />
             ) : (
@@ -146,15 +148,13 @@ export default function InstructorQaPage() {
       )}
 
       {viewMode === 'single' && activeQuestionId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="flex max-h-[85vh] w-full max-w-lg flex-col overflow-hidden rounded-xl bg-white shadow-xl">
+        <Modal open onClose={() => setActiveQuestionId(null)} bare ariaLabel={String(t('qa.detail'))} closeOnBackdrop={false} className="flex max-h-[85vh] w-full max-w-lg flex-col overflow-hidden rounded-xl bg-surface-raised shadow-xl">
             <div className="flex items-center justify-between border-b border-line-soft px-5 py-3.5">
               <span className="font-display text-[15px] font-bold text-ink">{t('qa.detail')}</span>
               <button type="button" onClick={() => setActiveQuestionId(null)} aria-label={t('qa.close')} className="text-xl text-ink-muted hover:text-ink">×</button>
             </div>
             <QaThreadPanel questionId={activeQuestionId} />
-          </div>
-        </div>
+          </Modal>
       )}
     </>
   );
@@ -167,8 +167,8 @@ function QuestionRow({ question: q, active, onClick }: { question: QaQuestion; a
     <button
       type="button"
       onClick={onClick}
-      className={`flex flex-col gap-1 rounded-xl border bg-white p-4 text-left shadow-sm transition-colors ${
-        active ? 'border-cyan-400 ring-1 ring-cyan-200' : 'border-line hover:border-cyan-300'
+      className={`flex flex-col gap-1 rounded-xl border bg-surface-raised p-4 text-left shadow-sm transition-colors ${
+        active ? 'border-accent ring-1 ring-accent/30' : 'border-line hover:border-accent/40'
       }`}
     >
       <div className="flex items-center justify-between gap-3">
@@ -180,7 +180,7 @@ function QuestionRow({ question: q, active, onClick }: { question: QaQuestion; a
         <span><span className="font-semibold">{q.userName}: </span>{q.content}</span>
       </p>
       <div className="flex items-center gap-2 text-[11.5px]">
-        <span className={`rounded-full px-2 py-0.5 font-semibold ${q.answerCount === 0 ? 'bg-white text-ink' : 'bg-line-soft text-ink-muted'}`}>
+        <span className={`rounded-full px-2 py-0.5 font-semibold ${q.answerCount === 0 ? 'bg-surface-raised text-ink' : 'bg-line-soft text-ink-muted'}`}>
           {q.answerCount === 0 ? t('qa.noAnswer') : t('qa.answers', { count: q.answerCount })}
         </span>
         {q.hasInstructorAnswer && (

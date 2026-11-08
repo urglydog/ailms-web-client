@@ -48,7 +48,7 @@ export function AdminLessonPreview({ lesson }: AdminLessonPreviewProps) {
         {docs.length > 0 && (
           <div className="mt-1.5 flex flex-col gap-1">
             {docs.map((doc) => (
-              <div key={doc.id} className="flex items-center justify-between gap-2 rounded-md bg-white px-2.5 py-1.5 text-[12px]">
+              <div key={doc.id} className="flex items-center justify-between gap-2 rounded-md bg-surface-raised px-2.5 py-1.5 text-[12px]">
                 <span className="min-w-0 flex-1 truncate text-ink">{doc.fileName}</span>
                 <span className="shrink-0 text-ink-muted">{formatFileSize(doc.fileSize)}</span>
                 <a href={doc.fileUrl} target="_blank" rel="noreferrer" className="shrink-0 font-bold text-accent-dark hover:underline">

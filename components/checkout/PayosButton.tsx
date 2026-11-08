@@ -20,7 +20,7 @@ export function PayosButton({ paying, disabled, onPay }: PayosButtonProps) {
       disabled={disabled}
       aria-busy={paying}
       className={`flex w-full items-center justify-between rounded-xl border-2 px-4 py-3 text-left transition-colors disabled:cursor-not-allowed ${
-        paying ? 'border-accent bg-tint' : 'border-line bg-white hover:border-accent'
+        paying ? 'border-accent bg-tint' : 'border-line bg-surface-raised hover:border-accent'
       }`}
     >
       <span className="flex items-center gap-3">

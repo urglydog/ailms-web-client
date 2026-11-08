@@ -83,11 +83,11 @@ export default function CertificateDetailPage() {
       <h1 className="mb-1 font-display text-2xl font-bold text-ink">{t('congrats')}</h1>
       <p className="mb-6 text-sm text-ink-muted">&ldquo;{certificate.courseTitle}&rdquo;</p>
 
-      <div className="grid gap-8 lg:grid-cols-[1fr_340px]">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-8 lg:grid-cols-[minmax(0,1fr)_340px]">
         <CertificatePreview certificate={certificate} />
 
         <div className="flex flex-col gap-3">
-          <dl className="rounded-xl border border-line bg-white p-4 text-sm">
+          <dl className="rounded-xl border border-line bg-surface-raised p-4 text-sm">
             <InfoRow label={t('recipient')} value={certificate.studentName} />
             <InfoRow label={t('instructor')} value={certificate.instructorName} />
             <InfoRow label={t('completedOn')} value={format(completedDate, 'dd/MM/yyyy')} />
@@ -122,7 +122,7 @@ export default function CertificateDetailPage() {
                 id="verify-url"
                 readOnly
                 value={certificate.verifyUrl}
-                className="w-full min-w-0 truncate rounded-lg border border-line bg-white px-2.5 py-2 text-xs text-ink-muted"
+                className="w-full min-w-0 truncate rounded-lg border border-line bg-surface-raised px-2.5 py-2 text-xs text-ink-muted"
               />
               <button
                 type="button"

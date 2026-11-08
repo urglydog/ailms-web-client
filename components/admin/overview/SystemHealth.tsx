@@ -42,7 +42,7 @@ function UsageBar({ label, used, total }: { label: string; used: number; total: 
 export function SystemHealth({ metrics, onRefresh }: { metrics: SystemMetrics | undefined; onRefresh: () => void }) {
   const t = useTranslations('admin.overview.health');
   return (
-    <section aria-labelledby="system-health-title" className="rounded-xl border border-line bg-white p-5 shadow-sm">
+    <section aria-labelledby="system-health-title" className="rounded-xl border border-line bg-surface-raised p-5 shadow-sm">
       <div className="mb-4 flex items-center justify-between gap-3">
         <h2 id="system-health-title" className="m-0 font-display text-[15px] font-bold text-ink">
           {t('title')}

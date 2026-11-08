@@ -117,7 +117,7 @@ export function SubtitlePositionEditor({
         position={translatedSettings.position}
         onChange={onChangeTranslatedPosition}
         containerRef={containerRef}
-        accentBorderClass="border-amber-400"
+        accentBorderClass="border-warning"
       />
     </div>
   );

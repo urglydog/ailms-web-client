@@ -1,5 +1,7 @@
 'use client';
 
+import { Modal } from '@/components/ui/Modal';
+
 import { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { CourseFilterDropdown } from '@/components/instructor/communication/CourseFilterDropdown';
@@ -28,12 +30,12 @@ export default function InstructorAssignmentsPage() {
 
       {isLoading && <div className="p-10 text-center text-sm text-ink-muted">{t('loading')}</div>}
       {!isLoading && (!assignments || assignments.length === 0) && (
-        <div className="rounded-xl border border-line bg-white p-10 text-center text-sm text-ink-muted shadow-sm">
+        <div className="rounded-xl border border-line bg-surface-raised p-10 text-center text-sm text-ink-muted shadow-sm">
           {t('assignments.empty')}
         </div>
       )}
 
-      <div className="overflow-hidden rounded-xl border border-line bg-white shadow-sm">
+      <div className="overflow-hidden rounded-xl border border-line bg-surface-raised shadow-sm">
         {assignments?.map((a, idx) => (
           <button
             key={a.id}
@@ -75,8 +77,7 @@ function SubmissionsModal({ assignment, onClose }: { assignment: AssignmentItem;
     drafts[id] ?? { score: score != null ? String(score) : '', feedback: feedback ?? '' };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-xl bg-white shadow-xl">
+    <Modal open onClose={onClose} bare ariaLabel={String(assignment.title)} closeOnBackdrop={false} className="flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-xl bg-surface-raised shadow-xl">
         <div className="flex items-center justify-between border-b border-line-soft px-5 py-3.5">
           <div>
             <p className="font-display text-[15px] font-bold text-ink">{assignment.title}</p>
@@ -149,7 +150,6 @@ function SubmissionsModal({ assignment, onClose }: { assignment: AssignmentItem;
             })}
           </div>
         </div>
-      </div>
-    </div>
+      </Modal>
   );
 }

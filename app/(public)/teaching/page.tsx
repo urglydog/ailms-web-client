@@ -70,7 +70,7 @@ export default function TeachingIntroPage() {
           lên đúng phần đó thay vì tách thành 1 khối riêng. Màn hình nhỏ xếp chữ lên trên ảnh vì
           phần xám không đủ rộng để đè chữ dễ đọc ở tỉ lệ 3:1. */}
       <section className="relative w-full">
-        <div className="bg-[#ececec] px-6 py-10 md:hidden">
+        <div className="bg-tint px-6 py-10 md:hidden">
           <HeroText ctaHref={ctaHref} ctaLabel={ctaLabel} />
         </div>
         <div className="relative hidden w-full md:block" style={{ aspectRatio: '3 / 1' }}>
@@ -86,7 +86,7 @@ export default function TeachingIntroPage() {
       </section>
 
       {/* Lý do nên bắt đầu */}
-      <section className="bg-white py-14">
+      <section className="bg-surface-raised py-14">
         <div className="shell flex flex-col gap-10">
           <h2 className="text-center font-display text-3xl font-bold text-ink md:text-4xl">
             Có rất nhiều lý do để bắt đầu.
@@ -103,11 +103,11 @@ export default function TeachingIntroPage() {
         </div>
       </section>
 
-      {/* Các bước bắt đầu — (19/09/2026, sửa lỗi) `bg-white` trước đây nằm CHUNG thẻ với
+      {/* Các bước bắt đầu — (19/09/2026, sửa lỗi) `bg-surface-raised` trước đây nằm CHUNG thẻ với
           `.shell` (có `max-w-shell` + `mx-auto`) nên chỉ tô trắng đúng phần nội dung ở giữa,
           2 bên rìa màn hình rộng vẫn lộ màu nền xám của trang. Nền trắng giờ đặt ở thẻ NGOÀI
           full-width, `.shell` chỉ còn nhiệm vụ canh giữa nội dung bên trong. */}
-      <section className="bg-white py-14">
+      <section className="bg-surface-raised py-14">
         <div className="shell">
           <StepsTabs />
         </div>
@@ -196,7 +196,7 @@ function StepsTabs() {
         {/* (19/09/2026, theo phản hồi) — nền trắng trùng màu nền của chính ảnh minh họa (thay
             `bg-accent/5` trước đây tạo viền lệch màu rõ), ảnh phóng to hơn (bỏ padding, tăng
             chiều cao). */}
-        <div className="relative h-80 overflow-hidden rounded-card bg-white md:h-[420px]">
+        <div className="relative h-80 overflow-hidden rounded-card bg-surface-raised md:h-[420px]">
           <Image src={step.image} alt="" fill className="object-contain" />
         </div>
       </div>

@@ -39,7 +39,7 @@ export default function AdminModerationPage() {
             aria-pressed={statusFilter === id}
             onClick={() => setStatusFilter(id)}
             className={`rounded-full px-4 py-2 text-[13px] font-semibold transition-colors ${
-              statusFilter === id ? 'bg-accent text-white' : 'border border-line bg-white text-ink-muted hover:border-accent hover:text-ink'
+              statusFilter === id ? 'bg-accent text-white' : 'border border-line bg-surface-raised text-ink-muted hover:border-accent hover:text-ink'
             }`}
           >
             {t(`tabs.${id}`)}
@@ -49,12 +49,12 @@ export default function AdminModerationPage() {
       </div>
 
       {error && (
-        <div role="alert" className="rounded-xl border border-danger/40 bg-white p-4 text-sm text-danger">
+        <div role="alert" className="rounded-xl border border-danger/40 bg-surface-raised p-4 text-sm text-danger">
           {error instanceof ApiError ? error.message : t('loadError')}
         </div>
       )}
 
-      <div className="overflow-hidden rounded-xl border border-line bg-white shadow-sm">
+      <div className="overflow-hidden rounded-xl border border-line bg-surface-raised shadow-sm">
         {loading ? (
           <div className="flex flex-col gap-2 p-4">
             {Array.from({ length: 4 }, (_, i) => (

@@ -205,6 +205,31 @@ export const publicCoursesApi = {
     return page.content.map(toSummary);
   },
 
+  /** Một trang kết quả (phân trang phía server). `page` đếm từ 1 ở giao diện, API Spring đếm từ 0. */
+  searchPage: async (
+    filters: CourseFilterState,
+    sortBy: CourseSortBy,
+    page: number,
+    size: number,
+    /** Hủy request khi bộ lọc đã đổi tiếp (React Query truyền vào). */
+    signal?: AbortSignal,
+  ): Promise<{ items: CourseSummary[]; hasNext: boolean }> => {
+    const query = buildQuery({
+      keyword: filters.keyword || undefined,
+      categorySlug: filters.category ?? undefined,
+      level: filters.level ?? undefined,
+      priceType: filters.priceType === 'all' ? undefined : filters.priceType,
+      minRating: filters.minRating ?? undefined,
+      durationBucket: filters.durationBucket ?? undefined,
+      sortBy: sortBy === 'newest' ? undefined : sortBy,
+      page: Math.max(0, page - 1),
+      size,
+    });
+    // Backend trả `Slice` (không đếm tổng): chỉ cần biết còn trang sau hay không.
+    const res = await api.get<{ content: RawSummary[]; last: boolean }>(`/api/v1/courses${query}`, { signal });
+    return { items: res.content.map(toSummary), hasNext: !res.last };
+  },
+
   getBySlug: async (slug: string): Promise<CourseDetail> => {
     const raw = await api.get<RawDetail>(`/api/v1/courses/${slug}`);
     return toDetail(raw);

@@ -23,7 +23,7 @@ export function CourseTile({ course }: { course: EnrolledCourse }) {
       <div className="relative">
         <CourseThumb thumbnailUrl={course.thumbnailUrl} title={course.courseTitle} className="aspect-[16/9]" />
         <span
-          className={`absolute left-2 top-2 rounded-full bg-white px-2 py-0.5 text-[11px] font-medium shadow-sm ${
+          className={`absolute left-2 top-2 rounded-full bg-surface-raised px-2 py-0.5 text-[11px] font-medium shadow-sm ${
             completed ? 'text-success-ink' : 'text-accent-dark'
           }`}
         >

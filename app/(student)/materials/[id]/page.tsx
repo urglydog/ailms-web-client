@@ -88,7 +88,7 @@ export default function MaterialDetailPage() {
 
     return (
       <div className="min-h-dvh bg-surface p-8 flex items-center justify-center">
-        <div className="shell max-w-md text-center py-12 px-6 bg-white rounded-2xl shadow-sm border border-line">
+        <div className="shell max-w-md text-center py-12 px-6 bg-surface-raised rounded-2xl shadow-sm border border-line">
           <div className="w-16 h-16 bg-streak-bg text-warning rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
             {isNotFound ? '📦' : '⚠️'}
           </div>
@@ -108,7 +108,7 @@ export default function MaterialDetailPage() {
             </button>
             <Link 
               href="/courses" 
-              className="px-5 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-sm transition-colors"
+              className="px-5 py-2 text-sm font-semibold text-white bg-accent hover:bg-accent-dark rounded-xl shadow-sm transition-colors"
             >
               Về trang chủ
             </Link>

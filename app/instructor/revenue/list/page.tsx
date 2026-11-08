@@ -1,5 +1,7 @@
 'use client';
 
+import { useThemeColors } from '@/lib/theme/useThemeColors';
+
 import { useMemo, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { AreaChart, Area, Bar, BarChart, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -35,6 +37,8 @@ function daysAgoIso(days: number): string {
  *   hạn này thay vì thêm endpoint mới ngoài phạm vi lần sửa này).
  */
 export default function RevenuePage() {
+  // Lưới/trục/tooltip theo theme sáng-tối (thuộc tính SVG không nhận biến CSS).
+  const palette = useThemeColors();
   const t = useTranslations('instructor.perf');
   const locale = useLocale();
   const formatMoney = (value: number) => formatMoneyIn(value, locale);
@@ -136,7 +140,7 @@ export default function RevenuePage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="m-0 font-display text-[20px] font-bold text-ink">Doanh thu</h1>
         <div className="flex items-center gap-2">
-          <div className="flex rounded-lg border border-line bg-white p-0.5 text-[12.5px] font-semibold">
+          <div className="flex rounded-lg border border-line bg-surface-raised p-0.5 text-[12.5px] font-semibold">
             <button
               type="button"
               onClick={() => setMode('preset')}
@@ -196,7 +200,7 @@ export default function RevenuePage() {
         </div>
       ) : (
         <>
-          <div className="rounded-xl border border-line bg-white p-4 shadow-sm">
+          <div className="rounded-xl border border-line bg-surface-raised p-4 shadow-sm">
             <span className="text-[12.5px] font-semibold text-ink-muted">{t('list.netTotal')}</span>
             <div className="mt-1 font-display text-[22px] font-extrabold text-success-ink">{formatMoney(total)}</div>
           </div>
@@ -214,7 +218,7 @@ export default function RevenuePage() {
             </div>
           )}
 
-          <div className="rounded-xl border border-line bg-white p-5 shadow-sm">
+          <div className="rounded-xl border border-line bg-surface-raised p-5 shadow-sm">
             <h2 className="mb-1 font-display text-[15px] font-bold text-ink">{t('list.chart.byDay')}</h2>
             <div className="mb-3 flex items-center gap-4 text-[12px] text-ink-muted">
               <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full" style={{ background: COLOR_ORGANIC }} /> {t('list.chart.organic')}</span>
@@ -224,10 +228,10 @@ export default function RevenuePage() {
               <div className="h-72 w-full min-w-0">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={chartData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                    <XAxis dataKey="day" tick={{ fontSize: 11 }} tickFormatter={formatShortDate} />
-                    <YAxis tick={{ fontSize: 11 }} tickFormatter={(v: number) => (v >= 1000 ? `${(v / 1000).toFixed(0)}k` : String(v))} />
-                    <Tooltip
+                    <CartesianGrid strokeDasharray="3 3" stroke={palette.line} />
+                    <XAxis dataKey="day" tick={{ fontSize: 11, fill: palette.inkMuted }} tickFormatter={formatShortDate} />
+                    <YAxis tick={{ fontSize: 11, fill: palette.inkMuted }} tickFormatter={(v: number) => (v >= 1000 ? `${(v / 1000).toFixed(0)}k` : String(v))} />
+                    <Tooltip contentStyle={{ background: palette.surfaceRaised, borderColor: palette.line, color: palette.ink }}
                       formatter={(value, name) => [formatMoney(Number(value ?? 0)), name === 'organic' ? t('list.chart.organic') : t('list.chart.referral')]}
                       labelFormatter={(label) => t('list.chart.day', { date: formatShortDate(String(label ?? '')) })}
                     />
@@ -242,15 +246,15 @@ export default function RevenuePage() {
           </div>
 
           {cumulativeData.length > 0 && (
-            <div className="rounded-xl border border-line bg-white p-5 shadow-sm">
+            <div className="rounded-xl border border-line bg-surface-raised p-5 shadow-sm">
               <h2 className="mb-3 font-display text-[15px] font-bold text-ink">{t('list.chart.cumulativeTitle')}</h2>
               <div className="h-40 w-full min-w-0">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={cumulativeData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                    <XAxis dataKey="day" tick={{ fontSize: 11 }} tickFormatter={formatShortDate} />
-                    <YAxis tick={{ fontSize: 11 }} tickFormatter={(v: number) => (v >= 1000 ? `${(v / 1000).toFixed(0)}k` : String(v))} />
-                    <Tooltip
+                    <CartesianGrid strokeDasharray="3 3" stroke={palette.line} />
+                    <XAxis dataKey="day" tick={{ fontSize: 11, fill: palette.inkMuted }} tickFormatter={formatShortDate} />
+                    <YAxis tick={{ fontSize: 11, fill: palette.inkMuted }} tickFormatter={(v: number) => (v >= 1000 ? `${(v / 1000).toFixed(0)}k` : String(v))} />
+                    <Tooltip contentStyle={{ background: palette.surfaceRaised, borderColor: palette.line, color: palette.ink }}
                       formatter={(value) => [formatMoney(Number(value ?? 0)), t('list.chart.cumulative')]}
                       labelFormatter={(label) => t('list.chart.day', { date: formatShortDate(String(label ?? '')) })}
                     />
@@ -261,7 +265,7 @@ export default function RevenuePage() {
             </div>
           )}
 
-          <div className="overflow-hidden rounded-xl border border-line bg-white shadow-sm">
+          <div className="overflow-hidden rounded-xl border border-line bg-surface-raised shadow-sm">
             <div className="overflow-x-auto">
               <div className="grid min-w-[720px] grid-cols-[1.4fr_110px_110px_130px_100px_130px] gap-3 border-b border-line bg-surface px-4 py-2.5 text-[11.5px] font-bold text-ink-muted">
                 <span>{t('list.cols.course')}</span>
@@ -308,7 +312,7 @@ export default function RevenuePage() {
 
 function StatCard({ label, value, tone = 'text-ink' }: { label: string; value: string; tone?: string }) {
   return (
-    <div className="rounded-xl border border-line bg-white p-4 shadow-sm">
+    <div className="rounded-xl border border-line bg-surface-raised p-4 shadow-sm">
       <span className="text-[11.5px] font-semibold text-ink-muted">{label}</span>
       <div className={`mt-1 font-display text-[22px] font-extrabold ${tone}`}>{value}</div>
     </div>
@@ -319,7 +323,7 @@ function StatCard({ label, value, tone = 'text-ink' }: { label: string; value: s
  * khô khan, tính từ `instructorEarning` (thực nhận), không cần endpoint mới. */
 function SplitBar({ label, percent, leftLabel, rightLabel }: { label: string; percent: number; leftLabel: string; rightLabel: string }) {
   return (
-    <div className="rounded-xl border border-line bg-white p-4 shadow-sm">
+    <div className="rounded-xl border border-line bg-surface-raised p-4 shadow-sm">
       <span className="text-[11.5px] font-semibold text-ink-muted">{label}</span>
       <div className="mt-2 flex h-3 w-full overflow-hidden rounded-full bg-line-soft">
         <div className="h-full bg-accent" style={{ width: `${percent}%` }} />

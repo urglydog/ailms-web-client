@@ -1,5 +1,7 @@
 'use client';
 
+import { Modal } from '@/components/ui/Modal';
+
 import { useMemo, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useMyCourses } from '@/hooks/useCourses';
@@ -227,8 +229,7 @@ export function CouponManager({ role }: CouponManagerProps) {
       )}
 
       {editing && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-          <div className="w-full max-w-lg rounded-2xl bg-surface shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+        <Modal open onClose={closeModal} bare ariaLabel={String(editing === 'new' ? t('form.createTitle') : t('form.editTitle'))} closeOnBackdrop={false} className="w-full max-w-lg rounded-2xl bg-surface shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
             <div className="px-6 py-4 border-b border-line flex justify-between items-center">
               <h2 className="font-display text-xl font-bold text-ink">
                 {editing === 'new' ? t('form.createTitle') : t('form.editTitle')}
@@ -401,8 +402,7 @@ export function CouponManager({ role }: CouponManagerProps) {
                 </button>
               </div>
             </form>
-          </div>
-        </div>
+          </Modal>
       )}
     </div>
   );

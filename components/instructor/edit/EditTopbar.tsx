@@ -62,7 +62,7 @@ export function EditTopbar({
   }, [previewOpen]);
 
   return (
-    <header className="sticky top-0 z-40 flex flex-wrap items-center justify-between gap-3 border-b border-line bg-white px-4 py-3 sm:px-8">
+    <header className="sticky top-0 z-40 flex flex-wrap items-center justify-between gap-3 border-b border-line bg-surface-raised px-4 py-3 sm:px-8">
       <div className="flex min-w-0 items-center gap-3 sm:gap-4">
         <Link href="/instructor/courses" className="flex shrink-0 items-center gap-1.5 text-[13px] font-semibold text-accent-dark no-underline hover:underline">
           <ArrowLeft size={16} aria-hidden />
@@ -89,7 +89,7 @@ export function EditTopbar({
             <ChevronDown size={14} aria-hidden className={previewOpen ? 'rotate-180 transition-transform' : 'transition-transform'} />
           </button>
           {previewOpen && (
-            <div role="menu" className="absolute right-0 top-full z-20 mt-1 w-56 overflow-hidden rounded-lg border border-line bg-white py-1 shadow-card-hover">
+            <div role="menu" className="absolute right-0 top-full z-20 mt-1 w-56 overflow-hidden rounded-lg border border-line bg-surface-raised py-1 shadow-card-hover">
               <button
                 type="button"
                 role="menuitem"

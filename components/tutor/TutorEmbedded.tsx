@@ -23,7 +23,7 @@ function AttachmentThumb({ attachment }: { attachment: TutorAttachment }) {
     return <img src={attachment.previewUrl} alt={attachment.fileName} className="max-h-40 rounded-lg border border-line/50 object-cover" />;
   }
   return (
-    <div className="flex max-w-[220px] items-center gap-1.5 rounded-lg border border-line bg-white px-2.5 py-1.5 text-xs text-ink-muted shadow-sm">
+    <div className="flex max-w-[220px] items-center gap-1.5 rounded-lg border border-line bg-surface-raised px-2.5 py-1.5 text-xs text-ink-muted shadow-sm">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden className="shrink-0">
         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6" />
       </svg>
@@ -73,7 +73,7 @@ function SessionRow({
             if (e.key === 'Escape') onCancelRename();
           }}
           onBlur={() => onSubmitRename(draftTitle)}
-          className="w-full rounded-lg border border-accent bg-white px-2 py-1.5 text-sm text-ink outline-none"
+          className="w-full rounded-lg border border-accent bg-surface-raised px-2 py-1.5 text-sm text-ink outline-none"
         />
       </li>
     );
@@ -112,7 +112,7 @@ function SessionRow({
       </button>
 
       {menuOpen && (
-        <div className="absolute right-1.5 top-9 z-10 w-40 overflow-hidden rounded-lg border border-line bg-white py-1 shadow-card-hover">
+        <div className="absolute right-1.5 top-9 z-10 w-40 overflow-hidden rounded-lg border border-line bg-surface-raised py-1 shadow-card-hover">
           <button
             type="button"
             onClick={onTogglePin}
@@ -283,7 +283,7 @@ export function TutorEmbedded({ courseId, lessonId, onSeek, lessonTitleById }: T
       </div>
 
       {showHistory ? (
-        <div className="flex flex-1 flex-col overflow-hidden bg-white" onClick={() => setOpenMenuId(null)}>
+        <div className="flex flex-1 flex-col overflow-hidden bg-surface-raised" onClick={() => setOpenMenuId(null)}>
           <div className="border-b border-line p-3">
             <input
               value={searchQuery}
@@ -337,7 +337,7 @@ export function TutorEmbedded({ courseId, lessonId, onSeek, lessonTitleById }: T
         <>
           <div
             ref={messagesContainerRef}
-            className="relative flex-1 overflow-y-auto bg-[#F8F9FA] p-4"
+            className="relative flex-1 overflow-y-auto bg-surface p-4"
             onDragOver={(e) => {
               e.preventDefault();
               setIsDraggingFile(true);
@@ -374,7 +374,7 @@ export function TutorEmbedded({ courseId, lessonId, onSeek, lessonTitleById }: T
                       className={`max-w-[90%] rounded-2xl px-4 py-2 text-sm ${
                         msg.sender === 'USER'
                           ? 'rounded-br-none bg-accent text-white whitespace-pre-wrap'
-                          : 'rounded-bl-none border border-line bg-white text-ink shadow-sm'
+                          : 'rounded-bl-none border border-line bg-surface-raised text-ink shadow-sm'
                       }`}
                     >
                       {msg.sender === 'AI' ? (
@@ -393,7 +393,7 @@ export function TutorEmbedded({ courseId, lessonId, onSeek, lessonTitleById }: T
               ))}
               {isSending && (
                 <div className="flex items-start">
-                  <div className="flex items-center gap-2 rounded-2xl rounded-bl-none border border-line bg-white px-4 py-2 text-sm text-ink shadow-sm">
+                  <div className="flex items-center gap-2 rounded-2xl rounded-bl-none border border-line bg-surface-raised px-4 py-2 text-sm text-ink shadow-sm">
                     <span className="animate-pulse">●</span>
                     <span className="animate-pulse delay-75">●</span>
                     <span className="animate-pulse delay-150">●</span>
@@ -409,7 +409,7 @@ export function TutorEmbedded({ courseId, lessonId, onSeek, lessonTitleById }: T
               e.preventDefault();
               handleSend();
             }}
-            className="flex flex-col gap-2 border-t border-line bg-white p-3"
+            className="flex flex-col gap-2 border-t border-line bg-surface-raised p-3"
           >
             {pendingFiles.length > 0 && (
               <div className="flex flex-wrap gap-1.5">
@@ -478,7 +478,7 @@ export function TutorEmbedded({ courseId, lessonId, onSeek, lessonTitleById }: T
                     handleSend();
                   }
                 }}
-                className="h-[42px] max-h-[120px] flex-1 resize-none rounded-2xl border border-line bg-surface-raised px-4 py-2.5 text-sm transition-colors focus:border-accent focus:bg-white focus:outline-none"
+                className="h-[42px] max-h-[120px] flex-1 resize-none rounded-2xl border border-line bg-surface-raised px-4 py-2.5 text-sm transition-colors focus:border-accent focus:bg-surface-raised focus:outline-none"
               />
               <button
                 type="submit"

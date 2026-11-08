@@ -107,7 +107,7 @@ export function FlashcardStudyMode({ deckName: _deckName, cards, language, onFin
         {onFinish && (
           <button
             onClick={onFinish}
-            className="flex items-center gap-2 bg-accent hover:bg-accent-dark text-white font-semibold px-8 py-3 rounded-card shadow-card transition-all"
+            className="flex items-center gap-2 bg-accent hover:bg-accent-dark text-white font-semibold px-8 py-3 rounded-card shadow-card transition"
           >
             <ArrowLeft className="w-4 h-4" /> Quay lại
           </button>
@@ -247,7 +247,7 @@ export function FlashcardStudyMode({ deckName: _deckName, cards, language, onFin
                         </span>
                         <button
                           onClick={() => handleRate(btn.quality)}
-                          className={`px-5 py-2.5 ${btn.cls} text-white font-semibold rounded-card text-sm shadow-card hover:shadow-card-hover transition-all`}
+                          className={`px-5 py-2.5 ${btn.cls} text-white font-semibold rounded-card text-sm shadow-card hover:shadow-card-hover transition`}
                         >
                           {btn.label}
                         </button>

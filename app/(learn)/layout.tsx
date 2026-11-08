@@ -34,13 +34,13 @@ function LearnHeaderBar() {
         {loggedIn && (
           <Link
             href="/my-courses"
-            className="flex shrink-0 items-center gap-1 rounded-md px-1.5 py-1 text-[13px] font-medium text-ink-muted no-underline hover:bg-tint hover:text-accent-dark hover:no-underline"
+            className="flex min-h-10 min-w-10 shrink-0 items-center justify-center gap-1 rounded-md px-1.5 py-1 text-[13px] font-medium text-ink-muted no-underline hover:bg-tint hover:text-accent-dark hover:no-underline"
           >
             <ArrowLeft size={16} aria-hidden />
             <span className="sr-only sm:not-sr-only">{t('back')}</span>
           </Link>
         )}
-        <Link href="/" className="flex shrink-0 items-center gap-2 no-underline">
+        <Link href="/" aria-label="LinguaLearn" className="flex min-h-10 min-w-10 shrink-0 items-center justify-center gap-2 no-underline">
           <span className="flex h-6 w-6 items-center justify-center rounded bg-accent font-display text-[13px] font-bold text-white">
             L
           </span>

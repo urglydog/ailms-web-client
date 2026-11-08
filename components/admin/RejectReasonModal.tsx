@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { Modal } from '@/components/ui/Modal';
 import { useTranslations } from 'next-intl';
 
 const MIN_REASON_LENGTH = 20;
@@ -19,21 +20,9 @@ export function RejectReasonModal({ courseTitle, onConfirm, onClose, isSubmittin
   const length = reason.trim().length;
   const isValid = length >= MIN_REASON_LENGTH;
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [onClose]);
-
   return (
-    <div className="fixed inset-0 z-[400] flex items-center justify-center bg-ink/40 p-4">
-      <div role="dialog" aria-modal="true" aria-labelledby="reject-title" className="w-full max-w-md rounded-2xl border border-line bg-white p-5 shadow-card-hover">
-        <h2 id="reject-title" className="m-0 font-display text-[16px] font-bold text-ink">
-          {t('title')}
-        </h2>
-        <p className="mt-1 text-[13px] text-ink-muted">{t('body', { title: courseTitle })}</p>
+    <Modal open onClose={onClose} title={t('title')} hideClose>
+        <p className="m-0 text-[13px] text-ink-muted">{t('body', { title: courseTitle })}</p>
 
         <label htmlFor="reject-reason" className="sr-only">
           {t('label')}
@@ -64,7 +53,6 @@ export function RejectReasonModal({ courseTitle, onConfirm, onClose, isSubmittin
             {t('confirm')}
           </button>
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 }

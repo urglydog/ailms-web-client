@@ -69,7 +69,7 @@ export default function NewLiveSessionPage() {
       </p>
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col gap-4 rounded-xl border border-line bg-white p-5 shadow-sm"
+        className="flex flex-col gap-4 rounded-xl border border-line bg-surface-raised p-5 shadow-sm"
       >
         <label className="flex flex-col gap-1.5">
           <span className="text-[12.5px] font-semibold text-ink-muted">{t('form.title')}</span>
@@ -153,7 +153,7 @@ export default function NewLiveSessionPage() {
         </label>
 
         {createLiveSession.error instanceof ApiError && (
-          <div className="rounded-lg border border-danger/40 bg-white p-3 text-[12.5px] text-danger">
+          <div className="rounded-lg border border-danger/40 bg-surface-raised p-3 text-[12.5px] text-danger">
             {createLiveSession.error.message}
           </div>
         )}

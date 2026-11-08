@@ -88,7 +88,7 @@ export function HelpCenter() {
                 setTopic(null);
               }}
               className={`flex items-start gap-3 rounded-xl border p-4 text-left transition-colors ${
-                selected === id ? 'border-accent bg-tint' : 'border-line bg-white hover:bg-surface'
+                selected === id ? 'border-accent bg-tint' : 'border-line bg-surface-raised hover:bg-surface'
               }`}
             >
               <Icon size={20} aria-hidden className="mt-0.5 shrink-0 text-accent" />
@@ -105,7 +105,7 @@ export function HelpCenter() {
       {selected && (
         <section aria-labelledby="help-faq" className="flex flex-col gap-3">
           <h2 id="help-faq" className="m-0 font-display text-base font-bold text-ink">{t('faqTitle')}</h2>
-          <div className="flex flex-col divide-y divide-line-soft rounded-xl border border-line bg-white">
+          <div className="flex flex-col divide-y divide-line-soft rounded-xl border border-line bg-surface-raised">
             {faqs.map((faq) => (
               <details key={faq.q} className="group p-4">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold text-ink">
@@ -116,7 +116,7 @@ export function HelpCenter() {
                 <button
                   type="button"
                   onClick={() => setTopic({ category: selected, subject: buildSubject(selected, faq.q), hint: faq.hint })}
-                  className="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-line bg-white px-3 py-1.5 text-xs font-bold text-accent-dark hover:bg-tint"
+                  className="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-line bg-surface-raised px-3 py-1.5 text-xs font-bold text-accent-dark hover:bg-tint"
                 >
                   <Send size={13} aria-hidden />
                   {t('requestThis')}

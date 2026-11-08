@@ -37,12 +37,12 @@ export default function InstructorLivePage() {
       />
 
       {error && (
-        <div role="alert" className="rounded-xl border border-danger/40 bg-white p-4 text-sm text-danger">
+        <div role="alert" className="rounded-xl border border-danger/40 bg-surface-raised p-4 text-sm text-danger">
           {error instanceof ApiError ? error.message : t('loadError')}
         </div>
       )}
 
-      <div className="overflow-hidden rounded-xl border border-line bg-white shadow-sm">
+      <div className="overflow-hidden rounded-xl border border-line bg-surface-raised shadow-sm">
         <div className={`hidden border-b border-line bg-surface px-4 py-2.5 text-[11.5px] font-bold uppercase tracking-wide text-ink-muted ${LIVE_ROW_GRID}`}>
           <span>{t('columns.title')}</span>
           <span>{t('columns.course')}</span>

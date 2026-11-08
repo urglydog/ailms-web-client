@@ -1,4 +1,6 @@
 'use client';
+
+import { PopoverMotion } from '@/components/ui/PopoverMotion';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -24,6 +26,7 @@ import { LanguageModal } from '@/components/layout/LanguageModal';
 import { MobileDrawer } from '@/components/layout/header/MobileDrawer';
 import { NotificationMenu } from '@/components/layout/header/NotificationMenu';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
+import { ConfirmDialog } from '@/components/admin/ui/ConfirmDialog';
 import { LOCALE_NATIVE_NAMES, useLocaleStore } from '@/lib/stores/localeStore';
 import type { CartItem, WishlistItem } from '@/types/domain';
 
@@ -190,7 +193,7 @@ export function Header() {
   return (
     <>
       <header
-        className="sticky top-0 z-30 bg-white border-b border-line"
+        className="sticky top-0 z-30 bg-surface-raised border-b border-line"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="mx-auto flex h-[72px] max-w-7xl items-center justify-between gap-2 px-4 sm:gap-3.5 md:px-8">
@@ -288,7 +291,7 @@ export function Header() {
                 </div>
 
                 {headerDropdown.activeId === 'streak' && streakData && (
-                  <div className="absolute right-0 top-12 z-[200] w-72 rounded-2xl border border-line bg-white p-4 shadow-[0_20px_50px_rgba(19,22,32,0.15)]">
+                  <div className="absolute right-0 top-12 z-[200] w-72 rounded-2xl border border-line bg-surface-raised p-4 shadow-[0_20px_50px_rgba(19,22,32,0.15)]">
                     <div className="flex items-center gap-3 mb-4">
                       <span className="text-3xl">🔥</span>
                       <div>
@@ -358,8 +361,7 @@ export function Header() {
                 </svg>
               </Link>
 
-              {headerDropdown.activeId === 'wishlist' && (
-                <div className="absolute right-0 top-12 z-[200] w-80 rounded-2xl border border-line bg-white p-2 shadow-[0_20px_50px_rgba(19,22,32,0.15)]">
+              <PopoverMotion open={headerDropdown.activeId === 'wishlist'} origin="top right" className="absolute right-0 top-12 z-[200] w-80 rounded-2xl border border-line bg-surface-raised p-2 shadow-card-hover">
                   {wishlistItems && wishlistItems.length > 0 ? (
                     <>
                       <div className="flex max-h-96 flex-col gap-1 overflow-y-auto p-1">
@@ -379,8 +381,7 @@ export function Header() {
                   ) : (
                     <div className="p-4 text-center text-[13px] text-ink-muted">{t('wishlist.empty')}</div>
                   )}
-                </div>
-              )}
+                </PopoverMotion>
             </div>
 
             {/* Cart Icon + dropdown xem nhanh */}
@@ -402,8 +403,7 @@ export function Header() {
                 )}
               </Link>
 
-              {headerDropdown.activeId === 'cart' && (
-                <div className="absolute right-0 top-12 z-[200] w-80 rounded-2xl border border-line bg-white p-2 shadow-[0_20px_50px_rgba(19,22,32,0.15)]">
+              <PopoverMotion open={headerDropdown.activeId === 'cart'} origin="top right" className="absolute right-0 top-12 z-[200] w-80 rounded-2xl border border-line bg-surface-raised p-2 shadow-card-hover">
                   {cartItems && cartItems.length > 0 ? (
                     <>
                       <div className="flex max-h-96 flex-col gap-1 overflow-y-auto p-1">
@@ -427,8 +427,7 @@ export function Header() {
                   ) : (
                     <div className="p-4 text-center text-[13px] text-ink-muted">{t('cart.empty')}</div>
                   )}
-                </div>
-              )}
+                </PopoverMotion>
             </div>
 
             {isLoggedIn && (
@@ -457,8 +456,7 @@ export function Header() {
                   )}
                 </button>
 
-                {headerDropdown.activeId === 'notifications' && (
-                  <div className="absolute right-0 top-full z-[200] pt-2">
+                <PopoverMotion open={headerDropdown.activeId === 'notifications'} origin="top right" className="absolute right-0 top-full z-[200] pt-2">
                     <NotificationMenu
                       notifications={notifications}
                       unreadCount={unreadCount}
@@ -469,8 +467,7 @@ export function Header() {
                         router.push(url);
                       }}
                     />
-                  </div>
-                )}
+                  </PopoverMotion>
               </div>
             )}
 
@@ -496,8 +493,7 @@ export function Header() {
                     currentUser?.fullName ? currentUser.fullName.charAt(0) : 'U'
                   )}
                 </button>
-                {headerDropdown.activeId === 'account' && (
-                  <div className="absolute right-0 top-full z-[200] pt-2">
+                <PopoverMotion open={headerDropdown.activeId === 'account'} origin="top right" className="absolute right-0 top-full z-[200] pt-2">
                     <AccountMenu
                       user={{
                         id: currentUser?.id ?? null,
@@ -511,8 +507,7 @@ export function Header() {
                       onOpenLanguage={() => setShowLanguageModal(true)}
                       onLogout={() => setShowLogoutModal(true)}
                     />
-                  </div>
-                )}
+                  </PopoverMotion>
               </div>
             ) : (
               <>
@@ -547,29 +542,17 @@ export function Header() {
         />
       </header>
 
-      {/* Custom Logout Modal */}
-      {showLogoutModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity">
-          <div className="w-full max-w-sm rounded-2xl border border-line bg-white p-6 shadow-xl">
-            <h3 className="mb-2 font-display text-lg font-bold text-ink">{t('logoutModal.title')}</h3>
-            <p className="mb-6 text-sm text-ink-muted">{t('logoutModal.body')}</p>
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={() => setShowLogoutModal(false)}
-                className="rounded-full bg-line-soft px-4 py-2 text-sm font-semibold text-ink hover:bg-line transition-colors"
-              >
-                {t('logoutModal.cancel')}
-              </button>
-              <button
-                onClick={handleLogoutConfirm}
-                className="rounded-full bg-danger px-4 py-2 text-sm font-semibold text-white hover:bg-danger/90 transition-colors"
-              >
-                {t('logoutModal.confirm')}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Xác nhận đăng xuất — dùng hộp thoại chung (alertdialog, focus sẵn ở nút Hủy, Esc, hiệu ứng vào/ra) */}
+      <ConfirmDialog
+        open={showLogoutModal}
+        title={t('logoutModal.title')}
+        body={t('logoutModal.body')}
+        cancelLabel={t('logoutModal.cancel')}
+        confirmLabel={t('logoutModal.confirm')}
+        tone="danger"
+        onCancel={() => setShowLogoutModal(false)}
+        onConfirm={handleLogoutConfirm}
+      />
 
       {showLanguageModal && <LanguageModal onClose={() => setShowLanguageModal(false)} />}
     </>

@@ -71,7 +71,7 @@ export function LessonResourcePanel({ lessonId }: { lessonId: number }) {
           <div
             key={doc.id}
             draggable={false}
-            className="flex items-center justify-between gap-2 rounded-lg bg-white px-3 py-1.5 text-[12.5px]"
+            className="flex items-center justify-between gap-2 rounded-lg bg-surface-raised px-3 py-1.5 text-[12.5px]"
           >
             {doc.fileType === 'LINK' ? (
               <a
@@ -79,7 +79,7 @@ export function LessonResourcePanel({ lessonId }: { lessonId: number }) {
                 target="_blank"
                 rel="noreferrer"
                 draggable={false}
-                className="min-w-0 flex-1 truncate text-cyan-700 hover:underline"
+                className="min-w-0 flex-1 truncate text-accent-dark hover:underline"
               >
                 🔗 {doc.fileName}
               </a>
@@ -109,7 +109,7 @@ export function LessonResourcePanel({ lessonId }: { lessonId: number }) {
               type="button"
               draggable={false}
               onClick={() => setMode('file')}
-              className={`flex-1 rounded-md py-1.5 ${mode === 'file' ? 'bg-white text-cyan-700 shadow-sm' : 'text-ink-muted'}`}
+              className={`flex-1 rounded-md py-1.5 ${mode === 'file' ? 'bg-surface-raised text-accent-dark shadow-sm' : 'text-ink-muted'}`}
             >
               Thêm tệp từ máy
             </button>
@@ -117,7 +117,7 @@ export function LessonResourcePanel({ lessonId }: { lessonId: number }) {
               type="button"
               draggable={false}
               onClick={() => setMode('link')}
-              className={`flex-1 rounded-md py-1.5 ${mode === 'link' ? 'bg-white text-cyan-700 shadow-sm' : 'text-ink-muted'}`}
+              className={`flex-1 rounded-md py-1.5 ${mode === 'link' ? 'bg-surface-raised text-accent-dark shadow-sm' : 'text-ink-muted'}`}
             >
               Dán link
             </button>
@@ -158,7 +158,7 @@ export function LessonResourcePanel({ lessonId }: { lessonId: number }) {
                 type="submit"
                 draggable={false}
                 disabled={addLink.isPending}
-                className="self-start rounded-lg bg-cyan-600 px-4 py-1.5 text-[12px] font-bold text-white hover:bg-cyan-700 disabled:cursor-not-allowed disabled:opacity-50"
+                className="self-start rounded-lg bg-accent px-4 py-1.5 text-[12px] font-bold text-white hover:bg-accent-dark disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {addLink.isPending ? 'Đang thêm...' : 'Thêm liên kết'}
               </button>

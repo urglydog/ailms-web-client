@@ -47,7 +47,7 @@ export function ProfileBanner({
         </div>
 
         <div className="min-w-0 flex-1">
-          <span className="mb-1 inline-block rounded-full bg-white px-2.5 py-0.5 text-xs font-bold text-accent-dark">
+          <span className="mb-1 inline-block rounded-full bg-surface-raised px-2.5 py-0.5 text-xs font-bold text-accent-dark">
             {role === 'INSTRUCTOR' ? t('role.instructor') : t('role.student')}
           </span>
           <h1 className="font-display text-3xl font-bold text-ink">{fullName}</h1>
@@ -66,7 +66,7 @@ export function ProfileBanner({
             {isOwnProfile && (
               <Link
                 href="/profile"
-                className="inline-flex items-center gap-2 rounded-full border border-accent bg-white px-4 py-2 text-sm font-semibold text-accent-dark no-underline hover:bg-surface"
+                className="inline-flex items-center gap-2 rounded-full border border-accent bg-surface-raised px-4 py-2 text-sm font-semibold text-accent-dark no-underline hover:bg-surface"
               >
                 <Settings className="h-4 w-4" aria-hidden="true" />
                 {t('settings')}
@@ -89,7 +89,7 @@ export function ProfileBanner({
 
 function Stat({ value, label, icon }: { value: number; label: string; icon?: React.ReactNode }) {
   return (
-    <div className="min-w-[88px] rounded-[10px] border border-line bg-white px-4 py-3 text-center">
+    <div className="min-w-[88px] rounded-[10px] border border-line bg-surface-raised px-4 py-3 text-center">
       <dd className="flex items-center justify-center gap-1 font-display text-2xl font-bold text-ink">
         {icon}
         {value}

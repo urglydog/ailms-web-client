@@ -61,10 +61,10 @@ export function CategoryManager() {
       </form>
 
       {errorMessage && (
-        <div role="alert" className="rounded-xl border border-danger/40 bg-white p-4 text-[13px] text-danger">{errorMessage}</div>
+        <div role="alert" className="rounded-xl border border-danger/40 bg-surface-raised p-4 text-[13px] text-danger">{errorMessage}</div>
       )}
 
-      <div className="overflow-x-auto rounded-xl border border-line bg-white shadow-sm">
+      <div className="overflow-x-auto rounded-xl border border-line bg-surface-raised shadow-sm">
         <table className="w-full min-w-[520px] text-left text-sm">
           <thead className="bg-surface text-xs font-bold text-ink-muted uppercase">
             <tr>
@@ -138,7 +138,7 @@ function CategoryRow({
           onBlur={() => {
             if (name.trim() && name !== category.name) onSave(name.trim());
           }}
-          className="w-full rounded-md border border-transparent bg-transparent px-2 py-1 font-semibold text-ink focus:border-accent focus:bg-white focus:outline-none"
+          className="w-full rounded-md border border-transparent bg-transparent px-2 py-1 font-semibold text-ink focus:border-accent focus:bg-surface-raised focus:outline-none"
         />
       </td>
       <td className="px-6 py-3 text-ink-muted">{category.slug}</td>

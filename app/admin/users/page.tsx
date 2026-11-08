@@ -120,7 +120,7 @@ export default function AdminUsersPage() {
       <PageHeader title={t('title')} subtitle={t('subtitle')} />
 
       {aiLockProposals.length > 0 && (
-        <section aria-labelledby="ai-lock-title" className="flex flex-col gap-3 rounded-xl border border-warning/50 bg-white p-4">
+        <section aria-labelledby="ai-lock-title" className="flex flex-col gap-3 rounded-xl border border-warning/50 bg-surface-raised p-4">
           <h2 id="ai-lock-title" className="m-0 flex items-center gap-2 font-display text-[15px] font-bold text-ink">
             <TriangleAlert size={18} className="text-warning" aria-hidden />
             {t('ai.title', { count: aiLockProposals.length })}
@@ -137,7 +137,7 @@ export default function AdminUsersPage() {
                 <button type="button" onClick={() => handleConfirmLockProposal(p.userId)} className="rounded-lg bg-danger px-3 py-1.5 text-xs font-bold text-white hover:opacity-90">
                   {t('ai.confirm')}
                 </button>
-                <button type="button" onClick={() => handleDismissLockProposal(p.userId)} className="rounded-lg border border-line bg-white px-3 py-1.5 text-xs font-bold text-ink hover:bg-tint">
+                <button type="button" onClick={() => handleDismissLockProposal(p.userId)} className="rounded-lg border border-line bg-surface-raised px-3 py-1.5 text-xs font-bold text-ink hover:bg-tint">
                   {t('ai.dismiss')}
                 </button>
               </div>
@@ -155,7 +155,7 @@ export default function AdminUsersPage() {
               aria-pressed={filter === id}
               onClick={() => setFilter(id)}
               className={`rounded-full px-3.5 py-1.5 text-[13px] font-semibold transition-colors ${
-                filter === id ? 'bg-accent text-white' : 'border border-line bg-white text-ink-muted hover:border-accent hover:text-ink'
+                filter === id ? 'bg-accent text-white' : 'border border-line bg-surface-raised text-ink-muted hover:border-accent hover:text-ink'
               }`}
             >
               {t(`filter.${id}`)} <span className={filter === id ? 'text-white/85' : 'text-ink-muted'}>({counts[id].toLocaleString(locale)})</span>
@@ -170,13 +170,13 @@ export default function AdminUsersPage() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={t('searchPh')}
-            className="w-full rounded-lg border border-line bg-white py-2.5 pl-9 pr-3 text-sm text-ink outline-none focus:border-accent"
+            className="w-full rounded-lg border border-line bg-surface-raised py-2.5 pl-9 pr-3 text-sm text-ink outline-none focus:border-accent"
           />
         </label>
       </div>
 
       {loading ? (
-        <div className="flex flex-col gap-2 rounded-xl border border-line bg-white p-4">
+        <div className="flex flex-col gap-2 rounded-xl border border-line bg-surface-raised p-4">
           {Array.from({ length: 5 }, (_, i) => (
             <Skeleton key={i} className="h-11" />
           ))}
@@ -189,11 +189,11 @@ export default function AdminUsersPage() {
         <nav aria-label={t('pager.aria')} className="flex flex-wrap items-center justify-between gap-3 px-1">
           <span className="text-sm text-ink-muted">{t('pager.showing', { shown: paged.items.length, total: filtered.length })}</span>
           <div className="flex items-center gap-2">
-            <button type="button" disabled={paged.page === 1} onClick={() => setPage(paged.page - 1)} className="rounded-lg border border-line bg-white px-3 py-1.5 text-sm font-semibold text-ink hover:bg-tint disabled:opacity-50">
+            <button type="button" disabled={paged.page === 1} onClick={() => setPage(paged.page - 1)} className="rounded-lg border border-line bg-surface-raised px-3 py-1.5 text-sm font-semibold text-ink hover:bg-tint disabled:opacity-50">
               {t('pager.prev')}
             </button>
             <span className="px-2 text-sm font-semibold text-ink">{t('pager.page', { page: paged.page, total: paged.totalPages })}</span>
-            <button type="button" disabled={paged.page === paged.totalPages} onClick={() => setPage(paged.page + 1)} className="rounded-lg border border-line bg-white px-3 py-1.5 text-sm font-semibold text-ink hover:bg-tint disabled:opacity-50">
+            <button type="button" disabled={paged.page === paged.totalPages} onClick={() => setPage(paged.page + 1)} className="rounded-lg border border-line bg-surface-raised px-3 py-1.5 text-sm font-semibold text-ink hover:bg-tint disabled:opacity-50">
               {t('pager.next')}
             </button>
           </div>

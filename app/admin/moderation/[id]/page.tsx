@@ -52,7 +52,7 @@ export default function AdminModerationDetailPage() {
 
   if (error || !course) {
     return (
-      <div role="alert" className="rounded-xl border border-danger/40 bg-white p-4 text-sm text-danger">
+      <div role="alert" className="rounded-xl border border-danger/40 bg-surface-raised p-4 text-sm text-danger">
         {error instanceof ApiError ? error.message : t('notFound')}
       </div>
     );
@@ -77,7 +77,7 @@ export default function AdminModerationDetailPage() {
             <button
               type="button"
               onClick={() => setShowRejectModal(true)}
-              className="rounded-full border border-danger/50 bg-white px-5 py-2.5 text-[13.5px] font-bold text-danger hover:bg-danger/5"
+              className="rounded-full border border-danger/50 bg-surface-raised px-5 py-2.5 text-[13.5px] font-bold text-danger hover:bg-danger/5"
             >
               {t('reject')}
             </button>
@@ -94,13 +94,13 @@ export default function AdminModerationDetailPage() {
       </div>
 
       {actionError && (
-        <div role="alert" className="rounded-xl border border-danger/40 bg-white p-4 text-[13px] text-danger">
+        <div role="alert" className="rounded-xl border border-danger/40 bg-surface-raised p-4 text-[13px] text-danger">
           {actionError.message}
         </div>
       )}
 
       {course.status === 'REJECTED' && course.rejectReason && (
-        <div role="note" className="rounded-xl border border-danger/40 bg-white p-4 text-[13px] text-ink">
+        <div role="note" className="rounded-xl border border-danger/40 bg-surface-raised p-4 text-[13px] text-ink">
           <span className="font-bold text-danger">{t('rejectedReason')} </span>
           {course.rejectReason}
         </div>
@@ -108,7 +108,7 @@ export default function AdminModerationDetailPage() {
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_320px]">
         <div className="order-2 flex flex-col gap-4 lg:order-1">
-          <div className="rounded-xl border border-line bg-white p-5 shadow-sm">
+          <div className="rounded-xl border border-line bg-surface-raised p-5 shadow-sm">
             {course.thumbnailUrl && (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={course.thumbnailUrl} alt={course.title} className="mb-3 h-40 w-full rounded-lg object-cover" />
@@ -119,7 +119,7 @@ export default function AdminModerationDetailPage() {
           <div className="flex flex-col gap-3">
             <h2 className="m-0 font-display text-[15px] font-bold text-ink">{t('content')}</h2>
             {sortedChapters.map((chapter) => (
-              <div key={chapter.id} className="rounded-xl border border-line bg-white p-4 shadow-sm">
+              <div key={chapter.id} className="rounded-xl border border-line bg-surface-raised p-4 shadow-sm">
                 <span className="font-display text-[13.5px] font-bold text-ink">{chapter.title}</span>
                 <div className="mt-2 flex flex-col gap-1.5">
                   {[...chapter.lessons]
@@ -151,7 +151,7 @@ export default function AdminModerationDetailPage() {
           </div>
         </div>
 
-        <div className="order-1 flex h-fit flex-col gap-3 rounded-xl border border-line bg-white p-4 shadow-sm lg:order-2">
+        <div className="order-1 flex h-fit flex-col gap-3 rounded-xl border border-line bg-surface-raised p-4 shadow-sm lg:order-2">
           <InfoRow label={t('info.instructor')} value={course.instructorName} />
           <InfoRow label={t('info.category')} value={course.categoryName} />
           <InfoRow label={t('info.level')} value={tLevel(course.level)} />

@@ -127,7 +127,7 @@ export default function AdminUserDetailPage() {
         title={user.fullName}
         subtitle={user.email}
         action={
-          <Link href="/admin/users" className="inline-flex items-center gap-1.5 rounded-lg border border-line bg-white px-3 py-2 text-sm font-semibold text-ink hover:bg-tint">
+          <Link href="/admin/users" className="inline-flex items-center gap-1.5 rounded-lg border border-line bg-surface-raised px-3 py-2 text-sm font-semibold text-ink hover:bg-tint">
             <ArrowLeft size={14} aria-hidden />
             {t('back')}
           </Link>
@@ -135,7 +135,7 @@ export default function AdminUserDetailPage() {
       />
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <section className="flex flex-col gap-3 rounded-xl border border-line bg-white p-5 shadow-sm">
+        <section className="flex flex-col gap-3 rounded-xl border border-line bg-surface-raised p-5 shadow-sm">
           <h2 className="m-0 font-display text-[15px] font-bold text-ink">{t('profile.title')}</h2>
           <Row label={t('profile.role')} value={user.role} />
           <Row label={t('profile.authProvider')} value={user.authProvider} />
@@ -159,7 +159,7 @@ export default function AdminUserDetailPage() {
           </button>
         </section>
 
-        <section className="flex flex-col gap-3 rounded-xl border border-line bg-white p-5 shadow-sm">
+        <section className="flex flex-col gap-3 rounded-xl border border-line bg-surface-raised p-5 shadow-sm">
           <h2 className="m-0 font-display text-[15px] font-bold text-ink">{t('aiLock.title')}</h2>
           <Row
             label={t('aiLock.status')}
@@ -182,7 +182,7 @@ export default function AdminUserDetailPage() {
           )}
         </section>
 
-        <section className="flex flex-col gap-3 rounded-xl border border-line bg-white p-5 shadow-sm">
+        <section className="flex flex-col gap-3 rounded-xl border border-line bg-surface-raised p-5 shadow-sm">
           <h2 className="m-0 font-display text-[15px] font-bold text-ink">{t('spam.title')}</h2>
           <p className="m-0 text-xs text-ink-muted">{t('spam.hint')}</p>
           {!user.isActive ? (
@@ -209,7 +209,7 @@ export default function AdminUserDetailPage() {
                 value={spamReason}
                 onChange={(e) => setSpamReason(e.target.value)}
                 placeholder={t('spam.reasonPh')}
-                className="w-full rounded-lg border border-line bg-white p-2.5 text-sm text-ink outline-none focus:border-accent"
+                className="w-full rounded-lg border border-line bg-surface-raised p-2.5 text-sm text-ink outline-none focus:border-accent"
               />
               <button
                 type="button"
@@ -223,7 +223,7 @@ export default function AdminUserDetailPage() {
           )}
         </section>
 
-        <section className="flex flex-col gap-3 rounded-xl border border-line bg-white p-5 shadow-sm">
+        <section className="flex flex-col gap-3 rounded-xl border border-line bg-surface-raised p-5 shadow-sm">
           <h2 className="m-0 font-display text-[15px] font-bold text-ink">{t('resetLink.title')}</h2>
           <p className="m-0 text-xs text-ink-muted">{t('resetLink.hint')}</p>
           <button

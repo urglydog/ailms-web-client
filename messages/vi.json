@@ -436,6 +436,8 @@
     }
   },
   "courseList": {
+    "loadMore": { "button": "Xem thêm khóa học", "loading": "Đang tải thêm khóa học…", "end": "Bạn đã xem hết khóa học phù hợp." },
+    "pagination": { "nav": "Phân trang", "prev": "Trang trước", "next": "Trang sau", "page": "Trang {page}" },
     "title": "Kho khóa học",
     "subtitle": "Mọi khóa học đều có thể lồng tiếng sang ngôn ngữ bạn chọn.",
     "all": "Tất cả",

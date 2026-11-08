@@ -79,7 +79,7 @@ export default function AdminOverviewPage() {
                 <Link
                   key={id}
                   href={href}
-                  className="flex items-center gap-3 rounded-xl border border-line bg-white p-3.5 text-ink no-underline shadow-sm transition-colors hover:border-accent hover:text-ink"
+                  className="flex items-center gap-3 rounded-xl border border-line bg-surface-raised p-3.5 text-ink no-underline shadow-sm transition-colors hover:border-accent hover:text-ink"
                 >
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-tint text-accent-dark">
                     <Icon size={18} aria-hidden />

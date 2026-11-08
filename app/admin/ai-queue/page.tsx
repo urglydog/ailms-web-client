@@ -75,7 +75,7 @@ export default function AiQueuePage() {
             <span
               role="status"
               className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${
-                healthy ? 'bg-success-tint text-success-ink' : 'border border-danger/40 bg-white text-danger'
+                healthy ? 'bg-success-tint text-success-ink' : 'border border-danger/40 bg-surface-raised text-danger'
               }`}
             >
               <span aria-hidden className={`h-2 w-2 rounded-full ${healthy ? 'bg-success' : 'bg-danger'}`} />
@@ -105,7 +105,7 @@ export default function AiQueuePage() {
           <h2 id="queue-detail" className="m-0 font-display text-[15px] font-bold text-ink">
             {t('queueDetail')}
           </h2>
-          <div className="overflow-hidden rounded-xl border border-line bg-white shadow-sm">
+          <div className="overflow-hidden rounded-xl border border-line bg-surface-raised shadow-sm">
             {isLoading && <div className="flex h-32 items-center justify-center text-sm text-ink-muted">{t('loading')}</div>}
             {isError && (
               <div role="alert" className="flex h-32 items-center justify-center px-4 text-center text-sm text-danger">
@@ -124,7 +124,7 @@ export default function AiQueuePage() {
                   </div>
                   <span
                     className={`shrink-0 rounded-full px-3 py-1 text-xs font-bold ${
-                      info.pending > 0 ? 'border border-warning bg-white text-ink' : 'bg-success-tint text-success-ink'
+                      info.pending > 0 ? 'border border-warning bg-surface-raised text-ink' : 'bg-success-tint text-success-ink'
                     }`}
                   >
                     {t('pendingTasks', { count: info.pending })}
@@ -143,7 +143,7 @@ export default function AiQueuePage() {
               {t('slots', { total: stats?.key_pool?.length ?? 0, active: stats?.key_pool?.filter((k) => !k.in_cooldown).length ?? 0 })}
             </span>
           </div>
-          <div className="overflow-hidden rounded-xl border border-line bg-white shadow-sm">
+          <div className="overflow-hidden rounded-xl border border-line bg-surface-raised shadow-sm">
             {(!stats?.key_pool || stats.key_pool.length === 0) && (
               <div className="flex h-32 items-center justify-center text-sm text-ink-muted">{t('noKeys')}</div>
             )}
@@ -162,7 +162,7 @@ export default function AiQueuePage() {
                 <span
                   className={`whitespace-nowrap rounded-full px-2.5 py-1 text-[11px] font-bold ${
                     slot.in_cooldown
-                      ? 'border border-warning bg-white text-ink'
+                      ? 'border border-warning bg-surface-raised text-ink'
                       : slot.status === 'ACTIVE'
                         ? 'bg-success-tint text-success-ink'
                         : 'bg-line-soft text-ink-muted'
@@ -184,7 +184,7 @@ export default function AiQueuePage() {
           <span className="rounded-full bg-line-soft px-2.5 py-0.5 text-[11px] font-bold text-ink-muted">{t('beat.staticBadge')}</span>
         </div>
         <p className="m-0 text-xs text-ink-muted">{t('beat.staticNote')}</p>
-        <div className="overflow-hidden rounded-xl border border-line bg-white shadow-sm">
+        <div className="overflow-hidden rounded-xl border border-line bg-surface-raised shadow-sm">
           {BEAT_JOBS.map((job) => (
             <div key={job.name} className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-line-soft px-5 py-3.5 last:border-0">
               <div className="flex min-w-0 flex-1 basis-56 flex-col gap-0.5">

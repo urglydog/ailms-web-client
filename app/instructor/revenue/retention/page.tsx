@@ -1,5 +1,7 @@
 'use client';
 
+import { useThemeColors } from '@/lib/theme/useThemeColors';
+
 import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -11,6 +13,8 @@ import { useMyCourseDetail } from '@/hooks/useCourses';
  * Retention Heatmap / Drop-off Rate): chọn 1 bài học, xem % học viên còn xem tới tại từng mốc
  * 10% thời lượng — chỗ nào tụt mạnh là chỗ học viên hay bỏ ngang. */
 export default function RetentionPage() {
+  // Lưới/trục/tooltip theo theme sáng-tối (thuộc tính SVG không nhận biến CSS).
+  const palette = useThemeColors();
   const t = useTranslations('instructor.perf');
   const { data: courses } = useInstructorCourseOptions();
   const [courseId, setCourseId] = useState<number | undefined>(undefined);
@@ -47,7 +51,7 @@ export default function RetentionPage() {
         <p className="mt-1 text-[12.5px] text-ink-muted">{t('retention.subtitle')}</p>
       </div>
 
-      <div className="flex flex-wrap gap-3 rounded-xl border border-line bg-white p-4 shadow-sm">
+      <div className="flex flex-wrap gap-3 rounded-xl border border-line bg-surface-raised p-4 shadow-sm">
         <label className="flex flex-col gap-1">
           <span className="text-[12px] font-semibold text-ink-muted">{t('retention.course')}</span>
           <select
@@ -81,17 +85,17 @@ export default function RetentionPage() {
       </div>
 
       {!lessonId && (
-        <div className="rounded-xl border border-line bg-white p-10 text-center text-[13px] text-ink-muted">
+        <div className="rounded-xl border border-line bg-surface-raised p-10 text-center text-[13px] text-ink-muted">
           {t('retention.pick')}
         </div>
       )}
 
       {lessonId && isLoading && (
-        <div className="rounded-xl border border-line bg-white p-10 text-center text-sm text-ink-muted">{t('common.loading')}</div>
+        <div className="rounded-xl border border-line bg-surface-raised p-10 text-center text-sm text-ink-muted">{t('common.loading')}</div>
       )}
 
       {lessonId && !isLoading && (!points || points.length === 0) && (
-        <div className="rounded-xl border border-line bg-white p-10 text-center text-[13px] text-ink-muted">
+        <div className="rounded-xl border border-line bg-surface-raised p-10 text-center text-[13px] text-ink-muted">
           {t('retention.noViews')}
         </div>
       )}
@@ -103,14 +107,14 @@ export default function RetentionPage() {
       )}
 
       {lessonId && points && points.length > 0 && (
-        <div className="rounded-xl border border-line bg-white p-5 shadow-sm">
+        <div className="rounded-xl border border-line bg-surface-raised p-5 shadow-sm">
           <div className="h-64 w-full min-w-0">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis dataKey="label" tick={{ fontSize: 11 }} />
-                <YAxis domain={[0, 100]} tickFormatter={(v: number) => `${v}%`} tick={{ fontSize: 11 }} />
-                <Tooltip formatter={(value) => [`${Number(value).toFixed(1)}%`, t('retention.tooltip')]} labelFormatter={(label) => t('retention.label', { label: String(label) })} />
+                <CartesianGrid strokeDasharray="3 3" stroke={palette.line} />
+                <XAxis dataKey="label" tick={{ fontSize: 11, fill: palette.inkMuted }} />
+                <YAxis domain={[0, 100]} tickFormatter={(v: number) => `${v}%`} tick={{ fontSize: 11, fill: palette.inkMuted }} />
+                <Tooltip contentStyle={{ background: palette.surfaceRaised, borderColor: palette.line, color: palette.ink }} formatter={(value) => [`${Number(value).toFixed(1)}%`, t('retention.tooltip')]} labelFormatter={(label) => t('retention.label', { label: String(label) })} />
                 <Bar dataKey="retainedPercent" fill="#0891b2" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>

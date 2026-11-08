@@ -36,14 +36,14 @@ export function DateRangeSelector({ value, onChange }: { value: PerformanceRange
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-haspopup="listbox"
-        className="flex items-center gap-2 rounded-lg border border-line bg-white px-3.5 py-2 text-[13px] font-semibold text-ink hover:border-accent"
+        className="flex items-center gap-2 rounded-lg border border-line bg-surface-raised px-3.5 py-2 text-[13px] font-semibold text-ink hover:border-accent"
       >
         <Calendar size={14} aria-hidden className="text-accent" />
         {t(value)}
         <ChevronDown size={14} aria-hidden className={open ? 'rotate-180 transition-transform' : 'transition-transform'} />
       </button>
       {open && (
-        <ul role="listbox" aria-label={t('label')} className="absolute right-0 top-full z-10 m-0 mt-1 w-44 list-none overflow-hidden rounded-lg border border-line bg-white p-0 py-1 shadow-card-hover">
+        <ul role="listbox" aria-label={t('label')} className="absolute right-0 top-full z-10 m-0 mt-1 w-44 list-none overflow-hidden rounded-lg border border-line bg-surface-raised p-0 py-1 shadow-card-hover">
           {RANGES.map((range) => (
             <li
               key={range}

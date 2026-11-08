@@ -68,10 +68,10 @@ export function AiJobQueueManager() {
       </div>
 
       {errorMessage && (
-        <div role="alert" className="rounded-xl border border-danger/40 bg-white p-4 text-[13px] text-danger">{errorMessage}</div>
+        <div role="alert" className="rounded-xl border border-danger/40 bg-surface-raised p-4 text-[13px] text-danger">{errorMessage}</div>
       )}
 
-      <div className="overflow-x-auto rounded-xl border border-line bg-white shadow-sm">
+      <div className="overflow-x-auto rounded-xl border border-line bg-surface-raised shadow-sm">
         <table className="w-full min-w-[820px] text-left text-sm">
           <thead className="bg-surface text-xs font-bold text-ink-muted uppercase">
             <tr>
@@ -110,7 +110,7 @@ export function AiJobQueueManager() {
                   <span
                     className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
                       job.status === 'FAILED'
-                        ? 'bg-white border border-danger/40 text-danger'
+                        ? 'bg-surface-raised border border-danger/40 text-danger'
                         : job.status === 'COMPLETED'
                           ? 'bg-success-tint text-success-ink'
                           : job.status === 'SKIPPED'
@@ -154,7 +154,7 @@ export function AiJobQueueManager() {
               type="button"
               disabled={data.first}
               onClick={() => setPage((p) => Math.max(0, p - 1))}
-              className="rounded-lg border border-line bg-white px-3 py-1.5 text-sm font-semibold text-ink hover:bg-tint disabled:opacity-50"
+              className="rounded-lg border border-line bg-surface-raised px-3 py-1.5 text-sm font-semibold text-ink hover:bg-tint disabled:opacity-50"
             >
               {t('pager.prev')}
             </button>
@@ -162,7 +162,7 @@ export function AiJobQueueManager() {
               type="button"
               disabled={data.last}
               onClick={() => setPage((p) => p + 1)}
-              className="rounded-lg border border-line bg-white px-3 py-1.5 text-sm font-semibold text-ink hover:bg-tint disabled:opacity-50"
+              className="rounded-lg border border-line bg-surface-raised px-3 py-1.5 text-sm font-semibold text-ink hover:bg-tint disabled:opacity-50"
             >
               {t('pager.next')}
             </button>

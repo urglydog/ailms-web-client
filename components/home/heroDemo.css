@@ -1,5 +1,5 @@
 /* Video demo ở hero trang chủ — mọi lớp có tiền tố hd- để không đụng CSS của site. */
-.hd-frame{--accent:#1A6FE0;--accent-dark:#155FC4;--ink:#0A2540;--muted:#4B6784;--surface:#F3F9FF;--line:#CFE3FB;--tint:#E8F2FF;--cyan:#22D3EE;--hl:#FFD84A;--ok:#13804A;font-family:inherit;color:var(--ink);width:100%;aspect-ratio:16/9;position:relative;border-radius:14px;overflow:hidden;background:#fff;
+.hd-frame{--accent:#1A6FE0;--accent-dark:#155FC4;--ink:#0A2540;--muted:#4B6784;--surface:#F3F9FF;--line:#CFE3FB;--tint:#E8F2FF;--cyan:#22D3EE;--hl:#FFD84A;--ok:#0F6B3D;font-family:inherit;color:var(--ink);width:100%;aspect-ratio:16/9;position:relative;border-radius:14px;overflow:hidden;background:#fff;
     box-shadow:0 18px 50px rgba(10,37,64,.18);border:1px solid var(--line)}
   [data-hd="stage"]{position:absolute;left:0;top:0;width:800px;height:450px;transform-origin:0 0;background:#fff;overflow:hidden}
   [data-hd="cam"]{position:absolute;left:0;top:0;width:800px;height:450px;transform-origin:0 0;transition:transform .8s cubic-bezier(.45,.05,.2,1)}

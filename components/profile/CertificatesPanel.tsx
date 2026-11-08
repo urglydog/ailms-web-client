@@ -76,7 +76,7 @@ function TopicChip({ label, active, onClick }: { label: string; active: boolean;
       aria-pressed={active}
       onClick={onClick}
       className={`rounded-full border px-3.5 py-1.5 text-sm font-semibold transition-colors ${
-        active ? 'border-accent bg-accent text-white' : 'border-line bg-white text-ink-muted hover:border-accent hover:text-ink'
+        active ? 'border-accent bg-accent text-white' : 'border-line bg-surface-raised text-ink-muted hover:border-accent hover:text-ink'
       }`}
     >
       {label}

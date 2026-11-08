@@ -1,7 +1,8 @@
 'use client';
 
+import { Modal } from '@/components/ui/Modal';
+
 import { useState, useEffect } from 'react';
-import { createPortal } from 'react-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api, ApiError } from '@/lib/api/client';
 import { toast } from 'sonner';
@@ -345,7 +346,7 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [], allLesso
           <div className="relative ml-3 border-l-2 border-line pl-6 py-4 space-y-8">
             {planDays.map((day, i) => (
               <div key={i} className="relative">
-                <div className="absolute -left-[31px] top-1 h-3 w-3 rounded-full border-2 border-accent bg-white" />
+                <div className="absolute -left-[31px] top-1 h-3 w-3 rounded-full border-2 border-accent bg-surface-raised" />
                 <h4 className="font-semibold text-ink">
                   {format(new Date(day.date), 'EEEE, dd MMMM, yyyy', { locale: vi })}
                 </h4>
@@ -358,7 +359,7 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [], allLesso
                       <Link 
                         key={j} 
                         href={`/learn/${lesson.lesson_id}`}
-                        className={`group flex items-center justify-between rounded-lg border bg-white p-3 shadow-sm transition-all hover:border-accent hover:shadow-md ${isCompleted ? 'border-success/30 bg-success-tint/30' : 'border-line-soft'}`}
+                        className={`group flex items-center justify-between rounded-lg border bg-surface-raised p-3 shadow-sm transition hover:border-accent hover:shadow-md ${isCompleted ? 'border-success/30 bg-success-tint/30' : 'border-line-soft'}`}
                       >
                         <div className="flex items-center gap-3">
                           {isCompleted ? (
@@ -394,9 +395,7 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [], allLesso
       )}
 
       {/* Modal Cấu hình Lộ trình */}
-      {showModal && typeof window !== 'undefined' && createPortal(
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl">
+      {showModal && typeof window !== 'undefined' && <Modal open onClose={() => setShowModal(false)} bare ariaLabel="Cấu hình lộ trình học AI" closeOnBackdrop={false} className="w-full max-w-md overflow-hidden rounded-2xl bg-surface-raised shadow-2xl">
             <div className="border-b border-line p-4">
               <h3 className="font-semibold text-ink flex items-center gap-2">
                 <Sparkles className="h-5 w-5 text-accent" />
@@ -461,15 +460,10 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [], allLesso
                 </button>
               </div>
             </form>
-          </div>
-        </div>,
-        document.body
-      )}
+          </Modal>}
 
       {/* Modal Xác nhận Xóa Lộ trình */}
-      {showDeleteModal && typeof window !== 'undefined' && createPortal(
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-sm overflow-hidden rounded-2xl bg-white shadow-2xl">
+      {showDeleteModal && typeof window !== 'undefined' && <Modal open onClose={() => setShowDeleteModal(false)} bare ariaLabel="Xóa lộ trình hiện tại?" role="alertdialog" closeOnBackdrop={false} className="w-full max-w-sm overflow-hidden rounded-2xl bg-surface-raised shadow-2xl">
             <div className="p-6 text-center">
               <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-danger/10">
                 <AlertTriangle className="h-6 w-6 text-danger" />
@@ -498,15 +492,10 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [], allLesso
                 {deletePlan.isPending ? 'Đang xóa...' : 'Xóa lộ trình'}
               </button>
             </div>
-          </div>
-        </div>,
-        document.body
-      )}
+          </Modal>}
 
       {/* Modal Reschedule Preview */}
-      {showRescheduleModal && typeof window !== 'undefined' && createPortal(
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl">
+      {showRescheduleModal && typeof window !== 'undefined' && <Modal open onClose={() => setShowRescheduleModal(false)} bare ariaLabel="Cập nhật tiến độ" closeOnBackdrop={false} className="w-full max-w-md overflow-hidden rounded-2xl bg-surface-raised shadow-2xl">
             <div className="border-b border-line p-4">
               <h3 className="font-semibold text-ink flex items-center gap-2">
                 <Clock className="h-5 w-5 text-warning" />
@@ -572,10 +561,7 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [], allLesso
                 </button>
               </div>
             </form>
-          </div>
-        </div>,
-        document.body
-      )}
+          </Modal>}
     </div>
   );
 }

@@ -5,9 +5,9 @@ import type { CourseStatus } from '@/types/domain';
 
 const STATUS_CLASS: Record<CourseStatus, string> = {
   DRAFT: 'bg-surface text-ink-muted border border-line',
-  PENDING: 'bg-white text-ink border border-highlight',
+  PENDING: 'bg-surface-raised text-ink border border-highlight',
   PUBLISHED: 'bg-success-tint text-success-ink',
-  REJECTED: 'bg-white text-danger border border-danger/40',
+  REJECTED: 'bg-surface-raised text-danger border border-danger/40',
   ARCHIVED: 'bg-line-soft text-ink-muted',
 };
 

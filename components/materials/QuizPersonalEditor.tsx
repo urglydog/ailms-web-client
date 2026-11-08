@@ -1,5 +1,7 @@
 'use client';
 
+import { Modal } from '@/components/ui/Modal';
+
 import { useState } from 'react';
 import { useUpdatePersonalQuestion, useAddPersonalQuestion, useDeletePersonalQuestion } from '@/hooks/useQuizzes';
 import { toast } from 'sonner';
@@ -92,8 +94,7 @@ export function QuizPersonalEditor({ questions, quizId }: { questions: QuizQuest
       </div>
 
       {(isAddingQuestion || editingQuestion) && (
-        <div className="fixed inset-0 z-50 bg-ink/50 flex items-center justify-center p-4">
-          <div className="bg-surface-raised rounded-card max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
+        <Modal open onClose={() => { setEditingQuestion(null); setIsAddingQuestion(false); }} bare ariaLabel={String(isAddingQuestion ? 'Thêm câu hỏi' : 'Sửa câu hỏi')} closeOnBackdrop={false} className="bg-surface-raised rounded-card max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
             <h3 className="text-xl font-bold mb-4 font-display text-ink">
               {isAddingQuestion ? 'Thêm Câu Hỏi' : 'Sửa Câu Hỏi'}
             </h3>
@@ -119,13 +120,12 @@ export function QuizPersonalEditor({ questions, quizId }: { questions: QuizQuest
                 setIsAddingQuestion(false);
               }}
             />
-          </div>
-        </div>
+          </Modal>
       )}
 
       <div className="grid grid-cols-1 gap-4">
         {questions.map((q, idx) => (
-          <div key={q.id} className="p-5 rounded-card border border-line bg-surface-raised space-y-3 shadow-card hover:border-accent transition-all">
+          <div key={q.id} className="p-5 rounded-card border border-line bg-surface-raised space-y-3 shadow-card hover:border-accent transition">
             <div className="flex items-start justify-between gap-3">
               <div className="font-bold text-base text-ink">
                 <span className="text-accent mr-2">Câu {idx + 1}:</span> {q.content}
@@ -150,7 +150,7 @@ export function QuizPersonalEditor({ questions, quizId }: { questions: QuizQuest
               {q.options.map((opt, oIdx) => (
                 <div
                   key={opt.id || oIdx}
-                  className={`p-3.5 rounded-card text-sm font-medium border flex items-center justify-between transition-all ${opt.isCorrect
+                  className={`p-3.5 rounded-card text-sm font-medium border flex items-center justify-between transition ${opt.isCorrect
                     ? 'bg-success/10 border-success/30 text-success font-bold'
                     : 'bg-surface border-line text-ink-muted'
                     }`}

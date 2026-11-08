@@ -71,7 +71,7 @@ export function MaterialLanguagePicker({ languages, value, onChange, disabled }:
         disabled={disabled || languages.length === 0}
         aria-haspopup="listbox"
         aria-expanded={open}
-        className="flex w-full items-center justify-between gap-2 rounded-md border border-line bg-white px-3 py-2
+        className="flex w-full items-center justify-between gap-2 rounded-md border border-line bg-surface-raised px-3 py-2
                    text-sm text-ink transition-colors hover:border-accent disabled:cursor-not-allowed disabled:opacity-50"
       >
         {active ? (
@@ -92,7 +92,7 @@ export function MaterialLanguagePicker({ languages, value, onChange, disabled }:
       </button>
 
       {open && languages.length > 0 && (
-        <div className="absolute z-20 mt-1 w-full min-w-[220px] overflow-hidden rounded-card border border-line bg-white shadow-card-hover">
+        <div className="absolute z-20 mt-1 w-full min-w-[220px] overflow-hidden rounded-card border border-line bg-surface-raised shadow-card-hover">
           <div className="border-b border-line-soft p-2">
             <input
               ref={searchInputRef}

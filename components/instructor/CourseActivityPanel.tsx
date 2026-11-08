@@ -44,7 +44,7 @@ export function CourseActivityPanel({ courseId, onClose }: { courseId: number; o
         onClick={onClose}
       />
       <div
-        className={`fixed right-4 top-4 bottom-4 z-50 w-80 bg-surface-raised border border-line rounded-card shadow-card-hover overflow-hidden flex flex-col transition-all duration-200 ${
+        className={`fixed right-4 top-4 bottom-4 z-50 w-80 bg-surface-raised border border-line rounded-card shadow-card-hover overflow-hidden flex flex-col transition duration-200 ${
           entered ? 'translate-x-0 opacity-100' : 'translate-x-4 opacity-0'
         }`}
       >

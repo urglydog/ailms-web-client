@@ -76,7 +76,7 @@ export function LiveChatPanel({ isAuthenticated }: { isAuthenticated: boolean })
   };
 
   return (
-    <div className="flex h-full min-h-[360px] flex-col rounded-xl border border-line bg-white">
+    <div className="flex h-full min-h-[360px] flex-col rounded-xl border border-line bg-surface-raised">
       <div className="border-b border-line-soft px-4 py-3">
         <span className="text-[13px] font-bold text-ink">Chat trực tiếp</span>
       </div>

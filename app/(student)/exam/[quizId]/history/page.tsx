@@ -83,7 +83,7 @@ function AttemptHistoryContent() {
                   <select
                     value={selectedAttemptId || ''}
                     onChange={e => setSelectedAttemptId(Number(e.target.value))}
-                    className="text-xs border border-line rounded-lg px-3 py-1.5 bg-white font-semibold focus:outline-none focus:ring-2 focus:ring-accent/30"
+                    className="text-xs border border-line rounded-lg px-3 py-1.5 bg-surface-raised font-semibold focus:outline-none focus:ring-2 focus:ring-accent/30"
                   >
                     {pagedHistory.map((h, idx) => (
                       <option key={h.id} value={h.id}>
@@ -128,7 +128,7 @@ function AttemptHistoryContent() {
         ) : isLoadingHistory ? (
           <div className="text-center text-ink-muted py-8 text-sm">Đang tải lịch sử...</div>
         ) : !history || history.length === 0 ? (
-          <div className="text-center text-ink-muted py-8 bg-white border border-line rounded-md shadow-sm text-sm">
+          <div className="text-center text-ink-muted py-8 bg-surface-raised border border-line rounded-md shadow-sm text-sm">
             Bạn chưa có lượt làm bài nào cho bài thi này.
           </div>
         ) : (
@@ -137,7 +137,7 @@ function AttemptHistoryContent() {
             <div className="md:col-span-2">
               {selectedAttemptId ? (
                 isLoadingDetail ? (
-                  <div className="bg-white border border-line rounded-lg p-8 text-center shadow-sm text-sm">
+                  <div className="bg-surface-raised border border-line rounded-lg p-8 text-center shadow-sm text-sm">
                     Đang tải chi tiết bài làm...
                   </div>
                 ) : attemptDetail ? (() => {
@@ -150,7 +150,7 @@ function AttemptHistoryContent() {
                       const hasAnswer = q.selectedOptionIds && q.selectedOptionIds.length > 0;
                       const showCorrectness = q.isCorrect !== null && q.correctOptionIds && q.correctOptionIds.length > 0;
                       // Border: green if correct, red if wrong or unanswered, neutral if allowReview is false
-                      const cardBorder = q.isCorrect === null ? 'border-line bg-white' : (q.isCorrect ? 'border-green-400 bg-success-tint/30' : 'border-danger bg-danger/5');
+                      const cardBorder = q.isCorrect === null ? 'border-line bg-surface-raised' : (q.isCorrect ? 'border-success bg-success-tint/30' : 'border-danger bg-danger/5');
 
                       return (
                         <div key={q.questionId} id={`question-${q.questionId}`} className={`border-2 rounded-lg p-4 ${cardBorder}`}>
@@ -174,7 +174,7 @@ function AttemptHistoryContent() {
                               const isSelected = q.selectedOptionIds?.includes(opt.id);
                               const isCorrectAnswer = showCorrectness && q.correctOptionIds?.includes(opt.id);
 
-                              let optClass = "bg-white border-line text-ink-muted";
+                              let optClass = "bg-surface-raised border-line text-ink-muted";
                               let Icon: LucideIcon | null = null;
 
                               if (showCorrectness) {
@@ -219,7 +219,7 @@ function AttemptHistoryContent() {
                   </div>
                   );
                 })() : (
-                  <div className="bg-white border border-line rounded-lg p-8 text-center text-danger shadow-sm text-sm">
+                  <div className="bg-surface-raised border border-line rounded-lg p-8 text-center text-danger shadow-sm text-sm">
                     Không tải được chi tiết
                   </div>
                 )

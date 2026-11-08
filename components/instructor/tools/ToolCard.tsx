@@ -12,7 +12,7 @@ export function ToolCard({ tool }: { tool: ToolDef }) {
   return (
     <Link
       href={tool.href}
-      className="group flex flex-col gap-3 rounded-xl border border-line bg-white p-5 no-underline shadow-sm transition-colors hover:border-accent hover:no-underline"
+      className="group flex flex-col gap-3 rounded-xl border border-line bg-surface-raised p-5 no-underline shadow-sm transition-colors hover:border-accent hover:no-underline"
     >
       <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-tint text-accent-dark">
         <Icon className="h-5 w-5" />

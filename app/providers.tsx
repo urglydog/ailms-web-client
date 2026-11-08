@@ -6,6 +6,7 @@ import { NotificationProvider } from '@/components/providers/NotificationProvide
 import { LocaleProvider } from '@/components/providers/LocaleProvider';
 import { SystemBanner } from '@/components/layout/SystemBanner';
 import { Toaster } from 'sonner';
+import { MotionConfig } from 'motion/react';
 
 /**
  * React Query provider.
@@ -42,6 +43,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
   );
 
   return (
+    // reducedMotion="user": khi hệ điều hành bật giảm chuyển động, motion tự bỏ transform (giữ opacity).
+    <MotionConfig reducedMotion="user">
     <QueryClientProvider client={queryClient}>
       <LocaleProvider>
         <NotificationProvider>
@@ -71,5 +74,6 @@ export function Providers({ children }: { children: React.ReactNode }) {
         </NotificationProvider>
       </LocaleProvider>
     </QueryClientProvider>
+    </MotionConfig>
   );
 }

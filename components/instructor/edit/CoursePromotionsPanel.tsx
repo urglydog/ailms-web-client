@@ -1,5 +1,7 @@
 'use client';
 
+import { Modal } from '@/components/ui/Modal';
+
 import { useState } from 'react';
 import { useCreateCoupon, useDeleteCoupon, useMyCoupons, useUpdateCoupon } from '@/hooks/useCoupons';
 import type { Coupon, DiscountType } from '@/types/domain';
@@ -103,7 +105,7 @@ export function CoursePromotionsPanel({ courseId }: { courseId: number }) {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="rounded-xl border border-line bg-white p-5 shadow-sm">
+      <div className="rounded-xl border border-line bg-surface-raised p-5 shadow-sm">
         <h2 className="mb-1 font-display text-[16px] font-bold text-ink">Giới thiệu sinh viên</h2>
         <p className="text-[12.5px] text-ink-muted">
           Tính năng chia sẻ link giới thiệu và ghi nhận doanh số riêng đang được lên kế hoạch, chưa có ở
@@ -111,7 +113,7 @@ export function CoursePromotionsPanel({ courseId }: { courseId: number }) {
         </p>
       </div>
 
-      <div className="rounded-xl border border-line bg-white p-5 shadow-sm">
+      <div className="rounded-xl border border-line bg-surface-raised p-5 shadow-sm">
         <div className="mb-4 flex items-center justify-between">
           <div>
             <h2 className="font-display text-[16px] font-bold text-ink">Mã giảm giá cho khóa học này</h2>
@@ -123,7 +125,7 @@ export function CoursePromotionsPanel({ courseId }: { courseId: number }) {
           <button
             type="button"
             onClick={openCreate}
-            className="shrink-0 rounded-full bg-cyan-600 px-4 py-2 text-[12.5px] font-bold text-white hover:bg-cyan-700"
+            className="shrink-0 rounded-full bg-accent px-4 py-2 text-[12.5px] font-bold text-white hover:bg-accent-dark"
           >
             + Tạo mã giảm giá
           </button>
@@ -152,7 +154,7 @@ export function CoursePromotionsPanel({ courseId }: { courseId: number }) {
                       : `-${coupon.discountValue.toLocaleString('vi-VN')}đ`}
                   </span>
                   {coupon.scopeType === 'ALL_COURSES' && (
-                    <span className="rounded-full bg-cyan-50 px-2 py-0.5 text-[10.5px] font-bold text-cyan-700">
+                    <span className="rounded-full bg-tint px-2 py-0.5 text-[10.5px] font-bold text-accent-dark">
                       Toàn bộ khóa học của bạn
                     </span>
                   )}
@@ -172,7 +174,7 @@ export function CoursePromotionsPanel({ courseId }: { courseId: number }) {
                     <button
                       type="button"
                       onClick={() => openEdit(coupon)}
-                      className="text-[11.5px] font-bold text-cyan-700 hover:underline"
+                      className="text-[11.5px] font-bold text-accent-dark hover:underline"
                     >
                       Sửa
                     </button>
@@ -192,8 +194,7 @@ export function CoursePromotionsPanel({ courseId }: { courseId: number }) {
       </div>
 
       {editing && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+        <Modal open onClose={() => setEditing(null)} bare ariaLabel={String(editing === 'new' ? 'Tạo mã giảm giá' : 'Sửa mã giảm giá')} closeOnBackdrop={false} className="w-full max-w-md rounded-2xl bg-surface-raised p-6 shadow-2xl">
             <h2 className="mb-4 font-display text-lg font-bold text-ink">
               {editing === 'new' ? 'Tạo mã giảm giá' : 'Sửa mã giảm giá'}
             </h2>
@@ -289,14 +290,13 @@ export function CoursePromotionsPanel({ courseId }: { courseId: number }) {
                 <button
                   type="submit"
                   disabled={isSaving}
-                  className="rounded-lg bg-cyan-600 px-4 py-2 text-sm font-bold text-white hover:bg-cyan-700 disabled:opacity-60"
+                  className="rounded-lg bg-accent px-4 py-2 text-sm font-bold text-white hover:bg-accent-dark disabled:opacity-60"
                 >
                   {isSaving ? 'Đang lưu...' : 'Lưu'}
                 </button>
               </div>
             </form>
-          </div>
-        </div>
+          </Modal>
       )}
     </div>
   );

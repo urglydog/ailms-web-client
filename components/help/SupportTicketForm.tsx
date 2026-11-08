@@ -13,7 +13,7 @@ const MAX_FILES = 3;
 const MAX_SIZE_MB = 5;
 const ACCEPTED = ['image/jpeg', 'image/png', 'image/webp'];
 
-const INPUT_CLASS = 'w-full rounded-lg border border-line bg-white p-2.5 text-sm text-ink outline-none focus:border-accent';
+const INPUT_CLASS = 'w-full rounded-lg border border-line bg-surface-raised p-2.5 text-sm text-ink outline-none focus:border-accent';
 
 interface Props {
   initialCategory: SupportCategory;
@@ -87,7 +87,7 @@ export function SupportTicketForm({ initialCategory, initialEmail = '', lockedSu
       <div role="status" className="flex flex-col gap-3 rounded-xl border border-success/30 bg-success-tint p-5">
         <h3 className="m-0 font-display text-base font-bold text-success-ink">{t('form.successTitle')}</h3>
         <p className="m-0 text-sm text-ink">{t('form.successBody', { code })}</p>
-        <button type="button" onClick={reset} className="w-fit rounded-lg border border-line bg-white px-3 py-1.5 text-xs font-bold text-ink hover:bg-surface">
+        <button type="button" onClick={reset} className="w-fit rounded-lg border border-line bg-surface-raised px-3 py-1.5 text-xs font-bold text-ink hover:bg-surface">
           {t('form.newRequest')}
         </button>
       </div>
@@ -95,7 +95,7 @@ export function SupportTicketForm({ initialCategory, initialEmail = '', lockedSu
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4 rounded-xl border border-line bg-white p-5 shadow-sm">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4 rounded-xl border border-line bg-surface-raised p-5 shadow-sm">
       <h3 className="m-0 font-display text-base font-bold text-ink">{t('form.title')}</h3>
       {error && <div role="alert" className="rounded-lg border border-danger/40 bg-danger/5 px-3 py-2 text-sm text-danger">{error}</div>}
 
@@ -145,7 +145,7 @@ export function SupportTicketForm({ initialCategory, initialEmail = '', lockedSu
           onClick={() => fileInput.current?.click()}
           disabled={files.length >= MAX_FILES}
           title={t('form.attachHint', { count: MAX_FILES, size: MAX_SIZE_MB })}
-          className="inline-flex w-fit items-center gap-1.5 rounded-lg border border-line bg-white px-3 py-1.5 text-xs font-bold text-ink hover:bg-surface disabled:opacity-50"
+          className="inline-flex w-fit items-center gap-1.5 rounded-lg border border-line bg-surface-raised px-3 py-1.5 text-xs font-bold text-ink hover:bg-surface disabled:opacity-50"
         >
           <ImagePlus size={14} aria-hidden />
           {t('form.addFiles')}

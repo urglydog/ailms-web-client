@@ -69,7 +69,7 @@ export default function PerformanceOverviewPage() {
         />
       </div>
 
-      <section className="rounded-xl border border-line bg-white p-5 shadow-sm">
+      <section className="rounded-xl border border-line bg-surface-raised p-5 shadow-sm">
         <h2 className="m-0 mb-4 font-display text-[15px] font-bold text-ink">{t('chart.title')}</h2>
         {mounted && allRows ? <RevenueBars series={series} /> : <p className="m-0 text-sm text-ink-muted">{placeholder}</p>}
       </section>

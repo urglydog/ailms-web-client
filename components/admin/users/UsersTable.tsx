@@ -17,7 +17,7 @@ const COLUMNS: UserSortField[] = ['fullName', 'email', 'createdAt', 'role'];
 
 const ROLE_CLASS: Record<string, string> = {
   ADMIN: 'bg-tint text-accent-dark',
-  INSTRUCTOR: 'bg-white text-ink border border-accent/40',
+  INSTRUCTOR: 'bg-surface-raised text-ink border border-accent/40',
   STUDENT: 'bg-surface text-ink-muted border border-line',
 };
 
@@ -30,7 +30,7 @@ export function UsersTable({ users, sortField, sortOrder, onSort, onToggleBlock 
   const ariaSort = (field: UserSortField) => (sortField !== field ? 'none' : sortOrder === 'asc' ? 'ascending' : 'descending');
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-line bg-white shadow-sm">
+    <div className="overflow-x-auto rounded-xl border border-line bg-surface-raised shadow-sm">
       <table className="w-full min-w-[760px] text-left text-sm">
         <thead className="border-b border-line bg-surface text-xs text-ink-muted">
           <tr>

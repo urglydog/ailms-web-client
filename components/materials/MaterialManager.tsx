@@ -304,7 +304,7 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
         ) : materials && materials.length > 0 ? (
           <div className="flex flex-col gap-3">
             {getFilteredAndSortedMaterials().map((m) => (
-              <div key={m.id} className="flex items-center justify-between border border-line rounded-lg p-4 bg-surface-raised hover:border-accent hover:shadow-card-hover transition-all group">
+              <div key={m.id} className="flex items-center justify-between border border-line rounded-lg p-4 bg-surface-raised hover:border-accent hover:shadow-card-hover transition group">
                 <div className="flex-1 mr-4">
                   {editingId === m.id ? (
                     <div className="flex flex-wrap items-center gap-2 mb-1">
@@ -442,7 +442,7 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
       <Link
         key={item.id}
         href={href}
-        className="block flex flex-col sm:flex-row items-start sm:items-center justify-between p-5 mb-3 bg-surface-raised border border-line rounded-card hover:border-accent hover:shadow-card-hover transition-all cursor-pointer group"
+        className="block flex flex-col sm:flex-row items-start sm:items-center justify-between p-5 mb-3 bg-surface-raised border border-line rounded-card hover:border-accent hover:shadow-card-hover transition cursor-pointer group"
       >
         <div className="flex-1 w-full">
           <div className="flex items-center gap-2 mb-2 flex-wrap">
@@ -537,7 +537,7 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
                   href={res.fileUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="block flex flex-col sm:flex-row items-start sm:items-center justify-between p-5 mb-3 bg-surface-raised border border-line rounded-card hover:border-accent hover:shadow-card-hover transition-all cursor-pointer group"
+                  className="block flex flex-col sm:flex-row items-start sm:items-center justify-between p-5 mb-3 bg-surface-raised border border-line rounded-card hover:border-accent hover:shadow-card-hover transition cursor-pointer group"
                 >
                   <div className="flex-1 w-full">
                     <div className="flex items-center gap-2 mb-2">

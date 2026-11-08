@@ -76,7 +76,7 @@ export function MessageInstructorFloatingButton({ courseId }: { courseId: number
   return (
     <>
       {open && conversationId && (
-        <div className="fixed bottom-24 right-6 z-40 flex h-[min(440px,70vh)] w-[calc(100vw-2rem)] max-w-[340px] flex-col overflow-hidden rounded-2xl border border-line bg-white shadow-2xl">
+        <div className="fixed bottom-24 right-6 z-40 flex h-[min(440px,70vh)] w-[calc(100vw-2rem)] max-w-[340px] flex-col overflow-hidden rounded-2xl border border-line bg-surface-raised shadow-2xl">
           <div className="flex items-center gap-2.5 border-b border-line px-4 py-3">
             {conversation && <Avatar name={conversation.otherUserName} avatarUrl={conversation.otherUserAvatarUrl} size={28} />}
             <span className="flex-1 truncate font-display text-[14px] font-bold text-ink">
@@ -104,7 +104,7 @@ export function MessageInstructorFloatingButton({ courseId }: { courseId: number
           <button
             type="button"
             onClick={handleToggle}
-            className="flex max-w-[240px] items-center gap-2 rounded-2xl border border-line bg-white py-2 pl-2 pr-3 text-left shadow-lg transition-shadow hover:shadow-xl"
+            className="flex max-w-[240px] items-center gap-2 rounded-2xl border border-line bg-surface-raised py-2 pl-2 pr-3 text-left shadow-lg transition-shadow hover:shadow-xl"
           >
             <Avatar name={conversation.otherUserName} avatarUrl={conversation.otherUserAvatarUrl} size={30} />
             <span className="flex min-w-0 flex-col">
@@ -271,7 +271,7 @@ function FloatingConversationThread({ conversationId }: { conversationId: number
             type="button"
             onClick={handleScrollToBottomClick}
             aria-label="Cuộn xuống tin nhắn mới nhất"
-            className="absolute bottom-2 right-2 flex h-9 w-9 items-center justify-center rounded-full border border-line bg-white text-ink shadow-md hover:bg-surface-hover"
+            className="absolute bottom-2 right-2 flex h-9 w-9 items-center justify-center rounded-full border border-line bg-surface-raised text-ink shadow-md hover:bg-surface-hover"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 5v14M5 12l7 7 7-7" />
