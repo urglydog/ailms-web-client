@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Search, TriangleAlert } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { toast } from 'sonner';
@@ -9,12 +9,12 @@ import { UsersTable } from '@/components/admin/users/UsersTable';
 import { PageHeader } from '@/components/instructor/ui/PageHeader';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { api } from '@/lib/api/client';
+import { useDebounce } from '@/hooks/useDebounce';
+import type { Page } from '@/types/domain';
 import {
-  countUsers,
-  filterAndSortUsers,
-  paginate,
   type AdminUser,
   type SortOrder,
+  type UserCounts,
   type UserFilter,
   type UserSortField,
 } from '@/lib/admin/users';
@@ -30,12 +30,16 @@ interface AiLockProposal {
 
 const FILTERS: UserFilter[] = ['ALL', 'STUDENT', 'INSTRUCTOR', 'ADMIN', 'LOCKED', 'SPAM'];
 const PAGE_SIZE = 10;
+const EMPTY_COUNTS: UserCounts = { ALL: 0, STUDENT: 0, INSTRUCTOR: 0, ADMIN: 0, LOCKED: 0, SPAM: 0 };
 
 /** Quản lý người dùng: bộ lọc nhanh có đếm, tìm kiếm, bảng sắp xếp được, phân trang; khóa/mở khóa luôn hỏi xác nhận. */
 export default function AdminUsersPage() {
   const t = useTranslations('admin.users');
   const locale = useLocale();
-  const [users, setUsers] = useState<AdminUser[]>([]);
+  // Hiệu năng đợt 3 (08/11/2026): tìm/lọc/sắp xếp/phân trang PHÍA SERVER — trước đây tải TOÀN BỘ người dùng
+  // về trình duyệt rồi tự lọc, sẽ rất nặng khi số học viên tăng.
+  const [result, setResult] = useState<{ items: AdminUser[]; totalPages: number; total: number }>({ items: [], totalPages: 1, total: 0 });
+  const [counts, setCounts] = useState<UserCounts>(EMPTY_COUNTS);
   const [loading, setLoading] = useState(true);
   const [aiLockProposals, setAiLockProposals] = useState<AiLockProposal[]>([]);
 
@@ -46,13 +50,28 @@ export default function AdminUsersPage() {
   const [page, setPage] = useState(1);
   const [pendingBlock, setPendingBlock] = useState<AdminUser | null>(null);
 
+  const debouncedQuery = useDebounce(query, 300);
+
   const fetchUsers = useCallback(async () => {
     try {
-      setUsers(await api.get<AdminUser[]>('/api/v1/users'));
+      const params = new URLSearchParams({
+        filter,
+        sort: sortField,
+        order: sortOrder,
+        page: String(page),
+        size: String(PAGE_SIZE),
+      });
+      if (debouncedQuery.trim()) params.set('q', debouncedQuery.trim());
+      const [res, c] = await Promise.all([
+        api.get<Page<AdminUser>>(`/api/v1/users/admin?${params.toString()}`),
+        api.get<UserCounts>('/api/v1/users/admin/counts'),
+      ]);
+      setResult({ items: res.content, totalPages: Math.max(1, res.totalPages), total: res.totalElements });
+      setCounts({ ...EMPTY_COUNTS, ...c });
     } catch {
       toast.error(t('loadError'));
     }
-  }, [t]);
+  }, [t, debouncedQuery, filter, sortField, sortOrder, page]);
 
   const fetchAiLockProposals = useCallback(async () => {
     try {
@@ -63,12 +82,16 @@ export default function AdminUsersPage() {
   }, []);
 
   useEffect(() => {
-    Promise.all([fetchUsers(), fetchAiLockProposals()]).finally(() => setLoading(false));
-  }, [fetchUsers, fetchAiLockProposals]);
+    void fetchAiLockProposals();
+  }, [fetchAiLockProposals]);
+
+  useEffect(() => {
+    void fetchUsers().finally(() => setLoading(false));
+  }, [fetchUsers]);
 
   useEffect(() => {
     setPage(1);
-  }, [query, filter]);
+  }, [query, filter, sortField, sortOrder]);
 
   const handleConfirmLockProposal = async (userId: number) => {
     try {
@@ -111,9 +134,7 @@ export default function AdminUsersPage() {
     }
   };
 
-  const counts = useMemo(() => countUsers(users), [users]);
-  const filtered = useMemo(() => filterAndSortUsers(users, { query, filter, sortField, sortOrder }), [users, query, filter, sortField, sortOrder]);
-  const paged = paginate(filtered, page, PAGE_SIZE);
+  const paged = { items: result.items, totalPages: result.totalPages, page };
 
   return (
     <>
@@ -187,7 +208,7 @@ export default function AdminUsersPage() {
 
       {!loading && paged.totalPages > 1 && (
         <nav aria-label={t('pager.aria')} className="flex flex-wrap items-center justify-between gap-3 px-1">
-          <span className="text-sm text-ink-muted">{t('pager.showing', { shown: paged.items.length, total: filtered.length })}</span>
+          <span className="text-sm text-ink-muted">{t('pager.showing', { shown: paged.items.length, total: result.total })}</span>
           <div className="flex items-center gap-2">
             <button type="button" disabled={paged.page === 1} onClick={() => setPage(paged.page - 1)} className="rounded-lg border border-line bg-surface-raised px-3 py-1.5 text-sm font-semibold text-ink hover:bg-tint disabled:opacity-50">
               {t('pager.prev')}
