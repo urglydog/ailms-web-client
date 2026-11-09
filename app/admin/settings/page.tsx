@@ -75,7 +75,7 @@ function Meter({ label, used, total, warnAt, criticalAt }: { label: string; used
         <span className="font-semibold text-ink">{total > 0 ? `${formatBytes(used)} / ${formatBytes(total)} (${percent}%)` : '—'}</span>
       </div>
       <div role="progressbar" aria-label={label} aria-valuemin={0} aria-valuemax={100} aria-valuenow={percent} data-tone={tone} className="h-2 w-full overflow-hidden rounded-full bg-tint">
-        <div className={`h-full rounded-full transition-all ${BAR_COLOR[tone]}`} style={{ width: `${percent}%` }} />
+        <div className={`h-full rounded-full transition-[width] duration-300 ease-soft ${BAR_COLOR[tone]}`} style={{ width: `${percent}%` }} />
       </div>
     </div>
   );
@@ -142,14 +142,14 @@ export default function AdminSettingsPage() {
             <span
               role="status"
               className={`flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${
-                aiError ? 'border border-danger/40 bg-white text-danger' : 'bg-success-tint text-success-ink'
+                aiError ? 'border border-danger/40 bg-surface-raised text-danger' : 'bg-success-tint text-success-ink'
               }`}
             >
               <span aria-hidden className={`h-1.5 w-1.5 rounded-full ${aiError ? 'bg-danger' : 'bg-success'}`} />
               {aiError ? t('worker.down') : t('worker.up')}
             </span>
           </div>
-          <div className="overflow-hidden rounded-xl border border-line bg-white shadow-sm">
+          <div className="overflow-hidden rounded-xl border border-line bg-surface-raised shadow-sm">
             <ConfigRow label={t('worker.gemini')} value={aiHealth?.gemini_model ?? '—'} description={t('worker.geminiDesc')} badge="Live" />
             <ConfigRow label={t('worker.asr')} value={aiHealth?.asr_backend ?? '—'} description={t('worker.asrDesc')} />
             <ConfigRow label={t('worker.chunk')} value={aiHealth ? t('worker.minutes', { count: aiHealth.chunk_minutes }) : '—'} description={t('worker.chunkDesc')} />
@@ -162,7 +162,7 @@ export default function AdminSettingsPage() {
                 <button
                   type="button"
                   onClick={() => setDraft(null)}
-                  className="rounded-lg border border-line bg-white px-3 py-1.5 text-xs font-semibold text-ink hover:bg-tint"
+                  className="rounded-lg border border-line bg-surface-raised px-3 py-1.5 text-xs font-semibold text-ink hover:bg-tint"
                 >
                   {t('quotas.cancel')}
                 </button>
@@ -177,7 +177,7 @@ export default function AdminSettingsPage() {
               </div>
             )}
           </div>
-          <div className="overflow-hidden rounded-xl border border-line bg-white shadow-sm">
+          <div className="overflow-hidden rounded-xl border border-line bg-surface-raised shadow-sm">
             {quotasLoading && <div className="px-5 py-4 text-sm text-ink-muted">{t('quotas.loading')}</div>}
             {(quotas ?? []).map((item) => {
               const id = QUOTA_KEY_TO_ID[item.key] ?? item.key;
@@ -202,7 +202,7 @@ export default function AdminSettingsPage() {
 
         <div className="flex flex-col gap-2.5">
           <h2 className="m-0 font-display text-[15px] font-bold text-ink">{t('resources.title')}</h2>
-          <div className="flex flex-col gap-5 rounded-xl border border-line bg-white p-5 shadow-sm">
+          <div className="flex flex-col gap-5 rounded-xl border border-line bg-surface-raised p-5 shadow-sm">
             <Meter label={t('resources.ram')} used={systemMetrics?.ram.used ?? 0} total={systemMetrics?.ram.total ?? 0} warnAt={0.7} criticalAt={0.8} />
             <Meter label={t('resources.disk')} used={systemMetrics?.disk.used ?? 0} total={systemMetrics?.disk.total ?? 0} warnAt={0.8} criticalAt={0.9} />
             <div className="flex flex-col gap-3 border-t border-line-soft pt-4">
@@ -221,7 +221,7 @@ export default function AdminSettingsPage() {
             </div>
           </div>
 
-          <div className="flex flex-col gap-3 rounded-xl border border-line bg-white p-4 shadow-sm">
+          <div className="flex flex-col gap-3 rounded-xl border border-line bg-surface-raised p-4 shadow-sm">
             <span className="text-xs font-bold uppercase tracking-wide text-ink-muted">{t('env.title')}</span>
             {ENVIRONMENT.map(({ key, val }) => (
               <div key={key} className="flex justify-between gap-3">

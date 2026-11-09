@@ -1,5 +1,7 @@
 'use client';
 
+import { Modal } from '@/components/ui/Modal';
+
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useQueryClient } from '@tanstack/react-query';
@@ -46,7 +48,7 @@ function fillPlaceholders(text: string, vars: Record<string, string>): string {
 
 const STATUSES: SupportStatus[] = ['OPEN', 'IN_PROGRESS', 'RESOLVED'];
 const STATUS_CLASS: Record<SupportStatus, string> = {
-  OPEN: 'bg-white text-ink border-warning',
+  OPEN: 'bg-surface-raised text-ink border-warning',
   IN_PROGRESS: 'bg-tint text-accent-dark border-accent/30',
   RESOLVED: 'bg-success-tint text-success-ink border-success/30',
 };
@@ -186,11 +188,11 @@ export default function AdminSupportPage() {
     <>
       <PageHeader title={t('title')} subtitle={t('subtitle')} />
 
-      <div className="flex flex-wrap items-end gap-4 rounded-xl border border-line bg-white p-4">
+      <div className="flex flex-wrap items-end gap-4 rounded-xl border border-line bg-surface-raised p-4">
         <label className="flex w-full flex-col gap-1.5 sm:w-56">
           <span className="text-xs font-semibold text-ink-muted">{t('filters.status')}</span>
           <select
-            className="w-full rounded-lg border border-line bg-white p-2.5 text-sm text-ink outline-none focus:border-accent"
+            className="w-full rounded-lg border border-line bg-surface-raised p-2.5 text-sm text-ink outline-none focus:border-accent"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as SupportStatus | 'ALL')}
           >
@@ -205,15 +207,15 @@ export default function AdminSupportPage() {
       </div>
 
       {loading ? (
-        <div className="flex flex-col gap-2 rounded-xl border border-line bg-white p-4">
+        <div className="flex flex-col gap-2 rounded-xl border border-line bg-surface-raised p-4">
           {Array.from({ length: 4 }, (_, i) => (
             <Skeleton key={i} className="h-11" />
           ))}
         </div>
       ) : tickets.length === 0 ? (
-        <div className="rounded-xl border border-line bg-white p-8 text-center text-ink-muted">{t('empty')}</div>
+        <div className="rounded-xl border border-line bg-surface-raised p-8 text-center text-ink-muted">{t('empty')}</div>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-line bg-white shadow-sm">
+        <div className="overflow-x-auto rounded-xl border border-line bg-surface-raised shadow-sm">
           <table className="w-full min-w-[820px] text-left text-sm">
             <thead className="border-b border-line bg-surface text-xs text-ink-muted">
               <tr>
@@ -250,8 +252,7 @@ export default function AdminSupportPage() {
       )}
 
       {selected && (
-        <div className="fixed inset-0 z-[400] flex items-center justify-center bg-ink/40 p-4">
-          <div role="dialog" aria-modal="true" aria-label={selected.code} className="flex max-h-[92vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-line bg-white shadow-card-hover">
+        <Modal open onClose={() => setSelected(null)} bare ariaLabel={String(selected.code)} zClass="z-[400]" closeOnBackdrop={false} className="flex max-h-[92vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-line bg-surface-raised shadow-card-hover">
             <div className="flex items-start justify-between gap-3 border-b border-line p-5">
               <div className="min-w-0">
                 <p className="m-0 font-mono text-xs text-ink-muted">{selected.code} · {t(`category.${selected.category}`)}</p>
@@ -308,7 +309,7 @@ export default function AdminSupportPage() {
                   <select
                     value=""
                     onChange={(e) => applyTemplate(e.target.value)}
-                    className="w-full rounded-lg border border-line bg-white p-2.5 text-sm text-ink outline-none focus:border-accent"
+                    className="w-full rounded-lg border border-line bg-surface-raised p-2.5 text-sm text-ink outline-none focus:border-accent"
                   >
                     <option value="">{t('detail.templatePh')}</option>
                     {TEMPLATE_IDS.map((id) => (
@@ -321,7 +322,7 @@ export default function AdminSupportPage() {
 
                 <label className="flex flex-col gap-1.5">
                   <span className="text-xs font-semibold text-ink-muted">{t('detail.status')}</span>
-                  <select value={status} onChange={(e) => setStatus(e.target.value as SupportStatus)} className="w-full rounded-lg border border-line bg-white p-2.5 text-sm text-ink outline-none focus:border-accent">
+                  <select value={status} onChange={(e) => setStatus(e.target.value as SupportStatus)} className="w-full rounded-lg border border-line bg-surface-raised p-2.5 text-sm text-ink outline-none focus:border-accent">
                     {STATUSES.map((s) => (
                       <option key={s} value={s}>
                         {t(`status.${s}`)}
@@ -334,12 +335,12 @@ export default function AdminSupportPage() {
 
                 <label className="flex flex-col gap-1.5">
                   <span className="text-xs font-semibold text-ink-muted">{t('detail.greetingLabel')}</span>
-                  <input type="text" maxLength={200} value={greeting} onChange={(e) => setGreeting(e.target.value)} className="w-full rounded-lg border border-line bg-white p-2.5 text-sm text-ink outline-none focus:border-accent" />
+                  <input type="text" maxLength={200} value={greeting} onChange={(e) => setGreeting(e.target.value)} className="w-full rounded-lg border border-line bg-surface-raised p-2.5 text-sm text-ink outline-none focus:border-accent" />
                 </label>
 
                 <label className="flex flex-col gap-1.5">
                   <span className="text-xs font-semibold text-ink-muted">{t('detail.introLabel')}</span>
-                  <textarea rows={2} maxLength={1000} value={intro} onChange={(e) => setIntro(e.target.value)} className="w-full rounded-lg border border-line bg-white p-2.5 text-sm text-ink outline-none focus:border-accent" />
+                  <textarea rows={2} maxLength={1000} value={intro} onChange={(e) => setIntro(e.target.value)} className="w-full rounded-lg border border-line bg-surface-raised p-2.5 text-sm text-ink outline-none focus:border-accent" />
                 </label>
 
                 <div className="flex flex-col gap-3">
@@ -354,7 +355,7 @@ export default function AdminSupportPage() {
                           onChange={(e) => updateSection(i, { title: e.target.value })}
                           placeholder={t('detail.sectionTitlePh')}
                           aria-label={`${t('detail.sectionTitle')} ${i + 1}`}
-                          className="min-w-0 flex-1 rounded-lg border border-line bg-white p-2 text-sm font-semibold text-ink outline-none focus:border-accent"
+                          className="min-w-0 flex-1 rounded-lg border border-line bg-surface-raised p-2 text-sm font-semibold text-ink outline-none focus:border-accent"
                         />
                         <button type="button" title={t('detail.moveUp')} aria-label={`${t('detail.moveUp')} ${i + 1}`} disabled={i === 0} onClick={() => moveSection(i, -1)} className="shrink-0 rounded p-1.5 text-ink-muted hover:text-ink disabled:opacity-30">
                           <ArrowUp size={14} aria-hidden />
@@ -374,7 +375,7 @@ export default function AdminSupportPage() {
                             type="button"
                             aria-pressed={sec.type === type}
                             onClick={() => updateSection(i, { type })}
-                            className={`px-3 py-1.5 ${sec.type === type ? 'bg-accent text-white' : 'bg-white text-ink-muted hover:bg-surface'}`}
+                            className={`px-3 py-1.5 ${sec.type === type ? 'bg-accent text-white' : 'bg-surface-raised text-ink-muted hover:bg-surface'}`}
                           >
                             {type === 'TEXT' ? t('detail.typeText') : t('detail.typeList')}
                           </button>
@@ -388,7 +389,7 @@ export default function AdminSupportPage() {
                           value={sec.text}
                           onChange={(e) => updateSection(i, { text: e.target.value })}
                           aria-label={`${t('detail.sectionText')} ${i + 1}`}
-                          className="w-full rounded-lg border border-line bg-white p-2 text-sm text-ink outline-none focus:border-accent"
+                          className="w-full rounded-lg border border-line bg-surface-raised p-2 text-sm text-ink outline-none focus:border-accent"
                         />
                       ) : (
                         <div className="flex flex-col gap-2">
@@ -401,7 +402,7 @@ export default function AdminSupportPage() {
                                 value={item}
                                 onChange={(e) => updateSection(i, { items: sec.items.map((x, idx) => (idx === k ? e.target.value : x)) })}
                                 placeholder={t('detail.itemPh', { n: k + 1 })}
-                                className="min-w-0 flex-1 rounded-lg border border-line bg-white p-2 text-sm text-ink outline-none focus:border-accent"
+                                className="min-w-0 flex-1 rounded-lg border border-line bg-surface-raised p-2 text-sm text-ink outline-none focus:border-accent"
                               />
                               <button type="button" title={t('detail.removeItem')} aria-label={`${t('detail.removeItem')} ${k + 1}`} onClick={() => updateSection(i, { items: sec.items.filter((_, idx) => idx !== k) })} className="mt-1 shrink-0 rounded p-1.5 text-ink-muted hover:text-danger">
                                 <Trash2 size={14} aria-hidden />
@@ -413,7 +414,7 @@ export default function AdminSupportPage() {
                             disabled={sec.items.length >= MAX_ITEMS}
                             title={sec.items.length >= MAX_ITEMS ? t('detail.maxItems') : t('detail.addItem')}
                             onClick={() => updateSection(i, { items: [...sec.items, ''] })}
-                            className="inline-flex w-fit items-center gap-1.5 rounded-lg border border-line bg-white px-3 py-1.5 text-xs font-bold text-ink hover:bg-surface disabled:opacity-50"
+                            className="inline-flex w-fit items-center gap-1.5 rounded-lg border border-line bg-surface-raised px-3 py-1.5 text-xs font-bold text-ink hover:bg-surface disabled:opacity-50"
                           >
                             <Plus size={14} aria-hidden />
                             {t('detail.addItem')}
@@ -427,7 +428,7 @@ export default function AdminSupportPage() {
                     disabled={sections.length >= MAX_SECTIONS}
                     title={sections.length >= MAX_SECTIONS ? t('detail.maxSections') : t('detail.addSection')}
                     onClick={() => setSections([...sections, { title: '', type: 'TEXT', text: '', items: [] }])}
-                    className="inline-flex w-fit items-center gap-1.5 rounded-lg border border-line bg-white px-3 py-1.5 text-xs font-bold text-ink hover:bg-surface disabled:opacity-50"
+                    className="inline-flex w-fit items-center gap-1.5 rounded-lg border border-line bg-surface-raised px-3 py-1.5 text-xs font-bold text-ink hover:bg-surface disabled:opacity-50"
                   >
                     <Plus size={14} aria-hidden />
                     {t('detail.addSection')}
@@ -436,16 +437,16 @@ export default function AdminSupportPage() {
 
                 <label className="flex flex-col gap-1.5">
                   <span className="text-xs font-semibold text-ink-muted">{t('detail.closingLabel')}</span>
-                  <input type="text" maxLength={100} value={closing} onChange={(e) => setClosing(e.target.value)} className="w-full rounded-lg border border-line bg-white p-2.5 text-sm text-ink outline-none focus:border-accent" />
+                  <input type="text" maxLength={100} value={closing} onChange={(e) => setClosing(e.target.value)} className="w-full rounded-lg border border-line bg-surface-raised p-2.5 text-sm text-ink outline-none focus:border-accent" />
                 </label>
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <label className="flex flex-col gap-1.5">
                     <span className="text-xs font-semibold text-ink-muted">{t('detail.signatureNameLabel')}</span>
-                    <input type="text" maxLength={100} value={signatureName} onChange={(e) => setSignatureName(e.target.value)} className="w-full rounded-lg border border-line bg-white p-2.5 text-sm text-ink outline-none focus:border-accent" />
+                    <input type="text" maxLength={100} value={signatureName} onChange={(e) => setSignatureName(e.target.value)} className="w-full rounded-lg border border-line bg-surface-raised p-2.5 text-sm text-ink outline-none focus:border-accent" />
                   </label>
                   <label className="flex flex-col gap-1.5">
                     <span className="text-xs font-semibold text-ink-muted">{t('detail.teamLabel')}</span>
-                    <input type="text" maxLength={100} value={team} onChange={(e) => setTeam(e.target.value)} className="w-full rounded-lg border border-line bg-white p-2.5 text-sm text-ink outline-none focus:border-accent" />
+                    <input type="text" maxLength={100} value={team} onChange={(e) => setTeam(e.target.value)} className="w-full rounded-lg border border-line bg-surface-raised p-2.5 text-sm text-ink outline-none focus:border-accent" />
                   </label>
                 </div>
 
@@ -457,7 +458,7 @@ export default function AdminSupportPage() {
 
               <div className="flex flex-col gap-3 bg-surface p-5 text-sm">
                 <p className="m-0 text-xs font-semibold text-ink-muted">{t('detail.previewTitle')}</p>
-                <div className="flex flex-col gap-3 rounded-xl border border-line bg-white p-4 text-[13px] leading-[1.7] text-ink">
+                <div className="flex flex-col gap-3 rounded-xl border border-line bg-surface-raised p-4 text-[13px] leading-[1.7] text-ink">
                   <p className="m-0 font-bold">{fillPlaceholders(greeting, previewVars)}</p>
                   <p className="m-0 whitespace-pre-wrap break-words text-ink-muted">{fillPlaceholders(intro, previewVars)}</p>
                   <dl className="m-0 grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-[12px]">
@@ -511,8 +512,7 @@ export default function AdminSupportPage() {
                 {submitting ? t('detail.saving') : t('detail.save')}
               </button>
             </div>
-          </div>
-        </div>
+          </Modal>
       )}
     </>
   );

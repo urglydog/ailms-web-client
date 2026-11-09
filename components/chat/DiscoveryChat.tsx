@@ -1,5 +1,7 @@
 'use client';
 
+import { TypingDots } from '@/components/ui/TypingDots';
+
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -98,7 +100,10 @@ export function DiscoveryChat() {
     <>
       {/* Floating Button */}
       <button 
+        type="button"
         onClick={() => setIsOpen(!isOpen)}
+        aria-label={isOpen ? "Đóng trợ lý tìm khóa học" : "Mở trợ lý tìm khóa học"}
+        aria-expanded={isOpen}
         className="fixed bottom-6 right-6 flex h-14 w-14 items-center justify-center rounded-xl border border-accent-dark bg-accent text-white shadow-md z-50 btn-tactile"
       >
         {isOpen ? (
@@ -114,8 +119,8 @@ export function DiscoveryChat() {
           điện thoại (375–414px), lòi hẳn ra khỏi mép trái. Giờ co theo viewport, chỉ đạt đúng
           400px từ `sm:` trở lên. */}
       <div
-        className={`fixed bottom-24 right-6 flex h-[min(500px,70vh)] w-[calc(100vw-2rem)] max-w-[400px] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl border border-line z-50 origin-bottom-right transition-all duration-500 ease-[cubic-bezier(0.2,1,0.2,1)] ${
-          isOpen ? 'scale-100 opacity-100 translate-y-0' : 'scale-0 opacity-0 translate-y-20 pointer-events-none'
+        className={`fixed bottom-24 right-6 flex h-[min(500px,70vh)] w-[calc(100vw-2rem)] max-w-[400px] flex-col overflow-hidden rounded-2xl bg-surface-raised shadow-card-hover border border-line z-50 origin-bottom-right transition-[transform,opacity] duration-200 ease-soft ${
+          isOpen ? 'scale-100 opacity-100 translate-y-0' : 'pointer-events-none translate-y-3 scale-95 opacity-0'
         }`}
       >
         <div className="bg-accent px-4 py-3 text-white flex justify-between items-center">
@@ -131,7 +136,7 @@ export function DiscoveryChat() {
           </button>
         </div>
         
-          <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4 bg-[#F8F9FA]">
+          <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4 bg-surface">
             {messages.length === 0 && (
               <div className="text-center text-sm text-ink-muted mt-4">
                 Xin chào! Tôi là trợ lý AI. Bạn muốn tìm khóa học gì hôm nay?
@@ -141,7 +146,7 @@ export function DiscoveryChat() {
             {messages.map((msg, i) => (
               <div key={i} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
                 <div className={`max-w-[85%] rounded-2xl px-4 py-2 text-sm ${
-                  msg.role === 'user' ? 'bg-accent text-white rounded-br-none whitespace-pre-wrap' : 'bg-white border border-line text-ink rounded-bl-none shadow-sm'
+                  msg.role === 'user' ? 'bg-accent text-white rounded-br-none whitespace-pre-wrap' : 'bg-surface-raised border border-line text-ink rounded-bl-none shadow-sm'
                 }`}>
                   {msg.role === 'user' ? msg.text : <MarkdownRenderer content={msg.text} />}
                 </div>
@@ -149,7 +154,7 @@ export function DiscoveryChat() {
                 {msg.courses && msg.courses.length > 0 && (
                   <div className="mt-2 flex w-full max-w-full overflow-x-auto gap-3 pb-2 pt-1 no-scrollbar">
                     {msg.courses.map(c => (
-                      <Link key={c.id} href={`/courses/${c.slug}`} className="min-w-[220px] max-w-[220px] flex-shrink-0 bg-white border border-line rounded-xl p-3 flex flex-col gap-2 no-underline hover:border-accent shadow-sm transition-colors">
+                      <Link key={c.id} href={`/courses/${c.slug}`} className="min-w-[220px] max-w-[220px] flex-shrink-0 bg-surface-raised border border-line rounded-xl p-3 flex flex-col gap-2 no-underline hover:border-accent shadow-sm transition-colors">
                         <span className="font-semibold text-sm line-clamp-2 text-ink">{c.title}</span>
                         <span className="text-xs text-ink-muted">GV. {c.instructor_name}</span>
                         <div className="flex items-center justify-between mt-auto pt-2 border-t border-line-soft">
@@ -164,22 +169,20 @@ export function DiscoveryChat() {
             ))}
             {loading && (
               <div className="flex items-start">
-                <div className="bg-white border border-line text-ink rounded-2xl rounded-bl-none px-4 py-2 text-sm shadow-sm flex items-center gap-2">
-                  <span className="animate-pulse">●</span>
-                  <span className="animate-pulse delay-75">●</span>
-                  <span className="animate-pulse delay-150">●</span>
+                <div className="bg-surface-raised border border-line text-ink rounded-2xl rounded-bl-none px-4 py-2 text-sm shadow-sm flex items-center gap-2">
+                  <TypingDots />
                 </div>
               </div>
             )}
             <div ref={messagesEndRef} />
           </div>
 
-          <div className="border-t border-line p-3 bg-white">
+          <div className="border-t border-line p-3 bg-surface-raised">
             <form 
               onSubmit={(e) => { e.preventDefault(); sendMessage(); }}
               className="flex items-end gap-2"
             >
-              <div className="flex-1 rounded-2xl border border-line bg-surface-raised flex overflow-hidden focus-within:border-accent focus-within:bg-white transition-colors">
+              <div className="flex-1 rounded-2xl border border-line bg-surface-raised flex overflow-hidden focus-within:border-accent focus-within:bg-surface-raised transition-colors">
                 <textarea
                   value={input}
                   onChange={e => handleInputChange(e.target.value)}

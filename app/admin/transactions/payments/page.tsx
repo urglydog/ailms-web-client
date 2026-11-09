@@ -1,5 +1,7 @@
 'use client';
 
+import { Modal } from '@/components/ui/Modal';
+
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { isSameDay } from 'date-fns';
 import { ArrowDown, ArrowUp, ArrowUpDown, RefreshCw, X } from 'lucide-react';
@@ -38,8 +40,8 @@ type SortField = 'txnRef' | 'userEmail' | 'amount' | 'paymentMethod' | 'paidAt';
 const STATUSES = ['PAID', 'PENDING', 'FAILED', 'EXPIRED'] as const;
 const STATUS_CLASS: Record<string, string> = {
   PAID: 'bg-success-tint text-success-ink border-success/30',
-  PENDING: 'bg-white text-ink border-warning',
-  FAILED: 'bg-white text-danger border-danger/40',
+  PENDING: 'bg-surface-raised text-ink border-warning',
+  FAILED: 'bg-surface-raised text-danger border-danger/40',
   EXPIRED: 'bg-line-soft text-ink-muted border-line',
 };
 const PAGE_SIZE = 10;
@@ -141,7 +143,7 @@ export default function AdminPaymentsPage() {
     );
   };
 
-  const field = 'w-full rounded-lg border border-line bg-white p-2.5 text-sm text-ink outline-none focus:border-accent';
+  const field = 'w-full rounded-lg border border-line bg-surface-raised p-2.5 text-sm text-ink outline-none focus:border-accent';
   const labelCls = 'text-xs font-semibold text-ink-muted';
 
   return (
@@ -150,14 +152,14 @@ export default function AdminPaymentsPage() {
         title={t('title')}
         subtitle={t('subtitle')}
         action={
-          <button type="button" onClick={fetchPayments} className="inline-flex items-center gap-1.5 rounded-lg border border-line bg-white px-4 py-2 text-sm font-semibold text-ink hover:bg-tint">
+          <button type="button" onClick={fetchPayments} className="inline-flex items-center gap-1.5 rounded-lg border border-line bg-surface-raised px-4 py-2 text-sm font-semibold text-ink hover:bg-tint">
             <RefreshCw size={14} aria-hidden />
             {t('refresh')}
           </button>
         }
       />
 
-      <div className="flex flex-wrap items-end gap-4 rounded-xl border border-line bg-white p-4">
+      <div className="flex flex-wrap items-end gap-4 rounded-xl border border-line bg-surface-raised p-4">
         <label className="flex w-full flex-col gap-1.5 sm:w-64">
           <span className={labelCls}>{t('filters.email')}</span>
           <input type="search" placeholder={t('filters.emailPh')} className={field} value={searchEmail} onChange={(e) => setSearchEmail(e.target.value)} />
@@ -180,16 +182,16 @@ export default function AdminPaymentsPage() {
       </div>
 
       {loading ? (
-        <div className="flex flex-col gap-2 rounded-xl border border-line bg-white p-4">
+        <div className="flex flex-col gap-2 rounded-xl border border-line bg-surface-raised p-4">
           {Array.from({ length: 5 }, (_, i) => (
             <Skeleton key={i} className="h-11" />
           ))}
         </div>
       ) : payments.length === 0 ? (
-        <div className="rounded-xl border border-line bg-white p-8 text-center text-ink-muted">{t('empty')}</div>
+        <div className="rounded-xl border border-line bg-surface-raised p-8 text-center text-ink-muted">{t('empty')}</div>
       ) : (
         <div className="flex flex-col gap-4">
-          <div className="overflow-x-auto rounded-xl border border-line bg-white shadow-sm">
+          <div className="overflow-x-auto rounded-xl border border-line bg-surface-raised shadow-sm">
             <table className="w-full min-w-[980px] text-left text-sm">
               <thead className="border-b border-line bg-surface text-xs text-ink-muted">
                 <tr>
@@ -253,11 +255,11 @@ export default function AdminPaymentsPage() {
             <nav aria-label={t('pager.aria')} className="flex flex-wrap items-center justify-between gap-3 px-1">
               <span className="text-sm text-ink-muted">{t('pager.showing', { shown: paged.items.length, total: filtered.length })}</span>
               <div className="flex items-center gap-2">
-                <button type="button" disabled={paged.page === 1} onClick={() => setCurrentPage(paged.page - 1)} className="rounded-lg border border-line bg-white px-3 py-1.5 text-sm font-semibold text-ink hover:bg-tint disabled:opacity-50">
+                <button type="button" disabled={paged.page === 1} onClick={() => setCurrentPage(paged.page - 1)} className="rounded-lg border border-line bg-surface-raised px-3 py-1.5 text-sm font-semibold text-ink hover:bg-tint disabled:opacity-50">
                   {t('pager.prev')}
                 </button>
                 <span className="px-2 text-sm font-semibold text-ink">{t('pager.page', { page: paged.page, total: paged.totalPages })}</span>
-                <button type="button" disabled={paged.page === paged.totalPages} onClick={() => setCurrentPage(paged.page + 1)} className="rounded-lg border border-line bg-white px-3 py-1.5 text-sm font-semibold text-ink hover:bg-tint disabled:opacity-50">
+                <button type="button" disabled={paged.page === paged.totalPages} onClick={() => setCurrentPage(paged.page + 1)} className="rounded-lg border border-line bg-surface-raised px-3 py-1.5 text-sm font-semibold text-ink hover:bg-tint disabled:opacity-50">
                   {t('pager.next')}
                 </button>
               </div>
@@ -267,8 +269,7 @@ export default function AdminPaymentsPage() {
       )}
 
       {selectedPayment && (
-        <div className="fixed inset-0 z-[400] flex items-center justify-center bg-ink/40 p-4">
-          <div role="dialog" aria-modal="true" aria-labelledby="payment-detail-title" className="flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-line bg-white shadow-card-hover">
+        <Modal open onClose={() => setSelectedPayment(null)} bare ariaLabel={String(t('detail.title'))} zClass="z-[400]" closeOnBackdrop={false} className="flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-line bg-surface-raised shadow-card-hover">
             <div className="flex items-center justify-between border-b border-line px-6 py-4">
               <h2 id="payment-detail-title" className="m-0 font-display text-xl font-bold text-ink">{t('detail.title')}</h2>
               <button type="button" onClick={() => setSelectedPayment(null)} aria-label={t('detail.close')} className="flex h-8 w-8 items-center justify-center rounded-full text-ink-muted hover:bg-tint hover:text-ink">
@@ -324,7 +325,7 @@ export default function AdminPaymentsPage() {
               <div className="flex gap-2">
                 <Link
                   href={`/admin/transactions/disputes?ref=${selectedPayment.txnRef}`}
-                  className="rounded-lg border border-line bg-white px-3 py-1.5 text-sm font-semibold text-ink hover:bg-tint"
+                  className="rounded-lg border border-line bg-surface-raised px-3 py-1.5 text-sm font-semibold text-ink hover:bg-tint"
                 >
                   {t('detail.dispute')}
                 </Link>
@@ -333,8 +334,7 @@ export default function AdminPaymentsPage() {
                 {t('detail.close')}
               </button>
             </div>
-          </div>
-        </div>
+          </Modal>
       )}
     </>
   );

@@ -88,7 +88,7 @@ export default function InstructorCoursesPage() {
             }}
             placeholder={t('search')}
             aria-label={t('searchLabel')}
-            className="w-full rounded-lg border border-line bg-white py-2 pl-9 pr-3 text-[13px] text-ink placeholder:text-ink-muted focus:border-accent focus:outline-none"
+            className="w-full rounded-lg border border-line bg-surface-raised py-2 pl-9 pr-3 text-[13px] text-ink placeholder:text-ink-muted focus:border-accent focus:outline-none"
           />
         </div>
 
@@ -97,7 +97,7 @@ export default function InstructorCoursesPage() {
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value as CourseSort)}
-            className="rounded-lg border border-line bg-white px-3 py-2 text-[13px] font-semibold text-ink focus:border-accent focus:outline-none"
+            className="rounded-lg border border-line bg-surface-raised px-3 py-2 text-[13px] font-semibold text-ink focus:border-accent focus:outline-none"
           >
             {SORTS.map((s) => (
               <option key={s} value={s}>
@@ -111,7 +111,7 @@ export default function InstructorCoursesPage() {
           <button
             type="button"
             onClick={() => setDeleteTarget({ ids: [...selectedIds], label: t('confirm.many', { count: selectedIds.size }) })}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-danger/40 bg-white px-3.5 py-2 text-[13px] font-bold text-danger hover:bg-danger/5"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-danger/40 bg-surface-raised px-3.5 py-2 text-[13px] font-bold text-danger hover:bg-danger/5"
           >
             <Trash2 size={14} aria-hidden />
             {t('bulk.remove', { count: selectedIds.size })}
@@ -120,12 +120,12 @@ export default function InstructorCoursesPage() {
       </div>
 
       {error && (
-        <div role="alert" className="rounded-xl border border-danger/40 bg-white p-4 text-sm text-danger">
+        <div role="alert" className="rounded-xl border border-danger/40 bg-surface-raised p-4 text-sm text-danger">
           {error instanceof ApiError ? error.message : t('loadError')}
         </div>
       )}
 
-      <div className="overflow-hidden rounded-xl border border-line bg-white shadow-sm">
+      <div className="overflow-hidden rounded-xl border border-line bg-surface-raised shadow-sm">
         <div className={`hidden border-b border-line bg-surface px-4 py-2.5 text-[11.5px] font-bold uppercase tracking-wide text-ink-muted ${ROW_GRID}`}>
           <input type="checkbox" checked={allSelected} onChange={toggleSelectAll} aria-label={t('row.selectAll')} className="h-4 w-4 accent-accent" />
           <span>{t('row.columns.course')}</span>

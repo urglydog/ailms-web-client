@@ -1,12 +1,11 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useEffect } from 'react';
-import { createPortal } from 'react-dom';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { materialsApi } from '@/lib/api/materials';
-import { History, Eye, RotateCcw, X } from 'lucide-react';
+import { History, Eye, RotateCcw } from 'lucide-react';
+import { Modal } from '@/components/ui/Modal';
 import { MaterialBadge } from '@/components/materials/ui/MaterialBadge';
 
 interface VersionHistoryModalProps {
@@ -19,14 +18,6 @@ interface VersionHistoryModalProps {
 export function VersionHistoryModal({ courseId, materialId, onClose, onInspect }: VersionHistoryModalProps) {
   const t = useTranslations('instructor.common');
   const queryClient = useQueryClient();
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [onClose]);
 
   const { data: versions, isLoading } = useQuery({
     queryKey: ['material-versions', materialId],
@@ -45,25 +36,19 @@ export function VersionHistoryModal({ courseId, materialId, onClose, onInspect }
     onError: (err: Error) => toast.error(err.message || 'Không thể khôi phục phiên bản'),
   });
 
-  return createPortal(
-    <div className="fixed inset-0 z-[100000] flex items-center justify-center p-4 bg-ink/50 backdrop-blur-sm" onClick={onClose}>
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="version-history-title"
-        className="bg-surface-raised rounded-card max-w-lg w-full p-5 shadow-card-hover border border-line max-h-[80vh] flex flex-col"
-        onClick={e => e.stopPropagation()}
-      >
-        <div className="flex items-center justify-between mb-4">
-          <h3 id="version-history-title" className="text-base font-bold text-ink flex items-center gap-2">
-            <History className="w-4 h-4 text-ink-muted" /> Lịch sử phiên bản
-          </h3>
-          <button type="button" onClick={onClose} aria-label={t('close')} className="text-ink-muted hover:text-ink transition-colors">
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-
-        <div className="overflow-y-auto flex-1 flex flex-col gap-2">
+  return (
+    <Modal
+      open
+      onClose={onClose}
+      zClass="z-[100000]"
+      closeLabel={t('close')}
+      title={
+        <span className="flex items-center gap-2 text-base">
+          <History className="h-4 w-4 text-ink-muted" aria-hidden /> Lịch sử phiên bản
+        </span>
+      }
+    >
+        <div className="flex flex-col gap-2">
           {isLoading && <div className="text-sm text-ink-muted text-center py-6">Đang tải...</div>}
           {!isLoading && (versions?.length ?? 0) === 0 && (
             <div className="text-sm text-ink-muted text-center py-6">Chưa có lịch sử phiên bản nào.</div>
@@ -107,8 +92,6 @@ export function VersionHistoryModal({ courseId, materialId, onClose, onInspect }
             </div>
           ))}
         </div>
-      </div>
-    </div>,
-    document.body
+    </Modal>
   );
 }

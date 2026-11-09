@@ -77,7 +77,7 @@ function ProfilePageContent() {
 
       <div className="grid gap-8 md:grid-cols-2">
         {/* Cột 1: Thông tin cá nhân */}
-        <div className="rounded-card border border-line bg-white p-6 shadow-card">
+        <div className="rounded-card border border-line bg-surface-raised p-6 shadow-card">
           <div className="mb-6 flex items-center gap-4">
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-accent/10 font-display text-2xl font-bold text-accent-dark">
               {user.avatarUrl ? (
@@ -142,7 +142,7 @@ function ProfilePageContent() {
         {/* Cột 2: Quyền riêng tư + Đăng ký làm giảng viên */}
         <div className="flex flex-col gap-8">
           {/* "View public profile" (14/09/2026, mở rộng) — 2 công tắc tách riêng, xem User.java */}
-          <div className="rounded-card border border-line bg-white p-6 shadow-card">
+          <div className="rounded-card border border-line bg-surface-raised p-6 shadow-card">
             <h2 className="mb-1 font-display text-lg font-bold text-ink">Quyền riêng tư hồ sơ công khai</h2>
             <p className="mb-4 text-sm text-ink-muted">
               Người khác xem trang{' '}
@@ -168,7 +168,7 @@ function ProfilePageContent() {
           </div>
 
           {/* Task 10: Quản lý thiết bị & Bảo mật */}
-          <div className="rounded-card border border-line bg-white p-6 shadow-card">
+          <div className="rounded-card border border-line bg-surface-raised p-6 shadow-card">
             <h2 className="mb-2 font-display text-lg font-bold text-ink">Bảo mật & Thiết bị</h2>
             <p className="mb-4 text-sm text-ink-muted">
               Đăng xuất khỏi tất cả các thiết bị khác đang sử dụng tài khoản này.
@@ -203,7 +203,7 @@ function ProfilePageContent() {
                   toast.error('Có lỗi xảy ra, vui lòng thử lại.');
                 }
               }}
-              className="w-full rounded-lg border border-line bg-white py-2.5 text-sm font-bold text-ink hover:bg-surface-hover transition-colors"
+              className="w-full rounded-lg border border-line bg-surface-raised py-2.5 text-sm font-bold text-ink hover:bg-surface-hover transition-colors"
             >
               Đăng xuất khỏi tất cả các thiết bị khác
             </button>

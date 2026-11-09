@@ -18,7 +18,7 @@ interface MaterialTabsProps {
 
 /**
  * Tab dùng chung cho khu vực Học liệu — có thanh trượt (sliding indicator) chuyển động
- * mượt bằng CSS thuần (`transition-all`, không cần framer-motion), thay cho kiểu tab
+ * mượt bằng CSS thuần (`transition`, không cần framer-motion), thay cho kiểu tab
  * đổi màu tĩnh đang dùng rải rác trong dự án.
  */
 export function MaterialTabs({ tabs, active, onChange, className = '' }: MaterialTabsProps) {

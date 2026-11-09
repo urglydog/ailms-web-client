@@ -1,0 +1,66 @@
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
+import { useState } from 'react';
+import { Modal } from './Modal';
+
+function Harness({ onClose = () => {} }: { onClose?: () => void }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <button type="button" onClick={() => setOpen(true)}>
+        Mở
+      </button>
+      <Modal
+        open={open}
+        onClose={() => {
+          onClose();
+          setOpen(false);
+        }}
+        title="Xóa bài học"
+        footer={<button type="button">Đồng ý</button>}
+      >
+        <p>Nội dung</p>
+      </Modal>
+    </>
+  );
+}
+
+describe('Modal', () => {
+  it('là hộp thoại có tên lấy từ tiêu đề', () => {
+    render(<Harness />);
+    expect(screen.queryByRole('dialog')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Mở' }));
+    const dialog = screen.getByRole('dialog', { name: 'Xóa bài học' });
+    expect(dialog).toHaveAttribute('aria-modal', 'true');
+  });
+
+  it('focus vào trong khi mở và giữ focus vòng lại khi Tab', () => {
+    render(<Harness />);
+    fireEvent.click(screen.getByRole('button', { name: 'Mở' }));
+    const close = screen.getByRole('button', { name: 'Đóng' });
+    const ok = screen.getByRole('button', { name: 'Đồng ý' });
+    expect(close).toHaveFocus();
+    ok.focus();
+    fireEvent.keyDown(document, { key: 'Tab' });
+    expect(close).toHaveFocus();
+    fireEvent.keyDown(document, { key: 'Tab', shiftKey: true });
+    expect(ok).toHaveFocus();
+  });
+
+  it('Esc đóng và trả focus về nút đã mở', async () => {
+    const onClose = vi.fn();
+    render(<Harness onClose={onClose} />);
+    const trigger = screen.getByRole('button', { name: 'Mở' });
+    trigger.focus();
+    fireEvent.click(trigger);
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(onClose).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(trigger).toHaveFocus());
+  });
+
+  it('khóa cuộn trang nền khi mở', () => {
+    render(<Harness />);
+    fireEvent.click(screen.getByRole('button', { name: 'Mở' }));
+    expect(document.body.style.overflow).toBe('hidden');
+  });
+});

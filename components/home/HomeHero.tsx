@@ -11,7 +11,7 @@ export function HomeHero() {
 
   return (
     <section className="border-b border-line bg-surface">
-      <div className="shell grid items-center gap-10 py-12 lg:grid-cols-[1fr_1.15fr] lg:py-16">
+      <div className="shell grid grid-cols-[minmax(0,1fr)] items-center gap-10 py-12 lg:grid-cols-[minmax(0,1fr)_1.15fr] lg:py-16">
         <div className="flex flex-col items-start gap-4">
           <span className="rounded-full bg-tint px-3 py-1 text-xs font-medium text-accent-dark">{t('tag')}</span>
           <h1 className="m-0 font-display text-[32px] font-semibold leading-[1.35] text-ink sm:text-[36px]">

@@ -61,7 +61,7 @@ export function ReviewManager() {
   return (
     <div className="flex flex-col gap-4">
       {errorMessage && (
-        <div role="alert" className="rounded-xl border border-danger/40 bg-white p-4 text-[13px] text-danger">{errorMessage}</div>
+        <div role="alert" className="rounded-xl border border-danger/40 bg-surface-raised p-4 text-[13px] text-danger">{errorMessage}</div>
       )}
 
       {/* Filter Bar */}
@@ -84,7 +84,7 @@ export function ReviewManager() {
         />
         <select
           aria-label={t('statusLabel')}
-          className="rounded-lg border border-line bg-white px-3 py-2 text-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent min-w-[150px]"
+          className="rounded-lg border border-line bg-surface-raised px-3 py-2 text-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent min-w-[150px]"
           value={status}
           onChange={(e) => setStatus(e.target.value)}
         >
@@ -95,7 +95,7 @@ export function ReviewManager() {
         </select>
       </div>
 
-      <div className="overflow-x-auto rounded-xl border border-line bg-white shadow-sm">
+      <div className="overflow-x-auto rounded-xl border border-line bg-surface-raised shadow-sm">
         <table className="w-full min-w-[900px] text-left text-sm">
           <thead className="bg-surface text-xs font-bold text-ink-muted uppercase">
             <tr>
@@ -135,11 +135,11 @@ export function ReviewManager() {
                 <td className="px-6 py-3">
                   <div className="flex flex-col items-start gap-1">
                     {review.moderationStatus === 'PENDING_REPORT' ? (
-                      <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-bold text-ink border border-warning">
+                      <span className="rounded-full bg-surface-raised px-2.5 py-1 text-[11px] font-bold text-ink border border-warning">
                         {t('badge.pending')}
                       </span>
                     ) : review.isHidden ? (
-                      <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-bold text-danger border border-danger/40">
+                      <span className="rounded-full bg-surface-raised px-2.5 py-1 text-[11px] font-bold text-danger border border-danger/40">
                         {t('badge.hidden')}
                       </span>
                     ) : (
@@ -200,7 +200,7 @@ export function ReviewManager() {
           <button
             disabled={data.first}
             onClick={() => setPage((p) => p - 1)}
-            className="px-4 py-2 text-sm font-medium text-ink bg-white border border-line rounded-lg hover:bg-surface disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 text-sm font-medium text-ink bg-surface-raised border border-line rounded-lg hover:bg-surface disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {t('pager.prev')}
           </button>
@@ -210,7 +210,7 @@ export function ReviewManager() {
           <button
             disabled={data.last}
             onClick={() => setPage((p) => p + 1)}
-            className="px-4 py-2 text-sm font-medium text-ink bg-white border border-line rounded-lg hover:bg-surface disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 text-sm font-medium text-ink bg-surface-raised border border-line rounded-lg hover:bg-surface disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {t('pager.next')}
           </button>

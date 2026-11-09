@@ -1,5 +1,7 @@
 'use client';
 
+import { Modal } from '@/components/ui/Modal';
+
 import { useQueryClient, useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams, usePathname } from 'next/navigation';
@@ -662,7 +664,7 @@ function LearnPageContent() {
             bài nào (đánh dấu active) nên không cần lặp lại tên bài học ở đây nữa.
             Video lớn nhất, sidebar phải hẹp có tab, tab dưới video
             thay cho các khối CTA/card rời trước đây. */}
-        <div className={`grid gap-6 ${sidebarCollapsed ? 'lg:grid-cols-[1fr_auto]' : 'lg:grid-cols-[1fr_380px]'}`}>
+        <div className={`grid grid-cols-[minmax(0,1fr)] gap-6 ${sidebarCollapsed ? 'lg:grid-cols-[minmax(0,1fr)_auto]' : 'lg:grid-cols-[minmax(0,1fr)_380px]'}`}>
           {/* ── Cột phát bài giảng ── */}
           <div className="flex min-w-0 flex-col gap-4">
             {/* Video luôn hiển thị và phát được, bất kể mode — xem docblock đầu file.
@@ -842,7 +844,7 @@ function LearnPageContent() {
                 onClick={() => setSidebarCollapsed(false)}
                 title={t('sidebar.expand')}
                 aria-label={t('sidebar.expand')}
-                className="hidden h-10 w-10 items-center justify-center rounded-xl border border-line bg-white text-ink-muted shadow-sm transition-colors hover:border-accent hover:text-accent lg:flex"
+                className="hidden h-10 w-10 items-center justify-center rounded-xl border border-line bg-surface-raised text-ink-muted shadow-sm transition-colors hover:border-accent hover:text-accent lg:flex"
               >
                 <PanelRightOpen className="h-5 w-5" strokeWidth={1.75} />
               </button>
@@ -928,8 +930,7 @@ function LearnPageContent() {
       </div>
 
       {streamConflict && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="mx-4 w-full max-w-sm rounded-card bg-white p-6 shadow-card text-center animate-in zoom-in-95">
+        <Modal open onClose={() => {}} bare ariaLabel="Đã phát hiện thiết bị khác" role="alertdialog" closeOnBackdrop={false} className="mx-4 w-full max-w-sm rounded-card bg-surface-raised p-6 shadow-card text-center">
             <div className="mb-4 text-4xl">⚠️</div>
             <h2 className="mb-2 font-display text-lg font-bold text-ink">Đã phát hiện thiết bị khác</h2>
             <p className="mb-6 text-sm text-ink-muted">
@@ -941,8 +942,7 @@ function LearnPageContent() {
             >
               Tiếp tục phát tại đây
             </button>
-          </div>
-        </div>
+          </Modal>
       )}
 
       {lesson?.enrolled && lesson.courseId && (

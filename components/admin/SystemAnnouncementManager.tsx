@@ -11,8 +11,8 @@ const AUDIENCE_OPTIONS: AnnouncementAudience[] = ['ALL', 'INSTRUCTOR', 'STUDENT'
 const DISPATCH_STATUSES = ['PENDING', 'PROCESSING', 'DONE', 'FAILED'];
 
 const SEVERITY_BADGE_CLASS: Record<AnnouncementSeverity, string> = {
-  HIGH: 'bg-white text-danger border-danger/40',
-  MEDIUM: 'bg-white text-ink border-warning',
+  HIGH: 'bg-surface-raised text-danger border-danger/40',
+  MEDIUM: 'bg-surface-raised text-ink border-warning',
   LOW: 'bg-line-soft text-ink-muted border-line',
 };
 
@@ -60,7 +60,7 @@ export function SystemAnnouncementManager() {
 
   return (
     <div className="flex flex-col gap-6">
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4 rounded-xl border border-line bg-white p-5 shadow-sm">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4 rounded-xl border border-line bg-surface-raised p-5 shadow-sm">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label={t('form.title')}>
             <input
@@ -133,7 +133,7 @@ export function SystemAnnouncementManager() {
         </div>
 
         {errorMessage && (
-          <div role="alert" className="rounded-xl border border-danger/40 bg-white p-3 text-[12.5px] text-danger">{errorMessage}</div>
+          <div role="alert" className="rounded-xl border border-danger/40 bg-surface-raised p-3 text-[12.5px] text-danger">{errorMessage}</div>
         )}
 
         <button
@@ -145,7 +145,7 @@ export function SystemAnnouncementManager() {
         </button>
       </form>
 
-      <div className="overflow-x-auto rounded-xl border border-line bg-white shadow-sm">
+      <div className="overflow-x-auto rounded-xl border border-line bg-surface-raised shadow-sm">
         <table className="w-full min-w-[760px] text-left text-sm">
           <thead className="bg-surface text-xs font-bold text-ink-muted uppercase">
             <tr>

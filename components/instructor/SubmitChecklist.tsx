@@ -6,7 +6,7 @@ interface SubmitChecklistProps {
 /** Checklist điều kiện gửi duyệt — phản chiếu đúng BR-COURSE-01 (tiêu đề, mô tả, ảnh bìa, ≥1 chương, ≥3 bài sẵn sàng). */
 export function SubmitChecklist({ missingConditions, canSubmit }: SubmitChecklistProps) {
   return (
-    <div className="flex flex-col gap-2.5 rounded-xl border border-line bg-white p-4 shadow-sm">
+    <div className="flex flex-col gap-2.5 rounded-xl border border-line bg-surface-raised p-4 shadow-sm">
       <span className="font-display text-[13.5px] font-bold text-ink">Điều kiện gửi duyệt</span>
       {canSubmit ? (
         <div className="flex items-center gap-2 rounded-lg bg-success-tint px-3 py-2 text-[12.5px] font-semibold text-success-ink">

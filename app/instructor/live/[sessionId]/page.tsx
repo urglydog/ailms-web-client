@@ -54,7 +54,7 @@ export default function LiveControlRoomPage() {
 
   if (session.status === 'ENDED') {
     return (
-      <div className="mx-auto flex max-w-lg flex-col items-center gap-2 rounded-xl border border-line bg-white p-8 text-center">
+      <div className="mx-auto flex max-w-lg flex-col items-center gap-2 rounded-xl border border-line bg-surface-raised p-8 text-center">
         <h1 className="m-0 font-display text-lg font-bold text-ink">{session.title}</h1>
         <p className="text-sm text-ink-muted">{t('ended')}</p>
       </div>
@@ -64,7 +64,7 @@ export default function LiveControlRoomPage() {
   if (!liveKit) {
     const previewUrl = session.thumbnailUrl ?? session.courseThumbnailUrl;
     return (
-      <div className="mx-auto flex max-w-lg flex-col items-center gap-4 rounded-xl border border-line bg-white p-8 text-center">
+      <div className="mx-auto flex max-w-lg flex-col items-center gap-4 rounded-xl border border-line bg-surface-raised p-8 text-center">
         <h1 className="m-0 font-display text-lg font-bold text-ink">{session.title}</h1>
         <p className="text-[13px] text-ink-muted">
           {t('meta', { course: session.courseTitle, language: session.sourceLanguage })}
@@ -123,7 +123,7 @@ export default function LiveControlRoomPage() {
       video={false}
       onDisconnected={() => setLiveKit(null)}
     >
-      <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
         <ControlRoomBody
           title={session.title}
           onEnd={() => endLive.mutate(sessionId)}
@@ -187,7 +187,7 @@ function ControlRoomBody({
         )}
       </div>
 
-      <div className="flex flex-wrap items-center gap-3 rounded-xl border border-line bg-white p-4">
+      <div className="flex flex-wrap items-center gap-3 rounded-xl border border-line bg-surface-raised p-4">
         <ToggleButton
           active={isCameraEnabled}
           onClick={() => localParticipant.setCameraEnabled(!isCameraEnabled)}

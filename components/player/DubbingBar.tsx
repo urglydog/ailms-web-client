@@ -121,7 +121,7 @@ export function DubbingBar({ languages, activeCode, sourceLanguage, processing, 
           className={`relative h-[18px] w-8 rounded-full transition-colors duration-200 ${usingOriginal ? 'bg-accent' : 'bg-line'}`}
         >
           <span
-            className={`absolute top-0.5 h-3.5 w-3.5 rounded-full bg-white transition-[left] duration-200 ${
+            className={`absolute top-0.5 h-3.5 w-3.5 rounded-full bg-surface-raised transition-[left] duration-200 ${
               usingOriginal ? 'left-[16px]' : 'left-0.5'
             }`}
           />

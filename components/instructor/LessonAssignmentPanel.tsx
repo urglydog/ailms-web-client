@@ -56,7 +56,7 @@ export function LessonAssignmentPanel({ lessonId }: { lessonId: number }) {
 
       <div className="flex flex-col gap-1.5">
         {assignments?.map((a) => (
-          <div key={a.id} className="flex items-center justify-between gap-2 rounded-lg bg-white px-3 py-1.5 text-[12.5px]">
+          <div key={a.id} className="flex items-center justify-between gap-2 rounded-lg bg-surface-raised px-3 py-1.5 text-[12.5px]">
             <span className="min-w-0 flex-1 truncate text-ink">📝 {a.title}</span>
             <span className="shrink-0 text-ink-faint">{a.submissionCount} bài nộp</span>
             <button
@@ -79,7 +79,7 @@ export function LessonAssignmentPanel({ lessonId }: { lessonId: number }) {
           type="button"
           draggable={false}
           onClick={() => setShowForm(true)}
-          className="self-start rounded-lg bg-cyan-600 px-4 py-1.5 text-[12px] font-bold text-white hover:bg-cyan-700"
+          className="self-start rounded-lg bg-accent px-4 py-1.5 text-[12px] font-bold text-white hover:bg-accent-dark"
         >
           + Thêm bài tập
         </button>
@@ -130,7 +130,7 @@ export function LessonAssignmentPanel({ lessonId }: { lessonId: number }) {
               type="submit"
               draggable={false}
               disabled={!title.trim() || createAssignment.isPending}
-              className="rounded-lg bg-cyan-600 px-4 py-1.5 text-[12px] font-bold text-white hover:bg-cyan-700 disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-lg bg-accent px-4 py-1.5 text-[12px] font-bold text-white hover:bg-accent-dark disabled:cursor-not-allowed disabled:opacity-50"
             >
               {createAssignment.isPending ? 'Đang lưu...' : 'Lưu bài tập'}
             </button>

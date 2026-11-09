@@ -38,10 +38,10 @@ function GapSkeleton() {
 function getGapColorTheme(errorRate: number) {
   if (errorRate >= 0.7) {
     return {
-      text: 'text-rose-600',
-      bg: 'bg-rose-500',
+      text: 'text-danger',
+      bg: 'bg-danger',
       border: 'border-rose-500/20',
-      lightBg: 'bg-rose-50',
+      lightBg: 'bg-danger/10',
     };
   }
   if (errorRate >= 0.4) {
@@ -53,10 +53,10 @@ function getGapColorTheme(errorRate: number) {
     };
   }
   return {
-    text: 'text-sky-600',
+    text: 'text-accent',
     bg: 'bg-sky-500',
     border: 'border-sky-500/20',
-    lightBg: 'bg-sky-50',
+    lightBg: 'bg-tint',
   };
 }
 
@@ -92,7 +92,7 @@ export function KnowledgeGapsWidget({ courseId }: { courseId: number }) {
 
   if (gaps.length === 0) {
     return (
-      <div className="card p-6 mb-6 bg-gradient-to-r from-success/5 to-success/10 border border-success/20 shadow-sm transition-all hover:shadow-md">
+      <div className="card p-6 mb-6 bg-gradient-to-r from-success/5 to-success/10 border border-success/20 shadow-sm transition hover:shadow-md">
         <div className="flex items-start gap-4">
           <div className="p-3 bg-success/10 rounded-full text-success mt-0.5 shadow-sm">
             <Trophy className="w-6 h-6" />
@@ -122,7 +122,7 @@ export function KnowledgeGapsWidget({ courseId }: { courseId: number }) {
           const percent = Math.round(gap.errorRate * 100);
 
           return (
-            <div key={index} className={`flex flex-col sm:flex-row sm:items-center justify-between gap-5 p-5 rounded-xl border ${theme.border} ${theme.lightBg} transition-all hover:shadow-md`}>
+            <div key={index} className={`flex flex-col sm:flex-row sm:items-center justify-between gap-5 p-5 rounded-xl border ${theme.border} ${theme.lightBg} transition hover:shadow-md`}>
               <div className="w-full sm:w-2/3 flex-1">
                 <h4 className="font-bold text-ink mb-2 text-base">{gap.topic}</h4>
                 <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm font-medium mb-3">
@@ -131,7 +131,7 @@ export function KnowledgeGapsWidget({ courseId }: { courseId: number }) {
                 </div>
                 {/* Progress Bar */}
                 <div className="w-full bg-line rounded-full h-2 shadow-inner overflow-hidden">
-                  <div className={`h-2 rounded-full ${theme.bg} transition-all duration-1000 ease-out`} style={{ width: `${percent}%` }}></div>
+                  <div className={`h-2 rounded-full ${theme.bg} transition-[width] duration-700 ease-soft`} style={{ width: `${percent}%` }}></div>
                 </div>
               </div>
 
@@ -140,7 +140,7 @@ export function KnowledgeGapsWidget({ courseId }: { courseId: number }) {
                   href={`/learn/${gap.referenceLessonId}${gap.videoTimestamp ? `?seek=${gap.videoTimestamp}` : ''}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="shrink-0 flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-surface border border-line shadow-sm text-ink font-semibold text-sm hover:border-accent hover:text-accent transition-all group"
+                  className="shrink-0 flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-surface border border-line shadow-sm text-ink font-semibold text-sm hover:border-accent hover:text-accent transition group"
                 >
                   <PlayCircle className="w-4 h-4 group-hover:scale-110 transition-transform" />
                   Ôn tập lý thuyết
@@ -148,7 +148,7 @@ export function KnowledgeGapsWidget({ courseId }: { courseId: number }) {
               ) : (
                 <a
                   href="?tab=materials"
-                  className="shrink-0 flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-surface border border-line shadow-sm text-ink font-semibold text-sm hover:bg-surface-hover transition-all"
+                  className="shrink-0 flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-surface border border-line shadow-sm text-ink font-semibold text-sm hover:bg-surface-hover transition"
                   title="Chủ đề này thuộc bài đánh giá tổng hợp. Hãy xem lại toàn bộ học liệu."
                 >
                   <Lightbulb className="w-4 h-4 text-ink-muted" />

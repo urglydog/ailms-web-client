@@ -1,5 +1,7 @@
 'use client';
 
+import { Modal } from '@/components/ui/Modal';
+
 import { useState } from 'react';
 import { ApiError } from '@/lib/api/client';
 import { usersApi } from '@/lib/api/users';
@@ -46,9 +48,7 @@ export default function ChangePasswordModal({ onClose, onSuccess }: ChangePasswo
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
-        <h2 className="text-xl font-bold mb-4 text-ink">Đổi mật khẩu</h2>
+    <Modal open onClose={onClose} title="Đổi mật khẩu" closeOnBackdrop={false}>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-ink-muted mb-1">Mật khẩu hiện tại</label>
@@ -95,13 +95,12 @@ export default function ChangePasswordModal({ onClose, onSuccess }: ChangePasswo
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 bg-line text-ink py-2 rounded-lg hover:bg-line-dot font-semibold transition-colors"
+              className="flex-1 bg-tint text-ink py-2 rounded-lg hover:bg-line font-semibold transition-colors"
             >
               Hủy
             </button>
           </div>
         </form>
-      </div>
-    </div>
+    </Modal>
   );
 }

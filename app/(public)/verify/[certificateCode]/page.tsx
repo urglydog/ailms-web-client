@@ -80,7 +80,7 @@ export default function VerifyCertificatePage() {
 
 function StatusCard({ icon, title, description }: { icon: React.ReactNode; title: string; description: React.ReactNode }) {
   return (
-    <div className="flex w-full max-w-lg flex-col items-center gap-3 rounded-2xl border border-line bg-white p-8 shadow-card">
+    <div className="flex w-full max-w-lg flex-col items-center gap-3 rounded-2xl border border-line bg-surface-raised p-8 shadow-card">
       {icon}
       <h1 className="font-display text-lg font-bold text-ink">{title}</h1>
       <p className="text-sm leading-relaxed text-ink-muted">{description}</p>

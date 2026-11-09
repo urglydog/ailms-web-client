@@ -16,7 +16,7 @@ const STATUS_LABEL: Record<DisputeRes['status'], string> = {
   REOPENED: 'Đang chờ xử lý lại',
 };
 const STATUS_CLASS: Record<DisputeRes['status'], string> = {
-  OPEN: 'bg-white text-ink border-warning',
+  OPEN: 'bg-surface-raised text-ink border-warning',
   RESOLVED_REFUNDED: 'bg-success/10 text-success border-success/20',
   RESOLVED_REJECTED: 'bg-line text-ink-muted border-line',
   REOPENED: 'bg-danger/10 text-danger border-danger/30',
@@ -166,7 +166,7 @@ function RequestRefundContent() {
                   type="button"
                   disabled={alreadyDisputed(p.txnRef)}
                   onClick={() => setSelectedRef(p.txnRef)}
-                  className="flex items-center justify-between gap-3 rounded-xl border border-line bg-white p-4 text-left hover:border-accent disabled:cursor-not-allowed disabled:opacity-50"
+                  className="flex items-center justify-between gap-3 rounded-xl border border-line bg-surface-raised p-4 text-left hover:border-accent disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <div className="min-w-0">
                     <div className="truncate font-semibold text-ink">{p.courseTitle}</div>
@@ -175,7 +175,7 @@ function RequestRefundContent() {
                     </div>
                   </div>
                   {alreadyDisputed(p.txnRef) && (
-                    <span className="shrink-0 rounded-full border border-warning bg-white px-2.5 py-1 text-xs font-semibold text-ink">
+                    <span className="shrink-0 rounded-full border border-warning bg-surface-raised px-2.5 py-1 text-xs font-semibold text-ink">
                       Đang có khiếu nại chờ xử lý
                     </span>
                   )}
@@ -185,7 +185,7 @@ function RequestRefundContent() {
           )}
         </section>
       ) : (
-        <section className="flex flex-col gap-4 rounded-2xl border border-line bg-white p-6">
+        <section className="flex flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-6">
           <div className="flex items-center justify-between gap-3">
             <div>
               <div className="font-semibold text-ink">{selectedPayment.courseTitle}</div>
@@ -209,7 +209,7 @@ function RequestRefundContent() {
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
                 placeholder="VD: Bị trừ tiền nhưng không ghi danh được khóa học"
-                className="w-full rounded-lg border border-line bg-white p-2.5 text-sm text-ink outline-none focus:border-accent"
+                className="w-full rounded-lg border border-line bg-surface-raised p-2.5 text-sm text-ink outline-none focus:border-accent"
               />
             </label>
 
@@ -219,7 +219,7 @@ function RequestRefundContent() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={4}
-                className="w-full rounded-lg border border-line bg-white p-2.5 text-sm text-ink outline-none focus:border-accent"
+                className="w-full rounded-lg border border-line bg-surface-raised p-2.5 text-sm text-ink outline-none focus:border-accent"
               />
             </label>
 
@@ -230,7 +230,7 @@ function RequestRefundContent() {
                 value={refundBankAccount}
                 onChange={(e) => setRefundBankAccount(e.target.value)}
                 placeholder="VD: Vietcombank - 0123456789 - Nguyễn Văn A"
-                className="w-full rounded-lg border border-line bg-white p-2.5 text-sm text-ink outline-none focus:border-accent"
+                className="w-full rounded-lg border border-line bg-surface-raised p-2.5 text-sm text-ink outline-none focus:border-accent"
               />
             </label>
 
@@ -241,7 +241,7 @@ function RequestRefundContent() {
                 multiple
                 accept={ACCEPTED_TYPES}
                 onChange={handleFilesChange}
-                className="w-full rounded-lg border border-line bg-white p-2.5 text-sm text-ink outline-none focus:border-accent file:mr-3 file:rounded-md file:border-0 file:bg-tint file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-accent-dark"
+                className="w-full rounded-lg border border-line bg-surface-raised p-2.5 text-sm text-ink outline-none focus:border-accent file:mr-3 file:rounded-md file:border-0 file:bg-tint file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-accent-dark"
               />
               {files.length > 0 && (
                 <ul className="m-0 flex list-none flex-col gap-1 p-0 text-xs text-ink-muted">
@@ -276,7 +276,7 @@ function RequestRefundContent() {
           <h2 className="m-0 font-display text-lg font-bold text-ink">Khiếu nại của tôi</h2>
           <div className="flex flex-col gap-2">
             {myDisputes.map((d) => (
-              <div key={d.id} className="flex flex-col gap-3 rounded-xl border border-line bg-white p-4">
+              <div key={d.id} className="flex flex-col gap-3 rounded-xl border border-line bg-surface-raised p-4">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="min-w-0">
                     <div className="truncate font-semibold text-ink">{d.courseTitle}</div>
@@ -310,7 +310,7 @@ function RequestRefundContent() {
                         value={reopenReason}
                         onChange={(e) => setReopenReason(e.target.value)}
                         rows={3}
-                        className="w-full rounded-lg border border-line bg-white p-2.5 text-sm text-ink outline-none focus:border-accent"
+                        className="w-full rounded-lg border border-line bg-surface-raised p-2.5 text-sm text-ink outline-none focus:border-accent"
                       />
                     </label>
                     <div className="flex gap-2">

@@ -27,7 +27,7 @@ export function PasswordField({ id, label, value, onChange, className = '', ...r
           type={shown ? 'text' : 'password'}
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className={`w-full rounded-lg border border-line bg-white py-2.5 pl-4 pr-11 text-sm text-ink placeholder:text-ink-faint focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent ${className}`}
+          className={`w-full rounded-lg border border-line bg-surface-raised py-2.5 pl-4 pr-11 text-sm text-ink placeholder:text-ink-faint focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent ${className}`}
           {...rest}
         />
         <button

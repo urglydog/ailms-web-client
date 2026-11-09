@@ -31,14 +31,14 @@ export default function InstructorAnnouncementsPage() {
 
       {isLoading && <div className="p-10 text-center text-sm text-ink-muted">{t('loading')}</div>}
       {!isLoading && (!announcements || announcements.length === 0) && (
-        <div className="rounded-xl border border-line bg-white p-10 text-center text-sm text-ink-muted shadow-sm">
+        <div className="rounded-xl border border-line bg-surface-raised p-10 text-center text-sm text-ink-muted shadow-sm">
           {t('announcements.empty')}
         </div>
       )}
 
       <div className="flex flex-col gap-3">
         {announcements?.map((a) => (
-          <div key={a.id} className="rounded-xl border border-line bg-white p-4 shadow-sm">
+          <div key={a.id} className="rounded-xl border border-line bg-surface-raised p-4 shadow-sm">
             <div className="mb-1 flex items-start justify-between gap-3">
               <div>
                 <p className="text-[13.5px] font-bold text-ink">{a.title}</p>
@@ -86,7 +86,7 @@ function CreateAnnouncementForm({ courses }: { courses: InstructorCourseOption[]
   };
 
   return (
-    <div className="flex flex-col gap-3 rounded-xl border border-line bg-white p-4 shadow-sm">
+    <div className="flex flex-col gap-3 rounded-xl border border-line bg-surface-raised p-4 shadow-sm">
       <p className="font-display text-[14px] font-bold text-ink">{t('announcements.newTitle')}</p>
       <CourseFilterDropdown
         courses={courses}

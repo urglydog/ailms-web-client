@@ -147,7 +147,7 @@ function WishlistCard({ item }: { item: WishlistItem }) {
         onClick={() => removeFromWishlist.mutate(item.courseId)}
         disabled={removeFromWishlist.isPending}
         aria-label={t('remove')}
-        className="absolute right-2.5 top-2.5 flex h-9 w-9 items-center justify-center rounded-full bg-white text-danger shadow-sm hover:bg-white/90"
+        className="absolute right-2.5 top-2.5 flex h-9 w-9 items-center justify-center rounded-full bg-surface-raised text-danger shadow-sm hover:bg-white/90"
       >
         <Heart size={18} aria-hidden className="fill-current" />
       </button>

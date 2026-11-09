@@ -47,7 +47,7 @@ export function InstructorTopbar({ title, user, onOpenMenu, onOpenLanguage, onLo
   const toggle = (which: Exclude<Popover, null>) => setOpen((cur) => (cur === which ? null : which));
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-3 border-b border-line bg-white/95 px-4 backdrop-blur sm:px-6">
+    <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-3 border-b border-line bg-surface-raised/95 px-4 backdrop-blur sm:px-6">
       <button
         type="button"
         onClick={onOpenMenu}
@@ -120,7 +120,7 @@ export function InstructorTopbar({ title, user, onOpenMenu, onOpenLanguage, onLo
             <ChevronDown size={14} aria-hidden className="text-ink-muted" />
           </button>
           {open === 'account' && (
-            <div role="menu" className="absolute right-0 top-full z-[200] mt-2 w-60 rounded-panel border border-line bg-white p-2 shadow-card-hover">
+            <div role="menu" className="absolute right-0 top-full z-[200] mt-2 w-60 rounded-panel border border-line bg-surface-raised p-2 shadow-card-hover">
               <div className="border-b border-line-soft px-3 pb-2 pt-1">
                 <div className="truncate text-sm font-semibold text-ink">{user.fullName}</div>
                 <div className="text-xs text-ink-muted">{t('role')}</div>

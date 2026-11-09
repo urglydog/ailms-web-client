@@ -11,7 +11,7 @@ export function Chip({ active = false, className = '', children, ...rest }: Chip
     <button
       type="button"
       aria-pressed={active}
-      className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium
+      className={`inline-flex min-h-8 items-center rounded-full border px-3 py-1 text-xs font-medium
                   transition-colors duration-150 ease-soft
                   ${
                     active

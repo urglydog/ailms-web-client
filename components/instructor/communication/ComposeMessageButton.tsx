@@ -1,5 +1,7 @@
 'use client';
 
+import { Modal } from '@/components/ui/Modal';
+
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useInstructorCourseOptions, useInstructorStudents } from '@/hooks/useDashboard';
@@ -35,11 +37,7 @@ export function ComposeMessageButton() {
         {t('button')}
       </button>
 
-      {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-sm rounded-xl bg-white p-5 shadow-xl">
-            <h3 className="mb-4 font-display text-[15px] font-bold text-ink">{t('title')}</h3>
-
+      <Modal open={open} onClose={() => setOpen(false)} title={t('title')} size="sm">
             <label className="mb-1 block text-[12px] font-semibold text-ink-muted">{t('course')}</label>
             <select
               value={courseId}
@@ -69,7 +67,7 @@ export function ComposeMessageButton() {
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="rounded-lg border border-line px-4 py-2 text-[13px] font-semibold text-ink-muted hover:bg-surface"
+                className="rounded-lg border border-line px-4 py-2 text-[13px] font-semibold text-ink-muted hover:bg-tint"
               >
                 {t('cancel')}
               </button>
@@ -82,9 +80,7 @@ export function ComposeMessageButton() {
                 {t('start')}
               </button>
             </div>
-          </div>
-        </div>
-      )}
+      </Modal>
     </>
   );
 }

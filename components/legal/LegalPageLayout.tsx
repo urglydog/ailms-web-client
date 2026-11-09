@@ -28,7 +28,7 @@ export function LegalPageLayout({
 /** 1 mục trong trang chính sách — tiêu đề phụ + nội dung, cùng khung "card" như VALUES ở About. */
 export function LegalSection({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section className="rounded-card border border-line bg-white p-5 shadow-card">
+    <section className="rounded-card border border-line bg-surface-raised p-5 shadow-card">
       <h2 className="m-0 font-display text-[16px] font-semibold text-ink">{title}</h2>
       <div className="mt-2 flex flex-col gap-2 text-[14px] leading-[1.7] text-ink-muted">{children}</div>
     </section>

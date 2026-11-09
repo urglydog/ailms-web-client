@@ -1,5 +1,7 @@
 'use client';
 
+import { Modal } from '@/components/ui/Modal';
+
 import { Suspense, useEffect, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
@@ -12,7 +14,7 @@ import type { DisputeAdminRes, DisputeStatus } from '@/types/domain';
 
 const STATUSES: DisputeStatus[] = ['OPEN', 'REOPENED', 'RESOLVED_REFUNDED', 'RESOLVED_REJECTED'];
 const STATUS_CLASS: Record<DisputeStatus, string> = {
-  OPEN: 'bg-white text-ink border-warning',
+  OPEN: 'bg-surface-raised text-ink border-warning',
   REOPENED: 'bg-danger/10 text-danger border-danger/30',
   RESOLVED_REFUNDED: 'bg-success-tint text-success-ink border-success/30',
   RESOLVED_REJECTED: 'bg-line-soft text-ink-muted border-line',
@@ -85,11 +87,11 @@ function AdminDisputesContent() {
     <>
       <PageHeader title={t('title')} subtitle={t('subtitle')} />
 
-      <div className="flex flex-wrap items-end gap-4 rounded-xl border border-line bg-white p-4">
+      <div className="flex flex-wrap items-end gap-4 rounded-xl border border-line bg-surface-raised p-4">
         <label className="flex w-full flex-col gap-1.5 sm:w-56">
           <span className="text-xs font-semibold text-ink-muted">{t('filters.status')}</span>
           <select
-            className="w-full rounded-lg border border-line bg-white p-2.5 text-sm text-ink outline-none focus:border-accent"
+            className="w-full rounded-lg border border-line bg-surface-raised p-2.5 text-sm text-ink outline-none focus:border-accent"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as DisputeStatus | 'ALL')}
           >
@@ -104,15 +106,15 @@ function AdminDisputesContent() {
       </div>
 
       {loading ? (
-        <div className="flex flex-col gap-2 rounded-xl border border-line bg-white p-4">
+        <div className="flex flex-col gap-2 rounded-xl border border-line bg-surface-raised p-4">
           {Array.from({ length: 4 }, (_, i) => (
             <Skeleton key={i} className="h-11" />
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="rounded-xl border border-line bg-white p-8 text-center text-ink-muted">{t('empty')}</div>
+        <div className="rounded-xl border border-line bg-surface-raised p-8 text-center text-ink-muted">{t('empty')}</div>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-line bg-white shadow-sm">
+        <div className="overflow-x-auto rounded-xl border border-line bg-surface-raised shadow-sm">
           <table className="w-full min-w-[820px] text-left text-sm">
             <thead className="border-b border-line bg-surface text-xs text-ink-muted">
               <tr>
@@ -158,8 +160,7 @@ function AdminDisputesContent() {
       )}
 
       {selected && (
-        <div className="fixed inset-0 z-[400] flex items-center justify-center bg-ink/40 p-4">
-          <div role="dialog" aria-modal="true" className="flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-line bg-white shadow-card-hover">
+        <Modal open onClose={() => setSelected(null)} bare ariaLabel={String(t('detail.title'))} zClass="z-[400]" closeOnBackdrop={false} className="flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-line bg-surface-raised shadow-card-hover">
             <div className="flex items-center justify-between border-b border-line px-6 py-4">
               <h2 className="m-0 font-display text-xl font-bold text-ink">{t('detail.title')}</h2>
               <button type="button" onClick={() => setSelected(null)} aria-label={t('detail.cancel')} className="text-ink-muted hover:text-ink">
@@ -236,7 +237,7 @@ function AdminDisputesContent() {
                       onChange={(e) => setNote(e.target.value)}
                       rows={3}
                       placeholder={t('detail.notePh')}
-                      className="w-full rounded-lg border border-line bg-white p-2.5 text-sm text-ink outline-none focus:border-accent"
+                      className="w-full rounded-lg border border-line bg-surface-raised p-2.5 text-sm text-ink outline-none focus:border-accent"
                     />
                   </label>
                   <div className="mt-2 flex flex-wrap gap-2">
@@ -252,7 +253,7 @@ function AdminDisputesContent() {
                       type="button"
                       disabled={submitting || !note.trim()}
                       onClick={() => handleResolve('RESOLVED_REJECTED')}
-                      className="rounded-lg bg-white px-4 py-2 text-sm font-semibold text-danger ring-1 ring-inset ring-danger/40 hover:bg-danger/5 disabled:opacity-50"
+                      className="rounded-lg bg-surface-raised px-4 py-2 text-sm font-semibold text-danger ring-1 ring-inset ring-danger/40 hover:bg-danger/5 disabled:opacity-50"
                     >
                       {t('detail.reject')}
                     </button>
@@ -272,8 +273,7 @@ function AdminDisputesContent() {
                 {t('detail.cancel')}
               </button>
             </div>
-          </div>
-        </div>
+          </Modal>
       )}
     </>
   );

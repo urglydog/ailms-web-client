@@ -1,6 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import { Modal } from '@/components/ui/Modal';
 import { LOCALE_NATIVE_NAMES, LOCALES, useLocaleStore, type Locale } from '@/lib/stores/localeStore';
 
 /**
@@ -29,21 +30,7 @@ export function LanguageModal({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
-      onClick={onClose}
-    >
-      <div
-        className="w-full max-w-sm rounded-2xl border border-line bg-white p-6 shadow-xl"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="mb-4 flex items-center justify-between">
-          <h3 className="font-display text-lg font-bold text-ink">{t('title')}</h3>
-          <button type="button" onClick={onClose} aria-label={t('close')} className="text-xl text-ink-faint hover:text-ink">
-            ×
-          </button>
-        </div>
-
+    <Modal open onClose={onClose} title={t('title')} closeLabel={t('close')} size="sm">
         <div className="grid grid-cols-2 gap-1.5">
           {LOCALES.map((l) => (
             <button
@@ -51,14 +38,13 @@ export function LanguageModal({ onClose }: { onClose: () => void }) {
               type="button"
               onClick={() => handlePick(l)}
               className={`rounded-lg px-3 py-2.5 text-left text-sm transition-colors ${
-                l === locale ? 'bg-accent/10 font-semibold text-accent' : 'text-ink hover:bg-surface'
+                l === locale ? 'bg-accent/10 font-semibold text-accent-dark' : 'text-ink hover:bg-tint'
               }`}
             >
               {LOCALE_NATIVE_NAMES[l]}
             </button>
           ))}
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 }

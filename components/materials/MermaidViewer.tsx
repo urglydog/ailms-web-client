@@ -152,7 +152,7 @@ export function MermaidViewer({ chart, readOnly = false }: MermaidViewerProps) {
       {/* Thanh công cụ điều khiển sơ đồ */}
       <div className="flex flex-wrap items-center justify-between gap-4 bg-surface p-2 rounded-xl border border-line">
         {!readOnly ? (
-          <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-line">
+          <div className="flex items-center gap-1 bg-surface-raised p-1 rounded-lg border border-line">
             {DIRECTIONS.map(dir => (
               <button
                 key={dir.id}
@@ -172,14 +172,14 @@ export function MermaidViewer({ chart, readOnly = false }: MermaidViewerProps) {
           <div className="flex items-center gap-2">
             <button 
               onClick={handleCopyCode}
-              className="flex items-center gap-2 px-4 py-2 bg-tint hover:bg-accent text-ink hover:text-white rounded-lg text-sm font-medium transition-all border border-line"
+              className="flex items-center gap-2 px-4 py-2 bg-tint hover:bg-accent text-ink hover:text-white rounded-lg text-sm font-medium transition border border-line"
               title="Sao chép mã Mermaid"
             >
               Copy Code
             </button>
             <button 
               onClick={handleDownloadSVG}
-              className="flex items-center gap-2 px-4 py-2 bg-tint hover:bg-accent text-ink hover:text-white rounded-lg text-sm font-medium transition-all border border-line"
+              className="flex items-center gap-2 px-4 py-2 bg-tint hover:bg-accent text-ink hover:text-white rounded-lg text-sm font-medium transition border border-line"
               title="Tải sơ đồ dưới dạng ảnh SVG"
             >
               Tải ảnh (SVG)
@@ -189,9 +189,9 @@ export function MermaidViewer({ chart, readOnly = false }: MermaidViewerProps) {
       </div>
 
       {/* Vùng hiển thị sơ đồ */}
-      <div className="relative w-full min-h-[400px] h-[600px] bg-white rounded-2xl border border-line p-4 overflow-auto">
+      <div className="relative w-full min-h-[400px] h-[600px] bg-surface-raised rounded-2xl border border-line p-4 overflow-auto">
         {loading && (
-          <div className="absolute inset-0 bg-white/50 flex items-center justify-center z-10 backdrop-blur-sm">
+          <div className="absolute inset-0 bg-surface-raised/50 flex items-center justify-center z-10 backdrop-blur-sm">
             <span className="text-accent text-sm">Đang tải...</span>
           </div>
         )}

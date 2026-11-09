@@ -68,7 +68,7 @@ export default function HardQuestionsPage() {
         <select
           value={courseId}
           onChange={(e) => handleFilterChange(() => setCourseId(e.target.value ? Number(e.target.value) : ''))}
-          className="rounded-lg border border-line bg-white px-3 py-2 text-[13px] font-semibold text-ink focus:border-accent focus:outline-none"
+          className="rounded-lg border border-line bg-surface-raised px-3 py-2 text-[13px] font-semibold text-ink focus:border-accent focus:outline-none"
         >
           <option value="">{t('common.allCourses')}</option>
           {courses?.map((c) => (
@@ -78,7 +78,7 @@ export default function HardQuestionsPage() {
         <select
           value={severity}
           onChange={(e) => handleFilterChange(() => setSeverity(e.target.value as Severity))}
-          className="rounded-lg border border-line bg-white px-3 py-2 text-[13px] font-semibold text-ink focus:border-accent focus:outline-none"
+          className="rounded-lg border border-line bg-surface-raised px-3 py-2 text-[13px] font-semibold text-ink focus:border-accent focus:outline-none"
         >
           <option value="all">{t('hardQuestions.level.all')}</option>
           <option value="critical">{t('hardQuestions.level.critical')}</option>
@@ -87,14 +87,14 @@ export default function HardQuestionsPage() {
         <select
           value={sortBy}
           onChange={(e) => handleFilterChange(() => setSortBy(e.target.value as SortBy))}
-          className="rounded-lg border border-line bg-white px-3 py-2 text-[13px] font-semibold text-ink focus:border-accent focus:outline-none"
+          className="rounded-lg border border-line bg-surface-raised px-3 py-2 text-[13px] font-semibold text-ink focus:border-accent focus:outline-none"
         >
           <option value="wrongRate">{t('hardQuestions.sort.wrongRate')}</option>
           <option value="totalAnswers">{t('hardQuestions.sort.totalAnswers')}</option>
         </select>
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-line bg-white shadow-sm">
+      <div className="overflow-hidden rounded-xl border border-line bg-surface-raised shadow-sm">
         <div className="overflow-x-auto">
           <div className="grid min-w-[820px] grid-cols-[1.6fr_1fr_110px_160px_130px] gap-3 border-b border-line bg-surface px-4 py-2.5 text-[11.5px] font-bold text-ink-muted">
             <span>{t('hardQuestions.cols.question')}</span>
@@ -136,7 +136,7 @@ export default function HardQuestionsPage() {
               </div>
               <Link
                 href={`/instructor/courses/${row.courseId}/edit/materials?inspect=${row.materialGenerationId}`}
-                className="rounded-lg border border-line bg-tint px-2.5 py-1.5 text-center text-[12px] font-bold text-accent-dark no-underline hover:bg-cyan-100"
+                className="rounded-lg border border-line bg-tint px-2.5 py-1.5 text-center text-[12px] font-bold text-accent-dark no-underline hover:bg-tint"
               >
                 {t('hardQuestions.edit')}
               </Link>

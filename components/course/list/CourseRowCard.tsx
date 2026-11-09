@@ -32,7 +32,7 @@ export function CourseRowCard({ course }: { course: CourseSummary }) {
             alt=""
             fill
             sizes="(min-width: 640px) 224px, 100vw"
-            className="object-cover transition-transform duration-[400ms] ease-soft group-hover:scale-105"
+            className="object-cover transition-transform duration-300 ease-soft group-hover:scale-[1.03]"
           />
         )}
       </div>

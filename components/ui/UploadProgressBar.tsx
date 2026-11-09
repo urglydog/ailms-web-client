@@ -13,7 +13,7 @@ export function UploadProgressBar({ percent, label }: { percent: number; label: 
         aria-label={label}
         className="h-1.5 w-full overflow-hidden rounded-full bg-line-soft"
       >
-        <div className="h-full rounded-full bg-cyan-600 transition-[width] duration-300" style={{ width: `${percent}%` }} />
+        <div className="h-full rounded-full bg-accent transition-[width] duration-300" style={{ width: `${percent}%` }} />
       </div>
     </div>
   );

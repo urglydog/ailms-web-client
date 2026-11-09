@@ -15,7 +15,7 @@ interface PendingCoursesProps {
 export function PendingCourses({ courses, total }: PendingCoursesProps) {
   const t = useTranslations('admin.overview.pending');
   return (
-    <section aria-labelledby="pending-title" className="overflow-hidden rounded-xl border border-line bg-white shadow-sm">
+    <section aria-labelledby="pending-title" className="overflow-hidden rounded-xl border border-line bg-surface-raised shadow-sm">
       <div className="flex items-center justify-between gap-3 border-b border-line-soft px-4 py-3">
         <h2 id="pending-title" className="m-0 font-display text-[15px] font-bold text-ink">
           {t('title')}

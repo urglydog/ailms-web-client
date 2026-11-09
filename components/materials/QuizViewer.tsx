@@ -173,12 +173,12 @@ export function QuizViewer({ questions, quizId }: { questions: QuizQuestion[], q
   };
 
   return (
-    <div className="card border-line-soft shadow-sm overflow-hidden bg-white/70 backdrop-blur-md">
+    <div className="card border-line-soft shadow-sm overflow-hidden bg-surface-raised/70 backdrop-blur-md">
       <div className="bg-surface-hover px-6 py-4 border-b border-line flex justify-between items-center">
         <span className="font-semibold text-ink">Câu hỏi {currentIdx + 1} của {questions.length}</span>
         <div className="w-1/3 bg-line-soft h-2 rounded-full overflow-hidden">
           <div 
-            className="bg-accent h-full transition-all duration-300" 
+            className="bg-accent h-full transition duration-300" 
             style={{ width: `${((currentIdx + 1) / questions.length) * 100}%` }}
           />
         </div>
@@ -192,7 +192,7 @@ export function QuizViewer({ questions, quizId }: { questions: QuizQuestion[], q
             const isSelected = selectedOption === option.id;
             
             // Nếu đã trả lời, hiện thị đáp án đúng/sai
-            let buttonClass = "w-full text-left p-4 rounded-xl border transition-all duration-200 ";
+            let buttonClass = "w-full text-left p-4 rounded-xl border transition duration-200 ";
             if (!isAnswered) {
               buttonClass += isSelected ? "border-accent bg-accent/5 ring-2 ring-accent/20" : "border-line hover:border-ink-muted hover:bg-surface-hover";
             } else {
@@ -253,7 +253,7 @@ export function QuizViewer({ questions, quizId }: { questions: QuizQuestion[], q
           <button
             disabled={!isAnswered}
             onClick={handleNext}
-            className={`px-6 py-3 rounded-xl font-bold transition-all ${isAnswered ? 'bg-accent text-white hover:bg-accent-hover transform hover:scale-105 active:scale-95' : 'bg-surface-hover text-ink-muted cursor-not-allowed'}`}
+            className={`px-6 py-3 rounded-xl font-bold transition ${isAnswered ? 'bg-accent text-white hover:bg-accent-hover transform hover:scale-105 active:scale-95' : 'bg-surface-hover text-ink-muted cursor-not-allowed'}`}
           >
             {currentIdx === questions.length - 1 ? 'Hoàn thành' : 'Câu tiếp theo'}
           </button>

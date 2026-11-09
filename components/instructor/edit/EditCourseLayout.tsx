@@ -74,7 +74,7 @@ export function EditCourseLayout({ courseId, children }: { courseId: number; chi
 
       <main id="main-content" tabIndex={-1} className="mx-auto flex w-full max-w-[1400px] flex-1 flex-col gap-5 px-4 py-6 sm:px-8 sm:py-7">
         {!showSettings && course.status === 'REJECTED' && course.rejectReason && (
-          <div role="alert" className="rounded-xl border border-danger/40 bg-white p-4 text-[13px] text-danger">
+          <div role="alert" className="rounded-xl border border-danger/40 bg-surface-raised p-4 text-[13px] text-danger">
             <span className="font-bold">{t('banners.rejected')} </span>
             {course.rejectReason}
             {course.resubmitCount > 0 && <span className="ml-2">{t('banners.resubmitCount', { count: course.resubmitCount })}</span>}
@@ -82,7 +82,7 @@ export function EditCourseLayout({ courseId, children }: { courseId: number; chi
         )}
 
         {!showSettings && course.status === 'PUBLISHED' && (
-          <div className="rounded-xl border border-highlight bg-white p-4 text-[13px] text-ink">{t('banners.published')}</div>
+          <div className="rounded-xl border border-highlight bg-surface-raised p-4 text-[13px] text-ink">{t('banners.published')}</div>
         )}
 
         {!showSettings && isLocked && (
@@ -90,13 +90,13 @@ export function EditCourseLayout({ courseId, children }: { courseId: number; chi
         )}
 
         {!showSettings && submitCourse.error instanceof ApiError && (
-          <div role="alert" className="rounded-xl border border-danger/40 bg-white p-4 text-[13px] text-danger">
+          <div role="alert" className="rounded-xl border border-danger/40 bg-surface-raised p-4 text-[13px] text-danger">
             {submitCourse.error.message}
           </div>
         )}
 
         {showSettings ? (
-          <div className="rounded-xl border border-line bg-white shadow-sm">
+          <div className="rounded-xl border border-line bg-surface-raised shadow-sm">
             <div className="border-b border-line-soft px-6 py-4">
               <h2 className="m-0 font-display text-[17px] font-bold text-ink">{t('settings.title')}</h2>
             </div>

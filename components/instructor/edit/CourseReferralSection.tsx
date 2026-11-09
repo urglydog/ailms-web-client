@@ -48,7 +48,7 @@ export function CourseReferralSection({ course }: { course: CourseEditDetail }) 
         <button
           type="button"
           onClick={handleCopy}
-          className="shrink-0 rounded-lg bg-cyan-600 px-4 py-2 text-[13px] font-bold text-white hover:bg-cyan-700"
+          className="shrink-0 rounded-lg bg-accent px-4 py-2 text-[13px] font-bold text-white hover:bg-accent-dark"
         >
           {copied ? 'Đã sao chép ✓' : 'Sao chép'}
         </button>

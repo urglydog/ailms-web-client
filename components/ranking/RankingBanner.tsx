@@ -46,7 +46,7 @@ export function RankingBanner() {
           ))}
 
           {showMyRankPin && myRanking && (
-            <span className="shrink-0 rounded-full border border-dashed border-accent bg-white px-3 py-1.5 text-[13px] font-semibold text-ink-muted">
+            <span className="shrink-0 rounded-full border border-dashed border-accent bg-surface-raised px-3 py-1.5 text-[13px] font-semibold text-ink-muted">
               {t('yourRankInline', { rank: myRanking.rank, xp: myRanking.totalXp })}
             </span>
           )}
@@ -65,7 +65,7 @@ function medal(rank: number): string {
   if (rank === 1) return 'bg-star text-ink';
   if (rank === 2) return 'bg-line text-ink';
   if (rank === 3) return 'bg-warning text-ink';
-  return 'bg-white text-ink-muted';
+  return 'bg-surface-raised text-ink-muted';
 }
 
 function RankPill({ entry, index, isMe, xp }: { entry: LeaderboardEntry; index: number; isMe: boolean; xp: string }) {
@@ -73,7 +73,7 @@ function RankPill({ entry, index, isMe, xp }: { entry: LeaderboardEntry; index: 
     <Link
       href={`/u/${entry.userId}?tab=certificates`}
       style={{ '--i': index } as CSSProperties}
-      className={`ranking-item-enter flex shrink-0 items-center gap-2 rounded-full border border-line bg-white px-2.5 py-1.5 no-underline hover:no-underline ${
+      className={`ranking-item-enter flex shrink-0 items-center gap-2 rounded-full border border-line bg-surface-raised px-2.5 py-1.5 no-underline hover:no-underline ${
         entry.rank === 1 ? 'ranking-rank-1-glow' : ''
       } ${isMe ? 'ring-2 ring-accent ring-offset-1' : ''}`}
     >

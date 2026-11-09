@@ -58,7 +58,7 @@ export function AdminNavDrawer({ open, onClose, pathname, pendingCourses, openDi
         role="dialog"
         aria-modal="true"
         aria-label={t('shell.menuTitle')}
-        className={`absolute inset-y-0 left-0 flex w-[min(86vw,320px)] flex-col bg-white shadow-card-hover transition-transform duration-200 ease-soft ${
+        className={`absolute inset-y-0 left-0 flex w-[min(86vw,320px)] flex-col bg-surface-raised shadow-card-hover transition-transform duration-200 ease-soft ${
           shown ? 'translate-x-0' : '-translate-x-full'
         }`}
       >

@@ -1,5 +1,7 @@
 'use client';
 
+import { Modal } from '@/components/ui/Modal';
+
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { useLessonPlayer } from '@/hooks/usePublicCourses';
@@ -81,25 +83,18 @@ export function CoursePreview({
         )}
       </button>
 
-      {open && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
-          onClick={() => setOpen(false)}
-        >
-          <div
-            className="flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl bg-white"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between border-b border-line-soft px-4 py-3">
-              <div className="min-w-0">
-                <p className="text-[11px] font-semibold uppercase tracking-wide text-ink-faint">Xem trước khóa học</p>
-                <h3 className="truncate font-display text-sm font-bold text-ink">{courseTitle}</h3>
-              </div>
-              <button type="button" onClick={() => setOpen(false)} aria-label="Đóng" className="shrink-0 text-xl text-ink-faint hover:text-ink">
-                ×
-              </button>
-            </div>
-
+      <Modal
+        open={open}
+        onClose={() => setOpen(false)}
+        size="lg"
+        title={
+          <span className="block min-w-0">
+            <span className="block text-[11px] font-semibold uppercase tracking-wide text-ink-faint">Xem trước khóa học</span>
+            <span className="block truncate text-sm">{courseTitle}</span>
+          </span>
+        }
+      >
+          <div className="-mx-6 flex flex-col">
             <div className="aspect-video w-full shrink-0 bg-black">
               {isLoading || !player ? (
                 <div className="flex h-full items-center justify-center text-sm text-white/70">Đang tải video…</div>
@@ -124,14 +119,14 @@ export function CoursePreview({
               )}
             </div>
 
-            <div className="flex-1 overflow-y-auto p-2">
+            <div className="p-2">
               {previewLessons.map((lesson, index) => (
                 <button
                   key={lesson.id}
                   type="button"
                   onClick={() => setActiveIndex(index)}
                   className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm ${
-                    index === activeIndex ? 'bg-accent/10 text-accent' : 'text-ink hover:bg-surface'
+                    index === activeIndex ? 'bg-accent/10 text-accent-dark' : 'text-ink hover:bg-tint'
                   }`}
                 >
                   {index === activeIndex ? (
@@ -145,8 +140,7 @@ export function CoursePreview({
               ))}
             </div>
           </div>
-        </div>
-      )}
+      </Modal>
     </>
   );
 }

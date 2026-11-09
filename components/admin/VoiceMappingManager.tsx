@@ -116,10 +116,10 @@ export function VoiceMappingManager() {
       </label>
 
       {errorMessage && (
-        <div role="alert" className="rounded-xl border border-danger/40 bg-white p-4 text-[13px] text-danger">{errorMessage}</div>
+        <div role="alert" className="rounded-xl border border-danger/40 bg-surface-raised p-4 text-[13px] text-danger">{errorMessage}</div>
       )}
 
-      <div className="overflow-x-auto rounded-xl border border-line bg-white shadow-sm">
+      <div className="overflow-x-auto rounded-xl border border-line bg-surface-raised shadow-sm">
         <table className="w-full min-w-[700px] text-left text-sm">
           <thead className="bg-surface text-xs font-bold text-ink-muted uppercase">
             <tr>
@@ -167,7 +167,7 @@ export function VoiceMappingManager() {
                         input: { gender: e.target.value, isDefault: voice.isDefault, isActive: voice.isActive },
                       })
                     }
-                    className="rounded-md border border-transparent bg-transparent px-2 py-1 focus:border-accent focus:bg-white focus:outline-none"
+                    className="rounded-md border border-transparent bg-transparent px-2 py-1 focus:border-accent focus:bg-surface-raised focus:outline-none"
                   >
                     <option value="FEMALE">{t('gender.FEMALE')}</option>
                     <option value="MALE">{t('gender.MALE')}</option>

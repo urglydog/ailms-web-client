@@ -1,15 +1,10 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { createPortal } from 'react-dom';
+import { useState } from 'react';
+import { ConfirmDialog } from '@/components/admin/ui/ConfirmDialog';
 
 export function LogoutSidebarButton() {
   const [showConfirm, setShowConfirm] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('accessToken');
@@ -17,45 +12,25 @@ export function LogoutSidebarButton() {
     window.location.href = '/login';
   };
 
-  const modalContent = showConfirm && mounted ? (
-    <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-          <div className="w-full max-w-sm rounded-2xl bg-slate-900 border border-slate-800 p-6 shadow-2xl text-white">
-            <div className="flex items-center gap-3 text-danger mb-3">
-              <span className="text-2xl">⚠️</span>
-              <h3 className="font-bold text-base text-white">Xác nhận đăng xuất</h3>
-            </div>
-            <p className="text-xs text-slate-300 mb-6 leading-relaxed">
-              Bạn có chắc chắn muốn đăng xuất khỏi hệ thống không?
-            </p>
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={() => setShowConfirm(false)}
-                className="rounded-xl px-4 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-800 transition-all"
-              >
-                Hủy
-              </button>
-              <button
-                onClick={handleLogout}
-                className="rounded-xl bg-danger px-4 py-2 text-xs font-bold text-white shadow hover:bg-danger transition-all"
-              >
-                Đăng xuất
-              </button>
-            </div>
-          </div>
-        </div>
-  ) : null;
-
   return (
     <>
       <button
+        type="button"
         onClick={() => setShowConfirm(true)}
-        className="mt-4 px-2 text-left text-xs font-semibold text-danger no-underline hover:text-danger w-full flex items-center gap-2"
+        className="mt-4 flex w-full items-center gap-2 px-2 text-left text-xs font-semibold text-danger no-underline transition-colors duration-150 hover:text-danger"
       >
-        <span>🚪</span> Đăng xuất
+        <span aria-hidden>🚪</span> Đăng xuất
       </button>
-      
-      {mounted && typeof document !== 'undefined' ? createPortal(modalContent, document.body) : null}
+      <ConfirmDialog
+        open={showConfirm}
+        title="Xác nhận đăng xuất"
+        body="Bạn có chắc chắn muốn đăng xuất khỏi hệ thống không?"
+        cancelLabel="Hủy"
+        confirmLabel="Đăng xuất"
+        tone="danger"
+        onCancel={() => setShowConfirm(false)}
+        onConfirm={handleLogout}
+      />
     </>
   );
 }
-

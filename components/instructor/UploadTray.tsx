@@ -28,7 +28,7 @@ export function UploadTray() {
         : 'Đã tải xong';
 
   return (
-    <div className="fixed bottom-4 right-4 z-40 w-80 overflow-hidden rounded-xl border border-line bg-white shadow-2xl">
+    <div className="fixed bottom-4 right-4 z-40 w-80 overflow-hidden rounded-xl border border-line bg-surface-raised shadow-2xl">
       <button
         type="button"
         onClick={toggleOpen}

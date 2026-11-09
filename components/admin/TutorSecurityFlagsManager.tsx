@@ -19,7 +19,7 @@ export function TutorSecurityFlagsManager() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="overflow-x-auto rounded-xl border border-line bg-white shadow-sm">
+      <div className="overflow-x-auto rounded-xl border border-line bg-surface-raised shadow-sm">
         <table className="w-full min-w-[760px] text-left text-sm">
           <thead className="bg-surface text-xs font-bold text-ink-muted uppercase">
             <tr>
@@ -51,7 +51,7 @@ export function TutorSecurityFlagsManager() {
                 </td>
                 <td className="px-6 py-3 text-ink-muted">{f.courseTitle}</td>
                 <td className="px-6 py-3">
-                  <span className="inline-block rounded-full border border-warning bg-white px-2.5 py-1 text-[11px] font-semibold text-ink">
+                  <span className="inline-block rounded-full border border-warning bg-surface-raised px-2.5 py-1 text-[11px] font-semibold text-ink">
                     {f.matchedPattern}
                   </span>
                 </td>

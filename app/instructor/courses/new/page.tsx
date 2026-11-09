@@ -1,5 +1,7 @@
 'use client';
 
+import { Modal } from '@/components/ui/Modal';
+
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -90,22 +92,22 @@ export default function NewCoursePage() {
   };
 
   return (
-    <div className="fixed inset-0 z-40 flex flex-col bg-white">
+    <div className="fixed inset-0 z-40 flex flex-col bg-surface-raised">
       <header className="shrink-0">
         <div className="flex h-14 items-center justify-between px-6">
           <div className="flex items-center gap-4">
-            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-400 to-cyan-600 font-display text-[13px] font-bold text-white">
+            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-400 to-accent font-display text-[13px] font-bold text-white">
               L
             </span>
             <span className="text-[13.5px] font-semibold text-ink-muted">Bước {step + 1}/{TOTAL_STEPS}</span>
           </div>
-          <Link href="/instructor/courses" className="text-[13.5px] font-semibold text-cyan-700 no-underline hover:underline">
+          <Link href="/instructor/courses" className="text-[13.5px] font-semibold text-accent-dark no-underline hover:underline">
             Ra
           </Link>
         </div>
         <div className="h-[3px] w-full bg-tint">
           <div
-            className="h-full bg-cyan-600 transition-[width] duration-300"
+            className="h-full bg-accent transition-[width] duration-300"
             style={{ width: `${((step + 1) / TOTAL_STEPS) * 100}%` }}
           />
         </div>
@@ -124,7 +126,7 @@ export default function NewCoursePage() {
               onKeyDown={(e) => e.key === 'Enter' && goNext()}
               autoFocus
               placeholder="Ví dụ: Học Photoshop CS6 từ đầu"
-              className="mt-4 w-full rounded-lg border border-line px-4 py-3 text-[14px] focus:border-cyan-500 focus:outline-none"
+              className="mt-4 w-full rounded-lg border border-line px-4 py-3 text-[14px] focus:border-accent focus:outline-none"
             />
           </div>
         )}
@@ -137,7 +139,7 @@ export default function NewCoursePage() {
               value={categoryId}
               onChange={(e) => setCategoryId(e.target.value ? Number(e.target.value) : '')}
               autoFocus
-              className="mt-4 w-full rounded-lg border border-line px-4 py-3 text-[14px] focus:border-cyan-500 focus:outline-none"
+              className="mt-4 w-full rounded-lg border border-line px-4 py-3 text-[14px] focus:border-accent focus:outline-none"
             >
               <option value="">Chọn một danh mục</option>
               {categories?.map((c) => (
@@ -158,7 +160,7 @@ export default function NewCoursePage() {
                 <label
                   key={option}
                   className={`flex cursor-pointer items-center gap-3 rounded-lg border px-4 py-3 text-left text-[13.5px] font-semibold transition-colors ${
-                    weeklyTime === option ? 'border-cyan-500 ring-1 ring-cyan-500 text-ink' : 'border-line text-ink hover:border-line'
+                    weeklyTime === option ? 'border-accent ring-1 ring-accent text-ink' : 'border-line text-ink hover:border-line'
                   }`}
                 >
                   <input
@@ -187,7 +189,7 @@ export default function NewCoursePage() {
           <button
             type="button"
             onClick={goPrev}
-            className="rounded-full border border-cyan-600 px-5 py-2.5 text-[13px] font-bold text-cyan-700 hover:bg-cyan-50"
+            className="rounded-full border border-accent px-5 py-2.5 text-[13px] font-bold text-accent-dark hover:bg-tint"
           >
             Trước
           </button>
@@ -198,15 +200,14 @@ export default function NewCoursePage() {
           type="button"
           onClick={goNext}
           disabled={!stepValid || createCourse.isPending}
-          className="rounded-full bg-cyan-600 px-5 py-2.5 text-[13px] font-bold text-white hover:bg-cyan-700 disabled:cursor-not-allowed disabled:opacity-40"
+          className="rounded-full bg-accent px-5 py-2.5 text-[13px] font-bold text-white hover:bg-accent-dark disabled:cursor-not-allowed disabled:opacity-40"
         >
           {step < TOTAL_STEPS - 1 ? 'Tiếp tục' : createCourse.isPending ? 'Đang tạo...' : 'Tạo khóa học'}
         </button>
       </footer>
 
       {showProfileModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="flex w-full max-w-md flex-col gap-4 rounded-xl bg-white p-6 shadow-xl">
+        <Modal open onClose={() => setShowProfileModal(false)} bare ariaLabel="Hoàn thiện hồ sơ Giảng viên" closeOnBackdrop={false} className="flex w-full max-w-md flex-col gap-4 rounded-xl bg-surface-raised p-6 shadow-xl">
             <h2 className="m-0 text-lg font-bold text-ink">Hoàn thiện hồ sơ Giảng viên</h2>
             <p className="text-sm text-ink-muted">
               Bạn cần cập nhật chức danh nghề nghiệp và tiểu sử trước khi tạo khóa học đầu tiên.
@@ -243,13 +244,12 @@ export default function NewCoursePage() {
               <button
                 onClick={handleSaveProfile}
                 disabled={!headline.trim() || bio.trim().length < 20 || updateProfile.isPending}
-                className="rounded-full bg-cyan-600 px-5 py-2 text-[13px] font-bold text-white hover:bg-cyan-700 disabled:opacity-50"
+                className="rounded-full bg-accent px-5 py-2 text-[13px] font-bold text-white hover:bg-accent-dark disabled:opacity-50"
               >
                 {updateProfile.isPending ? 'Đang lưu...' : 'Lưu & Tiếp tục'}
               </button>
             </div>
-          </div>
-        </div>
+          </Modal>
       )}
     </div>
   );

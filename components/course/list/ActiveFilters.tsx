@@ -50,7 +50,7 @@ export function ActiveFilters({ filters, categories, onClear, onClearAll }: Acti
               type="button"
               onClick={() => onClear(chip.key)}
               aria-label={t('remove', { name: label })}
-              className="flex h-5 w-5 items-center justify-center rounded-full hover:bg-white"
+              className="flex h-5 w-5 items-center justify-center rounded-full hover:bg-surface-raised"
             >
               <X size={12} aria-hidden />
             </button>

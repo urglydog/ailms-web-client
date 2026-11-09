@@ -92,7 +92,7 @@ export default function BecomeInstructorWizard() {
   }
 
   return (
-    <div className="fixed inset-0 z-40 flex flex-col overflow-y-auto bg-white">
+    <div className="fixed inset-0 z-40 flex flex-col overflow-y-auto bg-surface-raised">
       <header className="shrink-0">
         <div className="flex h-14 items-center justify-between px-6">
           <div className="flex items-center gap-4">
@@ -275,7 +275,7 @@ function SuccessScreen() {
   }, [router]);
 
   return (
-    <div className="fixed inset-0 z-40 flex flex-col items-center justify-center gap-5 bg-white px-4 text-center">
+    <div className="fixed inset-0 z-40 flex flex-col items-center justify-center gap-5 bg-surface-raised px-4 text-center">
       <div className="success-circle flex h-24 w-24 items-center justify-center rounded-full bg-success/10">
         <svg width="52" height="52" viewBox="0 0 24 24" fill="none">
           <path

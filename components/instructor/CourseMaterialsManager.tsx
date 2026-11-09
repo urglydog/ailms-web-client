@@ -1,5 +1,7 @@
 'use client';
 
+import { Modal } from '@/components/ui/Modal';
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { materialsApi, InstructorMaterial, MaterialDetailRes } from '@/lib/api/materials';
 
@@ -7,7 +9,6 @@ import { useMyCourseDetail } from "@/hooks/useCourses";
 
 import { toast } from 'sonner';
 import React, { useState, useEffect } from 'react';
-import { createPortal } from 'react-dom';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { MindmapEditor } from '@/components/materials/MindmapEditor';
 import { MermaidCodeEditor } from '@/components/materials/MermaidCodeEditor';
@@ -56,7 +57,7 @@ function DraggableMaterialCard({ mat, onClick, isLoading: isPending }: { mat: In
       onDoubleClick={(e) => { e.stopPropagation(); onClick(); }}
       onMouseDown={(e) => { if (e.detail > 1) e.preventDefault(); }}
       {...attributes}
-      className={`relative border rounded-card flex flex-col overflow-hidden group transition-all duration-200 select-none ${
+      className={`relative border rounded-card flex flex-col overflow-hidden group transition duration-200 select-none ${
         isDragging ? 'opacity-40 scale-95 border-accent border-dashed shadow-card-hover' :
         isPending  ? 'opacity-60 pointer-events-none' :
         'bg-surface-raised border-line shadow-card hover:shadow-card-hover hover:border-accent/40'
@@ -373,8 +374,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
     
     
     return (
-      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-ink/50 backdrop-blur-sm p-4">
-        <div className="bg-surface-raised rounded-card max-w-sm w-full shadow-card-hover overflow-hidden border border-line">
+      <Modal open onClose={() => setConfirmDeleteId(null)} bare ariaLabel="Xóa học liệu" role="alertdialog" zClass="z-[100]" closeOnBackdrop={false} className="bg-surface-raised rounded-card max-w-sm w-full shadow-card-hover overflow-hidden border border-line">
           <div className="bg-danger/5 p-4 border-b border-danger/10 flex items-center gap-3">
             <Trash2 className="w-5 h-5 text-danger" />
             <h3 className="text-base font-bold text-ink">Xóa Học Liệu</h3>
@@ -399,14 +399,13 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
               <button
                 onClick={() => deleteMaterialMutation.mutate(confirmDeleteId)}
                 disabled={deleteMaterialMutation.isPending}
-                className="px-3 py-1.5 text-xs font-bold text-white bg-danger hover:bg-danger/90 rounded-card shadow-card transition-all disabled:opacity-50"
+                className="px-3 py-1.5 text-xs font-bold text-white bg-danger hover:bg-danger/90 rounded-card shadow-card transition disabled:opacity-50"
               >
                 {deleteMaterialMutation.isPending ? 'Đang xóa...' : 'Xác nhận xóa'}
               </button>
             </div>
           </div>
-        </div>
-      </div>
+        </Modal>
     );
   };
 
@@ -673,9 +672,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
 
       {renderDeleteModal()}
 
-      {confirmAction && typeof window !== 'undefined' && createPortal(
-        <div className="fixed inset-0 z-[100000] flex items-center justify-center p-4 bg-ink/50 backdrop-blur-sm">
-          <div className="bg-surface-raised rounded-card max-w-sm w-full p-5 shadow-card-hover border border-line">
+      {confirmAction && typeof window !== 'undefined' && <Modal open onClose={() => setConfirmAction(null)} bare ariaLabel={String(confirmAction.title)} role="alertdialog" zClass="z-[100000]" closeOnBackdrop={false} className="bg-surface-raised rounded-card max-w-sm w-full p-5 shadow-card-hover border border-line">
             <h3 className="text-base font-bold text-ink mb-2">{confirmAction.title}</h3>
             <p className="text-sm text-ink-muted mb-4 leading-relaxed">{confirmAction.message}</p>
             {isConfirmProcessing && (
@@ -706,10 +703,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                 {isConfirmProcessing ? 'Đang xử lý...' : 'Xác nhận'}
               </button>
             </div>
-          </div>
-        </div>,
-        document.body
-      )}
+          </Modal>}
 
     </DndContext>
   );
@@ -850,7 +844,7 @@ function MaterialWorkspaceViewer({
           {!readOnly && onDelete && (
             <button
               onClick={onDelete}
-              className="inline-flex items-center rounded-card px-3 py-1.5 text-xs font-bold bg-danger/10 text-danger border border-danger/20 hover:bg-danger/5 transition-all"
+              className="inline-flex items-center rounded-card px-3 py-1.5 text-xs font-bold bg-danger/10 text-danger border border-danger/20 hover:bg-danger/5 transition"
               title="Xóa toàn bộ học liệu này"
             >
               Xóa
@@ -927,7 +921,7 @@ function MaterialWorkspaceViewer({
                     </div>
                   )}
                   {detail.quizQuestions.map((q, idx) => (
-                    <div key={q.id} className="p-5 rounded-card border border-line bg-surface-hover/70 space-y-3 shadow-card hover:border-accent/40 transition-all">
+                    <div key={q.id} className="p-5 rounded-card border border-line bg-surface-hover/70 space-y-3 shadow-card hover:border-accent/40 transition">
                       <div className="flex items-start justify-between gap-3">
                         <div className="font-bold text-base text-ink">
                           <span className="text-accent mr-2">Câu {idx + 1}:</span> {q.content}
@@ -944,7 +938,7 @@ function MaterialWorkspaceViewer({
                         {q.options.map((opt) => (
                           <div
                             key={opt.id}
-                            className={`p-3.5 rounded-card text-sm font-medium border flex items-center justify-between transition-all ${opt.isCorrect
+                            className={`p-3.5 rounded-card text-sm font-medium border flex items-center justify-between transition ${opt.isCorrect
                               ? 'bg-success/10 border-success/30 text-success font-bold'
                               : 'bg-surface-raised border-line text-ink'
                               }`}
@@ -1053,7 +1047,7 @@ function MaterialWorkspaceViewer({
                     <div
                       key={card.id}
                       onClick={() => toggleCard(card.id)}
-                      className={`cursor-pointer min-h-[160px] p-5 rounded-card border transition-all duration-300 flex flex-col justify-between shadow-card hover:shadow-card-hover ${isFlipped
+                      className={`cursor-pointer min-h-[160px] p-5 rounded-card border transition duration-300 flex flex-col justify-between shadow-card hover:shadow-card-hover ${isFlipped
                         ? 'bg-accent text-white border-accent-dark'
                         : 'bg-surface-raised text-ink border-line hover:border-accent/40'
                         }`}
@@ -1205,7 +1199,7 @@ function CustomDateTimePicker({ value, onChange, label, onClear, hint }: { value
           <button type="button" onClick={onClear} className="text-[11px] text-danger hover:text-danger/80 font-semibold bg-danger/10 hover:bg-danger/5 px-2 py-0.5 rounded-card transition-colors">Xóa</button>
         )}
       </div>
-      <div className="flex items-stretch rounded-card border border-line focus-within:border-accent focus-within:ring-1 focus-within:ring-accent overflow-hidden bg-surface-raised shadow-card transition-all">
+      <div className="flex items-stretch rounded-card border border-line focus-within:border-accent focus-within:ring-1 focus-within:ring-accent overflow-hidden bg-surface-raised shadow-card transition">
         <input
           type="datetime-local"
           value={value}
@@ -1325,7 +1319,7 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
         <button
           onClick={handleSave}
           disabled={updateQuizSettingsMutation.isPending}
-          className="flex items-center gap-2 rounded-card bg-accent px-6 py-2.5 text-sm font-bold text-white hover:bg-accent-dark disabled:opacity-50 shadow-card transition-all"
+          className="flex items-center gap-2 rounded-card bg-accent px-6 py-2.5 text-sm font-bold text-white hover:bg-accent-dark disabled:opacity-50 shadow-card transition"
         >
           <Save className="w-4 h-4" /> {updateQuizSettingsMutation.isPending ? 'Đang lưu...' : 'Lưu Cấu Hình'}
         </button>
@@ -1338,7 +1332,7 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
           <div className="flex flex-col gap-3">
             <label className="text-sm font-bold text-ink">Chế độ bài thi</label>
             <div className="grid grid-cols-1 gap-3">
-              <label className={`cursor-pointer flex items-start gap-3 p-4 rounded-card border-2 transition-all ${examPolicy === 'PRACTICE_UNLIMITED' ? 'border-accent bg-accent/5' : 'border-line hover:border-accent/50'}`}>
+              <label className={`cursor-pointer flex items-start gap-3 p-4 rounded-card border-2 transition ${examPolicy === 'PRACTICE_UNLIMITED' ? 'border-accent bg-accent/5' : 'border-line hover:border-accent/50'}`}>
                 <input
                   type="radio"
                   name="examPolicy"
@@ -1352,7 +1346,7 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
                 </div>
               </label>
 
-              <label className={`cursor-pointer flex items-start gap-3 p-4 rounded-card border-2 transition-all ${examPolicy === 'PRACTICE_LIMITED' ? 'border-accent bg-accent/5' : 'border-line hover:border-accent/50'}`}>
+              <label className={`cursor-pointer flex items-start gap-3 p-4 rounded-card border-2 transition ${examPolicy === 'PRACTICE_LIMITED' ? 'border-accent bg-accent/5' : 'border-line hover:border-accent/50'}`}>
                 <input
                   type="radio"
                   name="examPolicy"
@@ -1376,7 +1370,7 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
                 </div>
               </label>
 
-              <label className={`cursor-pointer flex items-start gap-3 p-4 rounded-card border-2 transition-all ${examPolicy === 'EXAM_STRICT' ? 'border-accent bg-accent/5' : 'border-line hover:border-accent/50'}`}>
+              <label className={`cursor-pointer flex items-start gap-3 p-4 rounded-card border-2 transition ${examPolicy === 'EXAM_STRICT' ? 'border-accent bg-accent/5' : 'border-line hover:border-accent/50'}`}>
                 <input
                   type="radio"
                   name="examPolicy"
@@ -1458,7 +1452,7 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
                   onChange={(e) => setIsProctored(e.target.checked)}
                   className="sr-only peer"
                 />
-                <div className="w-14 h-7 bg-line peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-surface-raised after:border-line after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-danger"></div>
+                <div className="w-14 h-7 bg-line peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-surface-raised after:border-line after:border after:rounded-full after:h-6 after:w-6 after:transition peer-checked:bg-danger"></div>
               </label>
             </div>
             <p className="text-sm text-ink-muted leading-relaxed border-l-2 border-danger/30 pl-3">
@@ -1600,7 +1594,7 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
               setMaterialType('QUIZ');
               setScopeType(quizType === 'LECTURE_QUIZ' ? 'LESSON' : 'WHOLE_COURSE');
             }}
-            className={`cursor-pointer rounded-card p-4 border-2 transition-all flex flex-col items-center text-center gap-2 ${materialType === 'QUIZ' ? 'border-accent bg-accent/5 shadow-md scale-[1.02]' : 'border-line hover:border-accent/50 bg-surface-raised'
+            className={`cursor-pointer rounded-card p-4 border-2 transition flex flex-col items-center text-center gap-2 ${materialType === 'QUIZ' ? 'border-accent bg-accent/5 shadow-md scale-[1.02]' : 'border-line hover:border-accent/50 bg-surface-raised'
               }`}
           >
             <div className="flex justify-center"><FileQuestion className="w-9 h-9 text-accent" strokeWidth={1.5} /></div>
@@ -1613,7 +1607,7 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
               setMaterialType('FLASHCARD');
               setScopeType('CHAPTER');
             }}
-            className={`cursor-pointer rounded-card p-4 border-2 transition-all flex flex-col items-center text-center gap-2 ${materialType === 'FLASHCARD' ? 'border-accent bg-accent/5 shadow-md scale-[1.02]' : 'border-line hover:border-accent/40 bg-surface-raised'
+            className={`cursor-pointer rounded-card p-4 border-2 transition flex flex-col items-center text-center gap-2 ${materialType === 'FLASHCARD' ? 'border-accent bg-accent/5 shadow-md scale-[1.02]' : 'border-line hover:border-accent/40 bg-surface-raised'
               }`}
           >
             <div className="flex justify-center"><Layers className="w-9 h-9 text-accent" strokeWidth={1.5} /></div>
@@ -1626,7 +1620,7 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
               setMaterialType('MINDMAP');
               setScopeType('CHAPTER');
             }}
-            className={`cursor-pointer rounded-card p-4 border-2 transition-all flex flex-col items-center text-center gap-2 ${materialType === 'MINDMAP' ? 'border-accent bg-accent/5 shadow-md scale-[1.02]' : 'border-line hover:border-accent/40 bg-surface-raised'
+            className={`cursor-pointer rounded-card p-4 border-2 transition flex flex-col items-center text-center gap-2 ${materialType === 'MINDMAP' ? 'border-accent bg-accent/5 shadow-md scale-[1.02]' : 'border-line hover:border-accent/40 bg-surface-raised'
               }`}
           >
             <div className="flex justify-center"><Workflow className="w-9 h-9 text-accent" strokeWidth={1.5} /></div>
@@ -1644,7 +1638,7 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
               <div className="flex flex-col gap-2 pt-2 pb-2">
                 <span className="text-sm font-semibold text-ink">Phân loại Trắc nghiệm</span>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <label className={`cursor-pointer flex items-start gap-3 p-3 rounded-card border-2 transition-all ${quizType === 'LECTURE_QUIZ' ? 'border-accent bg-accent/5' : 'border-line bg-surface-raised hover:border-accent/30'}`}>
+                  <label className={`cursor-pointer flex items-start gap-3 p-3 rounded-card border-2 transition ${quizType === 'LECTURE_QUIZ' ? 'border-accent bg-accent/5' : 'border-line bg-surface-raised hover:border-accent/30'}`}>
                     <input type="radio" name="aiQuizType" value="LECTURE_QUIZ" checked={quizType === 'LECTURE_QUIZ'} onChange={() => {
                       setQuizType('LECTURE_QUIZ');
                       setScopeType('LESSON');
@@ -1656,7 +1650,7 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
                       <span className="text-xs text-ink-muted">Gắn vào 1 Bài học. Luôn hiện giải thích, làm vô hạn lần, không tính giờ.</span>
                     </div>
                   </label>
-                  <label className={`cursor-pointer flex items-start gap-3 p-3 rounded-card border-2 transition-all ${quizType === 'OFFICIAL_EXAM' ? 'border-accent bg-accent/5' : 'border-line bg-surface-raised hover:border-accent/30'}`}>
+                  <label className={`cursor-pointer flex items-start gap-3 p-3 rounded-card border-2 transition ${quizType === 'OFFICIAL_EXAM' ? 'border-accent bg-accent/5' : 'border-line bg-surface-raised hover:border-accent/30'}`}>
                     <input type="radio" name="aiQuizType" value="OFFICIAL_EXAM" checked={quizType === 'OFFICIAL_EXAM'} onChange={() => {
                       setQuizType('OFFICIAL_EXAM');
                       setScopeType('WHOLE_COURSE');
@@ -1806,7 +1800,7 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
                       <div
                         key={tpl.id}
                         onClick={() => setMapTemplate(tpl.id)}
-                        className={`cursor-pointer border rounded-card p-3 flex flex-col items-center justify-center gap-2 transition-all ${mapTemplate === tpl.id ? 'border-accent bg-accent/5 shadow-card ring-1 ring-accent' : 'border-line hover:border-line hover:bg-surface-hover bg-surface-raised'}`}
+                        className={`cursor-pointer border rounded-card p-3 flex flex-col items-center justify-center gap-2 transition ${mapTemplate === tpl.id ? 'border-accent bg-accent/5 shadow-card ring-1 ring-accent' : 'border-line hover:border-line hover:bg-surface-hover bg-surface-raised'}`}
                       >
                         <div className={`w-8 h-8 rounded-card flex items-center justify-center ${mapTemplate === tpl.id ? 'bg-accent/10 text-accent opacity-100' : 'bg-surface-hover text-ink-muted opacity-60'}`}><tpl.Icon className="w-4 h-4" strokeWidth={1.75} /></div>
                         <span className={`text-[11px] font-bold text-center ${mapTemplate === tpl.id ? 'text-accent' : 'text-ink-muted'}`}>{tpl.name}</span>
@@ -1916,8 +1910,7 @@ function QuizQuestionEditorModal({ question, chapters, onClose, onSuccess }: Qui
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/50 p-4">
-      <div className="bg-surface-raised p-6 rounded-card w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-card-hover border border-line">
+    <Modal open onClose={onClose} bare ariaLabel="Chỉnh sửa nội dung câu hỏi" closeOnBackdrop={false} className="bg-surface-raised p-6 rounded-card w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-card-hover border border-line">
         <h3 className="font-bold text-lg mb-4 text-ink">Chỉnh sửa Nội Dung Câu Hỏi</h3>
 
         {question.usageCount && question.usageCount > 0 ? (
@@ -2044,8 +2037,7 @@ function QuizQuestionEditorModal({ question, chapters, onClose, onSuccess }: Qui
             {updateMutation.isPending ? 'Đang lưu...' : 'Lưu Thay Đổi'}
           </button>
         </div>
-      </div>
-    </div>
+      </Modal>
   );
 }
 
@@ -2093,8 +2085,7 @@ function NewQuizQuestionEditorModal({ quizId, chapters, onClose, onSuccess }: { 
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/50 p-4">
-      <div className="bg-surface-raised p-6 rounded-card w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-card-hover border border-line">
+    <Modal open onClose={onClose} bare ariaLabel="Thêm câu hỏi mới" closeOnBackdrop={false} className="bg-surface-raised p-6 rounded-card w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-card-hover border border-line">
         <h3 className="font-bold text-lg mb-4 text-ink">Thêm Câu Hỏi Mới</h3>
 
         <label className="block text-sm font-semibold text-ink mb-1">Nội dung câu hỏi</label>
@@ -2218,8 +2209,7 @@ function NewQuizQuestionEditorModal({ quizId, chapters, onClose, onSuccess }: { 
             {addMutation.isPending ? 'Đang thêm...' : 'Thêm Câu Hỏi'}
           </button>
         </div>
-      </div>
-    </div>
+      </Modal>
   );
 }
 
@@ -2236,8 +2226,7 @@ function FlashcardEditorModal({ flashcard, onClose, onSuccess }: { flashcard: { 
   });
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/50 p-4">
-      <div className="bg-surface-raised p-6 rounded-card w-full max-w-lg shadow-card-hover border border-line">
+    <Modal open onClose={onClose} bare ariaLabel="Chỉnh sửa flashcard" closeOnBackdrop={false} className="bg-surface-raised p-6 rounded-card w-full max-w-lg shadow-card-hover border border-line">
         <h3 className="font-bold text-lg mb-4 text-ink">Chỉnh sửa Flashcard</h3>
         <label className="block text-sm font-semibold text-ink mb-1">Mặt Trước (Thuật ngữ)</label>
         <textarea value={frontText} onChange={e => setFrontText(e.target.value)} className="w-full border border-line p-3 rounded-card mb-4 focus:border-accent focus:outline-none" rows={3} />
@@ -2248,8 +2237,7 @@ function FlashcardEditorModal({ flashcard, onClose, onSuccess }: { flashcard: { 
           <button onClick={onClose} className="px-5 py-2 bg-surface-hover font-semibold text-ink rounded-lg hover:bg-line-soft">Hủy</button>
           <button onClick={() => updateMutation.mutate()} disabled={updateMutation.isPending} className="px-5 py-2 bg-accent text-white font-bold rounded-lg hover:bg-accent-dark shadow disabled:opacity-50">Lưu Thay Đổi</button>
         </div>
-      </div>
-    </div>
+      </Modal>
   );
 }
 
@@ -2266,8 +2254,7 @@ function NewFlashcardEditorModal({ generationId, onClose, onSuccess }: { generat
   });
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/50 p-4">
-      <div className="bg-surface-raised p-6 rounded-card w-full max-w-lg shadow-card-hover border border-line">
+    <Modal open onClose={onClose} bare ariaLabel="Thêm flashcard mới" closeOnBackdrop={false} className="bg-surface-raised p-6 rounded-card w-full max-w-lg shadow-card-hover border border-line">
         <h3 className="font-bold text-lg mb-4 text-ink">Thêm Flashcard Mới</h3>
         <label className="block text-sm font-semibold text-ink mb-1">Mặt Trước (Thuật ngữ)</label>
         <textarea value={frontText} onChange={e => setFrontText(e.target.value)} className="w-full border border-line p-3 rounded-card mb-4 focus:border-accent focus:outline-none" rows={3} />
@@ -2278,8 +2265,7 @@ function NewFlashcardEditorModal({ generationId, onClose, onSuccess }: { generat
           <button onClick={onClose} className="px-5 py-2 bg-surface-hover font-semibold text-ink rounded-lg hover:bg-line-soft">Hủy</button>
           <button onClick={() => addMutation.mutate()} disabled={addMutation.isPending || !frontText.trim() || !backText.trim()} className="px-5 py-2 bg-accent text-white font-bold rounded-lg hover:bg-accent-dark shadow disabled:opacity-50">Thêm Thẻ</button>
         </div>
-      </div>
-    </div>
+      </Modal>
   );
 }
 
@@ -2364,7 +2350,7 @@ function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess 
             onClick={() => {
               setMaterialType('QUIZ');
             }}
-            className={`cursor-pointer rounded-card p-4 border-2 transition-all flex flex-col items-center text-center gap-2 ${materialType === 'QUIZ' ? 'border-accent bg-accent/5 shadow-md scale-[1.02]' : 'border-line hover:border-accent/40 bg-surface-raised'}`}
+            className={`cursor-pointer rounded-card p-4 border-2 transition flex flex-col items-center text-center gap-2 ${materialType === 'QUIZ' ? 'border-accent bg-accent/5 shadow-md scale-[1.02]' : 'border-line hover:border-accent/40 bg-surface-raised'}`}
           >
             <div className="flex justify-center"><FileQuestion className="w-9 h-9 text-accent" strokeWidth={1.5} /></div>
             <div className="font-bold text-ink">Bài Thi (Quiz)</div>
@@ -2374,7 +2360,7 @@ function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess 
             onClick={() => {
               setMaterialType('FLASHCARD');
             }}
-            className={`cursor-pointer rounded-card p-4 border-2 transition-all flex flex-col items-center text-center gap-2 ${materialType === 'FLASHCARD' ? 'border-accent bg-accent/5 shadow-md scale-[1.02]' : 'border-line hover:border-accent/40 bg-surface-raised'}`}
+            className={`cursor-pointer rounded-card p-4 border-2 transition flex flex-col items-center text-center gap-2 ${materialType === 'FLASHCARD' ? 'border-accent bg-accent/5 shadow-md scale-[1.02]' : 'border-line hover:border-accent/40 bg-surface-raised'}`}
           >
             <div className="flex justify-center"><Layers className="w-9 h-9 text-accent" strokeWidth={1.5} /></div>
             <div className="font-bold text-ink">Flashcard</div>
@@ -2384,7 +2370,7 @@ function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess 
             onClick={() => {
               setMaterialType('MINDMAP');
             }}
-            className={`cursor-pointer rounded-card p-4 border-2 transition-all flex flex-col items-center text-center gap-2 ${materialType === 'MINDMAP' ? 'border-accent bg-accent/5 shadow-md scale-[1.02]' : 'border-line hover:border-accent/40 bg-surface-raised'}`}
+            className={`cursor-pointer rounded-card p-4 border-2 transition flex flex-col items-center text-center gap-2 ${materialType === 'MINDMAP' ? 'border-accent bg-accent/5 shadow-md scale-[1.02]' : 'border-line hover:border-accent/40 bg-surface-raised'}`}
           >
             <div className="flex justify-center"><Workflow className="w-9 h-9 text-accent" strokeWidth={1.5} /></div>
             <div className="font-bold text-ink">Mindmap</div>
@@ -2421,7 +2407,7 @@ function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess 
             <div className="flex flex-col gap-2 pt-2">
               <span className="text-sm font-semibold text-ink">Phân loại Trắc nghiệm</span>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <label className={`cursor-pointer flex items-start gap-3 p-3 rounded-card border-2 transition-all ${quizType === 'LECTURE_QUIZ' ? 'border-accent bg-accent/5' : 'border-line bg-surface-raised hover:border-accent/20'}`}>
+                <label className={`cursor-pointer flex items-start gap-3 p-3 rounded-card border-2 transition ${quizType === 'LECTURE_QUIZ' ? 'border-accent bg-accent/5' : 'border-line bg-surface-raised hover:border-accent/20'}`}>
                   <input type="radio" name="quizTypeTop" value="LECTURE_QUIZ" checked={quizType === 'LECTURE_QUIZ'} onChange={() => {
                     setQuizType('LECTURE_QUIZ');
                   }} className="mt-1" />
@@ -2430,7 +2416,7 @@ function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess 
                     <span className="text-xs text-ink-muted">Gắn vào 1 Bài học. Luôn hiện giải thích, làm vô hạn lần, không tính giờ.</span>
                   </div>
                 </label>
-                <label className={`cursor-pointer flex items-start gap-3 p-3 rounded-card border-2 transition-all ${quizType === 'OFFICIAL_EXAM' ? 'border-accent bg-accent/5' : 'border-line bg-surface-raised hover:border-accent/20'}`}>
+                <label className={`cursor-pointer flex items-start gap-3 p-3 rounded-card border-2 transition ${quizType === 'OFFICIAL_EXAM' ? 'border-accent bg-accent/5' : 'border-line bg-surface-raised hover:border-accent/20'}`}>
                   <input type="radio" name="quizTypeTop" value="OFFICIAL_EXAM" checked={quizType === 'OFFICIAL_EXAM'} onChange={() => {
                     setQuizType('OFFICIAL_EXAM');
                   }} className="mt-1" />

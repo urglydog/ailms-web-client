@@ -137,7 +137,7 @@ export function EnrollButton({
             type="button"
             onClick={() => !inCart && addToCart.mutate(courseId)}
             disabled={inCart || addToCart.isPending}
-            className="flex-1 rounded-full border-2 border-accent bg-white px-6 py-3 font-display text-base font-bold text-accent hover:bg-accent/5 disabled:cursor-not-allowed disabled:opacity-60"
+            className="flex-1 rounded-full border-2 border-accent bg-surface-raised px-6 py-3 font-display text-base font-bold text-accent hover:bg-accent/5 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {inCart ? t('inCart') : addToCart.isPending ? t('adding') : t('addCart')}
           </button>
@@ -179,7 +179,7 @@ function WishlistHeartButton({
       aria-label={inWishlist ? t('wishlistRemove') : t('wishlistAdd')}
       aria-pressed={inWishlist}
       className={`flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-full border-2 transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
-        inWishlist ? 'border-danger bg-danger/5 text-danger' : 'border-accent bg-white text-accent hover:bg-accent/5'
+        inWishlist ? 'border-danger bg-danger/5 text-danger' : 'border-accent bg-surface-raised text-accent hover:bg-accent/5'
       }`}
     >
       <svg width="20" height="20" viewBox="0 0 24 24" fill={inWishlist ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

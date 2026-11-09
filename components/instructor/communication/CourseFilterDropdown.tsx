@@ -39,7 +39,7 @@ export function CourseFilterDropdown({
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className={`rounded-lg border border-line bg-white px-3.5 py-2 text-[13px] font-semibold text-ink hover:border-accent ${
+        className={`rounded-lg border border-line bg-surface-raised px-3.5 py-2 text-[13px] font-semibold text-ink hover:border-accent ${
           fullWidth ? 'w-full text-left' : ''
         }`}
       >
@@ -49,7 +49,7 @@ export function CourseFilterDropdown({
       {open && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className={`absolute left-0 top-full z-20 mt-1 overflow-hidden rounded-lg border border-line bg-white shadow-lg ${fullWidth ? 'w-full' : 'w-64'}`}>
+          <div className={`absolute left-0 top-full z-20 mt-1 overflow-hidden rounded-lg border border-line bg-surface-raised shadow-lg ${fullWidth ? 'w-full' : 'w-64'}`}>
             <div className="flex items-center gap-1.5 border-b border-line-soft px-2.5 py-2">
               <SearchIcon className="h-3.5 w-3.5 shrink-0 text-ink-muted" />
               <input

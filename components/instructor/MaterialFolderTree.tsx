@@ -1,5 +1,7 @@
 'use client';
 
+import { Modal } from '@/components/ui/Modal';
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { Folder, MoreVertical, Plus, Trash2, ChevronRight, ChevronDown, FolderOpen, MoveRight, Pencil, History } from 'lucide-react';
 import { useMutation, useQueryClient, type UseMutationResult } from '@tanstack/react-query';
@@ -495,15 +497,7 @@ export function MaterialFolderTree({
       )}
 
       {/* ─── Folder Picker Modal (thay thế raw-ID prompt) ─── */}
-      {folderPickerFor !== null && createPortal(
-        <div
-          className="fixed inset-0 z-[100000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
-          onClick={() => setFolderPickerFor(null)}
-        >
-          <div
-            className="bg-surface-raised rounded-card max-w-sm w-full p-5 shadow-2xl border border-line"
-            onClick={e => e.stopPropagation()}
-          >
+      {folderPickerFor !== null && <Modal open onClose={() => setFolderPickerFor(null)} bare ariaLabel="Chọn thư mục" zClass="z-[100000]" className="bg-surface-raised rounded-card max-w-sm w-full p-5 shadow-2xl border border-line">
             <h3 className="text-base font-bold text-ink mb-3 flex items-center gap-2">
               <Folder className="w-5 h-5 text-accent" /> {folderPickerFor.mode === 'copy' ? 'Chọn Thư mục Đích cho Bản sao' : 'Chọn Thư mục Đích'}
             </h3>
@@ -536,21 +530,10 @@ export function MaterialFolderTree({
                 Hủy
               </button>
             </div>
-          </div>
-        </div>,
-        document.body
-      )}
+          </Modal>}
 
       {/* ─── Create Folder Modal (name-only, no raw IDs) ─── */}
-      {createFolderModal !== null && createPortal(
-        <div
-          className="fixed inset-0 z-[100000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
-          onClick={() => setCreateFolderModal(null)}
-        >
-          <div
-            className="bg-surface-raised rounded-card max-w-xs w-full p-5 shadow-2xl border border-line"
-            onClick={e => e.stopPropagation()}
-          >
+      {createFolderModal !== null && <Modal open onClose={() => setCreateFolderModal(null)} bare ariaLabel="Tạo thư mục" zClass="z-[100000]" className="bg-surface-raised rounded-card max-w-xs w-full p-5 shadow-2xl border border-line">
             <h3 className="text-base font-bold text-ink mb-3">
               {createFolderModal.parentId ? 'Tạo Thư mục Con' : 'Tạo Thư mục Mới'}
             </h3>
@@ -587,21 +570,10 @@ export function MaterialFolderTree({
                 Tạo
               </button>
             </div>
-          </div>
-        </div>,
-        document.body
-      )}
+          </Modal>}
 
       {/* ─── Rename Material Modal ─── */}
-      {renameModal !== null && createPortal(
-        <div
-          className="fixed inset-0 z-[100000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
-          onClick={() => setRenameModal(null)}
-        >
-          <div
-            className="bg-surface-raised rounded-card max-w-xs w-full p-5 shadow-2xl border border-line"
-            onClick={e => e.stopPropagation()}
-          >
+      {renameModal !== null && <Modal open onClose={() => setRenameModal(null)} bare ariaLabel="Đổi tên học liệu" zClass="z-[100000]" className="bg-surface-raised rounded-card max-w-xs w-full p-5 shadow-2xl border border-line">
             <h3 className="text-base font-bold text-ink mb-3">Đổi tên Học liệu</h3>
             <input
               autoFocus
@@ -636,10 +608,7 @@ export function MaterialFolderTree({
                 Lưu
               </button>
             </div>
-          </div>
-        </div>,
-        document.body
-      )}
+          </Modal>}
 
       {versionHistoryFor !== null && (
         <VersionHistoryModal

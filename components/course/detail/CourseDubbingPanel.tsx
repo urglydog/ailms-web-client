@@ -19,7 +19,7 @@ export function CourseDubbingPanel({ languages }: { languages: string[] }) {
       <p className="m-0 mb-3 text-sm leading-relaxed text-ink-muted">{t('body')}</p>
       <div className="flex flex-wrap gap-2">
         {languages.map((lang) => (
-          <span key={lang} className="rounded-full border border-line bg-white px-3 py-1 text-[13px] font-semibold text-accent-dark">
+          <span key={lang} className="rounded-full border border-line bg-surface-raised px-3 py-1 text-[13px] font-semibold text-accent-dark">
             {lang}
           </span>
         ))}

@@ -1,6 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 'use client';
 
+import { Modal } from '@/components/ui/Modal';
+
 import { useRef, useState, type ChangeEvent } from 'react';
 import { useUpdateProfile, useUploadAvatar } from '@/hooks/useCurrentUser';
 import type { User } from '@/types/domain';
@@ -45,9 +47,7 @@ export default function EditProfileModal({ user, onClose, onSuccess }: EditProfi
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
-        <h2 className="text-xl font-bold mb-4 text-ink">Chỉnh sửa hồ sơ</h2>
+    <Modal open onClose={onClose} title="Chỉnh sửa hồ sơ" closeOnBackdrop={false}>
 
         <div className="mb-5 flex items-center gap-4">
           <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full bg-accent/10 font-display text-2xl font-bold text-accent-dark">
@@ -112,13 +112,12 @@ export default function EditProfileModal({ user, onClose, onSuccess }: EditProfi
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 bg-line text-ink py-2 rounded-lg hover:bg-line-dot font-semibold transition-colors"
+              className="flex-1 bg-tint text-ink py-2 rounded-lg hover:bg-line font-semibold transition-colors"
             >
               Đóng
             </button>
           </div>
         </form>
-      </div>
-    </div>
+    </Modal>
   );
 }

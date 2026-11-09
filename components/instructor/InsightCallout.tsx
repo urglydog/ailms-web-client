@@ -7,7 +7,7 @@ import { useTranslations } from 'next-intl';
 type InsightTone = 'warning' | 'info';
 
 const TONE_CLASS: Record<InsightTone, string> = {
-  warning: 'border-highlight bg-white text-ink',
+  warning: 'border-highlight bg-surface-raised text-ink',
   info: 'border-line bg-tint text-accent-dark',
 };
 

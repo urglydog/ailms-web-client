@@ -57,6 +57,7 @@ const DARK_PAIRS: Array<[string, string, string]> = [
   ['cyan-ink trên cyan', D.cyanInk, D.cyan],
   ['chữ tối cố định trên highlight', NIGHT, D.highlight],
   ['chữ tối cố định trên warning', NIGHT, D.warning],
+  ['chữ tối cố định trên star (huy hiệu hạng 1)', NIGHT, D.star],
 ];
 
 describe('bảng màu', () => {

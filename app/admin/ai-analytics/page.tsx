@@ -8,7 +8,7 @@ import { PageHeader } from '@/components/instructor/ui/PageHeader';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { api } from '@/lib/api/client';
 import { getAccessToken } from '@/lib/auth/token';
-import { COLORS } from '@/lib/theme/colors';
+import { useThemeColors } from '@/lib/theme/useThemeColors';
 
 interface AiUsageSummary {
   userId: number;
@@ -26,6 +26,7 @@ interface AiUsageDaily {
 
 /** Thống kê dùng AI: biểu đồ chi phí 30 ngày và bảng tiêu thụ theo học viên, có nút khóa/mở khóa quyền dùng AI. */
 export default function AiAnalyticsPage() {
+  const palette = useThemeColors();
   const t = useTranslations('admin.aiAnalytics');
   const locale = useLocale();
   const queryClient = useQueryClient();
@@ -72,21 +73,21 @@ export default function AiAnalyticsPage() {
     <>
       <PageHeader title={t('title')} subtitle={t('subtitle')} />
 
-      <section aria-labelledby="ai-cost-title" className="rounded-xl border border-line bg-white p-6 shadow-sm">
+      <section aria-labelledby="ai-cost-title" className="rounded-xl border border-line bg-surface-raised p-6 shadow-sm">
         <h2 id="ai-cost-title" className="m-0 mb-4 text-sm font-semibold text-ink">
           {t('chartTitle')}
         </h2>
         {dailyData && dailyData.length > 0 ? (
           <ResponsiveContainer width="100%" height={240}>
             <AreaChart data={dailyData}>
-              <CartesianGrid strokeDasharray="3 3" stroke={COLORS.lineSoft} />
-              <XAxis dataKey="day" tick={{ fontSize: 11 }} />
-              <YAxis tick={{ fontSize: 11 }} tickFormatter={(v: number) => `$${v.toFixed(2)}`} />
+              <CartesianGrid strokeDasharray="3 3" stroke={palette.lineSoft} />
+              <XAxis dataKey="day" tick={{ fontSize: 11, fill: palette.inkMuted }} />
+              <YAxis tick={{ fontSize: 11, fill: palette.inkMuted }} tickFormatter={(v: number) => `$${v.toFixed(2)}`} />
               <Tooltip
                 formatter={(value) => [`$${Number(value ?? 0).toFixed(4)}`, t('cost')]}
                 labelFormatter={(label) => t('day', { date: String(label ?? '') })}
               />
-              <Area type="monotone" dataKey="totalCost" stroke={COLORS.accent} fill={COLORS.accent} fillOpacity={0.15} />
+              <Area type="monotone" dataKey="totalCost" stroke={palette.accent} fill={palette.accent} fillOpacity={0.15} />
             </AreaChart>
           </ResponsiveContainer>
         ) : (
@@ -94,7 +95,7 @@ export default function AiAnalyticsPage() {
         )}
       </section>
 
-      <div className="overflow-hidden rounded-xl border border-line bg-white shadow-sm">
+      <div className="overflow-hidden rounded-xl border border-line bg-surface-raised shadow-sm">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-line-soft">
             <thead className="bg-surface">
@@ -106,13 +107,13 @@ export default function AiAnalyticsPage() {
                 <th scope="col" className={`${th} text-right`}>{t('cols.actions')}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-line-soft bg-white">
+            <tbody className="divide-y divide-line-soft bg-surface-raised">
               {usageData?.map((row: AiUsageSummary) => (
                 <tr key={row.userId} className="transition-colors hover:bg-surface">
                   <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-ink">{row.email}</td>
                   <td className="whitespace-nowrap px-6 py-4 text-sm">
                     {row.isAiLocked ? (
-                      <span className="inline-flex items-center rounded-md bg-white px-2 py-1 text-xs font-medium text-danger ring-1 ring-inset ring-danger/40">{t('locked')}</span>
+                      <span className="inline-flex items-center rounded-md bg-surface-raised px-2 py-1 text-xs font-medium text-danger ring-1 ring-inset ring-danger/40">{t('locked')}</span>
                     ) : (
                       <span className="inline-flex items-center rounded-md bg-success-tint px-2 py-1 text-xs font-medium text-success-ink">{t('active')}</span>
                     )}
@@ -125,7 +126,7 @@ export default function AiAnalyticsPage() {
                       onClick={() => toggleLockMutation.mutate({ userId: row.userId, isLocked: !row.isAiLocked })}
                       disabled={toggleLockMutation.isPending}
                       aria-label={`${row.isAiLocked ? t('unlock') : t('lock')}: ${row.email}`}
-                      className={`inline-flex items-center rounded-md bg-white px-3 py-1.5 text-xs font-semibold shadow-sm ring-1 ring-inset disabled:opacity-50 ${
+                      className={`inline-flex items-center rounded-md bg-surface-raised px-3 py-1.5 text-xs font-semibold shadow-sm ring-1 ring-inset disabled:opacity-50 ${
                         row.isAiLocked ? 'text-ink ring-line hover:bg-surface' : 'text-danger ring-danger/40 hover:bg-danger/5'
                       }`}
                     >

@@ -19,7 +19,7 @@ export function CourseThumb({
           alt={title}
           fill
           sizes="(min-width: 1024px) 25vw, 50vw"
-          className="object-cover transition-transform duration-[400ms] ease-soft group-hover:scale-105"
+          className="object-cover transition-transform duration-300 ease-soft group-hover:scale-[1.03]"
         />
       ) : (
         <div className="flex h-full w-full items-center justify-center text-accent">

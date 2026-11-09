@@ -32,7 +32,7 @@ export function NotificationMenu({ notifications, unreadCount, onMarkRead, onMar
   const visible = groups[tab];
 
   return (
-    <div className="w-96 max-w-[calc(100vw-1.5rem)] rounded-panel border border-line bg-white p-2 shadow-card-hover">
+    <div className="w-96 max-w-[calc(100vw-1.5rem)] rounded-panel border border-line bg-surface-raised p-2 shadow-card-hover">
       <div className="flex items-center justify-between border-b border-line-soft px-2 pb-2 pt-1">
         <span className="font-display text-[13.5px] font-bold text-ink">{t('title')}</span>
         {unreadCount > 0 && (

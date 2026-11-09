@@ -25,7 +25,7 @@ export default function AboutPage() {
 
       <div className="mt-10 flex flex-col gap-6">
         {VALUES.map((v) => (
-          <div key={v.title} className="rounded-card border border-line bg-white p-5 shadow-card">
+          <div key={v.title} className="rounded-card border border-line bg-surface-raised p-5 shadow-card">
             <h2 className="m-0 font-display text-[16px] font-semibold text-ink">{v.title}</h2>
             <p className="mt-1.5 text-[14px] leading-[1.6] text-ink-muted">{v.desc}</p>
           </div>

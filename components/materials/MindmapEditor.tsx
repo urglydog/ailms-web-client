@@ -791,7 +791,7 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
                     {showLayouts && (
                         <div className="absolute top-full left-0 mt-2 w-64 bg-surface-raised border border-line rounded-card shadow-card-hover p-3 grid grid-cols-2 gap-2 z-50">
                             {LAYOUTS.map(l => (
-                                <button key={l.id} onClick={() => { setMapStyle(l.id); setShowLayouts(false); applyLayout(nodes, edges, l.id); }} className={`flex flex-col items-center justify-center p-3 rounded-lg border transition-all ${mapStyle === l.id ? 'border-accent bg-accent/5' : 'border-line hover:border-line-dot hover:bg-surface-hover'}`}>
+                                <button key={l.id} onClick={() => { setMapStyle(l.id); setShowLayouts(false); applyLayout(nodes, edges, l.id); }} className={`flex flex-col items-center justify-center p-3 rounded-lg border transition ${mapStyle === l.id ? 'border-accent bg-accent/5' : 'border-line hover:border-line-dot hover:bg-surface-hover'}`}>
                                     <l.Icon className="w-5 h-5 mb-1 text-ink-muted" strokeWidth={1.75} />
                                     <span className="text-[10px] font-bold text-center text-ink-muted leading-tight">{l.name}</span>
                                 </button>
@@ -854,20 +854,20 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
           panOnScrollMode={PanOnScrollMode.Free}
         >
           {readOnly && (
-              <Panel position="bottom-center" className="bg-white/90 backdrop-blur border border-line px-4 py-2 rounded-full shadow-lg mb-4 flex gap-4 text-xs font-bold text-ink-muted">
+              <Panel position="bottom-center" className="bg-surface-raised/90 backdrop-blur border border-line px-4 py-2 rounded-full shadow-lg mb-4 flex gap-4 text-xs font-bold text-ink-muted">
                   <span className="flex items-center gap-1"><MousePointer2 className="w-3.5 h-3.5" strokeWidth={1.75} /> Shift+Scroll to pan</span>
                   <span className="flex items-center gap-1"><Move className="w-3.5 h-3.5" strokeWidth={1.75} /> Drag/Pinch to zoom</span>
               </Panel>
           )}
-          <Controls className="bg-white border-line shadow-md" />
-          <MiniMap className="bg-white border-line shadow-md rounded-lg overflow-hidden" zoomable pannable nodeStrokeColor="#E2E8F0" nodeColor="#F1F5F9" />
+          <Controls className="bg-surface-raised border-line shadow-md" />
+          <MiniMap className="bg-surface-raised border-line shadow-md rounded-lg overflow-hidden" zoomable pannable nodeStrokeColor="#E2E8F0" nodeColor="#F1F5F9" />
           <Background gap={20} size={1} color="#E2E8F0" />
         </ReactFlow>
 
         {/* Editing Node Modal */}
         {editingNode && (
           <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm">
-            <div className="bg-white p-6 rounded-2xl shadow-2xl border border-line-soft w-96 max-w-[90%] animate-in zoom-in-95">
+            <div className="bg-surface-raised p-6 rounded-2xl shadow-2xl border border-line-soft w-96 max-w-[90%] animate-in zoom-in-95">
               <h3 className="text-sm font-bold text-ink mb-3 flex items-center gap-2"><Pencil className="w-4 h-4" strokeWidth={1.75} /> Nhập nội dung</h3>
               <textarea
                 autoFocus
@@ -884,7 +884,7 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
                         setEditingNode(null);
                     }
                 }}
-                className="w-full border border-line rounded-xl p-3 text-sm focus:ring-2 focus:ring-accent/20 focus:border-accent resize-none h-28 text-ink outline-none transition-all font-medium"
+                className="w-full border border-line rounded-xl p-3 text-sm focus:ring-2 focus:ring-accent/20 focus:border-accent resize-none h-28 text-ink outline-none transition font-medium"
               />
               <div className="flex gap-2 justify-end mt-5">
                 <button onClick={() => setEditingNode(null)} className="px-4 py-2.5 bg-surface text-ink-muted rounded-xl text-xs font-bold hover:bg-tint">Hủy</button>
@@ -904,7 +904,7 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
         )}
 
         {/* Nút ẩn/hiện sidebar phải — theo yêu cầu của bạn, khôi phục lại (đợt trước đã bỏ hẳn).
-            Lần này dùng nền accent tương phản rõ thay vì bg-white/border-gray-200/text-gray-500
+            Lần này dùng nền accent tương phản rõ thay vì bg-white/border-line/text-ink-muted
             gần như vô hình như bản gốc, để không lặp lại lỗi khó thấy đã sửa. */}
         {!readOnly && (
             <button
@@ -933,7 +933,7 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
                               <label className="text-[11px] font-bold text-ink-faint uppercase tracking-wider mb-3 block">Color Theme</label>
                               <div className="grid gap-2">
                                   {Object.entries(THEME_PRESETS).map(([theme, t]) => (
-                                      <button key={theme} onClick={() => { setColorTheme(theme); applyTheme(theme, nodes, edges); }} className={`p-3 rounded-card border text-left transition-all flex items-center gap-3 ${colorTheme === theme ? 'border-accent bg-accent/5 shadow-card' : 'border-line hover:border-line-dot hover:bg-surface-hover'}`}>
+                                      <button key={theme} onClick={() => { setColorTheme(theme); applyTheme(theme, nodes, edges); }} className={`p-3 rounded-card border text-left transition flex items-center gap-3 ${colorTheme === theme ? 'border-accent bg-accent/5 shadow-card' : 'border-line hover:border-line-dot hover:bg-surface-hover'}`}>
                                           {/* Preview: node gốc thu nhỏ đúng màu theme, thay vì chỉ dải màu trừu tượng */}
                                           <div
                                               className="shrink-0 flex items-center justify-center w-9 h-9 rounded-full text-[10px] font-bold border border-black/5"
@@ -972,7 +972,7 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
                                                     setTimeout(() => applyTheme(colorTheme, nextNodes, edges), 0);
                                                     return nextNodes;
                                                 });
-                                            }} className={`flex items-center justify-center py-2.5 rounded-lg border transition-all ${nodes.find(n => n.selected)?.data.shape === s.id || (s.id === 'rect' && !nodes.find(n => n.selected)?.data.shape) ? 'bg-accent/5 border-accent text-accent' : 'bg-surface-hover border-line text-ink-muted hover:border-line-dot'}`}>
+                                            }} className={`flex items-center justify-center py-2.5 rounded-lg border transition ${nodes.find(n => n.selected)?.data.shape === s.id || (s.id === 'rect' && !nodes.find(n => n.selected)?.data.shape) ? 'bg-accent/5 border-accent text-accent' : 'bg-surface-hover border-line text-ink-muted hover:border-line-dot'}`}>
                                                 {s.icon}
                                             </button>
                                         ))}

@@ -19,7 +19,7 @@ export function EditTabs({ courseId, pathname, settingsOpen }: EditTabsProps) {
   const active = settingsOpen ? null : activeEditTab(pathname, courseId);
 
   return (
-    <nav aria-label={t('tabsAria')} className="border-b border-line bg-white">
+    <nav aria-label={t('tabsAria')} className="border-b border-line bg-surface-raised">
       <div className="mx-auto flex w-full max-w-[1400px] gap-6 overflow-x-auto px-4 sm:px-8">
         {GROUPS.map((group) => (
           <div key={group} className="flex shrink-0 flex-col">

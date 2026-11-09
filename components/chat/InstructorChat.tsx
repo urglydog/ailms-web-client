@@ -1,5 +1,7 @@
 'use client';
 
+import { TypingDots } from '@/components/ui/TypingDots';
+
 import React, { useState, useRef, useEffect } from 'react';
 import { toast } from 'sonner';
 import { api } from '@/lib/api/client';
@@ -50,7 +52,7 @@ function renderFormattedMessage(text: string) {
               }
               if (part.startsWith('`') && part.endsWith('`')) {
                 return (
-                  <code key={pIdx} className="rounded bg-blue-50 px-1.5 py-0.5 font-mono text-[11px] text-blue-700 border border-blue-100">
+                  <code key={pIdx} className="rounded bg-tint px-1.5 py-0.5 font-mono text-[11px] text-accent-dark border border-line">
                     {part.slice(1, -1)}
                   </code>
                 );
@@ -122,7 +124,10 @@ export function InstructorChat() {
     <>
       {/* Floating Toggle Button */}
       <button
+        type="button"
         onClick={() => setIsOpen(!isOpen)}
+        aria-label={isOpen ? "Đóng trợ lý giảng viên AI" : "Mở trợ lý giảng viên AI"}
+        aria-expanded={isOpen}
         className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-xl bg-accent text-white shadow-md btn-tactile"
         title="Trợ lý Giảng viên AI"
       >
@@ -139,10 +144,12 @@ export function InstructorChat() {
           nhất quán trải nghiệm giữa 2 vai trò; trước đây khung này dùng w-96/height 520px riêng,
           thiếu overflow-hidden trên container ngoài khiến phần trên (bo góc rounded-t-2xl) bị
           hở/che khi cửa sổ trình duyệt thấp, và animation mở/đóng khác hẳn (scale-95 thay vì
-          scale-0 + translate-y-20, duration-300 thay vì duration-500 + easing riêng). */}
+          scale-0 + translate-y-20, duration-300 thay vì duration-500 + easing riêng).
+          (08/11/2026) Chuẩn hóa chuyển động: không còn mở từ scale(0) và 500ms — giờ scale 0.95 +
+          trượt 12px trong 200ms, chỉ animate transform/opacity (review-animations). */}
       <div
-        className={`fixed bottom-24 right-6 flex h-[min(500px,70vh)] w-[calc(100vw-2rem)] max-w-[400px] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl border border-line z-50 origin-bottom-right transition-all duration-500 ease-[cubic-bezier(0.2,1,0.2,1)] ${
-          isOpen ? 'scale-100 opacity-100 translate-y-0' : 'scale-0 opacity-0 translate-y-20 pointer-events-none'
+        className={`fixed bottom-24 right-6 flex h-[min(500px,70vh)] w-[calc(100vw-2rem)] max-w-[400px] flex-col overflow-hidden rounded-2xl bg-surface-raised shadow-card-hover border border-line z-50 origin-bottom-right transition-[transform,opacity] duration-200 ease-soft ${
+          isOpen ? 'scale-100 opacity-100 translate-y-0' : 'pointer-events-none translate-y-3 scale-95 opacity-0'
         }`}
       >
         {/* Header */}
@@ -156,9 +163,11 @@ export function InstructorChat() {
               <span className="text-[10px] text-blue-100">Sẵn sàng hỗ trợ phân tích khóa học</span>
             </div>
           </div>
-          <button 
+          <button
+            type="button"
             onClick={() => setIsOpen(false)}
-            className="text-white/80 hover:text-white text-sm"
+            aria-label="Đóng trợ lý"
+            className="flex h-9 w-9 items-center justify-center rounded-md text-sm text-white/80 transition-colors duration-150 hover:bg-white/10 hover:text-white"
           >
             ✕
           </button>
@@ -184,8 +193,8 @@ export function InstructorChat() {
               <div 
                 className={`px-4 py-2.5 rounded-2xl text-sm ${
                   msg.role === 'user'
-                    ? 'bg-blue-600 text-white rounded-br-none shadow-sm'
-                    : 'bg-white text-ink border border-line-soft rounded-bl-none shadow-sm'
+                    ? 'bg-accent text-white rounded-br-none shadow-sm'
+                    : 'bg-surface-raised text-ink border border-line-soft rounded-bl-none shadow-sm'
                 }`}
               >
                 {msg.role === 'assistant' ? renderFormattedMessage(msg.text) : msg.text}
@@ -193,7 +202,7 @@ export function InstructorChat() {
 
               {/* Enhanced UI Card for Assistant Data Payload */}
               {msg.data && (
-                <div className="mt-2 w-full rounded-xl bg-white p-3 border border-line text-xs shadow-sm space-y-1.5">
+                <div className="mt-2 w-full rounded-xl bg-surface-raised p-3 border border-line text-xs shadow-sm space-y-1.5">
                   {msg.data.data && (
                     <div className="flex justify-between items-center border-b border-line-soft pb-1.5">
                       <span className="text-ink-muted font-medium">Doanh thu:</span>
@@ -218,17 +227,15 @@ export function InstructorChat() {
           ))}
 
           {loading && (
-            <div className="flex items-center gap-1.5 bg-white border border-line-soft p-3 rounded-2xl rounded-bl-none w-20 shadow-sm">
-              <span className="h-2 w-2 rounded-full bg-blue-600 animate-bounce" />
-              <span className="h-2 w-2 rounded-full bg-blue-600 animate-bounce [animation-delay:0.2s]" />
-              <span className="h-2 w-2 rounded-full bg-blue-600 animate-bounce [animation-delay:0.4s]" />
+            <div className="flex items-center gap-1.5 bg-surface-raised border border-line-soft p-3 rounded-2xl rounded-bl-none w-20 shadow-sm">
+              <TypingDots />
             </div>
           )}
           <div ref={messagesEndRef} />
         </div>
 
         {/* Input Footer */}
-        <div className="p-3 bg-white border-t border-line-soft shrink-0">
+        <div className="p-3 bg-surface-raised border-t border-line-soft shrink-0">
           <form 
             onSubmit={(e: React.FormEvent) => { e.preventDefault(); sendMessage(); }}
             className="flex items-center gap-2"
@@ -239,13 +246,13 @@ export function InstructorChat() {
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange(e.target.value)}
               placeholder="Hỏi trợ lý (VD: Doanh thu tháng này?)..."
               maxLength={MAX_MESSAGE_LENGTH}
-              className="flex-1 bg-surface border border-line rounded-full px-4 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-ink"
+              className="flex-1 bg-surface border border-line rounded-full px-4 py-2 text-sm focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-colors text-ink"
               disabled={loading}
             />
             <button
               type="submit"
               disabled={!input.trim() || loading}
-              className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-600 text-white disabled:opacity-50 disabled:bg-gray-300 transition-colors"
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-accent text-white disabled:opacity-50 disabled:bg-line transition-colors"
             >
               ↑
             </button>

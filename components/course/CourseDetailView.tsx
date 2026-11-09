@@ -40,7 +40,7 @@ export function CourseDetailView({ course }: { course: CourseDetail }) {
       <CourseHero course={course} />
 
       <div className="shell py-10">
-        <div className="grid gap-10 lg:grid-cols-[1fr_340px]">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[minmax(0,1fr)_340px]">
           {/* ── Cột nội dung ── */}
           <div className="flex min-w-0 flex-col gap-8">
             <CourseLiveBanner courseId={course.id} />

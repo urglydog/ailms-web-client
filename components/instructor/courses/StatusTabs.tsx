@@ -41,7 +41,7 @@ export function StatusTabs({ counts, active, onChange }: StatusTabsProps) {
               }
             }}
             className={`rounded-full px-4 py-2 text-[13px] font-semibold transition-colors ${
-              selected ? 'bg-accent text-white' : 'border border-line bg-white text-ink-muted hover:border-accent hover:text-ink'
+              selected ? 'bg-accent text-white' : 'border border-line bg-surface-raised text-ink-muted hover:border-accent hover:text-ink'
             }`}
           >
             {t(status)} <span className={selected ? 'text-white/85' : 'text-ink-muted'}>{counts[status]}</span>

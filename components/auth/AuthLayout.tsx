@@ -47,7 +47,7 @@ export function AuthLayout({ title, children, footer }: { title: string; childre
         </div>
 
         <div
-          className={`flex flex-col justify-center p-8 transition-all duration-300 sm:p-10 ${
+          className={`flex flex-col justify-center p-8 transition duration-300 sm:p-10 ${
             entered ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'
           }`}
         >

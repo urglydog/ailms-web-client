@@ -192,7 +192,7 @@ function CartCheckoutContent() {
           <button
             type="button"
             onClick={() => (window.history.length > 1 ? router.back() : router.push('/cart'))}
-            className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-4 py-2 text-sm font-medium text-ink-muted transition-colors hover:bg-tint hover:text-ink"
+            className="inline-flex items-center gap-2 rounded-full border border-line bg-surface-raised px-4 py-2 text-sm font-medium text-ink-muted transition-colors hover:bg-tint hover:text-ink"
           >
             <ArrowLeft size={16} aria-hidden />
             {t('checkout.backToCart')}
@@ -200,7 +200,7 @@ function CartCheckoutContent() {
         </div>
         <CheckoutSteps current="payment" />
 
-        <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
           <div className="space-y-6">
             <div className="card p-6">
               <h2 className="mb-4 font-display text-lg font-bold text-ink">

@@ -55,7 +55,7 @@ export function MessagesInbox({
     // thoại — gần như không dùng được. Giờ 1 cột trên mobile, LUÔN chỉ hiện ĐÚNG 1 trong 2 khối
     // (danh sách hoặc hội thoại đang chọn) tùy theo `selectedId`, có nút "← Quay lại" để đổi
     // khối; từ `md:` trở lên giữ nguyên 2 cột luôn hiện song song như cũ.
-    <div className="grid h-[calc(100vh-180px)] min-h-[480px] grid-cols-1 overflow-hidden rounded-xl border border-line bg-white shadow-sm md:grid-cols-[300px_1fr]">
+    <div className="grid h-[calc(100vh-180px)] min-h-[480px] grid-cols-1 overflow-hidden rounded-xl border border-line bg-surface-raised shadow-sm md:grid-cols-[300px_1fr]">
       <div className={`flex-col border-r border-line-soft ${selectedId ? 'hidden md:flex' : 'flex'}`}>
         <div className="flex items-center justify-between gap-2 border-b border-line-soft p-3">
           <span className="font-display text-[14px] font-bold text-ink">Hội thoại</span>
@@ -83,13 +83,13 @@ export function MessagesInbox({
             {showSortMenu && (
               <>
                 <div className="fixed inset-0 z-10" onClick={() => setShowSortMenu(false)} />
-                <div className="absolute right-0 top-full z-20 mt-1 w-32 overflow-hidden rounded-lg border border-line bg-white py-1 shadow-lg">
+                <div className="absolute right-0 top-full z-20 mt-1 w-32 overflow-hidden rounded-lg border border-line bg-surface-raised py-1 shadow-lg">
                   {(['newest', 'oldest'] as SortOption[]).map((option) => (
                     <button
                       key={option}
                       type="button"
                       onClick={() => { setSort(option); setShowSortMenu(false); }}
-                      className={`block w-full px-3 py-1.5 text-left text-[12.5px] hover:bg-surface ${sort === option ? 'font-bold text-cyan-700' : 'text-ink'}`}
+                      className={`block w-full px-3 py-1.5 text-left text-[12.5px] hover:bg-surface ${sort === option ? 'font-bold text-accent-dark' : 'text-ink'}`}
                     >
                       {option === 'newest' ? 'Mới nhất' : 'Cũ nhất'}
                     </button>
@@ -112,7 +112,7 @@ export function MessagesInbox({
               type="button"
               onClick={() => setSelectedId(c.id)}
               className={`flex w-full items-start gap-2.5 border-b border-line-soft px-3 py-2.5 text-left transition-colors ${
-                selectedId === c.id ? 'bg-cyan-50' : 'hover:bg-surface'
+                selectedId === c.id ? 'bg-tint' : 'hover:bg-surface'
               }`}
             >
               <Avatar name={c.otherUserName} avatarUrl={c.otherUserAvatarUrl} size={34} />
@@ -120,7 +120,7 @@ export function MessagesInbox({
                 <div className="flex items-center justify-between gap-2">
                   <span className="truncate text-[13px] font-semibold text-ink">{c.otherUserName}</span>
                   {c.unreadCount > 0 && (
-                    <span className="shrink-0 rounded-full bg-cyan-600 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                    <span className="shrink-0 rounded-full bg-accent px-1.5 py-0.5 text-[10px] font-bold text-white">
                       {c.unreadCount > 9 ? '9+' : c.unreadCount}
                     </span>
                   )}
@@ -194,7 +194,7 @@ function ConversationThread({
               <Avatar name={m.senderName} avatarUrl={m.senderAvatarUrl} size={24} />
               <div
                 className={`max-w-[70%] rounded-xl px-3 py-2 text-[13px] ${
-                  m.mine ? 'bg-cyan-600 text-white' : 'bg-tint text-ink'
+                  m.mine ? 'bg-accent text-white' : 'bg-tint text-ink'
                 }`}
               >
                 {m.content}
@@ -222,7 +222,7 @@ function ConversationThread({
           type="button"
           onClick={handleSend}
           disabled={!content.trim() || sendMessage.isPending}
-          className="flex shrink-0 items-center justify-center rounded-lg bg-cyan-600 px-3.5 py-2 text-white hover:bg-cyan-700 disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex shrink-0 items-center justify-center rounded-lg bg-accent px-3.5 py-2 text-white hover:bg-accent-dark disabled:cursor-not-allowed disabled:opacity-50"
         >
           <SendIcon />
         </button>

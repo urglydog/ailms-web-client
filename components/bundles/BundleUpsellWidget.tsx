@@ -40,14 +40,14 @@ function BundleUpsellCard({ bundle, currentCourseId }: { bundle: CourseBundle; c
   };
 
   return (
-    <div className="rounded-2xl border border-cyan-100 bg-gradient-to-br from-cyan-50 to-blue-50 overflow-hidden">
+    <div className="rounded-2xl border border-line-soft bg-gradient-to-br from-tint to-tint overflow-hidden">
       {/* Top accent */}
-      <div className="h-1 bg-gradient-to-r from-cyan-400 to-blue-500" />
+      <div className="h-1 bg-gradient-to-r from-cyan-400 to-accent" />
 
       <div className="p-4">
         {/* Badge + title */}
         <div className="flex items-start gap-2 mb-2.5">
-          <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-cyan-600 px-2.5 py-0.5 text-[11px] font-bold text-white shadow">
+          <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-accent px-2.5 py-0.5 text-[11px] font-bold text-white shadow">
             🎁 -{bundle.discountPercent}%
           </span>
           <h4 className="text-sm font-bold text-ink leading-tight line-clamp-2">
@@ -64,7 +64,7 @@ function BundleUpsellCard({ bundle, currentCourseId }: { bundle: CourseBundle; c
             <ul className="space-y-1">
               {otherCourses.map((c) => (
                 <li key={c.id} className="flex items-center gap-1.5 text-xs text-ink">
-                  <span className="text-cyan-500 flex-shrink-0">✓</span>
+                  <span className="text-accent flex-shrink-0">✓</span>
                   <span className="truncate">{c.title}</span>
                 </li>
               ))}
@@ -73,12 +73,12 @@ function BundleUpsellCard({ bundle, currentCourseId }: { bundle: CourseBundle; c
         )}
 
         {/* Price row */}
-        <div className="flex items-center justify-between gap-2 rounded-xl bg-white/70 border border-white px-3 py-2.5 shadow-sm">
+        <div className="flex items-center justify-between gap-2 rounded-xl bg-surface-raised/70 border border-line px-3 py-2.5 shadow-sm">
           <div className="text-xs text-ink-muted">
             <span className="line-through text-ink-faint">{fmt(bundle.originalPrice)}</span>
             <span className="ml-1.5 text-danger font-bold">-{fmt(bundle.discountAmount)}</span>
           </div>
-          <span className="text-base font-extrabold text-cyan-700">{fmt(bundle.finalPrice)}</span>
+          <span className="text-base font-extrabold text-accent-dark">{fmt(bundle.finalPrice)}</span>
         </div>
 
         {/* CTA — thêm mọi khóa còn thiếu của gói vào giỏ hàng rồi chuyển tới /cart. Giỏ hàng tự
@@ -87,7 +87,7 @@ function BundleUpsellCard({ bundle, currentCourseId }: { bundle: CourseBundle; c
           type="button"
           onClick={() => void handleAddBundle()}
           disabled={addingBundle}
-          className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 py-2.5 text-sm font-bold text-white shadow hover:from-cyan-700 hover:to-blue-700 transition-all active:scale-95 disabled:opacity-60"
+          className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-accent to-accent py-2.5 text-sm font-bold text-white shadow hover:from-accent-dark hover:to-accent-dark transition active:scale-95 disabled:opacity-60"
         >
           {addingBundle ? 'Đang thêm...' : 'Mua gói để tiết kiệm thêm →'}
         </button>

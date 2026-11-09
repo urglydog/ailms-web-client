@@ -1,5 +1,7 @@
 'use client';
 
+import { PopoverMotion } from '@/components/ui/PopoverMotion';
+
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
@@ -111,8 +113,7 @@ export function ExploreMenu({ categories, liveNow }: ExploreMenuProps) {
         <ChevronDown size={14} aria-hidden className={`transition-transform duration-150 ${open ? 'rotate-180' : ''}`} />
       </button>
 
-      {open && (
-        <div className="absolute left-0 top-full z-[200] flex w-[min(680px,92vw)] overflow-hidden rounded-panel border border-line bg-surface-raised shadow-card-hover">
+      <PopoverMotion open={open} origin="top left" className="absolute left-0 top-full z-[200] flex w-[min(680px,92vw)] overflow-hidden rounded-panel border border-line bg-surface-raised shadow-card-hover">
           {/* Cột trái: nhóm danh mục + "Khám phá thêm". Rê chuột hoặc bấm để đổi nhóm đang xem. */}
           <div className="w-[200px] shrink-0 border-r border-line-soft bg-tint/40 p-2">
             <Link href="/courses" onClick={close} className={ROW}>
@@ -171,8 +172,7 @@ export function ExploreMenu({ categories, liveNow }: ExploreMenuProps) {
               )}
             </div>
           </div>
-        </div>
-      )}
+        </PopoverMotion>
     </div>
   );
 }

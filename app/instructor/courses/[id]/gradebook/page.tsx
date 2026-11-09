@@ -1,5 +1,7 @@
 'use client';
 
+import { Modal } from '@/components/ui/Modal';
+
 import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
@@ -69,7 +71,7 @@ export default function InstructorGradebookPage() {
           </div>
           <button
             onClick={() => router.push(`/instructor/courses/${courseId}/edit/materials`)}
-            className="bg-ink text-white px-4 py-2 rounded-xl text-sm font-bold shadow hover:bg-ink/90 transition-all"
+            className="bg-ink text-white px-4 py-2 rounded-xl text-sm font-bold shadow hover:bg-ink/90 transition"
           >
             Kho Học Liệu & Đề Thi
           </button>
@@ -77,7 +79,7 @@ export default function InstructorGradebookPage() {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="card p-6 border-l-4 border-blue-500">
+          <div className="card p-6 border-l-4 border-accent">
             <div className="text-xs font-bold uppercase tracking-wider text-ink-muted">Tổng học viên ghi danh</div>
             <div className="text-3xl font-extrabold text-ink mt-2">{gradebook.totalStudents} <span className="text-sm font-normal text-ink-muted">học viên</span></div>
           </div>
@@ -91,7 +93,7 @@ export default function InstructorGradebookPage() {
           </div>
           <div className="card p-6 border-l-4 border-purple-500">
             <div className="text-xs font-bold uppercase tracking-wider text-ink-muted">Tổng số lượt làm bài</div>
-            <div className="text-3xl font-extrabold text-purple-600 mt-2">{gradebook.totalAttempts} <span className="text-sm font-normal text-ink-muted">lượt</span></div>
+            <div className="text-3xl font-extrabold text-purple-600 dark:text-purple-300 mt-2">{gradebook.totalAttempts} <span className="text-sm font-normal text-ink-muted">lượt</span></div>
           </div>
         </div>
 
@@ -128,7 +130,7 @@ export default function InstructorGradebookPage() {
                     </td>
                     <td className="px-6 py-4 text-center font-semibold">
                       {student.attemptCount > 0 ? (
-                        <span className="bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full text-xs font-bold">
+                        <span className="bg-tint text-accent-dark px-2.5 py-1 rounded-full text-xs font-bold">
                           {student.attemptCount} lượt
                         </span>
                       ) : (
@@ -163,7 +165,7 @@ export default function InstructorGradebookPage() {
                       {student.latestAttemptId ? (
                         <button
                           onClick={() => setSelectedAttemptId(student.latestAttemptId)}
-                          className="bg-accent text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-accent-dark transition-all flex items-center gap-1 ml-auto"
+                          className="bg-accent text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-accent-dark transition flex items-center gap-1 ml-auto"
                         >
                           Chi Tiết Bài Làm
                         </button>
@@ -188,8 +190,7 @@ export default function InstructorGradebookPage() {
 
       {/* Attempt Inspection Modal */}
       {selectedAttemptId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
-          <div className="card w-full max-w-3xl max-h-[90vh] flex flex-col p-6 shadow-2xl bg-white rounded-2xl my-8">
+        <Modal open onClose={() => setSelectedAttemptId(null)} bare ariaLabel="Chi tiết bài làm học viên" closeOnBackdrop={false} className="card w-full max-w-3xl max-h-[90vh] flex flex-col p-6 shadow-2xl bg-surface-raised rounded-2xl my-8">
             <div className="flex justify-between items-center border-b border-line pb-4 mb-4">
               <div>
                 <h3 className="text-lg font-bold text-ink flex items-center gap-2">
@@ -246,7 +247,7 @@ export default function InstructorGradebookPage() {
                           if (isCorrect && isSelected) {
                             style += "border-success bg-success-tint text-success-ink font-bold";
                           } else if (isCorrect) {
-                            style += "border-emerald-400 bg-success-tint text-success-ink font-semibold";
+                            style += "border-success bg-success-tint text-success-ink font-semibold";
                           } else if (isSelected) {
                             style += "border-danger bg-danger/10 text-danger font-bold";
                           } else {
@@ -278,8 +279,7 @@ export default function InstructorGradebookPage() {
                 Đóng
               </button>
             </div>
-          </div>
-        </div>
+          </Modal>
       )}
     </div>
   );

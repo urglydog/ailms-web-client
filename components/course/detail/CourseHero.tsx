@@ -33,7 +33,7 @@ export function CourseHero({ course }: { course: CourseDetail }) {
             <span className="font-normal text-ink-muted">({course.reviewCount.toLocaleString(locale)})</span>
           </span>
           <span className="text-ink-muted">{t('learners', { count: course.learnerCount.toLocaleString(locale) })}</span>
-          <span className="rounded-full bg-white px-2.5 py-0.5 text-xs font-semibold text-accent-dark">
+          <span className="rounded-full bg-surface-raised px-2.5 py-0.5 text-xs font-semibold text-accent-dark">
             {t(`level.${course.level}`)}
           </span>
         </div>
@@ -61,7 +61,7 @@ export function CourseHero({ course }: { course: CourseDetail }) {
             {course.dubbedLanguages.map((lang) => (
               <span
                 key={lang}
-                className="rounded-full border border-line bg-white px-2.5 py-1 text-[12.5px] text-accent-dark"
+                className="rounded-full border border-line bg-surface-raised px-2.5 py-1 text-[12.5px] text-accent-dark"
               >
                 {lang}
               </span>

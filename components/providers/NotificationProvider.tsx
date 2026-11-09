@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
+import { useQueryClient } from '@tanstack/react-query';
 import { getAccessToken, decodeAccessToken } from '@/lib/auth/token';
 import { notificationApi } from '@/lib/api/notifications';
 import { toast } from 'sonner';
@@ -39,6 +40,7 @@ const NotificationContext = createContext<NotificationContextType | undefined>(u
  */
 export function NotificationProvider({ children }: { children: React.ReactNode }) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (!getAccessToken()) return;
@@ -88,6 +90,11 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
             return;
           }
 
+          // Hiệu năng đợt 5: tin nhắn mới → làm mới danh sách hội thoại ngay (thay polling 15 giây).
+          if (data.type === 'NEW_MESSAGE') {
+            queryClient.invalidateQueries({ queryKey: ['messages', 'conversations'] });
+          }
+
           // Payload thật từ NotificationService.notify() — NotificationRes đầy đủ.
           setNotifications(prev => [{
             id: data.id ?? Date.now(),
@@ -118,7 +125,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
       client.deactivate();
       clientRef.current = null;
     };
-  }, []);
+  }, [queryClient]);
 
   const unreadCount = notifications.filter(n => !n.isRead).length;
 

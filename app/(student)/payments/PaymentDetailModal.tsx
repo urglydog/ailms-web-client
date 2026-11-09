@@ -1,5 +1,7 @@
 'use client';
 
+import { Modal } from '@/components/ui/Modal';
+
 import Link from 'next/link';
 import type { PaymentRes } from '@/types/domain';
 import { format } from 'date-fns';
@@ -36,21 +38,8 @@ export default function PaymentDetailModal({ payment, onClose }: PaymentDetailMo
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="w-full max-w-lg bg-surface rounded-2xl shadow-xl overflow-hidden border border-line">
-        <div className="px-6 py-4 border-b border-line flex items-center justify-between">
-          <h2 className="text-xl font-display font-bold text-ink">Chi tiết giao dịch</h2>
-          <button
-            onClick={onClose}
-            className="text-ink-muted hover:text-ink transition-colors"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-
-        <div className="p-6 space-y-6">
+    <Modal open onClose={onClose} title="Chi tiết giao dịch" size="md">
+        <div className="space-y-6 pt-2">
           <div className="flex justify-between items-start">
             <div>
               <p className="text-sm font-medium text-ink-muted uppercase tracking-wider mb-1">Số tiền</p>
@@ -117,7 +106,7 @@ export default function PaymentDetailModal({ payment, onClose }: PaymentDetailMo
           </div>
         </div>
 
-        <div className="px-6 py-4 bg-surface-raised border-t border-line flex justify-between items-center">
+        <div className="-mx-6 -mb-6 mt-6 flex items-center justify-between border-t border-line-soft bg-tint/40 px-6 py-4">
           <div className="flex gap-3">
             {payment.status === 'PAID' ? (
               <Link
@@ -145,7 +134,6 @@ export default function PaymentDetailModal({ payment, onClose }: PaymentDetailMo
             Đóng
           </button>
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 }

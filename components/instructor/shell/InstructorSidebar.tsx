@@ -19,7 +19,7 @@ export function InstructorSidebar({ pathname, collapsed, onToggleCollapsed }: In
 
   return (
     <aside
-      className={`sticky top-0 hidden h-dvh shrink-0 flex-col border-r border-line bg-white transition-[width] duration-200 ease-out md:flex ${
+      className={`sticky top-0 hidden h-dvh shrink-0 flex-col border-r border-line bg-surface-raised transition-[width] duration-200 ease-out md:flex ${
         collapsed ? 'w-[68px]' : 'w-60'
       }`}
     >

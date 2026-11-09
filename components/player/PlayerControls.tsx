@@ -24,6 +24,9 @@ import { useEffect, useRef, useState } from 'react';
 
 export const SPEED_OPTIONS = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
 
+/** Vùng bấm nút biểu tượng: 40px trên điện thoại (WCAG 2.5.8, khuyến nghị chạm), 32px khi có chuột. */
+const CTRL = 'inline-flex h-10 w-10 items-center justify-center rounded-md transition-colors duration-150 sm:h-8 sm:w-8';
+
 const QUALITY_LABELS: Record<string, string> = {
   hd1080: '1080p',
   hd720: '720p',
@@ -179,7 +182,7 @@ export function PlayerControls({
         onPointerDown={handleProgressPointerDown}
         onPointerMove={handleProgressPointerMove}
         onPointerUp={handleProgressPointerUp}
-        className="group relative mx-3 mb-1.5 h-3 cursor-pointer touch-none"
+        className="group relative mx-3 mb-1.5 h-6 cursor-pointer touch-none sm:h-3"
       >
         <div className="absolute inset-x-0 top-1/2 h-1 -translate-y-1/2 rounded-full bg-white/25">
           <div className="h-full rounded-full bg-accent" style={{ width: `${progressPercent}%` }} />
@@ -198,8 +201,8 @@ export function PlayerControls({
           đề song ngữ là tính năng lõi của dự án, không nên giấu trên di động). */}
       <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1.5 px-2 sm:px-3">
         {/* ── Cụm trái: play/pause · lùi 5s · tốc độ · tua 5s · thời lượng ── */}
-        <div className="flex items-center gap-2 sm:gap-3">
-          <button type="button" onClick={onTogglePlay} aria-label={isPlaying ? 'Tạm dừng' : 'Phát'} className="hover:text-accent">
+        <div className="flex items-center gap-0.5 sm:gap-3">
+          <button type="button" onClick={onTogglePlay} aria-label={isPlaying ? 'Tạm dừng' : 'Phát'} className={`${CTRL} hover:text-accent`}>
             {isPlaying ? <PauseIcon /> : <PlayIcon />}
           </button>
           <button
@@ -207,7 +210,7 @@ export function PlayerControls({
             onClick={() => onSeek(Math.max(0, currentSec - 5))}
             aria-label="Lùi 5 giây"
             title="Lùi 5 giây"
-            className="hover:text-accent"
+            className={`${CTRL} hover:text-accent`}
           >
             <Skip5Icon direction="back" />
           </button>
@@ -218,7 +221,7 @@ export function PlayerControls({
               onClick={() => setSpeedOpen((v) => !v)}
               aria-haspopup="listbox"
               aria-expanded={speedOpen}
-              className="rounded border border-white/30 px-1.5 py-0.5 text-[12px] font-semibold hover:border-white"
+              className="min-h-10 rounded border border-white/30 px-2 py-0.5 text-[12px] font-semibold transition-colors duration-150 hover:border-white sm:min-h-0 sm:px-1.5"
             >
               {playbackRate}x
             </button>
@@ -248,7 +251,7 @@ export function PlayerControls({
             onClick={() => onSeek(Math.min(duration, currentSec + 5))}
             aria-label="Tua tới 5 giây"
             title="Tua tới 5 giây"
-            className="hover:text-accent"
+            className={`${CTRL} hover:text-accent`}
           >
             <Skip5Icon direction="forward" />
           </button>
@@ -259,7 +262,7 @@ export function PlayerControls({
         </div>
 
         {/* ── Cụm phải: âm lượng · phụ đề gốc/dịch · transcript · cài đặt · toàn màn hình ── */}
-        <div className="flex items-center gap-1.5 sm:gap-2.5">
+        <div className="flex items-center gap-0.5 sm:gap-2.5">
           {/* Mặc định CHỈ hiện icon loa — giữ chuột/focus vào loa mới lộ thanh kéo âm lượng.
               Bọc `<input>` trong 1 div `overflow-hidden` riêng (thay vì tự co width chính nó)
               vì con trượt (thumb) của `<input type="range">` không bị cắt theo width của
@@ -269,7 +272,7 @@ export function PlayerControls({
               type="button"
               onClick={onToggleMute}
               aria-label={muted || volume === 0 ? 'Bật tiếng' : 'Tắt tiếng'}
-              className="hover:text-accent"
+              className={`${CTRL} hover:text-accent`}
             >
               {muted || volume === 0 ? <VolumeMuteIcon /> : <VolumeIcon />}
             </button>
@@ -295,7 +298,7 @@ export function PlayerControls({
               disabled={!originalSubtitleAvailable}
               aria-pressed={showOriginalSub}
               title={originalSubtitleAvailable ? (originalSubtitleHint ?? 'Phụ đề gốc') : 'Bài học chưa có phụ đề gốc'}
-              className={`rounded border px-1.5 py-0.5 text-[11px] font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-30 ${
+              className={`min-h-10 rounded border px-2 py-0.5 text-[11px] font-semibold transition-colors sm:min-h-0 sm:px-1.5 disabled:cursor-not-allowed disabled:opacity-30 ${
                 showOriginalSub ? 'border-accent bg-accent text-white' : 'border-white/30 text-white/85 hover:border-white'
               }`}
             >
@@ -307,7 +310,7 @@ export function PlayerControls({
               disabled={!translatedSubtitleAvailable}
               aria-pressed={showTranslatedSub}
               title={translatedSubtitleAvailable ? 'Phụ đề đã dịch' : 'Ngôn ngữ đang chọn chưa có phụ đề dịch'}
-              className={`rounded border px-1.5 py-0.5 text-[11px] font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-30 ${
+              className={`min-h-10 rounded border px-2 py-0.5 text-[11px] font-semibold transition-colors sm:min-h-0 sm:px-1.5 disabled:cursor-not-allowed disabled:opacity-30 ${
                 showTranslatedSub ? 'border-accent bg-accent text-white' : 'border-white/30 text-white/85 hover:border-white'
               }`}
             >
@@ -320,13 +323,13 @@ export function PlayerControls({
             onClick={onToggleTranscript}
             aria-pressed={showTranscript}
             title="Bản ghi lời thoại (Transcript)"
-            className={showTranscript ? 'text-accent' : 'hover:text-accent'}
+            className={`${CTRL} ${showTranscript ? 'text-accent' : 'hover:text-accent'}`}
           >
             <TranscriptIcon />
           </button>
 
           <div ref={settingsRef} className="relative">
-            <button type="button" onClick={() => setSettingsOpen((v) => !v)} aria-label="Cài đặt" title="Cài đặt" className="hover:text-accent">
+            <button type="button" onClick={() => setSettingsOpen((v) => !v)} aria-label="Cài đặt" title="Cài đặt" className={`${CTRL} hover:text-accent`}>
               <GearIcon />
             </button>
             {settingsOpen && (
@@ -386,7 +389,7 @@ export function PlayerControls({
             onClick={onToggleFullscreen}
             aria-label={isFullscreen ? 'Thoát toàn màn hình' : 'Toàn màn hình'}
             title={isFullscreen ? 'Thoát toàn màn hình' : 'Toàn màn hình'}
-            className="hover:text-accent"
+            className={`${CTRL} hover:text-accent`}
           >
             {isFullscreen ? <CollapseIcon /> : <ExpandIcon />}
           </button>

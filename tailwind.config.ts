@@ -10,6 +10,9 @@ import { tw } from './lib/theme/cssVars';
  */
 const config: Config = {
   darkMode: 'class',
+  // Mọi `hover:` chỉ áp dụng khi thiết bị thật sự rê chuột được (@media (hover: hover)) — trên màn
+  // hình cảm ứng, chạm không còn để lại trạng thái hover "kẹt" (review-animations #8).
+  future: { hoverOnlyWhenSupported: true },
   content: [
     './app/**/*.{ts,tsx}',
     './components/**/*.{ts,tsx}',

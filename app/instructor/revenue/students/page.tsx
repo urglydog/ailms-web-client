@@ -48,7 +48,7 @@ export default function InstructorStudentsPage() {
           <select
             value={courseId}
             onChange={(e) => setCourseId(e.target.value ? Number(e.target.value) : '')}
-            className="rounded-lg border border-line bg-white px-3 py-2 text-[13px] font-semibold text-ink focus:border-accent focus:outline-none"
+            className="rounded-lg border border-line bg-surface-raised px-3 py-2 text-[13px] font-semibold text-ink focus:border-accent focus:outline-none"
           >
             <option value="">{t('common.allCourses')}</option>
             {courses?.map((c) => (
@@ -85,7 +85,7 @@ export default function InstructorStudentsPage() {
       )}
 
       {/* (26/09/2026, sửa lỗi) — cột cố định không co giãn dưới `lg`, bọc cuộn ngang thay vì bóp/vỡ. */}
-      <div className="overflow-hidden rounded-xl border border-line bg-white shadow-sm">
+      <div className="overflow-hidden rounded-xl border border-line bg-surface-raised shadow-sm">
         <div className="overflow-x-auto">
         <div className="grid min-w-[680px] grid-cols-[1.4fr_1.4fr_1fr_140px_140px] gap-3 border-b border-line bg-surface px-4 py-2.5 text-[11.5px] font-bold text-ink-muted">
           <span>{t('students.cols.student')}</span>
@@ -127,7 +127,7 @@ export default function InstructorStudentsPage() {
 
 function StatCard({ label, value, tone = 'text-ink' }: { label: string; value: string; tone?: string }) {
   return (
-    <div className="rounded-xl border border-line bg-white p-4 shadow-sm">
+    <div className="rounded-xl border border-line bg-surface-raised p-4 shadow-sm">
       <span className="text-[11.5px] font-semibold text-ink-muted">{label}</span>
       <div className={`mt-1 font-display text-[22px] font-extrabold ${tone}`}>{value}</div>
     </div>

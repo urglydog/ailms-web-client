@@ -136,7 +136,7 @@ export default function CartPage() {
       ) : items.length === 0 ? (
         <ShopEmptyState kind="cart" message={t('cart.emptyTitle')} cta={t('cart.emptyCta')} href="/courses" />
       ) : (
-        <div className="grid gap-8 lg:grid-cols-[1fr_340px]">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-8 lg:grid-cols-[minmax(0,1fr)_340px]">
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between border-b border-line-soft pb-3">
               <label className="flex items-center gap-2 text-sm text-ink-muted">
@@ -147,7 +147,7 @@ export default function CartPage() {
                 <button
                   type="button"
                   onClick={handleRemoveSelected}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-danger/30 bg-white px-3 py-1.5 text-xs font-semibold text-danger hover:bg-danger/5"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-danger/30 bg-surface-raised px-3 py-1.5 text-xs font-semibold text-danger hover:bg-danger/5"
                 >
                   <Trash2 size={13} aria-hidden />
                   {t('cart.removeSelected', { count: selectedItems.length })}
@@ -219,7 +219,7 @@ export default function CartPage() {
                     <button
                       type="button"
                       onClick={() => removeFromCart.mutate(item.courseId)}
-                      className="inline-flex items-center gap-1 rounded-full border border-danger/30 bg-white px-3 py-1 text-xs font-semibold text-danger hover:bg-danger/5"
+                      className="inline-flex items-center gap-1 min-h-8 rounded-full border border-danger/30 bg-surface-raised px-3 py-1 text-xs font-semibold text-danger hover:bg-danger/5"
                     >
                       <Trash2 size={12} aria-hidden />
                       {t('cart.remove')}
