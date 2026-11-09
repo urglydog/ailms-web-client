@@ -1,0 +1,122 @@
+'use client';
+
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { useBundlesForCourse } from '@/hooks/useBundles';
+import { useAddToCart, useCart } from '@/hooks/useCart';
+import { useMyEnrollments } from '@/hooks/useCartBundleMatches';
+import type { CourseBundle } from '@/types/domain';
+
+function fmt(amount: number) {
+  return amount.toLocaleString('vi-VN') + '₫';
+}
+
+function BundleUpsellCard({ bundle, currentCourseId }: { bundle: CourseBundle; currentCourseId: number }) {
+  const otherCourses = bundle.courses.filter((c) => c.id !== currentCourseId);
+  const router = useRouter();
+  const { data: cartItems } = useCart();
+  const { data: enrolled } = useMyEnrollments();
+  const addToCart = useAddToCart();
+  const [addingBundle, setAddingBundle] = useState(false);
+
+  const handleAddBundle = async () => {
+    const cartCourseIds = new Set((cartItems ?? []).map((i) => i.courseId));
+    const enrolledCourseIds = new Set((enrolled ?? []).map((e) => e.courseId));
+    // KHÔNG loại trừ currentCourseId — học viên có thể bấm nút này TRƯỚC KHI tự thêm chính
+    // khóa đang xem vào giỏ, nên khóa đó cũng có thể đang thiếu. Chỉ bỏ qua khóa đã THỰC SỰ có
+    // trong giỏ hoặc đã sở hữu rồi.
+    const missing = bundle.courses.filter((c) => !cartCourseIds.has(c.id) && !enrolledCourseIds.has(c.id));
+    setAddingBundle(true);
+    try {
+      // Tuần tự — không Promise.all — tránh race condition ghi giỏ hàng nếu nhiều request thêm
+      // khóa cùng lúc đụng nhau ở tầng lưu trữ giỏ hàng.
+      for (const c of missing) {
+        await addToCart.mutateAsync(c.id);
+      }
+      router.push('/cart');
+    } finally {
+      setAddingBundle(false);
+    }
+  };
+
+  return (
+    <div className="rounded-2xl border border-line-soft bg-gradient-to-br from-tint to-tint overflow-hidden">
+      {/* Top accent */}
+      <div className="h-1 bg-gradient-to-r from-cyan-400 to-accent" />
+
+      <div className="p-4">
+        {/* Badge + title */}
+        <div className="flex items-start gap-2 mb-2.5">
+          <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-accent px-2.5 py-0.5 text-[11px] font-bold text-white shadow">
+            🎁 -{bundle.discountPercent}%
+          </span>
+          <h4 className="text-sm font-bold text-ink leading-tight line-clamp-2">
+            {bundle.title}
+          </h4>
+        </div>
+
+        {/* Other courses in bundle */}
+        {otherCourses.length > 0 && (
+          <div className="mb-3">
+            <p className="text-[11px] font-semibold text-ink-muted uppercase tracking-wider mb-1.5">
+              Đi kèm trong gói:
+            </p>
+            <ul className="space-y-1">
+              {otherCourses.map((c) => (
+                <li key={c.id} className="flex items-center gap-1.5 text-xs text-ink">
+                  <span className="text-accent flex-shrink-0">✓</span>
+                  <span className="truncate">{c.title}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Price row */}
+        <div className="flex items-center justify-between gap-2 rounded-xl bg-surface-raised/70 border border-line px-3 py-2.5 shadow-sm">
+          <div className="text-xs text-ink-muted">
+            <span className="line-through text-ink-faint">{fmt(bundle.originalPrice)}</span>
+            <span className="ml-1.5 text-danger font-bold">-{fmt(bundle.discountAmount)}</span>
+          </div>
+          <span className="text-base font-extrabold text-accent-dark">{fmt(bundle.finalPrice)}</span>
+        </div>
+
+        {/* CTA — thêm mọi khóa còn thiếu của gói vào giỏ hàng rồi chuyển tới /cart. Giỏ hàng tự
+            phát hiện đủ bộ combo (xem useCartBundleMatches), không cần truyền `?bundle=id` nữa. */}
+        <button
+          type="button"
+          onClick={() => void handleAddBundle()}
+          disabled={addingBundle}
+          className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-accent to-accent py-2.5 text-sm font-bold text-white shadow hover:from-accent-dark hover:to-accent-dark transition active:scale-95 disabled:opacity-60"
+        >
+          {addingBundle ? 'Đang thêm...' : 'Mua gói để tiết kiệm thêm →'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+interface BundleUpsellWidgetProps {
+  courseId: number;
+}
+
+/**
+ * Widget gợi ý Bundle — hiển thị bên dưới nút mua trong cột ghi danh của trang chi tiết
+ * khóa học. Fetch theo courseId, không render gì cả nếu không có gói nào.
+ */
+export function BundleUpsellWidget({ courseId }: BundleUpsellWidgetProps) {
+  const { data: bundles, isLoading } = useBundlesForCourse(courseId);
+
+  if (isLoading || !bundles || bundles.length === 0) return null;
+
+  return (
+    <div className="flex flex-col gap-3 border-t border-dashed border-line pt-4 mt-1">
+      <p className="text-xs font-semibold text-ink-muted uppercase tracking-wider">
+        💡 Tiết kiệm hơn với gói combo
+      </p>
+      {bundles.map((bundle) => (
+        <BundleUpsellCard key={bundle.id} bundle={bundle} currentCourseId={courseId} />
+      ))}
+    </div>
+  );
+}

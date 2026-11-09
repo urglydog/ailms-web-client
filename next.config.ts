@@ -18,9 +18,38 @@ const nextConfig: NextConfig = {
       // Thumbnail của video YouTube (Lesson.videoSource = YOUTUBE)
       { protocol: 'https', hostname: 'i.ytimg.com' },
       { protocol: 'https', hostname: 'img.youtube.com' },
+      // Ảnh minh họa chủ đề ở trang chủ
+      { protocol: 'https', hostname: 'images.unsplash.com' },
       // Placeholder data
       { protocol: 'https', hostname: 'picsum.photos' },
     ],
+  },
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'Cross-Origin-Opener-Policy',
+            value: 'unsafe-none',
+          },
+        ],
+      },
+      {
+        // no-cache (không phải no-store) để Vercel CDN vẫn revalidate, tránh kẹt SW cũ
+        // khi file này được cập nhật ở các giai đoạn PWA sau.
+        source: '/sw.js',
+        headers: [
+          { key: 'Content-Type', value: 'application/javascript; charset=utf-8' },
+          { key: 'Cache-Control', value: 'no-cache' },
+          { key: 'Service-Worker-Allowed', value: '/' },
+        ],
+      },
+      {
+        source: '/manifest.json',
+        headers: [{ key: 'Content-Type', value: 'application/manifest+json' }],
+      },
+    ];
   },
 };
 

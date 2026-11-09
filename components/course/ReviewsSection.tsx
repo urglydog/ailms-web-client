@@ -66,11 +66,11 @@ export function ReviewsSection({ courseId }: { courseId: number }) {
             onChange={(e) => setComment(e.target.value)}
             rows={3}
             placeholder="Chia sẻ cảm nhận của bạn về khóa học (không bắt buộc)..."
-            className="rounded-lg border border-line bg-white px-3 py-2 text-sm text-ink
+            className="rounded-lg border border-line bg-surface-raised px-3 py-2 text-sm text-ink
                        placeholder:text-ink-faint focus:border-accent focus:outline-none"
           />
           {createReview.error instanceof ApiError && (
-            <p className="text-sm text-red-600">{createReview.error.message}</p>
+            <p className="text-sm text-danger">{createReview.error.message}</p>
           )}
           <button
             type="submit"

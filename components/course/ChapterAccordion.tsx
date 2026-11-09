@@ -2,8 +2,10 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Badge } from '@/components/ui/Badge';
 import { formatDuration } from '@/lib/format';
+import { detectOutlineLang, lessonLabel, sectionLabel } from '@/lib/course/outlineLabel';
 import type { Chapter } from '@/types/domain';
 
 /**
@@ -19,9 +21,22 @@ interface ChapterAccordionProps {
   chapters: Chapter[];
   /** Người dùng hiện tại đã sở hữu khoá học chưa (BR-ENROLL-01). */
   enrolled: boolean;
+  /** Mã/nhãn ngôn ngữ gốc của khóa — quyết định nhãn "Phần/Bài" hay "Section/Lesson". */
+  sourceLanguage?: string | null;
 }
 
-export function ChapterAccordion({ chapters, enrolled }: ChapterAccordionProps) {
+export function ChapterAccordion({ chapters, enrolled, sourceLanguage }: ChapterAccordionProps) {
+  const t = useTranslations('courseDetail.content');
+  const lang = detectOutlineLang(
+    sourceLanguage,
+    chapters.flatMap((c) => [c.title, ...c.lessons.map((l) => l.title)]),
+  );
+  // Số bài đếm liên tục xuyên suốt khóa.
+  const lessonOffsets: number[] = [];
+  chapters.reduce((acc, c) => {
+    lessonOffsets.push(acc);
+    return acc + c.lessons.length;
+  }, 0);
   // Mở chương đầu tiên sẵn để người xem thấy ngay cấu trúc bài học
   const [openIds, setOpenIds] = useState<number[]>(() =>
     chapters[0] ? [chapters[0].id] : [],
@@ -32,7 +47,7 @@ export function ChapterAccordion({ chapters, enrolled }: ChapterAccordionProps) 
 
   return (
     <div className="flex flex-col gap-3">
-      {chapters.map((chapter) => {
+      {chapters.map((chapter, chapterIdx) => {
         const isOpen = openIds.includes(chapter.id);
         const totalSec = chapter.lessons.reduce((sum, l) => sum + l.durationSec, 0);
 
@@ -44,10 +59,10 @@ export function ChapterAccordion({ chapters, enrolled }: ChapterAccordionProps) 
               aria-expanded={isOpen}
               className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left"
             >
-              <span className="font-display text-[15px] font-semibold text-ink">{chapter.title}</span>
+              <span className="font-display text-[15px] font-semibold text-ink">{sectionLabel(lang, chapterIdx + 1, chapter.title)}</span>
               <span className="flex shrink-0 items-center gap-3 text-[13px] text-ink-muted">
                 <span>
-                  {chapter.lessons.length} bài · {formatDuration(totalSec)}
+                  {t('lessons', { count: chapter.lessons.length })} · {formatDuration(totalSec)}
                 </span>
                 <span aria-hidden className={isOpen ? 'rotate-180 transition-transform' : 'transition-transform'}>
                   ▾
@@ -57,8 +72,9 @@ export function ChapterAccordion({ chapters, enrolled }: ChapterAccordionProps) 
 
             {isOpen && (
               <ul className="border-t border-line-soft">
-                {chapter.lessons.map((lesson) => {
+                {chapter.lessons.map((lesson, lessonIdx) => {
                   const accessible = enrolled || lesson.isPreview;
+                  const label = lessonLabel(lang, (lessonOffsets[chapterIdx] ?? 0) + lessonIdx + 1, lesson.title);
 
                   return (
                     <li
@@ -66,22 +82,26 @@ export function ChapterAccordion({ chapters, enrolled }: ChapterAccordionProps) 
                       className="flex items-center justify-between gap-3 border-b border-line-soft px-5 py-3 last:border-b-0"
                     >
                       <span className="flex min-w-0 items-center gap-2.5">
-                        <span aria-hidden className="text-ink-faint">
-                          {accessible ? '▶' : '🔒'}
+                        <span aria-hidden className="flex items-center text-ink-faint">
+                          {accessible ? (
+                            '▶'
+                          ) : (
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                          )}
                         </span>
                         {accessible ? (
                           <Link
                             href={`/learn/${lesson.id}`}
                             className="truncate text-sm font-medium no-underline"
                           >
-                            {lesson.title}
+                            {label}
                           </Link>
                         ) : (
-                          <span className="truncate text-sm text-ink-muted">{lesson.title}</span>
+                          <span className="truncate text-sm text-ink-muted">{label}</span>
                         )}
                         {lesson.isPreview && (
                           <Badge tone="accent" className="shrink-0">
-                            Học thử
+                            {t('preview')}
                           </Badge>
                         )}
                       </span>

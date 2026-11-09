@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 /**
  * Đồng bộ Dual Player — hiện thực BR-SYNC-01.
@@ -33,15 +33,32 @@ const DRIFT_TOLERANCE_SEC = 0.2;
 interface UseDualPlayerSyncOptions {
   /** Tạm dừng đồng bộ khi đang phát âm thanh gốc (chưa chọn bản lồng tiếng). */
   enabled?: boolean;
+  /**
+   * Mốc bắt đầu (giây, tuyệt đối theo video) của file audio đang tải.
+   *
+   * Khi `AudioTrack.status = PARTIAL`, mỗi file chunk do `dubbing_service.py` sinh ra tự
+   * đánh mốc t=0 ở **đầu chunk đó**, không phải đầu video — khác với `finalUrl` (t=0 =
+   * đầu video). Nếu không trừ offset này, mọi thao tác đồng bộ (`seeked`, vòng kiểm 250ms)
+   * sẽ tua audio sai vị trí ngay khi đang phát playlist chunk. Mặc định 0 (đúng cho
+   * `finalUrl` hoặc chunk đầu tiên có `startSec = 0`).
+   */
+  timeOffsetSec?: number;
 }
 
 export function useDualPlayerSync(
   videoRef: React.RefObject<HTMLVideoElement | null>,
   audioRef: React.RefObject<HTMLAudioElement | null>,
-  { enabled = true }: UseDualPlayerSyncOptions = {},
+  { enabled = true, timeOffsetSec = 0 }: UseDualPlayerSyncOptions = {},
 ) {
   // Giữ trong ref để interval không phải tạo lại khi component re-render
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  // Offset đổi mỗi khi phát sang chunk khác (~10 phút/lần) — dùng ref để không phải
+  // gỡ/gắn lại listener mỗi lần đổi, chỉ đọc giá trị mới nhất trong closure có sẵn.
+  const offsetRef = useRef(timeOffsetSec);
+
+  useEffect(() => {
+    offsetRef.current = timeOffsetSec;
+  }, [timeOffsetSec]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -63,7 +80,7 @@ export function useDualPlayerSync(
     const handlePause = () => audio.pause();
 
     const handleSeeked = () => {
-      audio.currentTime = video.currentTime;
+      audio.currentTime = Math.max(0, video.currentTime - offsetRef.current);
     };
 
     /** Không được bỏ sót: đổi tốc độ video mà audio giữ nguyên là lệch vĩnh viễn. */
@@ -80,8 +97,9 @@ export function useDualPlayerSync(
       if (video.paused) {
         return;
       }
-      if (Math.abs(video.currentTime - audio.currentTime) > DRIFT_TOLERANCE_SEC) {
-        audio.currentTime = video.currentTime;
+      const targetAudioTime = Math.max(0, video.currentTime - offsetRef.current);
+      if (Math.abs(targetAudioTime - audio.currentTime) > DRIFT_TOLERANCE_SEC) {
+        audio.currentTime = targetAudioTime;
       }
     }, SYNC_INTERVAL_MS);
 
@@ -108,16 +126,34 @@ export function useDualPlayerSync(
  *    chờ buffer mà audio chạy tiếp thì lệch vĩnh viễn và vòng kiểm 250 ms cũng
  *    không cứu được vì nó chỉ so thời gian, không biết video đang đứng.
  *
- * Sẽ hiện thực đầy đủ ở Giai đoạn 6 cùng UC16; ở đây khai báo trước để hợp đồng
- * rõ ràng và test viết được sớm.
+ * Hiện thực đầy đủ ở {@link useYouTubeDualPlayerSync} (Giai đoạn 6, UC16).
  */
 export interface YouTubePlayerLike {
   getCurrentTime(): number;
   seekTo(seconds: number, allowSeekAhead: boolean): void;
   getPlayerState(): number;
   mute(): void;
+  unMute(): void;
   getPlaybackRate(): number;
+  playVideo(): void;
+  pauseVideo(): void;
+  getDuration(): number;
+  setPlaybackRate(rate: number): void;
+  setVolume(volume: number): void;
+  getVolume(): number;
+  getAvailableQualityLevels(): string[];
+  setPlaybackQuality(quality: string): void;
+  getPlaybackQuality(): string;
+  /** Module phụ đề CC của YouTube (API không chính thức nhưng được dùng rộng rãi) — có thể vắng ở bản giả lập. */
+  loadModule?(name: string): void;
+  unloadModule?(name: string): void;
+  getOption?(module: string, option: string): unknown;
+  setOption?(module: string, option: string, value: unknown): void;
 }
+
+/** Số lần thử đọc phụ đề KHI VIDEO ĐANG PHÁT (mỗi lần 150ms, tổng 6 giây) trước khi kết luận video không có phụ đề. */
+const CAPTION_MAX_PLAYING_TRIES = 40;
+const CAPTION_RETRY_MS = 150;
 
 /** Mã trạng thái của YouTube IFrame Player API. */
 export const YT_STATE = {
@@ -128,3 +164,447 @@ export const YT_STATE = {
   BUFFERING: 3,
   CUED: 5,
 } as const;
+
+/** Sự kiện tối thiểu cần dùng — không cài `@types/youtube`, tự khai báo phần dùng tới. */
+interface YouTubePlayerEvent {
+  target: YouTubePlayerLike;
+  data: number;
+}
+
+interface YouTubePlayerConstructorOptions {
+  videoId: string;
+  playerVars?: Record<string, number | string>;
+  events?: {
+    onReady?: (event: YouTubePlayerEvent) => void;
+    onStateChange?: (event: YouTubePlayerEvent) => void;
+    onPlaybackRateChange?: (event: YouTubePlayerEvent) => void;
+  };
+}
+
+interface YouTubeIframeApi {
+  Player: new (
+    element: HTMLElement | string,
+    options: YouTubePlayerConstructorOptions,
+  ) => YouTubePlayerLike & { destroy(): void };
+}
+
+declare global {
+  interface Window {
+    YT?: YouTubeIframeApi;
+    onYouTubeIframeAPIReady?: () => void;
+  }
+}
+
+let youtubeApiPromise: Promise<YouTubeIframeApi> | null = null;
+
+/** Nạp script `iframe_api` đúng 1 lần cho cả trang, dù mở nhiều `DualPlayer` liên tiếp. */
+function loadYouTubeIframeApi(): Promise<YouTubeIframeApi> {
+  if (window.YT?.Player) {
+    return Promise.resolve(window.YT);
+  }
+  if (youtubeApiPromise) {
+    return youtubeApiPromise;
+  }
+  youtubeApiPromise = new Promise((resolve) => {
+    const previous = window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady = () => {
+      previous?.();
+      resolve(window.YT as YouTubeIframeApi);
+    };
+    const script = document.createElement('script');
+    script.src = 'https://www.youtube.com/iframe_api';
+    document.head.appendChild(script);
+  });
+  return youtubeApiPromise;
+}
+
+interface UseYouTubeDualPlayerSyncOptions {
+  /** Có bản lồng tiếng đang phát qua `<audio>` hay không. false = để YouTube tự phát tiếng gốc. */
+  dubActive?: boolean;
+  /** Xem giải thích ở {@link UseDualPlayerSyncOptions.timeOffsetSec} — cùng ý nghĩa. */
+  timeOffsetSec?: number;
+  /** Giao diện tham khảo Udemy (06/09/2026) — video kết thúc, dùng cho tính năng tự động chuyển
+   * sang bài học tiếp theo (trang cha quyết định, hook chỉ báo sự kiện). */
+  onEnded?: () => void;
+  /** (19/09/2026) — tự phát ngay khi player sẵn sàng, dùng lúc CHUYỂN BÀI (không áp dụng lúc mở
+   * bài lần đầu — trang cha (`learn/[lessonId]/page.tsx`) tự quyết định khi nào truyền `true`).
+   * Chỉ đọc giá trị NÀY tại đúng thời điểm `onReady` bắn ra (1 lần/lượt tạo player), không cần
+   * theo dõi đổi giá trị qua ref như `dubActive`/`timeOffsetSec` — vì `DualPlayer` đã tự remount
+   * (key theo `lessonId`) mỗi lần đổi bài, nên hook này vốn dĩ chỉ "sống" đúng 1 bài/lần tạo. */
+  autoPlay?: boolean;
+}
+
+/** Điều khiển thanh control tuỳ biến (Udemy-style) cho nguồn YouTube — thay hẳn UI có sẵn của
+ * YouTube (`playerVars.controls = 0`). `volume`/`muted` LUÔN phản ánh đúng nguồn ĐANG PHÁT ÂM
+ * THANH THẬT: thẻ `<audio>` (bản lồng tiếng) khi `dubActive`, ngược lại là chính YouTube player —
+ * y hệt quy tắc `muted={audioSrc !== null}` áp cho thẻ `<video>` ở nguồn UPLOAD. */
+export interface YouTubePlayerController {
+  currentSec: number;
+  duration: number;
+  isPlaying: boolean;
+  playbackRate: number;
+  volume: number;
+  muted: boolean;
+  /** Mã chất lượng thô của YouTube (`hd1080`/`hd720`/`large`/`medium`/`small`/`tiny`/`auto`),
+   * rỗng nếu API chưa sẵn sàng trả về danh sách. */
+  qualities: string[];
+  quality: string;
+  seekTo: (seconds: number) => void;
+  togglePlay: () => void;
+  play: () => void;
+  pause: () => void;
+  setPlaybackRateLevel: (rate: number) => void;
+  setVolumeLevel: (volume: number) => void;
+  toggleMute: () => void;
+  setQuality: (quality: string) => void;
+  /** Phụ đề CC của chính YouTube đang bật (mặc định tắt). */
+  captionsOn: boolean;
+  /** Video đã phát mà YouTube không trả về phụ đề nào — nút bật phụ đề không còn tác dụng. */
+  captionsUnavailable: boolean;
+  setCaptions: (on: boolean) => void;
+  toggleCaptions: () => void;
+}
+
+/**
+ * Đồng bộ Dual Player khi nguồn video là YouTube — cùng hợp đồng BR-SYNC-01 với
+ * {@link useDualPlayerSync} (4 sự kiện tương đương, vòng kiểm 250ms) nhưng đọc/ghi thời gian qua
+ * IFrame Player API thay vì thẻ `<video>` thường.
+ *
+ * Player luôn được tạo khi có `youtubeId` (kể cả chưa chọn ngôn ngữ lồng tiếng — video YouTube
+ * vẫn phải hiện ra và tự phát tiếng gốc); `dubActive` chỉ quyết định có `mute()` video + đồng bộ
+ * `<audio>` theo hay không, đổi được giữa chừng khi học viên chọn/bỏ chọn ngôn ngữ.
+ *
+ * Khác biệt quan trọng: dùng sự kiện `onPlaybackRateChange` có sẵn của IFrame API để đồng bộ
+ * tốc độ (không cần polling); trạng thái `BUFFERING` được coi như `pause` — video đứng chờ
+ * buffer mà audio chạy tiếp thì lệch vĩnh viễn, vòng kiểm 250ms không cứu được vì nó chỉ so
+ * thời gian chứ không biết video có đang thật sự chạy hay không.
+ */
+/**
+ * `currentSec` trả về là thời gian THẬT của video YouTube (`player.getCurrentTime()`), độc lập
+ * với `dubActive`/`timeOffsetSec` — dùng cho phụ đề (cần đồng bộ kể cả khi chưa chọn ngôn ngữ lồng
+ * tiếng), khác hẳn vòng đồng bộ `<audio>` bên dưới vốn chỉ chạy khi có bản lồng tiếng đang phát.
+ */
+export function useYouTubeDualPlayerSync(
+  containerRef: React.RefObject<HTMLElement | null>,
+  audioRef: React.RefObject<HTMLAudioElement | null>,
+  youtubeId: string | null,
+  { dubActive = false, timeOffsetSec = 0, onEnded, autoPlay = false }: UseYouTubeDualPlayerSyncOptions = {},
+): YouTubePlayerController {
+  const playerRef = useRef<YouTubePlayerLike | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const offsetRef = useRef(timeOffsetSec);
+  const dubActiveRef = useRef(dubActive);
+  const onEndedRef = useRef(onEnded);
+  const [currentSec, setCurrentSec] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [playbackRate, setPlaybackRateState] = useState(1);
+  // 100 = âm lượng đầy — mặc định của YouTube lẫn thẻ <audio>/<video> gốc.
+  const [volume, setVolume] = useState(100);
+  const [muted, setMuted] = useState(false);
+  const [qualities, setQualities] = useState<string[]>([]);
+  const [quality, setQualityState] = useState('auto');
+  const [captionsOn, setCaptionsOn] = useState(false);
+  // Đọc được giá trị MỚI NHẤT bên trong closure của sự kiện YT (tạo 1 lần lúc mount) mà không phải
+  // gỡ/gắn lại player mỗi khi học viên chỉnh âm lượng — cùng khuôn với `offsetRef`/`dubActiveRef`.
+  const volumeRef = useRef(volume);
+  const mutedRef = useRef(muted);
+  // `captionsOnRef` để closure sự kiện đọc được trạng thái mới nhất.
+  const captionsOnRef = useRef(false);
+  const captionRetryRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [captionsUnavailable, setCaptionsUnavailable] = useState(false);
+
+  // Track mặc định của video (ngôn ngữ gốc), đọc được 1 lần lúc đầu — xem `discoverCaptionTrack`.
+  const captionTrackRef = useRef<unknown>(null);
+
+  /**
+   * Bật/tắt CC độc lập với cài đặt trên tài khoản YouTube của người xem: tắt = gỡ module; bật = nạp module VÀ chọn hẳn
+   * track bằng `setOption` (chỉ nạp module thì tài khoản đang tắt CC vẫn không hiện gì). Chưa biết track thì chưa bật
+   * được: `discoverCaptionTrack` sẽ áp lại trạng thái mong muốn ngay khi biết.
+   */
+  const applyCaptions = useCallback((on: boolean) => {
+    const p = playerRef.current;
+    if (!p) return;
+    if (!on) {
+      p.setOption?.('captions', 'track', {});
+      p.unloadModule?.('captions');
+    } else if (captionTrackRef.current) {
+      p.loadModule?.('captions');
+      p.setOption?.('captions', 'track', captionTrackRef.current);
+    }
+  }, []);
+
+  /**
+   * `getOption('captions','tracklist')` luôn rỗng ở player nhúng (đã kiểm tra thực tế), nên không liệt kê được phụ đề.
+   * Cách dùng được: tạo player với `cc_load_policy: 1` để YouTube tự chọn track mặc định, đọc `getOption('captions','track')`
+   * một lần rồi lưu lại, sau đó tắt ngay nếu người học chưa bật. Sau khi tắt, giá trị đọc được không còn đáng tin.
+   */
+  const discoverCaptionTrack = useCallback((p: YouTubePlayerLike) => {
+    let playingTries = 0;
+    const attempt = () => {
+      captionRetryRef.current = null;
+      const track = p.getOption?.('captions', 'track') as { languageCode?: string } | undefined;
+      if (track?.languageCode) {
+        captionTrackRef.current = track;
+        applyCaptions(captionsOnRef.current);
+        return;
+      }
+      // Video chưa phát thì chưa có track là bình thường: chờ tiếp, chỉ đếm số lần thử khi đang phát.
+      if (p.getPlayerState() === YT_STATE.PLAYING) playingTries += 1;
+      if (playingTries >= CAPTION_MAX_PLAYING_TRIES) {
+        captionsOnRef.current = false;
+        setCaptionsOn(false);
+        setCaptionsUnavailable(true);
+        return;
+      }
+      captionRetryRef.current = setTimeout(attempt, CAPTION_RETRY_MS);
+    };
+    attempt();
+  }, [applyCaptions]);
+
+  useEffect(() => {
+    offsetRef.current = timeOffsetSec;
+  }, [timeOffsetSec]);
+
+  useEffect(() => {
+    onEndedRef.current = onEnded;
+  }, [onEnded]);
+
+  useEffect(() => {
+    volumeRef.current = volume;
+  }, [volume]);
+
+  useEffect(() => {
+    mutedRef.current = muted;
+  }, [muted]);
+
+  useEffect(() => {
+    dubActiveRef.current = dubActive;
+    const player = playerRef.current;
+    if (!player) return;
+    // Nguồn phát ÂM THANH THẬT đổi theo `dubActive` — âm lượng/tắt tiếng do học viên chỉnh phải
+    // đi theo đúng nguồn đang audible, không áp nhầm lên nguồn đang im lặng.
+    if (dubActive) {
+      player.mute();
+      const audio = audioRef.current;
+      if (audio) {
+        audio.volume = volumeRef.current / 100;
+        audio.muted = mutedRef.current;
+      }
+    } else {
+      audioRef.current?.pause();
+      player.setVolume(volumeRef.current);
+      if (mutedRef.current) player.mute();
+      else player.unMute();
+    }
+  }, [dubActive, audioRef]);
+
+  useEffect(() => {
+    if (!youtubeId || !containerRef.current) {
+      return;
+    }
+
+    let cancelled = false;
+    let player: (YouTubePlayerLike & { destroy(): void }) | null = null;
+    setCaptionsOn(false); // bài mới → phụ đề YouTube về mặc định tắt
+    captionsOnRef.current = false;
+    captionTrackRef.current = null;
+    setCaptionsUnavailable(false);
+
+    loadYouTubeIframeApi().then((YT) => {
+      if (cancelled || !containerRef.current) {
+        return;
+      }
+      player = new YT.Player(containerRef.current, {
+        videoId: youtubeId,
+        // Giao diện tham khảo Udemy (06/09/2026) — `controls: 0` để tự vẽ thanh điều khiển riêng
+        // (`PlayerControls.tsx`) thay UI mặc định của YouTube, đồng bộ giao diện với nguồn UPLOAD.
+        // `cc_load_policy: 1` chỉ để đọc được track mặc định (xem `discoverCaptionTrack`); phụ đề được tắt ngay sau đó,
+        // nút "Gốc" mới là nơi bật, bất kể cài đặt CC trên tài khoản YouTube của người xem.
+        playerVars: { controls: 0, modestbranding: 1, rel: 0, disablekb: 1, cc_load_policy: 1 },
+        events: {
+          onReady: (event) => {
+            if (dubActiveRef.current) {
+              event.target.mute();
+            } else {
+              event.target.setVolume(volumeRef.current);
+              if (mutedRef.current) event.target.mute();
+            }
+            setDuration(event.target.getDuration());
+            setPlaybackRateState(event.target.getPlaybackRate());
+            setQualities(event.target.getAvailableQualityLevels());
+            setQualityState(event.target.getPlaybackQuality());
+            playerRef.current = event.target;
+            discoverCaptionTrack(event.target);
+            if (autoPlay) event.target.playVideo();
+          },
+          onStateChange: (event) => {
+            setIsPlaying(event.data === YT_STATE.PLAYING || event.data === YT_STATE.BUFFERING);
+            setQualities(event.target.getAvailableQualityLevels());
+            setQualityState(event.target.getPlaybackQuality());
+            if (event.data === YT_STATE.ENDED) {
+              onEndedRef.current?.();
+            }
+            const audio = audioRef.current;
+            if (!audio || !dubActiveRef.current) return;
+            if (event.data === YT_STATE.PLAYING) {
+              void audio.play().catch(() => {
+                // Autoplay bị chặn khi chưa có tương tác — lần play tiếp theo sẽ thành công.
+              });
+            } else if (event.data === YT_STATE.PAUSED || event.data === YT_STATE.BUFFERING) {
+              audio.pause();
+            }
+          },
+          onPlaybackRateChange: (event) => {
+            setPlaybackRateState(event.data);
+            const audio = audioRef.current;
+            if (audio && dubActiveRef.current) {
+              audio.playbackRate = event.data;
+            }
+          },
+        },
+      });
+    });
+
+    intervalRef.current = setInterval(() => {
+      const p = playerRef.current;
+      if (p) {
+        setCurrentSec(p.getCurrentTime());
+        setDuration(p.getDuration());
+      }
+      const audio = audioRef.current;
+      if (!dubActiveRef.current || !audio || !p || p.getPlayerState() !== YT_STATE.PLAYING) {
+        return;
+      }
+      const targetAudioTime = Math.max(0, p.getCurrentTime() - offsetRef.current);
+      if (Math.abs(targetAudioTime - audio.currentTime) > DRIFT_TOLERANCE_SEC) {
+        audio.currentTime = targetAudioTime;
+      }
+    }, SYNC_INTERVAL_MS);
+
+    return () => {
+      cancelled = true;
+      if (captionRetryRef.current !== null) {
+        clearTimeout(captionRetryRef.current);
+        captionRetryRef.current = null;
+      }
+      if (intervalRef.current !== null) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+      playerRef.current = null;
+      player?.destroy();
+    };
+    // `autoPlay` cố ý KHÔNG nằm trong dependency — chỉ cần đọc đúng 1 lần lúc tạo player (xem
+    // docblock `UseYouTubeDualPlayerSyncOptions.autoPlay`); đưa vào đây sẽ huỷ/tạo lại player
+    // (mất vị trí phát) mỗi khi giá trị này đổi, dù `DualPlayer` đã tự remount theo `lessonId`
+    // nên hiệu ứng thật sự chỉ xảy ra đúng 1 lần/bài học như mong muốn.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [containerRef, audioRef, youtubeId]);
+
+  /** UC30 — tua video theo mốc thời gian trích dẫn của Gia sư AI (BR-TUTOR-02), cũng dùng cho
+   * thanh scrubber/nút tua 5s của control bar tuỳ biến. `allowSeekAhead: true` để tua được tới
+   * đoạn video YouTube chưa buffer, không chỉ trong phần đã tải. */
+  const seekTo = useCallback((seconds: number) => {
+    playerRef.current?.seekTo(seconds, true);
+  }, []);
+
+  const togglePlay = useCallback(() => {
+    const p = playerRef.current;
+    if (!p) return;
+    const state = p.getPlayerState();
+    if (state === YT_STATE.PLAYING || state === YT_STATE.BUFFERING) p.pauseVideo();
+    else p.playVideo();
+  }, []);
+
+  const play = useCallback(() => {
+    playerRef.current?.playVideo();
+  }, []);
+
+  const pause = useCallback(() => {
+    playerRef.current?.pauseVideo();
+  }, []);
+
+  const setPlaybackRateLevel = useCallback(
+    (rate: number) => {
+      playerRef.current?.setPlaybackRate(rate);
+      setPlaybackRateState(rate);
+      // Không chờ `onPlaybackRateChange` (có trình duyệt bắn trễ) — đổi tốc độ audio lồng tiếng
+      // ngay lập tức nếu đang là nguồn audible.
+      if (dubActiveRef.current && audioRef.current) {
+        audioRef.current.playbackRate = rate;
+      }
+    },
+    [audioRef],
+  );
+
+  const setVolumeLevel = useCallback(
+    (vol: number) => {
+      setVolume(vol);
+      if (dubActiveRef.current) {
+        const audio = audioRef.current;
+        if (audio) audio.volume = vol / 100;
+      } else {
+        playerRef.current?.setVolume(vol);
+      }
+      if (vol > 0 && mutedRef.current) setMuted(false);
+    },
+    [audioRef],
+  );
+
+  const toggleMute = useCallback(() => {
+    setMuted((prev) => {
+      const next = !prev;
+      if (dubActiveRef.current) {
+        const audio = audioRef.current;
+        if (audio) audio.muted = next;
+      } else if (next) {
+        playerRef.current?.mute();
+      } else {
+        playerRef.current?.unMute();
+      }
+      return next;
+    });
+  }, [audioRef]);
+
+  const setQuality = useCallback((q: string) => {
+    playerRef.current?.setPlaybackQuality(q);
+    setQualityState(q);
+  }, []);
+
+  const setCaptions = useCallback(
+    (on: boolean) => {
+      captionsOnRef.current = on;
+      setCaptionsOn(on);
+      applyCaptions(on);
+    },
+    [applyCaptions],
+  );
+
+  const toggleCaptions = useCallback(() => {
+    setCaptions(!captionsOnRef.current);
+  }, [setCaptions]);
+
+  return {
+    currentSec,
+    duration,
+    isPlaying,
+    playbackRate,
+    volume,
+    muted,
+    qualities,
+    quality,
+    seekTo,
+    togglePlay,
+    play,
+    pause,
+    setPlaybackRateLevel,
+    setVolumeLevel,
+    toggleMute,
+    setQuality,
+    captionsOn,
+    captionsUnavailable,
+    setCaptions,
+    toggleCaptions,
+  };
+}

@@ -1,0 +1,153 @@
+'use client';
+
+import { useMemo, useState } from 'react';
+import Link from 'next/link';
+import { useTranslations } from 'next-intl';
+import { InsightCallout } from '@/components/instructor/InsightCallout';
+import { Pagination } from '@/components/ui/Pagination';
+import { useHardQuestions, useInstructorCourseOptions } from '@/hooks/useDashboard';
+
+type Severity = 'all' | 'critical' | 'warning';
+type SortBy = 'wrongRate' | 'totalAnswers';
+
+const PAGE_SIZE = 10;
+
+function severityColor(percent: number): string {
+  return percent >= 80 ? 'bg-danger' : 'bg-warning';
+}
+
+/** "Hiệu suất" > Câu hỏi khó (29/09/2026, xây mới; 30/09/2026 viết lại — bỏ BarChart ngang, đổi
+ * sang Bảng Phân Tích Hành Động có phân trang/lọc: nội dung câu hỏi quá dài để làm nhãn trục,
+ * mục tiêu thật của giảng viên là TÌM và SỬA câu có vấn đề, không phải ngắm biểu đồ). Câu hỏi
+ * quiz có tỷ lệ trả lời sai > 60% (đã lọc ngưỡng mẫu tối thiểu ở BE, chống thiên lệch cỡ mẫu nhỏ). */
+export default function HardQuestionsPage() {
+  const t = useTranslations('instructor.perf');
+  const { data: rows, isLoading } = useHardQuestions();
+  const { data: courses } = useInstructorCourseOptions();
+  const [courseId, setCourseId] = useState<number | ''>('');
+  const [severity, setSeverity] = useState<Severity>('all');
+  const [sortBy, setSortBy] = useState<SortBy>('wrongRate');
+  const [page, setPage] = useState(1);
+
+  const filtered = useMemo(() => {
+    if (!rows) return [];
+    let result = rows;
+    if (courseId !== '') result = result.filter((r) => r.courseId === courseId);
+    if (severity === 'critical') result = result.filter((r) => r.wrongRatePercent >= 80);
+    if (severity === 'warning') result = result.filter((r) => r.wrongRatePercent >= 60 && r.wrongRatePercent < 80);
+    return [...result].sort((a, b) =>
+      sortBy === 'wrongRate' ? b.wrongRatePercent - a.wrongRatePercent : b.totalAnswers - a.totalAnswers,
+    );
+  }, [rows, courseId, severity, sortBy]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const pageRows = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const worst = rows && rows.length > 0 ? rows[0] : null;
+
+  const handleFilterChange = (apply: () => void) => {
+    apply();
+    setPage(1);
+  };
+
+  return (
+    <>
+      <div>
+        <h1 className="m-0 font-display text-[20px] font-bold text-ink">{t('hardQuestions.title')}</h1>
+        <p className="mt-1 text-[12.5px] text-ink-muted">
+          {t('hardQuestions.subtitle')}
+        </p>
+      </div>
+
+      {worst && (
+        <InsightCallout tone="warning">
+          {t('hardQuestions.warn', { count: rows?.length ?? 0, question: worst.content, percent: worst.wrongRatePercent.toFixed(0), course: worst.courseTitle })}
+        </InsightCallout>
+      )}
+
+      <div className="flex flex-wrap items-center gap-2">
+        <select
+          value={courseId}
+          onChange={(e) => handleFilterChange(() => setCourseId(e.target.value ? Number(e.target.value) : ''))}
+          className="rounded-lg border border-line bg-surface-raised px-3 py-2 text-[13px] font-semibold text-ink focus:border-accent focus:outline-none"
+        >
+          <option value="">{t('common.allCourses')}</option>
+          {courses?.map((c) => (
+            <option key={c.id} value={c.id}>{c.title}</option>
+          ))}
+        </select>
+        <select
+          value={severity}
+          onChange={(e) => handleFilterChange(() => setSeverity(e.target.value as Severity))}
+          className="rounded-lg border border-line bg-surface-raised px-3 py-2 text-[13px] font-semibold text-ink focus:border-accent focus:outline-none"
+        >
+          <option value="all">{t('hardQuestions.level.all')}</option>
+          <option value="critical">{t('hardQuestions.level.critical')}</option>
+          <option value="warning">{t('hardQuestions.level.warning')}</option>
+        </select>
+        <select
+          value={sortBy}
+          onChange={(e) => handleFilterChange(() => setSortBy(e.target.value as SortBy))}
+          className="rounded-lg border border-line bg-surface-raised px-3 py-2 text-[13px] font-semibold text-ink focus:border-accent focus:outline-none"
+        >
+          <option value="wrongRate">{t('hardQuestions.sort.wrongRate')}</option>
+          <option value="totalAnswers">{t('hardQuestions.sort.totalAnswers')}</option>
+        </select>
+      </div>
+
+      <div className="overflow-hidden rounded-xl border border-line bg-surface-raised shadow-sm">
+        <div className="overflow-x-auto">
+          <div className="grid min-w-[820px] grid-cols-[1.6fr_1fr_110px_160px_130px] gap-3 border-b border-line bg-surface px-4 py-2.5 text-[11.5px] font-bold text-ink-muted">
+            <span>{t('hardQuestions.cols.question')}</span>
+            <span>{t('hardQuestions.cols.lesson')}</span>
+            <span>{t('hardQuestions.cols.answers')}</span>
+            <span>{t('hardQuestions.cols.wrongRate')}</span>
+            <span>{t('hardQuestions.cols.actions')}</span>
+          </div>
+
+          {isLoading && <div className="p-10 text-center text-sm text-ink-muted">{t('common.loading')}</div>}
+          {!isLoading && pageRows.length === 0 && (
+            <div className="p-10 text-center text-sm text-ink-muted">
+              {rows && rows.length > 0
+                ? t('hardQuestions.emptyFiltered')
+                : t('hardQuestions.emptyAll')}
+            </div>
+          )}
+
+          {pageRows.map((row, idx) => (
+            <div
+              key={row.questionId}
+              className={`grid min-w-[820px] grid-cols-[1.6fr_1fr_110px_160px_130px] items-center gap-3 px-4 py-2.5 text-[13px] ${
+                idx < pageRows.length - 1 ? 'border-b border-line-soft' : ''
+              }`}
+            >
+              <span className="truncate font-semibold text-ink" title={row.content}>{row.content}</span>
+              <span className="truncate text-ink-muted">
+                {row.courseTitle}
+                {row.lessonTitle ? ` · ${row.lessonTitle}` : ''}
+              </span>
+              <span className="text-ink-muted">{row.totalAnswers}</span>
+              <div className="flex items-center gap-2">
+                <div className="h-2 w-16 overflow-hidden rounded-full bg-line-soft">
+                  <div className={`h-full rounded-full ${severityColor(row.wrongRatePercent)}`} style={{ width: `${row.wrongRatePercent}%` }} />
+                </div>
+                <span className={`text-[12px] font-bold ${row.wrongRatePercent >= 80 ? 'text-danger' : 'text-warning'}`}>
+                  {row.wrongRatePercent.toFixed(0)}%
+                </span>
+              </div>
+              <Link
+                href={`/instructor/courses/${row.courseId}/edit/materials?inspect=${row.materialGenerationId}`}
+                className="rounded-lg border border-line bg-tint px-2.5 py-1.5 text-center text-[12px] font-bold text-accent-dark no-underline hover:bg-tint"
+              >
+                {t('hardQuestions.edit')}
+              </Link>
+            </div>
+          ))}
+        </div>
+
+        {filtered.length > PAGE_SIZE && (
+          <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} className="px-4 pb-3" />
+        )}
+      </div>
+    </>
+  );
+}

@@ -11,8 +11,11 @@
 // ── Enum (khớp com.lms.common.enums) ────────────────────────────
 export type Role = 'STUDENT' | 'INSTRUCTOR' | 'ADMIN';
 export type CourseStatus = 'DRAFT' | 'PENDING' | 'PUBLISHED' | 'REJECTED' | 'ARCHIVED';
+
+/** "Đăng ký (Quyền riêng tư)" kiểu Udemy (19/09/2026). */
+export type CourseVisibility = 'PUBLIC' | 'PRIVATE_INVITE' | 'PRIVATE_PASSWORD';
 export type PaymentStatus = 'PENDING' | 'PAID' | 'FAILED' | 'EXPIRED';
-export type JobStatus = 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED' | 'SKIPPED';
+export type JobStatus = 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED' | 'SKIPPED' | 'CANCELLED';
 /** PARTIAL = đã có chunk phát được nhưng chưa ghép final.mp3 (BR-CHUNK-05) */
 export type TrackStatus = 'PROCESSING' | 'PARTIAL' | 'COMPLETED' | 'FAILED';
 export type MaterialType = 'MINDMAP' | 'FLASHCARD' | 'QUIZ';
@@ -20,8 +23,10 @@ export type ScopeType = 'WHOLE_COURSE' | 'CHAPTER' | 'COMPLETED_LESSONS';
 export type GenStatus = 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
 export type QuantityLevel = 'FEWER' | 'STANDARD' | 'MORE';
 export type DifficultyLevel = 'EASY' | 'MEDIUM' | 'HARD';
-export type RequestStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 export type CourseLevel = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
+/** Mã giảm giá (15/09/2026, mở rộng ngoài đặc tả gốc — UC55/UC56/UC57). */
+export type DiscountType = 'PERCENTAGE' | 'FIXED_AMOUNT';
+export type CouponScopeType = 'ALL_COURSES' | 'SPECIFIC_COURSES' | 'SINGLE_COURSE';
 export type LessonStatus = 'DRAFT' | 'READY' | 'UNAVAILABLE';
 
 // ── Người dùng ──────────────────────────────────────────────────
@@ -30,8 +35,49 @@ export interface User {
   email: string;
   fullName: string;
   avatarUrl: string | null;
+  headline: string | null;
+  bio: string | null;
   role: Role;
+  authProvider: string;
   preferredLanguage: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  /** "View public profile" (14/09/2026, mở rộng) — 2 công tắc tách riêng, mặc định công khai. */
+  coursesPublic: boolean;
+  wishlistPublic: boolean;
+}
+
+/** 1 khóa trên "View public profile" — đủ dữ liệu render thẻ card kiểu Udemy. */
+export interface PublicCourseSummary {
+  courseId: number;
+  title: string;
+  slug: string;
+  thumbnailUrl: string | null;
+  price: number;
+  isFree: boolean;
+  avgRating: number;
+  reviewCount: number;
+}
+
+/**
+ * "View public profile" (14/09/2026, mở rộng ngoài đặc tả gốc) — `courses`/`wishlist` là
+ * `null` (KHÔNG PHẢI mảng rỗng) khi chủ tài khoản đã ẩn mục đó — phân biệt "ẩn" với "công
+ * khai nhưng chưa có gì".
+ */
+export interface PublicProfile {
+  id: number;
+  fullName: string;
+  avatarUrl: string | null;
+  headline: string | null;
+  bio: string | null;
+  role: Role;
+  memberSince: string;
+  courses: PublicCourseSummary[] | null;
+  wishlist: PublicCourseSummary[] | null;
+  /** doc/DacTa_ChucNangChungChi.md — LUÔN công khai (không có cờ ẩn/hiện riêng như courses/
+   * wishlist), không bao giờ null — chỉ có thể là mảng rỗng. */
+  certificates: PublicCertificate[];
 }
 
 // ── Khoá học ────────────────────────────────────────────────────
@@ -49,6 +95,18 @@ export interface DubLanguage {
   flag: string;
   /** false = chưa có AudioTrack cho ngôn ngữ này -> hiện panel kích hoạt (UC18) */
   available: boolean;
+  /** Track thật của ngôn ngữ này (Giai đoạn 6) — null khi chưa `available` hoặc đang PROCESSING/FAILED. */
+  track?: AudioTrackInfo | null;
+  /** Phụ đề đã dịch sang ngôn ngữ này — rỗng nếu ngôn ngữ này chưa lồng tiếng xong. */
+  subtitles: SubtitleSegment[];
+}
+
+/** Một câu phụ đề kèm mốc thời gian chính xác tới mili-giây (khớp `TranscriptSegment` phía BE). */
+export interface SubtitleSegment {
+  seq: number;
+  startSec: number;
+  endSec: number;
+  text: string;
 }
 
 export interface CourseSummary {
@@ -63,19 +121,38 @@ export interface CourseSummary {
   avgRating: number;
   reviewCount: number;
   totalLessons: number;
+  /** UC09 mở rộng (14/09/2026) — tổng giây video, dùng cho bộ lọc "Thời lượng video" kiểu Udemy. */
+  totalDurationSec: number;
   categorySlug: string;
   langs: DubLanguage[];
   /** Dùng cho ảnh bìa gradient khi chưa có thumbnail thật */
   coverColorA: string;
   coverColorB: string;
+  /** Mã giảm giá (15/09/2026, mở rộng) — chỉ xét coupon `autoApply=true` (BR-COUPON-04), luôn
+   * bằng `price` nếu không có coupon nào áp dụng hoặc khóa MIỄN PHÍ. */
+  finalPrice: number;
+  /** null nếu không có coupon nào áp dụng. */
+  discountPercent: number | null;
 }
 
 export interface CourseDetail extends CourseSummary {
   description: string;
+  /** Ảnh đại diện giảng viên; null/undefined khi chưa đặt. */
+  instructorAvatarUrl?: string | null;
   status: CourseStatus;
   chapters: Chapter[];
   /** true khi người dùng hiện tại đã sở hữu khoá học (BR-ENROLL-01) */
   enrolled: boolean;
+  /** UC10 mở rộng (14/09/2026) — vùng "hero" nền đen kiểu Udemy ở trang chi tiết khóa. */
+  updatedAt: string;
+  /** Nhãn hiển thị (vd "Tiếng Anh"), null nếu chưa bài nào có transcript. */
+  sourceLanguage: string | null;
+  /** Ngôn ngữ đã lồng tiếng XONG (ít nhất 1 bài) — rỗng nếu chưa có. */
+  dubbedLanguages: string[];
+  learnerCount: number;
+  /** "Đăng ký (Quyền riêng tư)" kiểu Udemy (19/09/2026) — true khi cần nhập đúng mật khẩu mới
+   * ghi danh được (chế độ PRIVATE_PASSWORD). Không ảnh hưởng việc XEM trang chi tiết. */
+  requiresPassword: boolean;
 }
 
 export interface Chapter {
@@ -106,7 +183,10 @@ export interface CourseReview {
   comment: string | null;
   /** Admin ẩn nếu vi phạm tiêu chuẩn cộng đồng (UC44) — review ẩn không hiện ở trang công khai. */
   isHidden: boolean;
+  moderationReason: string | null;
   createdAt: string;
+  /** 03/10/2026, mở rộng — "VISIBLE" | "HIDDEN" | "PENDING_REPORT" (Giảng viên report, chờ Admin duyệt). */
+  moderationStatus: 'VISIBLE' | 'HIDDEN' | 'PENDING_REPORT';
 }
 
 /** UC09 — bộ lọc duyệt khóa học công khai. Không có field ngôn ngữ lồng tiếng: chưa có dữ liệu
@@ -116,6 +196,10 @@ export interface CourseFilterState {
   level: string | null;
   priceType: 'all' | 'free' | 'paid';
   keyword: string;
+  /** UC09 mở rộng (14/09/2026) — bộ lọc "Ratings" kiểu Udemy: sao trung bình >= giá trị này. */
+  minRating: number | null;
+  /** UC09 mở rộng (14/09/2026) — bộ lọc "Video Duration": "0-1" | "1-3" | "3-6" | "6-17" | "17+". */
+  durationBucket: string | null;
 }
 
 /** Không có từ khóa thì "relevance" cư xử giống hệt "newest" (không có gì để so khớp). */
@@ -157,6 +241,33 @@ export interface PlayerLesson {
   activeTrack: AudioTrackInfo | null;
   lastPositionSec: number;
   isPreview: boolean;
+  /**
+   * Học viên có thật sự sở hữu khóa học không — KHÁC `isPreview` (bài này có phải bài học thử
+   * hay không). Dùng field này để mở khoá Ghi chú/Học liệu AI/Socratic Tutor, không dùng
+   * `isPreview` (một bài preview vẫn xem được đầy đủ bởi học viên đã sở hữu khóa học).
+   * Luôn `false` ở luồng UC11 ẩn danh (chưa đăng nhập).
+   */
+  enrolled: boolean;
+  /** UC21/22 — sidebar "Trong khoá học này". Rỗng ở luồng UC11 ẩn danh (chưa đăng nhập). */
+  chapters: ChapterNav[];
+  /** Phụ đề ngôn ngữ GỐC — rỗng nếu bài học chưa từng lồng tiếng lần nào. */
+  originalSubtitles: SubtitleSegment[];
+}
+
+export interface ChapterNav {
+  chapterId: number;
+  chapterTitle: string;
+  displayOrder: number;
+  lessons: LessonNav[];
+}
+
+export interface LessonNav {
+  lessonId: number;
+  lessonTitle: string;
+  displayOrder: number;
+  durationSec: number;
+  isPreview: boolean;
+  isCompleted: boolean;
 }
 
 // ── Tiến độ lồng tiếng (UC20) ───────────────────────────────────
@@ -174,6 +285,66 @@ export interface PipelineStep {
   label: string;
   done: boolean;
   active: boolean;
+  /** F5.3 — chunk này hết retry (BR-CHUNK-04), vẫn phát bằng audio gốc riêng đoạn đó. */
+  failed?: boolean;
+}
+
+/**
+ * F5.3 — sự kiện realtime nhận qua STOMP `/topic/dubbing/{lessonId}`
+ * (`DubbingProgressSubscriber` forward nguyên văn payload Redis Pub/Sub của AI Worker).
+ *
+ * Có `chunkIndex` → sự kiện CẤP-CHUNK (một chunk 10 phút vừa xong/lỗi).
+ * Không có `chunkIndex` → sự kiện CẤP-JOB (toàn bộ pipeline vừa kết thúc) — đây mới là tín
+ * hiệu đáng tin để dừng progress bar, vì chunk cuối "COMPLETED" chưa có nghĩa là job đã xong
+ * (còn phải chờ FFmpeg concat + upload B2 + gọi callback `finish_*`).
+ */
+export interface DubbingChunkProgressEvent {
+  jobId: number;
+  lessonId: number;
+  chunkIndex: number;
+  totalChunks: number;
+  status: 'COMPLETED' | 'FAILED';
+}
+
+/**
+ * Sự kiện tiến độ CHI TIẾT trong lúc một chunk đang xử lý dở (chưa xong hẳn) — phân biệt
+ * với {@link DubbingChunkProgressEvent} bằng field `stage` (chunk chỉ COMPLETED/FAILED khi
+ * `dubbing_service.py` publish KHÔNG có field này). `PREPARING`/`FINALIZING` là 2 giai đoạn
+ * cấp-job (tải audio nguồn / ghép file cuối), không có `chunkIndex`; các stage còn lại luôn
+ * gắn với 1 chunk cụ thể.
+ */
+export interface DubbingStageProgressEvent {
+  jobId: number;
+  lessonId: number;
+  stage: 'PREPARING' | 'ASR' | 'TRANSLATE' | 'TTS' | 'UPLOADING' | 'FINALIZING';
+  chunkIndex?: number;
+  totalChunks?: number;
+}
+
+export interface DubbingJobFinishedEvent {
+  jobId: number;
+  lessonId: number;
+  status: 'COMPLETED' | 'FAILED' | 'SKIPPED' | 'CANCELLED';
+}
+
+export type DubbingProgressEvent =
+  | DubbingStageProgressEvent
+  | DubbingChunkProgressEvent
+  | DubbingJobFinishedEvent;
+
+/** UC45 — 1 dòng trong bảng giám sát hàng đợi lồng tiếng của Admin. */
+export interface AiJobSummary {
+  id: number;
+  lessonId: number;
+  lessonTitle: string;
+  targetLanguage: string;
+  status: JobStatus;
+  totalChunks: number;
+  doneChunks: number;
+  progressPercent: number;
+  retryCount: number;
+  errorMessage: string | null;
+  createdAt: string;
 }
 
 // ── Lỗi API (RFC 7807 ProblemDetail từ backend) ─────────────────
@@ -238,6 +409,9 @@ export interface InstructorCourseSummary {
   avgRating: number;
   totalLessons: number;
   createdAt: string;
+  /** % hồ sơ khóa học đã điền đủ (19/09/2026, mở rộng — giao diện tham khảo Udemy "Hoàn thành
+   * khóa học của bạn" ở trang danh sách): tiêu đề/mô tả/ảnh bìa/≥1 chương/≥1 bài học sẵn sàng. */
+  completionPercent: number;
 }
 
 export interface LessonEditItem {
@@ -250,6 +424,8 @@ export interface LessonEditItem {
   videoUrl: string | null;
   youtubeId: string | null;
   durationSec: number | null;
+  /** Mô tả bài giảng (15/09/2026, mở rộng — giao diện tham khảo Udemy) — null nếu chưa nhập. */
+  description: string | null;
 }
 
 export interface ChapterEditItem {
@@ -257,6 +433,8 @@ export interface ChapterEditItem {
   title: string;
   displayOrder: number;
   lessons: LessonEditItem[];
+  /** Mục tiêu học tập của phần này (15/09/2026, mở rộng — giao diện tham khảo Udemy). */
+  description: string | null;
 }
 
 export interface CourseEditDetail {
@@ -278,6 +456,11 @@ export interface CourseEditDetail {
   chapters: ChapterEditItem[];
   missingConditions: string[];
   canSubmit: boolean;
+  visibility: CourseVisibility;
+  hasEnrollPassword: boolean;
+  /** Chia doanh thu 2 mức (20/09/2026) — dựng liên kết giới thiệu `/courses/{slug}?ref=
+   * {referralCode}`. Chỉ trả về ở đây (CHÍNH chủ khóa học), không lộ qua API công khai. */
+  referralCode: string;
 }
 
 export interface CreateChapterInput {
@@ -286,6 +469,7 @@ export interface CreateChapterInput {
 
 export interface UpdateChapterInput {
   title: string;
+  description: string | null;
 }
 
 export interface CreateLessonInput {
@@ -295,6 +479,7 @@ export interface CreateLessonInput {
 export interface UpdateLessonInput {
   title: string;
   isPreview: boolean;
+  description: string | null;
 }
 
 export interface ReorderInput {
@@ -307,6 +492,57 @@ export interface CreateCategoryInput {
 
 export interface UpdateCategoryInput {
   name: string;
+}
+
+// ── Giai đoạn 5: Lồng tiếng AI ───────────────────────────────────
+
+/** UC47 — Admin cấu hình giọng đọc theo ngôn ngữ (BR-DUB-07). */
+export interface VoiceMapping {
+  id: number;
+  language: string;
+  voiceName: string;
+  gender: string;
+  isDefault: boolean;
+  isActive: boolean;
+}
+
+export interface CreateVoiceMappingInput {
+  language: string;
+  voiceName: string;
+  gender: string;
+  isDefault: boolean;
+}
+
+export interface UpdateVoiceMappingInput {
+  gender: string;
+  isDefault: boolean;
+  isActive: boolean;
+}
+
+/**
+ * UC18 — kết quả gọi kích hoạt lồng tiếng:
+ * `CREATED` (job mới, subscribe WebSocket) · `PROCESSING` (job đã có, dedupe BR-DUB-05) ·
+ * `AVAILABLE` (đã có audioUrl sẵn, phát luôn — BR-DUB-04).
+ */
+export interface DubbingActivateResult {
+  status: 'CREATED' | 'PROCESSING' | 'AVAILABLE';
+  jobId: number | null;
+  audioUrl: string | null;
+}
+
+/** UC20 mở rộng — 1 giọng đọc khả dụng của 1 ngôn ngữ (nguồn: `voice_mappings` đang active). */
+export interface VoiceOption {
+  language: string;
+  voiceName: string;
+  gender: 'MALE' | 'FEMALE';
+  isDefault: boolean;
+}
+
+/** UC20 — kết quả huỷ job lồng tiếng đang chạy. */
+export interface DubbingCancelResult {
+  status: 'CANCELLED';
+  jobId: number | null;
+  audioUrl: string | null;
 }
 
 // ── F2.2: Khám phá công khai & Đánh giá ──────────────────────────
@@ -340,19 +576,133 @@ export interface EnrolledCourse {
   isFree: boolean;
   price: number;
   alreadyReviewed: boolean;
+  /** UC22 — % bài COMPLETED / tổng bài READY (BR-PROGRESS-02). */
+  progressPct: number;
+  /** Chỉ có giá trị khi progressPct đạt 100. */
+  completedAt: string | null;
+  /** BR-PROGRESS-04 — MAX điểm Quiz mọi bộ. Luôn null ở Giai đoạn 6 (Quiz thật làm ở Giai đoạn 7). */
+  quizScore: number | null;
+  /** "Học ngay" — bấm vào thẳng bài học này thay vì trang chi tiết khoá. null nếu khoá chưa có bài. */
+  firstLessonId: number | null;
+  /** Trang "Khóa học của tôi" (giao diện kiểu Udemy) — tên giảng viên hiển thị trên thẻ card. */
+  instructorName: string;
+  /** Số sao (1-5) học viên TỰ chấm cho khóa; null nếu chưa đánh giá (khác `alreadyReviewed` — field này mang giá trị thật). */
+  myRating: number | null;
+  /** Ngày ghi danh — dùng cho sort "Recently Enrolled". */
+  enrolledAt: string;
+  /** Lần gần nhất xem 1 bài bất kỳ trong khóa — dùng cho sort "Recently Accessed"; null nếu chưa xem bài nào. */
+  lastAccessedAt: string | null;
+  /** doc/DacTa_ChucNangChungChi.md — chỉ có giá trị khi đã hoàn thành 100% VÀ chứng chỉ đã được
+   * cấp; dùng để điều hướng "Xem chứng chỉ" tới `/certificates/{code}` thay vì tải PDF thẳng. */
+  certificateCode: string | null;
+  /** "Học tiếp" — bài đang học dở (hoặc bài kế tiếp nếu bài gần nhất đã xong); null nếu khóa chưa có bài nào.
+   * Backend: `ResumePointResolver`. Bản backend cũ chưa trả field này nên FE luôn có đường lùi về `firstLessonId`. */
+  resumeLessonId?: number | null;
+  /** Vị trí (giây) mở `resumeLessonId`; trình phát tự khôi phục từ tiến độ đã lưu nên FE chỉ cần id bài. */
+  resumePositionSec?: number | null;
+}
+
+// ── F6.2: Tiến độ học tập (UC21, UC22) ───────────────────────────
+export interface LessonProgressRecordReq {
+  watchedSec: number;
+  lastPositionSec: number;
+}
+
+export interface LessonProgressRes {
+  watchedSec: number;
+  lastPositionSec: number;
+  isCompleted: boolean;
+}
+
+// ── F8.1: Socratic AI Tutor (UC30) ───────────────────────────────
+
+/** UC30 mở rộng — 1 tệp học viên gửi kèm câu hỏi. `dataBase64` KHÔNG có tiền tố
+ * `data:image/png;base64,` — chỉ phần dữ liệu thuần, cắt bỏ trước khi gửi (xem `filesToAttachmentReqs`). */
+export interface TutorAttachmentReq {
+  fileName: string;
+  dataBase64: string;
+}
+
+export interface TutorAskReq {
+  question: string;
+  /** Bỏ trống ở tin đầu tiên — BE tự tạo hoặc tái sử dụng phiên gần nhất. */
+  sessionId?: number | null;
+  /** UC30 mở rộng (06/09/2026) — bài học học viên ĐANG MỞ lúc hỏi, dùng làm ngữ cảnh MẶC ĐỊNH
+   * (không nói rõ bài nào thì trả lời theo bài này; nói rõ 1 bài KHÁC trong khóa thì AI tự đổi). */
+  currentLessonId: number;
+  attachments?: TutorAttachmentReq[];
+}
+
+export interface TutorAskRes {
+  sessionId: number;
+  answer: string;
+  /** Giây, BR-TUTOR-02 — luôn có ≥1 phần tử khi câu trả lời liên quan bài giảng. */
+  citedTimestamps: number[];
+  tokenUsed: number | null;
+  /** Bài học THẬT SỰ được dùng làm ngữ cảnh — có thể khác `currentLessonId` đã gửi lên nếu học
+   * viên hỏi rõ về 1 bài khác. Dùng để biết `citedTimestamps` thuộc video bài học nào. */
+  contextLessonId: number;
+}
+
+/** UC30 mở rộng — tệp đính kèm khi hiển thị (vừa gửi, hoặc phục hồi từ lịch sử). `previewUrl`
+ * chỉ dùng để XEM inline trong khung chat (ảnh) — không phải link tải xuống. */
+export interface TutorAttachment {
+  id: string;
+  fileName: string;
+  previewUrl: string;
+  mimeType: string;
+}
+
+/** Tin nhắn hiển thị trong `TutorPanel` — id có thể là số thật (BE) hoặc `local-...` tạm
+ * thời (vừa gửi, chưa có phản hồi). */
+export interface TutorMessage {
+  id: string;
+  sender: 'USER' | 'AI';
+  content: string;
+  citedTimestamps: number[];
+  attachments: TutorAttachment[];
+  /** UC30 mở rộng (06/09/2026) — bài học `citedTimestamps` thực sự thuộc về, null ở tin nhắn
+   * USER. Có thể khác bài học đang mở nếu học viên hỏi rõ về 1 bài khác trong khóa — click vào
+   * mốc thời gian phải điều hướng đúng bài này thay vì tua nhầm video đang mở. */
+  contextLessonId: number | null;
+}
+
+/** UC30 mở rộng — 1 dòng trong danh sách "lịch sử trò chuyện" kiểu ChatGPT. */
+export interface TutorSession {
+  id: number;
+  /** Do học viên đổi tên, hoặc AI tự gợi ý sau lượt hỏi đầu, hoặc rút gọn câu hỏi đầu. */
+  title: string;
+  /** Thời điểm tin nhắn GẦN NHẤT — quyết định thứ tự trong nhóm "chưa ghim". */
+  lastActivityAt: string;
+  isPinned: boolean;
 }
 
 // ── F3.2: Thanh toán & Đối soát ─────────────────────────────────
 
 export interface CreatePaymentReq {
   courseId: number;
-  paymentMethod: string; // 'VNPAY' | 'MOMO'
+  paymentMethod: string; // 'PAYOS'
   billingName?: string;
   billingPhone?: string;
+  /** Mã giảm giá học viên tự nhập (15/09/2026, mở rộng) — bỏ trống nếu không dùng mã (coupon
+   * autoApply vẫn được xét dù không nhập gì, xem BR-COUPON-01/04). */
+  couponCode?: string;
+  /** Coupon học viên tự chọn trong danh sách ở trang thanh toán (cần `manualCoupon: true`). */
+  couponId?: number;
+  manualCoupon?: boolean;
+  /** "Đăng ký (Quyền riêng tư)" kiểu Udemy (19/09/2026) — chỉ cần khi khóa học ở chế độ
+   * PRIVATE_PASSWORD (`CourseDetail.requiresPassword`), bỏ qua với mọi khóa khác. */
+  courseAccessPassword?: string;
+  /** Chia doanh thu 2 mức (20/09/2026) — mã từ liên kết giới thiệu riêng của Giảng viên
+   * (query `?ref=` đọc lúc vào trang chi tiết khóa học, xem `lib/referral.ts`). Khớp mã của
+   * ĐÚNG khóa này thì Giảng viên hưởng 97% thay vì 37%. */
+  referralCode?: string;
 }
 
 export interface PaymentUrlRes {
   paymentUrl: string;
+  /** Chỉ app mobile dùng (poll `/payments/mine` theo field này) — web không cần. */
+  txnRef: string;
 }
 
 export interface PaymentRes {
@@ -365,4 +715,555 @@ export interface PaymentRes {
   gatewayTxnNo: string | null;
   billingName?: string;
   billingPhone?: string;
+  /** Mã giảm giá (15/09/2026, mở rộng) — null nếu giao dịch không dùng coupon nào. */
+  originalAmount: number | null;
+  discountAmount: number;
+  couponCode: string | null;
+  /** Mã nhóm khi thanh toán giỏ hàng (null với đơn lẻ). */
+  orderGroupRef?: string | null;
+}
+
+/** Giỏ hàng (06/09/2026) — TÍNH NĂNG MỞ RỘNG, không nằm trong 49 use case đặc tả gốc. Gộp
+ * thanh toán nhiều khóa học tự chọn (checkbox) trong 1 lần "Proceed to Checkout". */
+export interface CreateBatchPaymentReq {
+  courseIds: number[];
+  paymentMethod: string;
+  billingName?: string;
+  billingPhone?: string;
+  /** BR-COUPON-05 — mỗi khóa trong giỏ tự chọn mã RIÊNG, đây chỉ là 1 mã áp dụng chung nếu
+   * học viên nhập ở khung "Mã giảm giá" của trang giỏ hàng (áp mã ĐÓ cho MỌI khóa đang thanh
+   * toán, mỗi khóa vẫn tự tính coupon tốt nhất — có thể một khóa lại có coupon autoApply lời
+   * hơn coupon nhập tay, xem `CouponService.resolveBestPrice`). */
+  couponCode?: string;
+  couponId?: number;
+  manualCoupon?: boolean;
+  /** Chia doanh thu 2 mức (20/09/2026) — mã giới thiệu RIÊNG cho từng khóa trong giỏ, khoá
+   * theo `courseId` (xem `lib/referral.ts`). Khóa nào không có entry ở đây tính ORGANIC. */
+  referralCodes?: Record<number, string>;
+  /** Gói khóa học (29/09/2026) — các bundle mà giỏ hàng đã khớp ĐỦ khóa (xem
+   * `matchCartBundles`). BE tự lấy khóa của bundle từ `CourseBundle`, không cần lặp lại trong
+   * `courseIds` — chỉ cần đúng `bundleId`, xem `PaymentDto.CreateBatchReq.bundleIds`. */
+  bundleIds?: number[];
+}
+
+/** Chi tiết 1 user cho trang `/admin/users/[id]` — khớp `UserDto.UserRes` (23/10/2026, mở rộng
+ * thêm isAiLocked/isSpamFlagged/spamFlagReason, chỉ có ý nghĩa khi Admin gọi). */
+export interface AdminUserDetail {
+  id: number;
+  email: string;
+  fullName: string;
+  avatarUrl: string | null;
+  headline: string | null;
+  bio: string | null;
+  role: 'STUDENT' | 'INSTRUCTOR' | 'ADMIN';
+  authProvider: string;
+  preferredLanguage: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string | null;
+  coursesPublic: boolean;
+  wishlistPublic: boolean;
+  isAiLocked: boolean;
+  isSpamFlagged: boolean;
+  spamFlagReason: string | null;
+}
+
+/** Khiếu nại/hoàn tiền giao dịch (23/10/2026) — thay nút "Hoàn tiền"/"Khiếu nại" vốn chỉ hiện
+ * toast, không gọi API nào. REOPENED (26/10/2026): user báo "chưa nhận được tiền" sau khi đã
+ * RESOLVED_REFUNDED. */
+export type DisputeStatus = 'OPEN' | 'RESOLVED_REFUNDED' | 'RESOLVED_REJECTED' | 'REOPENED';
+
+export interface FileDisputeReq {
+  paymentTxnRef: string;
+  reason: string;
+  description?: string;
+  refundBankAccount?: string;
+  termsAccepted: boolean;
+}
+
+export interface DisputeAttachment {
+  id: number;
+  fileUrl: string;
+  /** jpg / png / webp / mp4 / webm */
+  fileType: string;
+}
+
+export interface DisputeRes {
+  id: number;
+  paymentTxnRef: string;
+  courseTitle: string;
+  amount: number;
+  reason: string;
+  description: string | null;
+  status: DisputeStatus;
+  filedByEmail: string;
+  createdAt: string;
+  attachments: DisputeAttachment[];
+  resolvedAt: string | null;
+  /** != null nghĩa là đã dùng hết lượt mở lại (tối đa 1 lần). */
+  reopenedAt: string | null;
+}
+
+export interface DisputeAdminRes extends DisputeRes {
+  refundBankAccount: string | null;
+  adminNote: string | null;
+  resolvedByEmail: string | null;
+  reopenReason: string | null;
+  /** Note của lần resolve đầu, snapshot trước khi bị ghi đè bởi lần resolve sau reopen. */
+  previousAdminNote: string | null;
+}
+
+export interface ResolveDisputeReq {
+  status: 'RESOLVED_REFUNDED' | 'RESOLVED_REJECTED';
+  note: string;
+}
+
+/** User báo "chưa nhận được tiền" sau khi admin đã đánh dấu hoàn tiền (26/10/2026). */
+export interface ReopenDisputeReq {
+  reopenReason: string;
+}
+
+export type SupportCategory =
+  | 'ACCOUNT' | 'PAYMENT' | 'COURSE' | 'LEARNING' | 'AI_FEATURES' | 'EXAM' | 'CERTIFICATE'
+  | 'COMMUNITY' | 'LIVE' | 'INSTRUCTOR' | 'PRIVACY' | 'TECHNICAL' | 'OTHER';
+export type SupportStatus = 'OPEN' | 'IN_PROGRESS' | 'RESOLVED';
+
+/** Ticket hỗ trợ (05/11/2026) — khách chưa đăng nhập cũng gửi được. */
+export interface CreateSupportTicketReq {
+  email: string;
+  category: SupportCategory;
+  subject: string;
+  message: string;
+}
+
+export interface SupportTicketAdminRes {
+  id: number;
+  code: string;
+  email: string;
+  /** null nếu email chưa có tài khoản. */
+  userId: number | null;
+  /** Tên dùng trong lời chào email: họ tên nếu có tài khoản, không thì phần trước @. */
+  senderName: string;
+  category: SupportCategory;
+  subject: string;
+  message: string;
+  status: SupportStatus;
+  /** Bản text phẳng của phản hồi gần nhất. */
+  adminReply: string | null;
+  /** Nội dung email phản hồi gần nhất ở dạng có cấu trúc (placeholder chưa thay), null nếu chưa có. */
+  adminContent: SupportEmailContent | null;
+  resolvedByEmail: string | null;
+  resolvedAt: string | null;
+  createdAt: string;
+  attachments: { id: number; fileUrl: string; fileType: string }[];
+}
+
+export type SupportSectionType = 'TEXT' | 'LIST';
+
+/** 1 mục trong email phản hồi: tiêu đề tùy ý + (đoạn văn hoặc danh sách đánh số). */
+export interface SupportSection {
+  title: string;
+  type: SupportSectionType;
+  text: string | null;
+  items: string[] | null;
+}
+
+/** Toàn bộ nội dung email phản hồi Admin tự soạn; hỗ trợ placeholder {name} {code} {subject} {category}. */
+export interface SupportEmailContent {
+  greeting?: string | null;
+  intro?: string | null;
+  sections: SupportSection[];
+  closing?: string | null;
+  signatureName?: string | null;
+  signatureTeam?: string | null;
+  includeOriginal?: boolean | null;
+}
+
+export interface UpdateSupportTicketReq {
+  status: SupportStatus;
+  content?: SupportEmailContent;
+}
+
+/** Link reset mật khẩu Admin tự gửi thủ công cho user (23/10/2026). */
+export interface ResetLinkRes {
+  resetLink: string;
+  expiresAt: string;
+}
+
+/** 1 dòng trong giỏ hàng — đủ dữ liệu để hiển thị trực tiếp, không cần gọi thêm API chi tiết
+ * khóa học. */
+export interface CartItem {
+  courseId: number;
+  courseTitle: string;
+  courseSlug: string;
+  thumbnailUrl: string | null;
+  instructorName: string;
+  price: number;
+  addedAt: string;
+  /** (14/09/2026, mở rộng) — đủ thông tin hiển thị trên mỗi dòng giỏ hàng kiểu Udemy. */
+  avgRating: number;
+  reviewCount: number;
+  totalDurationSec: number;
+  totalLessons: number;
+  level: CourseLevel;
+  /** Mã giảm giá (15/09/2026, mở rộng) — giỏ hàng không có khóa MIỄN PHÍ (BR-CART-01) nên luôn
+   * xét coupon, không cần nhánh riêng như wishlist. */
+  finalPrice: number;
+  discountPercent: number | null;
+}
+
+/** Danh sách yêu thích (14/09/2026) — TÍNH NĂNG MỞ RỘNG, không nằm trong 49 use case đặc tả
+ * gốc, cùng tinh thần {@link CartItem}. Khác giỏ hàng: khóa MIỄN PHÍ vẫn thêm được (`isFree`). */
+export interface WishlistItem {
+  courseId: number;
+  courseTitle: string;
+  courseSlug: string;
+  thumbnailUrl: string | null;
+  instructorName: string;
+  price: number;
+  isFree: boolean;
+  avgRating: number;
+  reviewCount: number;
+  addedAt: string;
+  /** Mã giảm giá (15/09/2026, mở rộng) — bằng `price` cho khóa MIỄN PHÍ (không xét coupon). */
+  finalPrice: number;
+  discountPercent: number | null;
+}
+
+// ── Mã giảm giá (15/09/2026, mở rộng — UC55/UC56/UC57) ───────────
+
+export interface CouponCourseRef {
+  courseId: number;
+  courseTitle: string;
+}
+
+export interface Coupon {
+  id: number;
+  /** null khi `autoApply=true` (BR-COUPON-04) — coupon tự động không cần mã. */
+  code: string | null;
+  autoApply: boolean;
+  discountType: DiscountType;
+  discountValue: number;
+  scopeType: CouponScopeType;
+  /** Rỗng khi `scopeType=ALL_COURSES`. */
+  courses: CouponCourseRef[];
+  createdByName: string;
+  startAt: string;
+  endAt: string;
+  maxUsageCount: number | null;
+  maxUsagePerUser: number | null;
+  isActive: boolean;
+  usageCount: number;
+}
+
+export interface CreateCouponReq {
+  code?: string;
+  autoApply: boolean;
+  discountType: DiscountType;
+  discountValue: number;
+  scopeType: CouponScopeType;
+  courseIds?: number[];
+  startAt: string;
+  endAt: string;
+  maxUsageCount?: number | null;
+  maxUsagePerUser?: number | null;
+}
+
+export interface UpdateCouponReq extends CreateCouponReq {
+  isActive: boolean;
+}
+
+/** Xem trước giá sau khi nhập mã ở giỏ hàng/thanh toán — không tạo giao dịch nào. */
+export interface CouponPreviewReq {
+  courseId: number;
+  code?: string;
+  /** Học viên tự chọn coupon ở trang thanh toán — chỉ có hiệu lực khi `manualCoupon=true`. */
+  couponId?: number;
+  /** true = chế độ chọn thủ công: BE KHÔNG tự áp coupon autoApply. */
+  manualCoupon?: boolean;
+}
+
+/** Coupon học viên có thể chọn ở trang thanh toán (giảm nhiều nhất xếp trước). */
+export interface AvailableCoupon {
+  id: number;
+  discountType: 'PERCENTAGE' | 'FIXED_AMOUNT';
+  discountValue: number;
+  scopeType: string;
+  endAt: string;
+  savings: number;
+  applicableCourseIds: number[];
+}
+
+export interface CouponPriceRes {
+  originalPrice: number;
+  finalPrice: number;
+  discountPercent: number | null;
+  appliedCouponCode: string | null;
+  /** false khi có nhập mã nhưng mã đó KHÔNG áp dụng được cho khóa này — luôn true nếu bỏ trống mã. */
+  enteredCodeValid: boolean;
+}
+
+// ── F11.1: Live Classroom — vòng đời phiên (UC50) ────────────────
+
+export type LiveVisibility = 'COURSE_ONLY' | 'PUBLIC';
+export type LiveSessionStatus = 'SCHEDULED' | 'LIVE' | 'ENDED';
+
+export interface CreateLiveSessionInput {
+  courseId: number;
+  title: string;
+  visibility: LiveVisibility;
+  /** Bỏ trống thì BE tự lấy theo preferredLanguage của giảng viên (BR-LIVE-04). */
+  sourceLanguage?: string;
+  /** Bỏ trống nghĩa là "sẵn sàng bắt đầu bất kỳ lúc nào", không phải lỗi. */
+  scheduledAt?: string;
+}
+
+export interface LiveSession {
+  id: number;
+  title: string;
+  /** F11.9 mở rộng — `null` nghĩa là giảng viên chưa tự tải ảnh riêng, dùng `courseThumbnailUrl` thay. */
+  thumbnailUrl: string | null;
+  visibility: LiveVisibility;
+  status: LiveSessionStatus;
+  roomName: string;
+  sourceLanguage: string;
+  scheduledAt: string | null;
+  startedAt: string | null;
+  endedAt: string | null;
+  courseId: number;
+  courseTitle: string;
+  courseThumbnailUrl: string | null;
+}
+
+/** UC50 — trả về sau khi bấm "Bắt đầu Live", đủ để connect LiveKit React SDK. */
+export interface LiveSessionStartRes {
+  accessToken: string;
+  serverUrl: string;
+  roomName: string;
+  identity: string;
+}
+
+// ── F11.2: Xem Live theo phân quyền (UC51) ───────────────────────
+
+export interface LiveViewSummary {
+  id: number;
+  title: string;
+  status: LiveSessionStatus;
+  scheduledAt: string | null;
+  startedAt: string | null;
+}
+
+/** `viewerToken`/`serverUrl`/`roomName` chỉ có giá trị khi `status === 'LIVE'`. */
+export interface LiveViewDetail {
+  id: number;
+  title: string;
+  visibility: LiveVisibility;
+  status: LiveSessionStatus;
+  sourceLanguage: string;
+  scheduledAt: string | null;
+  startedAt: string | null;
+  endedAt: string | null;
+  courseId: number;
+  courseTitle: string;
+  viewerToken: string | null;
+  serverUrl: string | null;
+  roomName: string | null;
+}
+
+/** F11.9 — 1 dòng trong trang khám phá `/live` (tab Công khai + Khóa học của tôi dùng chung shape
+ * này — khác `LiveViewSummary`, vốn scoped sẵn theo 1 khóa học nên không cần lặp lại tên khóa). */
+export interface LiveFeedItem {
+  id: number;
+  title: string;
+  /** F11.9 mở rộng — BE đã tự áp dụng fallback về ảnh bìa khóa học nếu buổi live chưa có ảnh
+   * riêng, FE dùng thẳng — vẫn có thể `null` nếu khóa học cũng chưa có ảnh bìa nào. */
+  thumbnailUrl: string | null;
+  status: LiveSessionStatus;
+  scheduledAt: string | null;
+  startedAt: string | null;
+  courseId: number;
+  courseTitle: string;
+  /** Điều hướng sang `/courses/{slug}` — route khóa học dùng slug, không phải id. */
+  courseSlug: string;
+  instructorName: string;
+  sourceLanguage: string;
+}
+
+// ── F11.3: Lồng tiếng Live thời gian thực (UC52) ─────────────────
+
+export type LiveTrackStatus = 'ACTIVE' | 'STOPPED';
+
+export interface LiveLanguageTrack {
+  id: number;
+  targetLanguage: string;
+  voiceName: string;
+  status: LiveTrackStatus;
+  activeListenerCount: number;
+  /** Tên track LiveKit thật, dạng `translated-{targetLanguage}` — dùng để subscribe đúng luồng. */
+  trackName: string;
+}
+
+export interface ActivateLiveLanguageTrackInput {
+  targetLanguage: string;
+  /** Chỉ có tác dụng khi đây là ngôn ngữ CHƯA có track ACTIVE nào (BR-LIVE-05). */
+  voiceName?: string;
+}
+
+// ── Chứng chỉ hoàn thành khóa học (doc/DacTa_ChucNangChungChi.md, BR-CERT-01..10) ────────
+
+export type CertificateStatus = 'ACTIVE' | 'REVOKED';
+
+/** Đúng 7 field `CertificatePreview` cần để vẽ lại NGUYÊN hình chứng chỉ — `Certificate`/
+ * `PublicCertificate`/`CertificateVerification` (khi tìm thấy) đều thoả interface này, nên cả 3
+ * chỗ (trang riêng tư, thẻ hồ sơ công khai, trang xác thực công khai) dùng CHUNG 1 component xem
+ * trước, không phải 3 bản khác nhau (26/09/2026, mở rộng). */
+export interface CertificateVisual {
+  certificateCode: string;
+  courseTitle: string;
+  studentName: string;
+  courseHours: number;
+  instructorName: string;
+  completedAt: string;
+  verifyUrl: string;
+}
+
+/** "Chứng chỉ của tôi" (danh sách + chi tiết) — chủ sở hữu xem/tải/chia sẻ. Mọi field ở đây là
+ * SNAPSHOT tại thời điểm cấp (BR-CERT-04), không đổi dù hồ sơ/khóa học gốc đổi sau này. */
+export interface Certificate extends CertificateVisual {
+  courseId: number;
+  courseSlug: string;
+  issuedAt: string;
+  status: CertificateStatus;
+}
+
+/** Trang xác thực công khai `/verify/{certificateCode}` (BR-CERT-06) — KHÔNG có email, không có
+ * link tải PDF. `found=false` nghĩa là mã không tồn tại (khác REVOKED — REVOKED vẫn "found"). Các
+ * field snapshot vốn đã in công khai ngay trên mặt chứng chỉ nên không phát sinh rò rỉ riêng tư
+ * mới khi trả đủ để FE vẽ lại nguyên hình (26/09/2026, mở rộng — trước đây chỉ trả đủ cho 1 câu
+ * xác nhận dạng chữ). */
+export interface CertificateVerification extends Partial<CertificateVisual> {
+  found: boolean;
+  status: CertificateStatus | null;
+}
+
+/** Hiển thị ở trang hồ sơ công khai (`/u/{userId}`) — chỉ chứng chỉ ACTIVE. (26/09/2026, sửa lỗi)
+ * — trước đây có `courseThumbnailUrl` để hiện ảnh bìa khóa học ở thẻ, nay đổi sang hiện NGUYÊN
+ * hình chứng chỉ (`CertificatePreview`) nên bỏ field đó. */
+export interface PublicCertificate extends CertificateVisual {
+  courseCategoryName: string;
+  issuedAt: string;
+  status: CertificateStatus;
+}
+
+// ── Thông báo hệ thống từ Admin (26/09/2026, tính năng mới) ──────────────
+
+export type AnnouncementSeverity = 'HIGH' | 'MEDIUM' | 'LOW';
+export type AnnouncementAudience = 'ALL' | 'INSTRUCTOR' | 'STUDENT' | 'SPECIFIC_USER';
+export type AnnouncementDispatchStatus = 'PENDING' | 'PROCESSING' | 'DONE' | 'FAILED';
+
+export interface CreateSystemAnnouncementReq {
+  title: string;
+  content: string;
+  severity: AnnouncementSeverity;
+  audience: AnnouncementAudience;
+  /** Bắt buộc khi `audience = 'SPECIFIC_USER'`. */
+  targetUserId: number | null;
+  /** Chỉ có ý nghĩa khi `severity = 'HIGH'` (thời điểm banner tự ẩn) — null = vô thời hạn. */
+  expiresAt: string | null;
+}
+
+/** Lịch sử thông báo hệ thống đã gửi — trang Admin xem lại tiến độ phát tán (job nền Redis, xem
+ * `SystemAnnouncementService` phía backend). */
+export interface SystemAnnouncement {
+  id: number;
+  title: string;
+  content: string;
+  severity: AnnouncementSeverity;
+  audience: AnnouncementAudience;
+  targetUserId: number | null;
+  expiresAt: string | null;
+  dispatchStatus: AnnouncementDispatchStatus;
+  totalRecipients: number | null;
+  sentCount: number;
+  createdByAdminName: string;
+  createdAt: string;
+}
+
+/** Banner cố định đầu trang khi có thông báo `severity = 'HIGH'` đang hoạt động — public, không
+ * cần đăng nhập. */
+export interface SystemAnnouncementBanner {
+  id: number;
+  title: string;
+  content: string;
+  severity: AnnouncementSeverity;
+}
+
+/** BR-TUTOR-SEC-06 (doc/feat/injection/DacTa_ChongPromptInjection_TutorAgent.md) — 1 tin nhắn học
+ * viên gửi vào Socratic Tutor Agent khớp 1 pattern nghi vấn (pre-check heuristic). CHỈ để Admin
+ * xem lại/theo dõi, KHÔNG có hành động khóa/chặn nào gắn với dòng này ở v1. */
+export interface TutorSecurityFlag {
+  id: number;
+  studentId: number;
+  studentName: string;
+  studentEmail: string;
+  courseId: number;
+  courseTitle: string;
+  matchedPattern: string;
+  messageSnapshot: string;
+  createdAt: string;
+}
+
+// ── Course Bundles (29/09/2026) ─────────────────────────────────
+
+export interface BundleCourseItem {
+  id: number;
+  title: string;
+  thumbnail: string | null;
+  price: number;
+}
+
+export interface CourseBundle {
+  id: number;
+  title: string;
+  description: string | null;
+  discountPercent: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  courses: BundleCourseItem[];
+  originalPrice: number;
+  discountAmount: number;
+  finalPrice: number;
+}
+
+export interface CreateBundleReq {
+  title: string;
+  description?: string;
+  discountPercent: number;
+  courseIds: number[];
+}
+
+/** Ranking cộng đồng theo XP (UpComming_Plan.md) — 1 dòng trong Top N ở banner trang chủ. */
+export interface LeaderboardEntry {
+  rank: number;
+  userId: number;
+  fullName: string;
+  avatarUrl: string | null;
+  totalXp: number;
+}
+
+/** Hạng + XP của chính người đang đăng nhập — dùng khi không nằm trong Top N hiển thị.
+ * `ranked=false` khi chưa có XP nào, "hạng" lúc đó không có ý nghĩa, không nên hiển thị. */
+export interface MyRanking {
+  ranked: boolean;
+  rank: number;
+  totalXp: number;
+}
+
+export interface UpdateBundleReq {
+  title?: string;
+  description?: string;
+  discountPercent?: number;
+  isActive?: boolean;
+  courseIds?: number[];
 }

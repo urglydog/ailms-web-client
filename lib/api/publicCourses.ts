@@ -14,6 +14,8 @@ export const EMPTY_FILTERS: CourseFilterState = {
   level: null,
   priceType: 'all',
   keyword: '',
+  minRating: null,
+  durationBucket: null,
 };
 
 /** Cùng bảng màu placeholder ảnh bìa đã dùng ở `lib/mock/courses.ts` — giữ nhất quán hình ảnh. */
@@ -42,8 +44,12 @@ interface RawSummary {
   avgRating: number;
   reviewCount: number;
   totalLessons: number;
+  totalDurationSec: number;
   categorySlug: string;
   categoryName: string;
+  /** Mã giảm giá (15/09/2026, mở rộng) — xem `CourseSummary.finalPrice`. */
+  finalPrice: number;
+  discountPercent: number | null;
 }
 
 interface RawLesson {
@@ -64,6 +70,11 @@ interface RawChapter {
 interface RawDetail extends RawSummary {
   description: string | null;
   chapters: RawChapter[];
+  updatedAt: string;
+  sourceLanguage: string | null;
+  dubbedLanguages: string[];
+  learnerCount: number;
+  requiresPassword: boolean;
 }
 
 /**
@@ -85,10 +96,13 @@ function toSummary(raw: RawSummary): CourseSummary {
     avgRating: raw.avgRating,
     reviewCount: raw.reviewCount,
     totalLessons: raw.totalLessons,
+    totalDurationSec: raw.totalDurationSec,
     categorySlug: raw.categorySlug,
     langs: [],
     coverColorA,
     coverColorB,
+    finalPrice: raw.finalPrice,
+    discountPercent: raw.discountPercent,
   };
 }
 
@@ -119,6 +133,11 @@ function toDetail(raw: RawDetail): CourseDetail {
     chapters: toChapters(raw.chapters),
     // Chưa có luồng ghi danh/mua khóa thật (Giai đoạn 3) nên luôn coi là chưa sở hữu.
     enrolled: false,
+    updatedAt: raw.updatedAt,
+    sourceLanguage: raw.sourceLanguage,
+    dubbedLanguages: raw.dubbedLanguages,
+    learnerCount: raw.learnerCount,
+    requiresPassword: raw.requiresPassword,
   };
 }
 
@@ -152,6 +171,12 @@ function toPlayerLesson(raw: RawPlayerLesson): PlayerLesson {
     languages: [],
     activeTrack: null,
     lastPositionSec: 0,
+    // Chưa đăng nhập (UC11) — khách chưa từng sở hữu khoá nào, không có sidebar chương/bài +
+    // tiến độ, xem `useEnrolledLessonPlayer`.
+    enrolled: false,
+    chapters: [],
+    // UC11 ẩn danh chưa có API phụ đề (chỉ endpoint UC16/17 đã đăng nhập mới trả) — rỗng an toàn.
+    originalSubtitles: [],
   };
 }
 
@@ -171,11 +196,38 @@ export const publicCoursesApi = {
       categorySlug: filters.category ?? undefined,
       level: filters.level ?? undefined,
       priceType: filters.priceType === 'all' ? undefined : filters.priceType,
+      minRating: filters.minRating ?? undefined,
+      durationBucket: filters.durationBucket ?? undefined,
       sortBy: sortBy === 'newest' ? undefined : sortBy,
       size,
     });
     const page = await api.get<Page<RawSummary>>(`/api/v1/courses${query}`);
     return page.content.map(toSummary);
+  },
+
+  /** Một trang kết quả (phân trang phía server). `page` đếm từ 1 ở giao diện, API Spring đếm từ 0. */
+  searchPage: async (
+    filters: CourseFilterState,
+    sortBy: CourseSortBy,
+    page: number,
+    size: number,
+    /** Hủy request khi bộ lọc đã đổi tiếp (React Query truyền vào). */
+    signal?: AbortSignal,
+  ): Promise<{ items: CourseSummary[]; hasNext: boolean }> => {
+    const query = buildQuery({
+      keyword: filters.keyword || undefined,
+      categorySlug: filters.category ?? undefined,
+      level: filters.level ?? undefined,
+      priceType: filters.priceType === 'all' ? undefined : filters.priceType,
+      minRating: filters.minRating ?? undefined,
+      durationBucket: filters.durationBucket ?? undefined,
+      sortBy: sortBy === 'newest' ? undefined : sortBy,
+      page: Math.max(0, page - 1),
+      size,
+    });
+    // Backend trả `Slice` (không đếm tổng): chỉ cần biết còn trang sau hay không.
+    const res = await api.get<{ content: RawSummary[]; last: boolean }>(`/api/v1/courses${query}`, { signal });
+    return { items: res.content.map(toSummary), hasNext: !res.last };
   },
 
   getBySlug: async (slug: string): Promise<CourseDetail> => {

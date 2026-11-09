@@ -1,5 +1,8 @@
 'use client';
 
+import { Modal } from '@/components/ui/Modal';
+
+import Link from 'next/link';
 import type { PaymentRes } from '@/types/domain';
 import { format } from 'date-fns';
 
@@ -14,7 +17,7 @@ export default function PaymentDetailModal({ payment, onClose }: PaymentDetailMo
       case 'PAID':
         return 'bg-success/10 text-success border-success/20';
       case 'PENDING':
-        return 'bg-warning/10 text-warning border-warning/20';
+        return 'bg-warning/10 text-ink border-warning/40';
       case 'FAILED':
         return 'bg-danger/10 text-danger border-danger/20';
       case 'EXPIRED':
@@ -35,27 +38,20 @@ export default function PaymentDetailModal({ payment, onClose }: PaymentDetailMo
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="w-full max-w-lg bg-surface rounded-2xl shadow-xl overflow-hidden border border-line">
-        <div className="px-6 py-4 border-b border-line flex items-center justify-between">
-          <h2 className="text-xl font-display font-bold text-ink">Chi tiết giao dịch</h2>
-          <button
-            onClick={onClose}
-            className="text-ink-muted hover:text-ink transition-colors"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-
-        <div className="p-6 space-y-6">
+    <Modal open onClose={onClose} title="Chi tiết giao dịch" size="md">
+        <div className="space-y-6 pt-2">
           <div className="flex justify-between items-start">
             <div>
               <p className="text-sm font-medium text-ink-muted uppercase tracking-wider mb-1">Số tiền</p>
               <p className="text-3xl font-display font-bold text-accent">
                 {payment.amount.toLocaleString('vi-VN')}đ
               </p>
+              {payment.couponCode && payment.originalAmount != null && (
+                <p className="mt-1 text-sm text-ink-muted">
+                  <span className="line-through">{payment.originalAmount.toLocaleString('vi-VN')}đ</span>
+                  {' '}— đã giảm {payment.discountAmount.toLocaleString('vi-VN')}đ
+                </p>
+              )}
             </div>
             <div className="text-right">
               <p className="text-sm font-medium text-ink-muted uppercase tracking-wider mb-1">Trạng thái</p>
@@ -64,6 +60,13 @@ export default function PaymentDetailModal({ payment, onClose }: PaymentDetailMo
               </span>
             </div>
           </div>
+
+          {payment.couponCode && (
+            <div className="flex items-center justify-between rounded-lg bg-accent/5 border border-accent/20 px-4 py-2.5">
+              <span className="text-sm font-medium text-ink-muted">Mã giảm giá đã dùng</span>
+              <span className="font-mono font-bold text-accent-dark">{payment.couponCode}</span>
+            </div>
+          )}
 
           <div className="grid grid-cols-2 gap-y-4 gap-x-6 border-t border-line pt-6">
             <div className="col-span-2">
@@ -103,20 +106,26 @@ export default function PaymentDetailModal({ payment, onClose }: PaymentDetailMo
           </div>
         </div>
 
-        <div className="px-6 py-4 bg-surface-raised border-t border-line flex justify-between items-center">
+        <div className="-mx-6 -mb-6 mt-6 flex items-center justify-between border-t border-line-soft bg-tint/40 px-6 py-4">
           <div className="flex gap-3">
-            <button
-              onClick={() => alert('Tính năng Báo cáo vấn đề sẽ được ra mắt trong tương lai!')}
-              className="text-sm font-semibold text-danger hover:text-danger-dark transition-colors"
-            >
-              Báo cáo vấn đề
-            </button>
-            <button
-              onClick={() => alert('Chi tiết chính sách hoàn tiền xin xem trong Điều khoản sử dụng. Tính năng tự động hoàn tiền đang được phát triển.')}
+            {payment.status === 'PAID' ? (
+              <Link
+                href={`/disputes/new?ref=${payment.txnRef}`}
+                className="text-sm font-semibold text-danger hover:text-danger-dark transition-colors"
+              >
+                Báo cáo vấn đề
+              </Link>
+            ) : (
+              <span className="text-sm font-semibold text-ink-muted" title="Chỉ khiếu nại được giao dịch đã thanh toán thành công">
+                Báo cáo vấn đề
+              </span>
+            )}
+            <Link
+              href="/legal/refund"
               className="text-sm font-semibold text-ink-muted hover:text-ink transition-colors"
             >
-              Yêu cầu hỗ trợ
-            </button>
+              Chính sách hoàn tiền
+            </Link>
           </div>
           <button
             onClick={onClose}
@@ -125,7 +134,6 @@ export default function PaymentDetailModal({ payment, onClose }: PaymentDetailMo
             Đóng
           </button>
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 }

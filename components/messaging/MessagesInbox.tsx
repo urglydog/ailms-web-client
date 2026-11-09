@@ -1,0 +1,232 @@
+'use client';
+
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { SearchIcon, SendIcon } from '@/components/instructor/SidebarIcons';
+import { useConversationMessages, useConversations, useSendMessage } from '@/hooks/useCommunication';
+import { Avatar } from '@/components/ui/Avatar';
+
+type SortOption = 'newest' | 'oldest';
+
+/**
+ * Hộp thư 2 cột (danh sách hội thoại / nội dung tin nhắn) dùng chung cho cả 2 phía học viên và
+ * giảng viên (19/09/2026, tính năng mới) — API `ConversationRes`/`MessageRes` đã chuẩn hoá theo
+ * góc nhìn "mình"/"người kia" (`mine`, `otherUserName`) nên UI không cần biết đang là vai trò
+ * nào. `composeSlot` là chỗ cắm nút "Soạn tin nhắn" riêng của Giảng viên (chọn khóa → học viên).
+ */
+export function MessagesInbox({
+  composeSlot,
+  initialConversationId,
+}: {
+  composeSlot?: ReactNode;
+  /** Mở sẵn 1 hội thoại cụ thể (vd đến từ nút "Nhắn tin giảng viên" ở trang khóa học). */
+  initialConversationId?: number | null;
+}) {
+  const { data: conversations, isLoading } = useConversations();
+  const [selectedId, setSelectedId] = useState<number | null>(initialConversationId ?? null);
+  const [search, setSearch] = useState('');
+  const [sort, setSort] = useState<SortOption>('newest');
+  const [showSortMenu, setShowSortMenu] = useState(false);
+
+  useEffect(() => {
+    const first = conversations?.[0];
+    if (!selectedId && first) {
+      setSelectedId(first.id);
+    }
+  }, [conversations, selectedId]);
+
+  const selected = conversations?.find((c) => c.id === selectedId) ?? null;
+
+  const visibleConversations = useMemo(() => {
+    const list = conversations ?? [];
+    const filtered = search.trim()
+      ? list.filter(
+          (c) =>
+            c.otherUserName.toLowerCase().includes(search.toLowerCase()) ||
+            (c.lastMessagePreview ?? '').toLowerCase().includes(search.toLowerCase()),
+        )
+      : list;
+    const sorted = [...filtered].sort((a, b) => new Date(a.lastMessageAt).getTime() - new Date(b.lastMessageAt).getTime());
+    return sort === 'newest' ? sorted.reverse() : sorted;
+  }, [conversations, search, sort]);
+
+  return (
+    // (26/09/2026, sửa lỗi) — trước đây `grid-cols-[300px_1fr]` áp dụng KHÔNG điều kiện, không
+    // co lại dưới `md`, cột 300px cố định chỉ chừa ~75px cho toàn bộ khung tin nhắn trên điện
+    // thoại — gần như không dùng được. Giờ 1 cột trên mobile, LUÔN chỉ hiện ĐÚNG 1 trong 2 khối
+    // (danh sách hoặc hội thoại đang chọn) tùy theo `selectedId`, có nút "← Quay lại" để đổi
+    // khối; từ `md:` trở lên giữ nguyên 2 cột luôn hiện song song như cũ.
+    <div className="grid h-[calc(100vh-180px)] min-h-[480px] grid-cols-1 overflow-hidden rounded-xl border border-line bg-surface-raised shadow-sm md:grid-cols-[300px_1fr]">
+      <div className={`flex-col border-r border-line-soft ${selectedId ? 'hidden md:flex' : 'flex'}`}>
+        <div className="flex items-center justify-between gap-2 border-b border-line-soft p-3">
+          <span className="font-display text-[14px] font-bold text-ink">Hội thoại</span>
+          {composeSlot}
+        </div>
+        <div className="flex items-center gap-1.5 border-b border-line-soft p-2">
+          <div className="flex flex-1 items-center gap-1.5 rounded-lg border border-line px-2 py-1.5">
+            <SearchIcon className="h-3.5 w-3.5 shrink-0 text-ink-faint" />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Tìm theo tên, nội dung..."
+              className="w-full text-[12.5px] outline-none"
+            />
+          </div>
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setShowSortMenu((v) => !v)}
+              title="Sắp xếp"
+              className="rounded-lg border border-line px-2 py-1.5 text-[12px] font-semibold text-ink-muted hover:bg-surface"
+            >
+              {sort === 'newest' ? 'Mới nhất' : 'Cũ nhất'} ▾
+            </button>
+            {showSortMenu && (
+              <>
+                <div className="fixed inset-0 z-10" onClick={() => setShowSortMenu(false)} />
+                <div className="absolute right-0 top-full z-20 mt-1 w-32 overflow-hidden rounded-lg border border-line bg-surface-raised py-1 shadow-lg">
+                  {(['newest', 'oldest'] as SortOption[]).map((option) => (
+                    <button
+                      key={option}
+                      type="button"
+                      onClick={() => { setSort(option); setShowSortMenu(false); }}
+                      className={`block w-full px-3 py-1.5 text-left text-[12.5px] hover:bg-surface ${sort === option ? 'font-bold text-accent-dark' : 'text-ink'}`}
+                    >
+                      {option === 'newest' ? 'Mới nhất' : 'Cũ nhất'}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+        <div className="flex-1 overflow-y-auto">
+          {isLoading && <p className="p-4 text-center text-[13px] text-ink-muted">Đang tải...</p>}
+          {!isLoading && visibleConversations.length === 0 && (
+            <p className="p-4 text-center text-[13px] text-ink-muted">
+              {conversations && conversations.length > 0 ? 'Không tìm thấy hội thoại phù hợp.' : 'Chưa có hội thoại nào.'}
+            </p>
+          )}
+          {visibleConversations.map((c) => (
+            <button
+              key={c.id}
+              type="button"
+              onClick={() => setSelectedId(c.id)}
+              className={`flex w-full items-start gap-2.5 border-b border-line-soft px-3 py-2.5 text-left transition-colors ${
+                selectedId === c.id ? 'bg-tint' : 'hover:bg-surface'
+              }`}
+            >
+              <Avatar name={c.otherUserName} avatarUrl={c.otherUserAvatarUrl} size={34} />
+              <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="truncate text-[13px] font-semibold text-ink">{c.otherUserName}</span>
+                  {c.unreadCount > 0 && (
+                    <span className="shrink-0 rounded-full bg-accent px-1.5 py-0.5 text-[10px] font-bold text-white">
+                      {c.unreadCount > 9 ? '9+' : c.unreadCount}
+                    </span>
+                  )}
+                </div>
+                {c.courseTitle && <span className="truncate text-[11px] text-ink-faint">{c.courseTitle}</span>}
+                {c.lastMessagePreview && (
+                  <span className="truncate text-[12px] text-ink-muted">{c.lastMessagePreview}</span>
+                )}
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className={`flex-col ${selectedId ? 'flex' : 'hidden md:flex'}`}>
+        {!selected ? (
+          <div className="flex flex-1 items-center justify-center text-[13px] text-ink-faint">
+            Chọn 1 hội thoại để xem tin nhắn
+          </div>
+        ) : (
+          <ConversationThread
+            conversationId={selected.id}
+            otherUserName={selected.otherUserName}
+            otherUserAvatarUrl={selected.otherUserAvatarUrl}
+            onBack={() => setSelectedId(null)}
+          />
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ConversationThread({
+  conversationId, otherUserName, otherUserAvatarUrl, onBack,
+}: {
+  conversationId: number; otherUserName: string; otherUserAvatarUrl: string | null; onBack: () => void;
+}) {
+  const { data: messages, isLoading } = useConversationMessages(conversationId);
+  const sendMessage = useSendMessage();
+  const [content, setContent] = useState('');
+
+  const handleSend = () => {
+    if (!content.trim()) return;
+    sendMessage.mutate({ conversationId, content: content.trim() }, { onSuccess: () => setContent('') });
+  };
+
+  return (
+    <>
+      <div className="flex items-center gap-2.5 border-b border-line-soft px-4 py-3">
+        {/* Chỉ hiện dưới `md` — ở màn hình rộng cả 2 cột luôn hiện song song nên không cần "quay
+            lại" (xem `MessagesInbox`). */}
+        <button
+          type="button"
+          onClick={onBack}
+          aria-label="Quay lại danh sách hội thoại"
+          className="-ml-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-ink-muted hover:bg-tint md:hidden"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round">
+            <path d="m15 18-6-6 6-6" />
+          </svg>
+        </button>
+        <Avatar name={otherUserName} avatarUrl={otherUserAvatarUrl} size={30} />
+        <span className="font-display text-[14px] font-bold text-ink">{otherUserName}</span>
+      </div>
+
+      <div className="flex-1 overflow-y-auto p-4">
+        {isLoading && <p className="text-center text-[13px] text-ink-muted">Đang tải...</p>}
+        <div className="flex flex-col gap-2">
+          {messages?.map((m) => (
+            <div key={m.id} className={`flex items-end gap-2 ${m.mine ? 'flex-row-reverse' : ''}`}>
+              <Avatar name={m.senderName} avatarUrl={m.senderAvatarUrl} size={24} />
+              <div
+                className={`max-w-[70%] rounded-xl px-3 py-2 text-[13px] ${
+                  m.mine ? 'bg-accent text-white' : 'bg-tint text-ink'
+                }`}
+              >
+                {m.content}
+                <div className={`mt-1 text-[10.5px] ${m.mine ? 'text-cyan-100' : 'text-ink-faint'}`}>
+                  {new Date(m.createdAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex items-center gap-2 border-t border-line-soft p-3">
+        <input
+          type="text"
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') handleSend();
+          }}
+          placeholder="Nhập tin nhắn..."
+          className="flex-1 rounded-lg border border-line px-3 py-2 text-[13px] focus:border-accent focus:outline-none"
+        />
+        <button
+          type="button"
+          onClick={handleSend}
+          disabled={!content.trim() || sendMessage.isPending}
+          className="flex shrink-0 items-center justify-center rounded-lg bg-accent px-3.5 py-2 text-white hover:bg-accent-dark disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <SendIcon />
+        </button>
+      </div>
+    </>
+  );
+}

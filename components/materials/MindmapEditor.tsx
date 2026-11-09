@@ -1,0 +1,1066 @@
+'use client';
+
+import React, { useCallback, useEffect, useState, useRef, useMemo } from 'react';
+import {
+  ReactFlow,
+  Controls,
+  Background,
+  applyNodeChanges,
+  applyEdgeChanges,
+  addEdge,
+  Node,
+  Edge,
+  NodeChange,
+  EdgeChange,
+  Connection,
+  MarkerType,
+  useReactFlow,
+  ReactFlowProvider,
+  Position,
+  MiniMap,
+  Panel,
+  PanOnScrollMode,
+  getNodesBounds
+} from '@xyflow/react';
+import '@xyflow/react/dist/style.css';
+import dagre from 'dagre';
+import { toPng, toJpeg, toSvg } from 'html-to-image';
+import {
+  GitBranch,
+  ArrowLeftRight,
+  LayoutGrid,
+  ArrowRight,
+  ArrowLeft,
+  ArrowDown,
+  ArrowUp,
+  Download,
+  Undo2,
+  Redo2,
+  Save,
+  MousePointer2,
+  Move,
+  Pencil,
+  ChevronRight,
+  ChevronLeft,
+} from 'lucide-react';
+
+interface MindmapEditorProps {
+  initialMermaidCode: string;
+  initialTemplate?: string;
+  onSave?: (newMermaidCode: string) => void;
+  readOnly?: boolean;
+}
+
+const nodeWidth = 200;
+const nodeHeight = 50;
+
+/** `textColor` — màu chữ node cấp ≥2 (nhánh cháu), chọn riêng theo từng theme để luôn đủ tương
+ * phản với `background`. Trước đây hardcode 1 màu xám tối chung cho mọi theme — khiến theme nền
+ * tối ("Dark Nebula") bị ẩn chữ hoàn toàn, đã sửa ở đây. */
+const THEME_PRESETS: Record<string, { background: string, palette: string[], rootBg: string, rootColor: string, textColor: string }> = {
+  Dawn: {
+    background: '#FFFFFF',
+    palette: ['#FF6B6B', '#FFA94D', '#FFD43B', '#69DB7C', '#4DABF7', '#DA77F2'],
+    rootBg: '#212529',
+    rootColor: '#FFFFFF',
+    textColor: '#475569'
+  },
+  'Dark Nebula': {
+    background: '#1E1E2E',
+    palette: ['#F38BA8', '#FAB387', '#A6E3A1', '#89B4FA', '#CBA6F7'],
+    rootBg: '#CBA6F7',
+    rootColor: '#1E1E2E',
+    textColor: '#CDD6F4'
+  },
+  'Classic Business': {
+    background: '#F8F9FA',
+    palette: ['#2B4C7E', '#3D6B9C', '#4A7FB2', '#679BCE', '#86B5E3'],
+    rootBg: '#1A365D',
+    rootColor: '#FFFFFF',
+    textColor: '#334155'
+  },
+  'Oceanic': {
+    background: '#E0F2FE',
+    palette: ['#0284C7', '#0369A1', '#075985', '#0C4A6E', '#082F49'],
+    rootBg: '#0284C7',
+    rootColor: '#FFFFFF',
+    textColor: '#0C4A6E'
+  },
+  'Forest': {
+    background: '#F0FDF4',
+    palette: ['#16A34A', '#15803D', '#166534', '#14532D', '#052E16'],
+    rootBg: '#16A34A',
+    rootColor: '#FFFFFF',
+    textColor: '#14532D'
+  },
+  Slate: {
+    background: '#F8FAFC',
+    palette: ['#2563EB', '#1D4ED8', '#3B82F6', '#60A5FA', '#1E40AF'],
+    rootBg: '#0F172A',
+    rootColor: '#FFFFFF',
+    textColor: '#334155'
+  },
+  Sunset: {
+    background: '#FFF7ED',
+    palette: ['#F97316', '#EA580C', '#F43F5E', '#FB923C', '#FDBA74'],
+    rootBg: '#C2410C',
+    rootColor: '#FFFFFF',
+    textColor: '#7C2D12'
+  }
+};
+
+const LAYOUTS = [
+  { id: 'LR', name: 'Logic Chart (L-R)', Icon: ArrowRight },
+  { id: 'RL', name: 'Logic Chart (R-L)', Icon: ArrowLeft },
+  { id: 'TB', name: 'Org Chart (T-B)', Icon: ArrowDown },
+  { id: 'BT', name: 'Org Chart (B-T)', Icon: ArrowUp },
+];
+
+function getLayoutedElements(nodes: Node[], edges: Edge[], direction = 'LR') {
+  if (nodes.length === 0) return { nodes, edges };
+  
+  // Default Dagre
+  const dagreGraph = new dagre.graphlib.Graph();
+  dagreGraph.setDefaultEdgeLabel(() => ({}));
+  const actualDirection = (direction === 'FISHBONE' || direction === 'MATRIX') ? 'LR' : direction;
+  const isHorizontal = actualDirection === 'LR' || actualDirection === 'RL';
+  dagreGraph.setGraph({ rankdir: actualDirection, nodesep: 50, ranksep: 100 });
+
+  nodes.forEach((node) => {
+    dagreGraph.setNode(node.id, { width: nodeWidth, height: nodeHeight });
+  });
+
+  const validIds = new Set(nodes.map(n => n.id));
+  edges.forEach((edge) => {
+    if (validIds.has(edge.source) && validIds.has(edge.target)) {
+        dagreGraph.setEdge(edge.source, edge.target);
+    }
+  });
+
+  dagre.layout(dagreGraph);
+
+  const newNodes = nodes.map((node) => {
+    const nodeWithPosition = dagreGraph.node(node.id);
+    let targetPosition = isHorizontal ? Position.Left : Position.Top;
+    let sourcePosition = isHorizontal ? Position.Right : Position.Bottom;
+
+    if (actualDirection === 'RL') {
+        targetPosition = Position.Right;
+        sourcePosition = Position.Left;
+    } else if (actualDirection === 'BT') {
+        targetPosition = Position.Bottom;
+        sourcePosition = Position.Top;
+    }
+
+    let yOffset = 0;
+    if (direction === 'FISHBONE' && node.data.level !== 0) {
+        yOffset = (node.data.branchIndex as number % 2 === 0) ? -80 : 80;
+    }
+
+    return {
+      ...node,
+      targetPosition,
+      sourcePosition,
+      position: {
+        x: nodeWithPosition.x - nodeWidth / 2,
+        y: (nodeWithPosition.y - nodeHeight / 2) + yOffset,
+      },
+    };
+  });
+
+  return { nodes: newNodes, edges };
+}
+
+function parseMermaidToFlow(code: string, theme: string) {
+  const nodes: Node[] = [];
+  const edges: Edge[] = [];
+  const nodeMap = new Map<string, Node>();
+  const t = THEME_PRESETS[theme] || THEME_PRESETS['Dawn']!;
+  
+  const lines = code.split('\n').map(l => l.trim());
+  let inThemeStyle = false;
+
+  lines.forEach((line) => {
+    if (line.startsWith('%% THEME_STYLE_START')) {
+       inThemeStyle = true;
+       return;
+    }
+    if (line.startsWith('%% THEME_STYLE_END')) {
+       inThemeStyle = false;
+       return;
+    }
+    if (inThemeStyle) return;
+    
+    if (line.startsWith('%% POSITIONS: ')) return;
+    if (!line || line.startsWith('graph') || line.startsWith('mindmap')) return;
+    
+    if (line.startsWith('style ')) {
+      const match = line.match(/^style\s+([^\s]+)\s+(.*)$/);
+      if (match) {
+        const id = match[1] as string;
+        const styles = match[2] as string;
+        const fillMatch = styles.match(/fill:([^,]+)/);
+        const colorMatch = styles.match(/color:([^,]+)/);
+        
+        if (!nodeMap.has(id)) {
+           const newNode: Node = { id, position: {x:0, y:0}, data: { label: id, level: 0 } };
+           nodes.push(newNode);
+           nodeMap.set(id, newNode);
+        }
+        const node = nodeMap.get(id)!;
+        if (fillMatch) node.data.customBg = fillMatch[1];
+        if (colorMatch) node.data.customColor = colorMatch[1];
+      }
+      return;
+    }
+    
+    const edgeParts = line.split(/\s*-->\s*/);
+    const partIds = edgeParts.map((part) => {
+      const match = part.match(/^([^\s\[\]\(\)\{\}]+)(?:\["?(.*?)"?\]|\(\("?(.*?)"?\)\)|\("?(.*?)"?\)|\{"?(.*?)"?\})?$/);
+      if (match) {
+        const id = match[1] as string;
+        const rectLbl = match[2];
+        const circleLbl = match[3];
+        const roundedLbl = match[4];
+        const rhombusLbl = match[5];
+        const label = rectLbl || circleLbl || roundedLbl || rhombusLbl;
+        
+        let shape = 'rect';
+        if (circleLbl) shape = 'circle';
+        else if (roundedLbl) shape = 'rounded';
+        else if (rhombusLbl) shape = 'rhombus';
+        
+        if (!nodeMap.has(id)) {
+           const newNode: Node = {
+             id,
+             position: { x: 0, y: 0 },
+             data: { label: label || id, level: 0, shape },
+           };
+           nodes.push(newNode);
+           nodeMap.set(id, newNode);
+        } else if (label) {
+           const existing = nodeMap.get(id)!;
+           existing.data.label = label;
+           existing.data.shape = shape;
+        }
+        return id;
+      }
+      return null;
+    });
+
+    for (let i = 0; i < partIds.length - 1; i++) {
+      const source = partIds[i];
+      const target = partIds[i+1];
+      if (source && target) {
+        const edgeId = `e-${source}-${target}`;
+        if (!edges.find(e => e.id === edgeId)) {
+          edges.push({ id: edgeId, source, target, animated: false });
+        }
+      }
+    }
+  });
+
+  if (nodes.length === 0) {
+    nodes.push({ id: 'root', position: { x: 100, y: 100 }, data: { label: 'Chủ đề chính', level: 0 } });
+  }
+
+  // Calculate Levels using BFS
+  const rootNode = nodes[0]!;
+  rootNode.data.level = 0;
+  const queue = [rootNode.id];
+  const visited = new Set([rootNode.id]);
+
+  while(queue.length > 0) {
+    const curr = queue.shift()!;
+    const currNode = nodes.find(n => n.id === curr)!;
+    const childrenEdges = edges.filter(e => e.source === curr);
+    
+    childrenEdges.forEach((e, idx) => {
+      if (!visited.has(e.target)) {
+        visited.add(e.target);
+        const childNode = nodes.find(n => n.id === e.target);
+        if (childNode) {
+            childNode.data.level = (currNode.data.level as number) + 1;
+            if (childNode.data.level === 1) {
+                childNode.data.branchIndex = idx;
+            } else {
+                childNode.data.branchIndex = currNode.data.branchIndex;
+            }
+            queue.push(childNode.id);
+        }
+      }
+    });
+  }
+
+  // Apply visual styling based on calculated levels
+  nodes.forEach(n => {
+      const level = n.data.level as number;
+      const bIdx = (n.data.branchIndex as number) || 0;
+      const paletteColor = t.palette[bIdx % t.palette.length] || '#000000';
+
+      if (level === 0) {
+          n.style = { background: t.rootBg, color: t.rootColor, border: 'none', borderRadius: '8px', padding: '14px 24px', fontWeight: 'bold', fontSize: '16px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' };
+      } else if (level === 1) {
+          n.style = { background: '#FFFFFF', color: paletteColor, border: `2px solid ${paletteColor}`, borderRadius: '20px', padding: '10px 20px', fontWeight: 'bold', fontSize: '14px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' };
+      } else {
+          n.style = { background: 'transparent', color: t.textColor, border: 'none', borderBottom: `2px solid ${paletteColor}`, borderRadius: '0', padding: '6px 12px', fontWeight: '500', fontSize: '13px' };
+      }
+      
+      const shape = n.data.shape as string;
+      if (shape === 'rounded') n.style!.borderRadius = '20px';
+      if (shape === 'circle') { n.style!.borderRadius = '50%'; n.style!.width = '80px'; n.style!.height = '80px'; n.style!.display = 'flex'; n.style!.alignItems = 'center'; n.style!.justifyContent = 'center'; n.style!.textAlign = 'center'; }
+      if (shape === 'rhombus') { n.style!.borderRadius = '0'; n.style!.transform = 'rotate(45deg)'; /* basic representation */ }
+      
+      if (n.data.customBg) n.style!.background = n.data.customBg as string;
+      if (n.data.customColor) n.style!.color = n.data.customColor as string;
+      if (n.data.isBold) n.style!.fontWeight = '900';
+      if (n.data.isItalic) n.style!.fontStyle = 'italic';
+  });
+
+  edges.forEach(e => {
+      const targetNode = nodes.find(n => n.id === e.target);
+      const bIdx = (targetNode?.data.branchIndex as number) || 0;
+      const paletteColor = t.palette[bIdx % t.palette.length] || '#000000';
+      e.style = { stroke: paletteColor, strokeWidth: targetNode?.data.level === 1 ? 3 : 2 };
+      e.type = 'smoothstep';
+      e.markerEnd = { type: MarkerType.ArrowClosed, color: paletteColor };
+  });
+
+  return { nodes, edges };
+}
+
+function parseFlowToMarkdownList(nodes: Node[], edges: Edge[]): string {
+    if (nodes.length === 0) return '';
+    const rootNodes = nodes.filter(n => !edges.find(e => e.target === n.id));
+    const root = rootNodes[0] || nodes[0];
+    
+    let md = '';
+    
+    const dfs = (nodeId: string, level: number) => {
+        const node = nodes.find(n => n.id === nodeId);
+        if (!node) return;
+        const label = node.data.label as string;
+        if (level === 0) {
+            md += `# ${label}\n`;
+        } else {
+            md += `${'  '.repeat(level - 1)}- ${label}\n`;
+        }
+        
+        const children = edges.filter(e => e.source === nodeId).map(e => e.target);
+        for (const childId of children) {
+            dfs(childId, level + 1);
+        }
+    };
+    
+    if (root) dfs(root.id, 0);
+    return md;
+}
+
+function parseFlowToMermaid(nodes: Node[], edges: Edge[], layout: string, theme: string) {
+  let mermaid = `%% CONFIG: {"layout":"${layout}","theme":"${theme}"}\n`;
+  
+  let direction = layout;
+  if (layout === 'ORG_CHART' || layout === 'TB') direction = 'TB';
+  else if (layout === 'RL') direction = 'RL';
+  else if (layout === 'BT') direction = 'BT';
+  else direction = 'LR'; // Default for FISHBONE, LOGIC_CHART, etc.
+
+  mermaid += `graph ${direction}\n`;
+  const t = THEME_PRESETS[theme] || THEME_PRESETS['Dawn']!;
+  let customStyles = '';
+  let themeStyles = '%% THEME_STYLE_START\n';
+
+  nodes.forEach(n => {
+    const label = (n.data.label as string) || n.id;
+    let mdLabel = label;
+    if (n.data.isBold && n.data.isItalic) mdLabel = `***${label}***`;
+    else if (n.data.isBold) mdLabel = `**${label}**`;
+    else if (n.data.isItalic) mdLabel = `*${label}*`;
+
+    const shape = n.data.shape || 'rect';
+    if (shape === 'rounded') mermaid += `    ${n.id}("${mdLabel}")\n`;
+    else if (shape === 'circle') mermaid += `    ${n.id}(("${mdLabel}"))\n`;
+    else if (shape === 'rhombus') mermaid += `    ${n.id}{"${mdLabel}"}\n`;
+    else mermaid += `    ${n.id}["${mdLabel}"]\n`;
+    
+    // Theme Styles
+    const level = n.data.level as number;
+    const bIdx = (n.data.branchIndex as number) || 0;
+    const paletteColor = t.palette[bIdx % t.palette.length] || '#000000';
+    
+    let themeBg = 'none';
+    let themeColor = t.textColor;
+    let themeStroke = 'none';
+    
+    if (level === 0) {
+        themeBg = t.rootBg;
+        themeColor = t.rootColor;
+    } else if (level === 1) {
+        themeBg = '#FFFFFF';
+        themeColor = paletteColor;
+        themeStroke = paletteColor;
+    }
+    themeStyles += `    style ${n.id} fill:${themeBg},color:${themeColor},stroke:${themeStroke},stroke-width:2px\n`;
+    
+    // Custom Styles
+    const styleStr = [];
+    if (n.data.customBg) styleStr.push(`fill:${n.data.customBg}`);
+    if (n.data.customColor) styleStr.push(`color:${n.data.customColor}`);
+    
+    if (styleStr.length > 0) {
+       customStyles += `    style ${n.id} ${styleStr.join(',')}\n`;
+    }
+  });
+  
+  let linkStyles = '%% THEME_STYLE_START\n';
+  edges.forEach((e, idx) => {
+    mermaid += `    ${e.source} --> ${e.target}\n`;
+    const targetNode = nodes.find(n => n.id === e.target);
+    const bIdx = (targetNode?.data.branchIndex as number) || 0;
+    const paletteColor = t.palette[bIdx % t.palette.length] || '#000000';
+    const width = targetNode?.data.level === 1 ? '3px' : '2px';
+    linkStyles += `    linkStyle ${idx} stroke:${paletteColor},stroke-width:${width}\n`;
+  });
+  
+  themeStyles += '%% THEME_STYLE_END\n';
+  linkStyles += '%% THEME_STYLE_END\n';
+
+  return mermaid + themeStyles + linkStyles + customStyles;
+}
+
+export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOnly = false }: MindmapEditorProps) {
+  const [nodes, setNodes] = useState<Node[]>([]);
+  const [edges, setEdges] = useState<Edge[]>([]);
+  const [history, setHistory] = useState<{nodes: Node[], edges: Edge[]}[]>([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+
+  const pushHistory = useCallback((newNodes: Node[], newEdges: Edge[]) => {
+      setHistory(prev => {
+          const newHistory = prev.slice(0, historyIndex + 1);
+          newHistory.push({ nodes: newNodes, edges: newEdges });
+          if (newHistory.length > 20) newHistory.shift(); // Keep 20 steps
+          return newHistory;
+      });
+      setHistoryIndex(prev => prev >= 19 ? 19 : prev + 1);
+  }, [historyIndex]);
+
+  const applyTheme = useCallback((themeName: string, nds: Node[], eds: Edge[]) => {
+      const t = THEME_PRESETS[themeName] || THEME_PRESETS['Dawn']!;
+      const newNodes = nds.map(n => {
+          const level = n.data.level as number;
+          const bIdx = (n.data.branchIndex as number) || 0;
+          const paletteColor = t.palette[bIdx % t.palette.length] || '#000000';
+          const newStyle: React.CSSProperties = { ...n.style };
+          
+          if (level === 0) {
+              Object.assign(newStyle, { background: t.rootBg, color: t.rootColor, border: 'none', borderRadius: '8px', padding: '14px 24px', fontWeight: 'bold', fontSize: '16px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' });
+          } else if (level === 1) {
+              Object.assign(newStyle, { background: '#FFFFFF', color: paletteColor, border: `2px solid ${paletteColor}`, borderRadius: '20px', padding: '10px 20px', fontWeight: 'bold', fontSize: '14px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' });
+          } else {
+              Object.assign(newStyle, { background: 'transparent', color: t.textColor, border: 'none', borderBottom: `2px solid ${paletteColor}`, borderRadius: '0', padding: '6px 12px', fontWeight: '500', fontSize: '13px' });
+          }
+          
+          const shape = n.data.shape as string;
+          if (shape === 'rounded') newStyle.borderRadius = '20px';
+          if (shape === 'circle') { newStyle.borderRadius = '50%'; newStyle.width = '80px'; newStyle.height = '80px'; newStyle.display = 'flex'; newStyle.alignItems = 'center'; newStyle.justifyContent = 'center'; newStyle.textAlign = 'center'; }
+          if (shape === 'rhombus') { newStyle.borderRadius = '0'; newStyle.transform = 'rotate(45deg)'; }
+          
+          if (n.data.customBg) newStyle.background = n.data.customBg as string;
+          if (n.data.customColor) newStyle.color = n.data.customColor as string;
+          if (n.data.isBold) newStyle.fontWeight = '900';
+          if (n.data.isItalic) newStyle.fontStyle = 'italic';
+          
+          return { ...n, style: newStyle };
+      });
+      
+      const newEdges = eds.map(e => {
+          const targetNode = nds.find(n => n.id === e.target);
+          const bIdx = (targetNode?.data.branchIndex as number) || 0;
+          const paletteColor = t.palette[bIdx % t.palette.length] || '#000000';
+          return {
+              ...e,
+              style: { ...e.style, stroke: paletteColor, strokeWidth: targetNode?.data.level === 1 ? 3 : 2 },
+              markerEnd: { type: MarkerType.ArrowClosed, color: paletteColor }
+          };
+      });
+      
+      setNodes(newNodes);
+      setEdges(newEdges);
+      setTimeout(() => pushHistory(newNodes, newEdges), 100);
+  }, [pushHistory]);
+
+  const handleUndo = useCallback(() => {
+      if (historyIndex > 0) {
+          const prevState = history[historyIndex - 1];
+          if (prevState) {
+              setNodes(prevState.nodes);
+              setEdges(prevState.edges);
+              setHistoryIndex(historyIndex - 1);
+          }
+      }
+  }, [history, historyIndex]);
+
+  const handleRedo = useCallback(() => {
+      if (historyIndex < history.length - 1) {
+          const nextState = history[historyIndex + 1];
+          if (nextState) {
+              setNodes(nextState.nodes);
+              setEdges(nextState.edges);
+              setHistoryIndex(historyIndex + 1);
+          }
+      }
+  }, [history, historyIndex]);
+
+  const [editingNode, setEditingNode] = useState<{ id: string; label: string } | null>(null);
+  const { fitView } = useReactFlow();
+
+  const ref = useRef<HTMLDivElement>(null);
+  const [showExport, setShowExport] = useState(false);
+  const exportRef = useRef<HTMLDivElement>(null);
+  const layoutRef = useRef<HTMLDivElement>(null);
+  const [showLayouts, setShowLayouts] = useState(false);
+  
+  const [activeTab, setActiveTab] = useState<'Map' | 'Style'>('Map');
+  
+  // Parse initial config from mermaid code or props
+  const parsedConfig = useMemo(() => {
+    let layout = initialTemplate || 'LR';
+    let theme = 'Dawn';
+    const match = initialMermaidCode.match(/%% CONFIG: (.+)/);
+    if (match && match[1]) {
+        try {
+            const config = JSON.parse(match[1]);
+            if (config.layout) layout = config.layout;
+            if (config.theme) theme = config.theme;
+        } catch {}
+    }
+    if (layout === 'LOGIC_CHART' || layout === 'BRACE_MAP' || layout === 'TREE_TABLE' || layout === 'TIMELINE') layout = 'LR';
+    if (layout === 'ORG_CHART') layout = 'TB';
+
+    return { layout, theme };
+  }, [initialMermaidCode, initialTemplate]);
+
+  const [mapStyle, setMapStyle] = useState(parsedConfig.layout);
+  const [colorTheme, setColorTheme] = useState(parsedConfig.theme);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(!readOnly);
+
+  const initData = useCallback(() => {
+    const { nodes: n, edges: ed } = parseMermaidToFlow(initialMermaidCode, parsedConfig.theme);
+    const layouted = getLayoutedElements(n, ed, parsedConfig.layout);
+    setNodes(layouted.nodes);
+    setEdges(layouted.edges);
+    setHistory([{nodes: layouted.nodes, edges: layouted.edges}]);
+    setHistoryIndex(0);
+    setTimeout(() => fitView(), 100);
+  }, [initialMermaidCode, parsedConfig, fitView]);
+
+  useEffect(() => { initData(); }, [initData]);
+
+  // FIX 8: Click outside to close popovers
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (exportRef.current && !exportRef.current.contains(event.target as globalThis.Node)) setShowExport(false);
+      if (layoutRef.current && !layoutRef.current.contains(event.target as globalThis.Node)) setShowLayouts(false);
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // FIX 5: Layout Re-render
+  const applyLayout = useCallback((nds: Node[], eds: Edge[], layoutOverride?: string) => {
+    const layoutToUse = layoutOverride || mapStyle;
+    const tempMermaid = parseFlowToMermaid(nds, eds, layoutToUse, colorTheme);
+    const { nodes: parsedNodes, edges: parsedEdges } = parseMermaidToFlow(tempMermaid, colorTheme);
+    const layouted = getLayoutedElements(parsedNodes, parsedEdges, layoutToUse);
+    const finalNodes = layouted.nodes.map(n => {
+        const orig = nds.find(o => o.id === n.id);
+        return orig ? { ...n, selected: orig.selected } : n;
+    });
+    setNodes(finalNodes);
+    setEdges(layouted.edges);
+    pushHistory(layouted.nodes, layouted.edges);
+    setTimeout(() => fitView({ duration: 300 }), 50);
+  }, [mapStyle, colorTheme, fitView, pushHistory]);
+
+  const onNodesChange = useCallback((changes: NodeChange[]) => {
+      setNodes((nds) => {
+          const newNodes = applyNodeChanges(changes, nds);
+          const hasRemovals = changes.some(c => c.type === 'remove');
+          if (hasRemovals || changes.some(c => c.type === 'position')) {
+              if (hasRemovals) {
+                  setEdges(eds => {
+                      const validIds = new Set(newNodes.map(n => n.id));
+                      const validEdges = eds.filter(e => validIds.has(e.source) && validIds.has(e.target));
+                      setTimeout(() => applyLayout(newNodes, validEdges), 0);
+                      return validEdges;
+                  });
+              } else {
+                  setTimeout(() => applyLayout(newNodes, edges), 0);
+              }
+          }
+          return newNodes;
+      });
+  }, [edges, applyLayout]);
+
+  const onEdgesChange = useCallback((changes: EdgeChange[]) => {
+      setEdges((eds) => applyEdgeChanges(changes, eds));
+  }, []);
+
+  const onConnect = useCallback((params: Connection) => {
+      setEdges((eds) => {
+          const newEdges = addEdge({ ...params, animated: false }, eds);
+          setTimeout(() => applyLayout(nodes, newEdges), 0);
+          return newEdges;
+      });
+  }, [nodes, applyLayout]);
+
+  const handleExport = useCallback(async (type: 'png' | 'jpeg' | 'svg' | 'md') => {
+    setShowExport(false);
+    if (type === 'md') {
+        const md = parseFlowToMarkdownList(nodes, edges);
+        const blob = new Blob([md], { type: 'text/markdown' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'mindmap.md';
+        a.click();
+        return;
+    }
+    if (ref.current) {
+        const flowEl = ref.current.querySelector('.react-flow__viewport') as HTMLElement;
+        if (!flowEl) return;
+        
+        const nodesBounds = getNodesBounds(nodes);
+        const transformX = -nodesBounds.x + 50;
+        const transformY = -nodesBounds.y + 50;
+        const width = nodesBounds.width + 100;
+        const height = nodesBounds.height + 100;
+
+        const oldTransform = flowEl.style.transform;
+        flowEl.style.transform = `translate(${transformX}px, ${transformY}px) scale(1)`;
+        
+        const bg = THEME_PRESETS[colorTheme]?.background || '#FFFFFF';
+        try {
+            let dataUrl = '';
+            if (type === 'png') dataUrl = await toPng(flowEl, { backgroundColor: bg, width, height, style: { width: `${width}px`, height: `${height}px` } });
+            if (type === 'jpeg') dataUrl = await toJpeg(flowEl, { backgroundColor: bg, quality: 0.95, width, height, style: { width: `${width}px`, height: `${height}px` } });
+            if (type === 'svg') dataUrl = await toSvg(flowEl, { backgroundColor: bg, width, height, style: { width: `${width}px`, height: `${height}px` } });
+            const a = document.createElement('a');
+            a.href = dataUrl;
+            a.download = `mindmap.${type}`;
+            a.click();
+        } catch (err) { console.error('Export failed', err); } 
+        finally { flowEl.style.transform = oldTransform; }
+    }
+  }, [nodes, edges, colorTheme]);
+
+  const triggerAction = useCallback((action: 'TAB' | 'ENTER') => {
+      const selectedNode = nodes.find(n => n.selected);
+      if (!selectedNode) return;
+      
+      const newId = `node_${Date.now()}`;
+      const newNode: Node = { 
+          id: newId, 
+          position: { x: selectedNode.position.x + 100, y: selectedNode.position.y + 50 }, 
+          data: { 
+              label: 'Nhánh mới',
+              customBg: selectedNode.data.customBg,
+              customColor: selectedNode.data.customColor,
+              shape: selectedNode.data.shape,
+              isBold: selectedNode.data.isBold,
+              isItalic: selectedNode.data.isItalic
+          },
+          selected: false,
+          style: { ...selectedNode.style }
+      };
+
+      if (action === 'TAB') {
+        const nextNodes = [...nodes, newNode];
+        const newEdge: Edge = { id: `e-${selectedNode.id}-${newId}`, source: selectedNode.id, target: newId, animated: false };
+        setNodes(nextNodes);
+        setEdges(eds => {
+            const nextEds = [...eds, newEdge];
+            setTimeout(() => applyLayout(nextNodes, nextEds), 0);
+            return nextEds;
+        });
+      }
+
+      if (action === 'ENTER') {
+        if (selectedNode.id === 'root') return; // root cannot have sibling
+        const parentEdge = edges.find(ed => ed.target === selectedNode.id);
+        
+        const nextNodes = [...nodes, newNode];
+        setNodes(nextNodes);
+        
+        if (parentEdge) {
+            const newEdge: Edge = { id: `e-${parentEdge.source}-${newId}`, source: parentEdge.source, target: newId, animated: false };
+            setEdges(eds => {
+                const nextEds = [...eds, newEdge];
+                setTimeout(() => applyLayout(nextNodes, nextEds), 0);
+                return nextEds;
+            });
+        }
+      }
+  }, [nodes, edges, applyLayout]);
+
+  useEffect(() => {
+    if (readOnly) return;
+    const handler = (e: KeyboardEvent) => {
+      if (editingNode) return; // FIX 3: Ignore backspace if editing
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
+      
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        const selectedNode = nodes.find(n => n.selected);
+        if (!selectedNode || selectedNode.id === 'root') return; // Cannot delete root
+        
+        // Cascade delete
+        const idsToDelete = new Set<string>([selectedNode.id]);
+        let changed = true;
+        while(changed) {
+            changed = false;
+            edges.forEach(ed => {
+                if (idsToDelete.has(ed.source) && !idsToDelete.has(ed.target)) {
+                    idsToDelete.add(ed.target);
+                    changed = true;
+                }
+            });
+        }
+
+        setNodes(nds => {
+           const newNodes = nds.filter(n => !idsToDelete.has(n.id));
+           setEdges(eds => {
+               const newEdges = eds.filter(ed => !idsToDelete.has(ed.source) && !idsToDelete.has(ed.target));
+               setTimeout(() => applyLayout(newNodes, newEdges), 0);
+               return newEdges;
+           });
+           return newNodes;
+        });
+      }
+      
+      // FIX 2: Shortcuts
+      if (e.key === 'z' && (e.ctrlKey || e.metaKey)) {
+          e.preventDefault();
+          if (e.shiftKey) handleRedo();
+          else handleUndo();
+      }
+      if (e.key === 'y' && (e.ctrlKey || e.metaKey)) {
+          e.preventDefault();
+          handleRedo();
+      }
+
+      if (e.key === 's' && (e.ctrlKey || e.metaKey)) {
+          e.preventDefault();
+          if (onSave) {
+              const newCode = parseFlowToMermaid(nodes, edges, mapStyle, colorTheme);
+              onSave(newCode);
+          }
+      }
+      
+      if (e.key === 'Tab') { e.preventDefault(); triggerAction('TAB'); }
+      if (e.key === 'Enter') { e.preventDefault(); triggerAction('ENTER'); }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [editingNode, readOnly, nodes, edges, applyLayout, triggerAction, mapStyle, colorTheme, onSave, handleUndo, handleRedo]);
+
+  const hasSelectedNode = nodes.some(n => n.selected);
+
+  return (
+    <div className="flex h-[800px] w-full border border-line rounded-card overflow-hidden bg-surface relative" ref={ref} style={{ backgroundColor: THEME_PRESETS[colorTheme]?.background }}>
+
+      {/* Main Flow Canvas */}
+      <div className="flex-1 relative">
+
+        {/* Top Floating Toolbar — theo yêu cầu của bạn: quay lại hiện cố định như bản gốc (không
+            thu gọn hover-reveal nữa), chỉ tăng padding cho viền không sát icon như phản ánh. */}
+        {!readOnly && (
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 bg-surface-raised shadow-card rounded-xl border border-line px-2.5 py-2 flex gap-1 items-center animate-in slide-in-from-top-4">
+                <button onClick={() => triggerAction('TAB')} disabled={!hasSelectedNode} className={`flex flex-col items-center justify-center p-2.5 rounded-lg min-w-[64px] transition-colors ${hasSelectedNode ? 'hover:bg-surface-hover text-ink-muted' : 'opacity-40 cursor-not-allowed text-ink-faint'}`} title="Thêm nhánh con (Tab)">
+                    <GitBranch className="w-[18px] h-[18px]" strokeWidth={1.75} /><span className="text-[10px] font-bold mt-1">Subtopic</span>
+                </button>
+                <button onClick={() => triggerAction('ENTER')} disabled={!hasSelectedNode || nodes.find(n => n.selected)?.id === 'root'} className={`flex flex-col items-center justify-center p-2.5 rounded-lg min-w-[64px] transition-colors ${hasSelectedNode && nodes.find(n => n.selected)?.id !== 'root' ? 'hover:bg-surface-hover text-ink-muted' : 'opacity-40 cursor-not-allowed text-ink-faint'}`} title="Thêm nhánh ngang hàng (Enter)">
+                    <ArrowLeftRight className="w-[18px] h-[18px]" strokeWidth={1.75} /><span className="text-[10px] font-bold mt-1">Topic</span>
+                </button>
+
+                <div className="w-[1px] h-8 bg-line mx-1"></div>
+
+                <div className="relative" ref={layoutRef}>
+                    <button onClick={() => setShowLayouts(!showLayouts)} className="flex flex-col items-center justify-center p-2.5 hover:bg-surface-hover rounded-lg min-w-[64px] text-ink-muted transition-colors">
+                        <LayoutGrid className="w-[18px] h-[18px]" strokeWidth={1.75} /><span className="text-[10px] font-bold mt-1">Layout</span>
+                    </button>
+                    {showLayouts && (
+                        <div className="absolute top-full left-0 mt-2 w-64 bg-surface-raised border border-line rounded-card shadow-card-hover p-3 grid grid-cols-2 gap-2 z-50">
+                            {LAYOUTS.map(l => (
+                                <button key={l.id} onClick={() => { setMapStyle(l.id); setShowLayouts(false); applyLayout(nodes, edges, l.id); }} className={`flex flex-col items-center justify-center p-3 rounded-lg border transition ${mapStyle === l.id ? 'border-accent bg-accent/5' : 'border-line hover:border-line-dot hover:bg-surface-hover'}`}>
+                                    <l.Icon className="w-5 h-5 mb-1 text-ink-muted" strokeWidth={1.75} />
+                                    <span className="text-[10px] font-bold text-center text-ink-muted leading-tight">{l.name}</span>
+                                </button>
+                            ))}
+                        </div>
+                    )}
+                </div>
+                <div className="w-[1px] h-8 bg-line mx-1"></div>
+                <div className="relative" ref={exportRef}>
+                    <button onClick={() => setShowExport(!showExport)} className="flex flex-col items-center justify-center p-2.5 hover:bg-surface-hover rounded-lg min-w-[64px] text-ink-muted transition-colors">
+                        <Download className="w-[18px] h-[18px]" strokeWidth={1.75} /><span className="text-[10px] font-bold mt-1">Export</span>
+                    </button>
+                    {showExport && (
+                        <div className="absolute top-full left-0 mt-2 w-48 bg-surface-raised border border-line rounded-card shadow-card-hover py-2 flex flex-col z-50">
+                            <button onClick={() => handleExport('png')} className="px-4 py-2 text-left hover:bg-surface-hover text-sm font-medium text-ink">PNG Image</button>
+                            <button onClick={() => handleExport('svg')} className="px-4 py-2 text-left hover:bg-surface-hover text-sm font-medium text-ink">SVG Vector</button>
+                            <button onClick={() => handleExport('md')} className="px-4 py-2 text-left hover:bg-surface-hover text-sm font-medium text-ink border-t border-line-soft mt-1 pt-2">Markdown Code</button>
+                        </div>
+                    )}
+                </div>
+
+                <div className="w-[1px] h-8 bg-line mx-1"></div>
+
+                <button onClick={handleUndo} disabled={historyIndex <= 0} className={`flex flex-col items-center justify-center p-2.5 rounded-lg min-w-[48px] transition-colors ${historyIndex > 0 ? 'hover:bg-surface-hover text-ink-muted' : 'opacity-40 cursor-not-allowed text-ink-faint'}`} title="Hoàn tác (Ctrl+Z)">
+                    <Undo2 className="w-[18px] h-[18px]" strokeWidth={1.75} /><span className="text-[10px] font-bold mt-1">Undo</span>
+                </button>
+                <button onClick={handleRedo} disabled={historyIndex >= history.length - 1} className={`flex flex-col items-center justify-center p-2.5 rounded-lg min-w-[48px] transition-colors ${historyIndex < history.length - 1 ? 'hover:bg-surface-hover text-ink-muted' : 'opacity-40 cursor-not-allowed text-ink-faint'}`} title="Làm lại (Ctrl+Y)">
+                    <Redo2 className="w-[18px] h-[18px]" strokeWidth={1.75} /><span className="text-[10px] font-bold mt-1">Redo</span>
+                </button>
+
+                {onSave && (
+                    <>
+                        <div className="w-[1px] h-8 bg-line mx-1"></div>
+                        <button onClick={() => {
+                            const newCode = parseFlowToMermaid(nodes, edges, mapStyle, colorTheme);
+                            onSave(newCode);
+                        }} className="flex flex-col items-center justify-center p-2.5 hover:bg-accent/5 rounded-lg min-w-[80px] text-accent transition-colors border border-transparent hover:border-accent/30">
+                            <Save className="w-[18px] h-[18px]" strokeWidth={1.75} /><span className="text-[10px] font-bold mt-1">Save & Apply</span>
+                        </button>
+                    </>
+                )}
+          </div>
+        )}
+        
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={readOnly ? undefined : onNodesChange}
+          onEdgesChange={readOnly ? undefined : onEdgesChange}
+          onConnect={readOnly ? undefined : onConnect}
+          onNodeDoubleClick={(e, node) => !readOnly && setEditingNode({ id: node.id, label: String(node.data.label) })}
+          nodesDraggable={!readOnly}
+          nodesConnectable={!readOnly}
+          elementsSelectable={!readOnly}
+          deleteKeyCode={null} // Prevent default deletion, handled custom
+          fitView
+          attributionPosition="bottom-left"
+          panOnScroll={true} // FIX 6: Viewport interactions
+          zoomOnPinch={true}
+          panOnScrollMode={PanOnScrollMode.Free}
+        >
+          {readOnly && (
+              <Panel position="bottom-center" className="bg-surface-raised/90 backdrop-blur border border-line px-4 py-2 rounded-full shadow-lg mb-4 flex gap-4 text-xs font-bold text-ink-muted">
+                  <span className="flex items-center gap-1"><MousePointer2 className="w-3.5 h-3.5" strokeWidth={1.75} /> Shift+Scroll to pan</span>
+                  <span className="flex items-center gap-1"><Move className="w-3.5 h-3.5" strokeWidth={1.75} /> Drag/Pinch to zoom</span>
+              </Panel>
+          )}
+          <Controls className="bg-surface-raised border-line shadow-md" />
+          <MiniMap className="bg-surface-raised border-line shadow-md rounded-lg overflow-hidden" zoomable pannable nodeStrokeColor="#E2E8F0" nodeColor="#F1F5F9" />
+          <Background gap={20} size={1} color="#E2E8F0" />
+        </ReactFlow>
+
+        {/* Editing Node Modal */}
+        {editingNode && (
+          <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm">
+            <div className="bg-surface-raised p-6 rounded-2xl shadow-2xl border border-line-soft w-96 max-w-[90%] animate-in zoom-in-95">
+              <h3 className="text-sm font-bold text-ink mb-3 flex items-center gap-2"><Pencil className="w-4 h-4" strokeWidth={1.75} /> Nhập nội dung</h3>
+              <textarea
+                autoFocus
+                value={editingNode.label}
+                onChange={(e) => setEditingNode({ ...editingNode, label: e.target.value })}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        setNodes((nds) => {
+                            const newNodes = nds.map((n) => n.id === editingNode.id ? { ...n, data: { ...n.data, label: editingNode.label.trim() } } : n);
+                            setTimeout(() => applyLayout(newNodes, edges), 0);
+                            return newNodes;
+                        });
+                        setEditingNode(null);
+                    }
+                }}
+                className="w-full border border-line rounded-xl p-3 text-sm focus:ring-2 focus:ring-accent/20 focus:border-accent resize-none h-28 text-ink outline-none transition font-medium"
+              />
+              <div className="flex gap-2 justify-end mt-5">
+                <button onClick={() => setEditingNode(null)} className="px-4 py-2.5 bg-surface text-ink-muted rounded-xl text-xs font-bold hover:bg-tint">Hủy</button>
+                <button onClick={() => {
+                    setNodes((nds) => {
+                        const newNodes = nds.map((n) => n.id === editingNode.id ? { ...n, data: { ...n.data, label: editingNode.label.trim() } } : n);
+                        setTimeout(() => applyLayout(newNodes, edges), 0);
+                        return newNodes;
+                    });
+                    setEditingNode(null);
+                  }}
+                  className="px-5 py-2.5 bg-accent text-white rounded-xl text-xs font-bold hover:bg-accent/90 shadow-sm"
+                >Cập nhật</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Nút ẩn/hiện sidebar phải — theo yêu cầu của bạn, khôi phục lại (đợt trước đã bỏ hẳn).
+            Lần này dùng nền accent tương phản rõ thay vì bg-white/border-line/text-ink-muted
+            gần như vô hình như bản gốc, để không lặp lại lỗi khó thấy đã sửa. */}
+        {!readOnly && (
+            <button
+                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                className="absolute top-1/2 right-0 -translate-y-1/2 z-30 flex items-center justify-center w-6 h-12 rounded-l-lg bg-accent text-white shadow-card-hover hover:bg-accent-dark transition-colors"
+                title={isSidebarOpen ? 'Ẩn bảng điều khiển' : 'Hiện bảng điều khiển'}
+            >
+                {isSidebarOpen ? <ChevronRight className="w-4 h-4" strokeWidth={2} /> : <ChevronLeft className="w-4 h-4" strokeWidth={2} />}
+            </button>
+        )}
+      </div>
+
+      {/* Right Inspector Panel — cột flex, ẩn/hiện qua isSidebarOpen (khôi phục theo yêu cầu). */}
+      {!readOnly && isSidebarOpen && (
+          <div className="w-80 shrink-0 bg-surface-raised border-l border-line flex flex-col shadow-card z-10">
+              <div className="flex border-b border-line-soft p-2 gap-1">
+                  {['Map', 'Style'].map(tab => (
+                      <button key={tab} onClick={() => setActiveTab(tab as 'Style' | 'Map')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-colors ${activeTab === tab ? 'bg-surface-hover text-ink' : 'text-ink-faint hover:text-ink-muted hover:bg-surface-hover'}`}>{tab}</button>
+                  ))}
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-5 pb-24">
+                  {activeTab === 'Map' && (
+                      <div className="space-y-6">
+                          <div>
+                              <label className="text-[11px] font-bold text-ink-faint uppercase tracking-wider mb-3 block">Color Theme</label>
+                              <div className="grid gap-2">
+                                  {Object.entries(THEME_PRESETS).map(([theme, t]) => (
+                                      <button key={theme} onClick={() => { setColorTheme(theme); applyTheme(theme, nodes, edges); }} className={`p-3 rounded-card border text-left transition flex items-center gap-3 ${colorTheme === theme ? 'border-accent bg-accent/5 shadow-card' : 'border-line hover:border-line-dot hover:bg-surface-hover'}`}>
+                                          {/* Preview: node gốc thu nhỏ đúng màu theme, thay vì chỉ dải màu trừu tượng */}
+                                          <div
+                                              className="shrink-0 flex items-center justify-center w-9 h-9 rounded-full text-[10px] font-bold border border-black/5"
+                                              style={{ background: t.rootBg, color: t.rootColor }}
+                                          >
+                                              Aa
+                                          </div>
+                                          <div className="flex-1 min-w-0">
+                                              <span className="text-xs font-bold text-ink block">{theme}</span>
+                                              <div className="flex gap-1 h-2 rounded-full overflow-hidden w-full mt-1.5">
+                                                  {t.palette.map(c => <div key={c} className="flex-1" style={{backgroundColor: c}}></div>)}
+                                              </div>
+                                          </div>
+                                      </button>
+                                  ))}
+                              </div>
+                          </div>
+                      </div>
+                  )}
+                  {activeTab === 'Style' && (
+                      <div className="space-y-6">
+                        {nodes.filter(n => n.selected).length === 1 ? (
+                            <div className="space-y-4">
+                                <div className="border p-4 rounded-card border-line">
+                                    <label className="text-[11px] font-bold text-ink-faint uppercase tracking-wider mb-3 block">Shape</label>
+                                    <div className="grid grid-cols-3 gap-2">
+                                        {[
+                                            { id: 'rect', name: 'Hình vuông', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="6" width="18" height="12"></rect></svg> },
+                                            { id: 'rounded', name: 'Bo góc', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="6" width="18" height="12" rx="6"></rect></svg> },
+                                            { id: 'circle', name: 'Hình tròn', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"></circle></svg> }
+                                        ].map(s => (
+                                            <button key={s.id} title={s.name} onClick={() => {
+                                                const selectedId = nodes.find(n => n.selected)!.id;
+                                                setNodes(nds => {
+                                                    const nextNodes = nds.map(n => n.id === selectedId ? {...n, data: {...n.data, shape: s.id}} : n);
+                                                    setTimeout(() => applyTheme(colorTheme, nextNodes, edges), 0);
+                                                    return nextNodes;
+                                                });
+                                            }} className={`flex items-center justify-center py-2.5 rounded-lg border transition ${nodes.find(n => n.selected)?.data.shape === s.id || (s.id === 'rect' && !nodes.find(n => n.selected)?.data.shape) ? 'bg-accent/5 border-accent text-accent' : 'bg-surface-hover border-line text-ink-muted hover:border-line-dot'}`}>
+                                                {s.icon}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div className="border p-4 rounded-card border-line">
+                                    <label className="text-[11px] font-bold text-ink-faint uppercase tracking-wider mb-2 block">Màu Nền (Fill)</label>
+                                    <div className="flex gap-2">
+                                        <input type="color" className="w-10 h-10 rounded cursor-pointer border-0 p-0" onChange={(e) => {
+                                            const selectedId = nodes.find(n => n.selected)!.id;
+                                            setNodes(nds => nds.map(n => n.id === selectedId ? {...n, data: {...n.data, customBg: e.target.value}, style: {...n.style, background: e.target.value}} : n));
+                                        }} value={(() => {
+                                            const sn = nodes.find(n => n.selected);
+                                            if (sn?.data.customBg) return sn.data.customBg as string;
+                                            const bg = sn?.style?.background as string;
+                                            if (bg && bg.startsWith('#') && bg.length === 7) return bg;
+                                            return '#ffffff';
+                                        })()} />
+                                        <button onClick={() => {
+                                            const selectedId = nodes.find(n => n.selected)!.id;
+                                            setNodes(nds => nds.map(n => n.id === selectedId ? {...n, data: {...n.data, customBg: undefined}, style: {...n.style, background: undefined}} : n));
+                                            setTimeout(() => applyTheme(colorTheme, nodes, edges), 0);
+                                        }} className="text-xs bg-surface-hover hover:bg-line-soft px-3 rounded-lg text-ink-muted font-bold">Về mặc định</button>
+                                    </div>
+                                </div>
+                                <div className="border p-4 rounded-card border-line">
+                                    <label className="text-[11px] font-bold text-ink-faint uppercase tracking-wider mb-2 block">Văn Bản (Text)</label>
+                                    <div className="flex gap-2 mb-3">
+                                        <button title="In đậm" onClick={() => {
+                                            const selectedId = nodes.find(n => n.selected)!.id;
+                                            setNodes(nds => {
+                                                const sn = nds.find(n => n.id === selectedId)!;
+                                                const nextNodes = nds.map(n => n.id === selectedId ? {...n, data: {...n.data, isBold: !sn.data.isBold}} : n);
+                                                setTimeout(() => applyTheme(colorTheme, nextNodes, edges), 0);
+                                                return nextNodes;
+                                            });
+                                        }} className={`flex-1 py-1.5 text-xs font-bold rounded-lg border ${nodes.find(n => n.selected)?.data.isBold ? 'bg-ink text-white border-ink' : 'bg-surface-hover text-ink-muted border-line'}`}>B</button>
+                                        <button title="In nghiêng" onClick={() => {
+                                            const selectedId = nodes.find(n => n.selected)!.id;
+                                            setNodes(nds => {
+                                                const sn = nds.find(n => n.id === selectedId)!;
+                                                const nextNodes = nds.map(n => n.id === selectedId ? {...n, data: {...n.data, isItalic: !sn.data.isItalic}} : n);
+                                                setTimeout(() => applyTheme(colorTheme, nextNodes, edges), 0);
+                                                return nextNodes;
+                                            });
+                                        }} className={`flex-1 py-1.5 text-xs italic rounded-lg border ${nodes.find(n => n.selected)?.data.isItalic ? 'bg-ink text-white border-ink' : 'bg-surface-hover text-ink-muted border-line'}`}>I</button>
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <input type="color" className="w-10 h-10 rounded cursor-pointer border-0 p-0" onChange={(e) => {
+                                            const selectedId = nodes.find(n => n.selected)!.id;
+                                            setNodes(nds => nds.map(n => n.id === selectedId ? {...n, data: {...n.data, customColor: e.target.value}, style: {...n.style, color: e.target.value}} : n));
+                                        }} value={(() => {
+                                            const sn = nodes.find(n => n.selected);
+                                            if (sn?.data.customColor) return sn.data.customColor as string;
+                                            const c = sn?.style?.color as string;
+                                            if (c && c.startsWith('#') && c.length === 7) return c;
+                                            return '#000000';
+                                        })()} />
+                                        <button onClick={() => {
+                                            const selectedId = nodes.find(n => n.selected)!.id;
+                                            setNodes(nds => nds.map(n => n.id === selectedId ? {...n, data: {...n.data, customColor: undefined}, style: {...n.style, color: undefined}} : n));
+                                            setTimeout(() => applyTheme(colorTheme, nodes, edges), 0);
+                                        }} className="text-xs bg-surface-hover hover:bg-line-soft px-3 rounded-lg text-ink-muted font-bold">Về mặc định</button>
+                                    </div>
+                                </div>
+                                <div className="text-xs text-ink-faint mt-2 text-center">Tùy chỉnh sẽ được đồng bộ khi bạn nhấn &quot;Save &amp; Apply&quot;</div>
+                            </div>
+                        ) : (
+                            <div className="text-center text-ink-faint text-sm mt-10 p-4 border border-dashed rounded-card border-line">
+                                <strong className="text-ink-muted">Node Style</strong><br/><br/>
+                                Hãy click chọn một node cụ thể trên bản đồ để tuỳ chỉnh Shape, Font, Màu nền và Màu chữ.
+                            </div>
+                        )}
+                      </div>
+                  )}
+              </div>
+
+              {/* Removed old duplicate save button */}
+          </div>
+      )}
+    </div>
+  );
+}
+
+export function MindmapEditor(props: MindmapEditorProps) {
+    return (
+        <ReactFlowProvider>
+            <FlowEditor {...props} />
+        </ReactFlowProvider>
+    );
+}

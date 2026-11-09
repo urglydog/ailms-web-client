@@ -49,9 +49,25 @@ export class ApiError extends Error {
  */
 export function resolveBaseUrl(): string {
   if (typeof window === 'undefined') {
-    return process.env.INTERNAL_API_URL ?? 'http://backend:8080';
+    return process.env.INTERNAL_API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://backend:8080';
   }
   return process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
+}
+
+const STREAM_SESSION_ID_KEY = 'streamSessionId';
+
+/** ID định danh THIẾT BỊ/TRÌNH DUYỆT (không phải mỗi lần mount trang bài học) cho cơ chế giới
+ * hạn 1 phiên xem đồng thời (`PlayerHeartbeatService` ở BE, key Redis theo user). Lưu bền
+ * `localStorage` thay vì tạo mới mỗi lần vào bài học — nếu tạo mới mỗi lần mount, chuyển sang
+ * bài học khác trên CHÍNH thiết bị trong vòng 30s (TTL Redis) sẽ bị chính BE coi là "thiết bị
+ * khác" phát hiện, dù chỉ là 1 người dùng điều hướng bình thường (bug thật 12/10/2026, phát hiện
+ * khi vá lỗi tương tự bên mobile — xem `fix: mở lesson player trên mobile cướp quyền phát video`). */
+export function getOrCreateStreamSessionId(): string {
+  const existing = localStorage.getItem(STREAM_SESSION_ID_KEY);
+  if (existing) return existing;
+  const id = crypto.randomUUID();
+  localStorage.setItem(STREAM_SESSION_ID_KEY, id);
+  return id;
 }
 
 interface RequestOptions extends Omit<RequestInit, 'body'> {
@@ -60,28 +76,177 @@ interface RequestOptions extends Omit<RequestInit, 'body'> {
   token?: string;
 }
 
+let isRefreshing = false;
+let failedQueue: Array<{
+  resolve: (token: string) => void;
+  reject: (err: Error) => void;
+}> = [];
+
+function processQueue(error: Error | null, token: string | null = null) {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else if (token) {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+}
+
+/** Dùng bởi {@link fetchWithRefresh} khi phiên bị thu hồi giữa chừng (vd tài khoản vừa bị Admin
+ * khóa) — lưu lý do vào `sessionStorage` để trang `/login` đọc và hiện toast, thay vì văng về
+ * /login im lặng không một lời giải thích. */
+function redirectToLoginWithReason(reason: string | null) {
+  if (reason) {
+    try {
+      sessionStorage.setItem('loginKickReason', reason);
+    } catch {
+      /* Safari riêng tư chặn sessionStorage — bỏ qua, chỉ mất phần thông báo lý do */
+    }
+  }
+  window.location.href = '/login';
+}
+
+/**
+ * Fetch có tự refresh access token khi 401/403 — lõi dùng chung cho {@link request} (JSON) và
+ * {@link apiBlob} (tải file nhị phân, vd PDF). Tách riêng để 2 nơi không lặp lại y hệt logic
+ * refresh (đã từng có bug thật: các chỗ tải PDF/chứng chỉ dùng `fetch` thô riêng, không hề
+ * refresh khi access token hết hạn — khác hẳn mọi request JSON thường đi qua {@link request}).
+ */
+async function fetchWithRefresh(
+  path: string,
+  init: RequestInit,
+  extraAuthHeaders: (token: string) => HeadersInit,
+): Promise<Response> {
+  let currentToken: string | undefined;
+  if (typeof window !== 'undefined') {
+    currentToken = localStorage.getItem('accessToken') || undefined;
+  }
+
+  const buildHeaders = (token: string | undefined) => ({
+    ...init.headers,
+    ...(token ? extraAuthHeaders(token) : {}),
+  });
+
+  let response = await fetch(`${resolveBaseUrl()}${path}`, {
+    ...init,
+    headers: buildHeaders(currentToken),
+  });
+
+  if ((response.status === 401 || response.status === 403) && typeof window !== 'undefined') {
+    const refreshToken = localStorage.getItem('refreshToken');
+    if (refreshToken) {
+      if (isRefreshing) {
+        try {
+          const newToken = await new Promise<string>((resolve, reject) => {
+            failedQueue.push({ resolve, reject });
+          });
+          response = await fetch(`${resolveBaseUrl()}${path}`, { ...init, headers: buildHeaders(newToken) });
+        } catch {
+          throw new ApiError(await parseProblem(response));
+        }
+      } else {
+        isRefreshing = true;
+        try {
+          const refreshRes = await fetch(`${resolveBaseUrl()}/api/v1/auth/refresh`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refreshToken }),
+          });
+
+          if (refreshRes.ok) {
+            const data = await refreshRes.json();
+            localStorage.setItem('accessToken', data.accessToken);
+            localStorage.setItem('refreshToken', data.refreshToken);
+            processQueue(null, data.accessToken);
+
+            response = await fetch(`${resolveBaseUrl()}${path}`, { ...init, headers: buildHeaders(data.accessToken) });
+          } else {
+            // (23/10/2026, sửa bug thật) — trước đây văng thẳng về /login không kèm lý do gì cả
+            // (vd tài khoản vừa bị Admin khóa giữa phiên) — user tưởng web lỗi vặt, không biết
+            // vì sao bị đăng xuất. Lưu lý do thật (nếu BE trả được) để trang /login hiển thị.
+            const reason = await parseProblem(refreshRes).then((p) => p.detail).catch(() => null);
+            processQueue(new Error('Refresh failed'));
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            redirectToLoginWithReason(reason);
+          }
+        } catch (err) {
+          // Lỗi MẠNG khi refresh (vd "Failed to fetch" lúc BE đang khởi động lại / mất mạng thoáng
+          // qua) KHÔNG có nghĩa phiên hết hạn — không được xoá token/đẩy về /login, chỉ để yêu cầu
+          // này thất bại; lần gọi sau sẽ tự thử refresh lại. Chỉ khi BE TRẢ LỜI từ chối refresh
+          // (nhánh `!refreshRes.ok` ở trên) mới đăng xuất.
+          processQueue(err as Error);
+        } finally {
+          isRefreshing = false;
+        }
+      }
+    }
+  }
+
+  return response;
+}
+
 async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const { body, token, headers, ...rest } = options;
 
-  const response = await fetch(`${resolveBaseUrl()}${path}`, {
-    ...rest,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...headers,
+  const response = await fetchWithRefresh(
+    path,
+    {
+      ...rest,
+      headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}), ...headers },
+      ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
     },
-    ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
-  });
+    (t) => ({ Authorization: `Bearer ${t}` }),
+  );
 
   if (!response.ok) {
     throw new ApiError(await parseProblem(response));
   }
 
-  // 204 No Content không có body để parse
+  // 204 No Content, hoặc bất kỳ response "ok" nào có body rỗng — không có gì để parse
   if (response.status === 204) {
     return undefined as T;
   }
-  return (await response.json()) as T;
+  const text = await response.text();
+  if (!text) {
+    return undefined as T;
+  }
+  return JSON.parse(text) as T;
+}
+
+/**
+ * POST `FormData` (nộp bài kèm file đính kèm) — CÙNG logic refresh-on-401 với {@link request}.
+ * `request`/`api.post` không dùng được ở đây vì nó luôn `JSON.stringify` body, làm rỗng mọi
+ * `FormData`; trước đây chỗ nộp bài tập tự viết `fetch` riêng kèm `Authorization` tay, không hề
+ * refresh access token hết hạn (cùng bug với {@link apiBlob}).
+ */
+export async function apiFormData<T>(path: string, formData: FormData): Promise<T> {
+  const response = await fetchWithRefresh(path, { method: 'POST', body: formData }, (t) => ({
+    Authorization: `Bearer ${t}`,
+  }));
+  if (!response.ok) {
+    throw new ApiError(await parseProblem(response));
+  }
+  if (response.status === 204) {
+    return undefined as T;
+  }
+  const text = await response.text();
+  return text ? (JSON.parse(text) as T) : (undefined as T);
+}
+
+/**
+ * Tải file nhị phân (PDF chứng chỉ, đề thi...) — CÙNG logic refresh-on-401 với {@link request},
+ * khác ở chỗ trả về {@link Blob} thay vì parse JSON. Thay cho việc mỗi màn hình tự viết `fetch`
+ * riêng kèm `Authorization: Bearer` tay (bug thật: các chỗ đó không hề tự refresh token hết hạn,
+ * người dùng phải tự đăng xuất/đăng nhập lại mới tải được).
+ */
+export async function apiBlob(path: string): Promise<Blob> {
+  const response = await fetchWithRefresh(path, {}, (t) => ({ Authorization: `Bearer ${t}` }));
+  if (!response.ok) {
+    throw new ApiError(await parseProblem(response));
+  }
+  return response.blob();
 }
 
 /** Cố gắng đọc ProblemDetail; nếu backend trả HTML/text thì tự dựng một cái tương đương. */
@@ -171,6 +336,83 @@ export function uploadFile<T>(
   options: { token?: string; onProgress?: (percent: number) => void } = {},
 ): Promise<T> {
   return uploadFileCancelable<T>(path, file, options).promise;
+}
+
+/**
+ * Bản NHIỀU file cùng lúc dưới field `"files"` (số nhiều) — khớp
+ * `@RequestParam("files") MultipartFile[] files` phía backend (tài nguyên tĩnh toàn khoá học).
+ * `api.post` KHÔNG dùng được cho việc này vì nó luôn `JSON.stringify` body — làm rỗng mọi
+ * FormData; đây là lý do phải có helper XHR riêng, cùng khuôn với {@link uploadFileCancelable}.
+ */
+export function uploadFilesCancelable<T>(
+  path: string,
+  files: File[],
+  options: {
+    token?: string;
+    onProgress?: (percent: number) => void;
+    extraFields?: Record<string, string | number>;
+  } = {},
+): { promise: Promise<T>; abort: () => void } {
+  const xhr = new XMLHttpRequest();
+
+  const promise = new Promise<T>((resolve, reject) => {
+    xhr.open('POST', `${resolveBaseUrl()}${path}`);
+    if (options.token) {
+      xhr.setRequestHeader('Authorization', `Bearer ${options.token}`);
+    }
+
+    xhr.upload.onprogress = (e) => {
+      if (options.onProgress && e.lengthComputable) {
+        options.onProgress(Math.round((e.loaded / e.total) * 100));
+      }
+    };
+
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        resolve(xhr.status === 204 || !xhr.responseText ? (undefined as T) : (JSON.parse(xhr.responseText) as T));
+        return;
+      }
+      reject(new ApiError(parseProblemFromXhr(xhr)));
+    };
+    xhr.onerror = () => {
+      reject(
+        new ApiError({
+          type: 'about:blank',
+          title: 'Network Error',
+          status: 0,
+          detail: 'Không kết nối được máy chủ',
+          instance: path,
+          code: 'NETWORK_ERROR',
+          timestamp: new Date().toISOString(),
+        }),
+      );
+    };
+    xhr.onabort = () => reject(new UploadCancelledError());
+
+    const formData = new FormData();
+    files.forEach((file) => formData.append('files', file));
+    if (options.extraFields) {
+      Object.entries(options.extraFields).forEach(([key, value]) => {
+        formData.append(key, String(value));
+      });
+    }
+    xhr.send(formData);
+  });
+
+  return { promise, abort: () => xhr.abort() };
+}
+
+/** Bản không cần hủy giữa chừng — dựng trên {@link uploadFilesCancelable}. */
+export function uploadFiles<T>(
+  path: string,
+  files: File[],
+  options: {
+    token?: string;
+    onProgress?: (percent: number) => void;
+    extraFields?: Record<string, string | number>;
+  } = {},
+): Promise<T> {
+  return uploadFilesCancelable<T>(path, files, options).promise;
 }
 
 function parseProblemFromXhr(xhr: XMLHttpRequest): ProblemDetail {

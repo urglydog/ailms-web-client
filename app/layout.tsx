@@ -1,33 +1,45 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import Script from 'next/script';
-import { IBM_Plex_Mono, Outfit, Plus_Jakarta_Sans } from 'next/font/google';
+import localFont from 'next/font/local';
 import './globals.css';
 import { Providers } from './providers';
+import { SkipLink } from '@/components/layout/SkipLink';
+import { ServiceWorkerRegister } from '@/components/providers/ServiceWorkerRegister';
+import { COLORS } from '@/lib/theme/colors';
+import { themeCss } from '@/lib/theme/cssVars';
+import { THEME_INIT_SCRIPT } from '@/lib/theme/themeMode';
 
 /**
- * Font nạp qua `next/font` thay vì thẻ `<link>` Google Fonts: Next tự self-host,
- * nên không có request sang domain ngoài, không nhấp nháy font và không phụ thuộc
- * mạng của người dùng.
+ * Font tự lưu trữ (`.woff2` trong `app/fonts/`) thay vì `next/font/google`: file build ra
+ * KHÔNG BAO GIỜ cần tải gì từ `fonts.gstatic.com` nữa — CI (GitHub Actions) không có đường ra
+ * tới domain đó nên `next/font/google` từng làm `next build` fail toàn bộ (retry đủ 3 lần vẫn
+ * lỗi, không phải flake mạng tạm thời). File nguồn: lấy trực tiếp từ Google Fonts CSS2 API,
+ * subset `latin` (khớp đúng phạm vi ký tự mà cấu hình cũ đã dùng, không đổi hành vi hiển thị).
  */
-const outfit = Outfit({
-  subsets: ['latin'],
-  weight: ['500', '600', '700', '800'],
+const outfit = localFont({
+  src: './fonts/outfit-variable.woff2',
+  weight: '500 800',
   variable: '--font-outfit',
   display: 'swap',
+  preload: false,
 });
 
-const jakarta = Plus_Jakarta_Sans({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
+const jakarta = localFont({
+  src: './fonts/plus-jakarta-sans-variable.woff2',
+  weight: '400 700',
   variable: '--font-jakarta',
   display: 'swap',
+  preload: false,
 });
 
-const plexMono = IBM_Plex_Mono({
-  subsets: ['latin'],
-  weight: ['400', '500'],
+const plexMono = localFont({
+  src: [
+    { path: './fonts/ibm-plex-mono-400.woff2', weight: '400' },
+    { path: './fonts/ibm-plex-mono-500.woff2', weight: '500' },
+  ],
   variable: '--font-plex-mono',
   display: 'swap',
+  preload: false,
 });
 
 export const metadata: Metadata = {
@@ -37,12 +49,38 @@ export const metadata: Metadata = {
   },
   description:
     'Nền tảng học tập cá nhân hoá với lồng tiếng AI đa ngôn ngữ và trợ lý Socratic AI Tutor.',
+  manifest: '/manifest.json',
+  icons: {
+    icon: [
+      { url: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icons/icon-512.png', sizes: '512x512', type: 'image/png' },
+    ],
+    apple: [{ url: '/icons/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'LinguaLearn',
+  },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+  themeColor: COLORS.accent,
+  // Site chỉ có giao diện sáng — khai báo rõ để trình duyệt (Edge/Chrome "tự động làm tối trang") không
+  // đảo màu nền nhưng giữ nguyên chữ tối cố định, làm 1 số chỗ (vd "Điểm chính thức") mất chữ.
+  colorScheme: 'only light',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="vi" className={`${outfit.variable} ${jakarta.variable} ${plexMono.variable}`}>
+    <html lang="vi" suppressHydrationWarning className={`${outfit.variable} ${jakarta.variable} ${plexMono.variable}`}>
       <head>
+        {/* Biến màu sáng/tối (sinh từ lib/theme/colors.ts) + gắn lớp `dark` trước khi vẽ để không chớp trắng */}
+        <style dangerouslySetInnerHTML={{ __html: themeCss() }} />
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
         <Script
           src="https://accounts.google.com/gsi/client"
           async
@@ -50,7 +88,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body>
-        <Providers>{children}</Providers>
+        <ServiceWorkerRegister />
+        <Providers>
+          <SkipLink />
+          {children}
+        </Providers>
       </body>
     </html>
   );

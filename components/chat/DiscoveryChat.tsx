@@ -1,7 +1,21 @@
 'use client';
 
+import { TypingDots } from '@/components/ui/TypingDots';
+
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { toast } from 'sonner';
+import { api, ApiError } from '@/lib/api/client';
+import { getAccessToken } from '@/lib/auth/token';
+import { MarkdownRenderer } from '@/components/ui/MarkdownRenderer';
+
+/** Ẩn chatbot khi đang làm bài thi chính thức (`/exam/{quizId}`, KHÔNG phải `/exam/{quizId}/history`
+ * — lịch sử làm bài không phải lúc đang thi) — sót lại trước đây vì layout `(student)` mount
+ * `DiscoveryChat` cho MỌI trang trong nhóm, kể cả trang thi, cho học viên hỏi AI khi đang làm
+ * bài (gian lận). Trang thi không có layout riêng để tách component này ra cấp layout, nên check
+ * trực tiếp theo pathname ở đây. */
+const EXAM_TAKING_PATH = /^\/exam\/[^/]+\/?$/;
 
 interface DiscoveryCourseCard {
   id: number;
@@ -14,12 +28,33 @@ interface DiscoveryCourseCard {
   level_label: string;
 }
 
+interface DiscoveryChatResponse {
+  reply?: string;
+  courses?: DiscoveryCourseCard[];
+}
+
 export function DiscoveryChat() {
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<{role: 'user' | 'assistant', text: string, courses?: DiscoveryCourseCard[]}[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const maxLengthToastShownRef = useRef(false);
+
+  const MAX_MESSAGE_LENGTH = 1000;
+
+  const handleInputChange = (value: string) => {
+    setInput(value);
+    if (value.length >= MAX_MESSAGE_LENGTH) {
+      if (!maxLengthToastShownRef.current) {
+        toast.warning(`Đã đạt giới hạn ${MAX_MESSAGE_LENGTH} ký tự cho 1 tin nhắn.`);
+        maxLengthToastShownRef.current = true;
+      }
+    } else {
+      maxLengthToastShownRef.current = false;
+    }
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -29,6 +64,8 @@ export function DiscoveryChat() {
     scrollToBottom();
   }, [messages, loading]);
 
+  if (EXAM_TAKING_PATH.test(pathname)) return null;
+
   const sendMessage = async () => {
     if (!input.trim() || loading) return;
     const userMsg = input.trim();
@@ -37,21 +74,23 @@ export function DiscoveryChat() {
     setLoading(true);
 
     try {
-      // AI Worker HTTP API (Port 8002 as configured in .env)
-      const res = await fetch('http://localhost:8002/api/v1/discovery/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userMsg }),
+      const data = await api.post<DiscoveryChatResponse>('/api/v1/discovery/chat', { message: userMsg }, {
+        token: getAccessToken() || undefined
       });
-      const data = await res.json();
       
       setMessages(prev => [...prev, { 
         role: 'assistant', 
         text: data.reply || 'Không có phản hồi.', 
         courses: data.courses 
       }]);
-    } catch {
-      setMessages(prev => [...prev, { role: 'assistant', text: 'Xin lỗi, tôi đang gặp sự cố kết nối tới AI. Vui lòng kiểm tra lại.' }]);
+    } catch (err) {
+      // (23/10/2026, sửa bug thật) — trước đây nuốt mọi lỗi thành 1 câu "sự cố kết nối" chung
+      // chung, kể cả khi lý do thật là bị khóa AI/đánh dấu spam (403) — user tưởng hệ thống lỗi,
+      // không biết mình bị hạn chế. Giờ hiện đúng lý do thật khi là lỗi nghiệp vụ từ BE.
+      const text = err instanceof ApiError
+        ? err.message
+        : 'Xin lỗi, tôi đang gặp sự cố kết nối tới AI. Vui lòng kiểm tra lại.';
+      setMessages(prev => [...prev, { role: 'assistant', text }]);
     } finally {
       setLoading(false);
     }
@@ -61,21 +100,27 @@ export function DiscoveryChat() {
     <>
       {/* Floating Button */}
       <button 
+        type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 flex h-14 w-14 items-center justify-center rounded-full bg-accent text-white shadow-lg transition-transform hover:scale-105 z-50"
+        aria-label={isOpen ? "Đóng trợ lý tìm khóa học" : "Mở trợ lý tìm khóa học"}
+        aria-expanded={isOpen}
+        className="fixed bottom-6 right-6 flex h-14 w-14 items-center justify-center rounded-xl border border-accent-dark bg-accent text-white shadow-md z-50 btn-tactile"
       >
-        <span 
-          className="text-2xl transition-transform duration-300 ease-in-out" 
-          style={{ transform: isOpen ? 'rotate(90deg)' : 'rotate(0)' }}
-        >
-          {isOpen ? '✕' : '✨'}
-        </span>
+        {isOpen ? (
+          <span className="text-xl">✕</span>
+        ) : (
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          </svg>
+        )}
       </button>
 
-      {/* Chat Window */}
-      <div 
-        className={`fixed bottom-24 right-6 flex h-[500px] w-[400px] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl border border-line z-50 origin-bottom-right transition-all duration-500 ease-[cubic-bezier(0.2,1,0.2,1)] ${
-          isOpen ? 'scale-100 opacity-100 translate-y-0' : 'scale-0 opacity-0 translate-y-20 pointer-events-none'
+      {/* Chat Window — (26/09/2026, sửa lỗi) trước đây `w-[400px]` cố định RỘNG HƠN cả màn hình
+          điện thoại (375–414px), lòi hẳn ra khỏi mép trái. Giờ co theo viewport, chỉ đạt đúng
+          400px từ `sm:` trở lên. */}
+      <div
+        className={`fixed bottom-24 right-6 flex h-[min(500px,70vh)] w-[calc(100vw-2rem)] max-w-[400px] flex-col overflow-hidden rounded-2xl bg-surface-raised shadow-card-hover border border-line z-50 origin-bottom-right transition-[transform,opacity] duration-200 ease-soft ${
+          isOpen ? 'scale-100 opacity-100 translate-y-0' : 'pointer-events-none translate-y-3 scale-95 opacity-0'
         }`}
       >
         <div className="bg-accent px-4 py-3 text-white flex justify-between items-center">
@@ -90,8 +135,8 @@ export function DiscoveryChat() {
             ✕
           </button>
         </div>
-          
-          <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4 bg-[#F8F9FA]">
+        
+          <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4 bg-surface">
             {messages.length === 0 && (
               <div className="text-center text-sm text-ink-muted mt-4">
                 Xin chào! Tôi là trợ lý AI. Bạn muốn tìm khóa học gì hôm nay?
@@ -101,15 +146,15 @@ export function DiscoveryChat() {
             {messages.map((msg, i) => (
               <div key={i} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
                 <div className={`max-w-[85%] rounded-2xl px-4 py-2 text-sm ${
-                  msg.role === 'user' ? 'bg-accent text-white rounded-br-none' : 'bg-white border border-line text-ink rounded-bl-none shadow-sm'
+                  msg.role === 'user' ? 'bg-accent text-white rounded-br-none whitespace-pre-wrap' : 'bg-surface-raised border border-line text-ink rounded-bl-none shadow-sm'
                 }`}>
-                  {msg.text}
+                  {msg.role === 'user' ? msg.text : <MarkdownRenderer content={msg.text} />}
                 </div>
                 
                 {msg.courses && msg.courses.length > 0 && (
                   <div className="mt-2 flex w-full max-w-full overflow-x-auto gap-3 pb-2 pt-1 no-scrollbar">
                     {msg.courses.map(c => (
-                      <Link key={c.id} href={`/courses/${c.slug}`} className="min-w-[220px] max-w-[220px] flex-shrink-0 bg-white border border-line rounded-xl p-3 flex flex-col gap-2 no-underline hover:border-accent shadow-sm transition-colors">
+                      <Link key={c.id} href={`/courses/${c.slug}`} className="min-w-[220px] max-w-[220px] flex-shrink-0 bg-surface-raised border border-line rounded-xl p-3 flex flex-col gap-2 no-underline hover:border-accent shadow-sm transition-colors">
                         <span className="font-semibold text-sm line-clamp-2 text-ink">{c.title}</span>
                         <span className="text-xs text-ink-muted">GV. {c.instructor_name}</span>
                         <div className="flex items-center justify-between mt-auto pt-2 border-t border-line-soft">
@@ -124,26 +169,25 @@ export function DiscoveryChat() {
             ))}
             {loading && (
               <div className="flex items-start">
-                <div className="bg-white border border-line text-ink rounded-2xl rounded-bl-none px-4 py-2 text-sm shadow-sm flex items-center gap-2">
-                  <span className="animate-pulse">●</span>
-                  <span className="animate-pulse delay-75">●</span>
-                  <span className="animate-pulse delay-150">●</span>
+                <div className="bg-surface-raised border border-line text-ink rounded-2xl rounded-bl-none px-4 py-2 text-sm shadow-sm flex items-center gap-2">
+                  <TypingDots />
                 </div>
               </div>
             )}
             <div ref={messagesEndRef} />
           </div>
 
-          <div className="border-t border-line p-3 bg-white">
+          <div className="border-t border-line p-3 bg-surface-raised">
             <form 
               onSubmit={(e) => { e.preventDefault(); sendMessage(); }}
               className="flex items-end gap-2"
             >
-              <div className="flex-1 rounded-2xl border border-line bg-surface-raised flex overflow-hidden focus-within:border-accent focus-within:bg-white transition-colors">
+              <div className="flex-1 rounded-2xl border border-line bg-surface-raised flex overflow-hidden focus-within:border-accent focus-within:bg-surface-raised transition-colors">
                 <textarea
                   value={input}
-                  onChange={e => setInput(e.target.value)}
+                  onChange={e => handleInputChange(e.target.value)}
                   placeholder="Ví dụ: Khoá học IT cho người mới..."
+                  maxLength={MAX_MESSAGE_LENGTH}
                   rows={1}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && !e.shiftKey) {

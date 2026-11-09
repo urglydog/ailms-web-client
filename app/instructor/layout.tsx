@@ -1,85 +1,105 @@
 'use client';
 
-import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect } from 'react';
-import { LogoutSidebarButton } from '@/components/auth/LogoutSidebarButton';
+import { useCallback, useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { UploadTray } from '@/components/instructor/UploadTray';
+import { InstructorChat } from '@/components/chat/InstructorChat';
+import { InstructorNavDrawer } from '@/components/instructor/shell/InstructorNavDrawer';
+import { InstructorSidebar } from '@/components/instructor/shell/InstructorSidebar';
+import { InstructorTopbar } from '@/components/instructor/shell/InstructorTopbar';
+import { LogoutConfirm } from '@/components/instructor/shell/LogoutConfirm';
+import { LanguageModal } from '@/components/layout/LanguageModal';
 import { getCurrentRole } from '@/lib/auth/token';
+import { activeNavItem, isFullPageRoute } from '@/lib/instructor/nav';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 
+const COLLAPSED_KEY = 'instructor-sidebar-collapsed';
+
+/**
+ * Khung Kênh giảng viên (thiết kế lại): thanh bên sáng có nhãn luôn hiện (thu gọn được thành cột icon, nhớ lựa chọn),
+ * thanh trên có tên mục, nút Tạo khóa học, thông báo và menu tài khoản; dưới `md` thay bằng ngăn kéo.
+ *
+ * "Kho Học Liệu & Đề Thi"/"Live"/"Mã giảm giá" nằm trong trang "Công cụ" (xem `app/instructor/tools/page.tsx`); không có
+ * trang "Tổng quan"/"Học viên" riêng vì đã có tab trong "Hiệu suất" (`app/instructor/revenue/layout.tsx`).
+ *
+ * "Tạo khóa học mới" và trang chỉnh sửa khóa (`/edit/*`) là màn hình TOÀN TRANG riêng (tự có thanh trên + mini-nav), nên
+ * bỏ qua toàn bộ khung này cho 2 nhóm route đó.
+ */
 export default function InstructorLayout({ children }: { children: React.ReactNode }) {
+  const t = useTranslations('instructor');
   const router = useRouter();
   const pathname = usePathname();
+  const { data: currentUser } = useCurrentUser();
+
+  const [collapsed, setCollapsed] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [showLanguage, setShowLanguage] = useState(false);
+  const [showLogout, setShowLogout] = useState(false);
+  const closeMobileNav = useCallback(() => setMobileNavOpen(false), []);
 
   useEffect(() => {
-    const role = getCurrentRole();
-    if (role !== 'INSTRUCTOR') {
-      router.replace(role ? '/' : '/login');
-    }
+    if (!getCurrentRole()) router.replace('/login');
   }, [router]);
 
-  const sidebarItems = [
-    { id: 'overview', label: 'Tổng quan', href: '/instructor' },
-    { id: 'courseslist', label: 'Khóa học của tôi', href: '/instructor/courses' },
-    { id: 'revenue', label: 'Thống kê doanh thu', href: '/instructor/revenue' },
-    { id: 'students', label: 'Học viên', href: '/instructor/students' },
-  ];
+  // Đọc lựa chọn thu gọn sau khi mount để HTML máy chủ và máy khách khớp nhau.
+  useEffect(() => {
+    try {
+      setCollapsed(localStorage.getItem(COLLAPSED_KEY) === '1');
+    } catch {
+      /* không có localStorage thì giữ mặc định mở rộng */
+    }
+  }, []);
+
+  useEffect(() => {
+    setMobileNavOpen(false);
+  }, [pathname]);
+
+  const toggleCollapsed = () => {
+    setCollapsed((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem(COLLAPSED_KEY, next ? '1' : '0');
+      } catch {
+        /* bỏ qua */
+      }
+      return next;
+    });
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    window.location.href = '/login';
+  };
+
+  if (isFullPageRoute(pathname)) return <>{children}</>;
+
+  const active = activeNavItem(pathname);
+  const title = active ? t(`nav.${active.id}`) : t('shell.channel');
 
   return (
-    <div className="flex min-h-dvh bg-gray-50 text-gray-900 font-sans">
-      {/* Sidebar */}
-      <div className="sticky top-0 flex min-h-dvh w-[240px] shrink-0 flex-col gap-6 bg-[#0F1B2B] px-4 py-6 self-start">
-        <div className="flex items-center gap-[9px] px-2">
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-400 to-cyan-600 font-display text-base font-bold text-white">
-            L
-          </span>
-          <div className="flex min-w-0 flex-col">
-            <span className="font-display text-[15px] font-bold text-white">LinguaLearn</span>
-            <span className="text-[11px] text-slate-400">Giảng viên</span>
-          </div>
-        </div>
-        
-        <nav className="flex flex-col gap-1">
-          {sidebarItems.map((item) => {
-            const isActive = pathname === item.href || (item.href !== '/instructor' && pathname.startsWith(item.href));
-            return (
-              <Link
-                key={item.id}
-                href={item.href}
-                className={`block rounded-lg px-3.5 py-2.5 text-[13.5px] font-semibold no-underline ${
-                  isActive ? 'bg-cyan-400/15 text-cyan-300' : 'text-slate-300 hover:bg-slate-800'
-                }`}
-              >
-                {item.label}
-              </Link>
-            );
-          })}
-        </nav>
-        
-        <Link href="/" className="px-2 text-xs text-slate-400 no-underline hover:text-slate-300">
-          ← Về trang học viên
-        </Link>
-        
-        <div className="mt-auto border-t border-white/10 pt-3">
-          <div className="flex items-center gap-2.5 px-2">
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-600 font-display text-[12.5px] font-bold text-white">
-              TH
-            </span>
-            <div className="flex min-w-0 flex-col">
-              <span className="truncate text-[12.5px] font-semibold text-white">Trần Thanh Hà</span>
-              <span className="text-[11px] text-slate-400">Giảng viên</span>
-            </div>
-          </div>
-          <LogoutSidebarButton />
-        </div>
+    <div className="flex min-h-dvh bg-surface font-sans text-ink">
+      <InstructorSidebar pathname={pathname} collapsed={collapsed} onToggleCollapsed={toggleCollapsed} />
+      <InstructorNavDrawer open={mobileNavOpen} onClose={closeMobileNav} pathname={pathname} />
+
+      <div className="flex min-w-0 flex-1 flex-col">
+        <InstructorTopbar
+          title={title}
+          user={{ fullName: currentUser?.fullName ?? t('shell.loading'), avatarUrl: currentUser?.avatarUrl ?? null }}
+          onOpenMenu={() => setMobileNavOpen(true)}
+          onOpenLanguage={() => setShowLanguage(true)}
+          onLogout={() => setShowLogout(true)}
+        />
+        <main id="main-content" tabIndex={-1} className="flex min-w-0 flex-1 flex-col gap-[18px] p-4 sm:p-5 md:gap-[22px] md:p-[28px_32px]">
+          {children}
+        </main>
       </div>
 
-      {/* Main Content */}
-      <main className="flex-1 min-w-0 p-[28px_32px] flex flex-col gap-[22px]">
-        {children}
-      </main>
-
+      {showLanguage && <LanguageModal onClose={() => setShowLanguage(false)} />}
+      <LogoutConfirm open={showLogout} onCancel={() => setShowLogout(false)} onConfirm={handleLogout} />
       <UploadTray />
+      <InstructorChat />
     </div>
   );
 }

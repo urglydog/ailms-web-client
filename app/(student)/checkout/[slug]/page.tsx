@@ -1,24 +1,76 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
-import { publicCoursesApi } from '@/lib/api/publicCourses';
-import type { CourseDetail } from '@/types/domain';
-import { paymentsApi } from '@/lib/api/payments';
+import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
+import { BillingForm } from '@/components/checkout/BillingForm';
+import { plainSummary } from '@/lib/text/richText';
+import { CheckoutSteps } from '@/components/checkout/CheckoutSteps';
+import { CouponBox } from '@/components/checkout/CouponBox';
+import { CouponPicker } from '@/components/checkout/CouponPicker';
+import { OrderTotals } from '@/components/checkout/OrderTotals';
+import { PayosButton } from '@/components/checkout/PayosButton';
+import { publicCoursesApi } from '@/lib/api/publicCourses';
+import { couponsApi } from '@/lib/api/coupons';
+import { ApiError } from '@/lib/api/client';
+import { paymentsApi } from '@/lib/api/payments';
+import { rememberPayosReturn, takePayosCancelledNotice } from '@/lib/payosReturn';
+import { getReferralCode } from '@/lib/referral';
+import type { AvailableCoupon, CourseDetail } from '@/types/domain';
 
-export default function CheckoutPage() {
+function Spinner() {
+  return (
+    <div className="flex h-[60vh] items-center justify-center">
+      <div className="h-8 w-8 animate-spin rounded-full border-4 border-accent border-t-transparent" />
+    </div>
+  );
+}
+
+/** Thanh toán đúng 1 khóa (luồng "Mua khóa học" từ trang chi tiết). */
+function CheckoutPageContent() {
+  const t = useTranslations('shop');
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
   const courseSlug = decodeURIComponent(params.slug as string);
-  
+
   const [course, setCourse] = useState<CourseDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [payingMethod, setPayingMethod] = useState<string | null>(null);
-  
+
+  // Bấm Back từ trang PayOS: trình duyệt khôi phục trang này từ bfcache với `payingMethod` còn
+  // nguyên → nút PayOS quay mãi, không bấm được. Reset khi trang được hiện lại.
+  useEffect(() => {
+    const notifyCancelled = () => { if (takePayosCancelledNotice()) toast.info('Đã hủy thanh toán.'); };
+    notifyCancelled();
+    const onPageShow = (e: PageTransitionEvent) => {
+      if (e.persisted) setPayingMethod(null);
+      notifyCancelled();
+    };
+    window.addEventListener('pageshow', onPageShow);
+    return () => window.removeEventListener('pageshow', onPageShow);
+  }, []);
+
   const [billingName, setBillingName] = useState('');
   const [billingPhone, setBillingPhone] = useState('');
+  // "Đăng ký (Quyền riêng tư)" kiểu Udemy (19/09/2026) — chỉ hiện khi `course.requiresPassword`.
+  const [courseAccessPassword, setCourseAccessPassword] = useState('');
+
+  // Mã giảm giá (15/09/2026, mở rộng) — UC57. `finalPrice`/`discountPercent` mặc định đến từ
+  // coupon autoApply (BR-COUPON-04); nhập mã ở đây có thể thay bằng mức tốt hơn (BR-COUPON-01).
+  const [couponCode, setCouponCode] = useState(searchParams.get('coupon') ?? '');
+  const [appliedCode, setAppliedCode] = useState<string | null>(null);
+  const [preview, setPreview] = useState<{ finalPrice: number; discountPercent: number | null } | null>(null);
+  const [applying, setApplying] = useState(false);
+  // Khuyến mãi học viên TỰ CHỌN (không áp ngầm): undefined = chưa quyết định (sẽ chọn sẵn mức giảm
+  // nhiều nhất khi tải xong), null = chủ động không dùng.
+  const [availableCoupons, setAvailableCoupons] = useState<AvailableCoupon[]>([]);
+  const [couponsLoading, setCouponsLoading] = useState(true);
+  const [selectedCouponId, setSelectedCouponId] = useState<number | null | undefined>(undefined);
 
   useEffect(() => {
     if (!courseSlug) return;
@@ -26,12 +78,73 @@ export default function CheckoutPage() {
       .then((data) => {
         setCourse(data);
       })
-      .catch((_err) => {
-        toast.error('Không thể tải thông tin khóa học');
+      .catch(() => {
+        toast.error(t('checkout.loadError'));
         router.push('/courses');
       })
       .finally(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [courseSlug, router]);
+
+  useEffect(() => {
+    if (!course) return;
+    setCouponsLoading(true);
+    couponsApi.available([course.id])
+      .then((list) => {
+        setAvailableCoupons(list);
+        setSelectedCouponId((prev) => (prev === undefined ? (list[0]?.id ?? null) : prev));
+      })
+      .catch(() => setSelectedCouponId((prev) => (prev === undefined ? null : prev)))
+      .finally(() => setCouponsLoading(false));
+  }, [course]);
+
+  // Tính lại giá mỗi khi đổi khuyến mãi đã chọn hoặc mã nhập tay.
+  useEffect(() => {
+    if (!course || selectedCouponId === undefined) return;
+    couponsApi.preview({
+      courseId: course.id,
+      code: appliedCode ?? undefined,
+      couponId: selectedCouponId ?? undefined,
+      manualCoupon: true,
+    })
+      .then((r) => setPreview({ finalPrice: r.finalPrice, discountPercent: r.discountPercent }))
+      .catch(() => setPreview(null));
+  }, [course, selectedCouponId, appliedCode]);
+
+  useEffect(() => {
+    const preset = searchParams.get('coupon');
+    if (preset && course && !appliedCode) {
+      void applyCoupon(preset);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [course]);
+
+  const applyCoupon = async (code: string) => {
+    const trimmed = code.trim();
+    if (!trimmed || !course) return;
+    setApplying(true);
+    try {
+      const result = await couponsApi.preview({
+        courseId: course.id,
+        code: trimmed,
+        couponId: selectedCouponId ?? undefined,
+        manualCoupon: true,
+      });
+      if (!result.enteredCodeValid) {
+        toast.error(t('coupon.invalidOne'));
+        return;
+      }
+      setPreview({ finalPrice: result.finalPrice, discountPercent: result.discountPercent });
+      setAppliedCode(trimmed);
+      toast.success(t('coupon.applied'));
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : t('coupon.failed'));
+    } finally {
+      setApplying(false);
+    }
+  };
+
+  const finalPrice = preview?.finalPrice ?? course?.price ?? 0;
 
   const handlePay = async (method: string) => {
     if (!course) return;
@@ -41,154 +154,127 @@ export default function CheckoutPage() {
         courseId: course.id,
         paymentMethod: method,
         billingName,
-        billingPhone
+        billingPhone,
+        couponCode: appliedCode ?? undefined,
+        couponId: selectedCouponId ?? undefined,
+        manualCoupon: true,
+        courseAccessPassword: course.requiresPassword ? courseAccessPassword : undefined,
+        referralCode: getReferralCode(course.id),
       });
+      rememberPayosReturn();
       window.location.href = res.paymentUrl;
     } catch (err: unknown) {
-      const errorMsg = (err as Record<string, string>)?.detail || 'Có lỗi xảy ra khi thực hiện thanh toán';
-      toast.error(errorMsg);
+      // BUG THẬT (25/09/2026): `ApiError` không có field `.detail` (chỉ có `.message`, xem
+      // `lib/api/client.ts`) — trước đây luôn rơi về thông báo chung chung, không hiện được lý
+      // do thật từ BE. Sửa giống `applyCoupon` ở trên.
+      toast.error(err instanceof ApiError ? err.message : t('pay.error'));
       setPayingMethod(null);
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex h-[60vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-cyan-600 border-t-transparent"></div>
-      </div>
-    );
-  }
-
+  if (loading) return <Spinner />;
   if (!course) return null;
 
   return (
-    <main className="min-h-screen bg-gray-50 py-12">
-      <div className="mx-auto max-w-4xl px-4 md:px-8">
-        <h1 className="mb-8 font-display text-3xl font-bold text-gray-900">Thanh toán khóa học</h1>
-        
-        <div className="grid gap-8 md:grid-cols-3">
-          {/* Cột trái: Thông tin đơn hàng */}
-          <div className="md:col-span-2 space-y-6">
-            <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-              <h2 className="mb-4 text-lg font-bold text-gray-900">Thông tin khóa học</h2>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <div className="relative h-32 w-full sm:w-48 shrink-0 overflow-hidden rounded-xl">
-                  {course.thumbnailUrl ? (
-                    <Image
-                      src={course.thumbnailUrl}
-                      alt={course.title}
-                      fill
-                      className="object-cover"
-                    />
-                  ) : (
-                    <div className="h-full w-full bg-gradient-to-br from-cyan-100 to-blue-100" />
-                  )}
+    <div className="bg-surface py-10">
+      <div className="shell">
+        <div className="mb-2 flex flex-wrap items-center justify-between gap-3">
+          <h1 className="font-display text-3xl font-bold text-ink">{t('checkout.titleOne')}</h1>
+          <button
+            type="button"
+            onClick={() => (window.history.length > 1 ? router.back() : router.push(`/courses/${courseSlug}`))}
+            className="inline-flex items-center gap-2 rounded-full border border-line bg-surface-raised px-4 py-2 text-sm font-medium text-ink-muted transition-colors hover:bg-tint hover:text-ink"
+          >
+            <ArrowLeft size={16} aria-hidden />
+            {t('checkout.backToCourse')}
+          </button>
+        </div>
+        <CheckoutSteps current="payment" />
+
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
+          <div className="space-y-6">
+            <div className="card p-6">
+              <h2 className="mb-4 font-display text-lg font-bold text-ink">{t('checkout.courseInfo')}</h2>
+              <div className="flex flex-col gap-4 sm:flex-row">
+                <div className="relative h-32 w-full shrink-0 overflow-hidden rounded-xl bg-tint sm:w-48">
+                  {course.thumbnailUrl && <Image src={course.thumbnailUrl} alt="" fill sizes="192px" className="object-cover" />}
                 </div>
                 <div className="flex flex-col justify-center">
-                  <h3 className="font-display text-xl font-bold text-gray-900">{course.title}</h3>
-                  <p className="mt-2 text-sm text-gray-500 line-clamp-2">{course.description}</p>
-                  <div className="mt-3 flex items-center gap-2 text-sm font-medium text-gray-700">
-                    <span>Giảng viên:</span>
-                    <span className="text-cyan-700">{course.instructorName || 'Đang cập nhật'}</span>
+                  <h3 className="font-display text-xl font-bold text-ink">{course.title}</h3>
+                  <p className="mt-2 line-clamp-2 text-sm text-ink-muted">{plainSummary(course.description)}</p>
+                  <div className="mt-3 flex items-center gap-2 text-sm font-medium text-ink-muted">
+                    <span>{t('checkout.instructor')}</span>
+                    <span className="text-accent-dark">{course.instructorName || t('checkout.updating')}</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-              <h2 className="mb-4 text-lg font-bold text-gray-900">Thông tin bổ sung</h2>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <label className="mb-1.5 block text-sm font-semibold text-gray-700">Họ và tên</label>
-                  <input 
-                    type="text" 
-                    placeholder="Tên của bạn" 
-                    className="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500" 
-                    value={billingName}
-                    onChange={(e) => setBillingName(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <label className="mb-1.5 block text-sm font-semibold text-gray-700">Số điện thoại</label>
-                  <input 
-                    type="text" 
-                    placeholder="Số điện thoại liên hệ" 
-                    className="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500" 
-                    value={billingPhone}
-                    onChange={(e) => setBillingPhone(e.target.value)}
-                  />
-                </div>
+            <BillingForm name={billingName} phone={billingPhone} onNameChange={setBillingName} onPhoneChange={setBillingPhone} />
+
+            {course.requiresPassword && (
+              <div className="card p-6">
+                <h2 className="mb-1 font-display text-lg font-bold text-ink">{t('checkout.passwordTitle')}</h2>
+                <p className="mb-3 text-xs text-ink-muted">{t('checkout.passwordNote')}</p>
+                <input
+                  type="text"
+                  aria-label={t('checkout.passwordTitle')}
+                  placeholder={t('checkout.passwordPh')}
+                  className="w-full rounded-xl border border-line px-4 py-2.5 text-sm text-ink outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+                  value={courseAccessPassword}
+                  onChange={(e) => setCourseAccessPassword(e.target.value)}
+                />
               </div>
-              <p className="mt-3 text-xs text-gray-500">* Thông tin trên chỉ dùng để liên hệ hỗ trợ khi cần thiết, không ảnh hưởng đến tài khoản thanh toán của bạn.</p>
-            </div>
+            )}
           </div>
 
-          {/* Cột phải: Phương thức thanh toán */}
-          <div className="md:col-span-1 space-y-6">
-            <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm sticky top-24">
-              <h2 className="mb-4 text-lg font-bold text-gray-900">Tóm tắt đơn hàng</h2>
-              
-              <div className="flex justify-between border-b border-gray-100 pb-4">
-                <span className="text-gray-600">Tạm tính</span>
-                <span className="font-semibold text-gray-900">{course.price.toLocaleString('vi-VN')} đ</span>
-              </div>
-              
-              <div className="flex justify-between py-4">
-                <span className="text-base font-bold text-gray-900">Tổng cộng</span>
-                <span className="text-xl font-bold text-cyan-600">{course.price.toLocaleString('vi-VN')} đ</span>
+          <div>
+            <div className="card sticky top-24 p-6">
+              <h2 className="mb-4 font-display text-lg font-bold text-ink">{t('summary.title')}</h2>
+              <OrderTotals count={1} original={course.price} total={finalPrice} />
+
+              <div className="my-4 flex flex-col gap-4 border-t border-line-soft pt-4">
+                <CouponPicker
+                  coupons={availableCoupons}
+                  loading={couponsLoading}
+                  selectedId={selectedCouponId ?? null}
+                  onSelect={setSelectedCouponId}
+                />
+                <CouponBox
+                  value={couponCode}
+                  appliedCode={appliedCode}
+                  applying={applying}
+                  onChange={setCouponCode}
+                  onApply={() => void applyCoupon(couponCode)}
+                  onRemove={() => {
+                    setAppliedCode(null);
+                  }}
+                />
               </div>
 
-              <div className="mt-6 flex flex-col gap-3">
-                <button
-                  onClick={() => handlePay('VNPAY')}
-                  disabled={payingMethod !== null}
-                  className={`flex w-full items-center justify-between rounded-xl border-2 px-4 py-3 transition-colors ${
-                    payingMethod === 'VNPAY' ? 'border-cyan-600 bg-cyan-50' : 'border-gray-200 bg-white hover:border-cyan-300'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100 font-bold text-blue-700">V</div>
-                    <span className="font-semibold text-gray-900">VNPAY</span>
-                  </div>
-                  {payingMethod === 'VNPAY' && <div className="h-4 w-4 animate-spin rounded-full border-2 border-cyan-600 border-t-transparent" />}
-                </button>
+              <PayosButton paying={payingMethod === 'PAYOS'} disabled={payingMethod !== null} onPay={() => handlePay('PAYOS')} />
 
-                <button
-                  onClick={() => handlePay('MOMO')}
-                  disabled={payingMethod !== null}
-                  className={`flex w-full items-center justify-between rounded-xl border-2 px-4 py-3 transition-colors ${
-                    payingMethod === 'MOMO' ? 'border-pink-600 bg-pink-50' : 'border-gray-200 bg-white hover:border-pink-300'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-pink-100 font-bold text-pink-700">M</div>
-                    <span className="font-semibold text-gray-900">Ví MoMo</span>
-                  </div>
-                  {payingMethod === 'MOMO' && <div className="h-4 w-4 animate-spin rounded-full border-2 border-pink-600 border-t-transparent" />}
-                </button>
-
-                <button
-                  onClick={() => handlePay('ZALOPAY')}
-                  disabled={payingMethod !== null}
-                  className={`flex w-full items-center justify-between rounded-xl border-2 px-4 py-3 transition-colors ${
-                    payingMethod === 'ZALOPAY' ? 'border-green-600 bg-green-50' : 'border-gray-200 bg-white hover:border-green-300'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-100 font-bold text-green-700">Z</div>
-                    <span className="font-semibold text-gray-900">ZaloPay</span>
-                  </div>
-                  {payingMethod === 'ZALOPAY' && <div className="h-4 w-4 animate-spin rounded-full border-2 border-green-600 border-t-transparent" />}
-                </button>
-              </div>
-              
-              <p className="mt-4 text-center text-xs text-gray-500">
-                Bằng việc thanh toán, bạn đồng ý với Điều khoản dịch vụ của LinguaLearn.
+              <p className="mt-4 text-center text-xs text-ink-muted">
+                {t.rich('summary.terms', {
+                  link: (chunks) => (
+                    <Link href="/legal/terms" className="underline hover:text-accent-dark">
+                      {chunks}
+                    </Link>
+                  ),
+                })}
               </p>
             </div>
           </div>
         </div>
       </div>
-    </main>
+    </div>
+  );
+}
+
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={<Spinner />}>
+      <CheckoutPageContent />
+    </Suspense>
   );
 }

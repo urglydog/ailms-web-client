@@ -1,0 +1,244 @@
+'use client';
+
+import { LiveKitRoom, useLocalParticipant, useTracks, VideoTrack } from '@livekit/components-react';
+import { Track } from 'livekit-client';
+import { useParams } from 'next/navigation';
+import { useEffect, useState, type ChangeEvent } from 'react';
+import { useTranslations } from 'next-intl';
+import { LiveChatPanel } from '@/components/live/LiveChatPanel';
+import { UploadProgressBar } from '@/components/ui/UploadProgressBar';
+import { useEndLiveSession, useLiveSession, useStartLiveSession } from '@/hooks/useLiveSessions';
+import { useStartLiveThumbnailUpload } from '@/hooks/useUploadTray';
+import { useUploadTrayStore } from '@/lib/stores/uploadTrayStore';
+import { ApiError } from '@/lib/api/client';
+import type { LiveSessionStartRes } from '@/types/domain';
+
+/**
+ * UC50 — phòng điều khiển của giảng viên: bắt đầu/kết thúc, bật/tắt camera-mic-chia sẻ màn hình
+ * độc lập (BR-LIVE-03). `LiveKitRoom` chỉ render SAU khi có token thật (từ `/start`) — component
+ * con dùng `useLocalParticipant`/`useTracks` nên BẮT BUỘC nằm trong `RoomContext` do
+ * `LiveKitRoom` cung cấp, không tách ra ngoài được.
+ */
+export default function LiveControlRoomPage() {
+  const t = useTranslations('instructor.live.room');
+  const params = useParams<{ sessionId: string }>();
+  const sessionId = Number(params.sessionId);
+  const { data: session, isLoading } = useLiveSession(sessionId);
+  const startLive = useStartLiveSession();
+  const endLive = useEndLiveSession();
+  const [liveKit, setLiveKit] = useState<LiveSessionStartRes | null>(null);
+  const startThumbnailUpload = useStartLiveThumbnailUpload(sessionId);
+  const thumbnailTask = useUploadTrayStore((s) =>
+    s.tasks.find((t) => t.targetType === 'live-thumbnail' && t.targetId === sessionId),
+  );
+
+  const handleThumbnailFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file || !session) return;
+    startThumbnailUpload(file, t('thumbnailTask', { title: session.title }));
+  };
+
+  // Phiên ĐÃ live (tải lại trang, hoặc vào lại sau khi rớt mạng trong 60s ân hạn BR-LIVE-09)
+  // -> tự lấy token mới, không bắt bấm nút lại.
+  useEffect(() => {
+    if (session?.status === 'LIVE' && !liveKit && !startLive.isPending) {
+      startLive.mutate(sessionId, { onSuccess: setLiveKit });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- chỉ chạy lại khi trạng thái phiên đổi
+  }, [session?.status]);
+
+  if (isLoading || !session) {
+    return <div className="p-10 text-center text-sm text-ink-muted">{t('loading')}</div>;
+  }
+
+  if (session.status === 'ENDED') {
+    return (
+      <div className="mx-auto flex max-w-lg flex-col items-center gap-2 rounded-xl border border-line bg-surface-raised p-8 text-center">
+        <h1 className="m-0 font-display text-lg font-bold text-ink">{session.title}</h1>
+        <p className="text-sm text-ink-muted">{t('ended')}</p>
+      </div>
+    );
+  }
+
+  if (!liveKit) {
+    const previewUrl = session.thumbnailUrl ?? session.courseThumbnailUrl;
+    return (
+      <div className="mx-auto flex max-w-lg flex-col items-center gap-4 rounded-xl border border-line bg-surface-raised p-8 text-center">
+        <h1 className="m-0 font-display text-lg font-bold text-ink">{session.title}</h1>
+        <p className="text-[13px] text-ink-muted">
+          {t('meta', { course: session.courseTitle, language: session.sourceLanguage })}
+        </p>
+
+        {/* F11.9 mở rộng — ảnh hiện trên trang khám phá /live, không bắt buộc (mặc định dùng
+            ảnh bìa khóa học nếu bỏ trống). Sửa được bất kỳ lúc nào, kể cả sau khi đã live. */}
+        <div className="w-full text-left">
+          <span className="mb-1.5 block text-[12.5px] font-semibold text-ink">
+            {t('thumbnail')}
+          </span>
+          {previewUrl && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={previewUrl} alt={t('thumbnailAlt')} className="mb-2 h-32 w-full rounded-lg object-cover" />
+          )}
+          <input
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            onChange={handleThumbnailFileChange}
+            disabled={thumbnailTask?.status === 'uploading'}
+            className="text-[12.5px] file:mr-3 file:rounded-md file:border-0 file:bg-tint file:px-3 file:py-1.5 file:text-[12px] file:font-semibold"
+          />
+          {!session.thumbnailUrl && (
+            <p className="mt-1 text-[11px] text-ink-muted">
+              {t('noThumbnail')}
+            </p>
+          )}
+          {thumbnailTask?.status === 'uploading' && (
+            <UploadProgressBar percent={thumbnailTask.percent} label={t('uploading')} />
+          )}
+          {thumbnailTask?.status === 'error' && (
+            <p className="text-[11.5px] text-danger">{thumbnailTask.errorMessage}</p>
+          )}
+        </div>
+
+        {startLive.error instanceof ApiError && (
+          <p className="text-[12.5px] text-danger">{startLive.error.message}</p>
+        )}
+        <button
+          onClick={() => startLive.mutate(sessionId, { onSuccess: setLiveKit })}
+          disabled={startLive.isPending}
+          className="rounded-full bg-danger px-6 py-2.5 text-[13.5px] font-bold text-white hover:bg-danger/90 disabled:opacity-50"
+        >
+          {startLive.isPending ? t('connecting') : t('start')}
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <LiveKitRoom
+      serverUrl={liveKit.serverUrl}
+      token={liveKit.accessToken}
+      connect
+      audio={false}
+      video={false}
+      onDisconnected={() => setLiveKit(null)}
+    >
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <ControlRoomBody
+          title={session.title}
+          onEnd={() => endLive.mutate(sessionId)}
+          isEnding={endLive.isPending}
+        />
+        {/* Giảng viên luôn đã đăng nhập ở trang này — không cần RequireLoginModal. */}
+        <LiveChatPanel isAuthenticated />
+      </div>
+    </LiveKitRoom>
+  );
+}
+
+function ControlRoomBody({
+  title,
+  onEnd,
+  isEnding,
+}: {
+  title: string;
+  onEnd: () => void;
+  isEnding: boolean;
+}) {
+  const t = useTranslations('instructor.live.room');
+  const { localParticipant, isCameraEnabled, isMicrophoneEnabled, isScreenShareEnabled } =
+    useLocalParticipant();
+  const [shareSystemAudio, setShareSystemAudio] = useState(false);
+
+  const localTracks = useTracks([Track.Source.Camera, Track.Source.ScreenShare]).filter(
+    (t) => t.participant.isLocal,
+  );
+  const cameraTrack = localTracks.find((t) => t.source === Track.Source.Camera);
+  const screenTrack = localTracks.find((t) => t.source === Track.Source.ScreenShare);
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center justify-between">
+        <h1 className="m-0 font-display text-[18px] font-bold text-ink">{title}</h1>
+        <button
+          onClick={onEnd}
+          disabled={isEnding}
+          className="cursor-pointer rounded-full bg-ink px-5 py-2 text-[12.5px] font-bold text-white hover:bg-black disabled:opacity-50"
+        >
+          {isEnding ? t('ending') : t('end')}
+        </button>
+      </div>
+
+      {/* Chia sẻ màn hình làm nền, camera nổi Picture-in-Picture góc dưới (BR-LIVE-03) */}
+      <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-ink">
+        {screenTrack ? (
+          <VideoTrack trackRef={screenTrack} className="h-full w-full object-contain" />
+        ) : cameraTrack ? (
+          <VideoTrack trackRef={cameraTrack} className="h-full w-full object-cover" />
+        ) : (
+          <div className="flex h-full items-center justify-center text-sm text-ink-muted">
+            {t('cameraOff')}
+          </div>
+        )}
+        {screenTrack && cameraTrack && (
+          <div className="absolute bottom-3 right-3 h-24 w-40 overflow-hidden rounded-lg border-2 border-white/80 shadow-lg">
+            <VideoTrack trackRef={cameraTrack} className="h-full w-full object-cover" />
+          </div>
+        )}
+      </div>
+
+      <div className="flex flex-wrap items-center gap-3 rounded-xl border border-line bg-surface-raised p-4">
+        <ToggleButton
+          active={isCameraEnabled}
+          onClick={() => localParticipant.setCameraEnabled(!isCameraEnabled)}
+          label="Camera"
+        />
+        <ToggleButton
+          active={isMicrophoneEnabled}
+          onClick={() => localParticipant.setMicrophoneEnabled(!isMicrophoneEnabled)}
+          label="Micro"
+        />
+        <ToggleButton
+          active={isScreenShareEnabled}
+          onClick={() =>
+            localParticipant.setScreenShareEnabled(!isScreenShareEnabled, { audio: shareSystemAudio })
+          }
+          label={t('shareScreen')}
+        />
+        <label className="flex cursor-pointer items-center gap-1.5 text-[12.5px] text-ink-muted">
+          <input
+            type="checkbox"
+            checked={shareSystemAudio}
+            onChange={(e) => setShareSystemAudio(e.target.checked)}
+          />
+          {t('shareAudio')}
+        </label>
+      </div>
+      <p className="text-[11.5px] text-ink-muted">
+        {t('audioHint')}
+      </p>
+    </div>
+  );
+}
+
+function ToggleButton({
+  active,
+  onClick,
+  label,
+}: {
+  active: boolean;
+  onClick: () => void;
+  label: string;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`cursor-pointer rounded-full px-4 py-2 text-[13px] font-semibold transition-colors ${
+        active ? 'bg-accent text-white' : 'bg-line-soft text-ink-muted hover:bg-line-soft'
+      }`}
+    >
+      {active ? '● ' : ''}
+      {label}
+    </button>
+  );
+}

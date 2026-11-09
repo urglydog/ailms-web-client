@@ -1,4 +1,6 @@
 import { toast } from 'sonner';
+import { ApiError } from '@/lib/api/client';
+import type { ProblemDetail } from '@/types/domain';
 
 interface GoogleCredentialResponse {
   credential?: string;
@@ -19,8 +21,17 @@ export async function handleGoogleSuccess(credentialResponse: GoogleCredentialRe
     );
 
     if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.message || err.detail || 'Đăng nhập Google thất bại');
+      const err = (await res.json().catch(() => ({}))) as Partial<ProblemDetail>;
+      throw new ApiError({
+        type: err.type ?? 'about:blank',
+        title: err.title ?? '',
+        status: err.status ?? res.status,
+        detail: err.detail || 'Đăng nhập Google thất bại',
+        instance: err.instance ?? '',
+        code: err.code ?? 'UNKNOWN',
+        timestamp: err.timestamp ?? '',
+        fieldErrors: err.fieldErrors,
+      });
     }
 
     const data = await res.json();

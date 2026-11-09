@@ -1,19 +1,25 @@
-import { RegisterForm } from '@/components/auth/RegisterForm';
+'use client';
+
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
+import { AuthLayout } from '@/components/auth/AuthLayout';
+import { RegisterForm } from '@/components/auth/RegisterForm';
 
 export default function RegisterPage() {
+  const t = useTranslations('auth.register');
   return (
-    <section className="shell flex min-h-[70vh] items-center justify-center py-16">
-      <div className="card w-full max-w-md p-8 border border-line bg-surface-raised rounded-2xl shadow-sm">
-        <h1 className="font-display text-2xl font-bold text-ink mb-6 text-center">Đăng ký tài khoản</h1>
-        <RegisterForm />
-        <p className="mt-6 text-center text-sm text-ink-muted">
-          Đã có tài khoản?{' '}
-          <Link href="/login" className="font-semibold text-accent no-underline hover:underline">
-            Đăng nhập ngay
+    <AuthLayout
+      title={t('title')}
+      footer={
+        <>
+          {t('hasAccount')}{' '}
+          <Link href="/login" className="font-semibold text-accent-dark no-underline hover:underline">
+            {t('signInNow')}
           </Link>
-        </p>
-      </div>
-    </section>
+        </>
+      }
+    >
+      <RegisterForm />
+    </AuthLayout>
   );
 }

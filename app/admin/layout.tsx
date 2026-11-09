@@ -1,142 +1,118 @@
 'use client';
 
-import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { LogoutSidebarButton } from '@/components/auth/LogoutSidebarButton';
+import { useTranslations } from 'next-intl';
+import { AdminNavDrawer } from '@/components/admin/shell/AdminNavDrawer';
+import { AdminSidebar } from '@/components/admin/shell/AdminSidebar';
+import { AdminTopbar } from '@/components/admin/shell/AdminTopbar';
+import { LogoutConfirm } from '@/components/instructor/shell/LogoutConfirm';
+import { LanguageModal } from '@/components/layout/LanguageModal';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useModerationQueue } from '@/hooks/useCourses';
-import { api } from '@/lib/api/client';
-import { getAccessToken, getCurrentRole } from '@/lib/auth/token';
+import { getCurrentRole, getAccessToken } from '@/lib/auth/token';
+import { activeAdminItem } from '@/lib/admin/nav';
+import { disputesApi } from '@/lib/api/disputes';
+import { supportApi } from '@/lib/api/support';
 
-interface InstructorRequestSummary {
-  id: number;
-}
+const COLLAPSED_KEY = 'admin-sidebar-collapsed';
 
+/**
+ * Khung khu Quản trị (thiết kế lại): thanh bên sáng chia nhóm có nhãn luôn hiện (thu gọn được thành cột icon, nhớ lựa chọn),
+ * thanh trên có tên mục, thông báo và menu tài khoản; dưới `md` thay bằng ngăn kéo. Chỉ ADMIN được vào.
+ */
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
+  const t = useTranslations('admin');
   const router = useRouter();
+  const pathname = usePathname();
+  const { data: currentUser } = useCurrentUser();
 
-  const [userInfo, setUserInfo] = useState<{name: string, role: string, initials: string} | null>(null);
+  const [collapsed, setCollapsed] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [showLanguage, setShowLanguage] = useState(false);
+  const [showLogout, setShowLogout] = useState(false);
+  const closeMobileNav = useCallback(() => setMobileNavOpen(false), []);
 
   useEffect(() => {
     const role = getCurrentRole();
-    if (role !== 'ADMIN') {
-      router.replace(role ? '/' : '/login');
-    }
-
-    // Lấy thông tin user
-    const token = getAccessToken();
-    if (token) {
-      try {
-        const payload = token.split('.')[1];
-        if (payload) {
-          const decoded = JSON.parse(atob(payload));
-          const nameStr = decoded.name || decoded.fullName || decoded.sub || decoded.email || 'Admin';
-          
-          let roleStr = 'Admin';
-          if (typeof decoded.role === 'string') roleStr = decoded.role;
-          else if (Array.isArray(decoded.roles)) roleStr = decoded.roles[0] || 'Admin';
-          else if (typeof decoded.roles === 'string') roleStr = decoded.roles;
-          
-          // Tạo 1-2 chữ cái đầu
-          const words = nameStr.split(' ');
-          let initials = words[0].charAt(0).toUpperCase();
-          if (words.length > 1) {
-            initials += words[words.length - 1].charAt(0).toUpperCase();
-          }
-
-          setUserInfo({ name: nameStr, role: roleStr, initials });
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    }
+    if (role !== 'ADMIN') router.replace(role ? '/' : '/login');
   }, [router]);
 
-  // size:1 vì chỉ cần totalElements để hiện badge, không cần nội dung trang.
-  const { data: pendingCoursesPage } = useModerationQueue({ status: 'PENDING', size: 1 });
-  const { data: pendingRequests } = useQuery({
-    queryKey: ['instructor-requests', 'PENDING'],
-    queryFn: () =>
-      api.get<InstructorRequestSummary[]>('/api/v1/instructor-requests?status=PENDING', {
-        token: getAccessToken() ?? undefined,
-      }),
+  // Đọc lựa chọn thu gọn sau khi mount để HTML máy chủ và máy khách khớp nhau.
+  useEffect(() => {
+    try {
+      setCollapsed(localStorage.getItem(COLLAPSED_KEY) === '1');
+    } catch {
+      /* không có localStorage thì giữ mặc định mở rộng */
+    }
+  }, []);
+
+  useEffect(() => {
+    setMobileNavOpen(false);
+  }, [pathname]);
+
+  const toggleCollapsed = () => {
+    setCollapsed((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem(COLLAPSED_KEY, next ? '1' : '0');
+      } catch {
+        /* bỏ qua */
+      }
+      return next;
+    });
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    window.location.href = '/login';
+  };
+
+  // size:1 vì chỉ cần totalElements để hiện số trên mục Kiểm duyệt.
+  const { data: pendingPage } = useModerationQueue({ status: 'PENDING', size: 1 });
+  const pendingCourses = pendingPage?.totalElements ?? 0;
+
+  const { data: openDisputesList } = useQuery({
+    queryKey: ['admin', 'disputes', 'open-count'],
+    queryFn: () => disputesApi.listAllAdmin('OPEN'),
     enabled: !!getAccessToken(),
+    refetchInterval: 30000,
   });
+  const openDisputes = openDisputesList?.length ?? 0;
 
-  const pendingCoursesCount = pendingCoursesPage?.totalElements ?? 0;
-  const pendingRequestsCount = pendingRequests?.length ?? 0;
+  const { data: openSupportCount } = useQuery({
+    queryKey: ['admin', 'support', 'open-count'],
+    queryFn: () => supportApi.openCount(),
+    enabled: !!getAccessToken(),
+    refetchInterval: 30000,
+  });
+  const openSupport = openSupportCount?.open ?? 0;
 
-  const sidebarItems = [
-    { id: 'overview', label: 'Tổng quan', href: '/admin', badge: 0 },
-    { id: 'moderation', label: 'Kiểm duyệt khóa học', href: '/admin/moderation', badge: pendingCoursesCount },
-    { id: 'users', label: 'Quản lý người dùng', href: '/admin/users', badge: pendingRequestsCount },
-    { id: 'aiqueue', label: 'Giám sát AI Queue', href: '/admin/ai-queue', badge: 0 },
-    { id: 'transactions', label: 'Đối soát giao dịch', href: '/admin/transactions/payments', badge: 0 },
-    { id: 'categories', label: 'Danh mục', href: '/admin/categories', badge: 0 },
-    { id: 'reviews', label: 'Đánh giá', href: '/admin/reviews', badge: 0 },
-    { id: 'settings', label: 'Cấu hình hệ thống', href: '/admin/settings', badge: 0 },
-  ];
+  const active = activeAdminItem(pathname);
+  const title = active ? t(`nav.${active.id}`) : t('shell.panel');
 
   return (
-    <div className="flex min-h-dvh bg-gray-50 text-gray-900 font-sans">
-      {/* Sidebar */}
-      <div className="sticky top-0 flex min-h-dvh w-[240px] shrink-0 flex-col gap-5 bg-[#0F1B2B] px-4 py-6 self-start">
-        <div className="flex items-center gap-[9px] px-2">
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-400 to-cyan-600 font-display text-base font-bold text-white">
-            L
-          </span>
-          <div className="flex min-w-0 flex-col">
-            <span className="font-display text-[15px] font-bold text-white">LinguaLearn</span>
-            <span className="text-[11px] text-slate-400">Quản trị viên</span>
-          </div>
-        </div>
-        
-        <nav className="flex flex-col gap-1">
-          {sidebarItems.map((item) => {
-            const isActive = pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href));
-            return (
-              <Link
-                key={item.id}
-                href={item.href}
-                className={`flex items-center justify-between rounded-lg px-3.5 py-2.5 text-[13.5px] font-semibold no-underline ${
-                  isActive ? 'bg-cyan-400/15 text-cyan-300' : 'text-slate-300 hover:bg-slate-800'
-                }`}
-              >
-                <span>{item.label}</span>
-                {item.badge > 0 && (
-                  <span className="flex min-w-[18px] h-[18px] items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold text-white">
-                    {item.badge}
-                  </span>
-                )}
-              </Link>
-            );
-          })}
-        </nav>
-        
-        <Link href="/" className="px-2 text-xs text-slate-400 no-underline hover:text-slate-300">
-          ← Về trang học viên
-        </Link>
-        
-        <div className="mt-auto border-t border-white/10 pt-3">
-          <div className="flex items-center gap-2.5 px-2">
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-600 font-display text-[12.5px] font-bold text-white uppercase">
-              {userInfo?.initials || 'A'}
-            </span>
-            <div className="flex min-w-0 flex-col">
-              <span className="truncate text-[12.5px] font-semibold text-white">{userInfo?.name || 'Đang tải...'}</span>
-              <span className="text-[11px] text-slate-400">{userInfo?.role || 'Admin'}</span>
-            </div>
-          </div>
-          <LogoutSidebarButton />
-        </div>
+    <div className="flex min-h-dvh bg-surface font-sans text-ink">
+      <AdminSidebar pathname={pathname} collapsed={collapsed} onToggleCollapsed={toggleCollapsed} pendingCourses={pendingCourses} openDisputes={openDisputes} openSupport={openSupport} />
+      <AdminNavDrawer open={mobileNavOpen} onClose={closeMobileNav} pathname={pathname} pendingCourses={pendingCourses} openDisputes={openDisputes} openSupport={openSupport} />
+
+      <div className="flex min-w-0 flex-1 flex-col">
+        <AdminTopbar
+          title={title}
+          user={{ fullName: currentUser?.fullName ?? t('shell.loading'), avatarUrl: currentUser?.avatarUrl ?? null }}
+          onOpenMenu={() => setMobileNavOpen(true)}
+          onOpenLanguage={() => setShowLanguage(true)}
+          onLogout={() => setShowLogout(true)}
+        />
+        <main id="main-content" tabIndex={-1} className="flex min-w-0 flex-1 flex-col gap-[18px] p-4 sm:p-5 md:gap-[22px] md:p-[28px_32px]">
+          {children}
+        </main>
       </div>
 
-      {/* Main Content */}
-      <main className="flex-1 min-w-0 p-[28px_32px] flex flex-col gap-[22px]">
-        {children}
-      </main>
+      {showLanguage && <LanguageModal onClose={() => setShowLanguage(false)} />}
+      <LogoutConfirm open={showLogout} onCancel={() => setShowLogout(false)} onConfirm={handleLogout} />
     </div>
   );
 }

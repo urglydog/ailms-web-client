@@ -1,0 +1,73 @@
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { materialsApi, MaterialGenerationReq } from '@/lib/api/materials';
+
+export function useCourseMaterials(courseId: number) {
+  return useQuery({
+    queryKey: ['materials', 'course', courseId],
+    queryFn: () => materialsApi.listForCourse(courseId),
+    enabled: !!courseId,
+    staleTime: 0,
+    refetchInterval: (query) => {
+      const data = query.state.data;
+      if (data && data.some(m => m.status === 'PENDING' || m.status === 'PENDING_TRANSCRIPT' || m.status === 'PROCESSING')) {
+        return 3000;
+      }
+      return false;
+    }
+  });
+}
+
+export function useMaterialDetail(id: number) {
+  return useQuery({
+    queryKey: ['materials', 'detail', id],
+    queryFn: () => materialsApi.getDetail(id),
+    enabled: !!id,
+  });
+}
+
+export function useRequestMaterial() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (input: MaterialGenerationReq) => materialsApi.requestGeneration(input),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['materials', 'course', variables.courseId] });
+    },
+  });
+}
+
+export function useRenameMaterial(courseId: number) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, title }: { id: number; title: string }) => materialsApi.renameMaterial(id, title),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['materials', 'course', courseId] });
+    },
+  });
+}
+
+export function useDeleteMaterial(courseId: number) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => materialsApi.deleteMaterial(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['materials', 'course', courseId] });
+    },
+  });
+}
+
+export function useAvailableLanguages(courseId: number) {
+  return useQuery({
+    queryKey: ['materials', 'languages', courseId],
+    queryFn: () => materialsApi.getAvailableLanguages(courseId),
+    enabled: !!courseId,
+  });
+}
+
+export function useCourseChapters(courseId: number) {
+  return useQuery({
+    queryKey: ['materials', 'chapters', courseId],
+    queryFn: () => materialsApi.getCourseChapters(courseId),
+    enabled: !!courseId,
+  });
+}

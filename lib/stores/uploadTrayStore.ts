@@ -9,7 +9,7 @@ import { create } from 'zustand';
  */
 export type UploadTaskStatus = 'uploading' | 'success' | 'error';
 
-export type UploadTargetType = 'lesson-video' | 'lesson-document' | 'course-thumbnail';
+export type UploadTargetType = 'lesson-video' | 'lesson-document' | 'course-thumbnail' | 'live-thumbnail';
 
 export interface UploadTask {
   id: string;

@@ -20,10 +20,16 @@ export function useCreateReview(courseId: number) {
 
 // ── Admin (UC44) ──
 
-export function useAllReviews(page = 0, size = 20) {
+export function useAllReviews(
+  page = 0,
+  size = 20,
+  courseTitle?: string,
+  instructorEmail?: string,
+  status?: string
+) {
   return useQuery({
-    queryKey: ['reviews', 'all', page, size],
-    queryFn: () => reviewsApi.listAll(page, size),
+    queryKey: ['reviews', 'all', page, size, courseTitle, instructorEmail, status],
+    queryFn: () => reviewsApi.listAll(page, size, courseTitle, instructorEmail, status),
     enabled: !!getAccessToken(),
   });
 }

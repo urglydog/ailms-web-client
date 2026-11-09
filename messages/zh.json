@@ -1,0 +1,3144 @@
+{
+  "header": {
+    "nav": {
+      "courses": "课程",
+      "myCourses": "我的课程",
+      "live": "直播",
+      "community": "社区",
+      "about": "关于我们",
+      "explore": "探索"
+    },
+    "search": {
+      "ariaLabel": "搜索",
+      "placeholder": "搜索课程..."
+    },
+    "mobileMenu": {
+      "open": "打开菜单",
+      "close": "关闭菜单",
+      "title": "导航菜单"
+    },
+    "wishlist": {
+      "viewAll": "前往收藏夹",
+      "empty": "收藏夹是空的。",
+      "free": "免费",
+      "enrollFree": "免费报名",
+      "addToCart": "加入购物车",
+      "inCart": "已在购物车中",
+      "enrollSuccess": "报名成功！",
+      "enrollError": "报名失败，请稍后再试。"
+    },
+    "cart": {
+      "viewAll": "前往购物车",
+      "empty": "购物车是空的。",
+      "total": "总计"
+    },
+    "notifications": {
+      "title": "通知",
+      "markAllRead": "全部标记为已读",
+      "empty": "暂无通知",
+      "viewAll": "查看全部通知",
+      "tabMain": "主要",
+      "tabSystem": "系统",
+      "tabUnread": "未读",
+      "unreadDot": "未读",
+      "tabsAria": "通知类型"
+    },
+    "account": {
+      "guestName": "用户",
+      "adminPanel": "前往管理后台",
+      "wishlist": "收藏夹",
+      "publicProfile": "资料与成就",
+      "paymentHistory": "交易记录",
+      "profile": "账户设置",
+      "instructorChannel": "讲师频道",
+      "becomeInstructor": "成为讲师",
+      "language": "语言",
+      "logout": "退出登录",
+      "certificates": "证书与成就",
+      "requestRefund": "Request a refund"
+    },
+    "auth": {
+      "login": "登录",
+      "register": "注册",
+      "getStarted": "开始"
+    },
+    "logoutModal": {
+      "title": "确认退出登录",
+      "body": "您确定要退出登录吗？",
+      "cancel": "取消",
+      "confirm": "退出登录"
+    },
+    "explore": {
+      "allCourses": "全部课程",
+      "categories": "分类",
+      "more": "更多",
+      "liveNow": "直播中",
+      "groups": { "it": "信息技术", "soft": "软技能", "other": "其他领域" }
+    },
+    "theme": { "toDark": "切换到深色模式", "toLight": "切换到浅色模式", "label": "外观", "dark": "深色", "light": "浅色" },
+    "skipToContent": "跳到主要内容",
+    "help": "Help & Support"
+  },
+  "footer": {
+    "tagline": "学术级在线学习与考试管理系统。",
+    "discoverTitle": "探索",
+    "discover": {
+      "about": "关于我们",
+      "teaching": "在 LinguaLearn 授课",
+      "courses": "课程",
+      "help": "帮助与支持"
+    },
+    "legalTitle": "法律与政策",
+    "legal": {
+      "terms": "服务条款",
+      "privacy": "隐私政策",
+      "refund": "退款政策",
+      "revenueShare": "讲师收益分成",
+      "contentModeration": "内容审核规定",
+      "cookies": "Cookie 政策",
+      "accessibility": "无障碍声明"
+    },
+    "contactTitle": "联系我们",
+    "phoneLabel": "电话",
+    "emailLabel": "邮箱",
+    "copyright": "© {year} LinguaLearn — 胡志明市工业大学",
+    "sitemap": "网站地图"
+  },
+  "languageModal": {
+    "title": "选择语言",
+    "close": "关闭"
+  },
+  "home": {
+    "hero": {
+      "tag": "全新 · AI 配音",
+      "titleBefore": "所有课程，用",
+      "titleHighlight": "你的语言",
+      "description": "AI 将国际课程配音成你选择的语言，与原视频同步，无需字幕。",
+      "cta": "探索课程",
+      "demoLink": "观看演示 →"
+    },
+    "demo": {
+      "ariaLabel": "AI 配音演示视频",
+      "step1": "选择课程",
+      "step2": "选择语言",
+      "step3": "向 AI 导师提问",
+      "chatQuestion": "Figma 的自动布局有什么用？",
+      "chatAnswer": "自动布局能让框架随内容自动伸缩，你不用再手动调整每个间距。讲师在这里讲解：",
+      "aiName": "AI 导师",
+      "aiThinking": "AI 导师正在思考…",
+      "jumpToast": "跳转到 {time}",
+      "badgeOriginal": "原声",
+      "badgeReady": "就绪",
+      "originalSuffix": " · 原声",
+      "captions": {
+        "pick": "选择任意一门课程",
+        "play": "点击播放开始学习",
+        "original": "视频以原语言播放（英文字幕）",
+        "chooseLang": "选择 AI 配音声音，字幕随语言切换",
+        "askTutor": "有不懂的地方？直接在课程里问 AI 导师",
+        "clickTime": "点击时间戳即可跳到对应片段",
+        "jumped": "视频跳转到讲师讲解的位置"
+      },
+      "header": {
+        "title": "热门课程",
+        "subtitle": "学员高分评价的课程",
+        "search": "搜索课程…"
+      },
+      "player": {
+        "back": "← 我的课程",
+        "progress": "已完成 22%",
+        "dubLabel": "AI 配音声音",
+        "listenOriginal": "收听原声",
+        "tabLessons": "课时",
+        "tabTutor": "AI 导师",
+        "lessons": [
+          "课程介绍",
+          "设计原则",
+          "认识 Figma",
+          "自动布局与组件",
+          "交互原型"
+        ]
+      },
+      "card": {
+        "aiDub": "AI 配音",
+        "instructor": "讲师 {name}",
+        "beginner": "入门",
+        "intermediate": "中级",
+        "free": "免费"
+      },
+      "courses": [
+        "人工智能入门",
+        "React 网页开发",
+        "Python 数据分析",
+        "UI/UX 设计基础",
+        "IT 英语交流",
+        "数据分析 SQL",
+        "职场提示词工程",
+        "TypeScript 实战",
+        "新手 Figma"
+      ]
+    },
+    "trending": {
+      "title": "热门课程",
+      "all": "全部",
+      "viewAll": "查看全部",
+      "empty": "此分类暂无课程。"
+    },
+    "shelves": {
+      "newest": {
+        "title": "新上线",
+        "subtitle": "LinguaLearn 最近新增的课程"
+      },
+      "free": {
+        "title": "免费学习",
+        "subtitle": "立即开始，无需费用"
+      },
+      "beginner": {
+        "title": "适合初学者",
+        "subtitle": "基础课程，零基础也能跟上"
+      },
+      "byCategory": {
+        "subtitle": "{name} 热门课程"
+      }
+    },
+    "topics": {
+      "title": "按主题探索",
+      "subtitle": "选择你想学习的领域"
+    }
+  },
+  "myCourses": {
+    "title": "我的课程",
+    "tabs": {
+      "all": "全部课程",
+      "wishlist": "收藏"
+    },
+    "count": "{count} 门课程",
+    "loading": "加载中…",
+    "error": "无法加载课程列表。",
+    "stats": {
+      "streak": "连续学习",
+      "streakDays": "{n} 天",
+      "inProgress": "学习中",
+      "certificates": "已获证书"
+    },
+    "continue": {
+      "label": "继续学习",
+      "cta": "继续学习",
+      "details": "课程详情",
+      "progress": "已完成 {pct}%",
+      "lastAccessed": "上次学习 {time}"
+    },
+    "done": {
+      "label": "恭喜，你已完成",
+      "body": "你的证书已就绪，可下载或展示在公开主页上。",
+      "viewCertificate": "查看证书",
+      "share": "分享到主页"
+    },
+    "filter": {
+      "all": "全部",
+      "inProgress": "学习中",
+      "completed": "已完成"
+    },
+    "search": {
+      "placeholder": "按课程名称搜索…",
+      "aria": "搜索"
+    },
+    "sort": {
+      "label": "排序",
+      "recentlyAccessed": "最近访问",
+      "recentlyEnrolled": "最近报名",
+      "titleAsc": "名称：A 到 Z",
+      "titleDesc": "名称：Z 到 A"
+    },
+    "view": {
+      "list": "列表视图",
+      "grid": "卡片视图"
+    },
+    "card": {
+      "continue": "继续学习",
+      "viewCertificate": "查看证书",
+      "certificateTooltip": "打开证书页面",
+      "completed": "已完成",
+      "byInstructor": "讲师：{name}",
+      "lastAccessed": "上次学习 {time}",
+      "neverAccessed": "还没有学习任何课时",
+      "yourRating": "你对这门课的评分"
+    },
+    "empty": {
+      "title": "开始你的第一门课程",
+      "body": "选择一门国际课程，开启 AI 配音，用你的语言学习。",
+      "cta": "探索课程"
+    },
+    "noResults": {
+      "title": "没有找到匹配的课程",
+      "body": "试试更换关键词或去掉部分筛选。"
+    },
+    "suggestions": {
+      "title": "接下来推荐",
+      "trending": "热门课程"
+    }
+  },
+  "learn": {
+    "header": {
+      "back": "我的课程"
+    },
+    "dubbing": {
+      "groupAria": "选择 AI 配音声音",
+      "label": "AI 配音声音",
+      "original": "原声",
+      "listenOriginal": "收听原声",
+      "listAria": "语言列表",
+      "searchPlaceholder": "搜索语言…",
+      "searchAria": "搜索语言",
+      "noResults": "没有找到语言",
+      "ready": "已就绪",
+      "processing": "正在生成 {percent}%",
+      "create": "生成配音",
+      "sourceTag": "原语言",
+      "sourceTitle": "本课程本身就是你选择的语言"
+    },
+    "tabs": {
+      "overview": "概览",
+      "studyPlan": "AI 学习计划",
+      "qna": "问答",
+      "materials": "学习资料",
+      "gradebook": "成绩单",
+      "reviews": "评价"
+    },
+    "materials": {
+      "courseResources": "课程资源"
+    },
+    "sidebar": {
+      "content": "内容",
+      "transcript": "字幕文稿",
+      "tutor": "AI 导师",
+      "collapse": "收起以扩大视频空间",
+      "expand": "展开课程内容",
+      "completed": "已完成",
+      "current": "正在学习",
+      "notStarted": "未开始",
+      "hasAttachments": "含附件",
+      "signInPrompt": "登录后可查看完整课程大纲并跟踪学习进度。"
+    }
+  },
+  "profile": {
+    "role": {
+      "student": "学员",
+      "instructor": "讲师"
+    },
+    "memberSince": "加入于 {date}",
+    "share": "分享主页",
+    "shareCopied": "已复制主页链接",
+    "shareFailed": "无法复制，请重试。",
+    "settings": "账户设置",
+    "stats": {
+      "certificates": "证书",
+      "courses": "课程",
+      "streak": "连续天数"
+    },
+    "tabs": {
+      "certificates": "证书",
+      "courses": "已学",
+      "wishlist": "收藏"
+    },
+    "loading": "加载中...",
+    "notFound": "找不到该用户。",
+    "loadError": "无法加载主页，请稍后再试。",
+    "hidden": "该学员已隐藏此部分。",
+    "emptyCourses": "还没有课程。",
+    "emptyWishlist": "还没有收藏的课程。",
+    "emptyCertificates": "还没有证书。",
+    "certs": {
+      "all": "全部",
+      "sortLabel": "排序",
+      "issuedOn": "颁发于 {date}",
+      "sort": {
+        "newest": "日期：最新",
+        "oldest": "日期：最早",
+        "topic": "课程主题",
+        "title": "课程名称（A-Z）"
+      }
+    },
+    "free": "免费"
+  },
+  "certificate": {
+    "back": "我的证书",
+    "valid": "证书有效",
+    "congrats": "恭喜你完成课程！",
+    "recipient": "获得者",
+    "instructor": "讲师",
+    "completedOn": "完成日期",
+    "code": "证书编号",
+    "download": "下载 PDF",
+    "downloading": "下载中...",
+    "downloadError": "下载证书时出错，请重试。",
+    "linkedin": "添加到 LinkedIn",
+    "verifyLink": "验证链接",
+    "copy": "复制",
+    "copied": "已复制",
+    "copyError": "无法复制，请重试。",
+    "linkedinHint": "将此链接粘贴到 LinkedIn 的“证书”栏或简历的证书部分。",
+    "loading": "加载中...",
+    "notFound": "找不到该证书。",
+    "loadError": "无法加载证书，请稍后再试。"
+  },
+  "courseDetail": {
+    "breadcrumbAria": "路径",
+    "allCourses": "课程库",
+    "learners": "{count} 名学员",
+    "level": {
+      "BEGINNER": "入门",
+      "INTERMEDIATE": "中级",
+      "ADVANCED": "高级"
+    },
+    "instructor": "讲师：",
+    "updated": "更新于 {date}",
+    "dubbed": "已配音：",
+    "dubPanel": {
+      "title": "用你自己的语言学习",
+      "body": "每节课都由 AI 配音，并与原视频同步。学习时可随时切换声音，字幕也会随之改变。"
+    },
+    "content": {
+      "title": "课程内容",
+      "summary": "{chapters} 章 · {lessons} 节",
+      "lessons": "{count} 节",
+      "preview": "试看"
+    },
+    "reviews": "学员评价",
+    "price": {
+      "free": "免费",
+      "lifetime": "永久拥有"
+    },
+    "includes": [
+      "{count} 节带 AI 配音的课程",
+      "苏格拉底式 AI 导师",
+      "自动生成思维导图、记忆卡片和测验",
+      "购买后永久访问"
+    ],
+    "related": {
+      "title": "相关课程",
+      "subtitle": "与本课程同主题"
+    },
+    "enroll": {
+      "free": "报名",
+      "buy": "购买课程",
+      "learnNow": "开始学习",
+      "processing": "处理中...",
+      "addCart": "加入购物车",
+      "inCart": "已在购物车 ✓",
+      "adding": "添加中...",
+      "passwordPlaceholder": "输入报名密码",
+      "privateNote": "私密课程：请在结算时输入密码以直接购买。",
+      "wishlistAdd": "加入收藏",
+      "wishlistRemove": "取消收藏",
+      "toastSuccess": "报名成功！",
+      "toastError": "操作出错"
+    }
+  },
+  "courseList": {
+    "loadMore": { "button": "加载更多课程", "loading": "正在加载更多课程…", "end": "已显示全部符合条件的课程。" },
+    "pagination": { "nav": "分页", "prev": "上一页", "next": "下一页", "page": "第 {page} 页" },
+    "title": "课程库",
+    "subtitle": "每门课程都可以配音成你选择的语言。",
+    "all": "全部",
+    "found": "找到 <b>{count}</b> 门课程",
+    "loading": "加载中…",
+    "loadError": "无法加载课程列表。",
+    "sort": {
+      "label": "排序",
+      "relevance": "最相关",
+      "rating": "评分最高",
+      "reviews": "评价最多",
+      "newest": "最新"
+    },
+    "view": {
+      "grid": "卡片视图",
+      "list": "列表视图"
+    },
+    "filtersToggle": "筛选",
+    "activeLabel": "当前筛选：",
+    "clearAll": "全部清除",
+    "remove": "移除筛选 {name}",
+    "empty": {
+      "title": "没有找到合适的课程",
+      "body": "试试去掉一些筛选条件或更换关键词。",
+      "clear": "清除所有筛选"
+    },
+    "card": {
+      "lessons": "{count} 节",
+      "free": "免费"
+    },
+    "level": {
+      "BEGINNER": "入门",
+      "INTERMEDIATE": "中级",
+      "ADVANCED": "高级"
+    },
+    "ratingTier": "{tier} 及以上",
+    "duration": {
+      "0-1": "1 小时以内",
+      "1-3": "1 - 3 小时",
+      "3-6": "3 - 6 小时",
+      "6-17": "6 - 17 小时",
+      "17+": "17 小时以上"
+    },
+    "filters": {
+      "aria": "课程筛选",
+      "title": "筛选",
+      "clear": "清除筛选",
+      "category": "分类",
+      "rating": "评分",
+      "duration": "视频时长",
+      "price": "价格",
+      "level": "难度",
+      "free": "免费",
+      "paid": "付费",
+      "showMore": "显示更多（{count}）",
+      "showLess": "收起"
+    }
+  },
+  "shop": {
+    "steps": {
+      "aria": "购买进度",
+      "cart": "购物车",
+      "payment": "付款"
+    },
+    "coupon": {
+      "title": "优惠码",
+      "placeholder": "输入优惠码",
+      "apply": "使用",
+      "checking": "检查中...",
+      "remove": "移除优惠码",
+      "invalidMany": "该优惠码不适用于所选课程。",
+      "invalidOne": "该优惠码不适用于此课程。",
+      "applied": "已使用优惠码。",
+      "failed": "无法使用优惠码，请稍后再试。",
+      "selectOne": "请至少选择 1 门课程再使用优惠码。",
+      "pickerTitle": "为你推荐的优惠",
+      "pickerNone": "不使用优惠",
+      "pickerPercent": "立减 {value}%",
+      "pickerFixed": "立减 {value}",
+      "pickerSave": "节省 {amount}",
+      "pickerExpires": "截止 {date}",
+      "pickerLoading": "正在加载优惠..."
+    },
+    "summary": {
+      "title": "订单摘要",
+      "selected": "已选",
+      "selectedOf": "{selected} / {total} 门课程",
+      "subtotal": "小计（{count} 门课程）",
+      "subtotalOne": "小计",
+      "discount": "已优惠",
+      "total": "合计",
+      "terms": "付款即表示你同意 LinguaLearn 的<link>服务条款</link>。"
+    },
+    "billing": {
+      "title": "补充信息",
+      "name": "姓名",
+      "namePh": "你的姓名",
+      "phone": "电话号码",
+      "phonePh": "联系电话",
+      "note": "* 以上信息仅用于必要时联系你提供支持，不影响你的付款账户。"
+    },
+    "pay": {
+      "payos": "二维码转账（PayOS）",
+      "error": "付款时出错",
+      "proceed": "前往付款"
+    },
+    "cart": {
+      "title": "购物车",
+      "loading": "正在加载购物车...",
+      "selectAll": "全选（{count} 门课程）",
+      "removeSelected": "删除所选（{count}）",
+      "remove": "删除",
+      "selectCourse": "选择 {title}",
+      "instructor": "讲师 {name}",
+      "meta": "{hours} 小时课程 · {lessons} 节课 · {level}",
+      "bundleBadge": "组合 -{percent}%",
+      "bundleSuggest": "再加入 <b>{title}</b>（+{price}），即可享受“{bundle}”组合 <b>{percent}%</b> 折扣",
+      "addToCart": "加入购物车",
+      "emptyTitle": "你的购物车是空的。",
+      "emptyCta": "探索课程"
+    },
+    "checkout": {
+      "titleOne": "课程付款",
+      "titleMany": "{count} 门课程付款",
+      "backToCart": "返回购物车",
+      "backToCourse": "返回课程",
+      "courseInfo": "课程信息",
+      "coursesChosen": "已选 {count} 门课程",
+      "course": "课程",
+      "instructor": "讲师：",
+      "updating": "更新中",
+      "noItems": "没有可付款的课程，可能已从购物车中移除。",
+      "loadError": "无法加载课程信息",
+      "passwordTitle": "报名密码",
+      "passwordNote": "这是私密课程，需输入讲师提供的正确密码才能付款。",
+      "passwordPh": "输入报名密码"
+    },
+    "wishlist": {
+      "loading": "加载中…",
+      "search": "在收藏中搜索…",
+      "searchLabel": "搜索",
+      "empty": "你还没有收藏任何课程。",
+      "explore": "探索课程",
+      "noMatch": "没有找到合适的课程",
+      "noMatchHint": "换个关键词试试。",
+      "remove": "取消收藏",
+      "signUp": "报名",
+      "inCart": "✓ 已在购物车",
+      "adding": "添加中...",
+      "addCart": "加入购物车",
+      "free": "免费",
+      "signedUp": "报名成功！",
+      "signUpFailed": "报名失败，请稍后再试。",
+      "instructor": "讲师 {name}"
+    },
+    "courseLevel": {
+      "BEGINNER": "入门",
+      "INTERMEDIATE": "中级",
+      "ADVANCED": "高级"
+    }
+  },
+  "auth": {
+    "layout": {
+      "tagline": "用你自己的语言学习每一门课程",
+      "body": "AI 配音与原视频同步，还有可在课程中随时提问的 AI 导师。",
+      "highlights": [
+        "按你选择的语言生成 AI 配音",
+        "AI 导师答疑并直接跳转到相关视频片段",
+        "完成证书，可分享到个人主页和 LinkedIn"
+      ]
+    },
+    "fields": {
+      "email": "邮箱",
+      "password": "密码",
+      "fullName": "姓名",
+      "confirmPassword": "确认密码",
+      "showPassword": "显示密码",
+      "hidePassword": "隐藏密码"
+    },
+    "strength": {
+      "label": "密码强度：",
+      "short": "太短（至少 6 个字符）",
+      "weak": "较弱（需包含字母和数字）",
+      "good": "良好",
+      "strong": "很强（太棒了！）",
+      "tooWeak": "密码强度不够。请输入至少 6 个字符，并同时包含字母和数字。"
+    },
+    "match": {
+      "yes": "密码一致",
+      "no": "密码不一致",
+      "mismatch": "两次输入的密码不一致。"
+    },
+    "login": {
+      "title": "登录",
+      "registered": "账号创建成功！请登录。",
+      "orEmail": "或使用邮箱登录",
+      "forgot": "忘记密码？",
+      "forgotNeedEmail": "请先输入邮箱以重置密码",
+      "submit": "登录",
+      "submitting": "处理中...",
+      "failed": "登录失败",
+      "generic": "出了点问题",
+      "loading": "正在加载表单...",
+      "noAccount": "还没有账号？",
+      "signUpNow": "立即注册",
+      "tryAgain": "Try again"
+    },
+    "register": {
+      "title": "注册账号",
+      "stepInfo": "信息",
+      "stepOtp": "验证 OTP",
+      "submit": "注册",
+      "submitting": "处理中...",
+      "serverError": "注册时服务器出错",
+      "connectionError": "无法连接服务器，请重试。",
+      "otpIntro": "请查看邮箱 {email} 获取 6 位 OTP 验证码。",
+      "otpLabel": "OTP 验证码",
+      "verify": "验证",
+      "verifying": "验证中...",
+      "otpInvalid": "OTP 无效",
+      "hasAccount": "已有账号？",
+      "signInNow": "立即登录"
+    },
+    "forgot": {
+      "title": "忘记密码",
+      "intro": "输入注册邮箱，我们会发送 OTP 供你重置密码。",
+      "emailPh": "输入你的邮箱",
+      "send": "发送 OTP",
+      "sending": "发送中...",
+      "otpLabel": "OTP 验证码",
+      "otpHint": "输入邮件中的 6 位 OTP",
+      "newPassword": "新密码",
+      "newPasswordPh": "输入新密码",
+      "confirmPh": "确认新密码",
+      "reset": "重置密码",
+      "processing": "处理中...",
+      "success": "密码已修改！即将返回首页。",
+      "generic": "出错了",
+      "loading": "加载中...",
+      "backToLogin": "返回登录"
+    },
+    "resetByToken": {
+      "title": "Reset password",
+      "backToLogin": "Back to login",
+      "missingToken": "Missing a valid link — please use the exact link your Admin sent you.",
+      "newPassword": "New password",
+      "submit": "Reset password",
+      "submitting": "Processing...",
+      "success": "Password changed successfully! Please log in again.",
+      "genericError": "This link has expired or is invalid.",
+      "confirmPassword": "Confirm password",
+      "mismatch": "Passwords do not match."
+    }
+  },
+  "community": {
+    "title": "社区排行榜",
+    "subtitle": "每天学习、做测验、保持连续天数来积累 XP，与整个社区一起比拼。",
+    "loading": "正在加载排行榜...",
+    "empty": "排行榜上还没有人。",
+    "xp": "{xp} XP",
+    "yourRank": "你的排名",
+    "yourRankInline": "你的排名：#{rank} · {xp} XP",
+    "loginHint": "登录后可查看连续天数和你的排名。",
+    "login": "登录",
+    "viewAll": "查看全部",
+    "rank": "第 {rank} 名",
+    "podiumAria": "排行榜前三名",
+    "listAria": "排行榜"
+  },
+  "instructor": {
+    "nav": {
+      "courses": "我的课程",
+      "bundles": "课程组合",
+      "communication": "沟通",
+      "revenue": "数据表现",
+      "tools": "工具",
+      "aria": "讲师频道导航"
+    },
+    "shell": {
+      "brand": "LinguaLearn",
+      "role": "讲师",
+      "channel": "讲师频道",
+      "loading": "加载中...",
+      "backToStudent": "返回学员站点",
+      "createCourse": "创建课程",
+      "collapse": "收起侧栏",
+      "expand": "展开侧栏",
+      "openMenu": "打开菜单",
+      "closeMenu": "关闭菜单",
+      "menuTitle": "讲师频道菜单",
+      "account": "账户",
+      "language": "语言",
+      "logout": "退出登录",
+      "notifications": "通知",
+      "logoutTitle": "确认退出登录",
+      "logoutBody": "确定要退出系统吗？",
+      "cancel": "取消",
+      "confirm": "退出登录"
+    },
+    "courses": {
+      "title": "我的课程",
+      "subtitle": "管理、完善并跟踪你课程的状态。",
+      "loading": "加载中...",
+      "loadError": "无法加载课程列表。",
+      "search": "搜索你的课程...",
+      "searchLabel": "搜索",
+      "sort": {
+        "label": "排序",
+        "newest": "最新",
+        "oldest": "最早",
+        "az": "A-Z",
+        "za": "Z-A"
+      },
+      "status": {
+        "ALL": "全部",
+        "DRAFT": "草稿",
+        "PENDING": "待审核",
+        "PUBLISHED": "已发布",
+        "REJECTED": "已拒绝",
+        "ARCHIVED": "已归档"
+      },
+      "stats": {
+        "total": "课程总数",
+        "published": "已发布",
+        "pending": "待审核",
+        "attention": "需要处理"
+      },
+      "row": {
+        "lessons": "{count} 节",
+        "completion": "课程完成度",
+        "edit": "编辑",
+        "remove": "移除",
+        "select": "选择 {title}",
+        "selectAll": "全选",
+        "columns": {
+          "course": "课程",
+          "status": "状态",
+          "progress": "完成度",
+          "next": "下一步"
+        }
+      },
+      "next": {
+        "complete": "完善课程",
+        "submit": "提交审核",
+        "fixRejected": "查看原因并编辑",
+        "reactivate": "重新启用",
+        "waiting": "等待管理员审核",
+        "live": "已向学员开放"
+      },
+      "bulk": {
+        "remove": "移除所选（{count}）",
+        "selected": "已选 {count} 门课程"
+      },
+      "confirm": {
+        "title": "移除课程",
+        "message": "确定要移除 {label} 吗？新学员将无法找到和报名，已报名的学员仍可继续访问。",
+        "confirm": "移除",
+        "cancel": "取消",
+        "many": "已选 {count} 门课程"
+      },
+      "empty": {
+        "filtered": "该状态下还没有课程。",
+        "noneTitle": "你还没有课程",
+        "noneBody": "创建第一门课程，添加视频，让 AI 配音成多种语言。",
+        "noneCta": "创建课程"
+      }
+    },
+    "edit": {
+      "loading": "正在加载课程...",
+      "back": "返回课程列表",
+      "tabsAria": "课程编辑栏目",
+      "groups": {
+        "content": "课程内容",
+        "publish": "发布课程"
+      },
+      "tabs": {
+        "curriculum": "课程大纲",
+        "materials": "学习资料与测验",
+        "resources": "静态资源",
+        "proctoring": "考试监考",
+        "basics": "基本信息",
+        "pricing": "定价",
+        "promotions": "促销"
+      },
+      "completion": {
+        "label": "已完成 {percent}%",
+        "ready": "可以提交审核",
+        "missingTitle": "提交审核还缺少",
+        "aria": "课程完善进度：{percent}%"
+      },
+      "submit": {
+        "send": "提交审核",
+        "resubmit": "重新提交审核",
+        "needMore": "请先满足提交条件"
+      },
+      "preview": {
+        "label": "预览",
+        "asInstructor": "以讲师身份",
+        "asLearner": "以学员身份"
+      },
+      "settingsLabel": "设置",
+      "banners": {
+        "rejected": "拒绝原因：",
+        "resubmitCount": "（已重新提交 {count}/5 次）",
+        "published": "课程已发布。修改标题、简介、价格、章节、课时或视频会立即生效，无需管理员再次审核。",
+        "locked": "课程正在审核中，期间无法编辑内容。"
+      },
+      "settings": {
+        "title": "设置",
+        "statusTitle": "课程状态",
+        "statusDraft": "课程为草稿，尚未提交过。",
+        "statusPublished": "课程已公开发布。",
+        "statusArchived": "课程已从搜索中移除，已报名的学员仍可正常访问。",
+        "statusOther": "课程尚未公开发布。",
+        "reactivate": "重新启用",
+        "reactivating": "正在启用...",
+        "reactivateHint": "将课程恢复到归档前的状态，新学员即可重新搜索并报名。",
+        "archive": "移除课程",
+        "archiveHint": "新学员将无法再找到或报名此课程，但已报名的学员仍保留访问权限。这不是永久删除，你可以随时重新启用。",
+        "archiveConfirmTitle": "移除课程",
+        "archiveConfirmMessage": "新学员将无法再通过搜索找到或报名此课程，但已报名的学员仍保留访问权限。你可以随时重新启用。",
+        "archiveConfirm": "移除",
+        "cancel": "取消",
+        "coInstructor": "协作讲师管理正在开发中，将在后续更新中提供。"
+      }
+    },
+    "performance": {
+      "tabsAria": "数据表现栏目",
+      "tabs": {
+        "overview": "概览",
+        "revenue": "收入",
+        "students": "学员",
+        "reviews": "评价",
+        "hardQuestions": "难题",
+        "retention": "留存"
+      },
+      "range": {
+        "label": "时间范围",
+        "7d": "近 7 天",
+        "30d": "近 30 天",
+        "12m": "近 12 个月",
+        "all": "全部时间"
+      },
+      "insight": {
+        "see": "查看 →"
+      },
+      "overview": {
+        "title": "概览",
+        "subtitle": "快速了解你的核心表现。",
+        "kpi": {
+          "revenue": "实际收入（30 天）",
+          "enrollments": "新增报名",
+          "rating": "平均评分",
+          "hardQuestions": "难题"
+        },
+        "chart": {
+          "title": "每日实际收入（近 30 天）",
+          "aria": "每日收入柱状图，30 天共 {total}，最高一天 {peak}",
+          "empty": "近 30 天暂无收入。"
+        },
+        "growth": {
+          "start": "本期开始有收入",
+          "none": "暂无收入",
+          "flat": "收入与上一期持平",
+          "up": "收入比上一期增长 {percent}%",
+          "down": "收入比上一期下降 {percent}%"
+        },
+        "hard": "有 {count} 道题超过 60% 的学员答错，建议回顾相关内容。",
+        "lowRating": "{student} 在“{course}”给出了新的 {rating}★ 评价，建议尽快回复。"
+      }
+    },
+    "communication": {
+      "tabsAria": "沟通栏目",
+      "tabs": {
+        "qa": "问答",
+        "messages": "消息",
+        "assignments": "作业",
+        "announcements": "公告"
+      }
+    },
+    "tools": {
+      "title": "工具",
+      "subtitle": "帮助你管理和发展课程的工具。",
+      "open": "打开",
+      "items": {
+        "live": {
+          "title": "直播",
+          "description": "创建并管理在线直播授课，查看已结束场次的统计。"
+        },
+        "coupons": {
+          "title": "优惠码",
+          "description": "创建适用于一门、多门或全部课程的优惠码。"
+        },
+        "bundles": {
+          "title": "课程组合",
+          "description": "把多门课程打包并给出优惠，方便学员整套购买。"
+        }
+      }
+    },
+    "live": {
+      "title": "直播课堂",
+      "create": "创建直播",
+      "loading": "加载中...",
+      "loadError": "无法加载直播列表。",
+      "status": {
+        "SCHEDULED": "即将开始",
+        "LIVE": "直播中",
+        "ENDED": "已结束"
+      },
+      "columns": {
+        "title": "标题",
+        "course": "课程",
+        "status": "状态"
+      },
+      "enter": "进入直播间",
+      "details": "查看详情",
+      "empty": {
+        "title": "还没有直播",
+        "body": "创建第一场直播，与学员在线授课。"
+      },
+      "new": {
+        "title": "创建新直播",
+        "intro": "可提前预约，也可留空开始时间，创建后随时点击“开始直播”。直播发现页的缩略图可在下一步（创建完成后）添加。",
+        "form": {
+          "title": "直播标题",
+          "course": "课程",
+          "pickCourse": "-- 选择课程 --",
+          "language": "你将使用的语言",
+          "optional": "（可选）",
+          "languageDefault": "-- 默认使用个人资料中的语言 --",
+          "languageHint": "学员选择与此不同的配音语言，即可在直播中收听翻译。",
+          "visibility": "可见范围",
+          "courseOnly": "仅限已报名本课程的学员",
+          "public": "公开，任何人都能观看，包括未登录用户",
+          "startsAt": "计划开始时间",
+          "creating": "创建中...",
+          "create": "创建直播 →"
+        }
+      },
+      "room": {
+        "loading": "加载中...",
+        "ended": "本场直播已结束。",
+        "meta": "课程：{course} · 讲话语言：{language}",
+        "thumbnail": "直播发现页的缩略图",
+        "thumbnailAlt": "缩略图预览",
+        "noThumbnail": "尚未上传专属图片，暂时使用课程封面。",
+        "uploading": "正在上传图片...",
+        "thumbnailTask": "直播图片：{title}",
+        "connecting": "连接中...",
+        "start": "● 开始直播",
+        "ending": "正在结束...",
+        "end": "结束直播",
+        "cameraOff": "摄像头和屏幕共享已关闭",
+        "shareScreen": "共享屏幕",
+        "shareAudio": "共享系统声音",
+        "audioHint": "共享系统声音取决于浏览器，在 Chrome 上最稳定，需在浏览器弹出的屏幕共享对话框中勾选对应选项。"
+      }
+    },
+    "common": {
+      "close": "关闭"
+    },
+    "perf": {
+      "common": {
+        "allCourses": "全部课程",
+        "loading": "加载中..."
+      },
+      "students": {
+        "title": "学员",
+        "export": "导出 CSV",
+        "total": "学员总数",
+        "avgProgress": "平均进度",
+        "atRisk": "进度低于 {pct}% 的学员",
+        "atRiskWarn": "{ratio}% 的学员观看进度未超过课程的 {pct}%，可考虑发送提醒邮件，或检查开篇课程是否足够吸引人。",
+        "cols": {
+          "student": "学员",
+          "email": "邮箱",
+          "course": "课程",
+          "enrolled": "报名日期",
+          "progress": "进度"
+        },
+        "csv": {
+          "progress": "进度（%）"
+        },
+        "empty": "还没有学员报名。"
+      },
+      "reviews": {
+        "title": "评价",
+        "average": "平均评分",
+        "count": "{count} 条评价",
+        "distribution": "星级分布",
+        "tooltip": "{count} 条评价",
+        "lowAlert": "近 30 天有 {count} 条 {threshold}★ 及以下的评价，建议查看下方评论并回复或联系学员。",
+        "empty": "还没有评价。",
+        "reportPrompt": "举报此评价的原因（违反社区规范、垃圾信息等）：",
+        "reported": "已举报，该评价暂时隐藏，等待管理员审核。",
+        "reportError": "举报评价时出错。",
+        "reportTitle": "举报此评价（违反社区规范）"
+      },
+      "hardQuestions": {
+        "title": "难题",
+        "subtitle": "超过 60% 的学员答错的题目。可能是讲解不够清楚，或题目和答案需要复查。",
+        "warn": "有 {count} 道题的错误率超过 60%，建议优先复查“{question}”（{percent}% 错误，{course}）。",
+        "level": {
+          "all": "所有级别",
+          "critical": "≥ 80% — 红色警报",
+          "warning": "60–79% — 警告"
+        },
+        "sort": {
+          "wrongRate": "排序：错误率",
+          "totalAnswers": "排序：作答次数"
+        },
+        "cols": {
+          "question": "题目",
+          "lesson": "课程 / 课时",
+          "answers": "作答次数",
+          "wrongRate": "错误率",
+          "actions": "操作"
+        },
+        "emptyFiltered": "没有符合当前筛选的题目。",
+        "emptyAll": "暂时没有错误率超过 60% 的题目（样本足够时），你的课程状态良好。",
+        "edit": "查看并修改"
+      },
+      "retention": {
+        "title": "学员留存",
+        "subtitle": "视频每 10% 处仍在观看的学员比例，骤降的位置最容易有人离开。",
+        "course": "课程",
+        "lesson": "课时",
+        "chooseCourse": "— 选择课程 —",
+        "chooseLesson": "— 选择课时 —",
+        "pick": "请选择课程和课时以查看留存图表。",
+        "noViews": "该课时还没有学员观看，数据不足以绘制图表。",
+        "drop": "学员在视频 {from}%–{to}% 之间流失最多（下降 {points} 个百分点），请复查这一段，可能过长或难以理解。",
+        "tooltip": "仍在观看",
+        "label": "已观看到 {label}"
+      },
+      "list": {
+        "quick": "快速范围",
+        "custom": "自选日期",
+        "export": "导出 CSV",
+        "kpi": {
+          "transactions": "交易数",
+          "gross": "总收入",
+          "fee": "平台费用",
+          "net": "实际收入"
+        },
+        "netTotal": "此时间段内实际收入合计",
+        "topCourse": "<b>{title}</b> 本期贡献的收入最多：{amount}。",
+        "split": {
+          "bundleLabel": "组合与零售",
+          "bundle": "组合",
+          "retail": "零售",
+          "couponLabel": "使用优惠码与原价",
+          "coupon": "使用优惠码",
+          "full": "原价"
+        },
+        "chart": {
+          "byDay": "每日收入",
+          "organic": "自然流量",
+          "referral": "推荐",
+          "empty": "暂无数据可绘制图表。",
+          "day": "{date} 日",
+          "cumulativeTitle": "本期累计收入",
+          "cumulative": "累计"
+        },
+        "cols": {
+          "course": "课程",
+          "amount": "金额",
+          "net": "实际收入",
+          "source": "来源",
+          "coupon": "优惠码",
+          "paidAt": "支付日期"
+        },
+        "empty": "此时间段内没有交易。",
+        "sourceReferral": "推荐（97%）",
+        "sourceOrganic": "自然流量（37%）"
+      }
+    },
+    "comm": {
+      "loading": "加载中...",
+      "qa": {
+        "title": "问答",
+        "sortLabel": "排序：{value}",
+        "newest": "最新",
+        "oldest": "最早",
+        "twoCols": "双栏视图",
+        "oneCol": "单栏视图",
+        "onlyUnanswered": "只显示未回答的问题",
+        "empty": "还没有问题。",
+        "pick": "选择一个问题查看详情",
+        "detail": "问题详情",
+        "close": "关闭",
+        "noAnswer": "暂无回答",
+        "answers": "{count} 条回答",
+        "youAnswered": "你已回答",
+        "instructorTag": "（讲师）",
+        "placeholder": "回复学员...",
+        "send": "发送"
+      },
+      "assignments": {
+        "title": "作业",
+        "empty": "还没有作业。可在课程大纲编辑器中直接添加（“+ 作业”按钮）。",
+        "due": "截止：{date}",
+        "graded": "已批改 {graded}/{total}",
+        "noSubmissions": "还没有学员提交。",
+        "attachment": "附件",
+        "score": "分数",
+        "feedback": "反馈",
+        "save": "保存",
+        "gradedLine": "已批改：{score} 分",
+        "close": "关闭"
+      },
+      "announcements": {
+        "title": "公告",
+        "empty": "还没有公告。",
+        "delete": "删除",
+        "deleteTitle": "删除公告",
+        "deleteMessage": "确定要删除这条公告吗？已收到的学员仍会在收件箱中保留。",
+        "deleteConfirm": "删除",
+        "newTitle": "发送新公告",
+        "pickCourse": "选择课程...",
+        "titlePh": "公告标题",
+        "contentPh": "发送给本课程所有已报名学员的公告内容...",
+        "send": "发送公告"
+      },
+      "messages": {
+        "title": "消息"
+      },
+      "compose": {
+        "button": "+ 写消息",
+        "title": "写新消息",
+        "course": "课程",
+        "pickCourse": "选择课程...",
+        "student": "学员",
+        "pickStudent": "选择学员...",
+        "pickCourseFirst": "请先选择课程",
+        "cancel": "取消",
+        "start": "开始"
+      },
+      "filter": {
+        "allCourses": "全部课程",
+        "search": "搜索课程...",
+        "notFound": "没有找到课程。"
+      }
+    }
+  },
+  "coupons": {
+    "title": "优惠码",
+    "subtitleAdmin": "全站优惠券，或适用于任意课程的优惠券。",
+    "subtitleInstructor": "仅适用于你自己课程的优惠券。",
+    "create": "+ 创建优惠码",
+    "loading": "加载中...",
+    "empty": "还没有优惠码。",
+    "cols": {
+      "code": "优惠码",
+      "discount": "折扣",
+      "scope": "范围",
+      "time": "有效期",
+      "used": "已使用",
+      "status": "状态",
+      "actions": "操作"
+    },
+    "auto": "自动",
+    "autoCode": "（自动）",
+    "noCourse": "尚未选择课程",
+    "status": {
+      "off": "已关闭",
+      "expired": "已过期",
+      "on": "已启用",
+      "expiredTitle": "优惠码已过期，即使仍处于开启状态学员也无法使用"
+    },
+    "edit": "编辑",
+    "delete": "删除",
+    "confirmDelete": "删除优惠码“{code}”？",
+    "type": {
+      "PERCENTAGE": "按百分比",
+      "FIXED_AMOUNT": "固定金额"
+    },
+    "scope": {
+      "ALL_COURSES": "全部课程",
+      "SPECIFIC_COURSES": "指定的多门课程",
+      "SINGLE_COURSE": "1 门课程"
+    },
+    "form": {
+      "createTitle": "创建优惠码",
+      "editTitle": "编辑优惠码",
+      "autoApply": "自动应用（无需输入优惠码）",
+      "code": "优惠码",
+      "type": "折扣类型",
+      "valuePct": "数值（%）",
+      "valueFixed": "数值（đ）",
+      "scope": "适用范围",
+      "scopeMine": "我的全部课程",
+      "start": "开始",
+      "end": "结束",
+      "maxUsage": "使用次数上限（总计）",
+      "maxPerUser": "每位学员上限",
+      "unlimited": "不限",
+      "active": "启用（取消勾选可暂停此优惠券）",
+      "cancel": "取消",
+      "saving": "保存中...",
+      "save": "保存"
+    },
+    "picker": {
+      "label": "选择课程",
+      "search": "按名称搜索课程...",
+      "searchBtn": "搜索",
+      "adminHint": "请在上方搜索课程。",
+      "none": "你还没有课程。",
+      "needOne": "至少选择 1 门课程。"
+    }
+  },
+  "bundles": {
+    "pageTitle": "课程组合",
+    "pageSubtitle": "创建更优惠的课程组合来提升收入。",
+    "createNew": "创建组合",
+    "emptyTitle": "还没有组合",
+    "emptyBody": "创建第一个组合，提高转化率和每单平均收入。",
+    "createFirst": "创建第一个组合",
+    "off": "已关闭",
+    "edit": "编辑",
+    "info": {
+      "title": "课程组合如何运作",
+      "owned": "如果学员已拥有组合中的某门课程，系统会自动<b>扣除</b>该课程的价格。",
+      "coupon": "单独的优惠券<b>不会叠加</b>在组合内的课程上。",
+      "price": "价格在<b>下单时锁定</b>，之后即使你调整价格也不会变。"
+    },
+    "form": {
+      "editTitle": "编辑组合",
+      "createTitle": "创建新组合",
+      "name": "组合名称",
+      "namePh": "例如：全栈 Web 开发组合",
+      "desc": "简短描述",
+      "descPh": "描述购买组合的好处...",
+      "discount": "组合折扣",
+      "pickCourses": "选择课程（已选 {count} 门，至少 2 门）",
+      "noPublished": "你还没有已发布的课程。",
+      "minTwo": "组合至少需要 2 门课程！",
+      "preview": "价格预览",
+      "originalSum": "原价合计",
+      "discountLine": "减 {percent}%",
+      "learnerPays": "学员支付",
+      "active": "启用中",
+      "cancel": "取消",
+      "saving": "保存中...",
+      "update": "更新组合",
+      "create": "创建组合",
+      "close": "关闭"
+    }
+  },
+  "admin": {
+    "nav": {
+      "aria": "管理导航",
+      "groups": {
+        "content": "课程内容",
+        "ai": "AI 与自动化",
+        "finance": "财务",
+        "system": "系统"
+      },
+      "overview": "总览",
+      "users": "用户",
+      "moderation": "课程审核",
+      "categories": "分类",
+      "reviews": "评价",
+      "aianalytics": "AI 分析",
+      "aiqueue": "AI 队列监控",
+      "voicemappings": "配音声音",
+      "tutorsecurity": "AI 助教安全",
+      "transactions": "交易对账",
+      "coupons": "优惠券",
+      "announcements": "系统公告",
+      "settings": "系统设置",
+      "disputes": "Payment disputes",
+      "support": "Support requests"
+    },
+    "shell": {
+      "brand": "LinguaLearn",
+      "role": "管理员",
+      "panel": "管理",
+      "loading": "加载中...",
+      "backToStudent": "返回学员站点",
+      "collapse": "收起侧栏",
+      "expand": "展开侧栏",
+      "openMenu": "打开菜单",
+      "closeMenu": "关闭菜单",
+      "menuTitle": "管理菜单",
+      "account": "账户",
+      "language": "语言",
+      "logout": "退出登录",
+      "notifications": "通知"
+    },
+    "overview": {
+      "title": "系统总览",
+      "subtitle": "待处理事项和平台状态，一屏查看。",
+      "kpi": {
+        "pending": "待审核课程",
+        "users": "用户总数",
+        "courses": "课程总数",
+        "revenue": "预估收入"
+      },
+      "pending": {
+        "title": "最近提交的课程",
+        "viewAll": "查看全部（{count}）",
+        "empty": "没有等待审核的课程。",
+        "review": "审核 {title}",
+        "reviewShort": "审核"
+      },
+      "quick": {
+        "title": "快捷入口",
+        "moderation": "审核队列中的课程",
+        "users": "查找、锁定或更改用户角色",
+        "transactions": "查看支付和退款",
+        "aiqueue": "跟踪 AI 配音进度"
+      },
+      "health": {
+        "title": "服务器状态",
+        "refresh": "刷新",
+        "ram": "JVM 内存（RAM）",
+        "disk": "服务器磁盘空间",
+        "uptime": "运行时间",
+        "loading": "正在加载指标..."
+      }
+    },
+    "users": {
+      "title": "用户管理",
+      "subtitle": "搜索、按角色筛选，并锁定或解锁账户。",
+      "filtersAria": "按角色筛选",
+      "filter": {
+        "ALL": "全部",
+        "STUDENT": "学员",
+        "INSTRUCTOR": "讲师",
+        "ADMIN": "管理员",
+        "LOCKED": "已锁定",
+        "SPAM": "Spam flagged"
+      },
+      "searchLabel": "搜索用户",
+      "searchPh": "姓名或邮箱...",
+      "cols": {
+        "fullName": "姓名",
+        "email": "邮箱",
+        "createdAt": "创建时间",
+        "role": "角色",
+        "status": "状态",
+        "actions": "操作",
+        "authProvider": "Sign-in method"
+      },
+      "role": {
+        "STUDENT": "学员",
+        "INSTRUCTOR": "讲师",
+        "ADMIN": "管理员"
+      },
+      "active": "正常",
+      "locked": "已锁定",
+      "lock": "锁定账户",
+      "unlock": "解锁",
+      "empty": "没有找到匹配的用户。",
+      "loadError": "无法加载用户列表。",
+      "lockedToast": "已锁定该用户。",
+      "unlockedToast": "已解锁该用户。",
+      "updateError": "更新用户时出错。",
+      "confirm": {
+        "lockTitle": "锁定此账户？",
+        "lockBody": "{name} 在解锁前将无法登录。",
+        "unlockTitle": "解锁此账户？",
+        "unlockBody": "{name} 将可以重新登录并使用系统。",
+        "cancel": "取消"
+      },
+      "ai": {
+        "title": "AI 锁定建议（{count}）",
+        "confirm": "确认锁定",
+        "dismiss": "忽略",
+        "confirmed": "已按建议锁定该用户的 AI 功能。",
+        "dismissed": "已忽略该建议。",
+        "confirmError": "确认锁定时出错。",
+        "dismissError": "忽略建议时出错。"
+      },
+      "pager": {
+        "aria": "用户分页",
+        "showing": "显示 {shown} / {total} 位用户",
+        "prev": "上一页",
+        "next": "下一页",
+        "page": "第 {page} / {total} 页"
+      },
+      "authLocal": "Email"
+    },
+    "moderation": {
+      "title": "课程审核",
+      "subtitle": "查看内容，决定发布或拒绝讲师的课程。",
+      "filtersAria": "按状态筛选",
+      "tabs": {
+        "PENDING": "待审核",
+        "PUBLISHED": "已发布",
+        "REJECTED": "已拒绝",
+        "ARCHIVED": "已归档"
+      },
+      "loadError": "无法加载课程列表。",
+      "empty": {
+        "title": "没有课程",
+        "PENDING": "目前没有等待审核的课程。",
+        "PUBLISHED": "还没有已发布的课程。",
+        "REJECTED": "还没有被拒绝的课程。",
+        "ARCHIVED": "还没有已归档的课程。"
+      },
+      "lessons": "{count} 节课",
+      "free": "免费",
+      "review": "审核",
+      "view": "查看",
+      "reviewAria": "审核 {title}",
+      "viewAria": "查看 {title}",
+      "detail": {
+        "back": "返回",
+        "notFound": "未找到课程。",
+        "reject": "拒绝",
+        "approve": "批准",
+        "cancel": "取消",
+        "rejectedReason": "拒绝原因：",
+        "content": "课程内容",
+        "previewTag": "试看",
+        "info": {
+          "instructor": "讲师",
+          "category": "分类",
+          "level": "难度",
+          "price": "价格",
+          "free": "免费",
+          "resubmits": "重新提交次数"
+        },
+        "approveConfirm": {
+          "title": "批准此课程？",
+          "body": "“{title}”将被发布，学员可以立即报名。"
+        }
+      },
+      "reject": {
+        "title": "拒绝课程",
+        "body": "“{title}”将变为已拒绝状态。讲师会看到此原因，以便修改后重新提交。",
+        "label": "拒绝原因",
+        "placeholder": "请清楚说明原因（至少 {min} 个字符）...",
+        "counter": "{count}/{min} 个字符",
+        "cancel": "取消",
+        "confirm": "确认拒绝"
+      },
+      "lesson": {
+        "videoTitle": "原始视频 — {title}",
+        "noVideo": "该课时尚未上传视频。",
+        "documents": "附件",
+        "loading": "加载中...",
+        "docsError": "无法加载附件列表。",
+        "noDocs": "没有附件。",
+        "view": "查看",
+        "download": "下载"
+      }
+    },
+    "queue": {
+      "title": "AI 队列监控",
+      "subtitle": "AI Worker 状态、任务队列、Gemini 密钥池和配音任务。",
+      "worker": "AI Worker：{status}",
+      "ok": "运行中",
+      "down": "异常",
+      "refresh": "刷新",
+      "stats": {
+        "pending": "队列中等待",
+        "started": "处理中",
+        "success": "已完成",
+        "failure": "失败"
+      },
+      "queueDetail": "队列详情",
+      "loading": "加载中...",
+      "connectError": "无法连接 AI Worker：",
+      "queueEmpty": "队列为空，没有等待中的任务。",
+      "defaultQueue": "Celery 默认队列",
+      "pendingTasks": "{count} 个任务等待中",
+      "keyPool": "Gemini 密钥池（槽位）",
+      "slots": "{total} 个槽位（{active} 个可用）",
+      "noKeys": "尚未配置任何密钥。",
+      "failures": "连续失败 {count} 次",
+      "recoverIn": "{sec} 秒后恢复",
+      "slot": {
+        "cooldown": "⏸ 冷却中",
+        "active": "✓ 可用"
+      },
+      "beat": {
+        "title": "Celery Beat — 定时任务",
+        "cleanupTemp": {
+          "desc": "清理超过 24 小时的中间文件（.wav、视频分块）",
+          "schedule": "每小时（整点）"
+        },
+        "cleanupNotifications": {
+          "desc": "删除超过 90 天的已读通知",
+          "schedule": "每天凌晨 3:00"
+        },
+        "remindFlashcards": {
+          "desc": "提醒复习闪卡（SM-2）",
+          "schedule": "每天早上 7:00"
+        },
+        "reportAudio": {
+          "desc": "报告超过 180 天未使用的音频",
+          "schedule": "每周一凌晨 4:00"
+        },
+        "staticBadge": "Static, not live data",
+        "staticNote": "Reference list hardcoded in the AI Worker code — unlike the two tables above, it does not update in real time.",
+        "configured": "✓ Configured",
+        "notConfigured": "○ Not deployed"
+      },
+      "jobs": "配音任务列表"
+    },
+    "aiAnalytics": {
+      "title": "AI 分析",
+      "subtitle": "监控学员的 API 用量，必要时锁定 AI 使用权限。",
+      "chartTitle": "每日 AI 费用（最近 30 天）",
+      "cost": "费用",
+      "day": "{date} 日",
+      "noDaily": "暂无每日数据",
+      "cols": {
+        "email": "学员邮箱",
+        "status": "AI 状态",
+        "tokens": "总 token",
+        "cost": "总费用（$）",
+        "actions": "操作"
+      },
+      "locked": "已锁定",
+      "active": "正常",
+      "lock": "锁定 AI",
+      "unlock": "解锁",
+      "empty": "暂无统计数据",
+      "updated": "已更新该用户的 AI 状态",
+      "error": "出错了"
+    },
+    "voices": {
+      "title": "配音声音",
+      "subtitle": "决定学员可选配音语言的唯一来源；关闭启用即隐藏该语言。",
+      "langPh": "语言代码（例如 en-US）",
+      "langLabel": "语言代码",
+      "voicePh": "Edge-TTS 声音名称（例如 en-US-JennyNeural）",
+      "voiceLabel": "Edge-TTS 声音名称",
+      "gender": {
+        "FEMALE": "女",
+        "MALE": "男"
+      },
+      "genderLabel": "性别",
+      "isDefault": "默认",
+      "add": "添加声音",
+      "cols": {
+        "language": "语言",
+        "voice": "声音",
+        "gender": "性别",
+        "default": "默认",
+        "active": "启用",
+        "actions": "操作"
+      },
+      "loading": "加载中...",
+      "empty": "还没有声音，学员将看不到任何配音语言（BR-DUB-07）。",
+      "delete": "删除",
+      "error": "出错了",
+      "deleteError": "无法删除此声音。",
+      "confirmDelete": {
+        "title": "删除此声音？",
+        "body": "声音 {voice}（{language}）将从系统中移除。",
+        "cancel": "取消"
+      },
+      "searchLabel": "搜索声音",
+      "searchPh": "按语言或声音名称搜索...",
+      "showMore": "显示更多",
+      "showing": "显示 {shown} / {total} 个声音",
+      "noMatch": "没有匹配的声音。"
+    },
+    "tutorSec": {
+      "title": "AI 助教安全",
+      "subtitle": "学员发给 AI 助教的消息中，被预检查标记为可疑的内容（要求忽略规则、冒充管理员、越狱等）。仅用于监控，此处不会自动锁定或封禁账户。",
+      "cols": {
+        "student": "学员",
+        "course": "课程",
+        "pattern": "匹配的模式",
+        "message": "消息内容",
+        "time": "时间"
+      },
+      "loading": "加载中...",
+      "empty": "还没有被标记为可疑的消息。",
+      "pager": {
+        "aria": "安全日志分页",
+        "info": "第 {page} / {total} 页 — 共 {count} 条记录",
+        "prev": "上一页",
+        "next": "下一页"
+      }
+    },
+    "jobs": {
+      "filterLabel": "Filter by status",
+      "searchLabel": "Search by lesson or language",
+      "searchPh": "Search by lesson title or language...",
+      "status": {
+        "ALL": "All",
+        "PENDING": "Pending",
+        "PROCESSING": "Processing",
+        "COMPLETED": "Completed",
+        "FAILED": "Failed",
+        "SKIPPED": "Skipped"
+      },
+      "cols": {
+        "lesson": "Lesson",
+        "language": "Language",
+        "status": "Status",
+        "progress": "Progress",
+        "retry": "Retries",
+        "error": "Error",
+        "actions": "Actions"
+      },
+      "loading": "Loading...",
+      "empty": "No jobs.",
+      "retry": "Retry",
+      "retryError": "Could not retry this job.",
+      "pager": {
+        "aria": "Dubbing job pagination",
+        "prev": "Previous",
+        "next": "Next",
+        "page": "Page {page} of {total}"
+      }
+    },
+    "payments": {
+      "title": "支付对账",
+      "subtitle": "管理并核对平台上的课程购买交易。",
+      "refresh": "刷新数据",
+      "loadError": "无法加载交易记录",
+      "empty": "平台上还没有交易。",
+      "noMatch": "没有符合筛选条件的交易。",
+      "status": {
+        "PAID": "成功",
+        "PENDING": "处理中",
+        "FAILED": "失败",
+        "EXPIRED": "已过期"
+      },
+      "source": {
+        "referral": "推荐",
+        "organic": "自然流量"
+      },
+      "filters": {
+        "email": "按邮箱搜索",
+        "emailPh": "输入学员邮箱...",
+        "date": "按日期筛选",
+        "status": "状态",
+        "all": "全部状态"
+      },
+      "cols": {
+        "ref": "交易编号",
+        "user": "用户",
+        "amount": "金额",
+        "fee": "平台费用",
+        "net": "实际收入",
+        "source": "来源",
+        "method": "方式",
+        "status": "状态",
+        "time": "时间",
+        "actions": "操作"
+      },
+      "details": "详情",
+      "pager": {
+        "aria": "交易分页",
+        "showing": "显示 {shown} / {total} 笔交易",
+        "prev": "上一页",
+        "next": "下一页",
+        "page": "第 {page} / {total} 页"
+      },
+      "detail": {
+        "title": "Transaction details",
+        "close": "Close",
+        "course": "Course",
+        "account": "Purchasing account",
+        "billingName": "Billing name",
+        "phone": "Phone number",
+        "none": "None",
+        "source": "Revenue source",
+        "sourceReferral": "Instructor’s own referral link",
+        "sourceOrganic": "Found by the learner on the platform",
+        "fee": "Platform fee ({percent}%)",
+        "earning": "Instructor receives ({percent}%)",
+        "coupon": "Coupon used",
+        "couponMath": "Original {original} − Discount {discount}",
+        "method": "Payment method",
+        "status": "Status",
+        "failReason": "Failure reason",
+        "failText": "Cancelled by the payment gateway or by the user.",
+        "ref": "Reference code",
+        "gateway": "Gateway code",
+        "notYet": "Not yet",
+        "dispute": "View/handle dispute"
+      }
+    },
+    "settings": {
+      "title": "系统设置",
+      "subtitle": "AI Worker and server resources are read-only; business quotas can be edited and saved.",
+      "worker": {
+        "title": "AI Worker",
+        "up": "运行中",
+        "down": "无法连接",
+        "gemini": "Gemini 模型（LLM）",
+        "geminiDesc": "BR-DUB-02：不写死，读取环境变量 GEMINI_MODEL",
+        "asr": "ASR 后端（语音转文字）",
+        "asrDesc": "groq = Groq 云 API · whisperx_local = 本地 GPU",
+        "chunk": "分块时长（BR-CHUNK-02）",
+        "minutes": "{count} 分钟",
+        "chunkDesc": "将视频切成固定分块以便并行处理",
+        "url": "AI Worker URL",
+        "urlDesc": "与 FastAPI 服务通信的内部地址"
+      },
+      "quotas": {
+        "title": "Business quotas",
+        "dubStudent": "Dubbing / learner / day",
+        "dubInstructor": "Dubbing / instructor / day",
+        "materials": "Generated materials / day",
+        "tutor": "AI Tutor messages / day",
+        "guestSearch": "AI search (guest) / hour",
+        "loading": "Loading...",
+        "save": "Save",
+        "saving": "Saving...",
+        "cancel": "Cancel",
+        "saved": "Configuration saved.",
+        "saveError": "Could not save configuration."
+      },
+      "resources": {
+        "title": "后端资源",
+        "ram": "JVM 内存",
+        "disk": "服务器磁盘",
+        "uptime": "后端运行时间",
+        "courses": "课程总数",
+        "users": "用户总数"
+      },
+      "env": {
+        "title": "环境"
+      }
+    },
+    "categories": {
+      "title": "分类管理",
+      "subtitle": "添加、重命名或删除课程分类。",
+      "newPh": "新分类名称...",
+      "newLabel": "新分类名称",
+      "add": "添加分类",
+      "error": "出错了",
+      "deleteError": "无法删除此分类。",
+      "cols": {
+        "name": "分类名称",
+        "slug": "Slug",
+        "actions": "操作"
+      },
+      "loading": "加载中...",
+      "empty": "还没有分类。",
+      "nameLabel": "分类名称",
+      "delete": "删除",
+      "confirm": {
+        "title": "删除此分类？",
+        "body": "分类“{name}”将被删除。如果仍有课程属于该分类，系统会拒绝。",
+        "cancel": "取消"
+      }
+    },
+    "reviews": {
+      "title": "评价审核",
+      "subtitle": "隐藏违规评价，并处理讲师的举报。",
+      "coursePh": "课程名称...",
+      "instructorPh": "讲师邮箱...",
+      "statusLabel": "状态",
+      "statusOpt": {
+        "ALL": "全部状态",
+        "VISIBLE": "显示中",
+        "HIDDEN": "已隐藏",
+        "PENDING_REPORT": "待处理（讲师举报）"
+      },
+      "cols": {
+        "course": "课程",
+        "student": "学员",
+        "stars": "星级",
+        "comment": "评论",
+        "date": "日期",
+        "status": "状态",
+        "actions": "操作"
+      },
+      "loading": "加载中...",
+      "empty": "还没有评价。",
+      "noComment": "（无评论）",
+      "badge": {
+        "pending": "举报待处理",
+        "hidden": "已隐藏",
+        "visible": "显示中"
+      },
+      "reason": "原因：{reason}",
+      "unhide": "重新显示",
+      "hide": "隐藏",
+      "keepHidden": "保持隐藏",
+      "rejectReportTip": "驳回举报，重新显示评价",
+      "confirmReportTip": "确认举报，保持隐藏",
+      "hideError": "无法隐藏此评价。",
+      "unhideError": "无法取消隐藏此评价。",
+      "starsLabel": "5 星中的 {count} 星",
+      "pager": {
+        "aria": "评价分页",
+        "prev": "上一页",
+        "next": "下一页",
+        "page": "第 {page} / {total} 页"
+      }
+    },
+    "announce": {
+      "title": "系统公告",
+      "subtitle": "向所有人、仅讲师、仅学员或某一位用户发送公告。发送在后台运行，送达所有收件人可能需要几秒到几分钟。",
+      "severity": {
+        "HIGH": "高 — 显示为页面顶部横幅（例如系统维护）",
+        "MEDIUM": "中 — 仅出现在通知铃中",
+        "LOW": "低 — 仅出现在通知铃中"
+      },
+      "audience": {
+        "ALL": "所有人",
+        "INSTRUCTOR": "仅讲师",
+        "STUDENT": "仅学员",
+        "SPECIFIC_USER": "指定某位用户（按 ID）"
+      },
+      "dispatch": {
+        "PENDING": "等待处理",
+        "PROCESSING": "发送中...",
+        "DONE": "已发送",
+        "FAILED": "失败"
+      },
+      "form": {
+        "title": "标题",
+        "titlePh": "例如：系统维护",
+        "severity": "级别",
+        "content": "内容",
+        "audience": "接收范围",
+        "userId": "用户 ID（见“用户”页面）",
+        "expires": "横幅自动隐藏时间（留空 = 显示到有更新的高级别公告）",
+        "sending": "发送中...",
+        "send": "发送公告",
+        "error": "出错了，请稍后重试。"
+      },
+      "cols": {
+        "title": "标题",
+        "severity": "级别",
+        "audience": "范围",
+        "status": "状态",
+        "sent": "已发送",
+        "created": "创建时间"
+      },
+      "loading": "加载中...",
+      "empty": "还没有发送过公告。",
+      "user": "用户 #{id}",
+      "sevLabel": {
+        "HIGH": "高",
+        "MEDIUM": "中",
+        "LOW": "低"
+      }
+    },
+    "disputes": {
+      "title": "Payment disputes",
+      "subtitle": "Disputes/refund requests filed by learners or instructors.",
+      "loadError": "Could not load the dispute list.",
+      "empty": "No disputes yet.",
+      "filters": {
+        "status": "Status",
+        "all": "All"
+      },
+      "status": {
+        "OPEN": "Open",
+        "REOPENED": "Reopened - priority",
+        "RESOLVED_REFUNDED": "Refunded",
+        "RESOLVED_REJECTED": "Rejected"
+      },
+      "cols": {
+        "ref": "Transaction ID",
+        "user": "Filed by",
+        "reason": "Reason",
+        "amount": "Amount",
+        "status": "Status",
+        "time": "Time",
+        "actions": "Actions"
+      },
+      "process": "Process",
+      "detail": {
+        "title": "Process dispute",
+        "course": "Course",
+        "amount": "Amount",
+        "reason": "Reason",
+        "description": "Description",
+        "bankAccount": "Refund bank account",
+        "none": "None",
+        "note": "Resolution note *",
+        "notePh": "Explain the decision...",
+        "markRefunded": "Mark as refunded",
+        "reject": "Reject dispute",
+        "cancel": "Close",
+        "resolvedBy": "Resolved by {email}",
+        "error": "Could not process this dispute.",
+        "attachments": "Attached evidence",
+        "viewVideo": "View video",
+        "reopenReason": "Reason for reopening",
+        "previousNote": "Previous resolution note",
+        "noteOverwriteWarning": "The new note will be saved; the previous note is kept above."
+      },
+      "fileSuccess": "Dispute filed."
+    },
+    "userDetail": {
+      "back": "Back",
+      "genericError": "Something went wrong, please try again.",
+      "lockedToast": "Account locked.",
+      "unlockedToast": "Account unlocked.",
+      "aiLockedToast": "AI access locked.",
+      "aiUnlockedToast": "AI access unlocked.",
+      "spamFlagSuccess": "Flagged as spam.",
+      "spamUnflagSuccess": "Spam flag removed.",
+      "linkCopied": "Link copied.",
+      "confirm": {
+        "cancel": "Cancel",
+        "lockTitle": "Lock this account?",
+        "lockBody": "The user will no longer be able to log in (the current session is revoked immediately too). This also automatically locks AI access and flags the account as spam.",
+        "unlockTitle": "Unlock this account?",
+        "unlockBody": "The user can log in and use the system normally again. The AI-lock/spam flags are NOT cleared automatically — remove them separately if needed.",
+        "aiLockTitle": "Lock AI access?",
+        "aiLockBody": "The user won't be able to use AI Tutor, AI Discovery, material generation... until unlocked. No effect on other features.",
+        "aiUnlockTitle": "Unlock AI access?",
+        "aiUnlockBody": "The user can use AI features normally again.",
+        "spamFlagTitle": "Flag this account as spam?",
+        "spamFlagBody": "This also automatically locks AI access and blocks the user from writing course reviews.",
+        "spamUnflagTitle": "Remove spam flag?",
+        "spamUnflagBody": "The user can write reviews again. The AI-lock flag is NOT cleared automatically — remove it separately under AI Access if needed."
+      },
+      "profile": {
+        "title": "Profile",
+        "role": "Role",
+        "authProvider": "Signed in with",
+        "createdAt": "Created at",
+        "status": "Status",
+        "active": "Active",
+        "locked": "Locked",
+        "lock": "Lock account",
+        "unlock": "Unlock"
+      },
+      "aiLock": {
+        "title": "AI access",
+        "status": "Status",
+        "active": "AI access granted",
+        "locked": "AI access locked",
+        "lock": "Lock AI",
+        "unlock": "Unlock AI",
+        "disabledWhileLocked": "Account is locked — the AI flag follows the account lock state; unlock the account to edit it separately."
+      },
+      "spam": {
+        "title": "Spam/scam flag",
+        "hint": "Flagging as spam automatically locks AI access and blocks writing course reviews — does not lock the whole account, never shown publicly to others.",
+        "reason": "Reason",
+        "reasonPh": "Reason for flagging as spam/scam...",
+        "none": "No reason given",
+        "flag": "Flag as spam",
+        "unflag": "Remove flag",
+        "disabledWhileLocked": "Account is locked — the spam flag follows the account lock state; unlock the account to edit it separately."
+      },
+      "resetLink": {
+        "title": "Password reset assistance",
+        "hint": "Use when a user forgot their password but isn't receiving the OTP — the system emails the link (expires in 30 minutes) to the user. The link is also shown below so you can send it manually if the email doesn't arrive or lands in spam.",
+        "generate": "Generate & email reset link",
+        "generating": "Generating...",
+        "copy": "Copy link",
+        "expiresAt": "Expires at {time}",
+        "sent": "Reset link emailed to the user",
+        "googleBlocked": "This account signs in with Google and has no password to reset."
+      }
+    },
+    "support": {
+      "title": "Support requests",
+      "subtitle": "Requests from users (including signed-out visitors). Replies are emailed to the sender.",
+      "filters": {
+        "status": "Status",
+        "all": "All"
+      },
+      "status": {
+        "OPEN": "Open",
+        "IN_PROGRESS": "In progress",
+        "RESOLVED": "Resolved"
+      },
+      "category": {
+        "ACCOUNT": "Account & sign-in",
+        "PAYMENT": "Payments & refunds",
+        "COURSE": "Courses & content",
+        "LEARNING": "Learning: quizzes, flashcards, materials",
+        "AI_FEATURES": "AI features",
+        "EXAM": "Exams & proctoring",
+        "CERTIFICATE": "Certificates",
+        "COMMUNITY": "Community & reviews",
+        "LIVE": "Live sessions",
+        "INSTRUCTOR": "For instructors",
+        "PRIVACY": "Privacy & data",
+        "TECHNICAL": "Technical issues",
+        "OTHER": "Other"
+      },
+      "cols": {
+        "code": "Code",
+        "sender": "Sender",
+        "subject": "Subject",
+        "category": "Topic",
+        "status": "Status",
+        "time": "Time",
+        "actions": "Actions"
+      },
+      "empty": "No support requests yet.",
+      "loadError": "Couldn't load support requests.",
+      "view": "View",
+      "detail": {
+        "close": "Close",
+        "message": "Message",
+        "attachments": "Screenshots",
+        "noAttachments": "No attachments.",
+        "status": "Status",
+        "save": "Save & send reply",
+        "saving": "Saving...",
+        "saved": "Request updated.",
+        "error": "Couldn't update the request.",
+        "openUser": "Open user page",
+        "noUser": "No account uses this email",
+        "previousReply": "Previous reply",
+        "template": "Reply template",
+        "templatePh": "Pick a template to pre-fill...",
+        "previewTitle": "Preview of the email sent to the user",
+        "replyRequired": "Write at least one section with content before saving.",
+        "form": "Compose reply email",
+        "greetingLabel": "Greeting",
+        "introLabel": "Opening line",
+        "sectionsLabel": "Content sections",
+        "sectionTitle": "Section title",
+        "sectionTitlePh": "e.g. Steps to follow",
+        "typeText": "Paragraph",
+        "typeList": "Numbered list",
+        "sectionText": "Content",
+        "itemPh": "Line {n} text...",
+        "addItem": "Add line",
+        "removeItem": "Remove line",
+        "addSection": "Add section",
+        "removeSection": "Remove section",
+        "moveUp": "Move up",
+        "moveDown": "Move down",
+        "maxSections": "Up to 8 sections.",
+        "maxItems": "Up to 10 lines.",
+        "closingLabel": "Closing",
+        "signatureNameLabel": "Signed by",
+        "teamLabel": "Team",
+        "includeOriginal": "Include the original request in the email",
+        "placeholderHint": "You can use {name}, {code}, {subject}, {category} in any field — they are filled in when sent.",
+        "defaults": {
+          "greeting": "Dear {name},",
+          "intro": "Regarding support request {code}, here is our response.",
+          "closing": "Best regards,",
+          "team": "LinguaLearn Support Team"
+        },
+        "typeLabel": "Section content type",
+        "preview": {
+          "empty": "(No reply content yet)",
+          "original": "Original request",
+          "code": "Request code",
+          "category": "Topic",
+          "subject": "Subject",
+          "status": "Status",
+          "footer": "Automated email from the LinguaLearn support system, please do not reply directly."
+        },
+        "templates": {
+          "received": {
+            "label": "General · Request received",
+            "status": "IN_PROGRESS",
+            "sections": [
+              {
+                "title": "Request status",
+                "type": "TEXT",
+                "text": "We have received your request and are working on it. You will get the result by email within 24 working hours."
+              }
+            ]
+          },
+          "needMoreInfo": {
+            "label": "General · More information needed",
+            "status": "IN_PROGRESS",
+            "sections": [
+              {
+                "title": "We need more information",
+                "type": "TEXT",
+                "text": "To handle your request we need you to provide a bit more information below."
+              },
+              {
+                "title": "Please provide",
+                "type": "LIST",
+                "items": [
+                  "The exact steps that lead to the problem.",
+                  "A screenshot of the error (if any).",
+                  "The device and browser you are using."
+                ]
+              },
+              {
+                "title": "How to send it",
+                "type": "TEXT",
+                "text": "Please submit a new request in the Help Center quoting the request code so we can continue."
+              }
+            ]
+          },
+          "resolved": {
+            "label": "General · Resolved",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Outcome",
+                "type": "TEXT",
+                "text": "Your request has been resolved. Thank you for your patience."
+              }
+            ]
+          },
+          "cannotReproduce": {
+            "label": "General · Cannot reproduce",
+            "status": "IN_PROGRESS",
+            "sections": [
+              {
+                "title": "Findings",
+                "type": "TEXT",
+                "text": "Our technical team checked but could not reproduce the problem you described."
+              },
+              {
+                "title": "You can try",
+                "type": "LIST",
+                "items": [
+                  "Reload and clear your browser cache.",
+                  "Try another browser or device.",
+                  "If it persists, send a screenshot or a screen recording of the steps."
+                ]
+              }
+            ]
+          },
+          "duplicate": {
+            "label": "General · Duplicate request",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Notice",
+                "type": "TEXT",
+                "text": "This request duplicates an earlier one from you, so we are handling them together. Please follow the reply on the original request."
+              }
+            ]
+          },
+          "outOfScope": {
+            "label": "General · Out of scope",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Scope of support",
+                "type": "TEXT",
+                "text": "Unfortunately the matter you raised is outside what the platform can support, so we can't handle it directly."
+              },
+              {
+                "title": "Suggestion",
+                "type": "TEXT",
+                "text": "You can contact the relevant party or send feedback so we can consider improving in the future."
+              }
+            ]
+          },
+          "feedbackThanks": {
+            "label": "General · Thanks for the feedback",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Thank you",
+                "type": "TEXT",
+                "text": "Thank you for taking the time to share feedback. We have logged it and passed it to the product team for upcoming updates."
+              }
+            ]
+          },
+          "resetPassword": {
+            "label": "Account · Password reset instructions",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Outcome",
+                "type": "TEXT",
+                "text": "An administrator verified your request and sent a password reset link to your email separately."
+              },
+              {
+                "title": "Steps to follow",
+                "type": "LIST",
+                "items": [
+                  "Open the email titled \"Reset password - LinguaLearn\" (also check Spam).",
+                  "Click \"Reset password\". The link is valid for 30 minutes and can be used once.",
+                  "Enter your new password twice to confirm.",
+                  "Return to Sign in and use your new password."
+                ]
+              }
+            ]
+          },
+          "googleAccount": {
+            "label": "Account · Google sign-in",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Findings",
+                "type": "TEXT",
+                "text": "Your account was registered with Google, so it has no separate password to reset."
+              },
+              {
+                "title": "How to sign in",
+                "type": "LIST",
+                "items": [
+                  "Open the Sign in page.",
+                  "Click \"Sign in with Google\".",
+                  "Choose the Google account you registered with."
+                ]
+              }
+            ]
+          },
+          "accountLocked": {
+            "label": "Account · Locked account under review",
+            "status": "IN_PROGRESS",
+            "sections": [
+              {
+                "title": "Status",
+                "type": "TEXT",
+                "text": "We received your request about the locked account and are reviewing its activity."
+              },
+              {
+                "title": "What we need from you",
+                "type": "LIST",
+                "items": [
+                  "The email of the locked account.",
+                  "When you noticed the account was locked.",
+                  "A short explanation of your recent activity."
+                ]
+              }
+            ]
+          },
+          "paymentActivated": {
+            "label": "Payment · Course activated",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Reconciliation result",
+                "type": "TEXT",
+                "text": "We reconciled and confirmed your transaction, and the course has been activated for your account."
+              },
+              {
+                "title": "How to access the course",
+                "type": "LIST",
+                "items": [
+                  "Sign out and back in.",
+                  "Open \"My courses\".",
+                  "Pick the course you just bought to start learning."
+                ]
+              }
+            ]
+          },
+          "paymentNotFound": {
+            "label": "Payment · Transaction not found",
+            "status": "IN_PROGRESS",
+            "sections": [
+              {
+                "title": "Findings",
+                "type": "TEXT",
+                "text": "We could not find a transaction matching the information you provided."
+              },
+              {
+                "title": "Please resend",
+                "type": "LIST",
+                "items": [
+                  "The transaction code or transfer note.",
+                  "A screenshot of the receipt or balance change.",
+                  "The exact time of payment."
+                ]
+              }
+            ]
+          },
+          "refundGuide": {
+            "label": "Payment · How to file a refund dispute",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Refund process",
+                "type": "TEXT",
+                "text": "Refunds are handled through the transaction dispute feature so that all details and evidence are captured."
+              },
+              {
+                "title": "Steps to follow",
+                "type": "LIST",
+                "items": [
+                  "Read the Refund policy.",
+                  "Open your account menu, choose \"Request a refund\" and pick the transaction.",
+                  "Enter the reason, receiving account and attach evidence.",
+                  "Accept the policy and submit; the result will be emailed to you."
+                ]
+              }
+            ]
+          },
+          "refundNotEligible": {
+            "label": "Payment · Not eligible for refund",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Review result",
+                "type": "TEXT",
+                "text": "After review, your transaction does not meet the refund conditions of the current Refund policy."
+              },
+              {
+                "title": "Please note",
+                "type": "TEXT",
+                "text": "If you have new evidence, file a follow-up dispute and we will review it again."
+              }
+            ]
+          },
+          "couponIssue": {
+            "label": "Payment · Coupon code",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Findings",
+                "type": "TEXT",
+                "text": "We checked your coupon code and the result is below."
+              },
+              {
+                "title": "Conditions",
+                "type": "LIST",
+                "items": [
+                  "The code is within its validity period and has uses left.",
+                  "It applies to the course or bundle you chose.",
+                  "Each code can only be used the allowed number of times."
+                ]
+              }
+            ]
+          },
+          "courseAccessFixed": {
+            "label": "Course · Access restored",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Outcome",
+                "type": "TEXT",
+                "text": "We checked and restored your access to the course."
+              },
+              {
+                "title": "To apply the change",
+                "type": "LIST",
+                "items": [
+                  "Sign out and back in.",
+                  "Open \"My courses\" and pick the course."
+                ]
+              }
+            ]
+          },
+          "videoTroubleshoot": {
+            "label": "Course · Video troubleshooting",
+            "status": "IN_PROGRESS",
+            "sections": [
+              {
+                "title": "Troubleshooting",
+                "type": "LIST",
+                "items": [
+                  "Check your connection and reload the page.",
+                  "Try another browser (a current Chrome, Edge or Safari).",
+                  "Disable ad blockers for LinguaLearn.",
+                  "If it still fails, send a screenshot and the lesson name so we can check the video file."
+                ]
+              }
+            ]
+          },
+          "contentReported": {
+            "label": "Course · Content issue forwarded",
+            "status": "IN_PROGRESS",
+            "sections": [
+              {
+                "title": "Status",
+                "type": "TEXT",
+                "text": "We logged the content issue you reported and forwarded it to the instructor and moderators for review."
+              }
+            ]
+          },
+          "quizReview": {
+            "label": "Learning · Quiz answer review",
+            "status": "IN_PROGRESS",
+            "sections": [
+              {
+                "title": "Status",
+                "type": "TEXT",
+                "text": "We forwarded the question you raised to the instructor to review the answer key. If it is corrected, your result will be updated."
+              }
+            ]
+          },
+          "streakRestored": {
+            "label": "Learning · Streak restored",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Outcome",
+                "type": "TEXT",
+                "text": "We checked your study history and corrected your learning streak."
+              }
+            ]
+          },
+          "aiKnownIssue": {
+            "label": "AI · AI issue logged",
+            "status": "IN_PROGRESS",
+            "sections": [
+              {
+                "title": "Status",
+                "type": "TEXT",
+                "text": "We logged the issue with the AI feature and passed it to the technical team."
+              },
+              {
+                "title": "In the meantime",
+                "type": "LIST",
+                "items": [
+                  "Try again in a few minutes.",
+                  "Use the course materials and lectures as a reference.",
+                  "Send another screenshot if it keeps happening."
+                ]
+              }
+            ]
+          },
+          "aiLockExplained": {
+            "label": "AI · AI access lock explained",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Review result",
+                "type": "TEXT",
+                "text": "AI access on your account was restricted because it had been flagged for violations or spam. We reviewed your request."
+              },
+              {
+                "title": "You can",
+                "type": "LIST",
+                "items": [
+                  "Keep using all other learning features.",
+                  "Send more details if you believe the flag was a mistake."
+                ]
+              }
+            ]
+          },
+          "examIncident": {
+            "label": "Exam · Incident logged",
+            "status": "IN_PROGRESS",
+            "sections": [
+              {
+                "title": "Status",
+                "type": "TEXT",
+                "text": "We logged the incident during your exam and passed it to the responsible instructor, who will decide the appropriate action."
+              },
+              {
+                "title": "In the meantime",
+                "type": "LIST",
+                "items": [
+                  "Keep any screenshots and error messages.",
+                  "Do not retake the exam until the instructor advises."
+                ]
+              }
+            ]
+          },
+          "proctorFalseFlag": {
+            "label": "Exam · Proctoring flag review",
+            "status": "IN_PROGRESS",
+            "sections": [
+              {
+                "title": "Status",
+                "type": "TEXT",
+                "text": "We received your request to review the proctoring warnings on your exam and forwarded it to the instructor to check the proctoring images."
+              }
+            ]
+          },
+          "certificateIssued": {
+            "label": "Certificate · Issued",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Findings",
+                "type": "TEXT",
+                "text": "We checked your progress and issued the certificate for your course."
+              },
+              {
+                "title": "How to view and download",
+                "type": "LIST",
+                "items": [
+                  "Open your profile, Certificates section.",
+                  "Pick the course certificate.",
+                  "Click download to save the PDF."
+                ]
+              }
+            ]
+          },
+          "certificateIncomplete": {
+            "label": "Certificate · Not yet eligible",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Findings",
+                "type": "TEXT",
+                "text": "Your course isn't eligible for a certificate yet because some content is incomplete."
+              },
+              {
+                "title": "To complete",
+                "type": "LIST",
+                "items": [
+                  "The remaining lessons in the course.",
+                  "The mandatory quizzes/tests of the course."
+                ]
+              }
+            ]
+          },
+          "communityReport": {
+            "label": "Community · Report received",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Outcome",
+                "type": "TEXT",
+                "text": "Thank you for reporting. Moderators reviewed the content and took appropriate action under the community rules."
+              },
+              {
+                "title": "If it happens again",
+                "type": "TEXT",
+                "text": "Please send another request with new screenshots so we can act faster."
+              }
+            ]
+          },
+          "reviewHidden": {
+            "label": "Community · Review hidden",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Review result",
+                "type": "TEXT",
+                "text": "Your review was hidden because it doesn't comply with the platform's content rules."
+              },
+              {
+                "title": "You can",
+                "type": "LIST",
+                "items": [
+                  "Edit it into constructive feedback without offensive language.",
+                  "Post the review again after editing."
+                ]
+              }
+            ]
+          },
+          "liveIssue": {
+            "label": "Live · Live session issue logged",
+            "status": "IN_PROGRESS",
+            "sections": [
+              {
+                "title": "Status",
+                "type": "TEXT",
+                "text": "We logged the issue in the live session and are checking with the instructor."
+              },
+              {
+                "title": "You can try",
+                "type": "LIST",
+                "items": [
+                  "Reload and rejoin the session.",
+                  "Check your network and prefer a stable connection.",
+                  "Watch the recording later if the instructor publishes one."
+                ]
+              }
+            ]
+          },
+          "instructorRejected": {
+            "label": "Instructor · After a course rejection",
+            "status": "RESOLVED",
+            "sections": [
+              {
+                "title": "Outcome",
+                "type": "TEXT",
+                "text": "Your course was not approved. The specific reason appears on your course management page."
+              },
+              {
+                "title": "How to fix and resubmit",
+                "type": "LIST",
+                "items": [
+                  "Read the moderators' feedback carefully.",
+                  "Edit the content accordingly.",
+                  "Resubmit the course for review."
+                ]
+              }
+            ]
+          },
+          "instructorPayout": {
+            "label": "Instructor · Revenue reconciliation",
+            "status": "IN_PROGRESS",
+            "sections": [
+              {
+                "title": "Status",
+                "type": "TEXT",
+                "text": "We received your revenue reconciliation request and are checking the transactions in the period you named."
+              },
+              {
+                "title": "Information needed",
+                "type": "LIST",
+                "items": [
+                  "The payout period that looks wrong.",
+                  "The related course.",
+                  "The amount you expected and the one shown."
+                ]
+              }
+            ]
+          },
+          "privacyRequest": {
+            "label": "Privacy · Personal data request",
+            "status": "IN_PROGRESS",
+            "sections": [
+              {
+                "title": "Status",
+                "type": "TEXT",
+                "text": "We received your personal data request. To protect your account, we must verify your identity before acting."
+              },
+              {
+                "title": "Next steps",
+                "type": "LIST",
+                "items": [
+                  "Send the request from the exact account email.",
+                  "We verify and process it as soon as possible.",
+                  "The result will be emailed to you."
+                ]
+              }
+            ]
+          },
+          "technicalGeneric": {
+            "label": "Technical · General troubleshooting",
+            "status": "IN_PROGRESS",
+            "sections": [
+              {
+                "title": "Troubleshooting",
+                "type": "LIST",
+                "items": [
+                  "Reload and sign in again.",
+                  "Clear the cache or use a private window.",
+                  "Try another browser or device.",
+                  "If it still fails, send a screenshot with the page link."
+                ]
+              }
+            ]
+          },
+          "notificationHelp": {
+            "label": "Technical · Not receiving notifications/emails",
+            "status": "IN_PROGRESS",
+            "sections": [
+              {
+                "title": "What to check",
+                "type": "LIST",
+                "items": [
+                  "Check the Spam and Promotions folders.",
+                  "Allow notifications for LinguaLearn in the browser/app.",
+                  "Add the LinguaLearn sender address to your contacts."
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "supportHelp": {
+    "title": "Help & Support",
+    "subtitle": "Pick the topic you need help with to see quick answers. If that doesn't solve it, send a request and our support team will reply by email.",
+    "pickCategory": "What do you need help with?",
+    "faqTitle": "Frequently asked questions",
+    "stillNeedHelp": "Still need help?",
+    "openForm": "Send a support request",
+    "closeForm": "Close form",
+    "categories": {
+      "ACCOUNT": {
+        "title": "Account & sign-in",
+        "desc": "Forgot password, OTP, locked account, Google sign-in"
+      },
+      "PAYMENT": {
+        "title": "Payments & refunds",
+        "desc": "Paid but no access, double charge, refunds, coupons"
+      },
+      "COURSE": {
+        "title": "Courses & content",
+        "desc": "Can't open a course, video, documents, wrong content"
+      },
+      "LEARNING": {
+        "title": "Learning: quizzes, flashcards, materials",
+        "desc": "Quiz grading, flashcards, AI materials, assignments, streak"
+      },
+      "AI_FEATURES": {
+        "title": "AI features",
+        "desc": "AI Tutor, AI study plan, AI lock, AI dubbing"
+      },
+      "EXAM": {
+        "title": "Exams & proctoring",
+        "desc": "Camera, disconnects, submission, false violations, scores"
+      },
+      "CERTIFICATE": {
+        "title": "Certificates",
+        "desc": "Missing certificate, wrong name, verification code, PDF download"
+      },
+      "COMMUNITY": {
+        "title": "Community & reviews",
+        "desc": "Report abuse, harassment, hidden reviews, Q&A, messages"
+      },
+      "LIVE": {
+        "title": "Live sessions",
+        "desc": "Can't join, lost audio/video, translated captions, cancelled sessions"
+      },
+      "INSTRUCTOR": {
+        "title": "For instructors",
+        "desc": "Course approval, revenue, uploads, reports, becoming an instructor"
+      },
+      "PRIVACY": {
+        "title": "Privacy & data",
+        "desc": "Delete account, export data, public profile, suspected breach"
+      },
+      "TECHNICAL": {
+        "title": "Technical issues",
+        "desc": "Page errors, slow loading, mobile app, notifications, display"
+      },
+      "OTHER": {
+        "title": "Other",
+        "desc": "Feedback, partnerships, anything else"
+      }
+    },
+    "faq": {
+      "ACCOUNT": [
+        {
+          "q": "I forgot my password",
+          "a": "Go to Sign in, choose Forgot password and enter your email to receive an OTP (valid for 5 minutes). If you don't see the email, check your Spam folder.",
+          "hint": "The email you registered with and when you tried to reset."
+        },
+        {
+          "q": "I didn't receive the OTP",
+          "a": "Wait a few minutes and check your Spam folder. If it still doesn't arrive, send a request: an administrator will verify you and email a password reset link (valid for 30 minutes).",
+          "hint": "Your account email, when you tried and whether you checked Spam."
+        },
+        {
+          "q": "I sign in with Google. Can I change my password?",
+          "a": "Accounts that sign in with Google have no separate password, so there is nothing to reset. Use the Sign in with Google button each time.",
+          "hint": "The Google email you use and the error you see when signing in."
+        },
+        {
+          "q": "My account is locked",
+          "a": "An account can be locked for rule violations or unusual activity. Send a request with your account email and the message you see so it can be reviewed.",
+          "hint": "Account email, when it was locked and the on-screen message."
+        },
+        {
+          "q": "An unknown device signed in, or I keep getting signed out",
+          "a": "Open Account settings, sign out of all other devices and change your password right away. If you still see unusual activity, send a request so we can check.",
+          "hint": "The unfamiliar device/IP you saw and when it happened."
+        },
+        {
+          "q": "I want to change my email or account details",
+          "a": "Your name, avatar and profile details can be edited in Account settings. To change your sign-in email, send a request so an administrator can verify you and help.",
+          "hint": "Current email, the email you want to switch to and why."
+        }
+      ],
+      "PAYMENT": [
+        {
+          "q": "I paid but can't access the course",
+          "a": "The system may take a few minutes to confirm the payment. If the course is still missing from My courses after 15 minutes, send a request so we can reconcile it.",
+          "hint": "Transaction code, amount, payment time and a screenshot of the receipt/balance change."
+        },
+        {
+          "q": "I was charged twice for the same course",
+          "a": "Keep both receipts and send a request. We will reconcile and refund the duplicate payment if it matches your description.",
+          "hint": "Both transaction codes, amount of each, times and a balance-change screenshot."
+        },
+        {
+          "q": "Payment failed or the QR code expired",
+          "a": "The payment QR code is valid for a short time; go back to your cart to generate a new one. If money was deducted but the order failed, send a request with the receipt.",
+          "hint": "Course you wanted, payment time and receipt screenshot (if charged)."
+        },
+        {
+          "q": "I want a refund",
+          "a": "Read the Refund policy, then file a dispute under Request a refund in your account menu (with your reason and evidence). Refunds are handled separately there.",
+          "hint": "Course, transaction code and why you want a refund."
+        },
+        {
+          "q": "I haven't received my refund",
+          "a": "How long the money takes depends on your bank. If the expected time has passed, reopen the dispute under Request a refund (only possible within the allowed window) or send a request here.",
+          "hint": "Dispute/transaction code, refund confirmation date and receiving account (mask digits)."
+        },
+        {
+          "q": "My coupon doesn't apply",
+          "a": "A code may be expired, used up or not valid for the course/bundle you chose. Check its conditions; if it still fails send a request with the code name.",
+          "hint": "Coupon code, the course/bundle and the error message."
+        },
+        {
+          "q": "I need an invoice or payment receipt",
+          "a": "Send a request with the details to put on the invoice and we will help.",
+          "hint": "Transaction code, name/company and details for the invoice."
+        }
+      ],
+      "COURSE": [
+        {
+          "q": "I can't open a course I enrolled in",
+          "a": "Sign out and back in, then check My courses. If the course is still missing or won't open, send a request.",
+          "hint": "Course name, when you enrolled and the error message."
+        },
+        {
+          "q": "The lesson video won't play",
+          "a": "Check your connection, reload the page or try another browser. If it still fails, send a request with the lesson name and a screenshot.",
+          "hint": "Course, lesson, browser/device and a screenshot."
+        },
+        {
+          "q": "Lesson documents won't download",
+          "a": "Reload the page or try another browser. If the file still fails, send a request so we can check it.",
+          "hint": "Course, lesson and document name."
+        },
+        {
+          "q": "Course content is wrong, missing or outdated",
+          "a": "Send a request describing exactly what's wrong; we will pass it to the instructor and moderators. You can also ask in the lesson's Q&A.",
+          "hint": "Course, lesson, location (video timestamp) and what is wrong."
+        },
+        {
+          "q": "My progress isn't updating",
+          "a": "Progress is recorded when you finish a lesson; try reloading after studying. If it's still missing, send a request so we can check.",
+          "hint": "Course, lessons you finished that aren't counted and a progress screenshot."
+        },
+        {
+          "q": "A course I bought was removed or is no longer accessible",
+          "a": "A course may be hidden temporarily for edits or moderation. Send a request so we can confirm its status and your access.",
+          "hint": "Course name, transaction code and when it disappeared."
+        }
+      ],
+      "LEARNING": [
+        {
+          "q": "A quiz was graded wrong or the answer key is incorrect",
+          "a": "Send a request naming the question you think is wrong; we will ask the instructor to review the answer key.",
+          "hint": "Quiz name, question number, your answer and why you think it's wrong."
+        },
+        {
+          "q": "I can't retake a quiz or lost my result",
+          "a": "Some quizzes limit attempts. If a result disappeared unexpectedly, send a request so we can check your attempt history.",
+          "hint": "Quiz name, when you took it and the message you see."
+        },
+        {
+          "q": "Flashcards won't sync or review is broken",
+          "a": "Reload or sign in again to sync. If cards still show the wrong schedule or vanish, send a request.",
+          "hint": "Flashcard set, device you use and a description of the problem."
+        },
+        {
+          "q": "AI-generated materials (quiz/flashcards/mind map) are broken or empty",
+          "a": "Try generating again after a few minutes. If it still fails or the content is off, send a request with the lesson you used.",
+          "hint": "Material type, source lesson and an error screenshot."
+        },
+        {
+          "q": "My learning streak was lost or miscounted",
+          "a": "The streak counts days you finish a lesson or quiz. If you studied but it still broke, send a request.",
+          "hint": "Days you studied, your current streak and a screenshot."
+        },
+        {
+          "q": "I submitted an assignment but see no grade, or it won't submit",
+          "a": "Check the file size and format and try again. If a submitted assignment doesn't show or stays ungraded for long, send a request.",
+          "hint": "Course, assignment name, submission time and file name."
+        }
+      ],
+      "AI_FEATURES": [
+        {
+          "q": "The AI Tutor gave a wrong or inappropriate answer",
+          "a": "AI can be wrong; compare it with the lesson. If an answer is seriously wrong or inappropriate, send a request with the conversation so we can improve.",
+          "hint": "Lesson, your question and the AI's answer (or a screenshot)."
+        },
+        {
+          "q": "The AI shows an error or doesn't respond",
+          "a": "Try again in a few minutes. If it persists, send a request with the error so the tech team can check.",
+          "hint": "Which AI feature, when it failed and the message shown."
+        },
+        {
+          "q": "My AI access is locked",
+          "a": "AI access can be locked when an account is flagged for violations or spam. Send a request with your account email to be reviewed.",
+          "hint": "Your account email and the message shown when using AI."
+        },
+        {
+          "q": "The AI study plan is unreasonable or can't be generated",
+          "a": "Update your goal and study time, then generate again. If the plan is still off or fails, send a request.",
+          "hint": "The goal you entered, related course and a screenshot of the plan."
+        },
+        {
+          "q": "My review or comment was wrongly blocked by the AI filter",
+          "a": "The automatic filter can block normal content by mistake. Send a request with what you posted so we can review it.",
+          "hint": "What you posted, where (course/lesson) and when."
+        },
+        {
+          "q": "AI dubbing or captions are wrong or out of sync",
+          "a": "Send a request with the lesson, language and the timestamp that is wrong so we can pass it to the dubbing team.",
+          "hint": "Lesson, language and the incorrect video timestamp."
+        }
+      ],
+      "EXAM": [
+        {
+          "q": "The camera won't start during an exam",
+          "a": "Allow the browser to use your camera and microphone, close other apps using the camera and reload. On a phone, try a computer or the mobile app instead.",
+          "hint": "Device, browser and the camera error message."
+        },
+        {
+          "q": "The exam froze or disconnected while I was taking it",
+          "a": "Stay on the page and check your network; don't reload repeatedly. Send a request right away with the time so we can log the incident with the instructor.",
+          "hint": "Exam name, when it froze/disconnected and a screenshot."
+        },
+        {
+          "q": "Exam submission failed",
+          "a": "Don't close the page. Wait about a minute; if it is still stuck, take a screenshot and send a request immediately so your work can be checked.",
+          "hint": "Exam name, when you pressed submit and a screenshot."
+        },
+        {
+          "q": "I was flagged for a proctoring violation by mistake",
+          "a": "The proctoring system can misjudge (low light, someone walking by...). Send a request with the context so the instructor and admins can review.",
+          "hint": "Exam name, when you were flagged and the circumstances."
+        },
+        {
+          "q": "My exam score is wrong or missing",
+          "a": "Some exams need instructor grading so results may not show instantly. If the expected time has passed or the score looks wrong, send a request.",
+          "hint": "Exam name, submission time and the score you expected."
+        },
+        {
+          "q": "The exam has problems on my phone",
+          "a": "Phone browsers can restrict camera access or recording. Try a computer or the LinguaLearn mobile app.",
+          "hint": "Phone model, browser and a description of the issue."
+        }
+      ],
+      "CERTIFICATE": [
+        {
+          "q": "I finished a course but see no certificate",
+          "a": "Send a request with the course name so an administrator can check your progress and eligibility.",
+          "hint": "Course name, when you finished and a progress screenshot."
+        },
+        {
+          "q": "The name on my certificate is wrong",
+          "a": "Certificates print the name from your profile. Update your name in Account settings or send a request so we can reissue it correctly.",
+          "hint": "Correct name, name currently printed and the course name."
+        },
+        {
+          "q": "The certificate verification code doesn't work",
+          "a": "Re-check the code (case-sensitive) and the verification link. If it still can't be verified, send a request with the certificate code.",
+          "hint": "Certificate code and the verification link/screenshot."
+        },
+        {
+          "q": "I can't download the certificate PDF",
+          "a": "Reload or try another browser. If it still fails, send a request with the course name.",
+          "hint": "Course name, browser/device and the error message."
+        }
+      ],
+      "COMMUNITY": [
+        {
+          "q": "I want to report violating content",
+          "a": "Send a request with a link or screenshot of the content (comment, question, message, course). Moderators will review and act.",
+          "hint": "Link/screenshot, the poster's name and why it violates the rules."
+        },
+        {
+          "q": "I'm being harassed or receiving spam messages",
+          "a": "Take screenshots of the messages and send a request. We will review and may act on the offending account.",
+          "hint": "Sender name/email, message screenshots and times."
+        },
+        {
+          "q": "My review was hidden or rejected",
+          "a": "A review can be hidden if it breaks content rules or is caught by the automatic filter. Send a request with what you wrote to be reviewed.",
+          "hint": "Course, the review text and when you posted it."
+        },
+        {
+          "q": "My question hasn't been answered by the instructor",
+          "a": "Instructors need time to respond. If it stays unanswered for too long, send a request with a link to the question.",
+          "hint": "Course, lesson and the question text."
+        },
+        {
+          "q": "I can't message my instructor",
+          "a": "You can only message instructors of courses you are enrolled in. If you qualify and it still fails, send a request.",
+          "hint": "Instructor name, course and the error message."
+        }
+      ],
+      "LIVE": [
+        {
+          "q": "I can't join the live session",
+          "a": "Check you are signed in and allowed to watch, then reload. If you still can't join, send a request with the session name.",
+          "hint": "Session name, start time, device and the error message."
+        },
+        {
+          "q": "I lose video or audio during a live session",
+          "a": "Check your network, reload and try another browser. If it keeps happening, send a request with the time.",
+          "hint": "Session name, when video/audio dropped, network and device."
+        },
+        {
+          "q": "Real-time translated captions are wrong or missing",
+          "a": "Pick the caption language again in the session. If captions are still wrong or missing, send a request.",
+          "hint": "Session name, the language you chose and when it failed."
+        },
+        {
+          "q": "A live session was cancelled or rescheduled",
+          "a": "Instructors can change the schedule. If you didn't get a notice or need help, send a request.",
+          "hint": "Session name, course and the schedule you saw."
+        }
+      ],
+      "INSTRUCTOR": [
+        {
+          "q": "My course was rejected",
+          "a": "The rejection reason is shown on your course management page. Edit per the feedback and resubmit; if you need clarification, send a request.",
+          "hint": "Course name and the feedback/reason you see."
+        },
+        {
+          "q": "My course has been pending review too long",
+          "a": "Review time depends on the queue. If it has been unusually long, send a request with the course name.",
+          "hint": "Course name and the date you submitted it."
+        },
+        {
+          "q": "Instructor revenue or payout looks wrong",
+          "a": "Send a request naming the period and amount that looks wrong so we can reconcile.",
+          "hint": "Payout period, related course, expected vs shown amount."
+        },
+        {
+          "q": "I can't upload a video or document",
+          "a": "Check size, format and your connection, then retry. If it still fails, send a request with the file name.",
+          "hint": "File name, size, format and the error message."
+        },
+        {
+          "q": "My course or content was reported",
+          "a": "Send a request to add context and your explanation; moderators will review fairly.",
+          "hint": "Course name, the reported content and your explanation."
+        },
+        {
+          "q": "I want to become an instructor",
+          "a": "Open Become an Instructor in your account menu and complete the sign-up. If you hit an error or need help, send a request.",
+          "hint": "Account email and the step you're stuck on."
+        }
+      ],
+      "PRIVACY": [
+        {
+          "q": "I want to delete my account and data",
+          "a": "Send a request from your account email. We will verify your identity before acting and tell you the result by email.",
+          "hint": "Account email and the scope of data you want deleted."
+        },
+        {
+          "q": "I want a copy of my personal data",
+          "a": "Send a request from your account email naming the data you need. We will verify and reply by email.",
+          "hint": "Account email and the type of data you need."
+        },
+        {
+          "q": "My public profile shows information I don't want",
+          "a": "Open Account settings to hide your courses or wishlist on your public profile. If information still shows, send a request.",
+          "hint": "Public profile link and the information shown."
+        },
+        {
+          "q": "I suspect my account was breached or data leaked",
+          "a": "Change your password and sign out of all other devices in Account settings right away, then send a request so we can check for unusual activity.",
+          "hint": "What looked unusual, when you noticed and any unfamiliar device/IP."
+        }
+      ],
+      "TECHNICAL": [
+        {
+          "q": "The site shows errors, a blank page or loads very slowly",
+          "a": "Reload, clear your cache or switch browsers. If it still fails, send a request with the page link and a screenshot.",
+          "hint": "Page link, browser/device and a screenshot."
+        },
+        {
+          "q": "The mobile app has errors or closes suddenly",
+          "a": "Update Expo Go/the app to the latest version and sign in again. If it still fails, send a request with your device and the screen where it happens.",
+          "hint": "Phone model, OS version and the screen where it fails."
+        },
+        {
+          "q": "I'm not receiving notifications or emails",
+          "a": "Check your Spam folder and the browser/app notification permission. If you still don't get them, send a request with your account email.",
+          "hint": "Account email, which notification is missing and when."
+        },
+        {
+          "q": "The layout looks broken on my device or browser",
+          "a": "Send a request with a screenshot, device and browser so we can reproduce it.",
+          "hint": "Device, OS, browser, screen size and a screenshot."
+        },
+        {
+          "q": "The interface text or translation is wrong",
+          "a": "Send a request naming the screen and the text that is wrong so we can fix the translation.",
+          "hint": "Selected language, screen and the incorrect text."
+        }
+      ],
+      "OTHER": [
+        {
+          "q": "I have feedback about a feature or the experience",
+          "a": "We value all feedback. Send a request describing what you'd like improved.",
+          "hint": "The related screen/feature and what you'd like."
+        },
+        {
+          "q": "I'd like to partner or discuss business",
+          "a": "Send a request with your organization and the proposal; we will reply by email.",
+          "hint": "Organization, contact person and your proposal."
+        },
+        {
+          "q": "My issue isn't in any of the topics above",
+          "a": "Send a request describing the problem clearly and our team will reply by email.",
+          "hint": "A detailed description, when it happened and a screenshot if you have one."
+        }
+      ]
+    },
+    "form": {
+      "title": "Send a support request",
+      "email": "Email for the reply",
+      "category": "Topic",
+      "subject": "Subject",
+      "message": "Details",
+      "messageHint": "At least 10 characters. The clearer the description, the faster we can help.",
+      "attach": "Screenshots (optional)",
+      "attachHint": "Up to {count} jpg/png/webp images, {size}MB each.",
+      "addFiles": "Choose images",
+      "remove": "Remove",
+      "tooMany": "You can attach at most {count} images.",
+      "tooBig": "Image \"{name}\" exceeds {size}MB.",
+      "badType": "\"{name}\" is not a jpg/png/webp image.",
+      "submit": "Send request",
+      "submitting": "Sending...",
+      "genericError": "Couldn't send the request, please try again.",
+      "successTitle": "Request sent",
+      "successBody": "Your request code is {code}. We sent a confirmation email and will reply within 24-48 hours. If you don't see it, check your Spam folder.",
+      "newRequest": "Send another request",
+      "topic": "Topic",
+      "topicHint": "The topic is filled in from the item you picked.",
+      "messageGuided": "Describe your situation",
+      "shouldInclude": "Please include:"
+    },
+    "forgotHint": "Didn't receive the OTP?",
+    "forgotLink": "Send a support request",
+    "requestThis": "Didn't solve it? Send a request",
+    "otherInGroup": "Something else in this topic",
+    "otherLabel": "Other issue"
+  }
+}

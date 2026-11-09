@@ -1,0 +1,56 @@
+'use client';
+
+import Link from 'next/link';
+import { useLiveSessionsForCourse } from '@/hooks/useLiveView';
+
+function formatDateTime(iso: string): string {
+  return new Date(iso).toLocaleString('vi-VN', {
+    day: '2-digit',
+    month: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
+/**
+ * UC51 — điểm vào duy nhất để Guest/Student thấy và bấm vào buổi live của khóa học này, từ
+ * trang chi tiết khóa học công khai. Không hiện gì nếu chưa có phiên LIVE/SCHEDULED nào — không
+ * làm rối trang chi tiết khóa học bình thường (đa số khóa không có live đang diễn ra).
+ */
+export function CourseLiveBanner({ courseId }: { courseId: number }) {
+  const { data: sessions } = useLiveSessionsForCourse(courseId);
+  const liveNow = sessions?.find((s) => s.status === 'LIVE');
+  const upcoming = sessions?.find((s) => s.status === 'SCHEDULED');
+  const session = liveNow ?? upcoming;
+
+  if (!session) return null;
+
+  return (
+    <Link
+      href={`/live/${session.id}`}
+      className="card flex items-center justify-between gap-3 border-danger/30 bg-danger/5 px-5 py-4 no-underline hover:border-danger/40"
+    >
+      <div className="flex items-center gap-3">
+        <span className={liveNow ? 'text-danger' : 'text-ink-muted'} aria-hidden>
+          {liveNow ? (
+            '●'
+          ) : (
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" />
+            </svg>
+          )}
+        </span>
+        <div>
+          <p className="m-0 font-display text-sm font-bold text-ink">
+            {liveNow ? 'Đang live: ' : 'Sắp live: '}
+            {session.title}
+          </p>
+          {!liveNow && session.scheduledAt && (
+            <p className="m-0 text-xs text-ink-muted">Dự kiến {formatDateTime(session.scheduledAt)}</p>
+          )}
+        </div>
+      </div>
+      <span className="text-sm font-semibold text-accent">Xem ngay →</span>
+    </Link>
+  );
+}

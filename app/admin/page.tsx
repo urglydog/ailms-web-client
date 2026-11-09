@@ -1,9 +1,17 @@
 'use client';
 
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { Activity, DollarSign, ShieldCheck, Users } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
+import { PendingCourses } from '@/components/admin/overview/PendingCourses';
+import { SystemHealth, type SystemMetrics } from '@/components/admin/overview/SystemHealth';
+import { MetricCard } from '@/components/instructor/performance/MetricCard';
+import { PageHeader } from '@/components/instructor/ui/PageHeader';
 import { api } from '@/lib/api/client';
 import { getAccessToken } from '@/lib/auth/token';
+import { formatMoney } from '@/lib/shop/money';
 import { useModerationQueue } from '@/hooks/useCourses';
 
 interface AdminDashboardData {
@@ -13,68 +21,79 @@ interface AdminDashboardData {
   totalRevenue: number;
 }
 
+const QUICK_LINKS = [
+  { id: 'moderation', href: '/admin/moderation', icon: ShieldCheck },
+  { id: 'users', href: '/admin/users', icon: Users },
+  { id: 'transactions', href: '/admin/transactions/payments', icon: DollarSign },
+  { id: 'aiqueue', href: '/admin/ai-queue', icon: Activity },
+] as const;
+
+/** Tổng quan Quản trị: 4 chỉ số, hàng đợi duyệt khóa, lối tắt tới việc hay làm và tình trạng máy chủ. Token chỉ có ở máy khách nên
+ * chờ mount mới truy vấn (tránh lệch HTML giữa máy chủ và máy khách). */
 export default function AdminOverviewPage() {
+  const t = useTranslations('admin.overview');
+  const tNav = useTranslations('admin.nav');
+  const locale = useLocale();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const enabled = mounted && !!getAccessToken();
+
   const { data } = useQuery({
     queryKey: ['dashboard', 'admin'],
     queryFn: () => api.get<AdminDashboardData>('/api/v1/dashboard/admin', { token: getAccessToken() ?? undefined }),
-    enabled: !!getAccessToken(),
+    enabled,
   });
-  const { data: pendingPage } = useModerationQueue({ status: 'PENDING', size: 3 });
 
-  const totalCourses = data?.totalCourses ?? 0;
-  const pendingCoursesCount = data?.pendingCourses ?? 0;
-  const totalUsers = data?.totalUsers ?? 0;
-  const totalRevenue = data?.totalRevenue ?? 0;
-  const pendingCourses = pendingPage?.content ?? [];
+  const { data: systemMetrics, refetch: refetchSystem } = useQuery({
+    queryKey: ['dashboard', 'system'],
+    queryFn: () => api.get<SystemMetrics>('/api/v1/dashboard/admin/system', { token: getAccessToken() ?? undefined }),
+    enabled,
+    refetchInterval: 10000, // Tự động làm mới mỗi 10 giây
+  });
+
+  const { data: pendingPage } = useModerationQueue({ status: 'PENDING', size: 5 });
+
+  const pendingCount = data?.pendingCourses ?? 0;
+  const dash = (n: number | undefined) => (n === undefined ? '—' : n.toLocaleString(locale));
 
   return (
     <>
-      <h1 className="m-0 font-display text-[22px] font-bold text-gray-900">Tổng quan hệ thống</h1>
-      
-      <div className="grid grid-cols-4 gap-3.5">
-        <div className="flex cursor-pointer flex-col gap-1.5 rounded-xl border border-gray-200 bg-white p-4 hover:border-gray-300 shadow-sm">
-          <span className="text-xs text-gray-500">Khóa học chờ duyệt</span>
-          <span className="font-display text-[24px] font-extrabold text-gray-900">{pendingCoursesCount}</span>
-        </div>
-        <div className="flex cursor-pointer flex-col gap-1.5 rounded-xl border border-gray-200 bg-white p-4 hover:border-gray-300 shadow-sm">
-          <span className="text-xs text-gray-500">Tổng người dùng</span>
-          <span className="font-display text-[24px] font-extrabold text-gray-900">{totalUsers}</span>
-        </div>
-        <div className="flex cursor-pointer flex-col gap-1.5 rounded-xl border border-gray-200 bg-white p-4 hover:border-gray-300 shadow-sm">
-          <span className="text-xs text-gray-500">Tổng khóa học</span>
-          <span className="font-display text-[24px] font-extrabold text-gray-900">{totalCourses}</span>
-        </div>
-        <div className="flex cursor-pointer flex-col gap-1.5 rounded-xl border border-gray-200 bg-white p-4 hover:border-gray-300 shadow-sm">
-          <span className="text-xs text-gray-500">Doanh thu tạm tính</span>
-          <span className="font-display text-[24px] font-extrabold text-gray-900">{totalRevenue.toLocaleString('vi-VN')}đ</span>
-        </div>
+      <PageHeader title={t('title')} subtitle={t('subtitle')} />
+
+      <div className="grid grid-cols-2 gap-3.5 lg:grid-cols-4">
+        <MetricCard label={t('kpi.pending')} value={dash(data?.pendingCourses)} tone={pendingCount > 0 ? 'warning' : 'default'} />
+        <MetricCard label={t('kpi.users')} value={dash(data?.totalUsers)} />
+        <MetricCard label={t('kpi.courses')} value={dash(data?.totalCourses)} />
+        <MetricCard label={t('kpi.revenue')} value={data ? formatMoney(data.totalRevenue, locale) : '—'} />
       </div>
-      
-      <div className="flex flex-col gap-2.5">
-        <span className="font-display text-[15px] font-bold text-gray-900">Khóa học chờ duyệt gần đây</span>
-        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-          {pendingCourses.length === 0 && (
-            <div className="p-6 text-center text-sm text-gray-500">Không có khóa học nào đang chờ duyệt.</div>
-          )}
-          {pendingCourses.map((course, idx) => (
-            <div key={course.id} className={`flex items-center gap-3 px-4 py-3 ${idx < pendingCourses.length - 1 ? 'border-b border-gray-100' : ''}`}>
-              <div
-                className="h-7 w-10 shrink-0 rounded-md bg-cover bg-center bg-[repeating-linear-gradient(135deg,#0E7490,#0E7490_8px,#0891B2_8px,#0891B2_16px)]"
-                style={course.thumbnailUrl ? { backgroundImage: `url(${course.thumbnailUrl})` } : undefined}
-              ></div>
-              <span className="flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-[13px] font-semibold text-gray-900">
-                {course.title}
-              </span>
-              <span className="text-[12.5px] text-gray-400">{course.categoryName}</span>
-              <Link
-                href={`/admin/moderation/${course.id}`}
-                className="cursor-pointer whitespace-nowrap text-[12px] font-bold text-cyan-600 no-underline hover:text-cyan-700"
-              >
-                Xem trước
-              </Link>
+
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <div className="flex flex-col gap-4 lg:col-span-2">
+          <PendingCourses courses={pendingPage?.content ?? []} total={pendingPage?.totalElements ?? pendingCount} />
+          <section aria-labelledby="quick-title">
+            <h2 id="quick-title" className="m-0 mb-2.5 font-display text-[15px] font-bold text-ink">
+              {t('quick.title')}
+            </h2>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {QUICK_LINKS.map(({ id, href, icon: Icon }) => (
+                <Link
+                  key={id}
+                  href={href}
+                  className="flex items-center gap-3 rounded-xl border border-line bg-surface-raised p-3.5 text-ink no-underline shadow-sm transition-colors hover:border-accent hover:text-ink"
+                >
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-tint text-accent-dark">
+                    <Icon size={18} aria-hidden />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block text-[13.5px] font-semibold">{tNav(id)}</span>
+                    <span className="block truncate text-xs text-ink-muted">{t(`quick.${id}`)}</span>
+                  </span>
+                </Link>
+              ))}
             </div>
-          ))}
+          </section>
         </div>
+        <SystemHealth metrics={systemMetrics} onRefresh={() => void refetchSystem()} />
       </div>
     </>
   );

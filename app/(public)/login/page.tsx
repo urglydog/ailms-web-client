@@ -1,22 +1,28 @@
-import { LoginForm } from '@/components/auth/LoginForm';
+'use client';
+
 import Link from 'next/link';
 import { Suspense } from 'react';
+import { useTranslations } from 'next-intl';
+import { AuthLayout } from '@/components/auth/AuthLayout';
+import { LoginForm } from '@/components/auth/LoginForm';
 
 export default function LoginPage() {
+  const t = useTranslations('auth.login');
   return (
-    <section className="shell flex min-h-[70vh] items-center justify-center py-16">
-      <div className="card w-full max-w-md p-8 border border-line bg-surface-raised rounded-2xl shadow-sm">
-        <h1 className="font-display text-2xl font-bold text-ink mb-6 text-center">Đăng nhập</h1>
-        <Suspense fallback={<div className="text-center text-sm text-ink-muted">Đang tải biểu mẫu...</div>}>
-          <LoginForm />
-        </Suspense>
-        <p className="mt-6 text-center text-sm text-ink-muted">
-          Chưa có tài khoản?{' '}
-          <Link href="/register" className="font-semibold text-accent no-underline hover:underline">
-            Đăng ký ngay
+    <AuthLayout
+      title={t('title')}
+      footer={
+        <>
+          {t('noAccount')}{' '}
+          <Link href="/register" className="font-semibold text-accent-dark no-underline hover:underline">
+            {t('signUpNow')}
           </Link>
-        </p>
-      </div>
-    </section>
+        </>
+      }
+    >
+      <Suspense fallback={<div className="text-center text-sm text-ink-muted">{t('loading')}</div>}>
+        <LoginForm />
+      </Suspense>
+    </AuthLayout>
   );
 }

@@ -4,6 +4,7 @@
 
 @layer base {
   html {
+    font-size: 14px;
     -webkit-text-size-adjust: 100%;
   }
 
@@ -11,12 +12,23 @@
     @apply bg-surface text-ink font-sans antialiased;
   }
 
+  /* Ghi màu trực tiếp thay vì `@apply text-accent`: @apply sẽ kéo cả quy tắc `.dark .text-accent`
+   * bên dưới vào thành `.dark a` (độ ưu tiên cao hơn `.text-white`), làm sai màu chữ trên nút. */
   a {
-    @apply text-accent no-underline;
+    color: rgb(var(--c-accent));
+    text-decoration: none;
   }
 
   a:hover {
-    @apply text-accent-dark underline;
+    color: rgb(var(--c-accent-dark));
+  }
+
+  :where(.dark) a {
+    color: rgb(var(--c-text-accent));
+  }
+
+  :where(.dark) a:hover {
+    color: rgb(var(--c-text-accent-dark));
   }
 
   /* Vòng focus nhìn thấy rõ — yêu cầu a11y, không được bỏ outline mà không thay thế */
@@ -31,47 +43,209 @@
     @apply mx-auto w-full max-w-shell px-6 md:px-8;
   }
 
-  /* Card cơ bản + hiệu ứng nhấc lên khi hover, khớp CourseCard của design */
+  /* Card cơ bản + hiệu ứng viền khi hover, giao diện phẳng chuẩn học thuật */
   .card {
-    @apply rounded-card border border-line bg-surface-raised shadow-card;
+    @apply rounded-lg border border-line bg-surface-raised;
   }
 
+  /* Thẻ tương tác: nâng 4px + bóng mềm khi hover (spec mục 9). Chỉ động transform/shadow/viền. */
   .card-interactive {
-    @apply card cursor-pointer transition-[transform,box-shadow] duration-200
-           hover:-translate-y-1 hover:shadow-card-hover;
+    @apply card cursor-pointer transition-[transform,box-shadow,border-color] duration-[250ms] ease-soft
+           hover:-translate-y-1 hover:border-accent hover:shadow-card-hover active:scale-[0.99];
   }
 
-  /* Nhãn dạng viên thuốc — dùng cho danh mục, ngôn ngữ, bộ lọc */
-  .pill {
-    @apply inline-flex items-center gap-1.5 rounded-full border border-line
-           bg-surface-raised px-3.5 py-2 text-sm font-medium text-ink-muted
+  /* Nút bấm: lún nhẹ 150ms khi nhấn (spec mục 9) */
+  .btn-tactile {
+    @apply transition-[transform,background-color,border-color,color] duration-150 ease-soft active:scale-[0.97];
+  }
+
+  /* Nhãn phân loại — dùng cho danh mục, ngôn ngữ, bộ lọc. Chuẩn Academic không dùng hình viên thuốc (pill) */
+  .badge {
+    @apply inline-flex items-center gap-1.5 rounded-md border border-line
+           bg-surface-raised px-3 py-1.5 text-xs font-semibold text-ink-muted
            transition-colors hover:border-accent hover:text-accent;
   }
 
-  .pill-active {
+  .badge-active {
     @apply border-accent bg-accent text-white hover:text-white;
   }
 
-  /* Ô skeleton khi đang tải */
+  /* Ô skeleton khi đang tải - tối giản, không chạy lấp lánh sến súa */
   .skeleton {
-    background: linear-gradient(90deg, #eef0f3 25%, #f7f8fa 50%, #eef0f3 75%);
-    background-size: 400px 100%;
-    @apply animate-skeleton-shine rounded;
+    @apply rounded-md bg-tint;
+    background-image: linear-gradient(
+      90deg,
+      rgb(var(--c-tint)) 25%,
+      rgb(var(--c-surface)) 50%,
+      rgb(var(--c-tint)) 75%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.2s linear infinite;
+  }
+
+  /* Xuất hiện lần lượt khi vào khung nhìn (hook `useReveal`): đặt `style={{ '--i': index }}`
+   * để so le 60ms mỗi phần tử. Ẩn từ đầu, hiện khi thêm lớp `is-in`. */
+  .reveal {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  .reveal.is-in {
+    animation: reveal-up 450ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    animation-delay: calc(var(--i, 0) * 60ms);
+  }
+
+  /* Vạch tiến độ của video demo ở trang chủ: đầy dần đúng bằng thời lượng một cảnh (3,8 giây). */
+  .demo-seg-fill {
+    transform-origin: left;
+    animation: demo-fill 3800ms linear forwards;
+  }
+
+  /* "Trở thành Giảng viên" — trang thành công cuối wizard onboarding (19/09/2026, tính năng
+   * mới): vòng tròn nảy vào rồi dấu tích "vẽ" theo sau, không dùng thư viện animation ngoài
+   * (dự án chưa cài `framer-motion`/`tailwindcss-animate`). */
+  .success-circle {
+    animation: success-circle-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+
+  .success-check {
+    stroke-dasharray: 48;
+    stroke-dashoffset: 48;
+    animation: success-check-draw 0.4s ease-out 0.35s forwards;
+  }
+
+  /* Banner "Bảng xếp hạng cộng đồng" ở trang chủ (05/10/2026) — trượt vào nhẹ khi trang vừa
+   * tải, thu hút chú ý mà không chạy lặp lại gây rối mắt. */
+  .ranking-banner-enter {
+    animation: ranking-banner-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  /* Mỗi hạng trong banner trượt vào LẦN LƯỢT (so le theo `--i`) chứ không cùng lúc — cảm giác
+   * "đếm thứ hạng" sống động hơn 1 khối phẳng xuất hiện 1 lượt. */
+  .ranking-item-enter {
+    animation: ranking-item-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: calc(var(--i, 0) * 80ms);
+  }
+
+  /* Hào quang vàng nhẹ quanh hạng #1 — CHỈ hạng 1 (01/10/2026), lặp vô hạn nhưng chậm/tinh tế,
+   * không chói như "AI vibe" cũ (xem docblock đầu tailwind.config.ts). */
+  .ranking-rank-1-glow {
+    animation: ranking-gold-pulse 2.4s ease-in-out infinite;
+  }
+}
+
+/* Chấm "đang trả lời" (components/ui/TypingDots.tsx): chỉ đổi độ mờ, không dịch chuyển */
+.typing-dot {
+  animation: typing-fade 1.1s ease-in-out infinite;
+}
+
+@keyframes typing-fade {
+  0%,
+  80%,
+  100% {
+    opacity: 0.25;
+  }
+  40% {
+    opacity: 1;
+  }
+}
+
+@keyframes demo-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes skeleton-shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes ranking-banner-in {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes ranking-item-in {
+  from {
+    transform: translateY(6px) scale(0.92);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes ranking-gold-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 5px rgba(245, 158, 11, 0.12);
+  }
+}
+
+@keyframes success-circle-pop {
+  from {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes success-check-draw {
+  to {
+    stroke-dashoffset: 0;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   /*
-   * Tôn trọng thiết lập giảm chuyển động của hệ điều hành.
-   * Riêng animation báo "AI đang xử lý" vẫn giữ vì nó truyền tải trạng thái
-   * chứ không phải trang trí — nhưng làm chậm lại đáng kể.
+   * Tôn trọng thiết lập giảm chuyển động của hệ điều hành — "nhẹ hơn chứ không phải bằng 0"
+   * (review-animations #8): bỏ chuyển động dịch chuyển/phóng to/lặp vô hạn, nhưng GIỮ đổi màu và
+   * mờ dần ngắn vì chúng giúp nhận ra trạng thái thay đổi. Chuyển động viết bằng motion/react
+   * được MotionConfig reducedMotion="user" (app/providers.tsx) tự xử lý theo cùng nguyên tắc.
+   * Riêng animation báo "AI đang xử lý" vẫn giữ vì nó truyền tải trạng thái — nhưng chậm lại.
    */
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+    transition-duration: 0.12s !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Hover/press không còn nhấc hoặc phóng to */
+  .card-interactive:hover,
+  .card-interactive:active,
+  .btn-tactile:active {
+    transform: none !important;
   }
 
   .animate-ai-pulse,
@@ -79,4 +253,80 @@
     animation-duration: 3s !important;
     animation-iteration-count: infinite !important;
   }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ───────── Chế độ tối (lớp `dark` trên <html>, xem components/theme/ThemeToggle.tsx) ─────────
+ * Biến màu của từng chế độ sinh từ lib/theme/colors.ts (lib/theme/cssVars.ts) — ở đây KHÔNG ghi mã hex.
+ * 1) accent/success/danger/warning là màu NỀN nút (chữ trắng đạt AA) nên giữ độ đậm; khi dùng làm CHỮ
+ *    trên nền tối thì đổi sang bản sáng (--c-text-*) để vẫn đạt AA.
+ * 2) Lớp phủ và khối "nền tối" (bg-ink, bg-ink/50…) luôn tối ở cả hai chế độ.
+ * 3) Nền vàng (highlight) / cam (warning) luôn đi với chữ tối.
+ * (08/11/2026) Đã gỡ lớp ánh xạ màu cứng (bg-white, text-gray-*…) — mã nguồn dùng token thật.
+ * Riêng chứng chỉ in (CertificatePreview) cố ý giữ nền trắng ở cả hai chế độ. */
+.dark .text-accent,
+.dark .hover\:text-accent:hover,
+.dark .group:hover .group-hover\:text-accent,
+.dark .focus\:text-accent:focus {
+  color: rgb(var(--c-text-accent));
+}
+.dark .text-accent-dark,
+.dark .hover\:text-accent-dark:hover,
+.dark .group:hover .group-hover\:text-accent-dark,
+.dark .focus\:text-accent-dark:focus {
+  color: rgb(var(--c-text-accent-dark));
+}
+.dark .text-success,
+.dark .hover\:text-success:hover,
+.dark .group:hover .group-hover\:text-success,
+.dark .focus\:text-success:focus {
+  color: rgb(var(--c-text-success));
+}
+.dark .text-danger,
+.dark .hover\:text-danger:hover,
+.dark .group:hover .group-hover\:text-danger,
+.dark .focus\:text-danger:focus {
+  color: rgb(var(--c-text-danger));
+}
+.dark .text-warning,
+.dark .hover\:text-warning:hover,
+.dark .group:hover .group-hover\:text-warning,
+.dark .focus\:text-warning:focus {
+  color: rgb(var(--c-text-warning));
+}
+.dark .bg-ink,
+.dark .bg-ink\/40,
+.dark .bg-ink\/50,
+.dark .bg-ink\/60,
+.dark .bg-ink\/70,
+.dark .bg-ink\/80,
+.dark .bg-ink\/90,
+.dark .bg-ink\/95 {
+  --tw-bg-opacity: 1;
+}
+.dark .bg-ink { background-color: rgb(var(--c-night) / 1); }
+.dark .bg-ink\/40 { background-color: rgb(var(--c-night) / 0.40); }
+.dark .bg-ink\/50 { background-color: rgb(var(--c-night) / 0.50); }
+.dark .bg-ink\/60 { background-color: rgb(var(--c-night) / 0.60); }
+.dark .bg-ink\/70 { background-color: rgb(var(--c-night) / 0.70); }
+.dark .bg-ink\/80 { background-color: rgb(var(--c-night) / 0.80); }
+.dark .bg-ink\/90 { background-color: rgb(var(--c-night) / 0.90); }
+.dark .bg-ink\/95 { background-color: rgb(var(--c-night) / 0.95); }
+.dark .bg-highlight,
+.dark .bg-warning,
+.dark .bg-star {
+  --c-ink: var(--c-night);
+}
+/* Ảnh, video giữ nguyên; bóng đổ đậm hơn một chút trên nền tối */
+.dark .shadow-card-hover,
+.dark .hover\:shadow-card-hover:hover {
+  box-shadow: 0 10px 24px rgb(0 0 0 / 0.45);
+}
+.dark .badge-active,
+.dark .badge-active:hover {
+  color: rgb(var(--c-white));
 }

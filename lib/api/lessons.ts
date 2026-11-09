@@ -57,6 +57,11 @@ export const lessonsApi = {
       onProgress,
     }),
 
+  /** "+ Tài nguyên" > "Dán link" (15/09/2026, mở rộng — giao diện tham khảo Udemy) — khác upload
+   * file thật, chỉ lưu lại đường dẫn ngoài. */
+  addDocumentLink: (lessonId: number, input: { title: string; url: string }) =>
+    api.post<LessonDocumentItem>(`/api/v1/lessons/${lessonId}/documents/link`, input, { token: authToken() }),
+
   deleteDocument: (documentId: number) =>
     api.delete<void>(`/api/v1/lesson-documents/${documentId}`, { token: authToken() }),
 };
