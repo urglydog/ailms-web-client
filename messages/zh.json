@@ -713,6 +713,7 @@
       "bundles": "课程组合",
       "communication": "沟通",
       "revenue": "数据表现",
+      "earnings": "Earnings",
       "tools": "工具",
       "aria": "讲师频道导航"
     },
@@ -1379,6 +1380,7 @@
       "announcements": "系统公告",
       "settings": "系统设置",
       "disputes": "Payment disputes",
+      "payouts": "Instructor payouts",
       "support": "Support requests"
     },
     "shell": {

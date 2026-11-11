@@ -713,6 +713,7 @@
       "bundles": "Course bundles",
       "communication": "Communication",
       "revenue": "Performance",
+      "earnings": "Earnings",
       "tools": "Tools",
       "aria": "Instructor channel navigation"
     },
@@ -1376,6 +1377,7 @@
       "tutorsecurity": "AI Tutor security",
       "transactions": "Payment reconciliation",
       "disputes": "Payment disputes",
+      "payouts": "Instructor payouts",
       "coupons": "Coupons",
       "announcements": "System announcements",
       "settings": "System settings",

@@ -713,6 +713,7 @@
       "bundles": "Gói khóa học",
       "communication": "Giao tiếp",
       "revenue": "Hiệu suất",
+      "earnings": "Thu nhập",
       "tools": "Công cụ",
       "aria": "Điều hướng kênh giảng viên"
     },
@@ -1376,6 +1377,7 @@
       "tutorsecurity": "Bảo mật AI Tutor",
       "transactions": "Đối soát giao dịch",
       "disputes": "Khiếu nại giao dịch",
+      "payouts": "Chi trả giảng viên",
       "coupons": "Mã giảm giá",
       "announcements": "Thông báo hệ thống",
       "settings": "Cấu hình hệ thống",

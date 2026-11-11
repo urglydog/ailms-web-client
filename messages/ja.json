@@ -713,6 +713,7 @@
       "bundles": "講座セット",
       "communication": "コミュニケーション",
       "revenue": "パフォーマンス",
+      "earnings": "Earnings",
       "tools": "ツール",
       "aria": "講師チャンネルのナビゲーション"
     },
@@ -1379,6 +1380,7 @@
       "announcements": "システムのお知らせ",
       "settings": "システム設定",
       "disputes": "Payment disputes",
+      "payouts": "Instructor payouts",
       "support": "Support requests"
     },
     "shell": {
