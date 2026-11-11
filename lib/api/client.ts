@@ -169,7 +169,12 @@ async function fetchWithRefresh(
             processQueue(new Error('Refresh failed'));
             localStorage.removeItem('accessToken');
             localStorage.removeItem('refreshToken');
-            redirectToLoginWithReason(reason);
+            // Trang công khai (xem khóa học qua link/QR chia sẻ) KHÔNG cần đăng nhập: token cũ còn sót
+            // trên thiết bị (vd điện thoại) chỉ cần dọn đi, không được đẩy khách về /login kèm
+            // "refresh token hết hạn".
+            const p = window.location.pathname;
+            const isPublicPage = p === '/' || p.startsWith('/courses') || p.startsWith('/legal');
+            if (!isPublicPage) redirectToLoginWithReason(reason);
           }
         } catch (err) {
           // Lỗi MẠNG khi refresh (vd "Failed to fetch" lúc BE đang khởi động lại / mất mạng thoáng
