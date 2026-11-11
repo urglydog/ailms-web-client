@@ -33,6 +33,15 @@ export interface AdminPayment {
   couponCode: string | null;
   /** Chia doanh thu 2 mức (20/09/2026) — quyết định tỷ lệ ĐÃ áp dụng cho platformFee/instructorEarning ở trên. */
   revenueSource: 'ORGANIC' | 'INSTRUCTOR_REFERRAL';
+  /** Tỷ lệ phần nền tảng THỰC TẾ đã áp dụng (0–1, chốt lúc PAID) — null với đơn chưa PAID/0đ (11/11/2026). */
+  platformRate?: number | null;
+}
+
+/** % phần nền tảng của 1 đơn: ưu tiên tỷ lệ đã chốt trong DB (tỷ lệ là cấu hình admin nên đổi được),
+ * chỉ dùng giá trị mặc định cũ khi đơn chưa có `platformRate`. */
+function platformPercent(p: AdminPayment): number {
+  if (p.platformRate != null) return Math.round(p.platformRate * 10000) / 100;
+  return p.revenueSource === 'INSTRUCTOR_REFERRAL' ? 3 : 63;
 }
 
 type SortField = 'txnRef' | 'userEmail' | 'amount' | 'paymentMethod' | 'paidAt';
@@ -288,10 +297,10 @@ export default function AdminPaymentsPage() {
                     {selectedPayment.revenueSource === 'INSTRUCTOR_REFERRAL' ? t('detail.sourceReferral') : t('detail.sourceOrganic')}
                   </span>
                 </Detail>
-                <Detail label={t('detail.fee', { percent: selectedPayment.revenueSource === 'INSTRUCTOR_REFERRAL' ? 3 : 63 })}>
+                <Detail label={t('detail.fee', { percent: platformPercent(selectedPayment) })}>
                   <span className="font-semibold">{selectedPayment.platformFee ? money(selectedPayment.platformFee) : '-'}</span>
                 </Detail>
-                <Detail label={t('detail.earning', { percent: selectedPayment.revenueSource === 'INSTRUCTOR_REFERRAL' ? 97 : 37 })}>
+                <Detail label={t('detail.earning', { percent: Math.round((100 - platformPercent(selectedPayment)) * 100) / 100 })}>
                   <span className="font-semibold text-success-ink">{selectedPayment.instructorEarning ? money(selectedPayment.instructorEarning) : '-'}</span>
                 </Detail>
                 {selectedPayment.couponCode && (

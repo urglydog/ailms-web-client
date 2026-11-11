@@ -40,6 +40,19 @@ const QUOTA_KEY_TO_ID: Record<string, string> = {
   QUOTA_GUEST_SEARCH: 'guestSearch',
 };
 
+/** Cấu hình tài chính (11/11/2026) — khóa seed ở migration V156. `text` = danh sách phân cách dấu phẩy. */
+const FINANCE_FIELDS: Record<string, { type: 'number' | 'text'; unit?: string; min?: number; max?: number; width: string }> = {
+  REVENUE_ORGANIC_INSTRUCTOR_PCT: { type: 'number', unit: '%', min: 0, max: 100, width: 'w-24' },
+  REVENUE_REFERRAL_INSTRUCTOR_PCT: { type: 'number', unit: '%', min: 0, max: 100, width: 'w-24' },
+  REFUND_WINDOW_DAYS: { type: 'number', min: 0, max: 90, width: 'w-24' },
+  REFUND_MAX_PROGRESS_PCT: { type: 'number', unit: '%', min: 0, max: 100, width: 'w-24' },
+  REFUND_HOLIDAYS: { type: 'text', width: 'w-64' },
+  PAYOUT_HOLD_EXTRA_DAYS: { type: 'number', min: 0, max: 60, width: 'w-24' },
+  PAYOUT_MIN_AMOUNT: { type: 'number', unit: 'VND', min: 0, max: 100000000, width: 'w-32' },
+  PAYOUT_DAYS_OF_MONTH: { type: 'text', width: 'w-32' },
+  DISPUTE_INSTRUCTOR_RESPONSE_HOURS: { type: 'number', min: 1, max: 720, width: 'w-24' },
+};
+
 const ENVIRONMENT = [
   { key: 'Service', val: 'Spring Boot 3 + Next.js 15' },
   { key: 'Database', val: 'MySQL 8.0' },
@@ -117,6 +130,27 @@ export default function AdminSettingsPage() {
 
   const values = draft ?? Object.fromEntries((quotas ?? []).map((q) => [q.key, q.value]));
   const isDirty = draft !== null;
+  const financeItems = (quotas ?? []).filter((item) => item.key in FINANCE_FIELDS);
+  const quotaItems = (quotas ?? []).filter((item) => !(item.key in FINANCE_FIELDS));
+  const saveBar = isDirty ? (
+    <div className="flex gap-2">
+      <button
+        type="button"
+        onClick={() => setDraft(null)}
+        className="rounded-lg border border-line bg-surface-raised px-3 py-1.5 text-xs font-semibold text-ink hover:bg-tint"
+      >
+        {t('quotas.cancel')}
+      </button>
+      <button
+        type="button"
+        disabled={saveQuotas.isPending}
+        onClick={() => draft && saveQuotas.mutate(draft)}
+        className="rounded-lg bg-accent px-3 py-1.5 text-xs font-semibold text-white hover:bg-accent-dark disabled:opacity-50"
+      >
+        {saveQuotas.isPending ? t('quotas.saving') : t('quotas.save')}
+      </button>
+    </div>
+  ) : null;
 
   const { data: systemMetrics } = useQuery({
     queryKey: ['settings', 'system'],
@@ -157,29 +191,11 @@ export default function AdminSettingsPage() {
 
           <div className="mt-2 flex items-center justify-between gap-2">
             <h2 className="m-0 font-display text-[15px] font-bold text-ink">{t('quotas.title')}</h2>
-            {isDirty && (
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => setDraft(null)}
-                  className="rounded-lg border border-line bg-surface-raised px-3 py-1.5 text-xs font-semibold text-ink hover:bg-tint"
-                >
-                  {t('quotas.cancel')}
-                </button>
-                <button
-                  type="button"
-                  disabled={saveQuotas.isPending}
-                  onClick={() => draft && saveQuotas.mutate(draft)}
-                  className="rounded-lg bg-accent px-3 py-1.5 text-xs font-semibold text-white hover:bg-accent-dark disabled:opacity-50"
-                >
-                  {saveQuotas.isPending ? t('quotas.saving') : t('quotas.save')}
-                </button>
-              </div>
-            )}
+            {saveBar}
           </div>
           <div className="overflow-hidden rounded-xl border border-line bg-surface-raised shadow-sm">
             {quotasLoading && <div className="px-5 py-4 text-sm text-ink-muted">{t('quotas.loading')}</div>}
-            {(quotas ?? []).map((item) => {
+            {quotaItems.map((item) => {
               const id = QUOTA_KEY_TO_ID[item.key] ?? item.key;
               return (
                 <div key={item.key} className="flex flex-wrap items-center justify-between gap-2 border-b border-line-soft px-5 py-3.5 last:border-0">
@@ -198,6 +214,42 @@ export default function AdminSettingsPage() {
               );
             })}
           </div>
+
+          {financeItems.length > 0 && (
+            <>
+              <div className="mt-2 flex items-center justify-between gap-2">
+                <h2 className="m-0 font-display text-[15px] font-bold text-ink">{t('finance.title')}</h2>
+                {saveBar}
+              </div>
+              <p className="m-0 text-xs text-ink-muted">{t('finance.hint')}</p>
+              <div className="overflow-hidden rounded-xl border border-line bg-surface-raised shadow-sm">
+                {financeItems.map((item) => {
+                  const field = FINANCE_FIELDS[item.key];
+                  if (!field) return null;
+                  return (
+                    <div key={item.key} className="flex flex-wrap items-center justify-between gap-2 border-b border-line-soft px-5 py-3.5 last:border-0">
+                      <div className="flex min-w-0 flex-col gap-0.5">
+                        <span className="text-[13px] text-ink">{t(`finance.fields.${item.key}`)}</span>
+                        <span className="w-fit rounded bg-surface px-1.5 py-0.5 font-mono text-[10px] text-ink-muted">{item.key}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <input
+                          type={field.type}
+                          min={field.min}
+                          max={field.max}
+                          aria-label={t(`finance.fields.${item.key}`)}
+                          value={values[item.key] ?? ''}
+                          onChange={(e) => setDraft({ ...values, [item.key]: e.target.value })}
+                          className={`${field.width} rounded border border-line bg-surface px-2.5 py-1 text-right font-mono text-[12.5px] text-ink outline-none focus:border-accent`}
+                        />
+                        {field.unit && <span className="text-xs text-ink-muted">{field.unit}</span>}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </>
+          )}
         </div>
 
         <div className="flex flex-col gap-2.5">

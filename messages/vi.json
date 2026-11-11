@@ -1866,6 +1866,21 @@
         "saved": "Đã lưu cấu hình.",
         "saveError": "Không lưu được cấu hình."
       },
+      "finance": {
+        "title": "Tài chính",
+        "hint": "Tỷ lệ chia sẻ chỉ áp dụng cho đơn thanh toán thành công SAU khi lưu; đơn cũ giữ nguyên. Danh sách ngày dùng dấu phẩy.",
+        "fields": {
+          "REVENUE_ORGANIC_INSTRUCTOR_PCT": "Giảng viên nhận khi học viên tự tìm thấy khóa (organic)",
+          "REVENUE_REFERRAL_INSTRUCTOR_PCT": "Giảng viên nhận khi mua qua liên kết giới thiệu",
+          "REFUND_WINDOW_DAYS": "Hạn hoàn tiền (ngày)",
+          "REFUND_MAX_PROGRESS_PCT": "Tiến độ học tối đa để được hoàn tiền",
+          "REFUND_HOLIDAYS": "Ngày lễ gia hạn hạn hoàn tiền (YYYY-MM-DD, cách nhau dấu phẩy)",
+          "PAYOUT_HOLD_EXTRA_DAYS": "Giữ tiền thêm sau hạn hoàn (ngày)",
+          "PAYOUT_MIN_AMOUNT": "Số tiền rút tối thiểu",
+          "PAYOUT_DAYS_OF_MONTH": "Ngày chi trả trong tháng (1–28, cách nhau dấu phẩy)",
+          "DISPUTE_INSTRUCTOR_RESPONSE_HOURS": "Thời gian giảng viên phản hồi khiếu nại (giờ)"
+        }
+      },
       "resources": {
         "title": "Tài nguyên Backend",
         "ram": "RAM JVM",
