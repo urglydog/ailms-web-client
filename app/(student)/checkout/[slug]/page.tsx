@@ -19,6 +19,7 @@ import { couponsApi } from '@/lib/api/coupons';
 import { ApiError } from '@/lib/api/client';
 import { paymentsApi } from '@/lib/api/payments';
 import { rememberPayosReturn, takePayosCancelledNotice } from '@/lib/payosReturn';
+import { useRequireLogin } from '@/hooks/useRequireLogin';
 import { getReferralCode } from '@/lib/referral';
 import type { AvailableCoupon, CourseDetail } from '@/types/domain';
 
@@ -37,6 +38,7 @@ function CheckoutPageContent() {
   const params = useParams();
   const searchParams = useSearchParams();
   const courseSlug = decodeURIComponent(params.slug as string);
+  useRequireLogin();
 
   const [course, setCourse] = useState<CourseDetail | null>(null);
   const [loading, setLoading] = useState(true);
