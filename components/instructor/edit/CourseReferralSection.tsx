@@ -38,7 +38,7 @@ export function CourseReferralSection({ course }: { course: CourseEditDetail }) 
       <h3 className="m-0 text-[14px] font-bold text-ink">Liên kết giới thiệu</h3>
       <p className="text-[12px] text-ink-muted">
         Chia sẻ đúng liên kết này trên kênh của bạn (Facebook, YouTube...) — học viên mua qua
-        đây, bạn hưởng <span className="font-bold text-ink">{referralPct}</span> doanh thu thay vì
+        đây, bạn hưởng <span className="font-bold text-ink">{referralPct}</span> doanh thu thay vì{' '}
         {organicPct} khi học viên tự tìm thấy khóa học qua tìm kiếm trên nền tảng.
       </p>
 
