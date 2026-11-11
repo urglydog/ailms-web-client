@@ -14,7 +14,7 @@ export type CourseStatus = 'DRAFT' | 'PENDING' | 'PUBLISHED' | 'REJECTED' | 'ARC
 
 /** "Đăng ký (Quyền riêng tư)" kiểu Udemy (19/09/2026). */
 export type CourseVisibility = 'PUBLIC' | 'PRIVATE_INVITE' | 'PRIVATE_PASSWORD';
-export type PaymentStatus = 'PENDING' | 'PAID' | 'FAILED' | 'EXPIRED';
+export type PaymentStatus = 'PENDING' | 'PAID' | 'FAILED' | 'EXPIRED' | 'REFUNDED';
 export type JobStatus = 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED' | 'SKIPPED' | 'CANCELLED';
 /** PARTIAL = đã có chunk phát được nhưng chưa ghép final.mp3 (BR-CHUNK-05) */
 export type TrackStatus = 'PROCESSING' | 'PARTIAL' | 'COMPLETED' | 'FAILED';
@@ -773,12 +773,24 @@ export interface AdminUserDetail {
  * RESOLVED_REFUNDED. */
 export type DisputeStatus = 'OPEN' | 'RESOLVED_REFUNDED' | 'RESOLVED_REJECTED' | 'REOPENED';
 
+/** Lý do chuẩn hóa của khiếu nại (11/11/2026). Client cũ không gửi → BE hiểu là OTHER. */
+export type DisputeCategory =
+  | 'CHANGED_MIND' | 'CONTENT_MISMATCH' | 'TECHNICAL_ERROR' | 'DOUBLE_CHARGE' | 'NOT_ENROLLED' | 'OTHER';
+/** Tính lúc gửi: trong hạn + tiến độ ≤ ngưỡng → AUTO_ELIGIBLE; lỗi kỹ thuật → EXCEPTION. Admin vẫn quyết định cuối. */
+export type DisputeEligibility = 'AUTO_ELIGIBLE' | 'OUT_OF_POLICY' | 'EXCEPTION';
+export type InstructorDecision = 'AGREE_REFUND' | 'OBJECT' | 'NO_RESPONSE';
+/** STANDARD: giảng viên trả lại đúng phần đã nhận · PLATFORM_COMPENSATES: nền tảng gánh hết · INSTRUCTOR_FAULT: giảng viên trả toàn bộ. */
+export type RefundResponsibility = 'STANDARD' | 'PLATFORM_COMPENSATES' | 'INSTRUCTOR_FAULT';
+export type RefundTransferStatus = 'PENDING_TRANSFER' | 'TRANSFERRED';
+export type AttachmentSide = 'STUDENT' | 'INSTRUCTOR';
+
 export interface FileDisputeReq {
   paymentTxnRef: string;
   reason: string;
   description?: string;
   refundBankAccount?: string;
   termsAccepted: boolean;
+  category?: DisputeCategory;
 }
 
 export interface DisputeAttachment {
@@ -786,6 +798,7 @@ export interface DisputeAttachment {
   fileUrl: string;
   /** jpg / png / webp / mp4 / webm */
   fileType: string;
+  side?: AttachmentSide;
 }
 
 export interface DisputeRes {
@@ -802,6 +815,15 @@ export interface DisputeRes {
   resolvedAt: string | null;
   /** != null nghĩa là đã dùng hết lượt mở lại (tối đa 1 lần). */
   reopenedAt: string | null;
+  /** Lời nhắn/lý do của admin — học viên thấy được vì sao khiếu nại bị từ chối (11/11/2026). */
+  adminNote?: string | null;
+  category?: DisputeCategory | null;
+  eligibility?: DisputeEligibility | null;
+  instructorDecision?: InstructorDecision | null;
+  /** null = chưa duyệt hoàn tiền; PENDING_TRANSFER = đã duyệt, chờ chuyển khoản; TRANSFERRED = đã chuyển. */
+  refundTransferStatus?: RefundTransferStatus | null;
+  /** Hạn cuối được xin hoàn tiền của giao dịch. */
+  refundDeadline?: string | null;
 }
 
 export interface DisputeAdminRes extends DisputeRes {
@@ -811,11 +833,61 @@ export interface DisputeAdminRes extends DisputeRes {
   reopenReason: string | null;
   /** Note của lần resolve đầu, snapshot trước khi bị ghi đè bởi lần resolve sau reopen. */
   previousAdminNote: string | null;
+  progressPctAtFiling?: number | null;
+  instructorResponse?: string | null;
+  instructorRespondedAt?: string | null;
+  instructorDeadlineAt?: string | null;
+  /** Phần giảng viên/nền tảng ĐÃ nhận của giao dịch — để xem trước số tiền khi chọn chế độ trách nhiệm. */
+  instructorEarning?: number | null;
+  platformFee?: number | null;
+  paidAt?: string | null;
+  refundResponsibility?: RefundResponsibility | null;
+  refundInstructorCharge?: number | null;
+  refundPlatformShare?: number | null;
+  refundTransferRef?: string | null;
 }
 
 export interface ResolveDisputeReq {
   status: 'RESOLVED_REFUNDED' | 'RESOLVED_REJECTED';
   note: string;
+  responsibility?: RefundResponsibility;
+}
+
+export interface MarkTransferredReq {
+  transferRef: string;
+}
+
+/** Giảng viên xem khiếu nại thuộc khóa của mình — KHÔNG có email/SĐT/STK ngân hàng của học viên. */
+export interface InstructorDisputeRes {
+  id: number;
+  paymentTxnRef: string;
+  courseId: number;
+  courseTitle: string;
+  learnerName: string;
+  amount: number;
+  instructorEarning: number | null;
+  paidAt: string | null;
+  reason: string;
+  description: string | null;
+  category: DisputeCategory | null;
+  eligibility: DisputeEligibility | null;
+  progressPctAtFiling: number | null;
+  status: DisputeStatus;
+  createdAt: string;
+  studentAttachments: DisputeAttachment[];
+  instructorAttachments: DisputeAttachment[];
+  instructorDecision: InstructorDecision | null;
+  instructorResponse: string | null;
+  instructorRespondedAt: string | null;
+  instructorDeadlineAt: string | null;
+  resolvedAt: string | null;
+  /** Số tiền bị trừ khỏi thu nhập của giảng viên nếu đã hoàn tiền. */
+  instructorCharge: number | null;
+}
+
+export interface InstructorRespondReq {
+  decision: 'AGREE_REFUND' | 'OBJECT';
+  response: string;
 }
 
 /** User báo "chưa nhận được tiền" sau khi admin đã đánh dấu hoàn tiền (26/10/2026). */

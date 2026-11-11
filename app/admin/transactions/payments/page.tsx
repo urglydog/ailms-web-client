@@ -46,7 +46,7 @@ function platformPercent(p: AdminPayment): number {
 
 type SortField = 'txnRef' | 'userEmail' | 'amount' | 'paymentMethod' | 'paidAt';
 
-const STATUSES = ['PAID', 'PENDING', 'FAILED', 'EXPIRED'] as const;
+const STATUSES = ['PAID', 'PENDING', 'FAILED', 'EXPIRED', 'REFUNDED'] as const;
 const STATUS_CLASS: Record<string, string> = {
   PAID: 'bg-success-tint text-success-ink border-success/30',
   PENDING: 'bg-surface-raised text-ink border-warning',

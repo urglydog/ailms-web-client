@@ -909,9 +909,78 @@
         "lowRating": "Có đánh giá {rating}★ mới từ {student} ở khóa \"{course}\", nên phản hồi sớm."
       }
     },
+    "refunds": {
+      "title": "Yêu cầu hoàn tiền",
+      "subtitle": "Học viên gửi yêu cầu hoàn tiền/khiếu nại cho khóa học của bạn. Bạn có thể phản hồi kèm minh chứng; quản trị viên quyết định cuối cùng.",
+      "loadError": "Không tải được danh sách yêu cầu.",
+      "empty": "Chưa có yêu cầu hoàn tiền nào cho khóa học của bạn.",
+      "filters": {
+        "status": "Trạng thái",
+        "all": "Tất cả"
+      },
+      "status": {
+        "OPEN": "Chờ xử lý",
+        "REOPENED": "Mở lại",
+        "RESOLVED_REFUNDED": "Đã hoàn tiền",
+        "RESOLVED_REJECTED": "Đã từ chối"
+      },
+      "needsResponse": "Cần phản hồi",
+      "pendingBadge": "{count} yêu cầu cần phản hồi",
+      "deadline": "Hạn phản hồi: {time}",
+      "hoursLeft": "còn {count} giờ",
+      "overdue": "đã quá hạn (vẫn gửi được nếu quản trị viên chưa quyết định)",
+      "courseLabel": "Khóa học",
+      "learner": "Học viên",
+      "paidAt": "Thanh toán lúc",
+      "amount": "Số tiền học viên đã trả",
+      "yourEarning": "Thu nhập của bạn từ đơn này",
+      "category": {
+        "CHANGED_MIND": "Đổi ý / không phù hợp",
+        "CONTENT_MISMATCH": "Nội dung khác mô tả",
+        "TECHNICAL_ERROR": "Lỗi kỹ thuật",
+        "DOUBLE_CHARGE": "Trừ tiền hai lần",
+        "NOT_ENROLLED": "Trừ tiền nhưng không ghi danh",
+        "OTHER": "Lý do khác"
+      },
+      "eligibility": {
+        "AUTO_ELIGIBLE": "Đủ điều kiện theo chính sách",
+        "OUT_OF_POLICY": "Ngoài chính sách",
+        "EXCEPTION": "Lỗi kỹ thuật (xét riêng)"
+      },
+      "progress": "Đã học {percent}% khóa",
+      "detail": {
+        "title": "Chi tiết yêu cầu hoàn tiền",
+        "reason": "Lý do học viên nêu",
+        "attachments": "Minh chứng của học viên",
+        "viewVideo": "Xem video"
+      },
+      "result": {
+        "refunded": "Đã hoàn tiền cho học viên. Thu nhập của bạn bị trừ {charge}.",
+        "refundedNoCharge": "Đã hoàn tiền cho học viên. Thu nhập của bạn không bị trừ.",
+        "rejected": "Yêu cầu bị từ chối. Thu nhập của bạn không bị ảnh hưởng."
+      },
+      "response": {
+        "title": "Phản hồi của bạn",
+        "agree": "Đồng ý hoàn tiền",
+        "object": "Phản đối",
+        "agreeHint": "Bạn thấy yêu cầu hợp lý. Quản trị viên vẫn quyết định cuối cùng.",
+        "objectHint": "Bạn không đồng ý; hãy nêu lý do và đính kèm minh chứng nếu có.",
+        "text": "Nội dung phản hồi",
+        "textPh": "VD: Học viên đã học hết chương 3, nội dung khớp với mô tả khóa học...",
+        "files": "Minh chứng (ảnh/video, tối đa {max} file)",
+        "tooMany": "Chỉ được đính kèm tối đa {max} file.",
+        "submit": "Gửi phản hồi",
+        "submitting": "Đang gửi...",
+        "sent": "Đã gửi phản hồi.",
+        "error": "Không gửi được phản hồi.",
+        "noResponse": "Khiếu nại này đã được xử lý, không thể phản hồi nữa."
+      },
+      "note": "Quản trị viên sẽ xem phản hồi của bạn rồi quyết định cuối cùng. Phản hồi chỉ gửi được một lần."
+    },
     "communication": {
       "tabsAria": "Các mục giao tiếp",
       "tabs": {
+        "refunds": "Hoàn tiền",
         "qa": "Hỏi đáp",
         "messages": "Tin nhắn",
         "assignments": "Bài tập",
@@ -1729,7 +1798,8 @@
         "PAID": "Thành công",
         "PENDING": "Đang chờ xử lý",
         "FAILED": "Thất bại",
-        "EXPIRED": "Hết hạn"
+        "EXPIRED": "Hết hạn",
+        "REFUNDED": "Đã hoàn tiền"
       },
       "source": {
         "referral": "Giới thiệu",
@@ -1788,6 +1858,63 @@
       }
     },
     "disputes": {
+      "v2": {
+        "category": {
+          "CHANGED_MIND": "Đổi ý / không phù hợp",
+          "CONTENT_MISMATCH": "Nội dung khác mô tả",
+          "TECHNICAL_ERROR": "Lỗi kỹ thuật",
+          "DOUBLE_CHARGE": "Trừ tiền hai lần",
+          "NOT_ENROLLED": "Trừ tiền nhưng không ghi danh",
+          "OTHER": "Lý do khác"
+        },
+        "eligibility": {
+          "AUTO_ELIGIBLE": "Đủ điều kiện theo chính sách",
+          "OUT_OF_POLICY": "Ngoài chính sách",
+          "EXCEPTION": "Lỗi kỹ thuật (xét riêng)"
+        },
+        "progress": "Đã học {percent}% khóa",
+        "studentFiles": "Học viên đính kèm {count} minh chứng",
+        "decision": {
+          "AGREE_REFUND": "Giảng viên đồng ý hoàn",
+          "OBJECT": "Giảng viên phản đối",
+          "NO_RESPONSE": "Giảng viên không phản hồi"
+        },
+        "instructor": {
+          "title": "Phản hồi của giảng viên",
+          "waiting": "Chưa phản hồi",
+          "deadline": "Hạn phản hồi: {time}",
+          "none": "Không có hạn phản hồi (khiếu nại cũ)",
+          "respondedAt": "Phản hồi lúc {time}",
+          "file": "Minh chứng ({type})"
+        },
+        "responsibility": {
+          "title": "Ai chịu trách nhiệm khi hoàn tiền",
+          "STANDARD": {
+            "label": "Chuẩn — giảng viên trả lại đúng phần đã nhận",
+            "hint": "Đổi ý trong hạn, lỗi hệ thống, thanh toán trùng, không được ghi danh."
+          },
+          "PLATFORM_COMPENSATES": {
+            "label": "Nền tảng gánh hết",
+            "hint": "Học viên đã dùng được khóa nhưng lỗi do nền tảng; giảng viên giữ thu nhập."
+          },
+          "INSTRUCTOR_FAULT": {
+            "label": "Giảng viên chịu toàn bộ",
+            "hint": "Mô tả sai nghiêm trọng hoặc vi phạm chính sách. Bắt buộc ghi lý do ở ô ghi chú."
+          },
+          "preview": "Học viên nhận lại {learner} · Giảng viên bị trừ {instructor} · Nền tảng gánh {platform}"
+        },
+        "refund": {
+          "title": "Hoàn tiền đã duyệt",
+          "summary": "Chế độ: {mode}. Giảng viên bị trừ {instructor}, nền tảng gánh {platform}.",
+          "pending": "Đã thu hồi quyền học. Hãy chuyển khoản cho học viên rồi nhập mã giao dịch để hệ thống báo cho họ.",
+          "refPh": "Mã giao dịch chuyển khoản",
+          "markTransferred": "Đã chuyển khoản",
+          "transferred": "Đã chuyển tiền hoàn — mã {ref}"
+        },
+        "refundApproved": "Đã duyệt hoàn tiền: quyền học bị thu hồi, thu nhập giảng viên được điều chỉnh.",
+        "rejected": "Đã từ chối khiếu nại.",
+        "transferSaved": "Đã ghi nhận chuyển khoản và báo cho học viên."
+      },
       "title": "Khiếu nại giao dịch",
       "subtitle": "Khiếu nại/yêu cầu hoàn tiền do học viên, giảng viên gửi lên.",
       "loadError": "Không tải được danh sách khiếu nại.",

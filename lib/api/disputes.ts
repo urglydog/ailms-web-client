@@ -5,6 +5,9 @@ import type {
   DisputeRes,
   DisputeStatus,
   FileDisputeReq,
+  InstructorDisputeRes,
+  InstructorRespondReq,
+  MarkTransferredReq,
   ReopenDisputeReq,
   ResolveDisputeReq,
 } from '@/types/domain';
@@ -34,4 +37,24 @@ export const disputesApi = {
   /** User báo "chưa nhận được tiền" sau khi admin đã đánh dấu hoàn tiền (26/10/2026). */
   reopen: (id: number, req: ReopenDisputeReq) =>
     api.post<DisputeRes>(`/api/v1/disputes/mine/${id}/reopen`, req, { token: getAccessToken() ?? undefined }),
+
+  /** Admin đã chuyển khoản tiền hoàn cho học viên và nhập mã giao dịch (11/11/2026). */
+  markTransferred: (id: number, req: MarkTransferredReq) =>
+    api.post<DisputeAdminRes>(`/api/v1/disputes/admin/${id}/mark-transferred`, req, { token: getAccessToken() ?? undefined }),
+};
+
+/** Giảng viên xem/phản hồi khiếu nại hoàn tiền thuộc khóa của mình (11/11/2026). */
+export const instructorDisputesApi = {
+  list: (status?: DisputeStatus) => {
+    const query = status ? `?status=${status}` : '';
+    return api.get<InstructorDisputeRes[]>(`/api/v1/instructor/disputes${query}`, { token: getAccessToken() ?? undefined });
+  },
+
+  /** multipart: part "request" (JSON) + part "files" (0–5 ảnh/video minh chứng). */
+  respond: (id: number, req: InstructorRespondReq, files: File[] = []) => {
+    const formData = new FormData();
+    formData.append('request', new Blob([JSON.stringify(req)], { type: 'application/json' }));
+    files.forEach((file) => formData.append('files', file));
+    return apiFormData<InstructorDisputeRes>(`/api/v1/instructor/disputes/${id}/respond`, formData);
+  },
 };

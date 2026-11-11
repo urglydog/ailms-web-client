@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 import { ApiError } from '@/lib/api/client';
 import { disputesApi } from '@/lib/api/disputes';
 import { paymentsApi } from '@/lib/api/payments';
-import type { DisputeRes, PaymentRes } from '@/types/domain';
+import type { DisputeCategory, DisputeRes, PaymentRes } from '@/types/domain';
 
 const STATUS_LABEL: Record<DisputeRes['status'], string> = {
   OPEN: 'Chưa xử lý',
@@ -21,6 +21,15 @@ const STATUS_CLASS: Record<DisputeRes['status'], string> = {
   RESOLVED_REJECTED: 'bg-line text-ink-muted border-line',
   REOPENED: 'bg-danger/10 text-danger border-danger/30',
 };
+const CATEGORY_LABEL: Record<DisputeCategory, string> = {
+  CHANGED_MIND: 'Tôi đổi ý / khóa học không phù hợp',
+  CONTENT_MISMATCH: 'Nội dung khác với mô tả',
+  TECHNICAL_ERROR: 'Lỗi kỹ thuật (không vào học được...)',
+  DOUBLE_CHARGE: 'Bị trừ tiền hai lần',
+  NOT_ENROLLED: 'Đã trừ tiền nhưng không được ghi danh',
+  OTHER: 'Lý do khác',
+};
+const CATEGORIES = Object.keys(CATEGORY_LABEL) as DisputeCategory[];
 const MAX_FILES = 5;
 const ACCEPTED_TYPES = 'image/jpeg,image/png,image/webp,video/mp4,video/webm';
 /** Phải khớp `lms.rules.dispute-reopen-window-days` ở BE (application.yml) — đây chỉ là ước
@@ -46,6 +55,7 @@ function RequestRefundContent() {
   const [loading, setLoading] = useState(true);
   const [selectedRef, setSelectedRef] = useState<string | null>(preselectedRef);
 
+  const [category, setCategory] = useState<DisputeCategory>('CHANGED_MIND');
   const [reason, setReason] = useState('');
   const [description, setDescription] = useState('');
   const [refundBankAccount, setRefundBankAccount] = useState('');
@@ -69,10 +79,11 @@ function RequestRefundContent() {
   }, []);
 
   const selectedPayment = payments.find((p) => p.txnRef === selectedRef) ?? null;
-  const alreadyDisputed = (txnRef: string) => myDisputes.some((d) => d.paymentTxnRef === txnRef && d.status === 'OPEN');
+  const alreadyDisputed = (txnRef: string) => myDisputes.some((d) => d.paymentTxnRef === txnRef);
 
   const canReopen = (d: DisputeRes) =>
     d.status === 'RESOLVED_REFUNDED' &&
+    d.refundTransferStatus !== 'PENDING_TRANSFER' &&
     !d.reopenedAt &&
     d.resolvedAt != null &&
     Date.now() - new Date(d.resolvedAt).getTime() < REOPEN_WINDOW_DAYS * 24 * 60 * 60 * 1000;
@@ -104,6 +115,7 @@ function RequestRefundContent() {
 
   const resetForm = () => {
     setSelectedRef(null);
+    setCategory('CHANGED_MIND');
     setReason('');
     setDescription('');
     setRefundBankAccount('');
@@ -124,6 +136,7 @@ function RequestRefundContent() {
           description: description.trim() || undefined,
           refundBankAccount: refundBankAccount.trim() || undefined,
           termsAccepted,
+          category,
         },
         files,
       );
@@ -200,6 +213,23 @@ function RequestRefundContent() {
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             {error && <div role="alert" className="rounded-lg border border-danger/40 bg-danger/5 px-3 py-2 text-sm text-danger">{error}</div>}
+
+            <label className="flex flex-col gap-1.5">
+              <span className="text-sm font-semibold text-ink">Loại vấn đề *</span>
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value as DisputeCategory)}
+                className="w-full rounded-lg border border-line bg-surface-raised p-2.5 text-sm text-ink outline-none focus:border-accent"
+              >
+                {CATEGORIES.map((c) => (
+                  <option key={c} value={c}>{CATEGORY_LABEL[c]}</option>
+                ))}
+              </select>
+              <span className="text-xs text-ink-muted">
+                Hoàn tiền áp dụng trong thời hạn và mức tiến độ học theo chính sách; lỗi kỹ thuật được xét riêng.
+                Giảng viên của khóa học sẽ được báo và có thể phản hồi trước khi chúng tôi quyết định.
+              </span>
+            </label>
 
             <label className="flex flex-col gap-1.5">
               <span className="text-sm font-semibold text-ink">Lý do *</span>
@@ -288,6 +318,37 @@ function RequestRefundContent() {
                     {STATUS_LABEL[d.status]}
                   </span>
                 </div>
+
+                {d.category && (
+                  <div className="text-xs text-ink-muted">Loại vấn đề: {CATEGORY_LABEL[d.category]}</div>
+                )}
+
+                {d.status === 'OPEN' && (
+                  <div className="rounded-lg bg-surface px-3 py-2 text-xs text-ink-muted">
+                    {d.instructorDecision === 'AGREE_REFUND' && 'Giảng viên đã đồng ý hoàn tiền. '}
+                    {d.instructorDecision === 'OBJECT' && 'Giảng viên đã gửi phản hồi. '}
+                    Đang chờ đội ngũ hỗ trợ xem xét và quyết định.
+                  </div>
+                )}
+
+                {d.status === 'RESOLVED_REFUNDED' && d.refundTransferStatus === 'PENDING_TRANSFER' && (
+                  <div className="rounded-lg border border-accent/30 bg-tint px-3 py-2 text-xs text-ink">
+                    Yêu cầu hoàn tiền đã được chấp nhận, quyền truy cập khóa học đã được thu hồi. Chúng tôi sẽ chuyển
+                    khoản cho bạn và báo qua email/thông báo.
+                  </div>
+                )}
+                {d.status === 'RESOLVED_REFUNDED' && d.refundTransferStatus === 'TRANSFERRED' && (
+                  <div className="rounded-lg border border-success/30 bg-success/10 px-3 py-2 text-xs text-ink">
+                    Đã chuyển tiền hoàn cho bạn. Nếu chưa nhận được, bạn có thể báo lại bên dưới.
+                  </div>
+                )}
+
+                {(d.status === 'RESOLVED_REFUNDED' || d.status === 'RESOLVED_REJECTED') && d.adminNote && (
+                  <div className="rounded-lg bg-surface px-3 py-2 text-sm text-ink">
+                    <div className="mb-0.5 text-xs font-semibold text-ink-muted">Phản hồi từ đội ngũ hỗ trợ</div>
+                    {d.adminNote}
+                  </div>
+                )}
 
                 {canReopen(d) && reopeningId !== d.id && (
                   <button

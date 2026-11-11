@@ -22,6 +22,8 @@ export default function PaymentDetailModal({ payment, onClose }: PaymentDetailMo
         return 'bg-danger/10 text-danger border-danger/20';
       case 'EXPIRED':
         return 'bg-ink-muted/10 text-ink-muted border-line';
+      case 'REFUNDED':
+        return 'bg-tint text-accent-dark border-accent/30';
       default:
         return 'bg-line text-ink border-line';
     }
@@ -33,6 +35,7 @@ export default function PaymentDetailModal({ payment, onClose }: PaymentDetailMo
       case 'PENDING': return 'Đang chờ xử lý';
       case 'FAILED': return 'Thất bại';
       case 'EXPIRED': return 'Hết hạn';
+      case 'REFUNDED': return 'Đã hoàn tiền';
       default: return status;
     }
   };
