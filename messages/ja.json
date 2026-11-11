@@ -1752,6 +1752,21 @@
         "saved": "Configuration saved.",
         "saveError": "Could not save configuration."
       },
+      "finance": {
+        "title": "Finance",
+        "hint": "Revenue-share rates apply only to orders paid AFTER saving; existing orders keep their rate. Lists are comma-separated.",
+        "fields": {
+          "REVENUE_ORGANIC_INSTRUCTOR_PCT": "Instructor share when the learner finds the course (organic)",
+          "REVENUE_REFERRAL_INSTRUCTOR_PCT": "Instructor share for purchases via referral link",
+          "REFUND_WINDOW_DAYS": "Refund window (days)",
+          "REFUND_MAX_PROGRESS_PCT": "Max learning progress to qualify for a refund",
+          "REFUND_HOLIDAYS": "Holidays that extend the refund window (YYYY-MM-DD, comma-separated)",
+          "PAYOUT_HOLD_EXTRA_DAYS": "Extra holding days after the refund window",
+          "PAYOUT_MIN_AMOUNT": "Minimum payout amount",
+          "PAYOUT_DAYS_OF_MONTH": "Payout days of the month (1–28, comma-separated)",
+          "DISPUTE_INSTRUCTOR_RESPONSE_HOURS": "Instructor response time for disputes (hours)"
+        }
+      },
       "resources": {
         "title": "バックエンドのリソース",
         "ram": "JVM メモリ",

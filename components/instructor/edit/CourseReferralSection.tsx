@@ -1,19 +1,24 @@
 'use client';
 
 import { useState } from 'react';
+import { useRevenueShare } from '@/hooks/useRevenueShare';
 import type { CourseEditDetail } from '@/types/domain';
 
 /**
  * Chia doanh thu 2 mức (20/09/2026, tính năng mới) — trong panel Cài đặt của
  * `EditCourseLayout.tsx`, cùng khuôn `CourseVisibilitySection.tsx`.
  *
- * Học viên tự tìm thấy khóa qua tìm kiếm/duyệt danh mục trên nền tảng → Giảng viên hưởng 37%,
- * nền tảng giữ 63%. Học viên mua qua ĐÚNG liên kết này (Giảng viên tự đăng lên Facebook,
- * YouTube cá nhân...) → Giảng viên hưởng 97%, nền tảng chỉ giữ 3% — xem
- * {@code PaymentService.resolveRevenueSource} phía backend.
+ * Học viên tự tìm thấy khóa qua tìm kiếm/duyệt danh mục trên nền tảng → Giảng viên hưởng tỷ lệ
+ * organic. Học viên mua qua ĐÚNG liên kết này (Giảng viên tự đăng lên Facebook, YouTube cá
+ * nhân...) → Giảng viên hưởng tỷ lệ referral cao hơn — xem {@code PaymentService.resolveRevenueSource}
+ * phía backend. (11/11/2026) Hai tỷ lệ là cấu hình admin, đọc từ `GET /instructor/revenue-share`
+ * thay vì hard-code 37%/97%.
  */
 export function CourseReferralSection({ course }: { course: CourseEditDetail }) {
   const [copied, setCopied] = useState(false);
+  const { data: share } = useRevenueShare();
+  const referralPct = share ? `${share.referralInstructorPct}%` : '—';
+  const organicPct = share ? `${share.organicInstructorPct}%` : '—';
   const referralUrl = typeof window !== 'undefined'
     ? `${window.location.origin}/courses/${course.slug}?ref=${course.referralCode}`
     : `/courses/${course.slug}?ref=${course.referralCode}`;
@@ -33,8 +38,8 @@ export function CourseReferralSection({ course }: { course: CourseEditDetail }) 
       <h3 className="m-0 text-[14px] font-bold text-ink">Liên kết giới thiệu</h3>
       <p className="text-[12px] text-ink-muted">
         Chia sẻ đúng liên kết này trên kênh của bạn (Facebook, YouTube...) — học viên mua qua
-        đây, bạn hưởng <span className="font-bold text-ink">97%</span> doanh thu thay vì
-        37% khi học viên tự tìm thấy khóa học qua tìm kiếm trên nền tảng.
+        đây, bạn hưởng <span className="font-bold text-ink">{referralPct}</span> doanh thu thay vì
+        {organicPct} khi học viên tự tìm thấy khóa học qua tìm kiếm trên nền tảng.
       </p>
 
       <div className="flex gap-2">
