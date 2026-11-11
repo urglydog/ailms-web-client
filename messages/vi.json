@@ -185,6 +185,7 @@
       "empty": "Chưa có khóa học nào trong danh mục này."
     },
     "shelves": {
+      "featured": { "title": "Được đề xuất", "subtitle": "Các khóa học được LinguaLearn đề xuất cho bạn." },
       "newest": {
         "title": "Mới ra mắt",
         "subtitle": "Những khóa học vừa được thêm vào LinguaLearn"
@@ -1372,6 +1373,7 @@
       "moderation": "Kiểm duyệt khóa học",
       "categories": "Danh mục",
       "reviews": "Đánh giá",
+      "promotions": "Quảng bá khóa học",
       "aianalytics": "AI Analytics",
       "aiqueue": "Giám sát AI Queue",
       "voicemappings": "Giọng đọc lồng tiếng",

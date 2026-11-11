@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Share2 } from 'lucide-react';
 import { PageHeader } from '@/components/instructor/ui/PageHeader';
+import { PromotionPanel } from '@/components/share/PromotionPanel';
 import { ShareCourseDialog } from '@/components/share/ShareCourseDialog';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useShareCourses } from '@/hooks/useShareCourses';
@@ -104,6 +105,8 @@ export default function InstructorSharePage() {
           ))}
         </ul>
       )}
+
+      {data && data.length > 0 && <PromotionPanel courses={data} />}
 
       {sharing && (
         <ShareCourseDialog open onClose={() => setSharing(null)} title={sharing.title} slug={sharing.slug} referralCode={sharing.referralCode} />

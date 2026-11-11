@@ -185,6 +185,7 @@
       "empty": "此分类暂无课程。"
     },
     "shelves": {
+      "featured": { "title": "Recommended", "subtitle": "Courses recommended for you by LinguaLearn." },
       "newest": {
         "title": "新上线",
         "subtitle": "LinguaLearn 最近新增的课程"
@@ -1372,6 +1373,7 @@
       "moderation": "课程审核",
       "categories": "分类",
       "reviews": "评价",
+      "promotions": "Course promotions",
       "aianalytics": "AI 分析",
       "aiqueue": "AI 队列监控",
       "voicemappings": "配音声音",

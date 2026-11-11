@@ -185,6 +185,7 @@
       "empty": "No courses in this category yet."
     },
     "shelves": {
+      "featured": { "title": "Recommended", "subtitle": "Courses recommended for you by LinguaLearn." },
       "newest": {
         "title": "Just launched",
         "subtitle": "Courses recently added to LinguaLearn"
@@ -1372,6 +1373,7 @@
       "moderation": "Course moderation",
       "categories": "Categories",
       "reviews": "Reviews",
+      "promotions": "Course promotions",
       "aianalytics": "AI Analytics",
       "aiqueue": "AI Queue monitor",
       "voicemappings": "Dubbing voices",

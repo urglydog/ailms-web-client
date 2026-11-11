@@ -1,5 +1,5 @@
 export type AdminNavId =
-  | 'overview' | 'users' | 'moderation' | 'categories' | 'reviews' | 'aianalytics' | 'aiqueue'
+  | 'overview' | 'users' | 'moderation' | 'categories' | 'reviews' | 'promotions' | 'aianalytics' | 'aiqueue'
   | 'voicemappings' | 'tutorsecurity' | 'transactions' | 'disputes' | 'payouts' | 'coupons' | 'announcements' | 'support' | 'settings';
 
 export interface AdminNavItem {
@@ -22,6 +22,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
       { id: 'moderation', href: '/admin/moderation' },
       { id: 'categories', href: '/admin/categories' },
       { id: 'reviews', href: '/admin/reviews' },
+      { id: 'promotions', href: '/admin/promotions' },
     ],
   },
   {

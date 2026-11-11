@@ -185,6 +185,7 @@
       "empty": "このカテゴリにはまだ講座がありません。"
     },
     "shelves": {
+      "featured": { "title": "Recommended", "subtitle": "Courses recommended for you by LinguaLearn." },
       "newest": {
         "title": "新着講座",
         "subtitle": "LinguaLearn に追加されたばかりの講座"
@@ -1372,6 +1373,7 @@
       "moderation": "講座の審査",
       "categories": "カテゴリ",
       "reviews": "レビュー",
+      "promotions": "Course promotions",
       "aianalytics": "AI 分析",
       "aiqueue": "AI キュー監視",
       "voicemappings": "吹き替えの音声",
