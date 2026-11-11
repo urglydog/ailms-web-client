@@ -56,7 +56,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
               unstyled: true,
               classNames: {
                 toast:
-                  'flex items-start gap-3 w-full rounded-none border px-4 py-3 shadow-card-hover font-sans text-sm bg-surface-raised border-line text-ink',
+                  'flex items-start gap-3 w-full rounded-none border px-4 py-3 shadow-card-hover font-sans text-sm',
+                // Màu theo từng loại; KHÔNG đặt bg/text ở `toast` chung vì sẽ đè lên nhau tuỳ thứ tự CSS
+                // (bug 12/11: nền sáng ra chữ trắng trên nền trắng).
+                default: 'bg-surface-raised border-line text-ink',
+                loading: 'bg-surface-raised border-line text-ink',
                 title: 'font-bold',
                 description: 'text-current opacity-90 text-xs mt-0.5',
                 actionButton: 'bg-accent text-white rounded-none px-2.5 py-1 text-xs font-semibold',

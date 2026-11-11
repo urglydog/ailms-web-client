@@ -81,6 +81,11 @@ export function LoginForm() {
           }
         }
 
+        // `?next=` (vd link xác nhận trong email mở ở trình duyệt chưa đăng nhập): chỉ nhận đường dẫn
+        // nội bộ bắt đầu bằng 1 dấu `/` — chặn `//evil.com` và `/\evil.com` (open redirect).
+        const next = searchParams.get('next');
+        if (next && /^\/(?![/\\])/.test(next)) targetUrl = next;
+
         // Cập nhật lại giao diện (reload) và chuyển hướng
         window.location.href = targetUrl;
       },

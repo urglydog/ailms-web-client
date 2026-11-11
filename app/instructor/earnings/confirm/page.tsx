@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Suspense } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { PageHeader } from '@/components/instructor/ui/PageHeader';
 import { useConfirmFinance } from '@/hooks/useFinance';
@@ -23,6 +23,17 @@ export default function ConfirmFinancePage() {
 function ConfirmFinanceContent() {
   const token = useSearchParams().get('token') ?? '';
   const confirm = useConfirmFinance();
+  // Link email thường mở ở trình duyệt/ứng dụng khác (vd mail app trên điện thoại) — nơi chưa đăng nhập.
+  // Token xác nhận gắn với đúng tài khoản nên bắt buộc phải đăng nhập; hướng dẫn rõ thay vì báo "không có quyền".
+  const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
+  useEffect(() => {
+    try {
+      setLoggedIn(!!localStorage.getItem('accessToken'));
+    } catch {
+      setLoggedIn(false);
+    }
+  }, []);
+  const nextUrl = encodeURIComponent(`/instructor/earnings/confirm?token=${encodeURIComponent(token)}`);
 
   return (
     <>
@@ -30,6 +41,13 @@ function ConfirmFinanceContent() {
       <div className="flex max-w-lg flex-col gap-4 rounded-xl border border-line bg-surface-raised p-6 shadow-sm">
         {!token ? (
           <p role="alert" className="m-0 text-sm text-danger">Liên kết không hợp lệ: thiếu mã xác nhận.</p>
+        ) : loggedIn === false ? (
+          <>
+            <p className="m-0 text-sm text-ink">Bạn chưa đăng nhập trên trình duyệt này. Hãy đăng nhập bằng tài khoản giảng viên đã nhận email, hệ thống sẽ đưa bạn quay lại bước xác nhận.</p>
+            <Link href={`/login?next=${nextUrl}`} className="w-fit rounded-lg bg-accent px-5 py-2 text-sm font-semibold text-white no-underline hover:bg-accent-dark">
+              Đăng nhập để xác nhận
+            </Link>
+          </>
         ) : confirm.isSuccess ? (
           <>
             <p className="m-0 text-sm font-semibold text-success-ink">
