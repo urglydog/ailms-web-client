@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Check, Copy, ExternalLink, Mail, Send, Share2, type LucideIcon } from 'lucide-react';
+import { Check, Copy, ExternalLink, Mail, QrCode, Send, Share2, type LucideIcon } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import { toast } from 'sonner';
 import { Modal } from '@/components/ui/Modal';
 import { buildShareUrl, canNativeShare, channelHref, type ShareChannel } from '@/lib/share';
@@ -27,10 +28,11 @@ const CHANNELS: { id: ShareChannel; label: string; icon: LucideIcon }[] = [
 /**
  * Hộp chia sẻ khóa học (11/11/2026, Giai đoạn D). Có `referralCode` thì mọi link đều gắn `?ref=` (đơn mua qua link được tính
  * tỷ lệ giới thiệu cao hơn). Dùng Web Share API khi trình duyệt hỗ trợ (Safari iOS, Android Chrome), luôn có sao chép làm
- * phương án dự phòng; mã QR chưa có vì cần thêm thư viện (chờ chủ dự án duyệt).
+ * phương án dự phòng; có mã QR (thư viện `qrcode.react`, vẽ hoàn toàn trên trình duyệt) để quét từ điện thoại hay đưa vào slide/poster.
  */
 export function ShareCourseDialog({ open, onClose, title, slug, referralCode }: ShareCourseDialogProps) {
   const [copied, setCopied] = useState(false);
+  const [showQr, setShowQr] = useState(false);
   const origin = typeof window !== 'undefined' ? window.location.origin : '';
   const plainUrl = buildShareUrl(origin, slug, { ref: referralCode });
 
@@ -81,6 +83,22 @@ export function ShareCourseDialog({ open, onClose, title, slug, referralCode }: 
             {copied ? 'Đã chép' : 'Sao chép'}
           </button>
         </div>
+
+        <button
+          type="button"
+          onClick={() => setShowQr((v) => !v)}
+          aria-expanded={showQr}
+          title="Hiện mã QR để quét bằng điện thoại"
+          className="flex items-center justify-center gap-2 rounded-lg border border-line px-3 py-2 text-sm font-semibold text-ink hover:bg-tint"
+        >
+          <QrCode className="h-4 w-4" aria-hidden /> {showQr ? 'Ẩn mã QR' : 'Mã QR'}
+        </button>
+        {showQr && (
+          <div className="flex justify-center rounded-lg border border-line bg-surface p-4">
+            {/* Nền trắng cố định + mức sửa lỗi cao: quét được cả khi giao diện tối hoặc in nhỏ. */}
+            <QRCodeSVG value={plainUrl} size={176} level="M" bgColor="#ffffff" fgColor="#000000" marginSize={2} title={`Mã QR của ${title}`} />
+          </div>
+        )}
 
         <div className="grid grid-cols-3 gap-2">
           {canNativeShare() && (
