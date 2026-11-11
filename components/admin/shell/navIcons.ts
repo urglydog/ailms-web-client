@@ -1,5 +1,5 @@
 import {
-  Activity, BarChart, Bell, DollarSign, LayoutDashboard, LifeBuoy, MessageSquareWarning, Mic, Settings, Shield, ShieldCheck, Star, Tags, Ticket, Users,
+  Activity, BarChart, Bell, DollarSign, LayoutDashboard, LifeBuoy, Megaphone, MessageSquareWarning, Mic, Settings, Shield, ShieldCheck, Star, Tags, Ticket, Users, Wallet,
   type LucideIcon,
 } from 'lucide-react';
 import type { AdminNavId } from '@/lib/admin/nav';
@@ -10,12 +10,14 @@ export const ADMIN_NAV_ICONS: Record<AdminNavId, LucideIcon> = {
   moderation: ShieldCheck,
   categories: Tags,
   reviews: Star,
+  promotions: Megaphone,
   aianalytics: BarChart,
   aiqueue: Activity,
   voicemappings: Mic,
   tutorsecurity: Shield,
   transactions: DollarSign,
   disputes: MessageSquareWarning,
+  payouts: Wallet,
   coupons: Ticket,
   announcements: Bell,
   support: LifeBuoy,

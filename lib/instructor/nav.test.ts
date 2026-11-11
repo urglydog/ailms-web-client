@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { INSTRUCTOR_NAV, activeNavItem, isFullPageRoute, isInstructorNavActive } from './nav';
 
 describe('INSTRUCTOR_NAV', () => {
-  it('có 5 mục theo thứ tự: khóa học, gói, giao tiếp, hiệu suất, công cụ', () => {
-    expect(INSTRUCTOR_NAV.map((i) => i.id)).toEqual(['courses', 'bundles', 'communication', 'revenue', 'tools']);
+  it('có 6 mục theo thứ tự: khóa học, gói, giao tiếp, hiệu suất, thu nhập, công cụ', () => {
+    expect(INSTRUCTOR_NAV.map((i) => i.id)).toEqual(['courses', 'bundles', 'communication', 'revenue', 'earnings', 'tools']);
     expect(INSTRUCTOR_NAV.every((i) => i.href.startsWith('/instructor/'))).toBe(true);
   });
 });

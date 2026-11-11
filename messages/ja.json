@@ -185,6 +185,7 @@
       "empty": "このカテゴリにはまだ講座がありません。"
     },
     "shelves": {
+      "featured": { "title": "Recommended", "subtitle": "Courses recommended for you by LinguaLearn." },
       "newest": {
         "title": "新着講座",
         "subtitle": "LinguaLearn に追加されたばかりの講座"
@@ -713,6 +714,7 @@
       "bundles": "講座セット",
       "communication": "コミュニケーション",
       "revenue": "パフォーマンス",
+      "earnings": "Earnings",
       "tools": "ツール",
       "aria": "講師チャンネルのナビゲーション"
     },
@@ -909,9 +911,78 @@
         "lowRating": "{student} さんから「{course}」に新しい {rating}★ のレビューがあります。早めに返信しましょう。"
       }
     },
+    "refunds": {
+      "title": "Refund requests",
+      "subtitle": "Learners send refund requests/complaints for your courses. You can respond with evidence; an administrator makes the final decision.",
+      "loadError": "Could not load the requests.",
+      "empty": "There are no refund requests for your courses yet.",
+      "filters": {
+        "status": "Status",
+        "all": "All"
+      },
+      "status": {
+        "OPEN": "Pending",
+        "REOPENED": "Reopened",
+        "RESOLVED_REFUNDED": "Refunded",
+        "RESOLVED_REJECTED": "Rejected"
+      },
+      "needsResponse": "Needs response",
+      "pendingBadge": "{count} request(s) need a response",
+      "deadline": "Respond by: {time}",
+      "hoursLeft": "{count} hour(s) left",
+      "overdue": "overdue (you can still respond until an administrator decides)",
+      "courseLabel": "Course",
+      "learner": "Learner",
+      "paidAt": "Paid at",
+      "amount": "Amount the learner paid",
+      "yourEarning": "Your earning from this order",
+      "category": {
+        "CHANGED_MIND": "Changed mind / not suitable",
+        "CONTENT_MISMATCH": "Content differs from description",
+        "TECHNICAL_ERROR": "Technical error",
+        "DOUBLE_CHARGE": "Charged twice",
+        "NOT_ENROLLED": "Charged but not enrolled",
+        "OTHER": "Other"
+      },
+      "eligibility": {
+        "AUTO_ELIGIBLE": "Eligible under policy",
+        "OUT_OF_POLICY": "Outside policy",
+        "EXCEPTION": "Technical issue (reviewed separately)"
+      },
+      "progress": "Learner completed {percent}% of the course",
+      "detail": {
+        "title": "Refund request details",
+        "reason": "Reason given by the learner",
+        "attachments": "Learner's evidence",
+        "viewVideo": "View video"
+      },
+      "result": {
+        "refunded": "The learner was refunded. {charge} was deducted from your earnings.",
+        "refundedNoCharge": "The learner was refunded. Your earnings were not deducted.",
+        "rejected": "The request was rejected. Your earnings are unaffected."
+      },
+      "response": {
+        "title": "Your response",
+        "agree": "Agree to refund",
+        "object": "Object",
+        "agreeHint": "You find the request reasonable. An administrator still decides.",
+        "objectHint": "You disagree; give your reasons and attach evidence if you have any.",
+        "text": "Your response",
+        "textPh": "E.g. The learner finished chapter 3 and the content matches the description...",
+        "files": "Evidence (images/videos, up to {max} files)",
+        "tooMany": "You can attach at most {max} files.",
+        "submit": "Send response",
+        "submitting": "Sending...",
+        "sent": "Response sent.",
+        "error": "Could not send the response.",
+        "noResponse": "This dispute has been resolved; responding is no longer possible."
+      },
+      "note": "An administrator reviews your response and decides. You can respond only once."
+    },
     "communication": {
       "tabsAria": "コミュニケーションのセクション",
       "tabs": {
+        "refunds": "Refunds",
         "qa": "Q&A",
         "messages": "メッセージ",
         "assignments": "課題",
@@ -934,7 +1005,8 @@
         "bundles": {
           "title": "講座セット",
           "description": "複数の講座をお得な割引つきのセットにして、まとめて購入してもらえます。"
-        }
+        },
+        "share": { "title": "Share & Promote", "description": "Get your own referral link for each course, share it on social media and see the orders that came through your links." }
       }
     },
     "live": {
@@ -1301,6 +1373,7 @@
       "moderation": "講座の審査",
       "categories": "カテゴリ",
       "reviews": "レビュー",
+      "promotions": "Course promotions",
       "aianalytics": "AI 分析",
       "aiqueue": "AI キュー監視",
       "voicemappings": "吹き替えの音声",
@@ -1310,6 +1383,7 @@
       "announcements": "システムのお知らせ",
       "settings": "システム設定",
       "disputes": "Payment disputes",
+      "payouts": "Instructor payouts",
       "support": "Support requests"
     },
     "shell": {
@@ -1663,7 +1737,8 @@
         "PAID": "成功",
         "PENDING": "処理待ち",
         "FAILED": "失敗",
-        "EXPIRED": "期限切れ"
+        "EXPIRED": "期限切れ",
+        "REFUNDED": "Refunded"
       },
       "source": {
         "referral": "紹介",
@@ -1897,6 +1972,63 @@
       }
     },
     "disputes": {
+      "v2": {
+        "category": {
+          "CHANGED_MIND": "Changed mind / not suitable",
+          "CONTENT_MISMATCH": "Content differs from description",
+          "TECHNICAL_ERROR": "Technical error",
+          "DOUBLE_CHARGE": "Charged twice",
+          "NOT_ENROLLED": "Charged but not enrolled",
+          "OTHER": "Other"
+        },
+        "eligibility": {
+          "AUTO_ELIGIBLE": "Eligible under policy",
+          "OUT_OF_POLICY": "Outside policy",
+          "EXCEPTION": "Technical issue (reviewed separately)"
+        },
+        "progress": "Learner completed {percent}% of the course",
+        "studentFiles": "Learner attached {count} evidence file(s)",
+        "decision": {
+          "AGREE_REFUND": "Instructor agrees to refund",
+          "OBJECT": "Instructor objects",
+          "NO_RESPONSE": "Instructor did not respond"
+        },
+        "instructor": {
+          "title": "Instructor response",
+          "waiting": "No response yet",
+          "deadline": "Response deadline: {time}",
+          "none": "No deadline (legacy dispute)",
+          "respondedAt": "Responded at {time}",
+          "file": "Evidence ({type})"
+        },
+        "responsibility": {
+          "title": "Who bears the refund",
+          "STANDARD": {
+            "label": "Standard — instructor returns what they received",
+            "hint": "Changed mind within the window, system error, double payment, not enrolled."
+          },
+          "PLATFORM_COMPENSATES": {
+            "label": "Platform covers it all",
+            "hint": "Learner could use the course but the platform was at fault; the instructor keeps their earning."
+          },
+          "INSTRUCTOR_FAULT": {
+            "label": "Instructor bears everything",
+            "hint": "Seriously misleading description or policy violation. A reason in the note is required."
+          },
+          "preview": "Learner gets back {learner} · Instructor charged {instructor} · Platform bears {platform}"
+        },
+        "refund": {
+          "title": "Approved refund",
+          "summary": "Mode: {mode}. Instructor charged {instructor}, platform bears {platform}.",
+          "pending": "Access has been revoked. Transfer the money to the learner, then enter the transfer reference so they are notified.",
+          "refPh": "Bank transfer reference",
+          "markTransferred": "Mark as transferred",
+          "transferred": "Refund transferred — reference {ref}"
+        },
+        "refundApproved": "Refund approved: access revoked and instructor earnings adjusted.",
+        "rejected": "Dispute rejected.",
+        "transferSaved": "Transfer recorded and the learner was notified."
+      },
       "title": "Payment disputes",
       "subtitle": "Disputes/refund requests filed by learners or instructors.",
       "loadError": "Could not load the dispute list.",

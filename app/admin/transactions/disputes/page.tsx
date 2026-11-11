@@ -10,7 +10,8 @@ import { PageHeader } from '@/components/instructor/ui/PageHeader';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { ApiError } from '@/lib/api/client';
 import { disputesApi } from '@/lib/api/disputes';
-import type { DisputeAdminRes, DisputeStatus } from '@/types/domain';
+import { DisputeV2Details, RefundSummary, ResponsibilityPicker } from '@/components/admin/disputes/DisputeV2Details';
+import type { DisputeAdminRes, DisputeStatus, RefundResponsibility } from '@/types/domain';
 
 const STATUSES: DisputeStatus[] = ['OPEN', 'REOPENED', 'RESOLVED_REFUNDED', 'RESOLVED_REJECTED'];
 const STATUS_CLASS: Record<DisputeStatus, string> = {
@@ -40,6 +41,8 @@ function AdminDisputesContent() {
   const [statusFilter, setStatusFilter] = useState<DisputeStatus | 'ALL'>('ALL');
   const [selected, setSelected] = useState<DisputeAdminRes | null>(null);
   const [note, setNote] = useState('');
+  const [responsibility, setResponsibility] = useState<RefundResponsibility>('STANDARD');
+  const [transferRef, setTransferRef] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   const fetchDisputes = () => {
@@ -66,15 +69,37 @@ function AdminDisputesContent() {
   const openResolve = (d: DisputeAdminRes) => {
     setSelected(d);
     setNote('');
+    setResponsibility('STANDARD');
+    setTransferRef('');
   };
 
   const handleResolve = async (status: 'RESOLVED_REFUNDED' | 'RESOLVED_REJECTED') => {
     if (!selected || !note.trim()) return;
     setSubmitting(true);
     try {
-      await disputesApi.resolve(selected.id, { status, note: note.trim() });
-      toast.success(status === 'RESOLVED_REFUNDED' ? 'Đã đánh dấu hoàn tiền.' : 'Đã từ chối khiếu nại.');
+      await disputesApi.resolve(selected.id, {
+        status,
+        note: note.trim(),
+        ...(status === 'RESOLVED_REFUNDED' ? { responsibility } : {}),
+      });
+      toast.success(status === 'RESOLVED_REFUNDED' ? t('v2.refundApproved') : t('v2.rejected'));
       setSelected(null);
+      fetchDisputes();
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : t('detail.error'));
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleMarkTransferred = async () => {
+    if (!selected || !transferRef.trim()) return;
+    setSubmitting(true);
+    try {
+      const updated = await disputesApi.markTransferred(selected.id, { transferRef: transferRef.trim() });
+      toast.success(t('v2.transferSaved'));
+      setSelected(updated);
+      setTransferRef('');
       fetchDisputes();
     } catch (err) {
       toast.error(err instanceof ApiError ? err.message : t('detail.error'));
@@ -212,6 +237,8 @@ function AdminDisputesContent() {
                 )}
               </dl>
 
+              <DisputeV2Details d={selected} />
+
               {selected.status === 'REOPENED' && (
                 <div className="mt-5 rounded-lg border border-danger/40 bg-danger/5 p-4">
                   <p className="m-0 text-sm font-semibold text-danger">{t('detail.reopenReason')}</p>
@@ -230,6 +257,7 @@ function AdminDisputesContent() {
                   {selected.status === 'REOPENED' && (
                     <p className="m-0 text-xs text-ink-muted">{t('detail.noteOverwriteWarning')}</p>
                   )}
+                  <ResponsibilityPicker d={selected} value={responsibility} onChange={setResponsibility} />
                   <label className="flex flex-col gap-1.5">
                     <span className="text-sm font-semibold text-ink">{t('detail.note')}</span>
                     <textarea
@@ -267,6 +295,14 @@ function AdminDisputesContent() {
                   )}
                 </div>
               )}
+
+              <RefundSummary
+                d={selected}
+                transferRef={transferRef}
+                onTransferRefChange={setTransferRef}
+                onMarkTransferred={handleMarkTransferred}
+                submitting={submitting}
+              />
             </div>
             <div className="flex justify-end border-t border-line bg-surface px-6 py-4">
               <button type="button" onClick={() => setSelected(null)} className="rounded-lg bg-accent px-5 py-2 font-semibold text-white hover:bg-accent-dark">

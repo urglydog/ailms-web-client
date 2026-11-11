@@ -205,6 +205,20 @@ export const publicCoursesApi = {
     return page.content.map(toSummary);
   },
 
+  /**
+   * Kệ "Được đề xuất" (11/11/2026, Giai đoạn E): khóa đang trong đợt quảng bá đã được admin duyệt. Endpoint công khai chỉ đọc;
+   * BE kẹp `size` 1–24 và kiểm `categorySlug`. Lỗi/rỗng thì gọi nơi dùng tự xử lý (trang chủ bọc try/catch riêng).
+   */
+  featured: async (
+    placement: 'HOME_FEATURED' | 'CATEGORY_FEATURED' = 'HOME_FEATURED',
+    size = 8,
+    categorySlug?: string,
+  ): Promise<CourseSummary[]> => {
+    const query = buildQuery({ placement, categorySlug, size });
+    const res = await api.get<{ content: RawSummary[] }>(`/api/v1/courses/featured${query}`);
+    return res.content.map(toSummary);
+  },
+
   /** Một trang kết quả (phân trang phía server). `page` đếm từ 1 ở giao diện, API Spring đếm từ 0. */
   searchPage: async (
     filters: CourseFilterState,
