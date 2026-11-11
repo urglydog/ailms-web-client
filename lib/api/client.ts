@@ -104,7 +104,9 @@ function redirectToLoginWithReason(reason: string | null) {
       /* Safari riêng tư chặn sessionStorage — bỏ qua, chỉ mất phần thông báo lý do */
     }
   }
-  window.location.href = '/login';
+  // Kèm `next` để đăng nhập xong quay lại đúng trang đang làm dở (thanh toán, xác nhận email...).
+  const here = window.location.pathname + window.location.search;
+  window.location.href = here.startsWith('/login') ? '/login' : `/login?next=${encodeURIComponent(here)}`;
 }
 
 /**

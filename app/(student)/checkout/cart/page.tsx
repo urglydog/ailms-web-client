@@ -17,6 +17,7 @@ import { useCart } from '@/hooks/useCart';
 import { useCartBundleMatches } from '@/hooks/useCartBundleMatches';
 import { paymentsApi } from '@/lib/api/payments';
 import { rememberPayosReturn, takePayosCancelledNotice } from '@/lib/payosReturn';
+import { useRequireLogin } from '@/hooks/useRequireLogin';
 import { getReferralCodesFor } from '@/lib/referral';
 import { couponsApi } from '@/lib/api/coupons';
 import { ApiError } from '@/lib/api/client';
@@ -42,6 +43,7 @@ function CartCheckoutContent() {
   const t = useTranslations('shop');
   const locale = useLocale();
   const router = useRouter();
+  useRequireLogin();
   const searchParams = useSearchParams();
   const { data: cartItems, isLoading } = useCart();
   // Giỏ hàng cần token nên máy chủ không có dữ liệu; chờ mount mới chọn giữa "đang tải" và "trống" để HTML hai bên khớp.
