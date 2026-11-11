@@ -1004,7 +1004,8 @@
         "bundles": {
           "title": "講座セット",
           "description": "複数の講座をお得な割引つきのセットにして、まとめて購入してもらえます。"
-        }
+        },
+        "share": { "title": "Share & Promote", "description": "Get your own referral link for each course, share it on social media and see the orders that came through your links." }
       }
     },
     "live": {

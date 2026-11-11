@@ -1004,7 +1004,8 @@
         "bundles": {
           "title": "课程组合",
           "description": "把多门课程打包并给出优惠，方便学员整套购买。"
-        }
+        },
+        "share": { "title": "Share & Promote", "description": "Get your own referral link for each course, share it on social media and see the orders that came through your links." }
       }
     },
     "live": {

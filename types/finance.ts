@@ -106,3 +106,20 @@ export interface ConfirmResult {
   type: 'ACCOUNT' | 'PAYOUT';
   id: number;
 }
+
+/** 1 khóa của giảng viên + mã giới thiệu + số đơn theo nguồn (trang Chia sẻ, Giai đoạn D). */
+export interface CourseShare {
+  courseId: number;
+  title: string;
+  slug: string;
+  thumbnailUrl: string | null;
+  status: string;
+  visibility: string;
+  referralCode: string;
+  /** Chỉ khóa đã xuất bản mới có link chia sẻ dùng được. */
+  shareable: boolean;
+  referralOrders: number;
+  referralEarning: number;
+  organicOrders: number;
+  organicEarning: number;
+}

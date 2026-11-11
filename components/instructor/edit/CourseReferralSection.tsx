@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { ShareCourseDialog } from '@/components/share/ShareCourseDialog';
 import { useRevenueShare } from '@/hooks/useRevenueShare';
 import type { CourseEditDetail } from '@/types/domain';
 
@@ -16,6 +17,7 @@ import type { CourseEditDetail } from '@/types/domain';
  */
 export function CourseReferralSection({ course }: { course: CourseEditDetail }) {
   const [copied, setCopied] = useState(false);
+  const [sharing, setSharing] = useState(false);
   const { data: share } = useRevenueShare();
   const referralPct = share ? `${share.referralInstructorPct}%` : '—';
   const organicPct = share ? `${share.organicInstructorPct}%` : '—';
@@ -57,7 +59,18 @@ export function CourseReferralSection({ course }: { course: CourseEditDetail }) 
         >
           {copied ? 'Đã sao chép ✓' : 'Sao chép'}
         </button>
+        <button
+          type="button"
+          onClick={() => setSharing(true)}
+          title="Chia sẻ lên mạng xã hội hoặc qua ứng dụng trên thiết bị"
+          className="shrink-0 rounded-lg border border-line px-4 py-2 text-[13px] font-bold text-accent-dark hover:bg-tint"
+        >
+          Chia sẻ
+        </button>
       </div>
+      {sharing && (
+        <ShareCourseDialog open onClose={() => setSharing(false)} title={course.title} slug={course.slug} referralCode={course.referralCode} />
+      )}
     </div>
   );
 }

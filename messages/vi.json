@@ -1004,7 +1004,8 @@
         "bundles": {
           "title": "Gói khóa học",
           "description": "Gộp nhiều khóa thành một gói với mức giảm giá hấp dẫn để học viên mua trọn bộ."
-        }
+        },
+        "share": { "title": "Chia sẻ & Quảng bá", "description": "Lấy link giới thiệu riêng cho từng khóa, chia sẻ lên mạng xã hội và xem số đơn đến từ link của bạn." }
       }
     },
     "live": {

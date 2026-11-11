@@ -4,6 +4,7 @@ import type {
   AccountReveal,
   AdminPayout,
   ConfirmResult,
+  CourseShare,
   FinanceSummary,
   LedgerEntry,
   LinkPayoutAccountReq,
@@ -67,4 +68,15 @@ export const adminPayoutsApi = {
   reveal: (id: number) => api.get<AccountReveal>(`/api/v1/admin/payouts/${id}/account`, token()),
 
   exportCsv: () => apiBlob('/api/v1/admin/payouts/export.csv'),
+};
+
+/** Khóa của giảng viên + mã giới thiệu + đơn theo nguồn (11/11/2026, Giai đoạn D). `from`/`to` dạng YYYY-MM-DD, bỏ trống = toàn thời gian. */
+export const shareApi = {
+  courses: (from?: string, to?: string) => {
+    const params = new URLSearchParams();
+    if (from) params.set('from', from);
+    if (to) params.set('to', to);
+    const query = params.toString();
+    return api.get<CourseShare[]>(`/api/v1/instructor/share/courses${query ? `?${query}` : ''}`, token());
+  },
 };

@@ -1004,7 +1004,8 @@
         "bundles": {
           "title": "Course bundles",
           "description": "Group several courses into a bundle with an attractive discount so learners buy the whole set."
-        }
+        },
+        "share": { "title": "Share & Promote", "description": "Get your own referral link for each course, share it on social media and see the orders that came through your links." }
       }
     },
     "live": {

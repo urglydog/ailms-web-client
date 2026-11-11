@@ -1,6 +1,6 @@
-import { PackageIcon, TagIcon, VideoIcon } from '@/components/instructor/SidebarIcons';
+import { PackageIcon, ShareIcon, TagIcon, VideoIcon } from '@/components/instructor/SidebarIcons';
 
-export type ToolId = 'live' | 'coupons' | 'bundles';
+export type ToolId = 'live' | 'coupons' | 'bundles' | 'share';
 
 export interface ToolDef {
   id: ToolId;
@@ -14,4 +14,5 @@ export const TOOLS: ToolDef[] = [
   { id: 'live', href: '/instructor/live', icon: VideoIcon },
   { id: 'coupons', href: '/instructor/coupons', icon: TagIcon },
   { id: 'bundles', href: '/instructor/bundles', icon: PackageIcon },
+  { id: 'share', href: '/instructor/share', icon: ShareIcon },
 ];

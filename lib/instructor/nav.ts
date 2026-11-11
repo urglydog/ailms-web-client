@@ -14,7 +14,7 @@ export const INSTRUCTOR_NAV: InstructorNavItem[] = [
   { id: 'communication', href: '/instructor/communication' },
   { id: 'revenue', href: '/instructor/revenue' },
   { id: 'earnings', href: '/instructor/earnings' },
-  { id: 'tools', href: '/instructor/tools', alsoMatches: ['/instructor/live', '/instructor/coupons'] },
+  { id: 'tools', href: '/instructor/tools', alsoMatches: ['/instructor/live', '/instructor/coupons', '/instructor/share'] },
 ];
 
 /** Khớp chính xác hoặc là trang con (`/x/y` làm sáng `/x`); không dùng `startsWith` trần vì `/courses-old` sẽ khớp nhầm. */

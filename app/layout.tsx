@@ -1,3 +1,4 @@
+import { siteUrl } from '@/lib/siteUrl';
 import type { Metadata, Viewport } from 'next';
 import Script from 'next/script';
 import localFont from 'next/font/local';
@@ -43,6 +44,8 @@ const plexMono = localFont({
 });
 
 export const metadata: Metadata = {
+  // Cần để link tương đối trong OpenGraph/canonical thành URL tuyệt đối khi chia sẻ lên mạng xã hội (Giai đoạn D).
+  metadataBase: new URL(siteUrl()),
   title: {
     default: 'LinguaLearn — Học không giới hạn ngôn ngữ',
     template: '%s | LinguaLearn',
