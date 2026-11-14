@@ -7,6 +7,7 @@ import { PageHeader } from '@/components/instructor/ui/PageHeader';
 import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { ApiError } from '@/lib/api/client';
+import { payosPayoutApi } from '@/lib/api/payosPayout';
 import { adminPayoutsApi } from '@/lib/api/finance';
 import { PAYOUT_STATUS_CLASS, PAYOUT_STATUS_LABEL, dateOnly, dateTime, money } from '@/lib/finance';
 import { getAccessToken } from '@/lib/auth/token';
@@ -44,6 +45,28 @@ export default function AdminPayoutsPage() {
     setText('');
     setProofUrl('');
   };
+
+  // Chi tự động qua PayOS: chỉ hiện nút khi công tắc bật; số tiền/tài khoản do máy chủ lấy từ DB.
+  const { data: payosStatus } = useQuery({
+    queryKey: ['admin', 'payos-payout', 'status'],
+    queryFn: () => payosPayoutApi.status(),
+    enabled: !!getAccessToken(),
+    retry: false,
+  });
+  const autoTransfer = useMutation({
+    mutationFn: (id: number) => payosPayoutApi.transferPayout(id),
+    onSuccess: (order) => {
+      toast.success(
+        order.status === 'SUCCEEDED'
+          ? 'PayOS đã chi và đã ghi nhận.'
+          : order.status === 'FAILED'
+            ? `PayOS từ chối: ${order.errorMessage ?? 'không rõ lý do'}`
+            : 'Đã gửi lệnh chi sang PayOS, hệ thống sẽ tự cập nhật khi có kết quả.',
+      );
+      refresh();
+    },
+    onError,
+  });
 
   const approve = useMutation({
     mutationFn: (id: number) => adminPayoutsApi.approve(id),
@@ -86,7 +109,7 @@ export default function AdminPayoutsPage() {
   });
 
   const rows = useMemo(() => data ?? [], [data]);
-  const busy = approve.isPending || markPaid.isPending || reject.isPending || fail.isPending || reveal.isPending;
+  const busy = autoTransfer.isPending || approve.isPending || markPaid.isPending || reject.isPending || fail.isPending || reveal.isPending;
 
   const submitDialog = () => {
     if (!dialog || dialog.kind === 'reveal') return;
@@ -192,6 +215,17 @@ export default function AdminPayoutsPage() {
                           <button type="button" disabled={busy} onClick={() => reveal.mutate(p)} className="rounded-lg border border-line px-3 py-1.5 text-xs font-semibold text-accent-dark hover:bg-tint disabled:opacity-50">
                             Xem số TK
                           </button>
+                          {payosStatus?.enabled && (
+                            <button
+                              type="button"
+                              disabled={busy}
+                              title={`Gửi lệnh chuyển ${money(p.amount)} qua PayOS. Số dư tài khoản chi: ${payosStatus.balance === null ? 'không rõ' : money(payosStatus.balance)}`}
+                              onClick={() => autoTransfer.mutate(p.id)}
+                              className="rounded-lg bg-accent px-3 py-1.5 text-xs font-semibold text-white hover:bg-accent-dark disabled:opacity-50"
+                            >
+                              Chi qua PayOS
+                            </button>
+                          )}
                           <button type="button" disabled={busy} onClick={() => setDialog({ kind: 'paid', payout: p })} className="rounded-lg bg-success px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90 disabled:opacity-50">
                             Đã chuyển
                           </button>
