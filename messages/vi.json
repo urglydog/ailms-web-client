@@ -923,7 +923,7 @@
       "status": {
         "OPEN": "Chờ xử lý",
         "REOPENED": "Mở lại",
-        "RESOLVED_REFUNDED": "Đã hoàn tiền",
+        "RESOLVED_REFUNDED": "Đã duyệt hoàn tiền",
         "RESOLVED_REJECTED": "Đã từ chối"
       },
       "needsResponse": "Cần phản hồi",
@@ -1932,6 +1932,7 @@
         "OPEN": "Chưa xử lý",
         "REOPENED": "Mở lại - ưu tiên",
         "RESOLVED_REFUNDED": "Đã hoàn tiền",
+        "RESOLVED_REFUNDED_PENDING": "Đã duyệt · chờ chuyển",
         "RESOLVED_REJECTED": "Đã từ chối"
       },
       "cols": {

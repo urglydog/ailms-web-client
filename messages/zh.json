@@ -923,7 +923,7 @@
       "status": {
         "OPEN": "Pending",
         "REOPENED": "Reopened",
-        "RESOLVED_REFUNDED": "Refunded",
+        "RESOLVED_REFUNDED": "Refund approved",
         "RESOLVED_REJECTED": "Rejected"
       },
       "needsResponse": "Needs response",
@@ -2041,6 +2041,7 @@
         "OPEN": "Open",
         "REOPENED": "Reopened - priority",
         "RESOLVED_REFUNDED": "Refunded",
+        "RESOLVED_REFUNDED_PENDING": "Approved · awaiting transfer",
         "RESOLVED_REJECTED": "Rejected"
       },
       "cols": {
