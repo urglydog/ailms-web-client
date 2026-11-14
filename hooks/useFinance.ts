@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { financeApi } from '@/lib/api/finance';
 import { getAccessToken } from '@/lib/auth/token';
-import type { LinkPayoutAccountReq } from '@/types/finance';
+import type { EditPayoutAccountReq, LinkPayoutAccountReq } from '@/types/finance';
 
 const KEYS = {
   summary: ['instructor', 'finance', 'summary'],
@@ -25,6 +25,10 @@ export function usePayoutBanks() {
   return useQuery({ queryKey: KEYS.banks, queryFn: () => financeApi.banks(), enabled: enabled(), staleTime: 60 * 60 * 1000 });
 }
 
+export function usePayoutAccounts() {
+  return useQuery({ queryKey: KEYS.account, queryFn: () => financeApi.accounts(), enabled: enabled() });
+}
+
 export function useMyPayouts() {
   return useQuery({ queryKey: KEYS.payouts, queryFn: () => financeApi.payouts(), enabled: enabled() });
 }
@@ -43,11 +47,37 @@ export function useLinkAccount() {
   });
 }
 
+export function useEditAccount() {
+  const refresh = useRefreshFinance();
+  return useMutation({
+    mutationFn: (input: { id: number; req: EditPayoutAccountReq }) => financeApi.editAccount(input.id, input.req),
+    onSuccess: refresh,
+  });
+}
+
+export function useSetPrimaryAccount() {
+  const refresh = useRefreshFinance();
+  return useMutation({ mutationFn: (id: number) => financeApi.setPrimaryAccount(id), onSuccess: refresh });
+}
+
+export function useRemoveAccount() {
+  const refresh = useRefreshFinance();
+  return useMutation({ mutationFn: (id: number) => financeApi.removeAccount(id), onSuccess: refresh });
+}
+
+export function useChangePayoutAccount() {
+  const refresh = useRefreshFinance();
+  return useMutation({
+    mutationFn: (input: { payoutId: number; accountId: number }) => financeApi.changePayoutAccount(input.payoutId, input.accountId),
+    onSuccess: refresh,
+  });
+}
+
 export function useRequestPayout() {
   const refresh = useRefreshFinance();
   return useMutation({
-    mutationFn: (input: { amount: number; idempotencyKey: string }) =>
-      financeApi.requestPayout(input.amount, input.idempotencyKey),
+    mutationFn: (input: { amount: number; idempotencyKey: string; accountId?: number }) =>
+      financeApi.requestPayout(input.amount, input.idempotencyKey, input.accountId),
     onSuccess: refresh,
   });
 }

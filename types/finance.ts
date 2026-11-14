@@ -1,7 +1,7 @@
 /** Kiểu dữ liệu thu nhập / tài khoản nhận tiền / rút tiền (11/11/2026, Epic hoàn tiền – chi trả, Giai đoạn C). */
 
 export type PayoutStatus = 'PENDING_EMAIL' | 'REQUESTED' | 'APPROVED' | 'PAID' | 'REJECTED' | 'CANCELLED' | 'FAILED';
-export type PayoutAccountStatus = 'PENDING_CONFIRM' | 'ACTIVE' | 'REPLACED';
+export type PayoutAccountStatus = 'PENDING_CONFIRM' | 'ACTIVE' | 'REPLACED' | 'REMOVED';
 export type NameMatchStatus = 'MATCHED' | 'MISMATCH';
 export type LedgerEntryType = 'EARNING' | 'REFUND_REVERSAL' | 'PAYOUT_RESERVE' | 'PAYOUT_RELEASE' | 'ADJUSTMENT';
 
@@ -21,6 +21,10 @@ export interface PayoutAccount {
   nameMatchStatus: NameMatchStatus;
   usableFrom: string | null;
   confirmedAt: string | null;
+  /** Tài khoản mặc định dùng để rút. */
+  primary: boolean;
+  /** Có giá trị = bản chờ xác nhận do sửa tài khoản có id này. */
+  replacesAccountId: number | null;
 }
 
 export interface LinkPayoutAccountReq {
@@ -28,6 +32,16 @@ export interface LinkPayoutAccountReq {
   accountNumber: string;
   holderName: string;
 }
+
+/** Sửa tài khoản: `accountNumber` bỏ trống = giữ số cũ. Đổi ngân hàng/số cần xác nhận email, đổi tên chủ thì không. */
+export interface EditPayoutAccountReq {
+  bankCode: string;
+  accountNumber?: string;
+  holderName: string;
+}
+
+/** Tối đa 5 tài khoản nhận tiền mỗi giảng viên (khớp BE). */
+export const MAX_PAYOUT_ACCOUNTS = 5;
 
 export interface FinanceSummary {
   /** Số dư đã hết thời gian giữ (có thể âm nếu từng bị trừ sau khi đã chi). */

@@ -1,7 +1,8 @@
 'use client';
 
+import { useState } from 'react';
 import { toast } from 'sonner';
-import { useCancelPayout, useMyPayouts } from '@/hooks/useFinance';
+import { useCancelPayout, useChangePayoutAccount, useMyPayouts, usePayoutAccounts } from '@/hooks/useFinance';
 import { ApiError } from '@/lib/api/client';
 import { PAYOUT_STATUS_CLASS, PAYOUT_STATUS_LABEL, dateOnly, dateTime, money } from '@/lib/finance';
 
@@ -9,6 +10,12 @@ import { PAYOUT_STATUS_CLASS, PAYOUT_STATUS_LABEL, dateOnly, dateTime, money } f
 export function PayoutHistory() {
   const { data, isLoading } = useMyPayouts();
   const cancel = useCancelPayout();
+  const change = useChangePayoutAccount();
+  const { data: accounts } = usePayoutAccounts();
+  const active = (accounts ?? []).filter((a) => a.status === 'ACTIVE');
+  // Yêu cầu đang đổi tài khoản (mở khung chọn ngay trong dòng, không popup) và lựa chọn tạm.
+  const [changingId, setChangingId] = useState<number | null>(null);
+  const [pickedAccountId, setPickedAccountId] = useState<number | null>(null);
 
   const handleCancel = (id: number) => {
     cancel.mutate(id, {
@@ -42,6 +49,18 @@ export function PayoutHistory() {
                 <span className={`rounded-full border px-2.5 py-1 text-xs font-medium ${PAYOUT_STATUS_CLASS[p.status]}`}>
                   {PAYOUT_STATUS_LABEL[p.status]}
                 </span>
+                {(p.status === 'PENDING_EMAIL' || p.status === 'REQUESTED') && active.length > 1 && changingId !== p.id && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setChangingId(p.id);
+                      setPickedAccountId(null);
+                    }}
+                    className="rounded-lg border border-line px-3 py-1.5 text-xs font-semibold text-accent-dark hover:bg-tint"
+                  >
+                    Đổi tài khoản nhận
+                  </button>
+                )}
                 {(p.status === 'PENDING_EMAIL' || p.status === 'REQUESTED') && (
                   <button
                     type="button"
@@ -53,6 +72,46 @@ export function PayoutHistory() {
                   </button>
                 )}
               </div>
+              {changingId === p.id && (
+                <div className="flex w-full flex-wrap items-center gap-2 rounded-lg bg-surface p-3">
+                  <select
+                    value={pickedAccountId ?? ''}
+                    onChange={(e) => setPickedAccountId(e.target.value === '' ? null : Number(e.target.value))}
+                    aria-label="Tài khoản nhận mới"
+                    className="min-w-0 flex-1 rounded-lg border border-line bg-surface-raised p-2 text-sm text-ink outline-none focus:border-accent"
+                  >
+                    <option value="">Chọn tài khoản nhận mới</option>
+                    {active.map((a) => (
+                      <option key={a.id} value={a.id}>
+                        {a.bankName} {a.accountMask}{a.primary ? ' (mặc định)' : ''}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    type="button"
+                    disabled={pickedAccountId === null || change.isPending}
+                    onClick={() =>
+                      pickedAccountId !== null &&
+                      change.mutate(
+                        { payoutId: p.id, accountId: pickedAccountId },
+                        {
+                          onSuccess: () => {
+                            toast.success('Đã đổi tài khoản nhận của yêu cầu.');
+                            setChangingId(null);
+                          },
+                          onError: (err) => toast.error(err instanceof ApiError ? err.message : 'Không đổi được tài khoản nhận.'),
+                        },
+                      )
+                    }
+                    className="rounded-lg bg-accent px-3 py-2 text-xs font-semibold text-white hover:bg-accent-dark disabled:opacity-50"
+                  >
+                    Áp dụng
+                  </button>
+                  <button type="button" onClick={() => setChangingId(null)} className="rounded-lg border border-line px-3 py-2 text-xs font-semibold text-ink-muted hover:text-ink">
+                    Hủy
+                  </button>
+                </div>
+              )}
             </li>
           ))}
         </ul>

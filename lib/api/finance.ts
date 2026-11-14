@@ -2,6 +2,7 @@ import { api, apiBlob } from '@/lib/api/client';
 import { getAccessToken } from '@/lib/auth/token';
 import type {
   AccountReveal,
+  EditPayoutAccountReq,
   AdminPayout,
   ConfirmResult,
   CourseShare,
@@ -29,6 +30,21 @@ export const financeApi = {
   account: async (): Promise<PayoutAccount | null> =>
     (await api.get<PayoutAccount | undefined>('/api/v1/instructor/payout-account', token())) ?? null,
 
+  /** Mọi tài khoản đang dùng hoặc chờ xác nhận, tài khoản mặc định lên đầu. */
+  accounts: () => api.get<PayoutAccount[]>('/api/v1/instructor/payout-accounts', token()),
+
+  editAccount: (id: number, req: EditPayoutAccountReq) =>
+    api.put<PayoutAccount>(`/api/v1/instructor/payout-accounts/${id}`, req, token()),
+
+  setPrimaryAccount: (id: number) =>
+    api.post<PayoutAccount>(`/api/v1/instructor/payout-accounts/${id}/default`, {}, token()),
+
+  removeAccount: (id: number) => api.delete<void>(`/api/v1/instructor/payout-accounts/${id}`, token()),
+
+  /** Đổi tài khoản nhận của yêu cầu rút CHƯA được duyệt. */
+  changePayoutAccount: (payoutId: number, accountId: number) =>
+    api.put<PayoutRequest>(`/api/v1/instructor/payouts/${payoutId}/account`, { accountId }, token()),
+
   linkAccount: (req: LinkPayoutAccountReq) =>
     api.post<PayoutAccount>('/api/v1/instructor/payout-account', req, token()),
 
@@ -39,8 +55,8 @@ export const financeApi = {
   payouts: () => api.get<PayoutRequest[]>('/api/v1/instructor/payouts', token()),
 
   /** `idempotencyKey`: sinh 1 lần cho mỗi lần bấm → bấm đúp không tạo 2 yêu cầu. */
-  requestPayout: (amount: number, idempotencyKey: string) =>
-    api.post<PayoutRequest>('/api/v1/instructor/payouts', { amount }, {
+  requestPayout: (amount: number, idempotencyKey: string, accountId?: number) =>
+    api.post<PayoutRequest>('/api/v1/instructor/payouts', { amount, accountId }, {
       ...token(),
       headers: { 'Idempotency-Key': idempotencyKey },
     }),
