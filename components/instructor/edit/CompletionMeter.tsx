@@ -2,7 +2,9 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { CheckCircle2, ChevronDown } from 'lucide-react';
+import Link from 'next/link';
 import { useTranslations } from 'next-intl';
+import { missingConditionHref } from '@/lib/instructor/missingConditionLink';
 
 interface CompletionMeterProps {
   percent: number;
@@ -68,9 +70,22 @@ export function CompletionMeter({ percent, missing }: CompletionMeterProps) {
         <div className="absolute left-0 top-full z-[200] mt-2 w-72 rounded-panel border border-line bg-surface-raised p-3 shadow-card-hover">
           <p className="m-0 mb-1.5 text-[12px] font-bold uppercase tracking-wide text-ink-muted">{t('missingTitle')}</p>
           <ul className="m-0 flex list-disc flex-col gap-1 pl-4 text-[13px] text-ink">
-            {missing.map((m) => (
-              <li key={m}>{m}</li>
-            ))}
+            {missing.map((m) => {
+              const href = missingConditionHref(m);
+              return (
+                <li key={m}>
+                  {m}
+                  {href && (
+                    <>
+                      {' '}
+                      <Link href={href} className="font-semibold text-accent hover:underline">
+                        Làm ngay
+                      </Link>
+                    </>
+                  )}
+                </li>
+              );
+            })}
           </ul>
         </div>
       )}
