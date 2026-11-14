@@ -13,6 +13,8 @@ import { LanguageModal } from '@/components/layout/LanguageModal';
 import { getCurrentRole } from '@/lib/auth/token';
 import { activeNavItem, isFullPageRoute } from '@/lib/instructor/nav';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useNotification } from '@/components/providers/NotificationProvider';
+import { navBadgeCounts } from '@/lib/instructor/navBadges';
 
 const COLLAPSED_KEY = 'instructor-sidebar-collapsed';
 
@@ -31,6 +33,7 @@ export default function InstructorLayout({ children }: { children: React.ReactNo
   const router = useRouter();
   const pathname = usePathname();
   const { data: currentUser } = useCurrentUser();
+  const { notifications } = useNotification();
 
   const [collapsed, setCollapsed] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -80,7 +83,7 @@ export default function InstructorLayout({ children }: { children: React.ReactNo
 
   return (
     <div className="flex min-h-dvh bg-surface font-sans text-ink">
-      <InstructorSidebar pathname={pathname} collapsed={collapsed} onToggleCollapsed={toggleCollapsed} />
+      <InstructorSidebar pathname={pathname} collapsed={collapsed} onToggleCollapsed={toggleCollapsed} badges={navBadgeCounts(notifications)} />
       <InstructorNavDrawer open={mobileNavOpen} onClose={closeMobileNav} pathname={pathname} />
 
       <div className="flex min-w-0 flex-1 flex-col">

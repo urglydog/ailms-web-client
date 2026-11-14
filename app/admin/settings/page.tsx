@@ -51,6 +51,8 @@ const FINANCE_FIELDS: Record<string, { type: 'number' | 'text'; unit?: string; m
   PAYOUT_MIN_AMOUNT: { type: 'number', unit: 'VND', min: 0, max: 100000000, width: 'w-32' },
   PAYOUT_DAYS_OF_MONTH: { type: 'text', width: 'w-32' },
   DISPUTE_INSTRUCTOR_RESPONSE_HOURS: { type: 'number', min: 1, max: 720, width: 'w-24' },
+  PAYOS_PAYOUT_ENABLED: { type: 'number', min: 0, max: 1, width: 'w-24' },
+  PAYOS_PAYOUT_MAX_AMOUNT: { type: 'number', unit: 'VND', min: 0, max: 100000000, width: 'w-32' },
 };
 
 const ENVIRONMENT = [
