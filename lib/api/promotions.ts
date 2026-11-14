@@ -17,5 +17,5 @@ export const adminPromotionsApi = {
     api.get<PromotionRes[]>(`/api/v1/admin/promotions${status ? `?status=${status}` : ''}`, token()),
   approve: (id: number, req: ApprovePromotionReq) => api.post<PromotionRes>(`/api/v1/admin/promotions/${id}/approve`, req, token()),
   reject: (id: number, reason: string) => api.post<PromotionRes>(`/api/v1/admin/promotions/${id}/reject`, { reason }, token()),
-  end: (id: number) => api.post<PromotionRes>(`/api/v1/admin/promotions/${id}/end`, {}, token()),
+  end: (id: number, reason: string) => api.post<PromotionRes>(`/api/v1/admin/promotions/${id}/end`, { reason }, token()),
 };
