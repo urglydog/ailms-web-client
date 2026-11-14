@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { useThemeMode } from '@/components/theme/ThemeToggle';
@@ -62,7 +61,8 @@ export function AccountMenu({ user, languageName, onNavigate, onOpenLanguage, on
       <div className="mb-1 flex items-center gap-3 border-b border-line-soft px-3 pb-3 pt-2">
         <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-accent font-display text-base font-bold uppercase text-white">
           {user.avatarUrl ? (
-            <Image src={user.avatarUrl} alt={user.fullName} width={44} height={44} className="h-full w-full object-cover" />
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={user.avatarUrl} alt={user.fullName} className="h-full w-full object-cover" />
           ) : (
             initial
           )}
