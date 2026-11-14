@@ -1,6 +1,7 @@
 'use client';
 
 import { BalanceCards } from '@/components/instructor/earnings/BalanceCards';
+import { DebtCard } from '@/components/instructor/earnings/DebtCard';
 import { LedgerTable } from '@/components/instructor/earnings/LedgerTable';
 import { PayoutAccountCard } from '@/components/instructor/earnings/PayoutAccountCard';
 import { PayoutHistory } from '@/components/instructor/earnings/PayoutHistory';
@@ -35,6 +36,7 @@ export default function InstructorEarningsPage() {
       ) : (
         <>
           <BalanceCards summary={summary} />
+          <DebtCard />
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
             <PayoutAccountCard summary={summary} />
             <RequestPayoutCard summary={summary} />

@@ -8,6 +8,7 @@ import { ApiError } from '@/lib/api/client';
 import { disputesApi } from '@/lib/api/disputes';
 import { paymentsApi } from '@/lib/api/payments';
 import type { DisputeCategory, DisputeRes, PaymentRes } from '@/types/domain';
+import type { PayoutBank } from '@/types/finance';
 
 const STATUS_LABEL: Record<DisputeRes['status'], string> = {
   OPEN: 'Chưa xử lý',
@@ -15,6 +16,16 @@ const STATUS_LABEL: Record<DisputeRes['status'], string> = {
   RESOLVED_REJECTED: 'Đã từ chối',
   REOPENED: 'Đang chờ xử lý lại',
 };
+/**
+ * Nhãn trạng thái cho học viên: "Đã hoàn tiền" CHỈ khi tiền đã thực sự được chuyển. Admin duyệt rồi mà chưa chuyển khoản thì phải nói rõ
+ * "đã duyệt, chờ chuyển khoản" — nếu không học viên tưởng tiền đã về (bug 14/11/2026).
+ */
+function statusBadge(d: DisputeRes): { label: string; className: string } {
+  if (d.status === 'RESOLVED_REFUNDED' && d.refundTransferStatus === 'PENDING_TRANSFER') {
+    return { label: 'Đã duyệt · chờ chuyển khoản', className: 'bg-tint text-accent-dark border-accent/30' };
+  }
+  return { label: STATUS_LABEL[d.status], className: STATUS_CLASS[d.status] };
+}
 const STATUS_CLASS: Record<DisputeRes['status'], string> = {
   OPEN: 'bg-surface-raised text-ink border-warning',
   RESOLVED_REFUNDED: 'bg-success/10 text-success border-success/20',
@@ -58,7 +69,13 @@ function RequestRefundContent() {
   const [category, setCategory] = useState<DisputeCategory>('CHANGED_MIND');
   const [reason, setReason] = useState('');
   const [description, setDescription] = useState('');
-  const [refundBankAccount, setRefundBankAccount] = useState('');
+  // Tài khoản nhận hoàn tiền (14/11/2026): khai báo có cấu trúc để hệ thống chuyển đúng, người khai chịu trách nhiệm về độ chính xác.
+  const [banks, setBanks] = useState<PayoutBank[]>([]);
+  const [bankCode, setBankCode] = useState('');
+  const [accountNumber, setAccountNumber] = useState('');
+  const [accountNumberAgain, setAccountNumberAgain] = useState('');
+  const [accountHolder, setAccountHolder] = useState('');
+  const [ownConfirmed, setOwnConfirmed] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -69,14 +86,32 @@ function RequestRefundContent() {
   const [reopenSubmitting, setReopenSubmitting] = useState(false);
 
   useEffect(() => {
-    Promise.all([paymentsApi.listMine(), disputesApi.listMine()])
-      .then(([p, d]) => {
+    Promise.all([paymentsApi.listMine(), disputesApi.listMine(), disputesApi.banks().catch(() => [] as PayoutBank[])])
+      .then(([p, d, b]) => {
         setPayments(p.filter((x) => x.status === 'PAID'));
         setMyDisputes(d);
+        setBanks(b);
       })
       .catch(() => toast.error('Không tải được dữ liệu giao dịch.'))
       .finally(() => setLoading(false));
   }, []);
+
+  const digits = accountNumber.replace(/\s/g, '');
+  const hasAccountInput = bankCode !== '' || accountNumber.trim() !== '' || accountNumberAgain.trim() !== '' || accountHolder.trim() !== '';
+  const accountProblem = !hasAccountInput
+    ? null
+    : bankCode === ''
+      ? 'Hãy chọn ngân hàng nhận hoàn tiền.'
+      : !/^[0-9]{6,20}$/.test(digits)
+        ? 'Số tài khoản chỉ gồm chữ số (6–20 số).'
+        : accountNumberAgain.replace(/\s/g, '') !== digits
+          ? 'Hai lần nhập số tài khoản chưa khớp nhau.'
+          : accountHolder.trim().length < 2
+            ? 'Hãy nhập tên chủ tài khoản.'
+            : !ownConfirmed
+              ? 'Bạn cần xác nhận đây là tài khoản của chính bạn.'
+              : null;
+  const accountIncomplete = accountProblem !== null;
 
   const selectedPayment = payments.find((p) => p.txnRef === selectedRef) ?? null;
   const alreadyDisputed = (txnRef: string) => myDisputes.some((d) => d.paymentTxnRef === txnRef);
@@ -118,7 +153,11 @@ function RequestRefundContent() {
     setCategory('CHANGED_MIND');
     setReason('');
     setDescription('');
-    setRefundBankAccount('');
+    setBankCode('');
+    setAccountNumber('');
+    setAccountNumberAgain('');
+    setAccountHolder('');
+    setOwnConfirmed(false);
     setFiles([]);
     setTermsAccepted(false);
   };
@@ -126,6 +165,10 @@ function RequestRefundContent() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedPayment || !reason.trim() || !termsAccepted) return;
+    if (accountIncomplete) {
+      setError(accountProblem);
+      return;
+    }
     setSubmitting(true);
     setError(null);
     try {
@@ -134,7 +177,14 @@ function RequestRefundContent() {
           paymentTxnRef: selectedPayment.txnRef,
           reason: reason.trim(),
           description: description.trim() || undefined,
-          refundBankAccount: refundBankAccount.trim() || undefined,
+          ...(hasAccountInput
+            ? {
+                refundBankCode: bankCode,
+                refundAccountNumber: digits,
+                refundAccountHolder: accountHolder.trim(),
+                refundAccountOwnConfirmed: ownConfirmed,
+              }
+            : {}),
           termsAccepted,
           category,
         },
@@ -253,16 +303,70 @@ function RequestRefundContent() {
               />
             </label>
 
-            <label className="flex flex-col gap-1.5">
-              <span className="text-sm font-semibold text-ink">Số tài khoản nhận hoàn tiền (nếu có)</span>
-              <input
-                type="text"
-                value={refundBankAccount}
-                onChange={(e) => setRefundBankAccount(e.target.value)}
-                placeholder="VD: Vietcombank - 0123456789 - Nguyễn Văn A"
-                className="w-full rounded-lg border border-line bg-surface-raised p-2.5 text-sm text-ink outline-none focus:border-accent"
-              />
-            </label>
+            <fieldset className="m-0 flex flex-col gap-3 rounded-xl border border-line bg-surface p-4">
+              <legend className="px-1 text-sm font-semibold text-ink">Tài khoản nhận hoàn tiền (nên điền)</legend>
+              <p className="m-0 text-xs text-ink-muted">
+                Khoản hoàn được chuyển đúng theo thông tin bạn khai. Hãy nhập thật cẩn thận: nếu số tài khoản sai mà vẫn là một tài khoản có thật,
+                tiền sẽ chuyển tới người khác và khó thu hồi. Không điền ở bước này thì bạn cần liên hệ hỗ trợ để bổ sung trước khi nhận tiền.
+              </p>
+              <label className="flex flex-col gap-1.5">
+                <span className="text-sm font-semibold text-ink">Ngân hàng</span>
+                <select
+                  value={bankCode}
+                  onChange={(e) => setBankCode(e.target.value)}
+                  className="w-full rounded-lg border border-line bg-surface-raised p-2.5 text-sm text-ink outline-none focus:border-accent"
+                >
+                  <option value="">Chọn ngân hàng</option>
+                  {banks.map((b) => (
+                    <option key={b.code} value={b.code}>{b.name}</option>
+                  ))}
+                </select>
+              </label>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <label className="flex flex-col gap-1.5">
+                  <span className="text-sm font-semibold text-ink">Số tài khoản</span>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="off"
+                    maxLength={25}
+                    value={accountNumber}
+                    onChange={(e) => setAccountNumber(e.target.value)}
+                    className="w-full rounded-lg border border-line bg-surface-raised p-2.5 font-mono text-sm text-ink outline-none focus:border-accent"
+                  />
+                </label>
+                <label className="flex flex-col gap-1.5">
+                  <span className="text-sm font-semibold text-ink">Nhập lại số tài khoản</span>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="off"
+                    maxLength={25}
+                    value={accountNumberAgain}
+                    onChange={(e) => setAccountNumberAgain(e.target.value)}
+                    onPaste={(e) => e.preventDefault()}
+                    className="w-full rounded-lg border border-line bg-surface-raised p-2.5 font-mono text-sm text-ink outline-none focus:border-accent"
+                  />
+                </label>
+              </div>
+              <label className="flex flex-col gap-1.5">
+                <span className="text-sm font-semibold text-ink">Tên chủ tài khoản</span>
+                <input
+                  type="text"
+                  autoComplete="off"
+                  maxLength={100}
+                  value={accountHolder}
+                  onChange={(e) => setAccountHolder(e.target.value)}
+                  placeholder="NGUYEN VAN A"
+                  className="w-full rounded-lg border border-line bg-surface-raised p-2.5 text-sm text-ink outline-none focus:border-accent"
+                />
+              </label>
+              <label className="flex items-start gap-2 text-sm text-ink">
+                <input type="checkbox" checked={ownConfirmed} onChange={(e) => setOwnConfirmed(e.target.checked)} className="mt-1" />
+                <span>Tôi xác nhận đây là tài khoản của chính tôi, thông tin đã đúng và tôi chịu trách nhiệm về độ chính xác của nó.</span>
+              </label>
+              {hasAccountInput && accountProblem && <p className="m-0 text-xs text-danger">{accountProblem}</p>}
+            </fieldset>
 
             <label className="flex flex-col gap-1.5">
               <span className="text-sm font-semibold text-ink">Minh chứng (ảnh/video, tối đa {MAX_FILES} file)</span>
@@ -314,8 +418,8 @@ function RequestRefundContent() {
                       Mã GD: <span className="font-mono">{d.paymentTxnRef}</span> — {d.reason}
                     </div>
                   </div>
-                  <span className={`shrink-0 rounded-full border px-2.5 py-1 text-xs font-semibold ${STATUS_CLASS[d.status]}`}>
-                    {STATUS_LABEL[d.status]}
+                  <span className={`shrink-0 rounded-full border px-2.5 py-1 text-xs font-semibold ${statusBadge(d).className}`}>
+                    {statusBadge(d).label}
                   </span>
                 </div>
 

@@ -11,7 +11,14 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { ApiError } from '@/lib/api/client';
 import { disputesApi } from '@/lib/api/disputes';
 import { DisputeV2Details, RefundSummary, ResponsibilityPicker } from '@/components/admin/disputes/DisputeV2Details';
-import type { DisputeAdminRes, DisputeStatus, RefundResponsibility } from '@/types/domain';
+import {
+  AppealPanel,
+  PayosRefundTransfer,
+  ReasonCodeFields,
+  RefundAccountInfo,
+  policyProblem,
+} from '@/components/admin/disputes/DisputePolicyPanels';
+import type { DisputeAdminRes, DisputeStatus, RefundReasonCode, RefundResponsibility } from '@/types/domain';
 
 const STATUSES: DisputeStatus[] = ['OPEN', 'REOPENED', 'RESOLVED_REFUNDED', 'RESOLVED_REJECTED'];
 const STATUS_CLASS: Record<DisputeStatus, string> = {
@@ -43,6 +50,8 @@ function AdminDisputesContent() {
   const [note, setNote] = useState('');
   const [responsibility, setResponsibility] = useState<RefundResponsibility>('STANDARD');
   const [transferRef, setTransferRef] = useState('');
+  const [reasonCode, setReasonCode] = useState<RefundReasonCode | ''>('');
+  const [evidenceNote, setEvidenceNote] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   const fetchDisputes = () => {
@@ -71,6 +80,20 @@ function AdminDisputesContent() {
     setNote('');
     setResponsibility('STANDARD');
     setTransferRef('');
+    setReasonCode('');
+    setEvidenceNote('');
+  };
+
+  // Sau khi PayOS chi / admin quyết định khiếu nại: tải lại danh sách và giữ nguyên hộp thoại đang mở với dữ liệu mới.
+  const refreshSelected = () => {
+    const id = selected?.id;
+    disputesApi
+      .listAllAdmin(statusFilter === 'ALL' ? undefined : statusFilter)
+      .then((list) => {
+        setDisputes(list);
+        if (id != null) setSelected(list.find((x) => x.id === id) ?? null);
+      })
+      .catch(() => toast.error(t('loadError')));
   };
 
   const handleResolve = async (status: 'RESOLVED_REFUNDED' | 'RESOLVED_REJECTED') => {
@@ -80,7 +103,9 @@ function AdminDisputesContent() {
       await disputesApi.resolve(selected.id, {
         status,
         note: note.trim(),
-        ...(status === 'RESOLVED_REFUNDED' ? { responsibility } : {}),
+        ...(status === 'RESOLVED_REFUNDED'
+          ? { responsibility, ...(reasonCode ? { reasonCode } : {}), ...(evidenceNote.trim() ? { evidenceNote: evidenceNote.trim() } : {}) }
+          : {}),
       });
       toast.success(status === 'RESOLVED_REFUNDED' ? t('v2.refundApproved') : t('v2.rejected'));
       setSelected(null);
@@ -239,6 +264,11 @@ function AdminDisputesContent() {
 
               <DisputeV2Details d={selected} />
 
+              <div className="mt-4 flex flex-col gap-2">
+                <h3 className="m-0 text-sm font-semibold text-ink">Tài khoản nhận hoàn tiền</h3>
+                <RefundAccountInfo d={selected} />
+              </div>
+
               {selected.status === 'REOPENED' && (
                 <div className="mt-5 rounded-lg border border-danger/40 bg-danger/5 p-4">
                   <p className="m-0 text-sm font-semibold text-danger">{t('detail.reopenReason')}</p>
@@ -257,7 +287,22 @@ function AdminDisputesContent() {
                   {selected.status === 'REOPENED' && (
                     <p className="m-0 text-xs text-ink-muted">{t('detail.noteOverwriteWarning')}</p>
                   )}
-                  <ResponsibilityPicker d={selected} value={responsibility} onChange={setResponsibility} />
+                  <ResponsibilityPicker
+                    d={selected}
+                    value={responsibility}
+                    onChange={(v) => {
+                      setResponsibility(v);
+                      setReasonCode('');
+                    }}
+                  />
+                  <ReasonCodeFields
+                    responsibility={responsibility}
+                    reasonCode={reasonCode}
+                    onReasonCode={setReasonCode}
+                    evidenceNote={evidenceNote}
+                    onEvidenceNote={setEvidenceNote}
+                    problem={policyProblem(selected, responsibility, reasonCode, note, evidenceNote)}
+                  />
                   <label className="flex flex-col gap-1.5">
                     <span className="text-sm font-semibold text-ink">{t('detail.note')}</span>
                     <textarea
@@ -271,7 +316,7 @@ function AdminDisputesContent() {
                   <div className="mt-2 flex flex-wrap gap-2">
                     <button
                       type="button"
-                      disabled={submitting || !note.trim()}
+                      disabled={submitting || !note.trim() || policyProblem(selected, responsibility, reasonCode, note, evidenceNote) !== null}
                       onClick={() => handleResolve('RESOLVED_REFUNDED')}
                       className="rounded-lg bg-success px-4 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
                     >
@@ -295,6 +340,14 @@ function AdminDisputesContent() {
                   )}
                 </div>
               )}
+
+              {selected.refundTransferStatus === 'PENDING_TRANSFER' && (
+                <div className="mt-4">
+                  <PayosRefundTransfer d={selected} onChanged={refreshSelected} />
+                </div>
+              )}
+
+              <AppealPanel d={selected} onChanged={refreshSelected} />
 
               <RefundSummary
                 d={selected}

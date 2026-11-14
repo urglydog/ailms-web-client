@@ -783,6 +783,12 @@ export type InstructorDecision = 'AGREE_REFUND' | 'OBJECT' | 'NO_RESPONSE';
 export type RefundResponsibility = 'STANDARD' | 'PLATFORM_COMPENSATES' | 'INSTRUCTOR_FAULT';
 export type RefundTransferStatus = 'PENDING_TRANSFER' | 'TRANSFERRED';
 export type AttachmentSide = 'STUDENT' | 'INSTRUCTOR';
+/** Mã lý do chuẩn của quyết định hoàn tiền (14/11/2026): mỗi mã chỉ đi với đúng 1 chế độ trách nhiệm (khớp `RefundReasonCode` ở BE). */
+export type RefundReasonCode =
+  | 'BUYER_REMORSE' | 'OTHER'
+  | 'TECHNICAL_ISSUE' | 'DOUBLE_CHARGE' | 'NOT_ENROLLED' | 'PLATFORM_FAULT'
+  | 'COPYRIGHT_VIOLATION' | 'CONTENT_MISMATCH' | 'PROHIBITED_CONTENT';
+export type AppealStatus = 'NONE' | 'OPEN' | 'UPHELD' | 'REDUCED';
 
 export interface FileDisputeReq {
   paymentTxnRef: string;
@@ -791,6 +797,11 @@ export interface FileDisputeReq {
   refundBankAccount?: string;
   termsAccepted: boolean;
   category?: DisputeCategory;
+  /** Tài khoản nhận hoàn tiền CÓ CẤU TRÚC (14/11/2026): gửi bất kỳ trường nào thì phải đủ cả 4 và xác nhận chính chủ. */
+  refundBankCode?: string;
+  refundAccountNumber?: string;
+  refundAccountHolder?: string;
+  refundAccountOwnConfirmed?: boolean;
 }
 
 export interface DisputeAttachment {
@@ -845,12 +856,33 @@ export interface DisputeAdminRes extends DisputeRes {
   refundInstructorCharge?: number | null;
   refundPlatformShare?: number | null;
   refundTransferRef?: string | null;
+  /** Tài khoản nhận hoàn tiền khai báo có cấu trúc — null với khiếu nại cũ. */
+  refundBankCode?: string | null;
+  refundAccountNumber?: string | null;
+  refundAccountHolder?: string | null;
+  refundAccountConfirmed?: boolean;
+  refundReasonCode?: RefundReasonCode | null;
+  refundEvidenceNote?: string | null;
+  appealStatus?: AppealStatus | null;
+  appealReason?: string | null;
+  appealAt?: string | null;
+  appealDecisionNote?: string | null;
 }
 
 export interface ResolveDisputeReq {
   status: 'RESOLVED_REFUNDED' | 'RESOLVED_REJECTED';
   note: string;
   responsibility?: RefundResponsibility;
+  /** Bắt buộc với chế độ khác Chuẩn; mỗi mã chỉ đi với đúng 1 chế độ. */
+  reasonCode?: RefundReasonCode;
+  /** Bắt buộc với "giảng viên chịu toàn bộ" (tối thiểu 20 ký tự). */
+  evidenceNote?: string;
+}
+
+export type AppealDecision = 'UPHOLD' | 'REDUCE_TO_STANDARD';
+export interface AppealDecideReq {
+  decision: AppealDecision;
+  note: string;
 }
 
 export interface MarkTransferredReq {
@@ -883,6 +915,16 @@ export interface InstructorDisputeRes {
   resolvedAt: string | null;
   /** Số tiền bị trừ khỏi thu nhập của giảng viên nếu đã hoàn tiền. */
   instructorCharge: number | null;
+  /** Quyết định hoàn tiền: chế độ, mã lý do, ghi chú và minh chứng của admin — giảng viên phải biết vì sao bị trừ. */
+  refundResponsibility?: RefundResponsibility | null;
+  refundReasonCode?: RefundReasonCode | null;
+  refundNote?: string | null;
+  refundEvidenceNote?: string | null;
+  /** Hạn khiếu nại (chỉ khi "giảng viên chịu toàn bộ" và chưa khiếu nại). */
+  appealDeadline?: string | null;
+  appealStatus?: AppealStatus | null;
+  appealReason?: string | null;
+  appealDecisionNote?: string | null;
 }
 
 export interface InstructorRespondReq {
