@@ -188,7 +188,7 @@ function AdminDisputesContent() {
                   <td className="max-w-[220px] truncate px-4 py-3 text-ink-muted" title={d.reason}>{d.reason}</td>
                   <td className="px-4 py-3 font-semibold text-ink">{d.amount.toLocaleString('vi-VN')}đ</td>
                   <td className="px-4 py-3">
-                    <span className={`inline-block rounded-full border px-2.5 py-1 text-xs font-medium ${STATUS_CLASS[d.status]}`}>{t(`status.${d.status}`)}</span>
+                    <span className={`inline-block rounded-full border px-2.5 py-1 text-xs font-medium ${STATUS_CLASS[d.status]}`}>{d.status === 'RESOLVED_REFUNDED' && d.refundTransferStatus === 'PENDING_TRANSFER' ? t('status.RESOLVED_REFUNDED_PENDING') : t(`status.${d.status}`)}</span>
                   </td>
                   <td className="whitespace-nowrap px-4 py-3 text-ink-muted">{dateTime(d.createdAt)}</td>
                   <td className="px-4 py-3 text-right">
