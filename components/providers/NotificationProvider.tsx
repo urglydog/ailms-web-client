@@ -67,6 +67,17 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
         Authorization: `Bearer ${token}`,
       },
       reconnectDelay: 3000,
+      // Mỗi lần (tái) kết nối phải lấy token MỚI NHẤT: trước đây token chụp 1 lần lúc mount, hết hạn rồi thì
+      // cứ 3 giây lại gửi đúng token cũ lên (log BE "Expired JWT token" lặp mãi, không bao giờ nối lại được).
+      // Token hết hạn → gọi 1 API thường (đi qua fetchWithRefresh, tự refresh) để làm mới trước khi nối.
+      beforeConnect: async () => {
+        const exp = decodeAccessToken()?.exp;
+        if (typeof exp === 'number' && exp * 1000 <= Date.now() + 5000) {
+          await notificationApi.listMine().catch(() => {});
+        }
+        const fresh = getAccessToken();
+        if (fresh) client.connectHeaders = { Authorization: `Bearer ${fresh}` };
+      },
     });
 
     client.onConnect = () => {
