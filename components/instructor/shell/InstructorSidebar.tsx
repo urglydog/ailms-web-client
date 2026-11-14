@@ -10,10 +10,12 @@ interface InstructorSidebarProps {
   pathname: string;
   collapsed: boolean;
   onToggleCollapsed: () => void;
+  /** Số thông báo chưa đọc theo id mục menu (xem `navBadgeCounts`); không truyền = không hiện huy hiệu. */
+  badges?: Record<string, number>;
 }
 
 /** Thanh bên sáng của Kênh giảng viên (chỉ hiện từ `md` trở lên): nhãn luôn hiện rõ, có thể thu gọn thành cột icon. */
-export function InstructorSidebar({ pathname, collapsed, onToggleCollapsed }: InstructorSidebarProps) {
+export function InstructorSidebar({ pathname, collapsed, onToggleCollapsed, badges }: InstructorSidebarProps) {
   const t = useTranslations('instructor');
   const active = activeNavItem(pathname);
 
@@ -51,8 +53,21 @@ export function InstructorSidebar({ pathname, collapsed, onToggleCollapsed }: In
                 collapsed ? 'justify-center px-0' : 'px-3'
               } ${isActive ? 'bg-tint text-accent-dark' : 'text-ink-muted hover:bg-surface hover:text-ink'}`}
             >
-              <Icon className="h-5 w-5 shrink-0" />
-              {!collapsed && <span>{label}</span>}
+              <span className="relative shrink-0">
+                <Icon className="h-5 w-5" />
+                {collapsed && (badges?.[item.id] ?? 0) > 0 && (
+                  <span aria-hidden className="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full bg-danger ring-2 ring-surface-raised" />
+                )}
+              </span>
+              {!collapsed && <span className="flex-1">{label}</span>}
+              {!collapsed && (badges?.[item.id] ?? 0) > 0 && (
+                <span
+                  aria-label={`${badges?.[item.id]} thông báo chưa đọc`}
+                  className="flex h-5 min-w-5 items-center justify-center rounded-full bg-danger px-1.5 text-[11px] font-bold leading-none text-white"
+                >
+                  {(badges?.[item.id] ?? 0) > 99 ? '99+' : badges?.[item.id]}
+                </span>
+              )}
             </Link>
           );
         })}
