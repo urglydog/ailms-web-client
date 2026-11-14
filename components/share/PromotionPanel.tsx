@@ -145,7 +145,7 @@ export function PromotionPanel({ courses }: { courses: CourseShare[] }) {
                   onClick={() => handleCancel(p.id)}
                   className="w-fit rounded-lg border border-line px-3 py-1.5 text-xs font-semibold text-ink-muted hover:text-ink disabled:opacity-50"
                 >
-                  Hủy đăng ký
+                  {p.status === 'APPROVED' ? 'Gỡ quảng bá' : 'Hủy đăng ký'}
                 </button>
               )}
             </li>

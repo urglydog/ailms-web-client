@@ -18,7 +18,7 @@ import {
 } from '@/types/promotion';
 
 const STATUSES: PromotionStatus[] = ['REQUESTED', 'APPROVED', 'ENDED', 'REJECTED', 'CANCELLED'];
-type Dialog = { kind: 'approve' | 'reject'; promotion: PromotionRes };
+type Dialog = { kind: 'approve' | 'reject' | 'end'; promotion: PromotionRes };
 
 /** `datetime-local` không có múi giờ: dựng giờ địa phương rồi gửi dạng ISO không hậu tố (BE đọc `LocalDateTime`). */
 function toLocalInput(date: Date): string {
@@ -28,7 +28,7 @@ function toLocalInput(date: Date): string {
 
 /**
  * Duyệt quảng bá khóa học (11/11/2026, Epic hoàn tiền – chi trả, Giai đoạn E): xem đăng ký của giảng viên, duyệt kèm khung thời gian
- * (tối đa 90 ngày) và độ ưu tiên, từ chối kèm lý do, hoặc kết thúc sớm một đợt đang chạy. Cột hiệu quả là ƯỚC TÍNH (so với khoảng
+ * (tối đa 90 ngày), từ chối kèm lý do, hoặc gỡ sớm một đợt đang chạy (vd. phát hiện vi phạm, bắt buộc nêu lý do). Thứ tự hiển thị là xoay vòng công bằng theo giờ, không có độ ưu tiên chấm tay. Cột hiệu quả là ƯỚC TÍNH (so với khoảng
  * bằng nhau ngay trước đó), không phải quy kết chính xác.
  */
 export default function AdminPromotionsPage() {
@@ -36,7 +36,6 @@ export default function AdminPromotionsPage() {
   const [statusFilter, setStatusFilter] = useState<PromotionStatus | 'ALL'>('REQUESTED');
   const [dialog, setDialog] = useState<Dialog | null>(null);
   const [endAt, setEndAt] = useState('');
-  const [priority, setPriority] = useState('0');
   const [note, setNote] = useState('');
 
   const { data, isLoading, isError } = useQuery({
@@ -50,13 +49,12 @@ export default function AdminPromotionsPage() {
   const closeDialog = () => {
     setDialog(null);
     setNote('');
-    setPriority('0');
     setEndAt('');
   };
 
   const approve = useMutation({
-    mutationFn: (v: { id: number; endAt: string; priority: number; note: string }) =>
-      adminPromotionsApi.approve(v.id, { endAt: v.endAt, priority: v.priority, note: v.note || undefined }),
+    mutationFn: (v: { id: number; endAt: string; note: string }) =>
+      adminPromotionsApi.approve(v.id, { endAt: v.endAt, note: v.note || undefined }),
     onSuccess: () => { toast.success('Đã duyệt, khóa học sẽ lên kệ ngay.'); closeDialog(); refresh(); },
     onError,
   });
@@ -66,8 +64,8 @@ export default function AdminPromotionsPage() {
     onError,
   });
   const end = useMutation({
-    mutationFn: (id: number) => adminPromotionsApi.end(id),
-    onSuccess: () => { toast.success('Đã kết thúc đợt quảng bá.'); refresh(); },
+    mutationFn: (v: { id: number; reason: string }) => adminPromotionsApi.end(v.id, v.reason),
+    onSuccess: () => { toast.success('Đã gỡ quảng bá, giảng viên sẽ nhận được thông báo.'); closeDialog(); refresh(); },
     onError,
   });
 
@@ -80,7 +78,9 @@ export default function AdminPromotionsPage() {
     if (!dialog) return;
     const id = dialog.promotion.id;
     if (dialog.kind === 'approve') {
-      approve.mutate({ id, endAt: `${endAt}:00`, priority: Math.min(100, Math.max(0, Number(priority) || 0)), note: note.trim() });
+      approve.mutate({ id, endAt: `${endAt}:00`, note: note.trim() });
+    } else if (dialog.kind === 'end') {
+      end.mutate({ id, reason: note.trim() });
     } else {
       reject.mutate({ id, reason: note.trim() });
     }
@@ -141,7 +141,7 @@ export default function AdminPromotionsPage() {
               {p.requestNote && <div className="text-sm text-ink">Ghi chú của giảng viên: {p.requestNote}</div>}
               {p.startAt && p.endAt && (
                 <div className="text-xs text-ink-muted">
-                  {dateTime(p.startAt)} → {dateTime(p.endAt)} · ưu tiên {p.priority ?? 0}
+                  {dateTime(p.startAt)} → {dateTime(p.endAt)} 
                 </div>
               )}
               {(p.status === 'APPROVED' || p.status === 'ENDED') && (
@@ -162,8 +162,8 @@ export default function AdminPromotionsPage() {
                   </>
                 )}
                 {p.status === 'APPROVED' && (
-                  <button type="button" disabled={busy} onClick={() => end.mutate(p.id)} className="rounded-lg border border-line px-3 py-1.5 text-xs font-semibold text-ink-muted hover:text-ink disabled:opacity-50">
-                    Kết thúc sớm
+                  <button type="button" disabled={busy} onClick={() => setDialog({ kind: 'end', promotion: p })} className="rounded-lg border border-line px-3 py-1.5 text-xs font-semibold text-ink-muted hover:text-ink disabled:opacity-50">
+                    Gỡ quảng bá
                   </button>
                 )}
               </div>
@@ -178,7 +178,7 @@ export default function AdminPromotionsPage() {
           onClose={closeDialog}
           size="sm"
           closeOnBackdrop={false}
-          title={dialog.kind === 'approve' ? 'Duyệt quảng bá' : 'Từ chối đăng ký'}
+          title={dialog.kind === 'approve' ? 'Duyệt quảng bá' : dialog.kind === 'end' ? 'Gỡ quảng bá' : 'Từ chối đăng ký'}
           footer={
             <div className="flex justify-end gap-2">
               <button type="button" onClick={closeDialog} className="rounded-lg border border-line px-4 py-2 text-sm font-semibold text-ink-muted hover:text-ink">Hủy</button>
@@ -201,10 +201,6 @@ export default function AdminPromotionsPage() {
                   <span className="font-semibold text-ink">Kết thúc lúc *</span>
                   <input type="datetime-local" value={endAt} onChange={(e) => setEndAt(e.target.value)} className="w-full rounded-lg border border-line bg-surface-raised p-2.5 text-ink outline-none focus:border-accent" />
                   <span className="text-xs text-ink-muted">Bắt đầu ngay khi duyệt; tối đa 90 ngày.</span>
-                </label>
-                <label className="flex flex-col gap-1.5">
-                  <span className="font-semibold text-ink">Độ ưu tiên (0–100, lớn hơn hiện trước)</span>
-                  <input type="number" min={0} max={100} value={priority} onChange={(e) => setPriority(e.target.value)} className="w-full rounded-lg border border-line bg-surface-raised p-2.5 text-ink outline-none focus:border-accent" />
                 </label>
               </>
             )}

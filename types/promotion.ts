@@ -13,7 +13,6 @@ export interface PromotionRes {
   requestNote: string | null;
   startAt: string | null;
   endAt: string | null;
-  priority: number | null;
   adminNote: string | null;
   createdAt: string;
   /** Đang hiển thị thật cho học viên ngay lúc này. */
@@ -37,7 +36,6 @@ export interface CreatePromotionReq {
 export interface ApprovePromotionReq {
   startAt?: string;
   endAt: string;
-  priority?: number;
   note?: string;
 }
 
