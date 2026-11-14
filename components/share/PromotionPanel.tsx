@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { SearchableSelect } from '@/components/ui/SearchableSelect';
 import { useCancelPromotion, useMyPromotions, useRequestPromotion } from '@/hooks/usePromotions';
 import { ApiError } from '@/lib/api/client';
 import { dateTime, money } from '@/lib/finance';
@@ -68,19 +69,16 @@ export function PromotionPanel({ courses }: { courses: CourseShare[] }) {
       </div>
 
       <form onSubmit={submit} className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <label className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-1.5">
           <span className="text-xs font-semibold text-ink-muted">Khóa học</span>
-          <select
+          <SearchableSelect
+            options={shareable.map((c) => ({ value: c.courseId, label: c.title }))}
             value={courseId}
-            onChange={(e) => setCourseId(e.target.value === '' ? '' : Number(e.target.value))}
-            className="w-full rounded-lg border border-line bg-surface-raised p-2.5 text-sm text-ink outline-none focus:border-accent"
-          >
-            <option value="">Chọn khóa đã xuất bản</option>
-            {shareable.map((c) => (
-              <option key={c.courseId} value={c.courseId}>{c.title}</option>
-            ))}
-          </select>
-        </label>
+            onChange={setCourseId}
+            placeholder="Chọn khóa đã xuất bản"
+            searchPlaceholder="Tìm khóa học..."
+          />
+        </div>
         <label className="flex flex-col gap-1.5">
           <span className="text-xs font-semibold text-ink-muted">Vị trí</span>
           <select

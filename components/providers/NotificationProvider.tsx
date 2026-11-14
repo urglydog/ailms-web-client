@@ -85,18 +85,21 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
         try {
           const data = JSON.parse(message.body);
 
+          // SRS_REMINDER nay đi qua NotificationService.notify() như mọi thông báo khác (có id/tiêu đề/nội dung/liên kết) — trước đây
+          // nhánh riêng này đọc `data.message` (không tồn tại) nên nội dung rỗng và không có liên kết khi bấm.
           if (data.type === 'SRS_REMINDER') {
+            const content = data.content ?? data.message ?? '';
             setNotifications(prev => [{
-              id: Date.now(),
-              title: '📚 Ôn tập Flashcard',
-              content: data.message ?? '',
-              linkUrl: null,
+              id: data.id ?? Date.now(),
+              title: data.title ?? 'Đến giờ ôn flashcard',
+              content,
+              linkUrl: data.linkUrl ?? null,
               isRead: false,
-              createdAt: new Date().toISOString(),
+              createdAt: data.createdAt ?? new Date().toISOString(),
               type: data.type,
             }, ...prev]);
-            if (data.message) {
-              toast.info(data.message, { duration: 10000, icon: '📚' });
+            if (content) {
+              toast.info(content, { duration: 10000, icon: '📚' });
             }
             return;
           }
