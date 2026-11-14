@@ -14,6 +14,14 @@ export function useInstructorDisputes() {
   });
 }
 
+export function useAppealDispute() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: { id: number; reason: string }) => instructorDisputesApi.appeal(input.id, input.reason),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: KEY }),
+  });
+}
+
 export function useRespondToDispute() {
   const queryClient = useQueryClient();
   return useMutation({

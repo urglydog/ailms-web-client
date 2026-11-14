@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { DebtsPanel } from '@/components/admin/finance/DebtsPanel';
 import { PageHeader } from '@/components/instructor/ui/PageHeader';
 import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -125,6 +126,8 @@ export default function AdminPayoutsPage() {
         title="Chi trả giảng viên"
         subtitle="Duyệt yêu cầu rút tiền, chuyển khoản tay rồi ghi mã giao dịch. Từ chối hoặc thất bại sẽ trả tiền về số dư của giảng viên."
       />
+
+      <DebtsPanel />
 
       <div className="flex flex-wrap items-end justify-between gap-4 rounded-xl border border-line bg-surface-raised p-4">
         <label className="flex w-full flex-col gap-1.5 sm:w-64">

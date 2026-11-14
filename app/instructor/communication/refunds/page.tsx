@@ -7,6 +7,7 @@ import { PageHeader } from '@/components/instructor/ui/PageHeader';
 import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useInstructorDisputes, useRespondToDispute } from '@/hooks/useInstructorDisputes';
+import { RefundDecisionPanel } from '@/components/instructor/refunds/RefundDecisionPanel';
 import { ApiError } from '@/lib/api/client';
 import type { DisputeStatus, InstructorDisputeRes } from '@/types/domain';
 
@@ -220,6 +221,8 @@ function RefundDetailModal({ dispute: d, onClose }: { dispute: InstructorDispute
                 : t('result.refundedNoCharge')}
           </div>
         )}
+
+        <RefundDecisionPanel d={d} />
 
         <div className="rounded-lg border border-line bg-surface p-4">
           <h3 className="m-0 mb-2 text-sm font-semibold text-ink">{t('response.title')}</h3>

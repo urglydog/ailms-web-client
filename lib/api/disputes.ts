@@ -1,6 +1,8 @@
 import { api, apiFormData } from '@/lib/api/client';
 import { getAccessToken } from '@/lib/auth/token';
+import type { PayoutBank } from '@/types/finance';
 import type {
+  AppealDecideReq,
   DisputeAdminRes,
   DisputeRes,
   DisputeStatus,
@@ -38,6 +40,13 @@ export const disputesApi = {
   reopen: (id: number, req: ReopenDisputeReq) =>
     api.post<DisputeRes>(`/api/v1/disputes/mine/${id}/reopen`, req, { token: getAccessToken() ?? undefined }),
 
+  /** Danh sách ngân hàng cho form khai báo tài khoản nhận hoàn tiền (chọn từ danh sách, không gõ tự do). */
+  banks: () => api.get<PayoutBank[]>('/api/v1/disputes/banks', { token: getAccessToken() ?? undefined }),
+
+  /** Admin quyết định khiếu nại của giảng viên với quyết định "giảng viên chịu toàn bộ" (14/11/2026). */
+  decideAppeal: (id: number, req: AppealDecideReq) =>
+    api.post<DisputeAdminRes>(`/api/v1/disputes/admin/${id}/appeal/decide`, req, { token: getAccessToken() ?? undefined }),
+
   /** Admin đã chuyển khoản tiền hoàn cho học viên và nhập mã giao dịch (11/11/2026). */
   markTransferred: (id: number, req: MarkTransferredReq) =>
     api.post<DisputeAdminRes>(`/api/v1/disputes/admin/${id}/mark-transferred`, req, { token: getAccessToken() ?? undefined }),
@@ -57,4 +66,8 @@ export const instructorDisputesApi = {
     files.forEach((file) => formData.append('files', file));
     return apiFormData<InstructorDisputeRes>(`/api/v1/instructor/disputes/${id}/respond`, formData);
   },
+
+  /** Khiếu nại quyết định "giảng viên chịu toàn bộ" (một lần, trong hạn). */
+  appeal: (id: number, reason: string) =>
+    api.post<InstructorDisputeRes>(`/api/v1/instructor/disputes/${id}/appeal`, { reason }, { token: getAccessToken() ?? undefined }),
 };
