@@ -154,6 +154,11 @@ export function PayosRefundTransfer({ d, onChanged }: { d: DisputeAdminRes; onCh
         </span>
       </div>
       {blocked && <p className="m-0 text-xs text-ink-muted">Chưa đủ thông tin tài khoản chuẩn của học viên nên chưa chi tự động được; chuyển thủ công bên dưới.</p>}
+      {latest && (inFlight || latest.status === 'UNKNOWN') && (
+        <p className="m-0 text-xs font-semibold text-danger">
+          Đang có lệnh chi PayOS chưa có kết quả — KHÔNG chuyển tay lúc này (tránh chuyển tiền hai lần). Chờ kết quả hoặc bấm &quot;Chi qua PayOS&quot; để gửi lại.
+        </p>
+      )}
       {latest && (
         <p className="m-0 text-xs text-ink">
           Lệnh {latest.referenceId}: {latest.status === 'SUCCEEDED' ? 'thành công' : latest.status === 'FAILED' ? 'thất bại' : latest.status === 'UNKNOWN' ? 'chưa rõ kết quả (có thể bấm gửi lại, không chi trùng)' : 'đang xử lý'}
