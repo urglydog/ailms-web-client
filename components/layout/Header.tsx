@@ -488,7 +488,8 @@ export function Header() {
                   className="flex h-9 w-9 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-accent font-display text-[13px] font-bold uppercase text-white"
                 >
                   {currentUser?.avatarUrl ? (
-                    <Image src={currentUser.avatarUrl} alt="" width={36} height={36} className="h-full w-full object-cover" />
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={currentUser.avatarUrl} alt="" className="h-full w-full object-cover" />
                   ) : (
                     currentUser?.fullName ? currentUser.fullName.charAt(0) : 'U'
                   )}
