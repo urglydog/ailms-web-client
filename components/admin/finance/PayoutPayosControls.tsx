@@ -65,19 +65,20 @@ export function PayoutPayosControls({ payoutId, amount, status, onInFlightChange
     // eslint-disable-next-line react-hooks/exhaustive-deps -- chỉ phản ứng khi trạng thái lệnh đổi
   }, [latest?.status]);
 
+  // Nút nằm cùng hàng với các nút khác (kích thước cố định, không giãn); dòng trạng thái xuống hàng riêng (basis-full) để không đẩy/chèn các nút kia.
   return (
-    <div className="flex flex-col gap-1">
+    <>
       <button
         type="button"
         disabled={disabled || transfer.isPending || inFlight}
         title={`Gửi lệnh chuyển ${money(amount)} qua PayOS. Số dư tài khoản chi: ${status.balance === null ? 'không rõ' : money(status.balance)}`}
         onClick={() => transfer.mutate()}
-        className="rounded-lg bg-accent px-3 py-1.5 text-xs font-semibold text-white hover:bg-accent-dark disabled:opacity-50"
+        className="whitespace-nowrap rounded-lg bg-accent px-3 py-1.5 text-xs font-semibold text-white hover:bg-accent-dark disabled:opacity-50"
       >
         {transfer.isPending ? 'Đang gửi...' : inFlight ? 'PayOS đang xử lý...' : latest?.status === 'FAILED' || latest?.status === 'UNKNOWN' ? 'Chi lại qua PayOS' : 'Chi qua PayOS'}
       </button>
       {latest && (
-        <span className={`max-w-56 text-[11px] ${latest.status === 'FAILED' ? 'text-danger' : 'text-ink-muted'}`}>
+        <span className={`basis-full text-right text-[11px] ${latest.status === 'FAILED' ? 'text-danger' : 'text-ink-muted'}`}>
           {latest.referenceId}:{' '}
           {latest.status === 'SUCCEEDED'
             ? 'thành công'
@@ -89,6 +90,6 @@ export function PayoutPayosControls({ payoutId, amount, status, onInFlightChange
           {latest.nameMismatch ? ' ⚠ tên ngân hàng khác tên đã nhập' : ''}
         </span>
       )}
-    </div>
+    </>
   );
 }
