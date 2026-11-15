@@ -21,6 +21,6 @@ export const REASON_LABEL: Record<RefundReasonCode, string> = {
 
 export const RESPONSIBILITY_LABEL: Record<RefundResponsibility, string> = {
   STANDARD: 'Chuẩn — giảng viên trả lại đúng phần đã nhận',
-  PLATFORM_COMPENSATES: 'Nền tảng gánh hết',
+  PLATFORM_COMPENSATES: 'Nền tảng chịu toàn bộ',
   INSTRUCTOR_FAULT: 'Giảng viên chịu toàn bộ',
 };

@@ -1899,19 +1899,19 @@
             "hint": "Đổi ý trong hạn, lỗi hệ thống, thanh toán trùng, không được ghi danh."
           },
           "PLATFORM_COMPENSATES": {
-            "label": "Nền tảng gánh hết",
-            "hint": "Học viên đã dùng được khóa nhưng lỗi do nền tảng; giảng viên giữ thu nhập."
+            "label": "Hệ thống chịu toàn bộ",
+            "hint": "Học viên đã dùng được khóa nhưng lỗi từ phía hệ thống; giảng viên giữ nguyên thu nhập."
           },
           "INSTRUCTOR_FAULT": {
             "label": "Giảng viên chịu toàn bộ",
             "hint": "Mô tả sai nghiêm trọng hoặc vi phạm chính sách. Bắt buộc ghi lý do ở ô ghi chú."
           },
-          "preview": "Học viên nhận lại {learner} · Giảng viên bị trừ {instructor} · Nền tảng gánh {platform}"
+          "preview": "Học viên nhận lại {learner} · Trừ vào thu nhập giảng viên {instructor} · Phần hệ thống chịu {platform}"
         },
         "refund": {
           "title": "Hoàn tiền đã duyệt",
-          "summary": "Chế độ: {mode}. Giảng viên bị trừ {instructor}, nền tảng gánh {platform}.",
-          "pending": "Đã thu hồi quyền học. Hãy chuyển khoản cho học viên rồi nhập mã giao dịch để hệ thống báo cho họ.",
+          "summary": "Chế độ: {mode}. Trừ vào thu nhập giảng viên {instructor}; phần hệ thống chịu {platform}.",
+          "pending": "Đã thu hồi quyền học. Chi qua PayOS (tự động), hoặc chuyển khoản tay rồi nhập mã giao dịch để hệ thống báo cho học viên.",
           "refPh": "Mã giao dịch chuyển khoản",
           "markTransferred": "Đã chuyển khoản",
           "transferred": "Đã chuyển tiền hoàn — mã {ref}"

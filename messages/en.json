@@ -1899,19 +1899,19 @@
             "hint": "Changed mind within the window, system error, double payment, not enrolled."
           },
           "PLATFORM_COMPENSATES": {
-            "label": "Platform covers it all",
+            "label": "System covers it all",
             "hint": "Learner could use the course but the platform was at fault; the instructor keeps their earning."
           },
           "INSTRUCTOR_FAULT": {
             "label": "Instructor bears everything",
             "hint": "Seriously misleading description or policy violation. A reason in the note is required."
           },
-          "preview": "Learner gets back {learner} · Instructor charged {instructor} · Platform bears {platform}"
+          "preview": "Learner gets back {learner} · Instructor charged {instructor} · System bears {platform}"
         },
         "refund": {
           "title": "Approved refund",
-          "summary": "Mode: {mode}. Instructor charged {instructor}, platform bears {platform}.",
-          "pending": "Access has been revoked. Transfer the money to the learner, then enter the transfer reference so they are notified.",
+          "summary": "Mode: {mode}. Instructor charged {instructor}, the system bears {platform}.",
+          "pending": "Access has been revoked. Pay out via PayOS (automatic), or transfer manually and enter the transfer reference so the learner is notified.",
           "refPh": "Bank transfer reference",
           "markTransferred": "Mark as transferred",
           "transferred": "Refund transferred — reference {ref}"
