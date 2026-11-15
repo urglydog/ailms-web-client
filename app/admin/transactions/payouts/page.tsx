@@ -57,6 +57,14 @@ export default function AdminPayoutsPage() {
   });
   // Yêu cầu có lệnh PayOS đang chạy: khóa các nút chuyển tay/từ chối/thất bại để không chi hai lần hoặc trả tiền về số dư khi PayOS vẫn đang chuyển.
   const [inFlightIds, setInFlightIds] = useState<Set<number>>(new Set());
+  const [manualOpen, setManualOpen] = useState<Set<number>>(new Set());
+  const toggleManual = (id: number) =>
+    setManualOpen((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
   const setInFlight = (id: number, on: boolean) =>
     setInFlightIds((prev) => {
       if (prev.has(id) === on) return prev;
@@ -203,8 +211,8 @@ export default function AdminPayoutsPage() {
                     {p.scheduledFor && <div>Đợt chi: {dateOnly(p.scheduledFor)}</div>}
                     {p.paidAt && <div>Chi: {dateTime(p.paidAt)}</div>}
                   </td>
-                  <td className="px-4 py-3">
-                    <div className="flex flex-wrap justify-end gap-1.5">
+                  <td className="w-72 px-4 py-3">
+                    <div className="flex flex-wrap items-start justify-end gap-1.5">
                       {p.status === 'REQUESTED' && (
                         <button type="button" disabled={busy} onClick={() => approve.mutate(p.id)} className="rounded-lg bg-accent px-3 py-1.5 text-xs font-semibold text-white hover:bg-accent-dark disabled:opacity-50">
                           Duyệt
@@ -212,7 +220,7 @@ export default function AdminPayoutsPage() {
                       )}
                       {p.status === 'APPROVED' && (
                         <>
-                          <button type="button" disabled={busy} onClick={() => reveal.mutate(p)} className="rounded-lg border border-line px-3 py-1.5 text-xs font-semibold text-accent-dark hover:bg-tint disabled:opacity-50">
+                          <button type="button" disabled={busy} onClick={() => reveal.mutate(p)} className="whitespace-nowrap rounded-lg border border-line px-3 py-1.5 text-xs font-semibold text-accent-dark hover:bg-tint disabled:opacity-50">
                             Xem số TK
                           </button>
                           {payosStatus?.enabled && (
@@ -225,16 +233,31 @@ export default function AdminPayoutsPage() {
                               onChanged={refresh}
                             />
                           )}
-                          <button type="button" disabled={busy || inFlightIds.has(p.id)} onClick={() => setDialog({ kind: 'paid', payout: p })} className="rounded-lg bg-success px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90 disabled:opacity-50">
-                            Đã chuyển
-                          </button>
-                          <button type="button" disabled={busy || inFlightIds.has(p.id)} onClick={() => setDialog({ kind: 'fail', payout: p })} className="rounded-lg border border-line px-3 py-1.5 text-xs font-semibold text-ink-muted hover:text-ink disabled:opacity-50">
-                            Thất bại
-                          </button>
+                          {/* Khi PayOS bật: "Đã chuyển"/"Thất bại" là việc thủ công, gom vào một mục thu gọn cho khỏi rối. */}
+                          {payosStatus?.enabled && (
+                            <button
+                              type="button"
+                              aria-expanded={manualOpen.has(p.id)}
+                              onClick={() => toggleManual(p.id)}
+                              className="whitespace-nowrap rounded-lg border border-line px-3 py-1.5 text-xs font-semibold text-ink-muted hover:text-ink"
+                            >
+                              Thủ công {manualOpen.has(p.id) ? '▴' : '▾'}
+                            </button>
+                          )}
+                          {(!payosStatus?.enabled || manualOpen.has(p.id)) && (
+                            <>
+                              <button type="button" disabled={busy || inFlightIds.has(p.id)} onClick={() => setDialog({ kind: 'paid', payout: p })} className="whitespace-nowrap rounded-lg bg-success px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90 disabled:opacity-50">
+                                Đã chuyển
+                              </button>
+                              <button type="button" disabled={busy || inFlightIds.has(p.id)} onClick={() => setDialog({ kind: 'fail', payout: p })} className="whitespace-nowrap rounded-lg border border-line px-3 py-1.5 text-xs font-semibold text-ink-muted hover:text-ink disabled:opacity-50">
+                                Thất bại
+                              </button>
+                            </>
+                          )}
                         </>
                       )}
                       {(p.status === 'REQUESTED' || p.status === 'APPROVED') && (
-                        <button type="button" disabled={busy || inFlightIds.has(p.id)} onClick={() => setDialog({ kind: 'reject', payout: p })} className="rounded-lg px-3 py-1.5 text-xs font-semibold text-danger ring-1 ring-inset ring-danger/40 hover:bg-danger/5 disabled:opacity-50">
+                        <button type="button" disabled={busy || inFlightIds.has(p.id)} onClick={() => setDialog({ kind: 'reject', payout: p })} className="whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-semibold text-danger ring-1 ring-inset ring-danger/40 hover:bg-danger/5 disabled:opacity-50">
                           Từ chối
                         </button>
                       )}
