@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { ApiError } from '@/lib/api/client';
@@ -116,7 +116,21 @@ export function PayosRefundTransfer({ d, onChanged }: { d: DisputeAdminRes; onCh
     queryFn: () => payosPayoutApi.orders('DISPUTE_REFUND', d.id),
     enabled: !!getAccessToken() && !!status?.enabled,
     retry: false,
+    // Lệnh chi chạy nền: còn đang xử lý thì tự làm mới 10 giây/lần để thấy kết quả mà không phải đóng mở lại hộp thoại.
+    refetchInterval: (q) => {
+      const o = q.state.data?.[0];
+      return o && (o.status === 'PENDING' || o.status === 'SUBMITTED' || o.status === 'UNKNOWN') ? 10_000 : false;
+    },
   });
+  const latestStatus = orders?.[0]?.status;
+  const wasInFlight = useRef(false);
+  useEffect(() => {
+    const inFlightNow = latestStatus === 'PENDING' || latestStatus === 'SUBMITTED' || latestStatus === 'UNKNOWN';
+    // Vừa chuyển từ "đang xử lý" sang "thành công": tải lại khiếu nại để hiện trạng thái đã hoàn tiền.
+    if (wasInFlight.current && latestStatus === 'SUCCEEDED') onChanged();
+    wasInFlight.current = inFlightNow;
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- chỉ phản ứng khi trạng thái lệnh đổi
+  }, [latestStatus]);
   const transfer = useMutation({
     mutationFn: () => payosPayoutApi.transferRefund(d.id),
     onSuccess: (o) => {
@@ -161,7 +175,7 @@ export function PayosRefundTransfer({ d, onChanged }: { d: DisputeAdminRes; onCh
       )}
       {latest && (
         <p className="m-0 text-xs text-ink">
-          Lệnh {latest.referenceId}: {latest.status === 'SUCCEEDED' ? 'thành công' : latest.status === 'FAILED' ? 'thất bại' : latest.status === 'UNKNOWN' ? 'chưa rõ kết quả (có thể bấm gửi lại, không chi trùng)' : 'đang xử lý'}
+          Lệnh {latest.referenceId}: {latest.status === 'SUCCEEDED' ? 'thành công' : latest.status === 'FAILED' ? 'thất bại' : latest.status === 'UNKNOWN' ? 'chưa rõ kết quả (có thể bấm gửi lại, không chi trùng)' : 'đang xử lý — PayOS/ngân hàng đang chuyển tiền, có thể mất vài phút; trang tự cập nhật'}
           {latest.errorMessage ? ` — ${latest.errorMessage}` : ''}
           {latest.nameMismatch ? ` — ⚠ tên ngân hàng trả về "${latest.resolvedAccountName}" khác tên đã nhập` : ''}
         </p>
