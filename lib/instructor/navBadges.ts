@@ -20,3 +20,18 @@ export function navBadgeCounts(notifications: BadgeNotification[]): Record<strin
   }
   return counts;
 }
+
+/**
+ * Số thông báo chưa đọc theo từng TAB con của một khu (vd Giao tiếp: Hỏi đáp/Tin nhắn/Bài tập/Thông báo/Hoàn tiền): thông báo thuộc tab nào khi
+ * `linkUrl` của nó nằm trong `<prefix><khóa>`. Dùng để chỉ rõ thông báo mới ở TAB nào chứ không chỉ ở cả mục menu.
+ */
+export function sectionBadgeCounts(notifications: BadgeNotification[], prefix: string, keys: readonly string[]): Record<string, number> {
+  const counts: Record<string, number> = {};
+  for (const n of notifications) {
+    if (n.isRead || !n.linkUrl) continue;
+    const path = n.linkUrl.split(/[?#]/)[0] ?? '';
+    const key = keys.find((k) => path === `${prefix}${k}` || path.startsWith(`${prefix}${k}/`));
+    if (key) counts[key] = (counts[key] ?? 0) + 1;
+  }
+  return counts;
+}

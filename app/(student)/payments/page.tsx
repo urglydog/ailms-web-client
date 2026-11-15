@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { disputesApi } from '@/lib/api/disputes';
 import { paymentsApi } from '@/lib/api/payments';
 import type { PaymentRes } from '@/types/domain';
 import { format } from 'date-fns';
@@ -11,6 +12,8 @@ export default function PaymentsHistoryPage() {
   const [payments, setPayments] = useState<PaymentRes[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedPayment, setSelectedPayment] = useState<PaymentRes | null>(null);
+  // Giao dịch đã DUYỆT hoàn tiền nhưng tiền CHƯA chuyển: hiện "chờ chuyển" thay vì "Đã hoàn tiền" cho khớp trang Khiếu nại.
+  const [awaitingTransfer, setAwaitingTransfer] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     paymentsApi
@@ -18,6 +21,10 @@ export default function PaymentsHistoryPage() {
       .then((data) => setPayments(data))
       .catch(() => toast.error('Lỗi khi tải lịch sử giao dịch'))
       .finally(() => setLoading(false));
+    disputesApi
+      .listMine()
+      .then((ds) => setAwaitingTransfer(new Set(ds.filter((d) => d.refundTransferStatus === 'PENDING_TRANSFER').map((d) => d.paymentTxnRef))))
+      .catch(() => undefined);
   }, []);
 
   const getStatusColor = (status: string) => {
@@ -37,7 +44,8 @@ export default function PaymentsHistoryPage() {
     }
   };
 
-  const getStatusLabel = (status: string) => {
+  const getStatusLabel = (status: string, txnRef?: string) => {
+    if (status === 'REFUNDED' && txnRef && awaitingTransfer.has(txnRef)) return 'Đã duyệt hoàn · chờ chuyển';
     switch (status) {
       case 'PAID': return 'Thành công';
       case 'PENDING': return 'Đang chờ xử lý';
@@ -90,7 +98,7 @@ export default function PaymentsHistoryPage() {
                   <td className="px-6 py-4 font-medium text-ink">{p.paymentMethod}</td>
                   <td className="px-6 py-4">
                     <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-medium border ${getStatusColor(p.status)}`}>
-                      {getStatusLabel(p.status)}
+                      {getStatusLabel(p.status, p.txnRef)}
                     </span>
                   </td>
                   <td className="px-6 py-4">
@@ -105,8 +113,9 @@ export default function PaymentsHistoryPage() {
 
       {selectedPayment && (
         <PaymentDetailModal 
-          payment={selectedPayment} 
-          onClose={() => setSelectedPayment(null)} 
+          payment={selectedPayment}
+          awaitingTransfer={awaitingTransfer.has(selectedPayment.txnRef)}
+          onClose={() => setSelectedPayment(null)}
         />
       )}
     </div>
