@@ -437,8 +437,8 @@ function RequestRefundContent() {
 
                 {d.status === 'RESOLVED_REFUNDED' && d.refundTransferStatus === 'PENDING_TRANSFER' && (
                   <div className="rounded-lg border border-accent/30 bg-tint px-3 py-2 text-xs text-ink">
-                    Yêu cầu hoàn tiền đã được chấp nhận, quyền truy cập khóa học đã được thu hồi. Chúng tôi sẽ chuyển
-                    khoản cho bạn và báo qua email/thông báo.
+                    Yêu cầu hoàn tiền đã được chấp nhận, quyền truy cập khóa học đã được thu hồi. Hệ thống sẽ chi
+                    trả khoản hoàn vào tài khoản bạn đã khai và báo lại qua email/thông báo khi hoàn tất.
                   </div>
                 )}
                 {d.status === 'RESOLVED_REFUNDED' && d.refundTransferStatus === 'TRANSFERRED' && (

@@ -175,7 +175,7 @@ export function PayosRefundTransfer({ d, onChanged }: { d: DisputeAdminRes; onCh
       )}
       {latest && (
         <p className="m-0 text-xs text-ink">
-          Lệnh {latest.referenceId}: {latest.status === 'SUCCEEDED' ? 'thành công' : latest.status === 'FAILED' ? 'thất bại' : latest.status === 'UNKNOWN' ? 'chưa rõ kết quả (có thể bấm gửi lại, không chi trùng)' : 'đang xử lý — PayOS/ngân hàng đang chuyển tiền, có thể mất vài phút; trang tự cập nhật'}
+          Lệnh {latest.referenceId}: {latest.status === 'SUCCEEDED' ? 'thành công' : latest.status === 'FAILED' ? 'thất bại' : latest.status === 'UNKNOWN' ? 'chưa rõ kết quả (có thể bấm gửi lại, không chi trùng)' : 'đang xử lý — chờ PayOS/ngân hàng xác nhận, trang tự cập nhật khi có kết quả'}
           {latest.errorMessage ? ` — ${latest.errorMessage}` : ''}
           {latest.nameMismatch ? ` — ⚠ tên ngân hàng trả về "${latest.resolvedAccountName}" khác tên đã nhập` : ''}
         </p>

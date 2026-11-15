@@ -86,7 +86,7 @@ export function PayoutPayosControls({ payoutId, amount, status, onInFlightChange
               ? `thất bại${latest.errorMessage ? ` — ${latest.errorMessage}` : ''}`
               : latest.status === 'UNKNOWN'
                 ? 'chưa rõ kết quả'
-                : 'đang xử lý, có thể mất vài phút'}
+                : 'đang xử lý — chờ PayOS/ngân hàng xác nhận'}
           {latest.nameMismatch ? ' ⚠ tên ngân hàng khác tên đã nhập' : ''}
         </span>
       )}

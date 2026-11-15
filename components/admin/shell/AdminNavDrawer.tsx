@@ -14,10 +14,14 @@ interface AdminNavDrawerProps {
   pendingCourses: number;
   openDisputes?: number;
   openSupport?: number;
+  /** Yêu cầu rút tiền cần admin xử lý (chờ duyệt hoặc đã duyệt chờ chi). */
+  openPayouts?: number;
+  /** Đăng ký quảng bá chờ duyệt. */
+  openPromotions?: number;
 }
 
 /** Ngăn kéo điều hướng khu Quản trị cho điện thoại: trượt từ trái, khóa cuộn nền, đóng bằng Escape/nền mờ/nút đóng. */
-export function AdminNavDrawer({ open, onClose, pathname, pendingCourses, openDisputes = 0, openSupport = 0 }: AdminNavDrawerProps) {
+export function AdminNavDrawer({ open, onClose, pathname, pendingCourses, openDisputes = 0, openSupport = 0, openPayouts = 0, openPromotions = 0 }: AdminNavDrawerProps) {
   const t = useTranslations('admin');
   const closeRef = useRef<HTMLButtonElement>(null);
   const [shown, setShown] = useState(false);
@@ -89,7 +93,7 @@ export function AdminNavDrawer({ open, onClose, pathname, pendingCourses, openDi
               {group.items.map((item) => {
                 const isActive = active?.id === item.id;
                 const Icon = ADMIN_NAV_ICONS[item.id];
-                const badge = item.id === 'moderation' ? pendingCourses : item.id === 'disputes' ? openDisputes : item.id === 'support' ? openSupport : 0;
+                const badge = item.id === 'moderation' ? pendingCourses : item.id === 'disputes' ? openDisputes : item.id === 'support' ? openSupport : item.id === 'payouts' ? openPayouts : item.id === 'promotions' ? openPromotions : 0;
                 return (
                   <Link
                     key={item.id}
