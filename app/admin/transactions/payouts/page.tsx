@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { DebtsPanel } from '@/components/admin/finance/DebtsPanel';
+import { PayoutPayosControls } from '@/components/admin/finance/PayoutPayosControls';
 import { PageHeader } from '@/components/instructor/ui/PageHeader';
 import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -54,20 +55,16 @@ export default function AdminPayoutsPage() {
     enabled: !!getAccessToken(),
     retry: false,
   });
-  const autoTransfer = useMutation({
-    mutationFn: (id: number) => payosPayoutApi.transferPayout(id),
-    onSuccess: (order) => {
-      toast.success(
-        order.status === 'SUCCEEDED'
-          ? 'PayOS đã chi và đã ghi nhận.'
-          : order.status === 'FAILED'
-            ? `PayOS từ chối: ${order.errorMessage ?? 'không rõ lý do'}`
-            : 'Đã gửi lệnh chi sang PayOS, hệ thống sẽ tự cập nhật khi có kết quả.',
-      );
-      refresh();
-    },
-    onError,
-  });
+  // Yêu cầu có lệnh PayOS đang chạy: khóa các nút chuyển tay/từ chối/thất bại để không chi hai lần hoặc trả tiền về số dư khi PayOS vẫn đang chuyển.
+  const [inFlightIds, setInFlightIds] = useState<Set<number>>(new Set());
+  const setInFlight = (id: number, on: boolean) =>
+    setInFlightIds((prev) => {
+      if (prev.has(id) === on) return prev;
+      const next = new Set(prev);
+      if (on) next.add(id);
+      else next.delete(id);
+      return next;
+    });
 
   const approve = useMutation({
     mutationFn: (id: number) => adminPayoutsApi.approve(id),
@@ -110,7 +107,7 @@ export default function AdminPayoutsPage() {
   });
 
   const rows = useMemo(() => data ?? [], [data]);
-  const busy = autoTransfer.isPending || approve.isPending || markPaid.isPending || reject.isPending || fail.isPending || reveal.isPending;
+  const busy = approve.isPending || markPaid.isPending || reject.isPending || fail.isPending || reveal.isPending;
 
   const submitDialog = () => {
     if (!dialog || dialog.kind === 'reveal') return;
@@ -219,26 +216,25 @@ export default function AdminPayoutsPage() {
                             Xem số TK
                           </button>
                           {payosStatus?.enabled && (
-                            <button
-                              type="button"
+                            <PayoutPayosControls
+                              payoutId={p.id}
+                              amount={p.amount}
+                              status={payosStatus}
                               disabled={busy}
-                              title={`Gửi lệnh chuyển ${money(p.amount)} qua PayOS. Số dư tài khoản chi: ${payosStatus.balance === null ? 'không rõ' : money(payosStatus.balance)}`}
-                              onClick={() => autoTransfer.mutate(p.id)}
-                              className="rounded-lg bg-accent px-3 py-1.5 text-xs font-semibold text-white hover:bg-accent-dark disabled:opacity-50"
-                            >
-                              Chi qua PayOS
-                            </button>
+                              onInFlightChange={setInFlight}
+                              onChanged={refresh}
+                            />
                           )}
-                          <button type="button" disabled={busy} onClick={() => setDialog({ kind: 'paid', payout: p })} className="rounded-lg bg-success px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90 disabled:opacity-50">
+                          <button type="button" disabled={busy || inFlightIds.has(p.id)} onClick={() => setDialog({ kind: 'paid', payout: p })} className="rounded-lg bg-success px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90 disabled:opacity-50">
                             Đã chuyển
                           </button>
-                          <button type="button" disabled={busy} onClick={() => setDialog({ kind: 'fail', payout: p })} className="rounded-lg border border-line px-3 py-1.5 text-xs font-semibold text-ink-muted hover:text-ink disabled:opacity-50">
+                          <button type="button" disabled={busy || inFlightIds.has(p.id)} onClick={() => setDialog({ kind: 'fail', payout: p })} className="rounded-lg border border-line px-3 py-1.5 text-xs font-semibold text-ink-muted hover:text-ink disabled:opacity-50">
                             Thất bại
                           </button>
                         </>
                       )}
                       {(p.status === 'REQUESTED' || p.status === 'APPROVED') && (
-                        <button type="button" disabled={busy} onClick={() => setDialog({ kind: 'reject', payout: p })} className="rounded-lg px-3 py-1.5 text-xs font-semibold text-danger ring-1 ring-inset ring-danger/40 hover:bg-danger/5 disabled:opacity-50">
+                        <button type="button" disabled={busy || inFlightIds.has(p.id)} onClick={() => setDialog({ kind: 'reject', payout: p })} className="rounded-lg px-3 py-1.5 text-xs font-semibold text-danger ring-1 ring-inset ring-danger/40 hover:bg-danger/5 disabled:opacity-50">
                           Từ chối
                         </button>
                       )}
