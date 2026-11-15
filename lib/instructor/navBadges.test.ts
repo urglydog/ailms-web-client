@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { navBadgeCounts } from './navBadges';
+import { navBadgeCounts, sectionBadgeCounts } from './navBadges';
 
 describe('navBadgeCounts', () => {
   it('đếm thông báo chưa đọc theo mục menu dựa trên đường dẫn liên kết', () => {
@@ -20,5 +20,22 @@ describe('navBadgeCounts', () => {
       { isRead: false, linkUrl: '/instructor/earnings?tab=1#x' },
     ]);
     expect(counts).toEqual({ earnings: 1 });
+  });
+});
+
+describe('sectionBadgeCounts', () => {
+  it('đếm thông báo chưa đọc theo tab con của khu Giao tiếp', () => {
+    const counts = sectionBadgeCounts(
+      [
+        { isRead: false, linkUrl: '/instructor/communication/refunds' },
+        { isRead: false, linkUrl: '/instructor/communication/refunds?x=1' },
+        { isRead: false, linkUrl: '/instructor/communication/messages' },
+        { isRead: true, linkUrl: '/instructor/communication/qa' },
+        { isRead: false, linkUrl: '/instructor/earnings' },
+      ],
+      '/instructor/communication/',
+      ['qa', 'messages', 'assignments', 'announcements', 'refunds'],
+    );
+    expect(counts).toEqual({ refunds: 2, messages: 1 });
   });
 });

@@ -4,6 +4,8 @@ export interface SectionTab {
   key: string;
   href: string;
   label: string;
+  /** Số thông báo chưa đọc của mục này (không truyền hoặc 0 = không hiện huy hiệu). */
+  badge?: number;
 }
 
 interface SectionTabsProps {
@@ -30,6 +32,14 @@ export function SectionTabs({ tabs, pathname, ariaLabel }: SectionTabsProps) {
               }`}
             >
               {tab.label}
+              {(tab.badge ?? 0) > 0 && (
+                <span
+                  aria-label={`${tab.badge} chưa đọc`}
+                  className="ml-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-danger px-1 text-[10px] font-bold leading-none text-white"
+                >
+                  {(tab.badge ?? 0) > 99 ? '99+' : tab.badge}
+                </span>
+              )}
             </Link>
           );
         })}
