@@ -7,6 +7,7 @@ import { ApiError } from '@/lib/api/client';
 import { payosPayoutApi, type PayosStatus } from '@/lib/api/payosPayout';
 import { getAccessToken } from '@/lib/auth/token';
 import { money } from '@/lib/finance';
+import { BLOCKED_REFRESH_MS, FAILURE_LABEL, isRetryBlocked, retryButtonLabel } from '@/lib/payosRetry';
 
 interface Props {
   payoutId: number;
@@ -31,10 +32,13 @@ export function PayoutPayosControls({ payoutId, amount, status, onInFlightChange
     retry: false,
     refetchInterval: (q) => {
       const o = q.state.data?.[0];
-      return o && (o.status === 'PENDING' || o.status === 'SUBMITTED' || o.status === 'UNKNOWN') ? 10_000 : false;
+      if (o && (o.status === 'PENDING' || o.status === 'SUBMITTED' || o.status === 'UNKNOWN')) return 10_000;
+      // Đang bị chặn chi lại theo thời gian: làm mới định kỳ để nút tự mở đúng lúc BE cho phép.
+      return isRetryBlocked(o) ? BLOCKED_REFRESH_MS : false;
     },
   });
   const latest = orders?.[0];
+  const retryBlocked = isRetryBlocked(latest);
   const inFlight = !!latest && (latest.status === 'PENDING' || latest.status === 'SUBMITTED' || latest.status === 'UNKNOWN');
 
   const transfer = useMutation({
@@ -70,12 +74,12 @@ export function PayoutPayosControls({ payoutId, amount, status, onInFlightChange
     <>
       <button
         type="button"
-        disabled={disabled || transfer.isPending || inFlight}
-        title={`Gửi lệnh chuyển ${money(amount)} qua PayOS. Số dư tài khoản chi: ${status.balance === null ? 'không rõ' : money(status.balance)}`}
+        disabled={disabled || transfer.isPending || inFlight || retryBlocked}
+        title={retryBlocked ? (latest?.retryBlockedReason ?? 'Đang bị khóa chi lại') : `Gửi lệnh chuyển ${money(amount)} qua PayOS. Số dư tài khoản chi: ${status.balance === null ? 'không rõ' : money(status.balance)}`}
         onClick={() => transfer.mutate()}
         className="whitespace-nowrap rounded-lg bg-accent px-3 py-1.5 text-xs font-semibold text-white hover:bg-accent-dark disabled:opacity-50"
       >
-        {transfer.isPending ? 'Đang gửi...' : inFlight ? 'PayOS đang xử lý...' : latest?.status === 'FAILED' || latest?.status === 'UNKNOWN' ? 'Chi lại qua PayOS' : 'Chi qua PayOS'}
+        {transfer.isPending ? 'Đang gửi...' : inFlight ? 'PayOS đang xử lý...' : retryButtonLabel(latest) ?? (latest?.status === 'FAILED' || latest?.status === 'UNKNOWN' ? 'Chi lại qua PayOS' : 'Chi qua PayOS')}
       </button>
       {latest && (
         <span className={`basis-full text-right text-[11px] ${latest.status === 'FAILED' ? 'text-danger' : 'text-ink-muted'}`}>
@@ -83,7 +87,7 @@ export function PayoutPayosControls({ payoutId, amount, status, onInFlightChange
           {latest.status === 'SUCCEEDED'
             ? 'thành công'
             : latest.status === 'FAILED'
-              ? `thất bại${latest.errorMessage ? ` — ${latest.errorMessage}` : ''}`
+              ? `thất bại${latest.failureCategory ? ` (${FAILURE_LABEL[latest.failureCategory]})` : ''}${latest.errorMessage ? ` — ${latest.errorMessage}` : ''}${retryBlocked && latest.retryBlockedReason ? `. ${latest.retryBlockedReason}` : ''}`
               : latest.status === 'UNKNOWN'
                 ? 'chưa rõ kết quả'
                 : 'đang xử lý — chờ PayOS/ngân hàng xác nhận'}

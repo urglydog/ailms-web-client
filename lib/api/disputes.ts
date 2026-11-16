@@ -11,7 +11,9 @@ import type {
   InstructorRespondReq,
   MarkTransferredReq,
   ReopenDisputeReq,
+  RequestAccountUpdateReq,
   ResolveDisputeReq,
+  UpdateRefundAccountReq,
 } from '@/types/domain';
 
 export const disputesApi = {
@@ -46,6 +48,14 @@ export const disputesApi = {
   /** Admin quyết định khiếu nại của giảng viên với quyết định "giảng viên chịu toàn bộ" (14/11/2026). */
   decideAppeal: (id: number, req: AppealDecideReq) =>
     api.post<DisputeAdminRes>(`/api/v1/disputes/admin/${id}/appeal/decide`, req, { token: getAccessToken() ?? undefined }),
+
+  /** Học viên cập nhật tài khoản nhận hoàn tiền (16/11/2026); BE quyết định được phép hay không theo trạng thái khoản hoàn. */
+  updateRefundAccount: (id: number, req: UpdateRefundAccountReq) =>
+    api.put<DisputeRes>(`/api/v1/disputes/mine/${id}/refund-account`, req, { token: getAccessToken() ?? undefined }),
+
+  /** Admin yêu cầu học viên cập nhật tài khoản nhận hoàn tiền (16/11/2026). */
+  requestAccountUpdate: (id: number, req: RequestAccountUpdateReq) =>
+    api.post<DisputeAdminRes>(`/api/v1/disputes/admin/${id}/request-account-update`, req, { token: getAccessToken() ?? undefined }),
 
   /** Admin đã chuyển khoản tiền hoàn cho học viên và nhập mã giao dịch (11/11/2026). */
   markTransferred: (id: number, req: MarkTransferredReq) =>

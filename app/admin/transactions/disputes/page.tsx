@@ -188,7 +188,7 @@ function AdminDisputesContent() {
                   <td className="max-w-[220px] truncate px-4 py-3 text-ink-muted" title={d.reason}>{d.reason}</td>
                   <td className="px-4 py-3 font-semibold text-ink">{d.amount.toLocaleString('vi-VN')}đ</td>
                   <td className="px-4 py-3">
-                    <span className={`inline-block rounded-full border px-2.5 py-1 text-xs font-medium ${STATUS_CLASS[d.status]}`}>{d.status === 'RESOLVED_REFUNDED' && d.refundTransferStatus === 'PENDING_TRANSFER' ? t('status.RESOLVED_REFUNDED_PENDING') : t(`status.${d.status}`)}</span>
+                    <span className={`inline-block rounded-full border px-2.5 py-1 text-xs font-medium ${STATUS_CLASS[d.status]}`}>{d.status === 'RESOLVED_REFUNDED' && d.refundTransferStatus === 'AWAITING_ACCOUNT' ? 'Chờ học viên cập nhật TK' : d.status === 'RESOLVED_REFUNDED' && d.refundTransferStatus === 'PENDING_TRANSFER' ? t('status.RESOLVED_REFUNDED_PENDING') : t(`status.${d.status}`)}</span>
                   </td>
                   <td className="whitespace-nowrap px-4 py-3 text-ink-muted">{dateTime(d.createdAt)}</td>
                   <td className="px-4 py-3 text-right">
@@ -344,6 +344,12 @@ function AdminDisputesContent() {
               {selected.refundTransferStatus === 'PENDING_TRANSFER' && (
                 <div className="mt-4">
                   <PayosRefundTransfer d={selected} onChanged={refreshSelected} />
+                </div>
+              )}
+
+              {selected.refundTransferStatus === 'AWAITING_ACCOUNT' && (
+                <div className="mt-4 rounded-lg border border-warning bg-surface p-3 text-xs text-ink">
+                  Chưa chuyển được vào tài khoản học viên đã khai{selected.refundAccountSummary ? ` (${selected.refundAccountSummary})` : ''}. Đang chờ học viên cập nhật tài khoản nhận hoàn tiền; khi họ cập nhật, khoản hoàn tự quay về &quot;chờ chuyển&quot; để chi lại. Bạn vẫn có thể chuyển thủ công và ghi nhận bên dưới.
                 </div>
               )}
 
