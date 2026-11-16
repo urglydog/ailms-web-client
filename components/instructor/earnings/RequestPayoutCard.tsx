@@ -55,7 +55,7 @@ export function RequestPayoutCard({ summary }: { summary: FinanceSummary }) {
       <h2 className="m-0 font-display text-base font-bold text-ink">Yêu cầu rút tiền</h2>
       <p className="m-0 text-xs text-ink-muted">
         Tối thiểu {money(summary.minPayoutAmount)}. Sau khi xác nhận qua email, yêu cầu được xếp vào đợt chi gần nhất (kế tiếp:{' '}
-        {dateOnly(summary.nextPayoutDate)}).
+        {dateOnly(summary.nextPayoutDate)}). Bạn nhận đủ số tiền rút, phí chuyển tiền do nền tảng chịu.
       </p>
       {blocker && <div className="rounded-lg bg-surface px-3 py-2 text-sm text-ink">{blocker}</div>}
       <form onSubmit={submit} className="flex flex-col gap-3">

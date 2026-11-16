@@ -4,7 +4,7 @@ export default function RevenueSharePolicyPage() {
   return (
     <LegalPageLayout
       title="Chính sách chia sẻ doanh thu Giảng viên"
-      updatedAt="14/11/2026"
+      updatedAt="17/11/2026"
       intro={<p>Áp dụng từ 20/09/2026 cho các giao dịch mới. Tỷ lệ được xác định tại thời điểm thanh toán thành công.</p>}
     >
       <LegalSection title="1. Học viên tìm khóa học qua nền tảng (Organic)">
@@ -115,6 +115,14 @@ export default function RevenueSharePolicyPage() {
             ngân hàng từ chối, số tiền được trả lại số dư để Giảng viên chọn tài khoản khác và gửi lại yêu cầu.
           </li>
         </ul>
+      </LegalSection>
+
+      <LegalSection title="9. Phí chuyển tiền">
+        <p>
+          Phí chuyển tiền phát sinh khi chi trả cho Giảng viên (rút tiền) hoặc hoàn tiền cho học viên do <strong>nền tảng chịu</strong> và
+          đã nằm trong phần nền tảng giữ lại ở mục 1 và mục 2. Phí này không bị trừ thêm vào thu nhập của Giảng viên: số tiền bạn yêu cầu rút
+          là số tiền bạn nhận được.
+        </p>
       </LegalSection>
     </LegalPageLayout>
   );
