@@ -119,9 +119,9 @@ export default function RevenueSharePolicyPage() {
 
       <LegalSection title="9. Phí chuyển tiền">
         <p>
-          Phí chuyển tiền phát sinh khi chi trả cho Giảng viên (rút tiền) hoặc hoàn tiền cho học viên do <strong>nền tảng chịu</strong> và
-          đã nằm trong phần nền tảng giữ lại ở mục 1 và mục 2. Phí này không bị trừ thêm vào thu nhập của Giảng viên: số tiền bạn yêu cầu rút
-          là số tiền bạn nhận được.
+          Phí chuyển tiền phát sinh khi Giảng viên rút tiền hoặc khi học viên được hoàn tiền do <strong>LinguaLearn đảm nhận</strong> và đã
+          nằm trong phần nền tảng giữ lại ở mục 1 và mục 2. Khoản phí này không được khấu trừ thêm vào thu nhập của Giảng viên: số tiền
+          bạn yêu cầu rút chính là số tiền bạn nhận được.
         </p>
       </LegalSection>
     </LegalPageLayout>

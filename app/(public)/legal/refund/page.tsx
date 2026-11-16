@@ -34,7 +34,7 @@ export default function RefundPolicyPage() {
           <li>Vào <Link href="/disputes/new">Khiếu nại giao dịch</Link>, chọn giao dịch, loại vấn đề, mô tả và đính kèm minh chứng.</li>
           <li>Giảng viên của khóa học được thông báo và có <strong>48 giờ</strong> để phản hồi (đồng ý hoặc phản đối, kèm minh chứng).</li>
           <li>Quản trị viên xem xét cả hai bên và quyết định. Kết quả, kèm lý do, được gửi qua email và hiển thị trong trang khiếu nại.</li>
-          <li>Nếu được hoàn tiền, chúng tôi chuyển khoản <strong>đủ 100%</strong> số tiền đã thanh toán vào tài khoản bạn đã cung cấp (phí chuyển tiền do nền tảng chịu, không trừ vào khoản hoàn) và báo lại khi đã chuyển.</li>
+          <li>Nếu được hoàn tiền, chúng tôi chuyển khoản <strong>đủ 100%</strong> số tiền đã thanh toán vào tài khoản bạn đã cung cấp. LinguaLearn chi trả phí chuyển tiền nên khoản hoàn của bạn không bị khấu trừ. Chúng tôi sẽ báo lại khi đã chuyển.</li>
         </ol>
         <p>Mỗi giao dịch chỉ được gửi một khiếu nại. Nếu đã được báo chuyển tiền mà chưa nhận được, bạn có thể báo lại một lần trong vòng 7 ngày.</p>
       </LegalSection>
