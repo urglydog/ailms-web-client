@@ -1,7 +1,7 @@
 'use client';
 
 import { useLedger } from '@/hooks/useFinance';
-import { LEDGER_TYPE_LABEL, dateOnly, dateTime, money } from '@/lib/finance';
+import { LEDGER_TYPE_LABEL, dateOnly, dateTime, ledgerNote, money } from '@/lib/finance';
 
 /** Sao kê sổ cái: từng khoản cộng/trừ vào thu nhập (30 dòng mới nhất). */
 export function LedgerTable() {
@@ -30,7 +30,7 @@ export function LedgerTable() {
                 <tr key={e.id}>
                   <td className="whitespace-nowrap py-2 pr-3 text-ink-muted">{dateTime(e.createdAt)}</td>
                   <td className="py-2 pr-3 text-ink">{LEDGER_TYPE_LABEL[e.type]}</td>
-                  <td className="max-w-[240px] truncate py-2 pr-3 text-ink-muted" title={e.note ?? ''}>{e.note ?? ''}</td>
+                  <td className="max-w-[240px] truncate py-2 pr-3 text-ink-muted" title={ledgerNote(e.note)}>{ledgerNote(e.note)}</td>
                   <td className="whitespace-nowrap py-2 pr-3 text-xs text-ink-muted">
                     {e.matured ? 'Đã tính vào số dư' : `Giữ đến ${dateOnly(e.availableAt)}`}
                   </td>
