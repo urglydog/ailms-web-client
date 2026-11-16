@@ -7,6 +7,7 @@ import { ApiError } from '@/lib/api/client';
 import { disputesApi } from '@/lib/api/disputes';
 import { payosPayoutApi } from '@/lib/api/payosPayout';
 import { getAccessToken } from '@/lib/auth/token';
+import { BLOCKED_REFRESH_MS, FAILURE_LABEL, clockTime, isRetryBlocked, retryButtonLabel } from '@/lib/payosRetry';
 import { REASON_CODES, REASON_LABEL } from '@/lib/refundPolicy';
 import type { AppealDecision, DisputeAdminRes, RefundReasonCode, RefundResponsibility } from '@/types/domain';
 
@@ -119,7 +120,9 @@ export function PayosRefundTransfer({ d, onChanged }: { d: DisputeAdminRes; onCh
     // Lệnh chi chạy nền: còn đang xử lý thì tự làm mới 10 giây/lần để thấy kết quả mà không phải đóng mở lại hộp thoại.
     refetchInterval: (q) => {
       const o = q.state.data?.[0];
-      return o && (o.status === 'PENDING' || o.status === 'SUBMITTED' || o.status === 'UNKNOWN') ? 10_000 : false;
+      if (o && (o.status === 'PENDING' || o.status === 'SUBMITTED' || o.status === 'UNKNOWN')) return 10_000;
+      // Đang bị chặn chi lại theo thời gian: làm mới định kỳ để nút tự mở đúng lúc BE cho phép.
+      return isRetryBlocked(o) ? BLOCKED_REFRESH_MS : false;
     },
   });
   const latestStatus = orders?.[0]?.status;
@@ -147,22 +150,53 @@ export function PayosRefundTransfer({ d, onChanged }: { d: DisputeAdminRes; onCh
     onError: (err) => toast.error(err instanceof ApiError ? err.message : 'Không gửi được lệnh chi.'),
   });
 
+  const askAccount = useMutation({
+    mutationFn: () =>
+      disputesApi.requestAccountUpdate(d.id, {
+        reason: (orders?.[0]?.errorMessage ?? 'Cần kiểm tra lại tài khoản nhận hoàn tiền').slice(0, 280),
+      }),
+    onSuccess: () => {
+      toast.success('Đã yêu cầu học viên cập nhật tài khoản nhận hoàn tiền.');
+      onChanged();
+    },
+    onError: (err) => toast.error(err instanceof ApiError ? err.message : 'Không gửi được yêu cầu.'),
+  });
+
   if (!status?.enabled) return null;
   const latest = orders?.[0];
   const blocked = !d.refundBankCode || !d.refundAccountConfirmed;
   const inFlight = latest && (latest.status === 'PENDING' || latest.status === 'SUBMITTED');
+  const retryBlocked = isRetryBlocked(latest);
+  const accountChangedAt = clockTime(d.refundAccountUpdatedAt);
   return (
     <div className="flex flex-col gap-2 rounded-lg border border-line bg-surface-raised p-3">
       <div className="flex flex-wrap items-center gap-2">
         <button
           type="button"
-          disabled={transfer.isPending || blocked || !!inFlight}
+          disabled={transfer.isPending || blocked || !!inFlight || retryBlocked}
           onClick={() => transfer.mutate()}
-          title={blocked ? 'Cần học viên khai tài khoản dạng chuẩn và xác nhận chính chủ' : 'Chuyển tiền hoàn qua PayOS'}
+          title={
+            retryBlocked
+              ? (latest?.retryBlockedReason ?? 'Đang bị khóa chi lại')
+              : blocked
+                ? 'Cần học viên khai tài khoản dạng chuẩn và xác nhận chính chủ'
+                : 'Chuyển tiền hoàn qua PayOS'
+          }
           className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-dark disabled:opacity-50"
         >
-          Chi qua PayOS
+          {retryButtonLabel(latest) ?? (latest?.status === 'FAILED' ? 'Chi lại qua PayOS' : 'Chi qua PayOS')}
         </button>
+        {latest?.status === 'FAILED' && (
+          <button
+            type="button"
+            disabled={askAccount.isPending}
+            onClick={() => askAccount.mutate()}
+            title="Chuyển khoản hoàn sang trạng thái chờ học viên kiểm tra và cập nhật tài khoản nhận"
+            className="rounded-lg border border-line bg-surface px-3 py-2 text-sm font-semibold text-ink hover:bg-surface-raised disabled:opacity-50"
+          >
+            Yêu cầu học viên cập nhật TK
+          </button>
+        )}
         <span className="text-xs text-ink-muted">
           Số dư tài khoản chi: {status.balance == null ? 'không rõ' : `${status.balance.toLocaleString('vi-VN')}đ`}
         </span>
@@ -173,10 +207,16 @@ export function PayosRefundTransfer({ d, onChanged }: { d: DisputeAdminRes; onCh
           Đang có lệnh chi PayOS chưa có kết quả — KHÔNG chuyển tay lúc này (tránh chuyển tiền hai lần). Chờ kết quả hoặc bấm &quot;Chi qua PayOS&quot; để gửi lại.
         </p>
       )}
+      {accountChangedAt && (
+        <p className="m-0 text-xs font-semibold text-warning">
+          Học viên đã đổi tài khoản nhận hoàn tiền lúc {accountChangedAt}; hãy kiểm tra tài khoản mới trước khi chuyển.
+        </p>
+      )}
       {latest && (
         <p className="m-0 text-xs text-ink">
-          Lệnh {latest.referenceId}: {latest.status === 'SUCCEEDED' ? 'thành công' : latest.status === 'FAILED' ? 'thất bại' : latest.status === 'UNKNOWN' ? 'chưa rõ kết quả (có thể bấm gửi lại, không chi trùng)' : 'đang xử lý — chờ PayOS/ngân hàng xác nhận, trang tự cập nhật khi có kết quả'}
+          Lệnh {latest.referenceId}: {latest.status === 'SUCCEEDED' ? 'thành công' : latest.status === 'FAILED' ? `thất bại${latest.failureCategory ? ` (${FAILURE_LABEL[latest.failureCategory]})` : ''}` : latest.status === 'UNKNOWN' ? 'chưa rõ kết quả (có thể bấm gửi lại, không chi trùng)' : 'đang xử lý — chờ PayOS/ngân hàng xác nhận, trang tự cập nhật khi có kết quả'}
           {latest.errorMessage ? ` — ${latest.errorMessage}` : ''}
+          {retryBlocked && latest.retryBlockedReason ? `. ${latest.retryBlockedReason}` : ''}
           {latest.nameMismatch ? ` — ⚠ tên ngân hàng trả về "${latest.resolvedAccountName}" khác tên đã nhập` : ''}
         </p>
       )}

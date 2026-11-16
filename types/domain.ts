@@ -781,7 +781,8 @@ export type DisputeEligibility = 'AUTO_ELIGIBLE' | 'OUT_OF_POLICY' | 'EXCEPTION'
 export type InstructorDecision = 'AGREE_REFUND' | 'OBJECT' | 'NO_RESPONSE';
 /** STANDARD: giảng viên trả lại đúng phần đã nhận · PLATFORM_COMPENSATES: nền tảng gánh hết · INSTRUCTOR_FAULT: giảng viên trả toàn bộ. */
 export type RefundResponsibility = 'STANDARD' | 'PLATFORM_COMPENSATES' | 'INSTRUCTOR_FAULT';
-export type RefundTransferStatus = 'PENDING_TRANSFER' | 'TRANSFERRED';
+/** AWAITING_ACCOUNT (16/11/2026): chuyển khoản không thành vì tài khoản nhận có vấn đề — chờ học viên cập nhật tài khoản. */
+export type RefundTransferStatus = 'PENDING_TRANSFER' | 'AWAITING_ACCOUNT' | 'TRANSFERRED';
 export type AttachmentSide = 'STUDENT' | 'INSTRUCTOR';
 /** Mã lý do chuẩn của quyết định hoàn tiền (14/11/2026): mỗi mã chỉ đi với đúng 1 chế độ trách nhiệm (khớp `RefundReasonCode` ở BE). */
 export type RefundReasonCode =
@@ -835,9 +836,30 @@ export interface DisputeRes {
   refundTransferStatus?: RefundTransferStatus | null;
   /** Hạn cuối được xin hoàn tiền của giao dịch. */
   refundDeadline?: string | null;
+  /** BE quyết định học viên có được sửa tài khoản nhận hoàn tiền lúc này không (16/11/2026). */
+  canEditRefundAccount?: boolean;
+  /** Giải thích ngắn: vì sao đang khóa hoặc vì sao cần cập nhật. */
+  refundAccountHint?: string | null;
+  /** Tài khoản nhận hoàn tiền đang khai, đã che số (chỉ 4 số cuối). */
+  refundAccountSummary?: string | null;
+}
+
+/** Học viên cập nhật tài khoản nhận hoàn tiền khi chuyển khoản lỗi hoặc nhập nhầm (16/11/2026). */
+export interface UpdateRefundAccountReq {
+  refundBankCode: string;
+  refundAccountNumber: string;
+  refundAccountHolder: string;
+  refundAccountOwnConfirmed: boolean;
+}
+
+/** Admin yêu cầu học viên cập nhật tài khoản nhận hoàn tiền. */
+export interface RequestAccountUpdateReq {
+  reason: string;
 }
 
 export interface DisputeAdminRes extends DisputeRes {
+  /** Lần cuối học viên đổi tài khoản nhận hoàn tiền sau khi gửi khiếu nại — admin cần kiểm tra trước khi chuyển tiền. */
+  refundAccountUpdatedAt?: string | null;
   refundBankAccount: string | null;
   adminNote: string | null;
   resolvedByEmail: string | null;

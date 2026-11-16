@@ -5,6 +5,9 @@ const token = () => ({ token: getAccessToken() ?? undefined });
 
 export type PayosOrderStatus = 'PENDING' | 'SUBMITTED' | 'SUCCEEDED' | 'FAILED' | 'UNKNOWN';
 
+/** Nhóm nguyên nhân khi lệnh chi thất bại: TRANSIENT = sự cố tạm thời, ACCOUNT = tài khoản nhận có vấn đề, UNKNOWN = chưa phân loại được. */
+export type PayosFailureCategory = 'TRANSIENT' | 'ACCOUNT' | 'UNKNOWN';
+
 export interface PayosStatus {
   /** Công tắc `PAYOS_PAYOUT_ENABLED` trong Cài đặt. */
   enabled: boolean;
@@ -32,6 +35,13 @@ export interface PayosOrder {
   errorMessage: string | null;
   createdAt: string;
   completedAt: string | null;
+  failureCategory: PayosFailureCategory | null;
+  /** Chỉ có ở lệnh FAILED mới nhất — các trường dưới do BE tính, FE chỉ hiển thị. */
+  nextRetryAt: string | null;
+  attemptsLeft: number | null;
+  /** false = BE đang từ chối chi lại (chờ, hết lượt, hoặc lỗi tài khoản); null = không áp dụng. */
+  canRetry: boolean | null;
+  retryBlockedReason: string | null;
 }
 
 /** Chi tự động qua PayOS (14/11/2026). Số tiền và tài khoản do máy chủ lấy từ DB, FE chỉ gửi mã yêu cầu. */

@@ -23,7 +23,7 @@ export default function PaymentsHistoryPage() {
       .finally(() => setLoading(false));
     disputesApi
       .listMine()
-      .then((ds) => setAwaitingTransfer(new Set(ds.filter((d) => d.refundTransferStatus === 'PENDING_TRANSFER').map((d) => d.paymentTxnRef))))
+      .then((ds) => setAwaitingTransfer(new Set(ds.filter((d) => d.refundTransferStatus === 'PENDING_TRANSFER' || d.refundTransferStatus === 'AWAITING_ACCOUNT').map((d) => d.paymentTxnRef))))
       .catch(() => undefined);
   }, []);
 

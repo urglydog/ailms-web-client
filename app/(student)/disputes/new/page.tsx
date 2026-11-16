@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { ApiError } from '@/lib/api/client';
 import { disputesApi } from '@/lib/api/disputes';
 import { paymentsApi } from '@/lib/api/payments';
+import { RefundAccountEditor } from '@/components/disputes/RefundAccountEditor';
 import type { DisputeCategory, DisputeRes, PaymentRes } from '@/types/domain';
 import type { PayoutBank } from '@/types/finance';
 
@@ -23,6 +24,9 @@ const STATUS_LABEL: Record<DisputeRes['status'], string> = {
 function statusBadge(d: DisputeRes): { label: string; className: string } {
   if (d.status === 'RESOLVED_REFUNDED' && d.refundTransferStatus === 'PENDING_TRANSFER') {
     return { label: 'Đã duyệt · chờ chuyển khoản', className: 'bg-tint text-accent-dark border-accent/30' };
+  }
+  if (d.status === 'RESOLVED_REFUNDED' && d.refundTransferStatus === 'AWAITING_ACCOUNT') {
+    return { label: 'Cần cập nhật tài khoản', className: 'bg-danger/10 text-danger border-danger/30' };
   }
   return { label: STATUS_LABEL[d.status], className: STATUS_CLASS[d.status] };
 }
@@ -119,6 +123,7 @@ function RequestRefundContent() {
   const canReopen = (d: DisputeRes) =>
     d.status === 'RESOLVED_REFUNDED' &&
     d.refundTransferStatus !== 'PENDING_TRANSFER' &&
+    d.refundTransferStatus !== 'AWAITING_ACCOUNT' &&
     !d.reopenedAt &&
     d.resolvedAt != null &&
     Date.now() - new Date(d.resolvedAt).getTime() < REOPEN_WINDOW_DAYS * 24 * 60 * 60 * 1000;
@@ -440,6 +445,12 @@ function RequestRefundContent() {
                     Yêu cầu hoàn tiền đã được chấp nhận, quyền truy cập khóa học đã được thu hồi. Hệ thống sẽ chi
                     trả khoản hoàn vào tài khoản bạn đã khai và báo lại qua email/thông báo khi hoàn tất.
                   </div>
+                )}
+                {d.status === 'RESOLVED_REFUNDED' && (d.refundTransferStatus === 'PENDING_TRANSFER' || d.refundTransferStatus === 'AWAITING_ACCOUNT') && (
+                  <RefundAccountEditor
+                    dispute={d}
+                    onUpdated={(updated) => setMyDisputes((prev) => prev.map((x) => (x.id === updated.id ? updated : x)))}
+                  />
                 )}
                 {d.status === 'RESOLVED_REFUNDED' && d.refundTransferStatus === 'TRANSFERRED' && (
                   <div className="rounded-lg border border-success/30 bg-success/10 px-3 py-2 text-xs text-ink">
