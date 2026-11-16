@@ -1914,7 +1914,7 @@
           "pending": "Đã thu hồi quyền học. Chi qua PayOS (tự động), hoặc chuyển khoản tay rồi nhập mã giao dịch để hệ thống báo cho học viên.",
           "refPh": "Mã giao dịch chuyển khoản",
           "markTransferred": "Đã chuyển khoản",
-          "transferred": "Đã chuyển tiền hoàn — mã {ref}"
+          "transferred": "Đã hoàn tiền — mã giao dịch {ref}"
         },
         "refundApproved": "Đã duyệt hoàn tiền: quyền học bị thu hồi, thu nhập giảng viên được điều chỉnh.",
         "rejected": "Đã từ chối khiếu nại.",

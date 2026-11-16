@@ -23,18 +23,18 @@ const STATUS_LABEL: Record<DisputeRes['status'], string> = {
  */
 function statusBadge(d: DisputeRes): { label: string; className: string } {
   if (d.status === 'RESOLVED_REFUNDED' && d.refundTransferStatus === 'PENDING_TRANSFER') {
-    return { label: 'Đã duyệt · chờ chuyển khoản', className: 'bg-tint text-accent-dark border-accent/30' };
+    return { label: 'Đã duyệt · chờ chuyển tiền', className: 'bg-accent text-white border-accent' };
   }
   if (d.status === 'RESOLVED_REFUNDED' && d.refundTransferStatus === 'AWAITING_ACCOUNT') {
-    return { label: 'Cần cập nhật tài khoản', className: 'bg-danger/10 text-danger border-danger/30' };
+    return { label: 'Cần cập nhật tài khoản', className: 'bg-danger text-white border-danger' };
   }
   return { label: STATUS_LABEL[d.status], className: STATUS_CLASS[d.status] };
 }
 const STATUS_CLASS: Record<DisputeRes['status'], string> = {
-  OPEN: 'bg-surface-raised text-ink border-warning',
-  RESOLVED_REFUNDED: 'bg-success/10 text-success border-success/20',
-  RESOLVED_REJECTED: 'bg-line text-ink-muted border-line',
-  REOPENED: 'bg-danger/10 text-danger border-danger/30',
+  OPEN: 'bg-warning/20 text-ink border-warning',
+  RESOLVED_REFUNDED: 'bg-success text-white border-success',
+  RESOLVED_REJECTED: 'bg-line text-ink border-line',
+  REOPENED: 'bg-danger/10 text-danger border-danger',
 };
 const CATEGORY_LABEL: Record<DisputeCategory, string> = {
   CHANGED_MIND: 'Tôi đổi ý / khóa học không phù hợp',
@@ -50,6 +50,29 @@ const ACCEPTED_TYPES = 'image/jpeg,image/png,image/webp,video/mp4,video/webm';
 /** Phải khớp `lms.rules.dispute-reopen-window-days` ở BE (application.yml) — đây chỉ là ước
  * lượng hiển thị cho UI (ẩn/hiện nút), BE luôn là nơi validate thật khi gọi API. */
 const REOPEN_WINDOW_DAYS = 7;
+
+/** Bộ lọc trạng thái của danh sách "Yêu cầu của tôi" (16/11/2026). */
+type StatusFilter = 'ALL' | 'PROCESSING' | 'AWAITING' | 'REFUNDED' | 'REJECTED';
+const FILTER_LABEL: Record<StatusFilter, string> = {
+  ALL: 'Tất cả',
+  PROCESSING: 'Đang xử lý',
+  AWAITING: 'Chờ chuyển tiền',
+  REFUNDED: 'Đã hoàn tiền',
+  REJECTED: 'Bị từ chối',
+};
+const FILTERS = Object.keys(FILTER_LABEL) as StatusFilter[];
+
+function filterKey(d: DisputeRes): Exclude<StatusFilter, 'ALL'> {
+  if (d.status === 'OPEN' || d.status === 'REOPENED') return 'PROCESSING';
+  if (d.status === 'RESOLVED_REJECTED') return 'REJECTED';
+  if (d.refundTransferStatus === 'TRANSFERRED') return 'REFUNDED';
+  return 'AWAITING';
+}
+
+/** Không phân biệt hoa/thường và dấu tiếng Việt, để gõ "ai agent" vẫn tìm ra "AI Agent". */
+function norm(text: string): string {
+  return text.normalize('NFD').replace(/\p{M}+/gu, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase();
+}
 
 /** `useSearchParams()` bắt buộc nằm trong Suspense khi build production (bài học từ lần build
  * Vercel trước bị lỗi ở trang disputes admin vì thiếu bọc này). */
@@ -69,6 +92,11 @@ function RequestRefundContent() {
   const [myDisputes, setMyDisputes] = useState<DisputeRes[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedRef, setSelectedRef] = useState<string | null>(preselectedRef);
+  // Hai khu vực tách bạch: tạo yêu cầu mới (chọn giao dịch) và danh sách yêu cầu đã tạo (có tìm kiếm + lọc trạng thái).
+  const [tab, setTab] = useState<'create' | 'mine'>('create');
+  const [paySearch, setPaySearch] = useState('');
+  const [disputeSearch, setDisputeSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('ALL');
 
   const [category, setCategory] = useState<DisputeCategory>('CHANGED_MIND');
   const [reason, setReason] = useState('');
@@ -95,9 +123,12 @@ function RequestRefundContent() {
         setPayments(p.filter((x) => x.status === 'PAID'));
         setMyDisputes(d);
         setBanks(b);
+        // Có yêu cầu rồi thì mở thẳng danh sách; đi từ liên kết "ref=" (từ trang thanh toán) thì mở form tạo mới.
+        if (!preselectedRef && d.length > 0) setTab('mine');
       })
       .catch(() => toast.error('Không tải được dữ liệu giao dịch.'))
       .finally(() => setLoading(false));
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- chỉ tải một lần khi vào trang
   }, []);
 
   const digits = accountNumber.replace(/\s/g, '');
@@ -196,6 +227,7 @@ function RequestRefundContent() {
         files,
       );
       setMyDisputes((prev) => [filed, ...prev]);
+      setTab('mine');
       toast.success('Đã gửi khiếu nại. Chúng tôi sẽ phản hồi qua email sau khi xử lý xong.');
       resetForm();
     } catch (err) {
@@ -204,6 +236,15 @@ function RequestRefundContent() {
       setSubmitting(false);
     }
   };
+
+  const payQuery = norm(paySearch.trim());
+  const visiblePayments = payments.filter((p) => !payQuery || norm(`${p.courseTitle} ${p.txnRef}`).includes(payQuery));
+  const disputeQuery = norm(disputeSearch.trim());
+  const visibleDisputes = myDisputes.filter(
+    (d) => (statusFilter === 'ALL' || filterKey(d) === statusFilter) && (!disputeQuery || norm(`${d.courseTitle} ${d.paymentTxnRef} ${d.reason}`).includes(disputeQuery)),
+  );
+  const filterCount = (f: StatusFilter) => (f === 'ALL' ? myDisputes.length : myDisputes.filter((d) => filterKey(d) === f).length);
+  const needsAction = myDisputes.filter((d) => d.refundTransferStatus === 'AWAITING_ACCOUNT').length;
 
   if (loading) {
     return <div className="shell py-10 text-ink-muted">Đang tải...</div>;
@@ -219,22 +260,61 @@ function RequestRefundContent() {
         </p>
       </div>
 
-      {!selectedPayment ? (
+      <div role="tablist" aria-label="Khu vực yêu cầu hoàn tiền" className="flex flex-wrap gap-2 rounded-2xl border border-line bg-surface p-1.5">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={tab === 'create'}
+          onClick={() => setTab('create')}
+          className={`flex-1 rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors sm:flex-none ${tab === 'create' ? 'bg-accent text-white shadow' : 'text-ink hover:bg-tint'}`}
+        >
+          Tạo yêu cầu mới
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={tab === 'mine'}
+          onClick={() => setTab('mine')}
+          className={`flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors sm:flex-none ${tab === 'mine' ? 'bg-accent text-white shadow' : 'text-ink hover:bg-tint'}`}
+        >
+          Yêu cầu của tôi
+          <span className={`rounded-full px-2 py-0.5 text-xs ${tab === 'mine' ? 'bg-white/20 text-white' : 'bg-line text-ink'}`}>{myDisputes.length}</span>
+          {needsAction > 0 && <span className="rounded-full bg-danger px-2 py-0.5 text-xs text-white">{needsAction} cần xử lý</span>}
+        </button>
+      </div>
+
+      {tab === 'create' && (!selectedPayment ? (
         <section className="flex flex-col gap-3">
-          <h2 className="m-0 font-display text-lg font-bold text-ink">Chọn giao dịch cần khiếu nại</h2>
+          <div className="rounded-xl border-l-4 border-accent bg-tint px-4 py-3">
+            <h2 className="m-0 font-display text-lg font-bold text-ink">Tạo yêu cầu mới — chọn giao dịch</h2>
+            <p className="m-0 mt-0.5 text-xs text-ink-muted">Chỉ hiển thị các giao dịch đã thanh toán thành công. Chọn một giao dịch để điền thông tin yêu cầu.</p>
+          </div>
+          {payments.length > 0 && (
+            <input
+              type="search"
+              value={paySearch}
+              onChange={(e) => setPaySearch(e.target.value)}
+              placeholder="Tìm theo tên khóa học hoặc mã giao dịch"
+              aria-label="Tìm giao dịch"
+              className="w-full rounded-lg border border-line bg-surface-raised p-2.5 text-sm text-ink outline-none focus:border-accent"
+            />
+          )}
+          {payments.length > 0 && visiblePayments.length === 0 && (
+            <div className="rounded-xl border border-line bg-surface p-6 text-center text-sm text-ink-muted">Không có giao dịch nào phù hợp với từ khóa.</div>
+          )}
           {payments.length === 0 ? (
             <div className="rounded-xl border border-line bg-surface p-6 text-center text-ink-muted">
               Bạn chưa có giao dịch nào đã thanh toán thành công để khiếu nại.
             </div>
           ) : (
             <div className="flex flex-col gap-2">
-              {payments.map((p) => (
+              {visiblePayments.map((p) => (
                 <button
                   key={p.txnRef}
                   type="button"
                   disabled={alreadyDisputed(p.txnRef)}
                   onClick={() => setSelectedRef(p.txnRef)}
-                  className="flex items-center justify-between gap-3 rounded-xl border border-line bg-surface-raised p-4 text-left hover:border-accent disabled:cursor-not-allowed disabled:opacity-50"
+                  className="flex items-center justify-between gap-3 rounded-xl border-2 border-line bg-surface-raised p-4 text-left hover:border-accent disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <div className="min-w-0">
                     <div className="truncate font-semibold text-ink">{p.courseTitle}</div>
@@ -408,14 +488,51 @@ function RequestRefundContent() {
             </button>
           </form>
         </section>
-      )}
+      ))}
 
-      {myDisputes.length > 0 && (
+      {tab === 'mine' && (
         <section className="flex flex-col gap-3">
-          <h2 className="m-0 font-display text-lg font-bold text-ink">Khiếu nại của tôi</h2>
-          <div className="flex flex-col gap-2">
-            {myDisputes.map((d) => (
-              <div key={d.id} className="flex flex-col gap-3 rounded-xl border border-line bg-surface-raised p-4">
+          <div className="rounded-xl border-l-4 border-accent bg-tint px-4 py-3">
+            <h2 className="m-0 font-display text-lg font-bold text-ink">Yêu cầu của tôi</h2>
+            <p className="m-0 mt-0.5 text-xs text-ink-muted">Theo dõi trạng thái các yêu cầu hoàn tiền bạn đã tạo.</p>
+          </div>
+          {myDisputes.length > 0 && (
+            <>
+              <input
+                type="search"
+                value={disputeSearch}
+                onChange={(e) => setDisputeSearch(e.target.value)}
+                placeholder="Tìm theo khóa học, mã giao dịch hoặc lý do"
+                aria-label="Tìm yêu cầu"
+                className="w-full rounded-lg border border-line bg-surface-raised p-2.5 text-sm text-ink outline-none focus:border-accent"
+              />
+              <div className="flex flex-wrap gap-2" role="group" aria-label="Lọc theo trạng thái">
+                {FILTERS.map((f) => (
+                  <button
+                    key={f}
+                    type="button"
+                    aria-pressed={statusFilter === f}
+                    onClick={() => setStatusFilter(f)}
+                    className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${statusFilter === f ? 'border-accent bg-accent text-white' : 'border-line bg-surface-raised text-ink hover:border-accent'}`}
+                  >
+                    {FILTER_LABEL[f]} ({filterCount(f)})
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+          {myDisputes.length === 0 && (
+            <div className="rounded-xl border border-line bg-surface p-6 text-center text-sm text-ink-muted">
+              Bạn chưa tạo yêu cầu nào.{' '}
+              <button type="button" onClick={() => setTab('create')} className="font-semibold text-accent-dark underline">Tạo yêu cầu mới</button>
+            </div>
+          )}
+          {myDisputes.length > 0 && visibleDisputes.length === 0 && (
+            <div className="rounded-xl border border-line bg-surface p-6 text-center text-sm text-ink-muted">Không có yêu cầu nào phù hợp với bộ lọc.</div>
+          )}
+          <div className="flex flex-col gap-3">
+            {visibleDisputes.map((d) => (
+              <div key={d.id} className="flex flex-col gap-3 rounded-xl border-2 border-line bg-surface-raised p-4">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="min-w-0">
                     <div className="truncate font-semibold text-ink">{d.courseTitle}</div>
@@ -454,7 +571,7 @@ function RequestRefundContent() {
                 )}
                 {d.status === 'RESOLVED_REFUNDED' && d.refundTransferStatus === 'TRANSFERRED' && (
                   <div className="rounded-lg border border-success/30 bg-success/10 px-3 py-2 text-xs text-ink">
-                    Đã chuyển tiền hoàn cho bạn. Nếu chưa nhận được, bạn có thể báo lại bên dưới.
+                    {`Khoản hoàn tiền đã được chuyển vào ${d.refundAccountSummary ? `tài khoản ${d.refundAccountSummary}` : 'tài khoản bạn đã đăng ký'}. Nếu chưa nhận được, bạn có thể báo lại bên dưới.`}
                   </div>
                 )}
 

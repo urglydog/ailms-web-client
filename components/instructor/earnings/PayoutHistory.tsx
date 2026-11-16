@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { useCancelPayout, useChangePayoutAccount, useMyPayouts, usePayoutAccounts } from '@/hooks/useFinance';
 import { ApiError } from '@/lib/api/client';
-import { PAYOUT_STATUS_CLASS, PAYOUT_STATUS_LABEL, dateOnly, dateTime, money } from '@/lib/finance';
+import { INSTRUCTOR_PAYOUT_STATUS_LABEL, PAYOUT_STATUS_CLASS, dateOnly, dateTime, money } from '@/lib/finance';
 
 /** Lịch sử yêu cầu rút tiền; còn hủy được khi chưa được admin duyệt. */
 export function PayoutHistory() {
@@ -41,13 +41,13 @@ export function PayoutHistory() {
                 <span className="text-xs text-ink-muted">
                   {p.bankName} {p.accountMask} · {dateTime(p.createdAt)}
                   {p.scheduledFor && p.status === 'REQUESTED' ? ` · dự kiến chi ${dateOnly(p.scheduledFor)}` : ''}
-                  {p.transferRef ? ` · mã chuyển khoản ${p.transferRef}` : ''}
+                  {p.transferRef ? ` · mã giao dịch ${p.transferRef}` : ''}
                 </span>
                 {p.rejectReason && <span className="text-xs text-danger">Lý do: {p.rejectReason}</span>}
               </div>
               <div className="flex items-center gap-2">
                 <span className={`rounded-full border px-2.5 py-1 text-xs font-medium ${PAYOUT_STATUS_CLASS[p.status]}`}>
-                  {PAYOUT_STATUS_LABEL[p.status]}
+                  {INSTRUCTOR_PAYOUT_STATUS_LABEL[p.status]}
                 </span>
                 {(p.status === 'PENDING_EMAIL' || p.status === 'REQUESTED') && active.length > 1 && changingId !== p.id && (
                   <button
