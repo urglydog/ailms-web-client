@@ -1384,6 +1384,8 @@
       "settings": "システム設定",
       "disputes": "Payment disputes",
       "payouts": "Instructor payouts",
+      "invoices": "Invoices & vouchers",
+      "financereports": "Financial reports",
       "support": "Support requests"
     },
     "shell": {
@@ -1838,6 +1840,15 @@
           "REFUND_HOLIDAYS": "Holidays that extend the refund window (YYYY-MM-DD, comma-separated)",
           "PAYOUT_HOLD_EXTRA_DAYS": "Extra holding days after the refund window",
           "PAYOUT_MIN_AMOUNT": "Minimum payout amount",
+          "REPORT_DAILY_ENABLED": "Send the daily financial report (1 = on, 0 = off)",
+          "REPORT_WEEKLY_ENABLED": "Send the weekly financial report, Monday morning (1 = on, 0 = off)",
+          "REPORT_MONTHLY_ENABLED": "Send the monthly financial report, morning of the 1st (1 = on, 0 = off)",
+          "REPORT_RECIPIENTS": "Report recipients (comma-separated, empty = all admins)",
+          "STATEMENT_EMAIL_INSTRUCTORS": "Email the monthly earnings statement to instructors (1 = on, 0 = view in app only)",
+          "PAYOS_PAYOUT_FEE": "PayOS fee per successful payout (covered by the platform, used for statistics)",
+          "INVOICE_ISSUER_NAME": "Issuer name on documents",
+          "INVOICE_ISSUER_NOTE": "Issuer note on documents",
+          "INVOICE_EXCLUDED_EMAIL_SUFFIX": "Email suffix of demo accounts that get no documents (empty = no exclusion)",
           "PAYOUT_DAYS_OF_MONTH": "Payout days of the month (1–28, comma-separated)",
           "DISPUTE_INSTRUCTOR_RESPONSE_HOURS": "Instructor response time for disputes (hours)"
         }

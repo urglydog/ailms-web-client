@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { disputesApi } from '@/lib/api/disputes';
 import { paymentsApi } from '@/lib/api/payments';
@@ -58,7 +59,12 @@ export default function PaymentsHistoryPage() {
 
   return (
     <div className="shell py-10">
-      <h1 className="font-display text-2xl font-bold text-ink mb-6">Lịch sử giao dịch</h1>
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <h1 className="font-display text-2xl font-bold text-ink">Lịch sử giao dịch</h1>
+        <Link href="/invoices" className="text-sm font-semibold text-accent-dark hover:underline">
+          Hóa đơn của tôi
+        </Link>
+      </div>
       
       {loading ? (
         <div className="text-ink-muted">Đang tải dữ liệu...</div>
