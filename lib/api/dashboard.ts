@@ -27,6 +27,14 @@ export interface RevenueRow {
   bundleId?: number | null;
 }
 
+/** Số liệu tổng quan học viên do máy chủ tính (không tải toàn bộ danh sách về trình duyệt). */
+export interface StudentSummary {
+  total: number;
+  avgProgress: number;
+  atRiskCount: number;
+  atRiskBelowPct: number;
+}
+
 export interface StudentRow {
   studentId: number;
   studentName: string;
@@ -95,6 +103,16 @@ export const dashboardApi = {
       `/api/v1/dashboard/instructor/students${courseId ? `?courseId=${courseId}` : ''}`,
       { token: authToken() },
     ),
+
+  searchStudents: (p: { courseId?: number; atRiskOnly: boolean; q?: string; page: number }) => {
+    const qs = new URLSearchParams({ atRiskOnly: String(p.atRiskOnly), page: String(p.page), size: '15' });
+    if (p.courseId) qs.set('courseId', String(p.courseId));
+    if (p.q?.trim()) qs.set('q', p.q.trim());
+    return api.get<{ content: StudentRow[]; totalElements: number; totalPages: number }>(`/api/v1/dashboard/instructor/students/search?${qs.toString()}`, { token: authToken() });
+  },
+
+  getStudentSummary: (courseId?: number) =>
+    api.get<StudentSummary>(`/api/v1/dashboard/instructor/students/summary${courseId ? `?courseId=${courseId}` : ''}`, { token: authToken() }),
 
   getReviews: (courseId?: number) =>
     api.get<ReviewRow[]>(
