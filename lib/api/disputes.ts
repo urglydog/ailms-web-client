@@ -30,10 +30,18 @@ export const disputesApi = {
   listMine: () =>
     api.get<DisputeRes[]>('/api/v1/disputes/mine', { token: getAccessToken() ?? undefined }),
 
-  listAllAdmin: (status?: DisputeStatus) => {
-    const query = status ? `?status=${status}` : '';
-    return api.get<DisputeAdminRes[]>(`/api/v1/disputes/admin${query}`, { token: getAccessToken() ?? undefined });
+  /** Danh sách khiếu nại cho admin: lọc trạng thái, tìm theo mã đơn/email/tên người gửi, phân trang (mặc định 30 dòng/trang). */
+  listAllAdmin: (status?: DisputeStatus, q = '', page = 0, size = 30, needsAction = false) => {
+    const p = new URLSearchParams({ page: String(page), size: String(size) });
+    if (status) p.set('status', status);
+    if (needsAction) p.set('needsAction', 'true');
+    if (q.trim()) p.set('q', q.trim());
+    return api.get<DisputeAdminRes[]>(`/api/v1/disputes/admin?${p.toString()}`, { token: getAccessToken() ?? undefined });
   },
+
+  /** Số khiếu nại đang cần admin xử lý (chưa xử lý/mở lại, đã duyệt hoàn chờ chuyển, hoặc kháng nghị đang chờ) — dùng cho huy hiệu menu, không tải danh sách. */
+  openCount: () =>
+    api.get<{ open: number }>('/api/v1/disputes/admin/open-count', { token: getAccessToken() ?? undefined }),
 
   resolve: (id: number, req: ResolveDisputeReq) =>
     api.post<DisputeAdminRes>(`/api/v1/disputes/admin/${id}/resolve`, req, { token: getAccessToken() ?? undefined }),

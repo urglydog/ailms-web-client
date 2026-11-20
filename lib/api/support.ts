@@ -17,9 +17,12 @@ export const supportApi = {
     return apiFormData<{ code: string }>('/api/v1/support/tickets', formData);
   },
 
-  listAdmin: (status?: SupportStatus) => {
-    const query = status ? `?status=${status}` : '';
-    return api.get<SupportTicketAdminRes[]>(`/api/v1/admin/support/tickets${query}`, { token: getAccessToken() ?? undefined });
+  /** Yêu cầu hỗ trợ cho admin: lọc trạng thái, tìm theo mã/email/tiêu đề; chỉ lấy {@code size} dòng đầu (tăng size để xem thêm). */
+  listAdmin: (status?: SupportStatus, q = '', size = 30) => {
+    const p = new URLSearchParams({ page: '0', size: String(size) });
+    if (status) p.set('status', status);
+    if (q.trim()) p.set('q', q.trim());
+    return api.get<SupportTicketAdminRes[]>(`/api/v1/admin/support/tickets?${p.toString()}`, { token: getAccessToken() ?? undefined });
   },
 
   openCount: () =>

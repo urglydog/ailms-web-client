@@ -9,6 +9,7 @@ import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { PageHeader } from '@/components/instructor/ui/PageHeader';
 import { ArrowDown, ArrowUp, Plus, Trash2 } from 'lucide-react';
+import { useDebounce } from '@/hooks/useDebounce';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { ApiError } from '@/lib/api/client';
@@ -53,6 +54,8 @@ const STATUS_CLASS: Record<SupportStatus, string> = {
   RESOLVED: 'bg-success-tint text-success-ink border-success/30',
 };
 
+const TICKET_PAGE = 30;
+
 /** Hộp thư yêu cầu hỗ trợ của Admin — danh sách ticket, xem nội dung/ảnh, phản hồi (gửi email cho người gửi). */
 export default function AdminSupportPage() {
   const t = useTranslations('admin.support');
@@ -60,7 +63,11 @@ export default function AdminSupportPage() {
 
   const [tickets, setTickets] = useState<SupportTicketAdminRes[]>([]);
   const [loading, setLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState<SupportStatus | 'ALL'>('ALL');
+  // Hàng chờ (chưa xử lý) hiện sẵn; yêu cầu đã xử lý chỉ hiện khi chọn trạng thái hoặc tìm kiếm.
+  const [statusFilter, setStatusFilter] = useState<SupportStatus | 'ALL'>('OPEN');
+  const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search, 400);
+  const [limit, setLimit] = useState(TICKET_PAGE);
   const [selected, setSelected] = useState<SupportTicketAdminRes | null>(null);
   const [status, setStatus] = useState<SupportStatus>('OPEN');
   const [greeting, setGreeting] = useState('');
@@ -76,7 +83,7 @@ export default function AdminSupportPage() {
   const fetchTickets = () => {
     setLoading(true);
     supportApi
-      .listAdmin(statusFilter === 'ALL' ? undefined : statusFilter)
+      .listAdmin(statusFilter === 'ALL' ? undefined : statusFilter, debouncedSearch, limit)
       .then(setTickets)
       .catch(() => toast.error(t('loadError')))
       .finally(() => setLoading(false));
@@ -84,8 +91,8 @@ export default function AdminSupportPage() {
 
   useEffect(() => {
     fetchTickets();
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- chỉ phụ thuộc statusFilter
-  }, [statusFilter]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- chỉ phụ thuộc bộ lọc
+  }, [statusFilter, debouncedSearch, limit]);
 
   const dateTime = (iso: string) => new Date(iso).toLocaleString('vi-VN', { dateStyle: 'short', timeStyle: 'short' });
 
@@ -189,12 +196,28 @@ export default function AdminSupportPage() {
       <PageHeader title={t('title')} subtitle={t('subtitle')} />
 
       <div className="flex flex-wrap items-end gap-4 rounded-xl border border-line bg-surface-raised p-4">
+        <label className="flex min-w-0 flex-1 flex-col gap-1.5 sm:min-w-64">
+          <span className="text-xs font-semibold text-ink-muted">Tìm yêu cầu hỗ trợ</span>
+          <input
+            type="search"
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setLimit(TICKET_PAGE);
+            }}
+            placeholder="Mã yêu cầu, email hoặc tiêu đề..."
+            className="w-full rounded-lg border border-line bg-surface-raised p-2.5 text-sm text-ink outline-none focus:border-accent"
+          />
+        </label>
         <label className="flex w-full flex-col gap-1.5 sm:w-56">
           <span className="text-xs font-semibold text-ink-muted">{t('filters.status')}</span>
           <select
             className="w-full rounded-lg border border-line bg-surface-raised p-2.5 text-sm text-ink outline-none focus:border-accent"
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as SupportStatus | 'ALL')}
+            onChange={(e) => {
+              setStatusFilter(e.target.value as SupportStatus | 'ALL');
+              setLimit(TICKET_PAGE);
+            }}
           >
             <option value="ALL">{t('filters.all')}</option>
             {STATUSES.map((s) => (
@@ -248,6 +271,13 @@ export default function AdminSupportPage() {
               ))}
             </tbody>
           </table>
+          {tickets.length >= limit && (
+            <div className="flex justify-center border-t border-line p-3">
+              <button type="button" onClick={() => setLimit((n) => n + TICKET_PAGE)} className="rounded-lg border border-line bg-surface-raised px-4 py-2 text-sm font-semibold text-ink hover:bg-tint">
+                Xem thêm
+              </button>
+            </div>
+          )}
         </div>
       )}
 

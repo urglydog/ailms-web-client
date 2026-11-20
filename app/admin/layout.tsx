@@ -77,26 +77,25 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pendingCourses = pendingPage?.totalElements ?? 0;
 
   // Khiếu nại CẦN ADMIN LÀM GÌ ĐÓ: chưa xử lý/mở lại, đã duyệt hoàn nhưng chưa chuyển tiền, hoặc giảng viên khiếu nại quyết định đang chờ.
-  const { data: disputesList } = useQuery({
+  // Chỉ lấy SỐ ĐẾM từ máy chủ (trước đây tải toàn bộ khiếu nại mỗi 30 giây rồi đếm ở trình duyệt).
+  const { data: openDisputeCount } = useQuery({
     queryKey: ['admin', 'disputes', 'open-count'],
-    queryFn: () => disputesApi.listAllAdmin(),
+    queryFn: () => disputesApi.openCount(),
     enabled: !!getAccessToken(),
     refetchInterval: 30000,
   });
-  const openDisputes = (disputesList ?? []).filter(
-    (d) => d.status === 'OPEN' || d.status === 'REOPENED' || d.refundTransferStatus === 'PENDING_TRANSFER' || d.appealStatus === 'OPEN',
-  ).length;
+  const openDisputes = openDisputeCount?.open ?? 0;
 
   // Yêu cầu rút: chờ duyệt (REQUESTED) + đã duyệt chờ chi (APPROVED). Quảng bá: chờ duyệt.
   const { data: requestedPayouts } = useQuery({
     queryKey: ['admin', 'payouts', 'open-count', 'REQUESTED'],
-    queryFn: () => adminPayoutsApi.list('REQUESTED'),
+    queryFn: () => adminPayoutsApi.list('REQUESTED', '', 100),
     enabled: !!getAccessToken(),
     refetchInterval: 30000,
   });
   const { data: approvedPayouts } = useQuery({
     queryKey: ['admin', 'payouts', 'open-count', 'APPROVED'],
-    queryFn: () => adminPayoutsApi.list('APPROVED'),
+    queryFn: () => adminPayoutsApi.list('APPROVED', '', 100),
     enabled: !!getAccessToken(),
     refetchInterval: 30000,
   });

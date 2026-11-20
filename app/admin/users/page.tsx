@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { ConfirmDialog } from '@/components/admin/ui/ConfirmDialog';
 import { UsersTable } from '@/components/admin/users/UsersTable';
 import { PageHeader } from '@/components/instructor/ui/PageHeader';
+import { SearchPrompt } from '@/components/ui/SearchPanel';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { api } from '@/lib/api/client';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -51,9 +52,17 @@ export default function AdminUsersPage() {
   const [pendingBlock, setPendingBlock] = useState<AdminUser | null>(null);
 
   const debouncedQuery = useDebounce(query, 300);
+  // Tìm-kiếm-trước (20/11/2026): nhóm "Tất cả" và "Học viên" có rất nhiều người nên chỉ liệt kê khi có từ khóa; các nhóm nhỏ (giảng viên, quản trị,
+  // bị khóa, spam) liệt kê được ngay vì là danh sách cần theo dõi.
+  const needsQuery = (filter === 'ALL' || filter === 'STUDENT') && !debouncedQuery.trim();
 
   const fetchUsers = useCallback(async () => {
     try {
+      if (needsQuery) {
+        setResult({ items: [], totalPages: 1, total: 0 });
+        setCounts({ ...EMPTY_COUNTS, ...(await api.get<UserCounts>('/api/v1/users/admin/counts')) });
+        return;
+      }
       const params = new URLSearchParams({
         filter,
         sort: sortField,
@@ -71,7 +80,7 @@ export default function AdminUsersPage() {
     } catch {
       toast.error(t('loadError'));
     }
-  }, [t, debouncedQuery, filter, sortField, sortOrder, page]);
+  }, [t, debouncedQuery, filter, sortField, sortOrder, page, needsQuery]);
 
   const fetchAiLockProposals = useCallback(async () => {
     try {
@@ -196,7 +205,12 @@ export default function AdminUsersPage() {
         </label>
       </div>
 
-      {loading ? (
+      {needsQuery ? (
+        <SearchPrompt title="Nhập thông tin để tìm người dùng">
+          Hệ thống có rất nhiều tài khoản nên không hiển thị sẵn. Hãy nhập tên, email hoặc ID người dùng ở ô tìm kiếm phía trên;
+          hoặc chọn nhóm Giảng viên, Quản trị viên, Bị khóa, Spam để xem các nhóm cần theo dõi.
+        </SearchPrompt>
+      ) : loading ? (
         <div className="flex flex-col gap-2 rounded-xl border border-line bg-surface-raised p-4">
           {Array.from({ length: 5 }, (_, i) => (
             <Skeleton key={i} className="h-11" />
@@ -206,7 +220,7 @@ export default function AdminUsersPage() {
         <UsersTable users={paged.items} sortField={sortField} sortOrder={sortOrder} onSort={handleSort} onToggleBlock={setPendingBlock} />
       )}
 
-      {!loading && paged.totalPages > 1 && (
+      {!needsQuery && !loading && paged.totalPages > 1 && (
         <nav aria-label={t('pager.aria')} className="flex flex-wrap items-center justify-between gap-3 px-1">
           <span className="text-sm text-ink-muted">{t('pager.showing', { shown: paged.items.length, total: result.total })}</span>
           <div className="flex items-center gap-2">

@@ -66,8 +66,13 @@ export const financeApi = {
 
 /** Admin duyệt/chi/từ chối yêu cầu rút tiền (11/11/2026). */
 export const adminPayoutsApi = {
-  list: (status?: PayoutStatus) =>
-    api.get<AdminPayout[]>(`/api/v1/admin/payouts${status ? `?status=${status}` : ''}`, token()),
+  /** Yêu cầu rút cho admin: lọc trạng thái, tìm theo mã yêu cầu/email/tên giảng viên; chỉ lấy {@code size} dòng đầu (tăng size để xem thêm). */
+  list: (status?: PayoutStatus, q = '', size = 30) => {
+    const p = new URLSearchParams({ page: '0', size: String(size) });
+    if (status) p.set('status', status);
+    if (q.trim()) p.set('q', q.trim());
+    return api.get<AdminPayout[]>(`/api/v1/admin/payouts?${p.toString()}`, token());
+  },
 
   approve: (id: number) => api.post<AdminPayout>(`/api/v1/admin/payouts/${id}/approve`, {}, token()),
 

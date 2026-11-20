@@ -58,15 +58,48 @@ export interface ReportReconciliation {
   recordedCount: number;
 }
 
+export interface ReportRefundReason {
+  reason: string;
+  count: number;
+  amount: number;
+}
+
+export interface ReportSource {
+  source: string;
+  orders: number;
+  grossRevenue: number;
+}
+
+export interface ReportPayoutStage {
+  status: string;
+  count: number;
+  amount: number;
+  oldestDays: number;
+}
+
+export interface ReportMismatch {
+  kind: string;
+  reference: string;
+  amount: number;
+  at: string | null;
+  detail: string;
+}
+
 export interface FinanceReport {
   from: string;
   to: string;
   granularity: Granularity;
   summary: ReportSummary;
+  /** Kỳ liền trước có cùng độ dài, để so sánh tăng/giảm. */
+  previous: ReportSummary;
   buckets: ReportBucket[];
   courses: ReportCourse[];
   instructors: ReportInstructor[];
   reconciliation: ReportReconciliation;
+  refundReasons: ReportRefundReason[];
+  sources: ReportSource[];
+  payoutPipeline: ReportPayoutStage[];
+  mismatches: ReportMismatch[];
 }
 
 export interface ReportSnapshot {

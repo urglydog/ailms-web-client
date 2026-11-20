@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { DebtsPanel } from '@/components/admin/finance/DebtsPanel';
 import { PayoutPayosControls } from '@/components/admin/finance/PayoutPayosControls';
 import { PageHeader } from '@/components/instructor/ui/PageHeader';
+import { useDebounce } from '@/hooks/useDebounce';
 import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { ApiError } from '@/lib/api/client';
@@ -15,6 +16,7 @@ import { PAYOUT_STATUS_CLASS, PAYOUT_STATUS_LABEL, dateOnly, dateTime, money } f
 import { getAccessToken } from '@/lib/auth/token';
 import type { AccountReveal, AdminPayout, PayoutStatus } from '@/types/finance';
 
+const PAYOUT_PAGE = 30;
 const STATUSES: PayoutStatus[] = ['REQUESTED', 'APPROVED', 'PAID', 'PENDING_EMAIL', 'REJECTED', 'FAILED', 'CANCELLED'];
 type Dialog =
   | { kind: 'paid'; payout: AdminPayout }
@@ -29,14 +31,18 @@ type Dialog =
  */
 export default function AdminPayoutsPage() {
   const queryClient = useQueryClient();
+  // Hàng chờ duyệt hiện sẵn (ít, cần xử lý ngay); các yêu cầu đã xử lý chỉ hiện khi chọn trạng thái hoặc tìm kiếm.
   const [statusFilter, setStatusFilter] = useState<PayoutStatus | 'ALL'>('REQUESTED');
+  const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search, 400);
+  const [limit, setLimit] = useState(PAYOUT_PAGE);
   const [dialog, setDialog] = useState<Dialog | null>(null);
   const [text, setText] = useState('');
   const [proofUrl, setProofUrl] = useState('');
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ['admin', 'payouts', statusFilter],
-    queryFn: () => adminPayoutsApi.list(statusFilter === 'ALL' ? undefined : statusFilter),
+    queryKey: ['admin', 'payouts', statusFilter, debouncedSearch, limit],
+    queryFn: () => adminPayoutsApi.list(statusFilter === 'ALL' ? undefined : statusFilter, debouncedSearch, limit),
     enabled: !!getAccessToken(),
   });
 
@@ -135,11 +141,27 @@ export default function AdminPayoutsPage() {
       <DebtsPanel />
 
       <div className="flex flex-wrap items-end justify-between gap-4 rounded-xl border border-line bg-surface-raised p-4">
+        <label className="flex min-w-0 flex-1 flex-col gap-1.5 sm:min-w-64">
+          <span className="text-xs font-semibold text-ink-muted">Tìm yêu cầu rút</span>
+          <input
+            type="search"
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setLimit(PAYOUT_PAGE);
+            }}
+            placeholder="Mã yêu cầu, email hoặc tên giảng viên..."
+            className="w-full rounded-lg border border-line bg-surface-raised p-2.5 text-sm text-ink outline-none focus:border-accent"
+          />
+        </label>
         <label className="flex w-full flex-col gap-1.5 sm:w-64">
           <span className="text-xs font-semibold text-ink-muted">Trạng thái</span>
           <select
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as PayoutStatus | 'ALL')}
+            onChange={(e) => {
+              setStatusFilter(e.target.value as PayoutStatus | 'ALL');
+              setLimit(PAYOUT_PAGE);
+            }}
             className="w-full rounded-lg border border-line bg-surface-raised p-2.5 text-sm text-ink outline-none focus:border-accent"
           >
             <option value="ALL">Tất cả</option>
@@ -267,6 +289,13 @@ export default function AdminPayoutsPage() {
               ))}
             </tbody>
           </table>
+          {rows.length >= limit && (
+            <div className="flex justify-center border-t border-line p-3">
+              <button type="button" onClick={() => setLimit((n) => n + PAYOUT_PAGE)} className="rounded-lg border border-line bg-surface-raised px-4 py-2 text-sm font-semibold text-ink hover:bg-tint">
+                Xem thêm
+              </button>
+            </div>
+          )}
         </div>
       )}
 
