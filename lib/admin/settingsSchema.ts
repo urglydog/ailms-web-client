@@ -41,10 +41,10 @@ export const SETTING_GROUPS: SettingGroup[] = [
   {
     id: 'aicost',
     title: 'Chi phí AI',
-    description: 'Đơn giá dùng để quy đổi mức dùng AI thành chi phí ước tính trên trang AI Analytics. Hãy đặt theo bảng giá hiện hành của nhà cung cấp để số liệu sát hóa đơn.',
+    description: 'Hệ thống đã có sẵn bảng giá cho các model Gemini đang dùng. Các đơn giá dưới đây chỉ áp dụng cho model chưa có trong bảng giá, nên thường không cần chỉnh. Hãy đặt theo bảng giá hiện hành của nhà cung cấp để số liệu sát hóa đơn.',
     items: [
-      { key: 'AI_PRICE_INPUT_USD_PER_M', label: 'Đơn giá token đầu vào (Gemini)', help: 'USD cho mỗi 1 triệu token đầu vào.', kind: 'price', unit: 'USD / 1 triệu token', min: 0, max: 1000 },
-      { key: 'AI_PRICE_OUTPUT_USD_PER_M', label: 'Đơn giá token đầu ra và token suy nghĩ (Gemini)', help: 'USD cho mỗi 1 triệu token đầu ra; token suy nghĩ ẩn tính cùng đơn giá này.', kind: 'price', unit: 'USD / 1 triệu token', min: 0, max: 1000 },
+      { key: 'AI_PRICE_INPUT_USD_PER_M', label: 'Đơn giá token đầu vào (model chưa có trong bảng giá)', help: 'USD cho mỗi 1 triệu token đầu vào.', kind: 'price', unit: 'USD / 1 triệu token', min: 0, max: 1000 },
+      { key: 'AI_PRICE_OUTPUT_USD_PER_M', label: 'Đơn giá token đầu ra và suy nghĩ (model chưa có trong bảng giá)', help: 'USD cho mỗi 1 triệu token đầu ra; token suy nghĩ ẩn tính cùng đơn giá này.', kind: 'price', unit: 'USD / 1 triệu token', min: 0, max: 1000 },
       { key: 'AI_PRICE_EMBED_USD_PER_M', label: 'Đơn giá nhúng dữ liệu', kind: 'price', unit: 'USD / 1 triệu token', min: 0, max: 1000 },
       { key: 'AI_PRICE_AUDIO_USD_PER_HOUR', label: 'Đơn giá nhận dạng giọng nói (Groq)', help: 'USD cho mỗi giờ âm thanh.', kind: 'price', unit: 'USD / giờ âm thanh', min: 0, max: 1000 },
       { key: 'USD_VND_RATE', label: 'Tỷ giá USD sang VND', help: 'Dùng để hiển thị chi phí AI bằng đồng.', kind: 'number', unit: 'đ / USD', min: 1000, max: 100000 },

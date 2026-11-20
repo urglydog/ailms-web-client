@@ -11,8 +11,8 @@ import { ListSearch } from '@/components/ui/ListSearch';
 import { Pager } from '@/components/ui/SearchPanel';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useDebounce } from '@/hooks/useDebounce';
-import { api } from '@/lib/api/client';
-import { aiFeatureLabel, usd, vnd, type AiUsageOverview } from '@/lib/aiUsage';
+import { api, ApiError } from '@/lib/api/client';
+import { aiFeatureLabel, usd, vnd, type AiBillingEntry, type AiUsageOverview } from '@/lib/aiUsage';
 import { getAccessToken } from '@/lib/auth/token';
 import { useThemeColors } from '@/lib/theme/useThemeColors';
 
@@ -139,7 +139,7 @@ export default function AiAnalyticsPage() {
 
       {overview?.partialCoverage && (
         <p role="status" className="m-0 rounded-xl border border-warning bg-surface-raised p-4 text-sm text-ink">
-          Chi phí đầy đủ của mọi tính năng chỉ được ghi từ ngày {new Date(overview.trackingSince).toLocaleDateString('vi-VN')}. Trước ngày đó hệ thống chỉ ghi Flashcard, Sơ đồ tư duy và Quiz nên số liệu của khoảng này thấp hơn thực tế.
+          Hệ thống ghi chi phí đầy đủ của mọi tính năng từ ngày {new Date(overview.trackingSince).toLocaleDateString('vi-VN')}. Trước ngày đó, phần Flashcard, Sơ đồ tư duy và Quiz là số ghi nhận thật, còn Lồng tiếng và Gia sư AI là số ước tính từ dữ liệu đã lưu (chỉ tính phần nhìn thấy được, chưa gồm token suy nghĩ và các lần gọi thử), nên tổng của khoảng này thấp hơn thực tế. Hãy xem mục “Đối soát với hóa đơn” bên dưới để biết phần chênh.
         </p>
       )}
 
@@ -224,6 +224,8 @@ export default function AiAnalyticsPage() {
         </>
       ) : null}
 
+      <BillingPanel overview={overview} />
+
       <section className="flex flex-col gap-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="m-0 font-display text-base font-bold text-ink">Ai dùng AI nhiều nhất?</h2>
@@ -294,5 +296,129 @@ export default function AiAnalyticsPage() {
         <p className="m-0 text-xs text-ink-muted">Bảng này chỉ gồm các lệnh gọi AI gắn với một người dùng cụ thể; các chi phí hệ thống (nhúng dữ liệu, tìm kiếm của khách...) nằm trong tổng chi phí ở trên.</p>
       </section>
     </>
+  );
+}
+
+/** Đối soát với hóa đơn thực tế của Google AI Studio: admin nhập số tiền theo kỳ (không sửa/xóa, không chồng lấn); hệ thống so với phần đã quy được từ token và nêu phần chưa quy được. */
+function BillingPanel({ overview }: { overview?: AiUsageOverview }) {
+  const queryClient = useQueryClient();
+  const token = getAccessToken() ?? undefined;
+  const { data: entries } = useQuery({
+    queryKey: ['admin-ai-billing'],
+    queryFn: () => api.get<AiBillingEntry[]>('/api/v1/admin/ai-usage/billing', { token }),
+    enabled: !!token,
+  });
+  const [open, setOpen] = useState(false);
+  const [start, setStart] = useState('');
+  const [end, setEnd] = useState('');
+  const [amount, setAmount] = useState('');
+  const [note, setNote] = useState('');
+  const amountOk = /^\d{1,12}$/.test(amount.trim());
+  const canSave = !!start && !!end && start <= end && amountOk;
+
+  const add = useMutation({
+    mutationFn: () =>
+      api.post('/api/v1/admin/ai-usage/billing', { periodStart: start, periodEnd: end, amountVnd: Number(amount), source: 'Google AI Studio', note: note.trim() || null }, { token }),
+    onSuccess: () => {
+      toast.success('Đã lưu hóa đơn.');
+      setStart('');
+      setEnd('');
+      setAmount('');
+      setNote('');
+      queryClient.invalidateQueries({ queryKey: ['admin-ai-billing'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-ai-overview'] });
+    },
+    onError: (err) => toast.error(err instanceof ApiError ? err.message : 'Không lưu được hóa đơn. Vui lòng thử lại sau.'),
+  });
+
+  const rec = overview?.reconciliation;
+  const inputCls = 'rounded-lg border border-line bg-surface-raised px-3 py-2 text-sm text-ink outline-none focus:border-accent';
+  return (
+    <section className="flex flex-col gap-3 rounded-xl border border-line bg-surface-raised p-4 shadow-sm" aria-label="Đối soát với hóa đơn">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 className="m-0 font-display text-base font-bold text-ink">Đối soát với hóa đơn</h2>
+          <p className="m-0 mt-1 text-xs text-ink-muted">So chi phí ước tính từ token với số tiền Google AI Studio thực thu (nhập theo kỳ từ trang Usage của dự án). Chỉ gồm Gemini; Groq thanh toán riêng.</p>
+        </div>
+        <button type="button" onClick={() => setOpen((v) => !v)} className="rounded-lg border border-line px-3 py-1.5 text-xs font-bold text-accent-dark hover:bg-tint">
+          {open ? 'Đóng' : 'Nhập hóa đơn'}
+        </button>
+      </div>
+
+      {rec ? (
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <div className="rounded-lg bg-surface p-3">
+            <div className="text-xs font-semibold text-ink-muted">Hóa đơn thực tế</div>
+            <div className="font-display text-lg font-bold text-ink">{rec.billedVnd.toLocaleString('vi-VN')}đ</div>
+          </div>
+          <div className="rounded-lg bg-surface p-3">
+            <div className="text-xs font-semibold text-ink-muted">Đã quy được theo tính năng</div>
+            <div className="font-display text-lg font-bold text-ink">{rec.trackedVnd.toLocaleString('vi-VN')}đ</div>
+          </div>
+          <div className="rounded-lg bg-surface p-3">
+            <div className="text-xs font-semibold text-ink-muted">Chưa quy được</div>
+            <div className="font-display text-lg font-bold text-warning">{rec.unexplainedVnd.toLocaleString('vi-VN')}đ</div>
+            <div className="text-xs text-ink-muted">{rec.billedVnd > 0 ? Math.round((rec.unexplainedVnd / rec.billedVnd) * 100) : 0}% hóa đơn</div>
+          </div>
+        </div>
+      ) : (
+        <p className="m-0 text-sm text-ink-muted">Chưa có hóa đơn nào nằm trọn trong khoảng ngày đang xem. Chọn khoảng ngày bao trọn một kỳ hóa đơn đã nhập để xem đối soát.</p>
+      )}
+      {rec && rec.unexplainedVnd > 0 && (
+        <p className="m-0 text-xs text-ink-muted">
+          Phần chưa quy được thường đến từ token suy nghĩ ẩn, các lần chạy thử hoặc thất bại, hoặc tính năng chưa được ghi nhận (phiên học trực tiếp, tìm kiếm có Google Search). Từ ngày ghi nhận đầy đủ, phần này sẽ nhỏ dần.
+        </p>
+      )}
+
+      {open && (
+        <div className="flex flex-col gap-3 border-t border-line pt-3">
+          <div className="flex flex-wrap items-end gap-3">
+            <label className="flex flex-col gap-1">
+              <span className="text-xs font-semibold text-ink-muted">Từ ngày</span>
+              <input type="date" value={start} onChange={(e) => setStart(e.target.value)} className={inputCls} />
+            </label>
+            <label className="flex flex-col gap-1">
+              <span className="text-xs font-semibold text-ink-muted">Đến ngày</span>
+              <input type="date" value={end} min={start} onChange={(e) => setEnd(e.target.value)} className={inputCls} />
+            </label>
+            <label className="flex flex-col gap-1">
+              <span className="text-xs font-semibold text-ink-muted">Số tiền (đồng)</span>
+              <input
+                inputMode="numeric"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value.replace(/\D/g, '').slice(0, 12))}
+                placeholder="Ví dụ 220739"
+                className={`${inputCls} w-40 text-right`}
+              />
+            </label>
+            <label className="flex min-w-[12rem] flex-1 flex-col gap-1">
+              <span className="text-xs font-semibold text-ink-muted">Ghi chú (không bắt buộc)</span>
+              <input value={note} maxLength={300} onChange={(e) => setNote(e.target.value)} className={inputCls} />
+            </label>
+            <button
+              type="button"
+              disabled={!canSave || add.isPending}
+              onClick={() => add.mutate()}
+              className="rounded-lg bg-accent px-4 py-2 text-sm font-bold text-white hover:bg-accent-dark disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Lưu hóa đơn
+            </button>
+          </div>
+          <p className="m-0 text-xs text-ink-muted">Mỗi kỳ chỉ nhập một lần và không được trùng ngày với kỳ đã nhập. Hóa đơn đã lưu không sửa hoặc xóa được, để số liệu đối soát luôn đáng tin.</p>
+          <ul className="m-0 flex list-none flex-col gap-1 p-0 text-sm">
+            {(entries ?? []).map((e) => (
+              <li key={e.id} className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-surface px-3 py-2">
+                <span className="text-ink">
+                  {new Date(e.periodStart).toLocaleDateString('vi-VN')} – {new Date(e.periodEnd).toLocaleDateString('vi-VN')} · {e.source}
+                  {e.note ? <span className="text-ink-muted"> · {e.note}</span> : null}
+                </span>
+                <span className="font-semibold text-ink">{e.amountVnd.toLocaleString('vi-VN')}đ</span>
+              </li>
+            ))}
+            {(entries ?? []).length === 0 && <li className="text-ink-muted">Chưa có hóa đơn nào.</li>}
+          </ul>
+        </div>
+      )}
+    </section>
   );
 }
