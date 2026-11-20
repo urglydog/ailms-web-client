@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { Pager } from '@/components/ui/SearchPanel';
+import { useListControls } from '@/hooks/useListControls';
 import { useCancelPayout, useChangePayoutAccount, useMyPayouts, usePayoutAccounts } from '@/hooks/useFinance';
 import { useMyInvoices } from '@/hooks/useInvoices';
 import { invoicesApi } from '@/lib/api/invoices';
@@ -12,6 +14,14 @@ import { INSTRUCTOR_PAYOUT_STATUS_LABEL, PAYOUT_STATUS_CLASS, dateOnly, dateTime
 /** Lịch sử yêu cầu rút tiền; còn hủy được khi chưa được admin duyệt. */
 export function PayoutHistory() {
   const { data, isLoading } = useMyPayouts();
+  // Lọc theo trạng thái + tìm theo mã yêu cầu, phân trang 5 yêu cầu mỗi trang (danh sách của chính giảng viên nên lọc ở trình duyệt).
+  const [statusFilter, setStatusFilter] = useState<'ALL' | 'PENDING' | 'PAID' | 'CLOSED'>('ALL');
+  const list = useListControls(data, {
+    pageSize: 5,
+    filter: (p) =>
+      statusFilter === 'ALL' ? true : statusFilter === 'PAID' ? p.status === 'PAID' : statusFilter === 'PENDING' ? ['PENDING_EMAIL', 'REQUESTED', 'APPROVED'].includes(p.status) : ['REJECTED', 'FAILED', 'CANCELLED'].includes(p.status),
+    match: (p, q) => p.code.toLowerCase().includes(q) || (p.transferRef ?? '').toLowerCase().includes(q),
+  });
   const cancel = useCancelPayout();
   const change = useChangePayoutAccount();
   const { data: accounts } = usePayoutAccounts();
@@ -39,14 +49,44 @@ export function PayoutHistory() {
 
   return (
     <section className="flex flex-col gap-3 rounded-xl border border-line bg-surface-raised p-5 shadow-sm">
-      <h2 className="m-0 font-display text-base font-bold text-ink">Lịch sử rút tiền</h2>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h2 className="m-0 font-display text-base font-bold text-ink">Lịch sử rút tiền</h2>
+        {data && data.length > 0 && (
+          <div className="flex flex-wrap items-center gap-2">
+            <input
+              type="search"
+              aria-label="Tìm yêu cầu rút"
+              value={list.query}
+              onChange={(e) => list.setQuery(e.target.value)}
+              placeholder="Mã yêu cầu hoặc mã giao dịch..."
+              className="rounded-lg border border-line bg-surface-raised px-3 py-2 text-sm text-ink outline-none focus:border-accent"
+            />
+            <select
+              aria-label="Lọc theo trạng thái"
+              value={statusFilter}
+              onChange={(e) => {
+                setStatusFilter(e.target.value as 'ALL' | 'PENDING' | 'PAID' | 'CLOSED');
+                list.setPage(0);
+              }}
+              className="rounded-lg border border-line bg-surface-raised px-3 py-2 text-sm text-ink outline-none focus:border-accent"
+            >
+              <option value="ALL">Tất cả</option>
+              <option value="PENDING">Đang xử lý</option>
+              <option value="PAID">Đã nhận tiền</option>
+              <option value="CLOSED">Đã hủy / không thành công</option>
+            </select>
+          </div>
+        )}
+      </div>
       {isLoading ? (
         <p className="m-0 text-sm text-ink-muted">Đang tải...</p>
       ) : !data || data.length === 0 ? (
         <p className="m-0 text-sm text-ink-muted">Bạn chưa có yêu cầu rút tiền nào.</p>
+      ) : list.total === 0 ? (
+        <p className="m-0 text-sm text-ink-muted">Không có yêu cầu nào khớp bộ lọc.</p>
       ) : (
         <ul className="m-0 flex list-none flex-col divide-y divide-line-soft p-0">
-          {data.map((p) => (
+          {list.pageItems.map((p) => (
             <li key={p.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
               <div className="flex min-w-0 flex-col gap-0.5">
                 <span className="font-mono text-xs text-ink-muted">{p.code}</span>
@@ -139,6 +179,7 @@ export function PayoutHistory() {
           ))}
         </ul>
       )}
+      {data && data.length > 0 && list.total > 0 && <Pager page={list.page} totalPages={list.totalPages} total={list.total} onPage={list.setPage} />}
     </section>
   );
 }

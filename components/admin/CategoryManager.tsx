@@ -3,6 +3,9 @@
 import { useState, type FormEvent } from 'react';
 import { useTranslations } from 'next-intl';
 import { ConfirmDialog } from '@/components/admin/ui/ConfirmDialog';
+import { ListSearch } from '@/components/ui/ListSearch';
+import { Pager } from '@/components/ui/SearchPanel';
+import { useListControls } from '@/hooks/useListControls';
 import { useCategories, useCreateCategory, useDeleteCategory, useUpdateCategory } from '@/hooks/useCategories';
 import { ApiError } from '@/lib/api/client';
 import type { Category } from '@/types/domain';
@@ -11,6 +14,7 @@ export function CategoryManager() {
   const t = useTranslations('admin.categories');
   const [pendingDelete, setPendingDelete] = useState<Category | null>(null);
   const { data: categories, isLoading } = useCategories();
+  const list = useListControls(categories, { pageSize: 10, match: (c, q) => c.name.toLowerCase().includes(q) || c.slug.toLowerCase().includes(q) });
   const createCategory = useCreateCategory();
   const updateCategory = useUpdateCategory();
   const deleteCategory = useDeleteCategory();
@@ -64,6 +68,8 @@ export function CategoryManager() {
         <div role="alert" className="rounded-xl border border-danger/40 bg-surface-raised p-4 text-[13px] text-danger">{errorMessage}</div>
       )}
 
+      <ListSearch label="Tìm danh mục" value={list.query} onChange={list.setQuery} placeholder="Tìm theo tên hoặc đường dẫn danh mục..." />
+
       <div className="overflow-x-auto rounded-xl border border-line bg-surface-raised shadow-sm">
         <table className="w-full min-w-[520px] text-left text-sm">
           <thead className="bg-surface text-xs font-bold text-ink-muted uppercase">
@@ -88,7 +94,12 @@ export function CategoryManager() {
                 </td>
               </tr>
             )}
-            {categories?.map((category) => (
+            {!isLoading && categories && categories.length > 0 && list.total === 0 && (
+              <tr>
+                <td colSpan={3} className="px-6 py-6 text-center text-ink-muted">Không có danh mục nào khớp.</td>
+              </tr>
+            )}
+            {list.pageItems.map((category) => (
               <CategoryRow
                 key={category.id}
                 category={category}
@@ -99,6 +110,7 @@ export function CategoryManager() {
           </tbody>
         </table>
       </div>
+      <Pager page={list.page} totalPages={list.totalPages} total={list.total} onPage={list.setPage} />
 
       <ConfirmDialog
         open={pendingDelete !== null}

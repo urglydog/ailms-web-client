@@ -3,6 +3,9 @@
 import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
+import { ListSearch } from '@/components/ui/ListSearch';
+import { Pager } from '@/components/ui/SearchPanel';
+import { useListControls } from '@/hooks/useListControls';
 import { PageHeader } from '@/components/instructor/ui/PageHeader';
 import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -39,10 +42,13 @@ export default function InstructorRefundsPage() {
   const [statusFilter, setStatusFilter] = useState<DisputeStatus | 'ALL'>('ALL');
   const [selectedId, setSelectedId] = useState<number | null>(null);
 
-  const filtered = useMemo(
-    () => (data ?? []).filter((d) => statusFilter === 'ALL' || d.status === statusFilter),
-    [data, statusFilter],
-  );
+  const filterByStatus = useMemo(() => (d: { status: DisputeStatus }) => statusFilter === 'ALL' || d.status === statusFilter, [statusFilter]);
+  const list = useListControls(data, {
+    pageSize: 8,
+    filter: filterByStatus,
+    match: (d, q) => d.courseTitle.toLowerCase().includes(q) || d.paymentTxnRef.toLowerCase().includes(q) || d.learnerName.toLowerCase().includes(q),
+  });
+  const filtered = list.pageItems;
   const selected = (data ?? []).find((d) => d.id === selectedId) ?? null;
   const pendingCount = (data ?? []).filter(needsResponse).length;
 
@@ -51,12 +57,16 @@ export default function InstructorRefundsPage() {
       <PageHeader title={t('title')} subtitle={t('subtitle')} />
 
       <div className="flex flex-wrap items-end justify-between gap-4 rounded-xl border border-line bg-surface-raised p-4">
+        <ListSearch label="Tìm yêu cầu hoàn tiền" value={list.query} onChange={list.setQuery} placeholder="Tên khóa học, mã đơn hoặc tên học viên..." />
         <label className="flex w-full flex-col gap-1.5 sm:w-56">
           <span className="text-xs font-semibold text-ink-muted">{t('filters.status')}</span>
           <select
             className="w-full rounded-lg border border-line bg-surface-raised p-2.5 text-sm text-ink outline-none focus:border-accent"
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as DisputeStatus | 'ALL')}
+            onChange={(e) => {
+              setStatusFilter(e.target.value as DisputeStatus | 'ALL');
+              list.setPage(0);
+            }}
           >
             <option value="ALL">{t('filters.all')}</option>
             {STATUSES.map((s) => (
@@ -79,7 +89,7 @@ export default function InstructorRefundsPage() {
         </div>
       ) : isError ? (
         <div role="alert" className="rounded-xl border border-danger/40 bg-danger/5 p-6 text-center text-danger">{t('loadError')}</div>
-      ) : filtered.length === 0 ? (
+      ) : list.total === 0 ? (
         <div className="rounded-xl border border-line bg-surface-raised p-8 text-center text-ink-muted">{t('empty')}</div>
       ) : (
         <ul className="m-0 flex list-none flex-col gap-2 p-0">
@@ -108,6 +118,7 @@ export default function InstructorRefundsPage() {
           ))}
         </ul>
       )}
+      {!isLoading && !isError && list.total > 0 && <Pager page={list.page} totalPages={list.totalPages} total={list.total} onPage={list.setPage} />}
 
       {selected && <RefundDetailModal dispute={selected} onClose={() => setSelectedId(null)} />}
     </>

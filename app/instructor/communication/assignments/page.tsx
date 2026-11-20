@@ -1,5 +1,8 @@
 'use client';
 
+import { ListSearch } from '@/components/ui/ListSearch';
+import { Pager } from '@/components/ui/SearchPanel';
+import { useListControls } from '@/hooks/useListControls';
 import { Modal } from '@/components/ui/Modal';
 
 import { useState } from 'react';
@@ -20,12 +23,16 @@ export default function InstructorAssignmentsPage() {
 
   const { data: courses } = useInstructorCourseOptions();
   const { data: assignments, isLoading } = useInstructorAssignments(courseId || undefined);
+  const list = useListControls(assignments, { pageSize: 10, match: (a, q) => a.title.toLowerCase().includes(q) || a.courseTitle.toLowerCase().includes(q) || a.lessonTitle.toLowerCase().includes(q) });
 
   return (
     <>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="m-0 font-display text-[20px] font-bold text-ink">{t('assignments.title')}</h1>
-        <CourseFilterDropdown courses={courses ?? []} value={courseId} onChange={setCourseId} />
+        <div className="flex flex-wrap items-center gap-2">
+          <ListSearch label="Tìm bài tập" value={list.query} onChange={list.setQuery} placeholder="Tên bài tập, khóa học hoặc bài học..." />
+          <CourseFilterDropdown courses={courses ?? []} value={courseId} onChange={setCourseId} />
+        </div>
       </div>
 
       {isLoading && <div className="p-10 text-center text-sm text-ink-muted">{t('loading')}</div>}
@@ -36,13 +43,13 @@ export default function InstructorAssignmentsPage() {
       )}
 
       <div className="overflow-hidden rounded-xl border border-line bg-surface-raised shadow-sm">
-        {assignments?.map((a, idx) => (
+        {list.pageItems.map((a, idx) => (
           <button
             key={a.id}
             type="button"
             onClick={() => setActiveAssignment(a)}
             className={`flex w-full items-center justify-between gap-4 px-4 py-3 text-left transition-colors hover:bg-surface ${
-              idx < assignments.length - 1 ? 'border-b border-line-soft' : ''
+              idx < list.pageItems.length - 1 ? 'border-b border-line-soft' : ''
             }`}
           >
             <div className="min-w-0">
@@ -58,6 +65,11 @@ export default function InstructorAssignmentsPage() {
           </button>
         ))}
       </div>
+
+      {!isLoading && list.total > 0 && <Pager page={list.page} totalPages={list.totalPages} total={list.total} onPage={list.setPage} />}
+      {!isLoading && assignments && assignments.length > 0 && list.total === 0 && (
+        <div className="rounded-xl border border-line bg-surface-raised p-6 text-center text-sm text-ink-muted">Không có bài tập nào khớp.</div>
+      )}
 
       {activeAssignment && (
         <SubmissionsModal assignment={activeAssignment} onClose={() => setActiveAssignment(null)} />

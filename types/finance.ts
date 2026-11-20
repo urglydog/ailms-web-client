@@ -61,6 +61,14 @@ export interface FinanceSummary {
   hasOpenPayout: boolean;
 }
 
+/** Một trang sao kê kèm tổng số dòng (phân trang phía máy chủ). */
+export interface LedgerPage {
+  items: LedgerEntry[];
+  total: number;
+  page: number;
+  size: number;
+}
+
 export interface LedgerEntry {
   id: number;
   type: LedgerEntryType;

@@ -5,11 +5,15 @@ import type { CourseBundle, CreateBundleReq, UpdateBundleReq } from '@/types/dom
 /** API cho Course Bundles (29/09/2026 — Sprint 1 Bundles & Upsells). */
 export const bundlesApi = {
   /** Lấy danh sách gói của Giảng viên (phân trang — trả về content/totalPages). */
-  listMine: (page = 0) =>
+  listMine: (page = 0, size = 10) =>
     api.get<{ content: CourseBundle[]; totalPages: number; totalElements: number }>(
-      `/api/v1/instructor/bundles?page=${page}&size=10&sort=createdAt,desc`,
+      `/api/v1/instructor/bundles?page=${page}&size=${size}&sort=createdAt,desc`,
       { token: getAccessToken() ?? undefined },
     ),
+
+  /** Xóa gói (chưa ai mua) hoặc lưu trữ (đã có đơn mua): kết quả cho biết cụ thể. */
+  remove: (id: number) =>
+    api.delete<{ deleted: boolean; archived: boolean }>(`/api/v1/instructor/bundles/${id}`, { token: getAccessToken() ?? undefined }),
 
   create: (req: CreateBundleReq) =>
     api.post<CourseBundle>('/api/v1/instructor/bundles', req, { token: getAccessToken() ?? undefined }),

@@ -17,8 +17,13 @@ export function useFinanceSummary() {
   return useQuery({ queryKey: KEYS.summary, queryFn: () => financeApi.summary(), enabled: enabled() });
 }
 
-export function useLedger() {
-  return useQuery({ queryKey: KEYS.ledger, queryFn: () => financeApi.ledger(), enabled: enabled() });
+export function useLedger(params: { group?: string; from?: string; to?: string; page?: number } = {}) {
+  return useQuery({
+    queryKey: [...KEYS.ledger, params],
+    queryFn: () => financeApi.ledger(params),
+    enabled: enabled(),
+    placeholderData: (prev) => prev,
+  });
 }
 
 export function usePayoutBanks() {

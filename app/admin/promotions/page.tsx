@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { PageHeader } from '@/components/instructor/ui/PageHeader';
+import { Pager } from '@/components/ui/SearchPanel';
+import { useListControls } from '@/hooks/useListControls';
 import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { ApiError } from '@/lib/api/client';
@@ -86,7 +88,12 @@ export default function AdminPromotionsPage() {
     }
   };
 
-  const rows = data ?? [];
+  // Hàng chờ duyệt hiện sẵn (mặc định); tìm theo khóa/giảng viên và phân trang 10 dòng ở trình duyệt (danh sách theo trạng thái nên không lớn).
+  const list = useListControls(data, {
+    pageSize: 10,
+    match: (p, q) => p.courseTitle.toLowerCase().includes(q) || (p.instructorName ?? '').toLowerCase().includes(q) || (p.instructorEmail ?? '').toLowerCase().includes(q),
+  });
+  const rows = list.pageItems;
   const busy = approve.isPending || reject.isPending || end.isPending;
 
   return (
@@ -96,7 +103,17 @@ export default function AdminPromotionsPage() {
         subtitle="Duyệt đăng ký quảng bá của giảng viên. Khóa được duyệt xuất hiện ở kệ &quot;Được đề xuất&quot; trong khung thời gian bạn chọn."
       />
 
-      <div className="rounded-xl border border-line bg-surface-raised p-4">
+      <div className="flex flex-wrap items-end gap-4 rounded-xl border border-line bg-surface-raised p-4">
+        <label className="flex min-w-0 flex-1 flex-col gap-1.5 sm:min-w-64">
+          <span className="text-xs font-semibold text-ink-muted">Tìm đăng ký quảng bá</span>
+          <input
+            type="search"
+            value={list.query}
+            onChange={(e) => list.setQuery(e.target.value)}
+            placeholder="Tên khóa học, tên hoặc email giảng viên..."
+            className="w-full rounded-lg border border-line bg-surface-raised p-2.5 text-sm text-ink outline-none focus:border-accent"
+          />
+        </label>
         <label className="flex w-full flex-col gap-1.5 sm:w-64">
           <span className="text-xs font-semibold text-ink-muted">Trạng thái</span>
           <select
@@ -120,7 +137,7 @@ export default function AdminPromotionsPage() {
         </div>
       ) : isError ? (
         <div role="alert" className="rounded-xl border border-danger/40 bg-danger/5 p-6 text-center text-danger">Không tải được danh sách.</div>
-      ) : rows.length === 0 ? (
+      ) : list.total === 0 ? (
         <div className="rounded-xl border border-line bg-surface-raised p-8 text-center text-ink-muted">Không có đăng ký nào.</div>
       ) : (
         <ul className="m-0 flex list-none flex-col gap-3 p-0">
@@ -171,6 +188,7 @@ export default function AdminPromotionsPage() {
           ))}
         </ul>
       )}
+      {!isLoading && !isError && list.total > 0 && <Pager page={list.page} totalPages={list.totalPages} total={list.total} onPage={list.setPage} />}
 
       {dialog && (
         <Modal
