@@ -1566,7 +1566,7 @@
     },
     "queue": {
       "title": "AI キュー監視",
-      "subtitle": "AI Worker の状態、タスクキュー、Gemini キープール、吹き替えジョブ。",
+      "subtitle": "AI Worker の状態と、対応が必要な吹き替えジョブ。",
       "worker": "AI Worker：{status}",
       "ok": "稼働中",
       "down": "エラー",

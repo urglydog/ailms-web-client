@@ -7,7 +7,7 @@ import { ConfirmDialog } from '@/components/admin/ui/ConfirmDialog';
 import { Modal } from '@/components/ui/Modal';
 import { ListSearch } from '@/components/ui/ListSearch';
 import { useDebounce } from '@/hooks/useDebounce';
-import { useCreateSystemAnnouncement, useRevokeSystemAnnouncement, useSystemAnnouncements, useUpdateSystemAnnouncement } from '@/hooks/useSystemAnnouncements';
+import { useCreateSystemAnnouncement, useDeleteSystemAnnouncement, useRestoreSystemAnnouncement, useRevokeSystemAnnouncement, useSystemAnnouncements, useUpdateSystemAnnouncement } from '@/hooks/useSystemAnnouncements';
 import { ApiError } from '@/lib/api/client';
 import type { AnnouncementAudience, AnnouncementSeverity, CreateSystemAnnouncementReq, SystemAnnouncement } from '@/types/domain';
 
@@ -36,6 +36,9 @@ export function SystemAnnouncementManager() {
   const createAnnouncement = useCreateSystemAnnouncement();
   const updateAnnouncement = useUpdateSystemAnnouncement();
   const revokeAnnouncement = useRevokeSystemAnnouncement();
+  const restoreAnnouncement = useRestoreSystemAnnouncement();
+  const deleteAnnouncement = useDeleteSystemAnnouncement();
+  const [deleting, setDeleting] = useState<SystemAnnouncement | null>(null);
   const [editing, setEditing] = useState<SystemAnnouncement | null>(null);
   const [editTitle, setEditTitle] = useState('');
   const [editContent, setEditContent] = useState('');
@@ -60,6 +63,21 @@ export function SystemAnnouncementManager() {
         onError: (err) => toast.error(err instanceof ApiError ? err.message : 'Không cập nhật được thông báo. Vui lòng thử lại.'),
       },
     );
+  };
+  const restore = (a: SystemAnnouncement) =>
+    restoreAnnouncement.mutate(a.id, {
+      onSuccess: () => toast.success('Đã khôi phục thông báo. Người dùng thấy lại thông báo này.'),
+      onError: (err) => toast.error(err instanceof ApiError ? err.message : 'Không khôi phục được thông báo. Vui lòng thử lại.'),
+    });
+  const confirmDelete = () => {
+    if (!deleting) return;
+    deleteAnnouncement.mutate(deleting.id, {
+      onSuccess: () => {
+        toast.success('Đã xóa thông báo.');
+        setDeleting(null);
+      },
+      onError: (err) => toast.error(err instanceof ApiError ? err.message : 'Không xóa được thông báo. Vui lòng thử lại.'),
+    });
   };
   const confirmRevoke = () => {
     if (!revoking) return;
@@ -239,7 +257,11 @@ export function SystemAnnouncementManager() {
                 <td className="px-6 py-3 text-ink-muted">{new Date(a.createdAt).toLocaleString(locale)}</td>
                 <td className="whitespace-nowrap px-6 py-3 text-right">
                   {a.revokedAt ? (
-                    <span className="text-xs text-ink-muted">Đã thu hồi {new Date(a.revokedAt).toLocaleDateString(locale)}</span>
+                    <>
+                      <span className="mr-2 text-xs text-ink-muted">Đã thu hồi {new Date(a.revokedAt).toLocaleDateString(locale)}</span>
+                      <button type="button" disabled={restoreAnnouncement.isPending} onClick={() => restore(a)} className="rounded-lg px-2.5 py-1.5 text-xs font-bold text-accent-dark hover:bg-tint disabled:opacity-50">Khôi phục</button>
+                      <button type="button" onClick={() => setDeleting(a)} className="rounded-lg px-2.5 py-1.5 text-xs font-bold text-danger hover:bg-tint">Xóa</button>
+                    </>
                   ) : (
                     <>
                       <button type="button" onClick={() => openEdit(a)} className="rounded-lg px-2.5 py-1.5 text-xs font-bold text-accent-dark hover:bg-tint">Sửa</button>
@@ -289,6 +311,17 @@ export function SystemAnnouncementManager() {
           </div>
         </Modal>
       )}
+
+      <ConfirmDialog
+        open={deleting !== null}
+        tone="danger"
+        title="Xóa hẳn thông báo?"
+        body={deleting ? `Thông báo "${deleting.title}" và các bản người dùng đã nhận sẽ bị xóa vĩnh viễn, không khôi phục được. Nếu chỉ muốn tạm ẩn, hãy giữ ở trạng thái đã thu hồi.` : ''}
+        confirmLabel="Xóa hẳn"
+        cancelLabel="Hủy"
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleting(null)}
+      />
 
       <ConfirmDialog
         open={revoking !== null}

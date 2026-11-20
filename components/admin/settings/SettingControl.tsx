@@ -97,6 +97,29 @@ function PercentInput({ item, value, onChange, invalid }: Props) {
   );
 }
 
+/** Đơn giá thập phân (tối đa 4 chữ số sau dấu chấm): chỉ nhận chữ số và một dấu chấm. */
+function PriceInput({ item, value, onChange, invalid }: Props) {
+  return (
+    <div className="flex items-center gap-1.5">
+      <input
+        type="text"
+        inputMode="decimal"
+        autoComplete="off"
+        aria-label={item.label}
+        aria-invalid={invalid}
+        value={value}
+        onChange={(e) => {
+          const cleaned = e.target.value.replace(/[^\d.]/g, '');
+          const [intPart = '', ...rest] = cleaned.split('.');
+          onChange(rest.length ? `${intPart.slice(0, 4)}.${rest.join('').slice(0, 4)}` : intPart.slice(0, 4));
+        }}
+        className={`${base} w-28 text-right ${invalid ? 'border-danger' : 'border-line'}`}
+      />
+      {item.unit && <span className="text-xs text-ink-muted">{item.unit}</span>}
+    </div>
+  );
+}
+
 /** Ngày trong tháng (1–28): lưới 28 ô, chọn tối đa 4. */
 function DaysGrid({ item, value, onChange }: Props) {
   const selected = new Set(parseList(value).map(Number));
@@ -221,6 +244,8 @@ export function SettingControl(props: Props) {
       return <IntegerInput {...props} />;
     case 'percent':
       return <PercentInput {...props} />;
+    case 'price':
+      return <PriceInput {...props} />;
     case 'days':
       return <DaysGrid {...props} />;
     case 'dates':

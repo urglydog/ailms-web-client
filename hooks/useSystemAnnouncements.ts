@@ -37,6 +37,25 @@ export function useCreateSystemAnnouncement() {
   });
 }
 
+export function useRestoreSystemAnnouncement() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => systemAnnouncementsApi.restore(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'announcements'] });
+      queryClient.invalidateQueries({ queryKey: ['system-announcements', 'banner'] });
+    },
+  });
+}
+
+export function useDeleteSystemAnnouncement() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => systemAnnouncementsApi.remove(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin', 'announcements'] }),
+  });
+}
+
 /** Banner đầu trang — public, poll nhẹ mỗi 5 phút (không cần realtime, "bảo trì hệ thống" không
  * phải thông tin cấp bách tới mức cần WebSocket riêng). */
 export function useActiveBanner() {
