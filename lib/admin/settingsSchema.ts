@@ -3,7 +3,7 @@
  * (công tắc cho giá trị bật/tắt, ô số có đơn vị, danh sách email, danh sách ngày...). KHÔNG hiển thị tên biến kỹ thuật ra giao diện.
  * Khóa không có trong lược đồ này (vd cấu hình nội bộ, hoặc giá trị do bên thứ ba quy định như phí PayOS) không hiện và không sửa được ở đây.
  */
-export type SettingKind = 'switch' | 'number' | 'percent' | 'text' | 'emails' | 'days' | 'dates';
+export type SettingKind = 'switch' | 'number' | 'percent' | 'price' | 'text' | 'emails' | 'days' | 'dates';
 
 export interface SettingItem {
   key: string;
@@ -36,6 +36,18 @@ export const SETTING_GROUPS: SettingGroup[] = [
       { key: 'QUOTA_MATERIALS', label: 'Sinh học liệu mỗi người', help: 'Số lần tạo học liệu bằng AI (quiz, flashcard, sơ đồ tư duy) trong ngày.', kind: 'number', unit: 'lần/ngày', min: 0, max: 1000 },
       { key: 'QUOTA_TUTOR', label: 'Tin nhắn AI Tutor', help: 'Số tin nhắn tối đa một người có thể gửi cho AI Tutor trong ngày.', kind: 'number', unit: 'tin/ngày', min: 0, max: 10000 },
       { key: 'QUOTA_GUEST_SEARCH', label: 'Tìm kiếm AI của khách', help: 'Số lượt tìm kiếm AI mỗi giờ cho người chưa đăng nhập.', kind: 'number', unit: 'lượt/giờ', min: 0, max: 1000 },
+    ],
+  },
+  {
+    id: 'aicost',
+    title: 'Chi phí AI',
+    description: 'Đơn giá dùng để quy đổi mức dùng AI thành chi phí ước tính trên trang AI Analytics. Hãy đặt theo bảng giá hiện hành của nhà cung cấp để số liệu sát hóa đơn.',
+    items: [
+      { key: 'AI_PRICE_INPUT_USD_PER_M', label: 'Đơn giá token đầu vào (Gemini)', help: 'USD cho mỗi 1 triệu token đầu vào.', kind: 'price', unit: 'USD / 1 triệu token', min: 0, max: 1000 },
+      { key: 'AI_PRICE_OUTPUT_USD_PER_M', label: 'Đơn giá token đầu ra và token suy nghĩ (Gemini)', help: 'USD cho mỗi 1 triệu token đầu ra; token suy nghĩ ẩn tính cùng đơn giá này.', kind: 'price', unit: 'USD / 1 triệu token', min: 0, max: 1000 },
+      { key: 'AI_PRICE_EMBED_USD_PER_M', label: 'Đơn giá nhúng dữ liệu', kind: 'price', unit: 'USD / 1 triệu token', min: 0, max: 1000 },
+      { key: 'AI_PRICE_AUDIO_USD_PER_HOUR', label: 'Đơn giá nhận dạng giọng nói (Groq)', help: 'USD cho mỗi giờ âm thanh.', kind: 'price', unit: 'USD / giờ âm thanh', min: 0, max: 1000 },
+      { key: 'USD_VND_RATE', label: 'Tỷ giá USD sang VND', help: 'Dùng để hiển thị chi phí AI bằng đồng.', kind: 'number', unit: 'đ / USD', min: 1000, max: 100000 },
     ],
   },
   {
@@ -137,6 +149,11 @@ export function validateSetting(item: SettingItem, value: string): string | null
     if (!PERCENT.test(v)) return 'Chỉ nhập số không âm, tối đa 2 chữ số sau dấu chấm (ví dụ 37 hoặc 97.5).';
     const n = Number(v);
     if (n < (item.min ?? 0) || n > (item.max ?? 100)) return `Giá trị phải từ ${item.min ?? 0} đến ${item.max ?? 100}.`;
+  }
+  if (item.kind === 'price') {
+    if (v === '') return 'Vui lòng nhập một số.';
+    if (!/^\d{1,4}(\.\d{1,4})?$/.test(v)) return 'Chỉ nhập số không âm, tối đa 4 chữ số sau dấu chấm (ví dụ 0.30).';
+    if (Number(v) > (item.max ?? 1000)) return `Giá trị tối đa là ${item.max ?? 1000}.`;
   }
   if (item.kind === 'emails' && v !== '') {
     const items = parseList(v);

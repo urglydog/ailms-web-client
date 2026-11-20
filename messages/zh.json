@@ -1566,7 +1566,7 @@
     },
     "queue": {
       "title": "AI 队列监控",
-      "subtitle": "AI Worker 状态、任务队列、Gemini 密钥池和配音任务。",
+      "subtitle": "AI Worker 状态和需要处理的配音任务。",
       "worker": "AI Worker：{status}",
       "ok": "运行中",
       "down": "异常",

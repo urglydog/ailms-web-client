@@ -28,7 +28,8 @@ interface AiLockProposal {
   aiLockProposedReason: string;
 }
 
-const FILTERS: UserFilter[] = ['ALL', 'STUDENT', 'INSTRUCTOR', 'ADMIN', 'LOCKED', 'SPAM'];
+/** Chỉ còn hai nhóm cần theo dõi (tài khoản bị khóa, bị gắn cờ spam) vì khó tìm bằng từ khóa; mọi tài khoản khác tìm bằng ô tìm kiếm (kết quả hiện cả vai trò). */
+const FILTERS: UserFilter[] = ['LOCKED', 'SPAM'];
 const PAGE_SIZE = 10;
 
 /** Quản lý người dùng: bộ lọc nhanh có đếm, tìm kiếm, bảng sắp xếp được, phân trang; khóa/mở khóa luôn hỏi xác nhận. */
@@ -48,9 +49,8 @@ export default function AdminUsersPage() {
   const [pendingBlock, setPendingBlock] = useState<AdminUser | null>(null);
 
   const debouncedQuery = useDebounce(query, 300);
-  // Tìm-kiếm-trước (20/11/2026): nhóm "Tất cả", "Học viên" và "Giảng viên" có thể rất đông nên chỉ liệt kê khi có từ khóa; chỉ các nhóm nhỏ cần theo dõi
-  // (quản trị, bị khóa, spam) liệt kê ngay. Không hiện số đếm trên các nút lọc vì danh sách không được hiển thị sẵn.
-  const needsQuery = (filter === 'ALL' || filter === 'STUDENT' || filter === 'INSTRUCTOR') && !debouncedQuery.trim();
+  // Tìm-kiếm-trước: không liệt kê ai cho tới khi có từ khóa (tên, email, ID) hoặc chọn nhóm "Bị khóa"/"Bị gắn cờ spam". Bấm lại nút nhóm đang chọn để bỏ lọc.
+  const needsQuery = filter === 'ALL' && !debouncedQuery.trim();
 
   const fetchUsers = useCallback(async () => {
     try {
@@ -174,7 +174,7 @@ export default function AdminUsersPage() {
               key={id}
               type="button"
               aria-pressed={filter === id}
-              onClick={() => setFilter(id)}
+              onClick={() => setFilter((cur) => (cur === id ? 'ALL' : id))}
               className={`rounded-full px-3.5 py-1.5 text-[13px] font-semibold transition-colors ${
                 filter === id ? 'bg-accent text-white' : 'border border-line bg-surface-raised text-ink-muted hover:border-accent hover:text-ink'
               }`}
@@ -199,7 +199,7 @@ export default function AdminUsersPage() {
       {needsQuery ? (
         <SearchPrompt title="Nhập thông tin để tìm người dùng">
           Hệ thống có rất nhiều tài khoản nên không hiển thị sẵn. Hãy nhập tên, email hoặc ID người dùng ở ô tìm kiếm phía trên;
-          hoặc chọn nhóm Quản trị viên, Bị khóa, Spam để xem các nhóm cần theo dõi.
+          hoặc chọn nhóm Bị khóa / Bị gắn cờ spam để xem các tài khoản cần theo dõi. Vai trò của từng tài khoản hiện ngay trong kết quả.
         </SearchPrompt>
       ) : loading ? (
         <div className="flex flex-col gap-2 rounded-xl border border-line bg-surface-raised p-4">

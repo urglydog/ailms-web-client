@@ -1632,7 +1632,7 @@
     },
     "queue": {
       "title": "Giám sát AI Queue",
-      "subtitle": "Tình trạng AI Worker, hàng đợi tác vụ, nhóm khóa Gemini và các job lồng tiếng.",
+      "subtitle": "Tình trạng AI Worker và các job lồng tiếng cần theo dõi.",
       "worker": "AI Worker: {status}",
       "ok": "Hoạt động",
       "down": "Lỗi",

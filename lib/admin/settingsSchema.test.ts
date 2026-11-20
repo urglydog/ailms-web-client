@@ -40,7 +40,7 @@ describe('SETTING_GROUPS', () => {
   });
 
   it('mọi ô số đều có giới hạn min/max để kiểm tra khoảng', () => {
-    for (const item of [...byKind('number'), ...byKind('percent')]) {
+    for (const item of [...byKind('number'), ...byKind('percent'), ...byKind('price')]) {
       expect(item.min).toBeDefined();
       expect(item.max).toBeDefined();
     }
@@ -65,6 +65,14 @@ describe('validateSetting — phần trăm', () => {
     const item = find(key as string);
     for (const ok of ['0', '37', '97.5', '100', '99.99']) expect(validateSetting(item, ok), ok).toBeNull();
     for (const bad of ['', '-1', '101', '100.01', 'abc', '1e2', '37.123', '+5', '1,5', '٣']) expect(validateSetting(item, bad), `"${bad}"`).not.toBeNull();
+  });
+});
+
+describe('validateSetting — đơn giá thập phân', () => {
+  it.each(byKind('price').map((i) => [i.key]))('%s nhận đơn giá hợp lệ và từ chối giá trị sai', (key) => {
+    const item = find(key as string);
+    for (const ok of ['0', '0.30', '2.5', '1000', '12.3456']) expect(validateSetting(item, ok), ok).toBeNull();
+    for (const bad of ['', '  ', '-1', '1000.01', '1001', 'abc', '1e2', '0.12345', '+5', '1,5', '٣']) expect(validateSetting(item, bad), `"${bad}"`).not.toBeNull();
   });
 });
 

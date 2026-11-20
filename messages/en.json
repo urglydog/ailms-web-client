@@ -1632,7 +1632,7 @@
     },
     "queue": {
       "title": "AI Queue monitor",
-      "subtitle": "AI Worker health, task queues, the Gemini key pool and dubbing jobs.",
+      "subtitle": "AI Worker health and the dubbing jobs that need attention.",
       "worker": "AI Worker: {status}",
       "ok": "Running",
       "down": "Error",

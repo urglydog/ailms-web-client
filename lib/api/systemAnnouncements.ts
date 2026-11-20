@@ -19,6 +19,14 @@ export const systemAnnouncementsApi = {
   update: (id: number, req: { title: string; content: string; expiresAt: string | null }) =>
     api.put<SystemAnnouncement>(`/api/v1/admin/announcements/${id}`, req, { token: getAccessToken() ?? undefined }),
 
+  /** Khôi phục thông báo đã thu hồi để dùng lại. */
+  restore: (id: number) =>
+    api.post<SystemAnnouncement>(`/api/v1/admin/announcements/${id}/restore`, {}, { token: getAccessToken() ?? undefined }),
+
+  /** Xóa hẳn thông báo ĐÃ THU HỒI (bản ghi và các thông báo đã gửi). */
+  remove: (id: number) =>
+    api.delete<void>(`/api/v1/admin/announcements/${id}`, { token: getAccessToken() ?? undefined }),
+
   /** Thu hồi: ẩn khỏi người dùng, giữ bản ghi. */
   revoke: (id: number) =>
     api.post<SystemAnnouncement>(`/api/v1/admin/announcements/${id}/revoke`, {}, { token: getAccessToken() ?? undefined }),

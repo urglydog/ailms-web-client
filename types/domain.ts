@@ -345,6 +345,14 @@ export interface AiJobSummary {
   retryCount: number;
   errorMessage: string | null;
   createdAt: string;
+  courseTitle: string;
+  requestedByName: string | null;
+  requestedByEmail: string | null;
+  finishedAt: string | null;
+  /** Job lỗi nhưng bài học + ngôn ngữ này đã có bản lồng tiếng thành công. */
+  superseded: boolean;
+  /** Được phép thử lại (đang lỗi, còn lượt, chưa có bản thành công). */
+  retryable: boolean;
 }
 
 // ── Lỗi API (RFC 7807 ProblemDetail từ backend) ─────────────────
