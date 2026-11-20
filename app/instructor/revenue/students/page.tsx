@@ -12,12 +12,26 @@ const AT_RISK_WARNING_RATIO = 0.3;
 
 /** "Hiệu suất" > Sinh viên — danh sách học viên đã ghi danh trên các khóa của giảng viên
  * (19/09/2026, xây mới — trước đây `/instructor/students` chỉ là placeholder). */
+const STUDENT_PAGE = 15;
+
 export default function InstructorStudentsPage() {
   const t = useTranslations('instructor.perf');
   const locale = useLocale();
   const [courseId, setCourseId] = useState<number | ''>('');
   const { data: courses } = useInstructorCourseOptions();
   const { data: students, isLoading } = useInstructorStudents(courseId || undefined);
+
+  // Danh sách hiển thị theo mục đích: mặc định chỉ những học viên cần chú ý (tiến độ thấp) để giảng viên hành động; xem tất cả hoặc tìm theo tên/email/khóa khi cần.
+  const [view, setView] = useState<'risk' | 'all'>('risk');
+  const [query, setQuery] = useState('');
+  const [limit, setLimit] = useState(STUDENT_PAGE);
+  const visible = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    const list = (students ?? [])
+      .filter((s) => (view === 'risk' ? s.progressPct < AT_RISK_THRESHOLD_PCT : true))
+      .filter((s) => !q || s.studentName.toLowerCase().includes(q) || s.studentEmail.toLowerCase().includes(q) || s.courseTitle.toLowerCase().includes(q));
+    return view === 'risk' ? [...list].sort((a, b) => a.progressPct - b.progressPct) : list;
+  }, [students, view, query]);
 
   const stats = useMemo(() => {
     if (!students || students.length === 0) return null;
@@ -84,6 +98,44 @@ export default function InstructorStudentsPage() {
         </InsightCallout>
       )}
 
+      <div className="flex flex-wrap items-center gap-3">
+        <div role="group" aria-label="Chế độ xem" className="flex gap-2">
+          <button
+            type="button"
+            aria-pressed={view === 'risk'}
+            onClick={() => {
+              setView('risk');
+              setLimit(STUDENT_PAGE);
+            }}
+            className={`rounded-full px-3.5 py-1.5 text-[13px] font-semibold ${view === 'risk' ? 'bg-accent text-white' : 'border border-line bg-surface-raised text-ink-muted hover:text-ink'}`}
+          >
+            Cần chú ý{stats ? ` (${stats.atRiskCount})` : ''}
+          </button>
+          <button
+            type="button"
+            aria-pressed={view === 'all'}
+            onClick={() => {
+              setView('all');
+              setLimit(STUDENT_PAGE);
+            }}
+            className={`rounded-full px-3.5 py-1.5 text-[13px] font-semibold ${view === 'all' ? 'bg-accent text-white' : 'border border-line bg-surface-raised text-ink-muted hover:text-ink'}`}
+          >
+            Tất cả{stats ? ` (${stats.total})` : ''}
+          </button>
+        </div>
+        <input
+          type="search"
+          value={query}
+          onChange={(e) => {
+            setQuery(e.target.value);
+            setLimit(STUDENT_PAGE);
+          }}
+          placeholder="Tìm theo tên, email hoặc khóa học..."
+          aria-label="Tìm học viên"
+          className="ml-auto w-full rounded-lg border border-line bg-surface-raised px-3 py-2 text-sm text-ink outline-none focus:border-accent sm:w-72"
+        />
+      </div>
+
       {/* (26/09/2026, sửa lỗi) — cột cố định không co giãn dưới `lg`, bọc cuộn ngang thay vì bóp/vỡ. */}
       <div className="overflow-hidden rounded-xl border border-line bg-surface-raised shadow-sm">
         <div className="overflow-x-auto">
@@ -99,12 +151,17 @@ export default function InstructorStudentsPage() {
         {!isLoading && (!students || students.length === 0) && (
           <div className="p-10 text-center text-sm text-ink-muted">{t('students.empty')}</div>
         )}
+        {!isLoading && students && students.length > 0 && visible.length === 0 && (
+          <div className="p-10 text-center text-sm text-ink-muted">
+            {view === 'risk' && !query.trim() ? 'Không có học viên nào cần chú ý. Chọn "Tất cả" để xem toàn bộ học viên.' : 'Không có học viên nào khớp.'}
+          </div>
+        )}
 
-        {students?.map((s, idx) => (
+        {visible.slice(0, limit).map((s, idx, shown) => (
           <div
             key={idx}
             className={`grid min-w-[680px] grid-cols-[1.4fr_1.4fr_1fr_140px_140px] items-center gap-3 px-4 py-2.5 text-[13px] ${
-              idx < students.length - 1 ? 'border-b border-line-soft' : ''
+              idx < shown.length - 1 ? 'border-b border-line-soft' : ''
             }`}
           >
             <span className="truncate font-semibold text-ink">{s.studentName}</span>
@@ -120,6 +177,13 @@ export default function InstructorStudentsPage() {
           </div>
         ))}
         </div>
+        {visible.length > limit && (
+          <div className="flex justify-center border-t border-line p-3">
+            <button type="button" onClick={() => setLimit((n) => n + STUDENT_PAGE)} className="rounded-lg border border-line bg-surface-raised px-4 py-2 text-sm font-semibold text-ink hover:bg-tint">
+              Xem thêm ({visible.length - limit} học viên)
+            </button>
+          </div>
+        )}
       </div>
     </>
   );

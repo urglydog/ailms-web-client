@@ -14,6 +14,8 @@ export interface Invoice {
   issuedAt: string;
   relatedNumber: string | null;
   description: string | null;
+  /** Mã nghiệp vụ chứng từ gắn vào: mã đơn, mã yêu cầu rút, mã thanh toán nợ, hoặc kỳ YYYYMM. */
+  refs: string[];
 }
 
 /** Dòng trong danh sách quản trị (`GET /api/v1/admin/invoices`). */
@@ -29,6 +31,7 @@ export interface AdminInvoice {
   partyName: string;
   partyEmail: string;
   relatedNumber: string | null;
+  refs: string[];
 }
 
 export interface AdminInvoicePage {
@@ -45,4 +48,27 @@ export interface AdminInvoiceFilter {
   q?: string;
   page?: number;
   size?: number;
+}
+
+export interface InvoiceLine {
+  lineNo: number;
+  description: string;
+  quantity: number;
+  unitPrice: number;
+  amount: number;
+}
+
+export interface InvoiceSlice {
+  label: string;
+  amount: number;
+}
+
+/** Chi tiết một chứng từ: thông tin chung, các dòng, dữ liệu đã chụp và thành phần (thu nhập theo khóa của bảng kê tháng). */
+export interface InvoiceDetail {
+  header: AdminInvoice;
+  subtotal: number;
+  discount: number;
+  lines: InvoiceLine[];
+  details: Record<string, string | number>;
+  breakdown: InvoiceSlice[];
 }

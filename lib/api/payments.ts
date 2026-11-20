@@ -17,6 +17,14 @@ export const paymentsApi = {
   listMine: () =>
     api.get<PaymentRes[]>('/api/v1/payments/mine', { token: getAccessToken() ?? undefined }),
 
-  listAllAdmin: () =>
-    api.get<Record<string, unknown>[]>('/api/v1/payments/admin/all', { token: getAccessToken() ?? undefined }),
+  /** Tra cứu giao dịch cho admin: theo từ khóa (mã đơn, mã cổng, email/tên/ID người mua, khóa học) và/hoặc trạng thái; luôn phân trang. */
+  searchAdmin: (q: string, status: string, page: number, size = 10) => {
+    const p = new URLSearchParams({ page: String(page), size: String(size) });
+    if (q.trim()) p.set('q', q.trim());
+    if (status) p.set('status', status);
+    return api.get<{ items: Record<string, unknown>[]; total: number; page: number; size: number }>(
+      `/api/v1/payments/admin/search?${p.toString()}`,
+      { token: getAccessToken() ?? undefined },
+    );
+  },
 };

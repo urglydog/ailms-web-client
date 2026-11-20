@@ -3,6 +3,9 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { useCancelPayout, useChangePayoutAccount, useMyPayouts, usePayoutAccounts } from '@/hooks/useFinance';
+import { useMyInvoices } from '@/hooks/useInvoices';
+import { invoicesApi } from '@/lib/api/invoices';
+import { saveBlob } from '@/lib/invoices';
 import { ApiError } from '@/lib/api/client';
 import { INSTRUCTOR_PAYOUT_STATUS_LABEL, PAYOUT_STATUS_CLASS, dateOnly, dateTime, money } from '@/lib/finance';
 
@@ -13,6 +16,16 @@ export function PayoutHistory() {
   const change = useChangePayoutAccount();
   const { data: accounts } = usePayoutAccounts();
   const active = (accounts ?? []).filter((a) => a.status === 'ACTIVE');
+  // Phiếu chi của từng yêu cầu rút (gắn theo mã yêu cầu), tải ngay tại dòng.
+  const { data: invoices } = useMyInvoices();
+  const voucherByCode = new Map((invoices ?? []).filter((i) => i.type === 'PAYOUT').flatMap((i) => i.refs.map((r) => [r, i] as const)));
+  const downloadVoucher = async (id: number, number: string) => {
+    try {
+      saveBlob(await invoicesApi.pdf(id), `${number}.pdf`);
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : 'Không tải được phiếu chi. Vui lòng thử lại sau ít phút.');
+    }
+  };
   // Yêu cầu đang đổi tài khoản (mở khung chọn ngay trong dòng, không popup) và lựa chọn tạm.
   const [changingId, setChangingId] = useState<number | null>(null);
   const [pickedAccountId, setPickedAccountId] = useState<number | null>(null);
@@ -49,6 +62,16 @@ export function PayoutHistory() {
                 <span className={`rounded-full border px-2.5 py-1 text-xs font-medium ${PAYOUT_STATUS_CLASS[p.status]}`}>
                   {INSTRUCTOR_PAYOUT_STATUS_LABEL[p.status]}
                 </span>
+                {voucherByCode.has(p.code) && (
+                  <button
+                    type="button"
+                    onClick={() => downloadVoucher(voucherByCode.get(p.code)!.id, voucherByCode.get(p.code)!.number)}
+                    title="Tải phiếu chi (PDF)"
+                    className="rounded-lg border border-line px-3 py-1.5 text-xs font-semibold text-accent-dark hover:bg-tint"
+                  >
+                    Phiếu chi
+                  </button>
+                )}
                 {(p.status === 'PENDING_EMAIL' || p.status === 'REQUESTED') && active.length > 1 && changingId !== p.id && (
                   <button
                     type="button"

@@ -10,6 +10,7 @@ import { PageHeader } from '@/components/instructor/ui/PageHeader';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { ApiError } from '@/lib/api/client';
 import { disputesApi } from '@/lib/api/disputes';
+import { useDebounce } from '@/hooks/useDebounce';
 import { DisputeV2Details, RefundSummary, ResponsibilityPicker } from '@/components/admin/disputes/DisputeV2Details';
 import {
   AppealPanel,
@@ -45,7 +46,12 @@ function AdminDisputesContent() {
 
   const [disputes, setDisputes] = useState<DisputeAdminRes[]>([]);
   const [loading, setLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState<DisputeStatus | 'ALL'>('ALL');
+  // Hàng chờ xử lý hiện sẵn (số lượng ít, admin cần nắm ngay); khiếu nại đã xử lý chỉ hiện khi chọn trạng thái hoặc tìm kiếm.
+  const [statusFilter, setStatusFilter] = useState<DisputeStatus | 'ALL' | 'NEEDS_ACTION'>(highlightRef ? 'ALL' : 'NEEDS_ACTION');
+  const [search, setSearch] = useState(highlightRef ?? '');
+  const debouncedSearch = useDebounce(search, 400);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(false);
   const [selected, setSelected] = useState<DisputeAdminRes | null>(null);
   const [note, setNote] = useState('');
   const [responsibility, setResponsibility] = useState<RefundResponsibility>('STANDARD');
@@ -54,19 +60,26 @@ function AdminDisputesContent() {
   const [evidenceNote, setEvidenceNote] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  const fetchDisputes = () => {
-    setLoading(true);
+  const PAGE = 30;
+  const apiStatus = statusFilter === 'ALL' || statusFilter === 'NEEDS_ACTION' ? undefined : statusFilter;
+  // Tải trang đầu khi đổi trạng thái/từ khóa; "Xem thêm" nối thêm các trang sau.
+  const fetchDisputes = (nextPage = 0) => {
+    setLoading(nextPage === 0);
     disputesApi
-      .listAllAdmin(statusFilter === 'ALL' ? undefined : statusFilter)
-      .then(setDisputes)
+      .listAllAdmin(apiStatus, debouncedSearch, nextPage, PAGE, statusFilter === 'NEEDS_ACTION')
+      .then((list) => {
+        setDisputes((prev) => (nextPage === 0 ? list : [...prev, ...list]));
+        setHasMore(list.length === PAGE);
+        setPage(nextPage);
+      })
       .catch(() => toast.error(t('loadError')))
       .finally(() => setLoading(false));
   };
 
   useEffect(() => {
-    fetchDisputes();
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- chỉ phụ thuộc statusFilter
-  }, [statusFilter]);
+    fetchDisputes(0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- chỉ phụ thuộc bộ lọc
+  }, [statusFilter, debouncedSearch]);
 
   const filtered = useMemo(() => {
     if (!highlightRef) return disputes;
@@ -88,9 +101,11 @@ function AdminDisputesContent() {
   const refreshSelected = () => {
     const id = selected?.id;
     disputesApi
-      .listAllAdmin(statusFilter === 'ALL' ? undefined : statusFilter)
+      .listAllAdmin(apiStatus, debouncedSearch, 0, PAGE, statusFilter === 'NEEDS_ACTION')
       .then((list) => {
         setDisputes(list);
+        setHasMore(list.length === PAGE);
+        setPage(0);
         if (id != null) setSelected(list.find((x) => x.id === id) ?? null);
       })
       .catch(() => toast.error(t('loadError')));
@@ -138,13 +153,24 @@ function AdminDisputesContent() {
       <PageHeader title={t('title')} subtitle={t('subtitle')} />
 
       <div className="flex flex-wrap items-end gap-4 rounded-xl border border-line bg-surface-raised p-4">
+        <label className="flex min-w-0 flex-1 flex-col gap-1.5 sm:min-w-64">
+          <span className="text-xs font-semibold text-ink-muted">Tìm khiếu nại</span>
+          <input
+            type="search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Mã đơn, email hoặc tên người gửi, mã khiếu nại..."
+            className="w-full rounded-lg border border-line bg-surface-raised p-2.5 text-sm text-ink outline-none focus:border-accent"
+          />
+        </label>
         <label className="flex w-full flex-col gap-1.5 sm:w-56">
           <span className="text-xs font-semibold text-ink-muted">{t('filters.status')}</span>
           <select
             className="w-full rounded-lg border border-line bg-surface-raised p-2.5 text-sm text-ink outline-none focus:border-accent"
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as DisputeStatus | 'ALL')}
+            onChange={(e) => setStatusFilter(e.target.value as DisputeStatus | 'ALL' | 'NEEDS_ACTION')}
           >
+            <option value="NEEDS_ACTION">Cần xử lý</option>
             <option value="ALL">{t('filters.all')}</option>
             {STATUSES.map((s) => (
               <option key={s} value={s}>
@@ -206,6 +232,13 @@ function AdminDisputesContent() {
               ))}
             </tbody>
           </table>
+          {hasMore && (
+            <div className="flex justify-center border-t border-line p-3">
+              <button type="button" onClick={() => fetchDisputes(page + 1)} className="rounded-lg border border-line bg-surface-raised px-4 py-2 text-sm font-semibold text-ink hover:bg-tint">
+                Xem thêm
+              </button>
+            </div>
+          )}
         </div>
       )}
 
