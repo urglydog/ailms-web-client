@@ -10,12 +10,11 @@ import { PageHeader } from '@/components/instructor/ui/PageHeader';
 import { api } from '@/lib/api/client';
 import { getAccessToken } from '@/lib/auth/token';
 
-interface QueueStats {
-  queues: Record<string, { pending: number }>;
-  task_stats: { SUCCESS: number; FAILURE: number; PENDING: number; STARTED: number };
-  total_result_keys: number;
-  key_pool: { key_preview: string; status: string; in_cooldown: boolean; failures: number; model?: string; cooldown_remaining_sec?: number }[];
-  error?: string;
+interface JobSummary {
+  pending: number;
+  processing: number;
+  completed: number;
+  needsAttention: number;
 }
 
 interface HealthData {
@@ -31,9 +30,10 @@ export default function AiQueuePage() {
   const t = useTranslations('admin.queue');
   const token = getAccessToken() ?? '';
 
+  // Bốn thẻ số liệu lấy từ chính danh sách job lồng tiếng trong cơ sở dữ liệu (cùng nguồn với bảng bên dưới) — không dùng bộ nhớ tạm của AI Worker vì nó đếm cả task khác và tự hết hạn.
   const { data: stats, refetch } = useQuery({
-    queryKey: ['admin', 'queue-stats'],
-    queryFn: () => api.get<QueueStats>('/api/v1/admin/ai-worker/queue-stats', { token }),
+    queryKey: ['admin', 'dubbing-job-summary'],
+    queryFn: () => api.get<JobSummary>('/api/v1/admin/dubbing-jobs/summary', { token }),
     enabled: !!token,
     refetchInterval: 8000,
   });
@@ -48,8 +48,6 @@ export default function AiQueuePage() {
   const [isMounted, setIsMounted] = useState(false);
   useEffect(() => setIsMounted(true), []);
 
-  const totalPending = Object.values(stats?.queues ?? {}).reduce((s, q) => s + q.pending, 0);
-  const taskStats = stats?.task_stats ?? { SUCCESS: 0, FAILURE: 0, PENDING: 0, STARTED: 0 };
   const healthy = health?.status === 'ok';
 
   if (!isMounted) return null;
@@ -83,10 +81,10 @@ export default function AiQueuePage() {
       />
 
       <div className="grid grid-cols-2 gap-3.5 lg:grid-cols-4">
-        <MetricCard label={t('stats.pending')} value={String(totalPending)} />
-        <MetricCard label={t('stats.started')} value={String(taskStats.STARTED)} />
-        <MetricCard label={t('stats.success')} value={String(taskStats.SUCCESS)} />
-        <MetricCard label={t('stats.failure')} value={String(taskStats.FAILURE)} tone={taskStats.FAILURE > 0 ? 'warning' : 'default'} />
+        <MetricCard label={t('stats.pending')} value={String(stats?.pending ?? 0)} />
+        <MetricCard label={t('stats.started')} value={String(stats?.processing ?? 0)} />
+        <MetricCard label={t('stats.success')} value={String(stats?.completed ?? 0)} />
+        <MetricCard label={t('stats.failure')} value={String(stats?.needsAttention ?? 0)} tone={(stats?.needsAttention ?? 0) > 0 ? 'warning' : 'default'} />
       </div>
 
       <section className="flex flex-col gap-2.5" aria-labelledby="jobs-title">

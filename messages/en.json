@@ -1641,7 +1641,7 @@
         "pending": "Waiting in queue",
         "started": "In progress",
         "success": "Completed",
-        "failure": "Failed"
+        "failure": "Failed, needs action"
       },
       "queueDetail": "Queue details",
       "loading": "Loading...",

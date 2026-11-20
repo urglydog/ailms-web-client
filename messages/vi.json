@@ -1641,7 +1641,7 @@
         "pending": "Đang chờ trong Queue",
         "started": "Đang xử lý",
         "success": "Hoàn thành",
-        "failure": "Thất bại"
+        "failure": "Lỗi cần xử lý"
       },
       "queueDetail": "Chi tiết Queue",
       "loading": "Đang tải...",
