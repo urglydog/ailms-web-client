@@ -91,7 +91,7 @@ export default function AdminPromotionsPage() {
   // Hàng chờ duyệt hiện sẵn (mặc định); tìm theo khóa/giảng viên và phân trang 10 dòng ở trình duyệt (danh sách theo trạng thái nên không lớn).
   const list = useListControls(data, {
     pageSize: 10,
-    match: (p, q) => p.courseTitle.toLowerCase().includes(q) || p.instructorName.toLowerCase().includes(q) || p.instructorEmail.toLowerCase().includes(q),
+    match: (p, q) => p.courseTitle.toLowerCase().includes(q) || (p.instructorName ?? '').toLowerCase().includes(q) || (p.instructorEmail ?? '').toLowerCase().includes(q),
   });
   const rows = list.pageItems;
   const busy = approve.isPending || reject.isPending || end.isPending;
