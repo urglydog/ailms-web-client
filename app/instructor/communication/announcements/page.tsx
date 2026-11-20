@@ -1,5 +1,8 @@
 'use client';
 
+import { ListSearch } from '@/components/ui/ListSearch';
+import { Pager } from '@/components/ui/SearchPanel';
+import { useListControls } from '@/hooks/useListControls';
 import { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { CourseFilterDropdown } from '@/components/instructor/communication/CourseFilterDropdown';
@@ -19,12 +22,16 @@ export default function InstructorAnnouncementsPage() {
   const { data: courses } = useInstructorCourseOptions();
   const { data: announcements, isLoading } = useInstructorAnnouncements(filterCourseId || undefined);
   const deleteAnnouncement = useDeleteAnnouncement();
+  const list = useListControls(announcements, { pageSize: 8, match: (a, q) => a.title.toLowerCase().includes(q) || a.content.toLowerCase().includes(q) || a.courseTitle.toLowerCase().includes(q) });
 
   return (
     <>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="m-0 font-display text-[20px] font-bold text-ink">{t('announcements.title')}</h1>
-        <CourseFilterDropdown courses={courses ?? []} value={filterCourseId} onChange={setFilterCourseId} />
+        <div className="flex flex-wrap items-center gap-2">
+          <ListSearch label="Tìm thông báo" value={list.query} onChange={list.setQuery} placeholder="Tiêu đề, nội dung hoặc tên khóa học..." />
+          <CourseFilterDropdown courses={courses ?? []} value={filterCourseId} onChange={setFilterCourseId} />
+        </div>
       </div>
 
       <CreateAnnouncementForm courses={courses ?? []} />
@@ -37,7 +44,7 @@ export default function InstructorAnnouncementsPage() {
       )}
 
       <div className="flex flex-col gap-3">
-        {announcements?.map((a) => (
+        {list.pageItems.map((a) => (
           <div key={a.id} className="rounded-xl border border-line bg-surface-raised p-4 shadow-sm">
             <div className="mb-1 flex items-start justify-between gap-3">
               <div>
@@ -56,6 +63,10 @@ export default function InstructorAnnouncementsPage() {
           </div>
         ))}
       </div>
+      {!isLoading && list.total > 0 && <Pager page={list.page} totalPages={list.totalPages} total={list.total} onPage={list.setPage} />}
+      {!isLoading && announcements && announcements.length > 0 && list.total === 0 && (
+        <div className="rounded-xl border border-line bg-surface-raised p-6 text-center text-sm text-ink-muted">Không có thông báo nào khớp.</div>
+      )}
 
       {deleteId != null && (
         <ConfirmModal

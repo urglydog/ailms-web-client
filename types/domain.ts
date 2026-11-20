@@ -1323,6 +1323,8 @@ export interface SystemAnnouncement {
   sentCount: number;
   createdByAdminName: string;
   createdAt: string;
+  /** Thời điểm thu hồi (đã ẩn khỏi người dùng); null = còn hiệu lực. */
+  revokedAt: string | null;
 }
 
 /** Banner cố định đầu trang khi có thông báo `severity = 'HIGH'` đang hoạt động — public, không

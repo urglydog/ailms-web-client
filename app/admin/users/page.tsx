@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { Search, TriangleAlert } from 'lucide-react';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { ConfirmDialog } from '@/components/admin/ui/ConfirmDialog';
 import { UsersTable } from '@/components/admin/users/UsersTable';
@@ -15,7 +15,6 @@ import type { Page } from '@/types/domain';
 import {
   type AdminUser,
   type SortOrder,
-  type UserCounts,
   type UserFilter,
   type UserSortField,
 } from '@/lib/admin/users';
@@ -31,16 +30,13 @@ interface AiLockProposal {
 
 const FILTERS: UserFilter[] = ['ALL', 'STUDENT', 'INSTRUCTOR', 'ADMIN', 'LOCKED', 'SPAM'];
 const PAGE_SIZE = 10;
-const EMPTY_COUNTS: UserCounts = { ALL: 0, STUDENT: 0, INSTRUCTOR: 0, ADMIN: 0, LOCKED: 0, SPAM: 0 };
 
 /** Quản lý người dùng: bộ lọc nhanh có đếm, tìm kiếm, bảng sắp xếp được, phân trang; khóa/mở khóa luôn hỏi xác nhận. */
 export default function AdminUsersPage() {
   const t = useTranslations('admin.users');
-  const locale = useLocale();
   // Hiệu năng đợt 3 (08/11/2026): tìm/lọc/sắp xếp/phân trang PHÍA SERVER — trước đây tải TOÀN BỘ người dùng
   // về trình duyệt rồi tự lọc, sẽ rất nặng khi số học viên tăng.
   const [result, setResult] = useState<{ items: AdminUser[]; totalPages: number; total: number }>({ items: [], totalPages: 1, total: 0 });
-  const [counts, setCounts] = useState<UserCounts>(EMPTY_COUNTS);
   const [loading, setLoading] = useState(true);
   const [aiLockProposals, setAiLockProposals] = useState<AiLockProposal[]>([]);
 
@@ -52,15 +48,14 @@ export default function AdminUsersPage() {
   const [pendingBlock, setPendingBlock] = useState<AdminUser | null>(null);
 
   const debouncedQuery = useDebounce(query, 300);
-  // Tìm-kiếm-trước (20/11/2026): nhóm "Tất cả" và "Học viên" có rất nhiều người nên chỉ liệt kê khi có từ khóa; các nhóm nhỏ (giảng viên, quản trị,
-  // bị khóa, spam) liệt kê được ngay vì là danh sách cần theo dõi.
-  const needsQuery = (filter === 'ALL' || filter === 'STUDENT') && !debouncedQuery.trim();
+  // Tìm-kiếm-trước (20/11/2026): nhóm "Tất cả", "Học viên" và "Giảng viên" có thể rất đông nên chỉ liệt kê khi có từ khóa; chỉ các nhóm nhỏ cần theo dõi
+  // (quản trị, bị khóa, spam) liệt kê ngay. Không hiện số đếm trên các nút lọc vì danh sách không được hiển thị sẵn.
+  const needsQuery = (filter === 'ALL' || filter === 'STUDENT' || filter === 'INSTRUCTOR') && !debouncedQuery.trim();
 
   const fetchUsers = useCallback(async () => {
     try {
       if (needsQuery) {
         setResult({ items: [], totalPages: 1, total: 0 });
-        setCounts({ ...EMPTY_COUNTS, ...(await api.get<UserCounts>('/api/v1/users/admin/counts')) });
         return;
       }
       const params = new URLSearchParams({
@@ -71,12 +66,8 @@ export default function AdminUsersPage() {
         size: String(PAGE_SIZE),
       });
       if (debouncedQuery.trim()) params.set('q', debouncedQuery.trim());
-      const [res, c] = await Promise.all([
-        api.get<Page<AdminUser>>(`/api/v1/users/admin?${params.toString()}`),
-        api.get<UserCounts>('/api/v1/users/admin/counts'),
-      ]);
+      const res = await api.get<Page<AdminUser>>(`/api/v1/users/admin?${params.toString()}`);
       setResult({ items: res.content, totalPages: Math.max(1, res.totalPages), total: res.totalElements });
-      setCounts({ ...EMPTY_COUNTS, ...c });
     } catch {
       toast.error(t('loadError'));
     }
@@ -188,7 +179,7 @@ export default function AdminUsersPage() {
                 filter === id ? 'bg-accent text-white' : 'border border-line bg-surface-raised text-ink-muted hover:border-accent hover:text-ink'
               }`}
             >
-              {t(`filter.${id}`)} <span className={filter === id ? 'text-white/85' : 'text-ink-muted'}>({counts[id].toLocaleString(locale)})</span>
+              {t(`filter.${id}`)}
             </button>
           ))}
         </div>
@@ -208,7 +199,7 @@ export default function AdminUsersPage() {
       {needsQuery ? (
         <SearchPrompt title="Nhập thông tin để tìm người dùng">
           Hệ thống có rất nhiều tài khoản nên không hiển thị sẵn. Hãy nhập tên, email hoặc ID người dùng ở ô tìm kiếm phía trên;
-          hoặc chọn nhóm Giảng viên, Quản trị viên, Bị khóa, Spam để xem các nhóm cần theo dõi.
+          hoặc chọn nhóm Quản trị viên, Bị khóa, Spam để xem các nhóm cần theo dõi.
         </SearchPrompt>
       ) : loading ? (
         <div className="flex flex-col gap-2 rounded-xl border border-line bg-surface-raised p-4">

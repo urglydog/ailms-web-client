@@ -7,7 +7,7 @@ import type {
   ConfirmResult,
   CourseShare,
   FinanceSummary,
-  LedgerEntry,
+  LedgerPage,
   LinkPayoutAccountReq,
   PayoutAccount,
   PayoutBank,
@@ -21,8 +21,14 @@ const token = () => ({ token: getAccessToken() ?? undefined });
 export const financeApi = {
   summary: () => api.get<FinanceSummary>('/api/v1/instructor/finance/summary', token()),
 
-  ledger: (page = 0, size = 30) =>
-    api.get<LedgerEntry[]>(`/api/v1/instructor/finance/ledger?page=${page}&size=${size}`, token()),
+  /** Sao kê: lọc nhóm loại khoản (EARNING/REFUND/PAYOUT/DEBT/ADJUSTMENT) + khoảng ngày, phân trang phía máy chủ. */
+  ledger: (params: { group?: string; from?: string; to?: string; page?: number; size?: number } = {}) => {
+    const p = new URLSearchParams({ page: String(params.page ?? 0), size: String(params.size ?? 10) });
+    if (params.group && params.group !== 'ALL') p.set('group', params.group);
+    if (params.from) p.set('from', params.from);
+    if (params.to) p.set('to', params.to);
+    return api.get<LedgerPage>(`/api/v1/instructor/finance/ledger?${p.toString()}`, token());
+  },
 
   banks: () => api.get<PayoutBank[]>('/api/v1/instructor/payout-banks', token()),
 

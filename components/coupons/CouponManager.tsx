@@ -3,6 +3,9 @@
 import { Modal } from '@/components/ui/Modal';
 
 import { useMemo, useState } from 'react';
+import { ListSearch } from '@/components/ui/ListSearch';
+import { Pager } from '@/components/ui/SearchPanel';
+import { useListControls } from '@/hooks/useListControls';
 import { useLocale, useTranslations } from 'next-intl';
 import { useMyCourses } from '@/hooks/useCourses';
 import { useCreateCoupon, useDeleteCoupon, useMyCoupons, useUpdateCoupon } from '@/hooks/useCoupons';
@@ -68,6 +71,13 @@ export function CouponManager({ role }: CouponManagerProps) {
   const t = useTranslations('coupons');
   const locale = useLocale();
   const { data: coupons, isLoading } = useMyCoupons();
+  // Tìm theo mã/khóa áp dụng, lọc theo trạng thái, phân trang 10 dòng (danh sách do chính người quản lý sở hữu nên lọc ở trình duyệt).
+  const [statusFilter, setStatusFilter] = useState<'ALL' | 'ACTIVE' | 'INACTIVE'>('ALL');
+  const list = useListControls(coupons, {
+    pageSize: 10,
+    filter: (c) => (statusFilter === 'ALL' ? true : statusFilter === 'ACTIVE' ? c.isActive : !c.isActive),
+    match: (c, q) => (c.code ?? '').toLowerCase().includes(q) || c.courses.some((x) => x.courseTitle.toLowerCase().includes(q)),
+  });
   const createCoupon = useCreateCoupon();
   const updateCoupon = useUpdateCoupon();
   const deleteCoupon = useDeleteCoupon();
@@ -133,6 +143,25 @@ export function CouponManager({ role }: CouponManagerProps) {
         </button>
       </div>
 
+      {coupons && coupons.length > 0 && (
+        <div className="flex flex-wrap items-center gap-3">
+          <ListSearch label="Tìm mã giảm giá" value={list.query} onChange={list.setQuery} placeholder="Tìm theo mã hoặc tên khóa học áp dụng..." />
+          <select
+            aria-label="Lọc theo trạng thái"
+            value={statusFilter}
+            onChange={(e) => {
+              setStatusFilter(e.target.value as 'ALL' | 'ACTIVE' | 'INACTIVE');
+              list.setPage(0);
+            }}
+            className="rounded-lg border border-line bg-surface-raised px-3 py-2.5 text-sm text-ink outline-none focus:border-accent"
+          >
+            <option value="ALL">Tất cả trạng thái</option>
+            <option value="ACTIVE">Đang bật</option>
+            <option value="INACTIVE">Đã tắt</option>
+          </select>
+        </div>
+      )}
+
       {isLoading ? (
         <div className="text-sm text-ink-muted">{t('loading')}</div>
       ) : !coupons || coupons.length === 0 ? (
@@ -154,7 +183,7 @@ export function CouponManager({ role }: CouponManagerProps) {
               </tr>
             </thead>
             <tbody className="divide-y divide-line">
-              {coupons.map((coupon) => (
+              {list.pageItems.map((coupon) => (
                 <tr key={coupon.id} className="hover:bg-surface-raised transition-colors">
                   <td className="px-6 py-4 font-mono font-bold text-ink">
                     {coupon.code ?? <span className="italic font-sans font-normal text-ink-muted">{t('auto')}</span>}
@@ -227,6 +256,13 @@ export function CouponManager({ role }: CouponManagerProps) {
           </table>
         </div>
       )}
+
+      {coupons && coupons.length > 0 &&
+        (list.total === 0 ? (
+          <div className="card border border-line rounded-xl p-6 text-center text-sm text-ink-muted">Không có mã giảm giá nào khớp.</div>
+        ) : (
+          <Pager page={list.page} totalPages={list.totalPages} total={list.total} onPage={list.setPage} />
+        ))}
 
       {editing && (
         <Modal open onClose={closeModal} bare ariaLabel={String(editing === 'new' ? t('form.createTitle') : t('form.editTitle'))} closeOnBackdrop={false} className="w-full max-w-lg rounded-2xl bg-surface shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
