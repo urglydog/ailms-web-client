@@ -53,6 +53,15 @@ const FINANCE_FIELDS: Record<string, { type: 'number' | 'text'; unit?: string; m
   DISPUTE_INSTRUCTOR_RESPONSE_HOURS: { type: 'number', min: 1, max: 720, width: 'w-24' },
   PAYOS_PAYOUT_ENABLED: { type: 'number', min: 0, max: 1, width: 'w-24' },
   PAYOS_PAYOUT_MAX_AMOUNT: { type: 'number', unit: 'VND', min: 0, max: 100000000, width: 'w-32' },
+  PAYOS_PAYOUT_FEE: { type: 'number', unit: 'VND', min: 0, max: 100000, width: 'w-32' },
+  REPORT_DAILY_ENABLED: { type: 'number', min: 0, max: 1, width: 'w-24' },
+  REPORT_WEEKLY_ENABLED: { type: 'number', min: 0, max: 1, width: 'w-24' },
+  REPORT_MONTHLY_ENABLED: { type: 'number', min: 0, max: 1, width: 'w-24' },
+  REPORT_RECIPIENTS: { type: 'text', width: 'w-64' },
+  STATEMENT_EMAIL_INSTRUCTORS: { type: 'number', min: 0, max: 1, width: 'w-24' },
+  INVOICE_ISSUER_NAME: { type: 'text', width: 'w-64' },
+  INVOICE_ISSUER_NOTE: { type: 'text', width: 'w-64' },
+  INVOICE_EXCLUDED_EMAIL_SUFFIX: { type: 'text', width: 'w-40' },
 };
 
 const ENVIRONMENT = [

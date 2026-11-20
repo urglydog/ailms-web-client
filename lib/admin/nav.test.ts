@@ -21,10 +21,10 @@ describe('activeAdminItem', () => {
 });
 
 describe('ADMIN_NAV_GROUPS', () => {
-  it('giữ đủ 18 trang admin, không trùng href', () => {
+  it('giữ đủ 19 trang admin, không trùng href', () => {
     const hrefs = adminNavItems().map((i) => i.href);
-    expect(hrefs).toHaveLength(18);
-    expect(new Set(hrefs).size).toBe(18);
+    expect(hrefs).toHaveLength(19);
+    expect(new Set(hrefs).size).toBe(19);
   });
   it('nhóm đầu không có tiêu đề (Tổng quan, Người dùng)', () => {
     expect(ADMIN_NAV_GROUPS[0]?.id).toBe('main');

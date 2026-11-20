@@ -6,6 +6,7 @@ export const INVOICE_TYPE_LABEL: Record<InvoiceType, string> = {
   REFUND: 'Phiếu hoàn tiền',
   PAYOUT: 'Phiếu chi rút tiền',
   DEBT_RECEIPT: 'Biên lai trả nợ',
+  STATEMENT: 'Bảng kê thu nhập tháng',
 };
 
 export const INVOICE_STATUS_LABEL: Record<InvoiceStatus, string> = {

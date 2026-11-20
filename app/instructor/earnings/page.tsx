@@ -45,8 +45,8 @@ export default function InstructorEarningsPage() {
           <PayoutHistory />
           <InvoiceList
             title="Chứng từ"
-            types={['PAYOUT', 'DEBT_RECEIPT']}
-            emptyText="Phiếu chi và biên lai trả nợ sẽ xuất hiện tại đây sau khi yêu cầu rút tiền hoặc khoản trả nợ của bạn hoàn tất."
+            types={['STATEMENT', 'PAYOUT', 'DEBT_RECEIPT']}
+            emptyText="Bảng kê thu nhập tháng, phiếu chi và biên lai trả nợ sẽ xuất hiện tại đây khi có phát sinh."
           />
           <LedgerTable />
         </>

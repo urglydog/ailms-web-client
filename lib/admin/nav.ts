@@ -1,6 +1,6 @@
 export type AdminNavId =
   | 'overview' | 'users' | 'moderation' | 'categories' | 'reviews' | 'promotions' | 'aianalytics' | 'aiqueue'
-  | 'voicemappings' | 'tutorsecurity' | 'transactions' | 'disputes' | 'payouts' | 'invoices' | 'coupons' | 'announcements' | 'support' | 'settings';
+  | 'voicemappings' | 'tutorsecurity' | 'transactions' | 'disputes' | 'payouts' | 'invoices' | 'financereports' | 'coupons' | 'announcements' | 'support' | 'settings';
 
 export interface AdminNavItem {
   id: AdminNavId;
@@ -41,6 +41,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
       { id: 'disputes', href: '/admin/transactions/disputes' },
       { id: 'payouts', href: '/admin/transactions/payouts' },
       { id: 'invoices', href: '/admin/transactions/invoices' },
+      { id: 'financereports', href: '/admin/finance-reports' },
       { id: 'coupons', href: '/admin/coupons' },
     ],
   },

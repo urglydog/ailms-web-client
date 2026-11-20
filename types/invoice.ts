@@ -1,4 +1,4 @@
-export type InvoiceType = 'RECEIPT' | 'REFUND' | 'PAYOUT' | 'DEBT_RECEIPT';
+export type InvoiceType = 'RECEIPT' | 'REFUND' | 'PAYOUT' | 'DEBT_RECEIPT' | 'STATEMENT';
 export type InvoiceStatus = 'ISSUED' | 'VOIDED';
 
 /** Chứng từ của chính người dùng đăng nhập (`GET /api/v1/invoices`). */

@@ -12,7 +12,7 @@ import { dateTime, money } from '@/lib/finance';
 import { INVOICE_STATUS_LABEL, INVOICE_TYPE_LABEL, saveBlob } from '@/lib/invoices';
 import type { AdminInvoice, AdminInvoiceFilter, InvoiceType } from '@/types/invoice';
 
-const TYPES: InvoiceType[] = ['RECEIPT', 'REFUND', 'PAYOUT', 'DEBT_RECEIPT'];
+const TYPES: InvoiceType[] = ['RECEIPT', 'REFUND', 'PAYOUT', 'DEBT_RECEIPT', 'STATEMENT'];
 const PAGE_SIZE = 20;
 
 /**
