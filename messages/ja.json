@@ -1575,7 +1575,7 @@
         "pending": "キューで待機中",
         "started": "処理中",
         "success": "完了",
-        "failure": "失敗"
+        "failure": "要対応の失敗"
       },
       "queueDetail": "キューの詳細",
       "loading": "読み込み中...",

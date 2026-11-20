@@ -93,17 +93,17 @@ export function AiJobQueueManager() {
       </div>
 
       <div className="overflow-x-auto rounded-xl border border-line bg-surface-raised shadow-sm">
-        <table className="w-full min-w-[980px] text-left text-sm">
+        <table className="w-full min-w-[1100px] text-left text-sm">
           <thead className="bg-surface text-xs font-bold text-ink-muted uppercase">
             <tr>
-              <th className="px-4 py-3">Khóa học / Bài học</th>
-              <th className="px-4 py-3">Ngôn ngữ</th>
-              <th className="px-4 py-3">Người yêu cầu</th>
-              <th className="px-4 py-3">Trạng thái</th>
-              <th className="px-4 py-3">Tiến độ</th>
-              <th className="px-4 py-3">Thời gian</th>
-              <th className="px-4 py-3">Lỗi</th>
-              <th className="px-4 py-3 text-right">Thao tác</th>
+              <th className="whitespace-nowrap px-4 py-3">Khóa học / Bài học</th>
+              <th className="whitespace-nowrap px-4 py-3">Ngôn ngữ</th>
+              <th className="whitespace-nowrap px-4 py-3">Người yêu cầu</th>
+              <th className="whitespace-nowrap px-4 py-3">Trạng thái</th>
+              <th className="whitespace-nowrap px-4 py-3">Tiến độ</th>
+              <th className="whitespace-nowrap px-4 py-3">Thời gian</th>
+              <th className="whitespace-nowrap px-4 py-3">Lỗi</th>
+              <th className="whitespace-nowrap px-4 py-3 text-right">Thao tác</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-line-soft">
@@ -123,7 +123,7 @@ export function AiJobQueueManager() {
                   <div className="font-semibold text-ink">{job.courseTitle}</div>
                   <div className="text-xs text-ink-muted">{job.lessonTitle} · job #{job.id}</div>
                 </td>
-                <td className="px-4 py-3 text-ink-muted">{job.targetLanguage}</td>
+                <td className="whitespace-nowrap px-4 py-3 text-ink-muted">{job.targetLanguage}</td>
                 <td className="px-4 py-3 text-ink-muted">
                   {job.requestedByName ?? '—'}
                   {job.requestedByEmail && <div className="text-xs">{job.requestedByEmail}</div>}
@@ -146,13 +146,13 @@ export function AiJobQueueManager() {
                   </span>
                   {job.superseded && <div className="mt-1 text-xs text-success-ink">Đã có bản lồng tiếng thành công</div>}
                 </td>
-                <td className="px-4 py-3 text-ink-muted">{job.doneChunks}/{job.totalChunks} ({job.progressPercent}%)<div className="text-xs">Thử lại {job.retryCount}/3</div></td>
+                <td className="whitespace-nowrap px-4 py-3 text-ink-muted">{job.doneChunks}/{job.totalChunks} ({job.progressPercent}%)<div className="text-xs">Thử lại {job.retryCount}/3</div></td>
                 <td className="whitespace-nowrap px-4 py-3 text-xs text-ink-muted">
                   Tạo {dateTime(job.createdAt)}
                   {job.finishedAt && <div>Xong {dateTime(job.finishedAt)}</div>}
                 </td>
                 <td className="max-w-xs px-4 py-3 text-xs text-ink-muted"><span className="line-clamp-2" title={job.errorMessage ?? ''}>{job.errorMessage ?? '—'}</span></td>
-                <td className="px-4 py-3 text-right">
+                <td className="whitespace-nowrap px-4 py-3 text-right">
                   {job.retryable && (
                     <button
                       type="button"

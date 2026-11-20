@@ -1575,7 +1575,7 @@
         "pending": "队列中等待",
         "started": "处理中",
         "success": "已完成",
-        "failure": "失败"
+        "failure": "待处理的失败"
       },
       "queueDetail": "队列详情",
       "loading": "加载中...",
