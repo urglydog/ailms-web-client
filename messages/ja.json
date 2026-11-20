@@ -1384,6 +1384,7 @@
       "settings": "システム設定",
       "disputes": "Payment disputes",
       "payouts": "Instructor payouts",
+      "invoices": "Invoices & vouchers",
       "support": "Support requests"
     },
     "shell": {

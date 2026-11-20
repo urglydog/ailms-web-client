@@ -1,5 +1,5 @@
 import {
-  Activity, BarChart, Bell, DollarSign, LayoutDashboard, LifeBuoy, Megaphone, MessageSquareWarning, Mic, Settings, Shield, ShieldCheck, Star, Tags, Ticket, Users, Wallet,
+  Activity, BarChart, Bell, DollarSign, FileText, LayoutDashboard, LifeBuoy, Megaphone, MessageSquareWarning, Mic, Settings, Shield, ShieldCheck, Star, Tags, Ticket, Users, Wallet,
   type LucideIcon,
 } from 'lucide-react';
 import type { AdminNavId } from '@/lib/admin/nav';
@@ -18,6 +18,7 @@ export const ADMIN_NAV_ICONS: Record<AdminNavId, LucideIcon> = {
   transactions: DollarSign,
   disputes: MessageSquareWarning,
   payouts: Wallet,
+  invoices: FileText,
   coupons: Ticket,
   announcements: Bell,
   support: LifeBuoy,

@@ -2,6 +2,7 @@
 
 import { BalanceCards } from '@/components/instructor/earnings/BalanceCards';
 import { DebtCard } from '@/components/instructor/earnings/DebtCard';
+import { InvoiceList } from '@/components/invoices/InvoiceList';
 import { LedgerTable } from '@/components/instructor/earnings/LedgerTable';
 import { PayoutAccountCard } from '@/components/instructor/earnings/PayoutAccountCard';
 import { PayoutHistory } from '@/components/instructor/earnings/PayoutHistory';
@@ -42,6 +43,11 @@ export default function InstructorEarningsPage() {
             <RequestPayoutCard summary={summary} />
           </div>
           <PayoutHistory />
+          <InvoiceList
+            title="Chứng từ"
+            types={['PAYOUT', 'DEBT_RECEIPT']}
+            emptyText="Phiếu chi và biên lai trả nợ sẽ xuất hiện tại đây sau khi yêu cầu rút tiền hoặc khoản trả nợ của bạn hoàn tất."
+          />
           <LedgerTable />
         </>
       )}

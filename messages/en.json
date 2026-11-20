@@ -1381,6 +1381,7 @@
       "transactions": "Payment reconciliation",
       "disputes": "Payment disputes",
       "payouts": "Instructor payouts",
+      "invoices": "Invoices & vouchers",
       "coupons": "Coupons",
       "announcements": "System announcements",
       "settings": "System settings",
