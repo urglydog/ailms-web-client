@@ -4,13 +4,14 @@ import { renderWithIntl } from '@/test/renderWithIntl';
 import { CommunicationTabs } from './CommunicationTabs';
 
 describe('CommunicationTabs', () => {
-  it('có 4 liên kết: Hỏi đáp, Tin nhắn, Bài tập, Thông báo', () => {
+  it('có 5 liên kết: Hỏi đáp, Tin nhắn, Bài tập, Thông báo, Hoàn tiền', () => {
     renderWithIntl(<CommunicationTabs pathname="/instructor/communication/qa" />);
     expect(screen.getByRole('navigation', { name: 'Các mục giao tiếp' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Hỏi đáp' })).toHaveAttribute('href', '/instructor/communication/qa');
     expect(screen.getByRole('link', { name: 'Tin nhắn' })).toHaveAttribute('href', '/instructor/communication/messages');
     expect(screen.getByRole('link', { name: 'Bài tập' })).toHaveAttribute('href', '/instructor/communication/assignments');
     expect(screen.getByRole('link', { name: 'Thông báo' })).toHaveAttribute('href', '/instructor/communication/announcements');
+    expect(screen.getByRole('link', { name: 'Hoàn tiền' })).toHaveAttribute('href', '/instructor/communication/refunds');
   });
 
   it('đánh dấu mục đang mở bằng aria-current', () => {

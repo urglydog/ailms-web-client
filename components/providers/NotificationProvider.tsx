@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
+import { useQueryClient } from '@tanstack/react-query';
 import { getAccessToken, decodeAccessToken } from '@/lib/auth/token';
 import { notificationApi } from '@/lib/api/notifications';
 import { toast } from 'sonner';
@@ -39,6 +40,7 @@ const NotificationContext = createContext<NotificationContextType | undefined>(u
  */
 export function NotificationProvider({ children }: { children: React.ReactNode }) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (!getAccessToken()) return;
@@ -65,6 +67,17 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
         Authorization: `Bearer ${token}`,
       },
       reconnectDelay: 3000,
+      // Mỗi lần (tái) kết nối phải lấy token MỚI NHẤT: trước đây token chụp 1 lần lúc mount, hết hạn rồi thì
+      // cứ 3 giây lại gửi đúng token cũ lên (log BE "Expired JWT token" lặp mãi, không bao giờ nối lại được).
+      // Token hết hạn → gọi 1 API thường (đi qua fetchWithRefresh, tự refresh) để làm mới trước khi nối.
+      beforeConnect: async () => {
+        const exp = decodeAccessToken()?.exp;
+        if (typeof exp === 'number' && exp * 1000 <= Date.now() + 5000) {
+          await notificationApi.listMine().catch(() => {});
+        }
+        const fresh = getAccessToken();
+        if (fresh) client.connectHeaders = { Authorization: `Bearer ${fresh}` };
+      },
     });
 
     client.onConnect = () => {
@@ -72,20 +85,28 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
         try {
           const data = JSON.parse(message.body);
 
+          // SRS_REMINDER nay đi qua NotificationService.notify() như mọi thông báo khác (có id/tiêu đề/nội dung/liên kết) — trước đây
+          // nhánh riêng này đọc `data.message` (không tồn tại) nên nội dung rỗng và không có liên kết khi bấm.
           if (data.type === 'SRS_REMINDER') {
+            const content = data.content ?? data.message ?? '';
             setNotifications(prev => [{
-              id: Date.now(),
-              title: '📚 Ôn tập Flashcard',
-              content: data.message ?? '',
-              linkUrl: null,
+              id: data.id ?? Date.now(),
+              title: data.title ?? 'Đến giờ ôn flashcard',
+              content,
+              linkUrl: data.linkUrl ?? null,
               isRead: false,
-              createdAt: new Date().toISOString(),
+              createdAt: data.createdAt ?? new Date().toISOString(),
               type: data.type,
             }, ...prev]);
-            if (data.message) {
-              toast.info(data.message, { duration: 10000, icon: '📚' });
+            if (content) {
+              toast.info(content, { duration: 10000, icon: '📚' });
             }
             return;
+          }
+
+          // Hiệu năng đợt 5: tin nhắn mới → làm mới danh sách hội thoại ngay (thay polling 15 giây).
+          if (data.type === 'NEW_MESSAGE') {
+            queryClient.invalidateQueries({ queryKey: ['messages', 'conversations'] });
           }
 
           // Payload thật từ NotificationService.notify() — NotificationRes đầy đủ.
@@ -118,7 +139,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
       client.deactivate();
       clientRef.current = null;
     };
-  }, []);
+  }, [queryClient]);
 
   const unreadCount = notifications.filter(n => !n.isRead).length;
 

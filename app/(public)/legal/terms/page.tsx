@@ -5,7 +5,7 @@ export default function TermsPage() {
   return (
     <LegalPageLayout
       title="Điều khoản dịch vụ"
-      updatedAt="26/09/2026"
+      updatedAt="14/11/2026"
       intro={
         <p>
           LinguaLearn là nền tảng học trực tuyến (LMS) tích hợp AI, phát triển trong khuôn khổ đề
@@ -51,6 +51,17 @@ export default function TermsPage() {
         <p>
           Doanh thu được chia sẻ giữa Giảng viên và nền tảng theo tỷ lệ tùy nguồn gốc đơn hàng — xem{' '}
           <Link href="/legal/revenue-share">Chính sách chia sẻ doanh thu</Link>.
+        </p>
+      </LegalSection>
+
+      <LegalSection title="3A. Hoàn tiền, công nợ và tài khoản nhận tiền">
+        <p>
+          Người dùng khai tài khoản nhận tiền (hoàn tiền cho học viên, rút tiền cho giảng viên) chịu trách nhiệm về độ chính xác của thông tin
+          và xác nhận đó là tài khoản của chính mình; chúng tôi chuyển tiền đúng theo thông tin đã xác nhận. Giảng viên có thể phát sinh{' '}
+          <strong>công nợ</strong> khi bị trừ tiền do hoàn tiền vượt số dư; công nợ được bù trừ từ doanh thu mới hoặc trả chủ động, và quá hạn có thể
+          bị hạn chế xuất bản/quảng bá hoặc tạm ngừng nhận đăng ký mới theo{' '}
+          <Link href="/legal/revenue-share">Chính sách chia sẻ doanh thu</Link>. Quy trình khiếu nại và hoàn tiền xem tại{' '}
+          <Link href="/legal/refund">Chính sách hoàn tiền</Link>.
         </p>
       </LegalSection>
 

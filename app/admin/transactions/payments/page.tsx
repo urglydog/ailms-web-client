@@ -2,16 +2,20 @@
 
 import { Modal } from '@/components/ui/Modal';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { isSameDay } from 'date-fns';
-import { ArrowDown, ArrowUp, ArrowUpDown, RefreshCw, X } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { FileText, X } from 'lucide-react';
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { PageHeader } from '@/components/instructor/ui/PageHeader';
+import { Pager, SearchPanel, SearchPrompt } from '@/components/ui/SearchPanel';
 import { Skeleton } from '@/components/ui/Skeleton';
-import { paginate, type SortOrder } from '@/lib/admin/users';
+import { ApiError } from '@/lib/api/client';
+import { adminInvoicesApi } from '@/lib/api/invoices';
 import { paymentsApi } from '@/lib/api/payments';
+import { getAccessToken } from '@/lib/auth/token';
+import { saveBlob } from '@/lib/invoices';
 import { formatMoney } from '@/lib/shop/money';
 
 export interface AdminPayment {
@@ -33,11 +37,18 @@ export interface AdminPayment {
   couponCode: string | null;
   /** Chia doanh thu 2 mức (20/09/2026) — quyết định tỷ lệ ĐÃ áp dụng cho platformFee/instructorEarning ở trên. */
   revenueSource: 'ORGANIC' | 'INSTRUCTOR_REFERRAL';
+  /** Tỷ lệ phần nền tảng THỰC TẾ đã áp dụng (0–1, chốt lúc PAID) — null với đơn chưa PAID/0đ (11/11/2026). */
+  platformRate?: number | null;
 }
 
-type SortField = 'txnRef' | 'userEmail' | 'amount' | 'paymentMethod' | 'paidAt';
+/** % phần nền tảng của 1 đơn: ưu tiên tỷ lệ đã chốt trong DB (tỷ lệ là cấu hình admin nên đổi được),
+ * chỉ dùng giá trị mặc định cũ khi đơn chưa có `platformRate`. */
+function platformPercent(p: AdminPayment): number {
+  if (p.platformRate != null) return Math.round(p.platformRate * 10000) / 100;
+  return p.revenueSource === 'INSTRUCTOR_REFERRAL' ? 3 : 63;
+}
 
-const STATUSES = ['PAID', 'PENDING', 'FAILED', 'EXPIRED'] as const;
+const STATUSES = ['PAID', 'PENDING', 'FAILED', 'EXPIRED', 'REFUNDED'] as const;
 const STATUS_CLASS: Record<string, string> = {
   PAID: 'bg-success-tint text-success-ink border-success/30',
   PENDING: 'bg-surface-raised text-ink border-warning',
@@ -46,40 +57,38 @@ const STATUS_CLASS: Record<string, string> = {
 };
 const PAGE_SIZE = 10;
 
-/** Đối soát thanh toán: lọc theo email/ngày/trạng thái, bảng sắp xếp được, phân trang và hộp chi tiết giao dịch. */
+/**
+ * Đối soát thanh toán (tìm-kiếm-trước, 20/11/2026): mặc định không liệt kê giao dịch nào; admin nhập mã đơn, mã cổng, email/tên/ID người mua hoặc tên khóa học
+ * (và/hoặc chọn trạng thái) rồi bấm Tìm — kết quả phân trang phía máy chủ. Bấm một dòng để xem chi tiết và thao tác.
+ */
 export default function AdminPaymentsPage() {
   const t = useTranslations('admin.payments');
   const locale = useLocale();
   const money = (n: number) => formatMoney(n, locale);
-  const [payments, setPayments] = useState<AdminPayment[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const [statusFilter, setStatusFilter] = useState<string>('ALL');
-  const [searchEmail, setSearchEmail] = useState('');
-  const [searchDate, setSearchDate] = useState('');
-  const [sortField, setSortField] = useState<SortField>('paidAt');
-  const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
-  const [currentPage, setCurrentPage] = useState(1);
+  const [input, setInput] = useState('');
+  const [statusInput, setStatusInput] = useState('');
+  const [criteria, setCriteria] = useState<{ q: string; status: string } | null>(null);
+  const [page, setPage] = useState(0);
   const [selectedPayment, setSelectedPayment] = useState<AdminPayment | null>(null);
+  const [receiptBusy, setReceiptBusy] = useState(false);
   const closeRef = useRef<HTMLButtonElement>(null);
 
-  const fetchPayments = () => {
-    setLoading(true);
-    paymentsApi
-      .listAllAdmin()
-      .then((data) => setPayments(data as unknown as AdminPayment[]))
-      .catch(() => toast.error(t('loadError')))
-      .finally(() => setLoading(false));
+  const { data, isFetching, isError } = useQuery({
+    queryKey: ['admin', 'payments', criteria, page],
+    queryFn: () => paymentsApi.searchAdmin(criteria?.q ?? '', criteria?.status ?? '', page, PAGE_SIZE),
+    enabled: !!criteria && !!getAccessToken(),
+  });
+  const payments = (data?.items ?? []) as unknown as AdminPayment[];
+  const totalPages = data ? Math.max(1, Math.ceil(data.total / PAGE_SIZE)) : 1;
+
+  const search = () => {
+    if (!input.trim() && !statusInput) {
+      toast.error('Hãy nhập mã đơn, email, tên người mua hoặc khóa học (hoặc chọn trạng thái) để tra cứu.');
+      return;
+    }
+    setPage(0);
+    setCriteria({ q: input, status: statusInput });
   };
-
-  useEffect(() => {
-    fetchPayments();
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- chỉ tải một lần khi vào trang
-  }, []);
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [statusFilter, searchEmail, searchDate]);
 
   // Hộp chi tiết: Escape để đóng, tiêu điểm vào nút Đóng, trả tiêu điểm về nút đã mở.
   useEffect(() => {
@@ -97,50 +106,24 @@ export default function AdminPaymentsPage() {
   }, [selectedPayment]);
 
   const statusLabel = (status: string) => (STATUSES.includes(status as (typeof STATUSES)[number]) ? t(`status.${status}`) : status);
-
-  const handleSort = (field: SortField) => {
-    if (sortField === field) {
-      setSortOrder((o) => (o === 'asc' ? 'desc' : 'asc'));
-    } else {
-      setSortField(field);
-      setSortOrder('asc');
-    }
-  };
-
-  const filtered = useMemo(() => {
-    let result = [...payments];
-    if (statusFilter !== 'ALL') result = result.filter((p) => p.status === statusFilter);
-    if (searchEmail.trim()) {
-      const q = searchEmail.toLowerCase();
-      result = result.filter((p) => p.userEmail?.toLowerCase().includes(q));
-    }
-    if (searchDate) {
-      const target = new Date(searchDate);
-      result = result.filter((p) => p.paidAt && isSameDay(new Date(p.paidAt), target));
-    }
-    const dir = sortOrder === 'asc' ? 1 : -1;
-    return result.sort((a, b) => {
-      const value = (p: AdminPayment): string | number =>
-        sortField === 'paidAt' ? (p.paidAt ? new Date(p.paidAt).getTime() : 0) : (p[sortField] ?? 0);
-      const va = value(a);
-      const vb = value(b);
-      return va < vb ? -dir : va > vb ? dir : 0;
-    });
-  }, [payments, statusFilter, searchEmail, searchDate, sortField, sortOrder]);
-
-  const paged = paginate(filtered, currentPage, PAGE_SIZE);
   const dateTime = (iso: string) => new Date(iso).toLocaleString(locale, { dateStyle: 'short', timeStyle: 'short' });
 
-  const SortHeader = ({ field, label }: { field: SortField; label: string }) => {
-    const Icon = sortField !== field ? ArrowUpDown : sortOrder === 'asc' ? ArrowUp : ArrowDown;
-    return (
-      <th scope="col" aria-sort={sortField !== field ? 'none' : sortOrder === 'asc' ? 'ascending' : 'descending'} className="px-4 py-3 font-semibold">
-        <button type="button" onClick={() => handleSort(field)} className="inline-flex items-center gap-1.5 whitespace-nowrap font-semibold text-ink-muted hover:text-ink">
-          {label}
-          <Icon size={13} aria-hidden className={sortField === field ? 'text-accent' : 'opacity-50'} />
-        </button>
-      </th>
-    );
+  /** Tìm biên lai của đơn rồi tải PDF (biên lai gắn theo mã đơn/mã nhóm đơn). */
+  const downloadReceipt = async (p: AdminPayment) => {
+    setReceiptBusy(true);
+    try {
+      const res = await adminInvoicesApi.list({ q: p.txnRef, type: 'RECEIPT', size: 1 });
+      const inv = res.items[0];
+      if (!inv) {
+        toast.error('Giao dịch này chưa có biên lai. Biên lai được tạo sau khi giao dịch hoàn tất, thường trong vài phút.');
+        return;
+      }
+      saveBlob(await adminInvoicesApi.pdf(inv.id), `${inv.number}.pdf`);
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : 'Không tải được biên lai. Vui lòng thử lại.');
+    } finally {
+      setReceiptBusy(false);
+    }
   };
 
   const field = 'w-full rounded-lg border border-line bg-surface-raised p-2.5 text-sm text-ink outline-none focus:border-accent';
@@ -148,123 +131,100 @@ export default function AdminPaymentsPage() {
 
   return (
     <>
-      <PageHeader
-        title={t('title')}
-        subtitle={t('subtitle')}
-        action={
-          <button type="button" onClick={fetchPayments} className="inline-flex items-center gap-1.5 rounded-lg border border-line bg-surface-raised px-4 py-2 text-sm font-semibold text-ink hover:bg-tint">
-            <RefreshCw size={14} aria-hidden />
-            {t('refresh')}
-          </button>
+      <PageHeader title={t('title')} subtitle={t('subtitle')} />
+
+      <SearchPanel
+        label="Tìm giao dịch"
+        placeholder="Mã đơn, mã cổng thanh toán, email / tên / ID người mua, khóa học..."
+        value={input}
+        onChange={setInput}
+        onSubmit={search}
+        busy={isFetching}
+        filters={
+          <label className="flex w-full flex-col gap-1.5 sm:w-48">
+            <span className={labelCls}>{t('filters.status')}</span>
+            <select className={field} value={statusInput} onChange={(e) => setStatusInput(e.target.value)}>
+              <option value="">{t('filters.all')}</option>
+              {STATUSES.map((s) => (
+                <option key={s} value={s}>
+                  {t(`status.${s}`)}
+                </option>
+              ))}
+            </select>
+          </label>
         }
       />
 
-      <div className="flex flex-wrap items-end gap-4 rounded-xl border border-line bg-surface-raised p-4">
-        <label className="flex w-full flex-col gap-1.5 sm:w-64">
-          <span className={labelCls}>{t('filters.email')}</span>
-          <input type="search" placeholder={t('filters.emailPh')} className={field} value={searchEmail} onChange={(e) => setSearchEmail(e.target.value)} />
-        </label>
-        <label className="flex w-full flex-col gap-1.5 sm:w-48">
-          <span className={labelCls}>{t('filters.date')}</span>
-          <input type="date" className={field} value={searchDate} onChange={(e) => setSearchDate(e.target.value)} />
-        </label>
-        <label className="flex w-full flex-col gap-1.5 sm:w-48">
-          <span className={labelCls}>{t('filters.status')}</span>
-          <select className={field} value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
-            <option value="ALL">{t('filters.all')}</option>
-            {STATUSES.map((s) => (
-              <option key={s} value={s}>
-                {t(`status.${s}`)}
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
-
-      {loading ? (
+      {!criteria ? (
+        <SearchPrompt title="Nhập thông tin để tra cứu giao dịch">
+          Hệ thống có rất nhiều giao dịch nên không hiển thị sẵn. Hãy nhập mã đơn, mã cổng thanh toán, email, tên hoặc ID người mua, hoặc tên khóa học;
+          bấm vào một kết quả để xem chi tiết, tải biên lai và xử lý khiếu nại.
+        </SearchPrompt>
+      ) : isFetching && !data ? (
         <div className="flex flex-col gap-2 rounded-xl border border-line bg-surface-raised p-4">
-          {Array.from({ length: 5 }, (_, i) => (
+          {Array.from({ length: 4 }, (_, i) => (
             <Skeleton key={i} className="h-11" />
           ))}
         </div>
+      ) : isError ? (
+        <div role="alert" className="rounded-xl border border-danger/40 bg-danger/5 p-6 text-center text-danger">{t('loadError')}</div>
       ) : payments.length === 0 ? (
-        <div className="rounded-xl border border-line bg-surface-raised p-8 text-center text-ink-muted">{t('empty')}</div>
+        <div className="rounded-xl border border-line bg-surface-raised p-8 text-center text-ink-muted">{t('noMatch')}</div>
       ) : (
         <div className="flex flex-col gap-4">
           <div className="overflow-x-auto rounded-xl border border-line bg-surface-raised shadow-sm">
-            <table className="w-full min-w-[980px] text-left text-sm">
+            <table className="w-full min-w-[900px] text-left text-sm">
               <thead className="border-b border-line bg-surface text-xs text-ink-muted">
                 <tr>
-                  <SortHeader field="txnRef" label={t('cols.ref')} />
-                  <SortHeader field="userEmail" label={t('cols.user')} />
-                  <SortHeader field="amount" label={t('cols.amount')} />
+                  <th scope="col" className="px-4 py-3 font-semibold">{t('cols.ref')}</th>
+                  <th scope="col" className="px-4 py-3 font-semibold">{t('cols.user')}</th>
+                  <th scope="col" className="px-4 py-3 font-semibold">{t('cols.amount')}</th>
                   <th scope="col" className="px-4 py-3 font-semibold">{t('cols.fee')}</th>
                   <th scope="col" className="px-4 py-3 font-semibold">{t('cols.net')}</th>
                   <th scope="col" className="px-4 py-3 font-semibold">{t('cols.source')}</th>
-                  <SortHeader field="paymentMethod" label={t('cols.method')} />
                   <th scope="col" className="px-4 py-3 font-semibold">{t('cols.status')}</th>
-                  <SortHeader field="paidAt" label={t('cols.time')} />
+                  <th scope="col" className="px-4 py-3 font-semibold">{t('cols.time')}</th>
                   <th scope="col" className="px-4 py-3 text-right font-semibold">{t('cols.actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-line-soft">
-                {paged.items.length === 0 ? (
-                  <tr>
-                    <td colSpan={10} className="px-6 py-8 text-center text-ink-muted">{t('noMatch')}</td>
+                {payments.map((p) => (
+                  <tr key={p.txnRef} className="transition-colors hover:bg-surface">
+                    <td className="px-4 py-3 font-mono font-medium text-ink">{p.txnRef.substring(0, 8)}</td>
+                    <td className="max-w-[190px] truncate px-4 py-3 font-medium text-ink" title={p.userEmail}>
+                      {p.userEmail}
+                      <div className="truncate text-xs font-normal text-ink-muted" title={p.courseTitle}>{p.courseTitle}</div>
+                    </td>
+                    <td className="px-4 py-3 font-semibold text-ink">{money(p.amount ?? 0)}</td>
+                    <td className="px-4 py-3 font-semibold text-ink">{p.platformFee ? money(p.platformFee) : '-'}</td>
+                    <td className="px-4 py-3 font-semibold text-success-ink">{p.instructorEarning ? money(p.instructorEarning) : '-'}</td>
+                    <td className="px-4 py-3">
+                      <span className={`inline-block rounded-full px-2.5 py-1 text-xs font-semibold ${p.revenueSource === 'INSTRUCTOR_REFERRAL' ? 'bg-tint text-accent-dark' : 'bg-line-soft text-ink-muted'}`}>
+                        {p.revenueSource === 'INSTRUCTOR_REFERRAL' ? t('source.referral') : t('source.organic')}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className={`inline-block rounded-full border px-2.5 py-1 text-xs font-medium ${STATUS_CLASS[p.status] ?? 'border-line bg-line-soft text-ink'}`}>
+                        {statusLabel(p.status)}
+                      </span>
+                    </td>
+                    <td className="whitespace-nowrap px-4 py-3 text-ink-muted">{p.paidAt ? dateTime(p.paidAt) : '-'}</td>
+                    <td className="px-4 py-3 text-right">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedPayment(p)}
+                        aria-label={`${t('details')}: ${p.txnRef.substring(0, 8)}`}
+                        className="rounded-lg px-2.5 py-1.5 text-xs font-bold text-accent-dark hover:bg-tint"
+                      >
+                        {t('details')}
+                      </button>
+                    </td>
                   </tr>
-                ) : (
-                  paged.items.map((p) => (
-                    <tr key={p.txnRef} className="transition-colors hover:bg-surface">
-                      <td className="px-4 py-3 font-mono font-medium text-ink">{p.txnRef.substring(0, 8)}</td>
-                      <td className="max-w-[170px] truncate px-4 py-3 font-medium text-ink" title={p.userEmail}>{p.userEmail}</td>
-                      <td className="px-4 py-3 font-semibold text-ink">{money(p.amount ?? 0)}</td>
-                      <td className="px-4 py-3 font-semibold text-ink">{p.platformFee ? money(p.platformFee) : '-'}</td>
-                      <td className="px-4 py-3 font-semibold text-success-ink">{p.instructorEarning ? money(p.instructorEarning) : '-'}</td>
-                      <td className="px-4 py-3">
-                        <span className={`inline-block rounded-full px-2.5 py-1 text-xs font-semibold ${p.revenueSource === 'INSTRUCTOR_REFERRAL' ? 'bg-tint text-accent-dark' : 'bg-line-soft text-ink-muted'}`}>
-                          {p.revenueSource === 'INSTRUCTOR_REFERRAL' ? t('source.referral') : t('source.organic')}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className="inline-block rounded-full bg-line-soft px-2.5 py-1 text-xs font-semibold text-ink">{p.paymentMethod}</span>
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className={`inline-block rounded-full border px-2.5 py-1 text-xs font-medium ${STATUS_CLASS[p.status] ?? 'border-line bg-line-soft text-ink'}`}>
-                          {statusLabel(p.status)}
-                        </span>
-                      </td>
-                      <td className="whitespace-nowrap px-4 py-3 text-ink-muted">{p.paidAt ? dateTime(p.paidAt) : '-'}</td>
-                      <td className="px-4 py-3 text-right">
-                        <button
-                          type="button"
-                          onClick={() => setSelectedPayment(p)}
-                          aria-label={`${t('details')}: ${p.txnRef.substring(0, 8)}`}
-                          className="rounded-lg px-2.5 py-1.5 text-xs font-bold text-accent-dark hover:bg-tint"
-                        >
-                          {t('details')}
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                )}
+                ))}
               </tbody>
             </table>
           </div>
-
-          {paged.totalPages > 1 && (
-            <nav aria-label={t('pager.aria')} className="flex flex-wrap items-center justify-between gap-3 px-1">
-              <span className="text-sm text-ink-muted">{t('pager.showing', { shown: paged.items.length, total: filtered.length })}</span>
-              <div className="flex items-center gap-2">
-                <button type="button" disabled={paged.page === 1} onClick={() => setCurrentPage(paged.page - 1)} className="rounded-lg border border-line bg-surface-raised px-3 py-1.5 text-sm font-semibold text-ink hover:bg-tint disabled:opacity-50">
-                  {t('pager.prev')}
-                </button>
-                <span className="px-2 text-sm font-semibold text-ink">{t('pager.page', { page: paged.page, total: paged.totalPages })}</span>
-                <button type="button" disabled={paged.page === paged.totalPages} onClick={() => setCurrentPage(paged.page + 1)} className="rounded-lg border border-line bg-surface-raised px-3 py-1.5 text-sm font-semibold text-ink hover:bg-tint disabled:opacity-50">
-                  {t('pager.next')}
-                </button>
-              </div>
-            </nav>
-          )}
+          <Pager page={page} totalPages={totalPages} total={data?.total ?? 0} onPage={setPage} />
         </div>
       )}
 
@@ -288,10 +248,10 @@ export default function AdminPaymentsPage() {
                     {selectedPayment.revenueSource === 'INSTRUCTOR_REFERRAL' ? t('detail.sourceReferral') : t('detail.sourceOrganic')}
                   </span>
                 </Detail>
-                <Detail label={t('detail.fee', { percent: selectedPayment.revenueSource === 'INSTRUCTOR_REFERRAL' ? 3 : 63 })}>
+                <Detail label={t('detail.fee', { percent: platformPercent(selectedPayment) })}>
                   <span className="font-semibold">{selectedPayment.platformFee ? money(selectedPayment.platformFee) : '-'}</span>
                 </Detail>
-                <Detail label={t('detail.earning', { percent: selectedPayment.revenueSource === 'INSTRUCTOR_REFERRAL' ? 97 : 37 })}>
+                <Detail label={t('detail.earning', { percent: Math.round((100 - platformPercent(selectedPayment)) * 100) / 100 })}>
                   <span className="font-semibold text-success-ink">{selectedPayment.instructorEarning ? money(selectedPayment.instructorEarning) : '-'}</span>
                 </Detail>
                 {selectedPayment.couponCode && (
@@ -322,7 +282,16 @@ export default function AdminPaymentsPage() {
             </div>
 
             <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line bg-surface px-6 py-4">
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  disabled={receiptBusy}
+                  onClick={() => downloadReceipt(selectedPayment)}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-line bg-surface-raised px-3 py-1.5 text-sm font-semibold text-ink hover:bg-tint disabled:opacity-50"
+                >
+                  <FileText size={14} aria-hidden />
+                  {receiptBusy ? 'Đang tải...' : 'Tải biên lai'}
+                </button>
                 <Link
                   href={`/admin/transactions/disputes?ref=${selectedPayment.txnRef}`}
                   className="rounded-lg border border-line bg-surface-raised px-3 py-1.5 text-sm font-semibold text-ink hover:bg-tint"

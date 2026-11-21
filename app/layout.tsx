@@ -1,3 +1,4 @@
+import { siteUrl } from '@/lib/siteUrl';
 import type { Metadata, Viewport } from 'next';
 import Script from 'next/script';
 import localFont from 'next/font/local';
@@ -43,6 +44,8 @@ const plexMono = localFont({
 });
 
 export const metadata: Metadata = {
+  // Cần để link tương đối trong OpenGraph/canonical thành URL tuyệt đối khi chia sẻ lên mạng xã hội (Giai đoạn D).
+  metadataBase: new URL(siteUrl()),
   title: {
     default: 'LinguaLearn — Học không giới hạn ngôn ngữ',
     template: '%s | LinguaLearn',
@@ -69,6 +72,9 @@ export const viewport: Viewport = {
   initialScale: 1,
   viewportFit: 'cover',
   themeColor: COLORS.accent,
+  // Site chỉ có giao diện sáng — khai báo rõ để trình duyệt (Edge/Chrome "tự động làm tối trang") không
+  // đảo màu nền nhưng giữ nguyên chữ tối cố định, làm 1 số chỗ (vd "Điểm chính thức") mất chữ.
+  colorScheme: 'only light',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

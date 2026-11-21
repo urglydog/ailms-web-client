@@ -10,7 +10,16 @@ import { PageHeader } from '@/components/instructor/ui/PageHeader';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { ApiError } from '@/lib/api/client';
 import { disputesApi } from '@/lib/api/disputes';
-import type { DisputeAdminRes, DisputeStatus } from '@/types/domain';
+import { useDebounce } from '@/hooks/useDebounce';
+import { DisputeV2Details, RefundSummary, ResponsibilityPicker } from '@/components/admin/disputes/DisputeV2Details';
+import {
+  AppealPanel,
+  PayosRefundTransfer,
+  ReasonCodeFields,
+  RefundAccountInfo,
+  policyProblem,
+} from '@/components/admin/disputes/DisputePolicyPanels';
+import type { DisputeAdminRes, DisputeStatus, RefundReasonCode, RefundResponsibility } from '@/types/domain';
 
 const STATUSES: DisputeStatus[] = ['OPEN', 'REOPENED', 'RESOLVED_REFUNDED', 'RESOLVED_REJECTED'];
 const STATUS_CLASS: Record<DisputeStatus, string> = {
@@ -37,24 +46,40 @@ function AdminDisputesContent() {
 
   const [disputes, setDisputes] = useState<DisputeAdminRes[]>([]);
   const [loading, setLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState<DisputeStatus | 'ALL'>('ALL');
+  // Hàng chờ xử lý hiện sẵn (số lượng ít, admin cần nắm ngay); khiếu nại đã xử lý chỉ hiện khi chọn trạng thái hoặc tìm kiếm.
+  const [statusFilter, setStatusFilter] = useState<DisputeStatus | 'ALL' | 'NEEDS_ACTION'>(highlightRef ? 'ALL' : 'NEEDS_ACTION');
+  const [search, setSearch] = useState(highlightRef ?? '');
+  const debouncedSearch = useDebounce(search, 400);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(false);
   const [selected, setSelected] = useState<DisputeAdminRes | null>(null);
   const [note, setNote] = useState('');
+  const [responsibility, setResponsibility] = useState<RefundResponsibility>('STANDARD');
+  const [transferRef, setTransferRef] = useState('');
+  const [reasonCode, setReasonCode] = useState<RefundReasonCode | ''>('');
+  const [evidenceNote, setEvidenceNote] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  const fetchDisputes = () => {
-    setLoading(true);
+  const PAGE = 30;
+  const apiStatus = statusFilter === 'ALL' || statusFilter === 'NEEDS_ACTION' ? undefined : statusFilter;
+  // Tải trang đầu khi đổi trạng thái/từ khóa; "Xem thêm" nối thêm các trang sau.
+  const fetchDisputes = (nextPage = 0) => {
+    setLoading(nextPage === 0);
     disputesApi
-      .listAllAdmin(statusFilter === 'ALL' ? undefined : statusFilter)
-      .then(setDisputes)
+      .listAllAdmin(apiStatus, debouncedSearch, nextPage, PAGE, statusFilter === 'NEEDS_ACTION')
+      .then((list) => {
+        setDisputes((prev) => (nextPage === 0 ? list : [...prev, ...list]));
+        setHasMore(list.length === PAGE);
+        setPage(nextPage);
+      })
       .catch(() => toast.error(t('loadError')))
       .finally(() => setLoading(false));
   };
 
   useEffect(() => {
-    fetchDisputes();
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- chỉ phụ thuộc statusFilter
-  }, [statusFilter]);
+    fetchDisputes(0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- chỉ phụ thuộc bộ lọc
+  }, [statusFilter, debouncedSearch]);
 
   const filtered = useMemo(() => {
     if (!highlightRef) return disputes;
@@ -66,15 +91,55 @@ function AdminDisputesContent() {
   const openResolve = (d: DisputeAdminRes) => {
     setSelected(d);
     setNote('');
+    setResponsibility('STANDARD');
+    setTransferRef('');
+    setReasonCode('');
+    setEvidenceNote('');
+  };
+
+  // Sau khi PayOS chi / admin quyết định khiếu nại: tải lại danh sách và giữ nguyên hộp thoại đang mở với dữ liệu mới.
+  const refreshSelected = () => {
+    const id = selected?.id;
+    disputesApi
+      .listAllAdmin(apiStatus, debouncedSearch, 0, PAGE, statusFilter === 'NEEDS_ACTION')
+      .then((list) => {
+        setDisputes(list);
+        setHasMore(list.length === PAGE);
+        setPage(0);
+        if (id != null) setSelected(list.find((x) => x.id === id) ?? null);
+      })
+      .catch(() => toast.error(t('loadError')));
   };
 
   const handleResolve = async (status: 'RESOLVED_REFUNDED' | 'RESOLVED_REJECTED') => {
     if (!selected || !note.trim()) return;
     setSubmitting(true);
     try {
-      await disputesApi.resolve(selected.id, { status, note: note.trim() });
-      toast.success(status === 'RESOLVED_REFUNDED' ? 'Đã đánh dấu hoàn tiền.' : 'Đã từ chối khiếu nại.');
+      await disputesApi.resolve(selected.id, {
+        status,
+        note: note.trim(),
+        ...(status === 'RESOLVED_REFUNDED'
+          ? { responsibility, ...(reasonCode ? { reasonCode } : {}), ...(evidenceNote.trim() ? { evidenceNote: evidenceNote.trim() } : {}) }
+          : {}),
+      });
+      toast.success(status === 'RESOLVED_REFUNDED' ? t('v2.refundApproved') : t('v2.rejected'));
       setSelected(null);
+      fetchDisputes();
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : t('detail.error'));
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleMarkTransferred = async () => {
+    if (!selected || !transferRef.trim()) return;
+    setSubmitting(true);
+    try {
+      const updated = await disputesApi.markTransferred(selected.id, { transferRef: transferRef.trim() });
+      toast.success(t('v2.transferSaved'));
+      setSelected(updated);
+      setTransferRef('');
       fetchDisputes();
     } catch (err) {
       toast.error(err instanceof ApiError ? err.message : t('detail.error'));
@@ -88,13 +153,24 @@ function AdminDisputesContent() {
       <PageHeader title={t('title')} subtitle={t('subtitle')} />
 
       <div className="flex flex-wrap items-end gap-4 rounded-xl border border-line bg-surface-raised p-4">
+        <label className="flex min-w-0 flex-1 flex-col gap-1.5 sm:min-w-64">
+          <span className="text-xs font-semibold text-ink-muted">Tìm khiếu nại</span>
+          <input
+            type="search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Mã đơn, email hoặc tên người gửi, mã khiếu nại..."
+            className="w-full rounded-lg border border-line bg-surface-raised p-2.5 text-sm text-ink outline-none focus:border-accent"
+          />
+        </label>
         <label className="flex w-full flex-col gap-1.5 sm:w-56">
           <span className="text-xs font-semibold text-ink-muted">{t('filters.status')}</span>
           <select
             className="w-full rounded-lg border border-line bg-surface-raised p-2.5 text-sm text-ink outline-none focus:border-accent"
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as DisputeStatus | 'ALL')}
+            onChange={(e) => setStatusFilter(e.target.value as DisputeStatus | 'ALL' | 'NEEDS_ACTION')}
           >
+            <option value="NEEDS_ACTION">Cần xử lý</option>
             <option value="ALL">{t('filters.all')}</option>
             {STATUSES.map((s) => (
               <option key={s} value={s}>
@@ -138,7 +214,7 @@ function AdminDisputesContent() {
                   <td className="max-w-[220px] truncate px-4 py-3 text-ink-muted" title={d.reason}>{d.reason}</td>
                   <td className="px-4 py-3 font-semibold text-ink">{d.amount.toLocaleString('vi-VN')}đ</td>
                   <td className="px-4 py-3">
-                    <span className={`inline-block rounded-full border px-2.5 py-1 text-xs font-medium ${STATUS_CLASS[d.status]}`}>{t(`status.${d.status}`)}</span>
+                    <span className={`inline-block rounded-full border px-2.5 py-1 text-xs font-medium ${STATUS_CLASS[d.status]}`}>{d.status === 'RESOLVED_REFUNDED' && d.refundTransferStatus === 'AWAITING_ACCOUNT' ? 'Chờ học viên cập nhật TK' : d.status === 'RESOLVED_REFUNDED' && d.refundTransferStatus === 'PENDING_TRANSFER' ? t('status.RESOLVED_REFUNDED_PENDING') : t(`status.${d.status}`)}</span>
                   </td>
                   <td className="whitespace-nowrap px-4 py-3 text-ink-muted">{dateTime(d.createdAt)}</td>
                   <td className="px-4 py-3 text-right">
@@ -156,6 +232,13 @@ function AdminDisputesContent() {
               ))}
             </tbody>
           </table>
+          {hasMore && (
+            <div className="flex justify-center border-t border-line p-3">
+              <button type="button" onClick={() => fetchDisputes(page + 1)} className="rounded-lg border border-line bg-surface-raised px-4 py-2 text-sm font-semibold text-ink hover:bg-tint">
+                Xem thêm
+              </button>
+            </div>
+          )}
         </div>
       )}
 
@@ -212,6 +295,13 @@ function AdminDisputesContent() {
                 )}
               </dl>
 
+              <DisputeV2Details d={selected} />
+
+              <div className="mt-4 flex flex-col gap-2">
+                <h3 className="m-0 text-sm font-semibold text-ink">Tài khoản nhận hoàn tiền</h3>
+                <RefundAccountInfo d={selected} />
+              </div>
+
               {selected.status === 'REOPENED' && (
                 <div className="mt-5 rounded-lg border border-danger/40 bg-danger/5 p-4">
                   <p className="m-0 text-sm font-semibold text-danger">{t('detail.reopenReason')}</p>
@@ -230,6 +320,22 @@ function AdminDisputesContent() {
                   {selected.status === 'REOPENED' && (
                     <p className="m-0 text-xs text-ink-muted">{t('detail.noteOverwriteWarning')}</p>
                   )}
+                  <ResponsibilityPicker
+                    d={selected}
+                    value={responsibility}
+                    onChange={(v) => {
+                      setResponsibility(v);
+                      setReasonCode('');
+                    }}
+                  />
+                  <ReasonCodeFields
+                    responsibility={responsibility}
+                    reasonCode={reasonCode}
+                    onReasonCode={setReasonCode}
+                    evidenceNote={evidenceNote}
+                    onEvidenceNote={setEvidenceNote}
+                    problem={policyProblem(selected, responsibility, reasonCode, note, evidenceNote)}
+                  />
                   <label className="flex flex-col gap-1.5">
                     <span className="text-sm font-semibold text-ink">{t('detail.note')}</span>
                     <textarea
@@ -243,7 +349,7 @@ function AdminDisputesContent() {
                   <div className="mt-2 flex flex-wrap gap-2">
                     <button
                       type="button"
-                      disabled={submitting || !note.trim()}
+                      disabled={submitting || !note.trim() || policyProblem(selected, responsibility, reasonCode, note, evidenceNote) !== null}
                       onClick={() => handleResolve('RESOLVED_REFUNDED')}
                       className="rounded-lg bg-success px-4 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
                     >
@@ -267,6 +373,28 @@ function AdminDisputesContent() {
                   )}
                 </div>
               )}
+
+              {selected.refundTransferStatus === 'PENDING_TRANSFER' && (
+                <div className="mt-4">
+                  <PayosRefundTransfer d={selected} onChanged={refreshSelected} />
+                </div>
+              )}
+
+              {selected.refundTransferStatus === 'AWAITING_ACCOUNT' && (
+                <div className="mt-4 rounded-lg border border-warning bg-surface p-3 text-xs text-ink">
+                  Chưa chuyển được vào tài khoản học viên đã khai{selected.refundAccountSummary ? ` (${selected.refundAccountSummary})` : ''}. Đang chờ học viên cập nhật tài khoản nhận hoàn tiền; khi họ cập nhật, khoản hoàn tự quay về &quot;chờ chuyển&quot; để chi lại. Bạn vẫn có thể chuyển thủ công và ghi nhận bên dưới.
+                </div>
+              )}
+
+              <AppealPanel d={selected} onChanged={refreshSelected} />
+
+              <RefundSummary
+                d={selected}
+                transferRef={transferRef}
+                onTransferRefChange={setTransferRef}
+                onMarkTransferred={handleMarkTransferred}
+                submitting={submitting}
+              />
             </div>
             <div className="flex justify-end border-t border-line bg-surface px-6 py-4">
               <button type="button" onClick={() => setSelected(null)} className="rounded-lg bg-accent px-5 py-2 font-semibold text-white hover:bg-accent-dark">

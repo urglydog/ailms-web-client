@@ -26,6 +26,23 @@ export function useInstructorStudents(courseId?: number) {
   });
 }
 
+export function useInstructorStudentPage(p: { courseId?: number; atRiskOnly: boolean; q: string; page: number }) {
+  return useQuery({
+    queryKey: ['dashboard', 'instructor', 'students-page', p.courseId ?? 'all', p.atRiskOnly, p.q, p.page],
+    queryFn: () => dashboardApi.searchStudents(p),
+    enabled: !!getAccessToken(),
+    placeholderData: (prev) => prev,
+  });
+}
+
+export function useInstructorStudentSummary(courseId?: number) {
+  return useQuery({
+    queryKey: ['dashboard', 'instructor', 'students-summary', courseId ?? 'all'],
+    queryFn: () => dashboardApi.getStudentSummary(courseId),
+    enabled: !!getAccessToken(),
+  });
+}
+
 export function useInstructorReviews(courseId?: number) {
   return useQuery({
     queryKey: ['dashboard', 'instructor', 'reviews', courseId ?? 'all'],

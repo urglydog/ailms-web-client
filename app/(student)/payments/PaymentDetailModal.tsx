@@ -8,10 +8,12 @@ import { format } from 'date-fns';
 
 interface PaymentDetailModalProps {
   payment: PaymentRes;
+  /** Đã duyệt hoàn tiền nhưng tiền chưa chuyển: hiện "chờ chuyển" thay vì "Đã hoàn tiền". */
+  awaitingTransfer?: boolean;
   onClose: () => void;
 }
 
-export default function PaymentDetailModal({ payment, onClose }: PaymentDetailModalProps) {
+export default function PaymentDetailModal({ payment, onClose, awaitingTransfer = false }: PaymentDetailModalProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'PAID':
@@ -22,6 +24,8 @@ export default function PaymentDetailModal({ payment, onClose }: PaymentDetailMo
         return 'bg-danger/10 text-danger border-danger/20';
       case 'EXPIRED':
         return 'bg-ink-muted/10 text-ink-muted border-line';
+      case 'REFUNDED':
+        return 'bg-tint text-accent-dark border-accent/30';
       default:
         return 'bg-line text-ink border-line';
     }
@@ -33,6 +37,7 @@ export default function PaymentDetailModal({ payment, onClose }: PaymentDetailMo
       case 'PENDING': return 'Đang chờ xử lý';
       case 'FAILED': return 'Thất bại';
       case 'EXPIRED': return 'Hết hạn';
+      case 'REFUNDED': return awaitingTransfer ? 'Đã duyệt hoàn · chờ chuyển' : 'Đã hoàn tiền';
       default: return status;
     }
   };

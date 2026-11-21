@@ -4,7 +4,11 @@ import { Modal } from '@/components/ui/Modal';
 
 import { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-import { useMyBundles, useCreateBundle, useUpdateBundle } from '@/hooks/useBundles';
+import { ConfirmDialog } from '@/components/admin/ui/ConfirmDialog';
+import { ListSearch } from '@/components/ui/ListSearch';
+import { Pager } from '@/components/ui/SearchPanel';
+import { useListControls } from '@/hooks/useListControls';
+import { useMyBundles, useCreateBundle, useUpdateBundle, useDeleteBundle } from '@/hooks/useBundles';
 import { useMyCourses } from '@/hooks/useCourses';
 import type { CourseBundle, CreateBundleReq, UpdateBundleReq } from '@/types/domain';
 
@@ -227,7 +231,7 @@ function BundleForm({ editing, onClose }: BundleFormProps) {
 
 // ── Bundle Card ──────────────────────────────────────────────────
 
-function BundleCard({ bundle, onEdit }: { bundle: CourseBundle; onEdit: () => void }) {
+function BundleCard({ bundle, onEdit, onDelete }: { bundle: CourseBundle; onEdit: () => void; onDelete: () => void }) {
   const t = useTranslations('bundles');
   const locale = useLocale();
   const fmt = (amount: number) => formatAmount(amount, locale);
@@ -258,13 +262,23 @@ function BundleCard({ bundle, onEdit }: { bundle: CourseBundle; onEdit: () => vo
               <p className="mt-1 text-xs text-ink-muted line-clamp-1">{bundle.description}</p>
             )}
           </div>
-          <button
-            type="button"
-            onClick={onEdit}
-            className="shrink-0 rounded-xl border border-line px-3 py-1.5 text-xs font-semibold text-ink-muted hover:bg-surface hover:border-accent/40 hover:text-accent transition-colors"
-          >
-            {t('edit')}
-          </button>
+          <div className="flex shrink-0 gap-1.5">
+            <button
+              type="button"
+              onClick={onEdit}
+              className="rounded-xl border border-line px-3 py-1.5 text-xs font-semibold text-ink-muted hover:bg-surface hover:border-accent/40 hover:text-accent transition-colors"
+            >
+              {t('edit')}
+            </button>
+            <button
+              type="button"
+              onClick={onDelete}
+              aria-label={`Xóa gói: ${bundle.title}`}
+              className="rounded-xl border border-line px-3 py-1.5 text-xs font-semibold text-danger hover:bg-surface hover:border-danger/40 transition-colors"
+            >
+              Xóa
+            </button>
+          </div>
         </div>
 
         {/* Courses list */}
@@ -295,11 +309,20 @@ function BundleCard({ bundle, onEdit }: { bundle: CourseBundle; onEdit: () => vo
 
 export function BundleManager() {
   const t = useTranslations('bundles');
-  const { data, isLoading } = useMyBundles();
+  // Lấy tối đa 100 gói rồi tìm/lọc/phân trang 9 gói mỗi trang ở trình duyệt (danh sách do chính giảng viên sở hữu).
+  const { data, isLoading } = useMyBundles(0, 100);
   const [editing, setEditing] = useState<CourseBundle | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<'ALL' | 'ACTIVE' | 'INACTIVE'>('ALL');
+  const [pendingDelete, setPendingDelete] = useState<CourseBundle | null>(null);
+  const deleteBundle = useDeleteBundle();
 
   const bundles = data?.content ?? [];
+  const list = useListControls(bundles, {
+    pageSize: 9,
+    filter: (b) => (statusFilter === 'ALL' ? true : statusFilter === 'ACTIVE' ? b.isActive : !b.isActive),
+    match: (b, q) => b.title.toLowerCase().includes(q) || (b.description ?? '').toLowerCase().includes(q) || b.courses.some((c) => c.title.toLowerCase().includes(q)),
+  });
 
   return (
     <div className="flex flex-col gap-6">
@@ -348,16 +371,54 @@ export function BundleManager() {
       )}
 
       {!isLoading && bundles.length > 0 && (
-        <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-5">
-          {bundles.map((bundle) => (
-            <BundleCard
-              key={bundle.id}
-              bundle={bundle}
-              onEdit={() => { setEditing(bundle); setShowForm(true); }}
-            />
-          ))}
-        </div>
+        <>
+          <div className="flex flex-wrap items-center gap-3">
+            <ListSearch label="Tìm gói khóa học" value={list.query} onChange={list.setQuery} placeholder="Tìm theo tên gói hoặc tên khóa học trong gói..." />
+            <select
+              aria-label="Lọc theo trạng thái"
+              value={statusFilter}
+              onChange={(e) => {
+                setStatusFilter(e.target.value as 'ALL' | 'ACTIVE' | 'INACTIVE');
+                list.setPage(0);
+              }}
+              className="rounded-lg border border-line bg-surface-raised px-3 py-2.5 text-sm text-ink outline-none focus:border-accent"
+            >
+              <option value="ALL">Tất cả trạng thái</option>
+              <option value="ACTIVE">Đang bán</option>
+              <option value="INACTIVE">Đã tắt</option>
+            </select>
+          </div>
+          {list.total === 0 ? (
+            <p className="m-0 rounded-xl border border-line bg-surface-raised p-6 text-center text-sm text-ink-muted">Không có gói khóa học nào khớp.</p>
+          ) : (
+            <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-5">
+              {list.pageItems.map((bundle) => (
+                <BundleCard
+                  key={bundle.id}
+                  bundle={bundle}
+                  onEdit={() => { setEditing(bundle); setShowForm(true); }}
+                  onDelete={() => setPendingDelete(bundle)}
+                />
+              ))}
+            </div>
+          )}
+          <Pager page={list.page} totalPages={list.totalPages} total={list.total} onPage={list.setPage} />
+        </>
       )}
+
+      <ConfirmDialog
+        open={pendingDelete !== null}
+        tone="danger"
+        title="Xóa gói khóa học?"
+        body={pendingDelete ? `Gói "${pendingDelete.title}" chưa có người mua sẽ được xóa hẳn; nếu đã có người mua, gói sẽ được lưu trữ (ngừng bán, ẩn khỏi danh sách) và lịch sử đơn vẫn được giữ nguyên.` : ''}
+        confirmLabel="Xóa"
+        cancelLabel="Hủy"
+        onConfirm={() => {
+          if (pendingDelete) deleteBundle.mutate(pendingDelete.id);
+          setPendingDelete(null);
+        }}
+        onCancel={() => setPendingDelete(null)}
+      />
 
       {/* Info box */}
       <div className="rounded-xl border border-line bg-tint p-4 text-sm text-accent-dark flex gap-3">

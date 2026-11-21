@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { fireEvent, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { renderWithIntl } from '@/test/renderWithIntl';
 import AdminPaymentsPage from './page';
@@ -9,34 +9,46 @@ const row = (over: Record<string, unknown>) => ({
   couponCode: null, revenueSource: 'ORGANIC', ...over,
 });
 
-vi.mock('@/lib/api/payments', () => ({
-  paymentsApi: {
-    listAllAdmin: () =>
-      Promise.resolve([row({}), row({ txnRef: 'zzzzzz999999', userEmail: 'khac@x.vn', status: 'FAILED', amount: 50000, revenueSource: 'INSTRUCTOR_REFERRAL' })]),
-  },
+// useQuery giả: chỉ trả dữ liệu khi trang đã bật truy vấn (tức là sau khi bấm Tìm), giống hành vi thật.
+vi.mock('@tanstack/react-query', () => ({
+  useQuery: (opts: { enabled?: boolean }) => ({
+    data: opts.enabled
+      ? { items: [row({}), row({ txnRef: 'zzzzzz999999', userEmail: 'khac@x.vn', status: 'FAILED', amount: 50000, revenueSource: 'INSTRUCTOR_REFERRAL' })], total: 2, page: 0, size: 10 }
+      : undefined,
+    isFetching: false,
+    isError: false,
+  }),
 }));
+vi.mock('@/lib/auth/token', () => ({ getAccessToken: () => 'token' }));
+vi.mock('@/lib/api/payments', () => ({ paymentsApi: { searchAdmin: vi.fn() } }));
+vi.mock('@/lib/api/invoices', () => ({ adminInvoicesApi: { list: vi.fn(), pdf: vi.fn() } }));
 
-describe('AdminPaymentsPage', () => {
-  it('liệt kê giao dịch với nhãn trạng thái dịch được; cột sắp xếp có aria-sort', async () => {
-    renderWithIntl(<AdminPaymentsPage />);
-    await waitFor(() => expect(screen.getByText('hv@x.vn')).toBeInTheDocument());
-    expect(screen.getByText('Thành công', { selector: 'span' })).toBeInTheDocument();
-    expect(screen.getByRole('columnheader', { name: /Thời gian/ })).toHaveAttribute('aria-sort', 'descending');
-  });
+function search(text: string) {
+  fireEvent.change(screen.getByPlaceholderText(/Mã đơn, mã cổng thanh toán/), { target: { value: text } });
+  fireEvent.click(screen.getByRole('button', { name: 'Tìm kiếm' }));
+}
 
-  it('lọc theo email thu hẹp danh sách', async () => {
+describe('AdminPaymentsPage (tìm-kiếm-trước)', () => {
+  it('lúc đầu không liệt kê giao dịch nào, chỉ có hướng dẫn tra cứu', () => {
     renderWithIntl(<AdminPaymentsPage />);
-    await waitFor(() => screen.getByText('hv@x.vn'));
-    fireEvent.change(screen.getByPlaceholderText('Nhập email học viên...'), { target: { value: 'khac' } });
+    expect(screen.getByText('Nhập thông tin để tra cứu giao dịch')).toBeInTheDocument();
     expect(screen.queryByText('hv@x.vn')).toBeNull();
-    expect(screen.getByText('khac@x.vn')).toBeInTheDocument();
   });
 
-  it('mở chi tiết thành hộp thoại có tên, Escape đóng', async () => {
+  it('chỉ hiện kết quả sau khi bấm Tìm, với nhãn trạng thái dịch được', () => {
     renderWithIntl(<AdminPaymentsPage />);
-    await waitFor(() => screen.getByText('hv@x.vn'));
+    search('hv@x.vn');
+    expect(screen.getByText('hv@x.vn')).toBeInTheDocument();
+    expect(screen.getByText('Thành công', { selector: 'span' })).toBeInTheDocument();
+    expect(screen.queryByText('Nhập thông tin để tra cứu giao dịch')).toBeNull();
+  });
+
+  it('mở chi tiết thành hộp thoại có tên và nút tải biên lai, Escape đóng', () => {
+    renderWithIntl(<AdminPaymentsPage />);
+    search('abcdef');
     fireEvent.click(screen.getAllByRole('button', { name: /^Chi tiết/ })[0]!);
     expect(screen.getByRole('dialog', { name: 'Chi tiết giao dịch' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Tải biên lai' })).toBeInTheDocument();
     fireEvent.keyDown(document, { key: 'Escape' });
     expect(screen.queryByRole('dialog')).toBeNull();
   });

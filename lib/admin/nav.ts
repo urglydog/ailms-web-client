@@ -1,6 +1,6 @@
 export type AdminNavId =
-  | 'overview' | 'users' | 'moderation' | 'categories' | 'reviews' | 'aianalytics' | 'aiqueue'
-  | 'voicemappings' | 'tutorsecurity' | 'transactions' | 'disputes' | 'coupons' | 'announcements' | 'support' | 'settings';
+  | 'overview' | 'users' | 'moderation' | 'categories' | 'reviews' | 'promotions' | 'aianalytics' | 'aiqueue'
+  | 'voicemappings' | 'tutorsecurity' | 'transactions' | 'disputes' | 'payouts' | 'invoices' | 'financereports' | 'coupons' | 'announcements' | 'support' | 'settings';
 
 export interface AdminNavItem {
   id: AdminNavId;
@@ -22,6 +22,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
       { id: 'moderation', href: '/admin/moderation' },
       { id: 'categories', href: '/admin/categories' },
       { id: 'reviews', href: '/admin/reviews' },
+      { id: 'promotions', href: '/admin/promotions' },
     ],
   },
   {
@@ -38,6 +39,9 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
     items: [
       { id: 'transactions', href: '/admin/transactions/payments' },
       { id: 'disputes', href: '/admin/transactions/disputes' },
+      { id: 'payouts', href: '/admin/transactions/payouts' },
+      { id: 'invoices', href: '/admin/transactions/invoices' },
+      { id: 'financereports', href: '/admin/finance-reports' },
       { id: 'coupons', href: '/admin/coupons' },
     ],
   },

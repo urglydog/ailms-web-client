@@ -8,8 +8,28 @@ export const systemAnnouncementsApi = {
   create: (req: CreateSystemAnnouncementReq) =>
     api.post<SystemAnnouncement>('/api/v1/admin/announcements', req, { token: getAccessToken() ?? undefined }),
 
-  listAll: () =>
-    api.get<SystemAnnouncement[]>('/api/v1/admin/announcements', { token: getAccessToken() ?? undefined }),
+  /** Lịch sử cho admin: tìm theo tiêu đề/nội dung, lấy {@code size} dòng đầu (tăng size để xem thêm). */
+  list: (q = '', size = 10) => {
+    const p = new URLSearchParams({ page: '0', size: String(size) });
+    if (q.trim()) p.set('q', q.trim());
+    return api.get<SystemAnnouncement[]>(`/api/v1/admin/announcements?${p.toString()}`, { token: getAccessToken() ?? undefined });
+  },
+
+  /** Sửa nội dung (cả thông báo đã gửi tới người dùng). */
+  update: (id: number, req: { title: string; content: string; expiresAt: string | null }) =>
+    api.put<SystemAnnouncement>(`/api/v1/admin/announcements/${id}`, req, { token: getAccessToken() ?? undefined }),
+
+  /** Khôi phục thông báo đã thu hồi để dùng lại. */
+  restore: (id: number) =>
+    api.post<SystemAnnouncement>(`/api/v1/admin/announcements/${id}/restore`, {}, { token: getAccessToken() ?? undefined }),
+
+  /** Xóa hẳn thông báo ĐÃ THU HỒI (bản ghi và các thông báo đã gửi). */
+  remove: (id: number) =>
+    api.delete<void>(`/api/v1/admin/announcements/${id}`, { token: getAccessToken() ?? undefined }),
+
+  /** Thu hồi: ẩn khỏi người dùng, giữ bản ghi. */
+  revoke: (id: number) =>
+    api.post<SystemAnnouncement>(`/api/v1/admin/announcements/${id}/revoke`, {}, { token: getAccessToken() ?? undefined }),
 
   /** Public — không cần đăng nhập, banner "Bảo trì hệ thống" phải hiện được cho khách vãng lai.
    * Trả về `undefined` khi không có banner nào đang hoạt động (backend trả 200 rỗng thân). */

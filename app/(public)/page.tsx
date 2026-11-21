@@ -1,3 +1,4 @@
+import { FeaturedShelf } from '@/components/home/FeaturedShelf';
 import { HomeHero } from '@/components/home/HomeHero';
 import { HomeShelves } from '@/components/home/HomeShelves';
 import { TrendingCourses } from '@/components/home/TrendingCourses';
@@ -31,14 +32,24 @@ async function safeSearch(...args: Parameters<typeof publicCoursesApi.search>) {
   }
 }
 
+/** Kệ "Được đề xuất" lỗi (BE chưa có endpoint ở bản cũ, mạng chập chờn...) thì chỉ mất kệ đó, không ảnh hưởng cả trang. */
+async function safeFeatured() {
+  try {
+    return await publicCoursesApi.featured('HOME_FEATURED', 8);
+  } catch {
+    return [];
+  }
+}
+
 /** Trang chủ (spec mục 4): hero chia đôi, rồi "Đang thịnh hành" và các hàng Mới ra mắt / Miễn phí / Người mới / Chủ đề. Banner xếp hạng cộng đồng (có sẵn)
  * đặt cuối để không tranh chú ý với hero. */
 export default async function HomePage() {
-  const [courses, newest, free, beginner] = await Promise.all([
+  const [courses, newest, free, beginner, featured] = await Promise.all([
     safeSearch(EMPTY_FILTERS, 'rating', TRENDING_FETCH_SIZE),
     safeSearch(EMPTY_FILTERS, 'newest', TRENDING_FETCH_SIZE),
     safeSearch({ ...EMPTY_FILTERS, priceType: 'free' }, 'reviews', TRENDING_FETCH_SIZE),
     safeSearch({ ...EMPTY_FILTERS, level: 'BEGINNER', priceType: 'paid' }, 'rating', TRENDING_FETCH_SIZE),
+    safeFeatured(),
   ]);
 
   // Mỗi danh mục một kệ "nổi bật": lỗi ở danh mục nào thì bỏ riêng kệ đó, không làm hỏng cả trang chủ.
@@ -51,6 +62,7 @@ export default async function HomePage() {
   return (
     <>
       <HomeHero />
+      <FeaturedShelf courses={featured} />
       <TrendingCourses initialCourses={courses} />
       <HomeShelves newest={newest} free={free} beginner={beginner} categoryShelves={categoryShelves} />
       <RankingBanner />

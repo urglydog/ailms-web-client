@@ -1,3 +1,6 @@
+import Link from 'next/link';
+import { missingConditionHref } from '@/lib/instructor/missingConditionLink';
+
 interface SubmitChecklistProps {
   missingConditions: string[];
   canSubmit: boolean;
@@ -15,12 +18,20 @@ export function SubmitChecklist({ missingConditions, canSubmit }: SubmitChecklis
         </div>
       ) : (
         <ul className="flex flex-col gap-1.5">
-          {missingConditions.map((condition) => (
-            <li key={condition} className="flex items-center gap-2 text-[12.5px] text-danger">
-              <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-danger/10 text-[10px]">✗</span>
-              <span>{condition}</span>
-            </li>
-          ))}
+          {missingConditions.map((condition) => {
+            const href = missingConditionHref(condition);
+            return (
+              <li key={condition} className="flex items-center gap-2 text-[12.5px] text-danger">
+                <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-danger/10 text-[10px]">✗</span>
+                <span>{condition}</span>
+                {href && (
+                  <Link href={href} className="font-semibold text-accent hover:underline">
+                    Làm ngay
+                  </Link>
+                )}
+              </li>
+            );
+          })}
           <li className="flex items-center gap-2 text-[12.5px] text-success-ink">
             <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-success-tint text-[10px]">✓</span>
             <span>Khuyến nghị: Thêm Bài tập (Quiz/Flashcard/Mindmap) (Không bắt buộc)</span>

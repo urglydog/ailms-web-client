@@ -186,6 +186,7 @@
       "empty": "Chưa có khóa học nào trong danh mục này."
     },
     "shelves": {
+      "featured": { "title": "Được đề xuất", "subtitle": "Các khóa học được LinguaLearn đề xuất cho bạn." },
       "newest": {
         "title": "Mới ra mắt",
         "subtitle": "Những khóa học vừa được thêm vào LinguaLearn"
@@ -513,7 +514,14 @@
       "invalidOne": "Mã giảm giá không áp dụng được cho khóa học này.",
       "applied": "Đã áp dụng mã giảm giá.",
       "failed": "Không áp dụng được mã giảm giá, thử lại sau.",
-      "selectOne": "Chọn ít nhất 1 khóa học để áp dụng mã giảm giá."
+      "selectOne": "Chọn ít nhất 1 khóa học để áp dụng mã giảm giá.",
+      "pickerTitle": "Khuyến mãi dành cho bạn",
+      "pickerNone": "Không dùng khuyến mãi",
+      "pickerPercent": "Giảm {value}%",
+      "pickerFixed": "Giảm {value}",
+      "pickerSave": "Tiết kiệm {amount}",
+      "pickerExpires": "HSD {date}",
+      "pickerLoading": "Đang tải khuyến mãi..."
     },
     "summary": {
       "title": "Tóm tắt đơn hàng",
@@ -707,6 +715,7 @@
       "bundles": "Gói khóa học",
       "communication": "Giao tiếp",
       "revenue": "Hiệu suất",
+      "earnings": "Thu nhập",
       "tools": "Công cụ",
       "aria": "Điều hướng kênh giảng viên"
     },
@@ -903,9 +912,78 @@
         "lowRating": "Có đánh giá {rating}★ mới từ {student} ở khóa \"{course}\", nên phản hồi sớm."
       }
     },
+    "refunds": {
+      "title": "Yêu cầu hoàn tiền",
+      "subtitle": "Học viên gửi yêu cầu hoàn tiền/khiếu nại cho khóa học của bạn. Bạn có thể phản hồi kèm minh chứng; quản trị viên quyết định cuối cùng.",
+      "loadError": "Không tải được danh sách yêu cầu.",
+      "empty": "Chưa có yêu cầu hoàn tiền nào cho khóa học của bạn.",
+      "filters": {
+        "status": "Trạng thái",
+        "all": "Tất cả"
+      },
+      "status": {
+        "OPEN": "Chờ xử lý",
+        "REOPENED": "Mở lại",
+        "RESOLVED_REFUNDED": "Đã duyệt hoàn tiền",
+        "RESOLVED_REJECTED": "Đã từ chối"
+      },
+      "needsResponse": "Cần phản hồi",
+      "pendingBadge": "{count} yêu cầu cần phản hồi",
+      "deadline": "Hạn phản hồi: {time}",
+      "hoursLeft": "còn {count} giờ",
+      "overdue": "đã quá hạn (vẫn gửi được nếu quản trị viên chưa quyết định)",
+      "courseLabel": "Khóa học",
+      "learner": "Học viên",
+      "paidAt": "Thanh toán lúc",
+      "amount": "Số tiền học viên đã trả",
+      "yourEarning": "Thu nhập của bạn từ đơn này",
+      "category": {
+        "CHANGED_MIND": "Đổi ý / không phù hợp",
+        "CONTENT_MISMATCH": "Nội dung khác mô tả",
+        "TECHNICAL_ERROR": "Lỗi kỹ thuật",
+        "DOUBLE_CHARGE": "Trừ tiền hai lần",
+        "NOT_ENROLLED": "Trừ tiền nhưng không ghi danh",
+        "OTHER": "Lý do khác"
+      },
+      "eligibility": {
+        "AUTO_ELIGIBLE": "Đủ điều kiện theo chính sách",
+        "OUT_OF_POLICY": "Ngoài chính sách",
+        "EXCEPTION": "Lỗi kỹ thuật (xét riêng)"
+      },
+      "progress": "Đã học {percent}% khóa",
+      "detail": {
+        "title": "Chi tiết yêu cầu hoàn tiền",
+        "reason": "Lý do học viên nêu",
+        "attachments": "Minh chứng của học viên",
+        "viewVideo": "Xem video"
+      },
+      "result": {
+        "refunded": "Đã hoàn tiền cho học viên. Thu nhập của bạn bị trừ {charge}.",
+        "refundedNoCharge": "Đã hoàn tiền cho học viên. Thu nhập của bạn không bị trừ.",
+        "rejected": "Yêu cầu bị từ chối. Thu nhập của bạn không bị ảnh hưởng."
+      },
+      "response": {
+        "title": "Phản hồi của bạn",
+        "agree": "Đồng ý hoàn tiền",
+        "object": "Phản đối",
+        "agreeHint": "Bạn thấy yêu cầu hợp lý. Quản trị viên vẫn quyết định cuối cùng.",
+        "objectHint": "Bạn không đồng ý; hãy nêu lý do và đính kèm minh chứng nếu có.",
+        "text": "Nội dung phản hồi",
+        "textPh": "VD: Học viên đã học hết chương 3, nội dung khớp với mô tả khóa học...",
+        "files": "Minh chứng (ảnh/video, tối đa {max} file)",
+        "tooMany": "Chỉ được đính kèm tối đa {max} file.",
+        "submit": "Gửi phản hồi",
+        "submitting": "Đang gửi...",
+        "sent": "Đã gửi phản hồi.",
+        "error": "Không gửi được phản hồi.",
+        "noResponse": "Khiếu nại này đã được xử lý, không thể phản hồi nữa."
+      },
+      "note": "Quản trị viên sẽ xem phản hồi của bạn rồi quyết định cuối cùng. Phản hồi chỉ gửi được một lần."
+    },
     "communication": {
       "tabsAria": "Các mục giao tiếp",
       "tabs": {
+        "refunds": "Hoàn tiền",
         "qa": "Hỏi đáp",
         "messages": "Tin nhắn",
         "assignments": "Bài tập",
@@ -928,7 +1006,8 @@
         "bundles": {
           "title": "Gói khóa học",
           "description": "Gộp nhiều khóa thành một gói với mức giảm giá hấp dẫn để học viên mua trọn bộ."
-        }
+        },
+        "share": { "title": "Chia sẻ & Quảng bá", "description": "Lấy link giới thiệu riêng cho từng khóa, chia sẻ lên mạng xã hội và xem số đơn đến từ link của bạn." }
       }
     },
     "live": {
@@ -1295,12 +1374,16 @@
       "moderation": "Kiểm duyệt khóa học",
       "categories": "Danh mục",
       "reviews": "Đánh giá",
+      "promotions": "Quảng bá khóa học",
       "aianalytics": "AI Analytics",
       "aiqueue": "Giám sát AI Queue",
       "voicemappings": "Giọng đọc lồng tiếng",
       "tutorsecurity": "Bảo mật AI Tutor",
       "transactions": "Đối soát giao dịch",
       "disputes": "Khiếu nại giao dịch",
+      "payouts": "Chi trả giảng viên",
+      "invoices": "Hóa đơn & chứng từ",
+      "financereports": "Thống kê tài chính",
       "coupons": "Mã giảm giá",
       "announcements": "Thông báo hệ thống",
       "settings": "Cấu hình hệ thống",
@@ -1550,7 +1633,7 @@
     },
     "queue": {
       "title": "Giám sát AI Queue",
-      "subtitle": "Tình trạng AI Worker, hàng đợi tác vụ, nhóm khóa Gemini và các job lồng tiếng.",
+      "subtitle": "Tình trạng AI Worker và các job lồng tiếng cần theo dõi.",
       "worker": "AI Worker: {status}",
       "ok": "Hoạt động",
       "down": "Lỗi",
@@ -1559,7 +1642,7 @@
         "pending": "Đang chờ trong Queue",
         "started": "Đang xử lý",
         "success": "Hoàn thành",
-        "failure": "Thất bại"
+        "failure": "Lỗi cần xử lý"
       },
       "queueDetail": "Chi tiết Queue",
       "loading": "Đang tải...",
@@ -1723,7 +1806,8 @@
         "PAID": "Thành công",
         "PENDING": "Đang chờ xử lý",
         "FAILED": "Thất bại",
-        "EXPIRED": "Hết hạn"
+        "EXPIRED": "Hết hạn",
+        "REFUNDED": "Đã hoàn tiền"
       },
       "source": {
         "referral": "Giới thiệu",
@@ -1782,6 +1866,63 @@
       }
     },
     "disputes": {
+      "v2": {
+        "category": {
+          "CHANGED_MIND": "Đổi ý / không phù hợp",
+          "CONTENT_MISMATCH": "Nội dung khác mô tả",
+          "TECHNICAL_ERROR": "Lỗi kỹ thuật",
+          "DOUBLE_CHARGE": "Trừ tiền hai lần",
+          "NOT_ENROLLED": "Trừ tiền nhưng không ghi danh",
+          "OTHER": "Lý do khác"
+        },
+        "eligibility": {
+          "AUTO_ELIGIBLE": "Đủ điều kiện theo chính sách",
+          "OUT_OF_POLICY": "Ngoài chính sách",
+          "EXCEPTION": "Lỗi kỹ thuật (xét riêng)"
+        },
+        "progress": "Đã học {percent}% khóa",
+        "studentFiles": "Học viên đính kèm {count} minh chứng",
+        "decision": {
+          "AGREE_REFUND": "Giảng viên đồng ý hoàn",
+          "OBJECT": "Giảng viên phản đối",
+          "NO_RESPONSE": "Giảng viên không phản hồi"
+        },
+        "instructor": {
+          "title": "Phản hồi của giảng viên",
+          "waiting": "Chưa phản hồi",
+          "deadline": "Hạn phản hồi: {time}",
+          "none": "Không có hạn phản hồi (khiếu nại cũ)",
+          "respondedAt": "Phản hồi lúc {time}",
+          "file": "Minh chứng ({type})"
+        },
+        "responsibility": {
+          "title": "Ai chịu trách nhiệm khi hoàn tiền",
+          "STANDARD": {
+            "label": "Chuẩn — giảng viên trả lại đúng phần đã nhận",
+            "hint": "Đổi ý trong hạn, lỗi hệ thống, thanh toán trùng, không được ghi danh."
+          },
+          "PLATFORM_COMPENSATES": {
+            "label": "Hệ thống chịu toàn bộ",
+            "hint": "Học viên đã dùng được khóa nhưng lỗi từ phía hệ thống; giảng viên giữ nguyên thu nhập."
+          },
+          "INSTRUCTOR_FAULT": {
+            "label": "Giảng viên chịu toàn bộ",
+            "hint": "Mô tả sai nghiêm trọng hoặc vi phạm chính sách. Bắt buộc ghi lý do ở ô ghi chú."
+          },
+          "preview": "Học viên nhận lại {learner} · Trừ vào thu nhập giảng viên {instructor} · Phần hệ thống chịu {platform}"
+        },
+        "refund": {
+          "title": "Hoàn tiền đã duyệt",
+          "summary": "Chế độ: {mode}. Trừ vào thu nhập giảng viên {instructor}; phần hệ thống chịu {platform}.",
+          "pending": "Đã thu hồi quyền học. Chi qua PayOS (tự động), hoặc chuyển khoản tay rồi nhập mã giao dịch để hệ thống báo cho học viên.",
+          "refPh": "Mã giao dịch chuyển khoản",
+          "markTransferred": "Đã chuyển khoản",
+          "transferred": "Đã hoàn tiền — mã giao dịch {ref}"
+        },
+        "refundApproved": "Đã duyệt hoàn tiền: quyền học bị thu hồi, thu nhập giảng viên được điều chỉnh.",
+        "rejected": "Đã từ chối khiếu nại.",
+        "transferSaved": "Đã ghi nhận chuyển khoản và báo cho học viên."
+      },
       "title": "Khiếu nại giao dịch",
       "subtitle": "Khiếu nại/yêu cầu hoàn tiền do học viên, giảng viên gửi lên.",
       "loadError": "Không tải được danh sách khiếu nại.",
@@ -1794,6 +1935,7 @@
         "OPEN": "Chưa xử lý",
         "REOPENED": "Mở lại - ưu tiên",
         "RESOLVED_REFUNDED": "Đã hoàn tiền",
+        "RESOLVED_REFUNDED_PENDING": "Đã duyệt · chờ chuyển",
         "RESOLVED_REJECTED": "Đã từ chối"
       },
       "cols": {
@@ -1859,6 +2001,30 @@
         "cancel": "Hủy",
         "saved": "Đã lưu cấu hình.",
         "saveError": "Không lưu được cấu hình."
+      },
+      "finance": {
+        "title": "Tài chính",
+        "hint": "Tỷ lệ chia sẻ chỉ áp dụng cho đơn thanh toán thành công SAU khi lưu; đơn cũ giữ nguyên. Danh sách ngày dùng dấu phẩy.",
+        "fields": {
+          "REVENUE_ORGANIC_INSTRUCTOR_PCT": "Giảng viên nhận khi học viên tự tìm thấy khóa (organic)",
+          "REVENUE_REFERRAL_INSTRUCTOR_PCT": "Giảng viên nhận khi mua qua liên kết giới thiệu",
+          "REFUND_WINDOW_DAYS": "Hạn hoàn tiền (ngày)",
+          "REFUND_MAX_PROGRESS_PCT": "Tiến độ học tối đa để được hoàn tiền",
+          "REFUND_HOLIDAYS": "Ngày lễ gia hạn hạn hoàn tiền (YYYY-MM-DD, cách nhau dấu phẩy)",
+          "PAYOUT_HOLD_EXTRA_DAYS": "Giữ tiền thêm sau hạn hoàn (ngày)",
+          "PAYOUT_MIN_AMOUNT": "Số tiền rút tối thiểu",
+          "REPORT_DAILY_ENABLED": "Gửi báo cáo tài chính hằng ngày (1 = bật, 0 = tắt)",
+          "REPORT_WEEKLY_ENABLED": "Gửi báo cáo tài chính hằng tuần, sáng thứ Hai (1 = bật, 0 = tắt)",
+          "REPORT_MONTHLY_ENABLED": "Gửi báo cáo tài chính hằng tháng, sáng ngày 1 (1 = bật, 0 = tắt)",
+          "REPORT_RECIPIENTS": "Email nhận báo cáo (cách nhau dấu phẩy, để trống = tất cả quản trị viên)",
+          "STATEMENT_EMAIL_INSTRUCTORS": "Gửi bảng kê thu nhập tháng qua email cho giảng viên (1 = bật, 0 = chỉ xem trên giao diện)",
+          "PAYOS_PAYOUT_FEE": "Phí PayOS mỗi lệnh chi thành công (nền tảng chịu, dùng cho thống kê)",
+          "INVOICE_ISSUER_NAME": "Tên bên phát hành trên chứng từ",
+          "INVOICE_ISSUER_NOTE": "Ghi chú bên phát hành trên chứng từ",
+          "INVOICE_EXCLUDED_EMAIL_SUFFIX": "Đuôi email tài khoản demo không phát hành chứng từ (để trống = không loại trừ)",
+          "PAYOUT_DAYS_OF_MONTH": "Ngày chi trả trong tháng (1–28, cách nhau dấu phẩy)",
+          "DISPUTE_INSTRUCTOR_RESPONSE_HOURS": "Thời gian giảng viên phản hồi khiếu nại (giờ)"
+        }
       },
       "resources": {
         "title": "Tài nguyên Backend",

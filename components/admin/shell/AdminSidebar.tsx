@@ -15,10 +15,14 @@ interface AdminSidebarProps {
   /** Số khiếu nại chưa xử lý, hiện thành chấm số cạnh mục Khiếu nại giao dịch. */
   openDisputes?: number;
   openSupport?: number;
+  /** Yêu cầu rút tiền cần admin xử lý (chờ duyệt hoặc đã duyệt chờ chi). */
+  openPayouts?: number;
+  /** Đăng ký quảng bá chờ duyệt. */
+  openPromotions?: number;
 }
 
 /** Thanh bên sáng của khu Quản trị (từ `md`): nhãn luôn hiện, chia nhóm có tiêu đề, thu gọn được thành cột icon. */
-export function AdminSidebar({ pathname, collapsed, onToggleCollapsed, pendingCourses, openDisputes = 0, openSupport = 0 }: AdminSidebarProps) {
+export function AdminSidebar({ pathname, collapsed, onToggleCollapsed, pendingCourses, openDisputes = 0, openSupport = 0, openPayouts = 0, openPromotions = 0 }: AdminSidebarProps) {
   const t = useTranslations('admin');
   const active = activeAdminItem(pathname);
 
@@ -54,7 +58,7 @@ export function AdminSidebar({ pathname, collapsed, onToggleCollapsed, pendingCo
                 const isActive = active?.id === item.id;
                 const Icon = ADMIN_NAV_ICONS[item.id];
                 const label = t(`nav.${item.id}`);
-                const badge = item.id === 'moderation' ? pendingCourses : item.id === 'disputes' ? openDisputes : item.id === 'support' ? openSupport : 0;
+                const badge = item.id === 'moderation' ? pendingCourses : item.id === 'disputes' ? openDisputes : item.id === 'support' ? openSupport : item.id === 'payouts' ? openPayouts : item.id === 'promotions' ? openPromotions : 0;
                 return (
                   <Link
                     key={item.id}

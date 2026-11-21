@@ -1,4 +1,4 @@
-export type InstructorNavId = 'courses' | 'bundles' | 'communication' | 'revenue' | 'tools';
+export type InstructorNavId = 'courses' | 'bundles' | 'communication' | 'revenue' | 'earnings' | 'tools';
 
 export interface InstructorNavItem {
   id: InstructorNavId;
@@ -13,7 +13,8 @@ export const INSTRUCTOR_NAV: InstructorNavItem[] = [
   { id: 'bundles', href: '/instructor/bundles' },
   { id: 'communication', href: '/instructor/communication' },
   { id: 'revenue', href: '/instructor/revenue' },
-  { id: 'tools', href: '/instructor/tools', alsoMatches: ['/instructor/live', '/instructor/coupons'] },
+  { id: 'earnings', href: '/instructor/earnings' },
+  { id: 'tools', href: '/instructor/tools', alsoMatches: ['/instructor/live', '/instructor/coupons', '/instructor/share'] },
 ];
 
 /** Khớp chính xác hoặc là trang con (`/x/y` làm sáng `/x`); không dùng `startsWith` trần vì `/courses-old` sẽ khớp nhầm. */

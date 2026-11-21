@@ -14,7 +14,7 @@ export type CourseStatus = 'DRAFT' | 'PENDING' | 'PUBLISHED' | 'REJECTED' | 'ARC
 
 /** "Đăng ký (Quyền riêng tư)" kiểu Udemy (19/09/2026). */
 export type CourseVisibility = 'PUBLIC' | 'PRIVATE_INVITE' | 'PRIVATE_PASSWORD';
-export type PaymentStatus = 'PENDING' | 'PAID' | 'FAILED' | 'EXPIRED';
+export type PaymentStatus = 'PENDING' | 'PAID' | 'FAILED' | 'EXPIRED' | 'REFUNDED';
 export type JobStatus = 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED' | 'SKIPPED' | 'CANCELLED';
 /** PARTIAL = đã có chunk phát được nhưng chưa ghép final.mp3 (BR-CHUNK-05) */
 export type TrackStatus = 'PROCESSING' | 'PARTIAL' | 'COMPLETED' | 'FAILED';
@@ -345,6 +345,14 @@ export interface AiJobSummary {
   retryCount: number;
   errorMessage: string | null;
   createdAt: string;
+  courseTitle: string;
+  requestedByName: string | null;
+  requestedByEmail: string | null;
+  finishedAt: string | null;
+  /** Job lỗi nhưng bài học + ngôn ngữ này đã có bản lồng tiếng thành công. */
+  superseded: boolean;
+  /** Được phép thử lại (đang lỗi, còn lượt, chưa có bản thành công). */
+  retryable: boolean;
 }
 
 // ── Lỗi API (RFC 7807 ProblemDetail từ backend) ─────────────────
@@ -687,6 +695,9 @@ export interface CreatePaymentReq {
   /** Mã giảm giá học viên tự nhập (15/09/2026, mở rộng) — bỏ trống nếu không dùng mã (coupon
    * autoApply vẫn được xét dù không nhập gì, xem BR-COUPON-01/04). */
   couponCode?: string;
+  /** Coupon học viên tự chọn trong danh sách ở trang thanh toán (cần `manualCoupon: true`). */
+  couponId?: number;
+  manualCoupon?: boolean;
   /** "Đăng ký (Quyền riêng tư)" kiểu Udemy (19/09/2026) — chỉ cần khi khóa học ở chế độ
    * PRIVATE_PASSWORD (`CourseDetail.requiresPassword`), bỏ qua với mọi khóa khác. */
   courseAccessPassword?: string;
@@ -716,6 +727,8 @@ export interface PaymentRes {
   originalAmount: number | null;
   discountAmount: number;
   couponCode: string | null;
+  /** Mã nhóm khi thanh toán giỏ hàng (null với đơn lẻ). */
+  orderGroupRef?: string | null;
 }
 
 /** Giỏ hàng (06/09/2026) — TÍNH NĂNG MỞ RỘNG, không nằm trong 49 use case đặc tả gốc. Gộp
@@ -730,6 +743,8 @@ export interface CreateBatchPaymentReq {
    * toán, mỗi khóa vẫn tự tính coupon tốt nhất — có thể một khóa lại có coupon autoApply lời
    * hơn coupon nhập tay, xem `CouponService.resolveBestPrice`). */
   couponCode?: string;
+  couponId?: number;
+  manualCoupon?: boolean;
   /** Chia doanh thu 2 mức (20/09/2026) — mã giới thiệu RIÊNG cho từng khóa trong giỏ, khoá
    * theo `courseId` (xem `lib/referral.ts`). Khóa nào không có entry ở đây tính ORGANIC. */
   referralCodes?: Record<number, string>;
@@ -766,12 +781,36 @@ export interface AdminUserDetail {
  * RESOLVED_REFUNDED. */
 export type DisputeStatus = 'OPEN' | 'RESOLVED_REFUNDED' | 'RESOLVED_REJECTED' | 'REOPENED';
 
+/** Lý do chuẩn hóa của khiếu nại (11/11/2026). Client cũ không gửi → BE hiểu là OTHER. */
+export type DisputeCategory =
+  | 'CHANGED_MIND' | 'CONTENT_MISMATCH' | 'TECHNICAL_ERROR' | 'DOUBLE_CHARGE' | 'NOT_ENROLLED' | 'OTHER';
+/** Tính lúc gửi: trong hạn + tiến độ ≤ ngưỡng → AUTO_ELIGIBLE; lỗi kỹ thuật → EXCEPTION. Admin vẫn quyết định cuối. */
+export type DisputeEligibility = 'AUTO_ELIGIBLE' | 'OUT_OF_POLICY' | 'EXCEPTION';
+export type InstructorDecision = 'AGREE_REFUND' | 'OBJECT' | 'NO_RESPONSE';
+/** STANDARD: giảng viên trả lại đúng phần đã nhận · PLATFORM_COMPENSATES: nền tảng gánh hết · INSTRUCTOR_FAULT: giảng viên trả toàn bộ. */
+export type RefundResponsibility = 'STANDARD' | 'PLATFORM_COMPENSATES' | 'INSTRUCTOR_FAULT';
+/** AWAITING_ACCOUNT (16/11/2026): chuyển khoản không thành vì tài khoản nhận có vấn đề — chờ học viên cập nhật tài khoản. */
+export type RefundTransferStatus = 'PENDING_TRANSFER' | 'AWAITING_ACCOUNT' | 'TRANSFERRED';
+export type AttachmentSide = 'STUDENT' | 'INSTRUCTOR';
+/** Mã lý do chuẩn của quyết định hoàn tiền (14/11/2026): mỗi mã chỉ đi với đúng 1 chế độ trách nhiệm (khớp `RefundReasonCode` ở BE). */
+export type RefundReasonCode =
+  | 'BUYER_REMORSE' | 'OTHER'
+  | 'TECHNICAL_ISSUE' | 'DOUBLE_CHARGE' | 'NOT_ENROLLED' | 'PLATFORM_FAULT'
+  | 'COPYRIGHT_VIOLATION' | 'CONTENT_MISMATCH' | 'PROHIBITED_CONTENT';
+export type AppealStatus = 'NONE' | 'OPEN' | 'UPHELD' | 'REDUCED';
+
 export interface FileDisputeReq {
   paymentTxnRef: string;
   reason: string;
   description?: string;
   refundBankAccount?: string;
   termsAccepted: boolean;
+  category?: DisputeCategory;
+  /** Tài khoản nhận hoàn tiền CÓ CẤU TRÚC (14/11/2026): gửi bất kỳ trường nào thì phải đủ cả 4 và xác nhận chính chủ. */
+  refundBankCode?: string;
+  refundAccountNumber?: string;
+  refundAccountHolder?: string;
+  refundAccountOwnConfirmed?: boolean;
 }
 
 export interface DisputeAttachment {
@@ -779,6 +818,7 @@ export interface DisputeAttachment {
   fileUrl: string;
   /** jpg / png / webp / mp4 / webm */
   fileType: string;
+  side?: AttachmentSide;
 }
 
 export interface DisputeRes {
@@ -795,20 +835,131 @@ export interface DisputeRes {
   resolvedAt: string | null;
   /** != null nghĩa là đã dùng hết lượt mở lại (tối đa 1 lần). */
   reopenedAt: string | null;
+  /** Lời nhắn/lý do của admin — học viên thấy được vì sao khiếu nại bị từ chối (11/11/2026). */
+  adminNote?: string | null;
+  category?: DisputeCategory | null;
+  eligibility?: DisputeEligibility | null;
+  instructorDecision?: InstructorDecision | null;
+  /** null = chưa duyệt hoàn tiền; PENDING_TRANSFER = đã duyệt, chờ chuyển khoản; TRANSFERRED = đã chuyển. */
+  refundTransferStatus?: RefundTransferStatus | null;
+  /** Hạn cuối được xin hoàn tiền của giao dịch. */
+  refundDeadline?: string | null;
+  /** BE quyết định học viên có được sửa tài khoản nhận hoàn tiền lúc này không (16/11/2026). */
+  canEditRefundAccount?: boolean;
+  /** Giải thích ngắn: vì sao đang khóa hoặc vì sao cần cập nhật. */
+  refundAccountHint?: string | null;
+  /** Tài khoản nhận hoàn tiền đang khai, đã che số (chỉ 4 số cuối). */
+  refundAccountSummary?: string | null;
+}
+
+/** Học viên cập nhật tài khoản nhận hoàn tiền khi chuyển khoản lỗi hoặc nhập nhầm (16/11/2026). */
+export interface UpdateRefundAccountReq {
+  refundBankCode: string;
+  refundAccountNumber: string;
+  refundAccountHolder: string;
+  refundAccountOwnConfirmed: boolean;
+}
+
+/** Admin yêu cầu học viên cập nhật tài khoản nhận hoàn tiền. */
+export interface RequestAccountUpdateReq {
+  reason: string;
 }
 
 export interface DisputeAdminRes extends DisputeRes {
+  /** Lần cuối học viên đổi tài khoản nhận hoàn tiền sau khi gửi khiếu nại — admin cần kiểm tra trước khi chuyển tiền. */
+  refundAccountUpdatedAt?: string | null;
   refundBankAccount: string | null;
   adminNote: string | null;
   resolvedByEmail: string | null;
   reopenReason: string | null;
   /** Note của lần resolve đầu, snapshot trước khi bị ghi đè bởi lần resolve sau reopen. */
   previousAdminNote: string | null;
+  progressPctAtFiling?: number | null;
+  instructorResponse?: string | null;
+  instructorRespondedAt?: string | null;
+  instructorDeadlineAt?: string | null;
+  /** Phần giảng viên/nền tảng ĐÃ nhận của giao dịch — để xem trước số tiền khi chọn chế độ trách nhiệm. */
+  instructorEarning?: number | null;
+  platformFee?: number | null;
+  paidAt?: string | null;
+  refundResponsibility?: RefundResponsibility | null;
+  refundInstructorCharge?: number | null;
+  refundPlatformShare?: number | null;
+  refundTransferRef?: string | null;
+  /** Tài khoản nhận hoàn tiền khai báo có cấu trúc — null với khiếu nại cũ. */
+  refundBankCode?: string | null;
+  refundAccountNumber?: string | null;
+  refundAccountHolder?: string | null;
+  refundAccountConfirmed?: boolean;
+  refundReasonCode?: RefundReasonCode | null;
+  refundEvidenceNote?: string | null;
+  appealStatus?: AppealStatus | null;
+  appealReason?: string | null;
+  appealAt?: string | null;
+  appealDecisionNote?: string | null;
 }
 
 export interface ResolveDisputeReq {
   status: 'RESOLVED_REFUNDED' | 'RESOLVED_REJECTED';
   note: string;
+  responsibility?: RefundResponsibility;
+  /** Bắt buộc với chế độ khác Chuẩn; mỗi mã chỉ đi với đúng 1 chế độ. */
+  reasonCode?: RefundReasonCode;
+  /** Bắt buộc với "giảng viên chịu toàn bộ" (tối thiểu 20 ký tự). */
+  evidenceNote?: string;
+}
+
+export type AppealDecision = 'UPHOLD' | 'REDUCE_TO_STANDARD';
+export interface AppealDecideReq {
+  decision: AppealDecision;
+  note: string;
+}
+
+export interface MarkTransferredReq {
+  transferRef: string;
+}
+
+/** Giảng viên xem khiếu nại thuộc khóa của mình — KHÔNG có email/SĐT/STK ngân hàng của học viên. */
+export interface InstructorDisputeRes {
+  id: number;
+  paymentTxnRef: string;
+  courseId: number;
+  courseTitle: string;
+  learnerName: string;
+  amount: number;
+  instructorEarning: number | null;
+  paidAt: string | null;
+  reason: string;
+  description: string | null;
+  category: DisputeCategory | null;
+  eligibility: DisputeEligibility | null;
+  progressPctAtFiling: number | null;
+  status: DisputeStatus;
+  createdAt: string;
+  studentAttachments: DisputeAttachment[];
+  instructorAttachments: DisputeAttachment[];
+  instructorDecision: InstructorDecision | null;
+  instructorResponse: string | null;
+  instructorRespondedAt: string | null;
+  instructorDeadlineAt: string | null;
+  resolvedAt: string | null;
+  /** Số tiền bị trừ khỏi thu nhập của giảng viên nếu đã hoàn tiền. */
+  instructorCharge: number | null;
+  /** Quyết định hoàn tiền: chế độ, mã lý do, ghi chú và minh chứng của admin — giảng viên phải biết vì sao bị trừ. */
+  refundResponsibility?: RefundResponsibility | null;
+  refundReasonCode?: RefundReasonCode | null;
+  refundNote?: string | null;
+  refundEvidenceNote?: string | null;
+  /** Hạn khiếu nại (chỉ khi "giảng viên chịu toàn bộ" và chưa khiếu nại). */
+  appealDeadline?: string | null;
+  appealStatus?: AppealStatus | null;
+  appealReason?: string | null;
+  appealDecisionNote?: string | null;
+}
+
+export interface InstructorRespondReq {
+  decision: 'AGREE_REFUND' | 'OBJECT';
+  response: string;
 }
 
 /** User báo "chưa nhận được tiền" sau khi admin đã đánh dấu hoàn tiền (26/10/2026). */
@@ -970,6 +1121,21 @@ export interface UpdateCouponReq extends CreateCouponReq {
 export interface CouponPreviewReq {
   courseId: number;
   code?: string;
+  /** Học viên tự chọn coupon ở trang thanh toán — chỉ có hiệu lực khi `manualCoupon=true`. */
+  couponId?: number;
+  /** true = chế độ chọn thủ công: BE KHÔNG tự áp coupon autoApply. */
+  manualCoupon?: boolean;
+}
+
+/** Coupon học viên có thể chọn ở trang thanh toán (giảm nhiều nhất xếp trước). */
+export interface AvailableCoupon {
+  id: number;
+  discountType: 'PERCENTAGE' | 'FIXED_AMOUNT';
+  discountValue: number;
+  scopeType: string;
+  endAt: string;
+  savings: number;
+  applicableCourseIds: number[];
 }
 
 export interface CouponPriceRes {
@@ -1165,6 +1331,8 @@ export interface SystemAnnouncement {
   sentCount: number;
   createdByAdminName: string;
   createdAt: string;
+  /** Thời điểm thu hồi (đã ẩn khỏi người dùng); null = còn hiệu lực. */
+  revokedAt: string | null;
 }
 
 /** Banner cố định đầu trang khi có thông báo `severity = 'HIGH'` đang hoạt động — public, không

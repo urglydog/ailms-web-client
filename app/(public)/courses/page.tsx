@@ -5,6 +5,7 @@ import { Suspense, useEffect, useState } from 'react';
 import { SearchX } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { CourseCard } from '@/components/course/CourseCard';
+import { CategoryFeaturedShelf } from '@/components/course/list/CategoryFeaturedShelf';
 import { CourseFilterBar } from '@/components/course/CourseFilterBar';
 import { ActiveFilters } from '@/components/course/list/ActiveFilters';
 import { CourseRowCard } from '@/components/course/list/CourseRowCard';
@@ -157,6 +158,8 @@ function CoursesPageContent() {
           onClear={(key) => setFilters((prev) => clearFilter(prev, key))}
           onClearAll={resetAll}
         />
+
+        {filters.category && !filters.keyword && <CategoryFeaturedShelf categorySlug={filters.category} />}
 
         <section aria-busy={refreshing || isFetchingNextPage}>
           {error && (

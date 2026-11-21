@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { CourseDetailClientRetry } from '@/components/course/CourseDetailClientRetry';
 import { CourseDetailView } from '@/components/course/CourseDetailView';
 import { ApiError } from '@/lib/api/client';
@@ -18,6 +19,40 @@ import { publicCoursesApi } from '@/lib/api/publicCourses';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
+}
+
+/** Cắt mô tả thành đoạn ngắn cho thẻ xem trước khi chia sẻ (bỏ thẻ HTML/markdown đơn giản và khoảng trắng thừa). */
+function summarize(text: string, max = 160): string {
+  const plain = text.replace(/<[^>]*>/g, ' ').replace(/[#*_`>]/g, ' ').replace(/\s+/g, ' ').trim();
+  return plain.length <= max ? plain : `${plain.slice(0, max - 1).trimEnd()}…`;
+}
+
+/**
+ * Thẻ xem trước khi chia sẻ link khóa học lên Facebook/Zalo/X... (11/11/2026, Giai đoạn D) — trước đây trang không có
+ * OpenGraph nên link chia sẻ chỉ hiện tiêu đề chung. Khóa không xem được ẩn danh (riêng tư/chưa xuất bản) trả metadata
+ * trung tính + noindex, không lộ gì về khóa đó. `getBySlug` gọi lại với cùng slug ở trang bên dưới được Next gộp request.
+ */
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  try {
+    const course = await publicCoursesApi.getBySlug(slug);
+    const description = summarize(course.description || course.title);
+    const images = course.thumbnailUrl ? [{ url: course.thumbnailUrl }] : undefined;
+    return {
+      title: course.title,
+      description,
+      alternates: { canonical: `/courses/${slug}` },
+      openGraph: { type: 'website', title: course.title, description, url: `/courses/${slug}`, images },
+      twitter: {
+        card: images ? 'summary_large_image' : 'summary',
+        title: course.title,
+        description,
+        images: images?.map((i) => i.url),
+      },
+    };
+  } catch {
+    return { title: 'Khóa học', robots: { index: false, follow: false } };
+  }
 }
 
 export default async function CourseDetailPage({ params }: PageProps) {

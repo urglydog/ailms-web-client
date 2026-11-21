@@ -1,14 +1,18 @@
+import { useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Client } from '@stomp/stompjs';
+import SockJS from 'sockjs-client';
 import { announcementApi, assignmentApi, messageApi, qaApi } from '@/lib/api/communication';
 import { getAccessToken } from '@/lib/auth/token';
 
 // ==================== Q&A ====================
 
-export function useQaQuestions(params: { courseId?: number; onlyUnanswered?: boolean; page?: number }) {
+export function useQaQuestions(params: { courseId?: number; onlyUnanswered?: boolean; search?: string; sort?: 'newest' | 'oldest'; page?: number }) {
   return useQuery({
-    queryKey: ['qa', 'questions', params.courseId ?? 'all', params.onlyUnanswered ?? false, params.page ?? 0],
+    queryKey: ['qa', 'questions', params.courseId ?? 'all', params.onlyUnanswered ?? false, params.search ?? '', params.sort ?? 'newest', params.page ?? 0],
     queryFn: () => qaApi.listQuestions(params),
     enabled: !!getAccessToken(),
+    placeholderData: (prev) => prev,
   });
 }
 
@@ -72,17 +76,49 @@ export function useConversations() {
     queryKey: ['messages', 'conversations'],
     queryFn: () => messageApi.listConversations(),
     enabled: !!getAccessToken(),
-    refetchInterval: 15000,
+    // Hiệu năng đợt 5: danh sách được làm mới khi có thông báo NEW_MESSAGE qua WebSocket
+    // (NotificationProvider). Polling chỉ còn là lưới an toàn khi socket rớt.
+    refetchInterval: 60000,
   });
 }
 
 export function useConversationMessages(conversationId: number | null) {
+  useConversationSocket(conversationId);
   return useQuery({
     queryKey: ['messages', 'conversation', conversationId],
     queryFn: () => messageApi.getMessages(conversationId as number),
     enabled: !!getAccessToken() && !!conversationId,
-    refetchInterval: 5000,
+    // Hiệu năng đợt 5: tin mới đến qua WebSocket — trước đây mỗi khung chat mở gọi API 5 giây/lần.
+    refetchInterval: 60000,
   });
+}
+
+/**
+ * Nghe `/topic/conversations/{id}` (backend kiểm quyền người trong hội thoại lúc SUBSCRIBE). Có tin
+ * mới thì tải lại hội thoại — không chèn thẳng payload vì field `mine` trong đó tính theo NGƯỜI GỬI,
+ * và tải lại còn đánh dấu đã đọc.
+ */
+function useConversationSocket(conversationId: number | null) {
+  const queryClient = useQueryClient();
+  useEffect(() => {
+    const token = getAccessToken();
+    if (!token || !conversationId) return;
+    const client = new Client({
+      webSocketFactory: () => new SockJS(`${process.env.NEXT_PUBLIC_WS_URL ?? 'http://localhost:8080'}/ws`),
+      connectHeaders: { Authorization: `Bearer ${token}` },
+      reconnectDelay: 3000,
+    });
+    client.onConnect = () => {
+      client.subscribe(`/topic/conversations/${conversationId}`, () => {
+        queryClient.invalidateQueries({ queryKey: ['messages', 'conversation', conversationId] });
+        queryClient.invalidateQueries({ queryKey: ['messages', 'conversations'] });
+      });
+    };
+    client.activate();
+    return () => {
+      client.deactivate();
+    };
+  }, [conversationId, queryClient]);
 }
 
 export function useSendMessage() {

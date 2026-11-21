@@ -15,8 +15,8 @@ describe('ToolCard', () => {
 });
 
 describe('TOOLS', () => {
-  it('có 3 công cụ: Live, Mã giảm giá, Gói khóa học, mỗi công cụ một đường dẫn riêng', () => {
-    expect(TOOLS.map((t) => t.id)).toEqual(['live', 'coupons', 'bundles']);
-    expect(new Set(TOOLS.map((t) => t.href)).size).toBe(3);
+  it('có 4 công cụ: Live, Mã giảm giá, Gói khóa học, Chia sẻ & Quảng bá, mỗi công cụ một đường dẫn riêng', () => {
+    expect(TOOLS.map((t) => t.id)).toEqual(['live', 'coupons', 'bundles', 'share']);
+    expect(new Set(TOOLS.map((t) => t.href)).size).toBe(4);
   });
 });

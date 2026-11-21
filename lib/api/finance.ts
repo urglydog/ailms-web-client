@@ -1,0 +1,109 @@
+import { api, apiBlob } from '@/lib/api/client';
+import { getAccessToken } from '@/lib/auth/token';
+import type {
+  AccountReveal,
+  EditPayoutAccountReq,
+  AdminPayout,
+  ConfirmResult,
+  CourseShare,
+  FinanceSummary,
+  LedgerPage,
+  LinkPayoutAccountReq,
+  PayoutAccount,
+  PayoutBank,
+  PayoutRequest,
+  PayoutStatus,
+} from '@/types/finance';
+
+const token = () => ({ token: getAccessToken() ?? undefined });
+
+/** Thu nhập, tài khoản nhận tiền, rút tiền của giảng viên (11/11/2026, Giai đoạn C). */
+export const financeApi = {
+  summary: () => api.get<FinanceSummary>('/api/v1/instructor/finance/summary', token()),
+
+  /** Sao kê: lọc nhóm loại khoản (EARNING/REFUND/PAYOUT/DEBT/ADJUSTMENT) + khoảng ngày, phân trang phía máy chủ. */
+  ledger: (params: { group?: string; from?: string; to?: string; page?: number; size?: number } = {}) => {
+    const p = new URLSearchParams({ page: String(params.page ?? 0), size: String(params.size ?? 10) });
+    if (params.group && params.group !== 'ALL') p.set('group', params.group);
+    if (params.from) p.set('from', params.from);
+    if (params.to) p.set('to', params.to);
+    return api.get<LedgerPage>(`/api/v1/instructor/finance/ledger?${p.toString()}`, token());
+  },
+
+  banks: () => api.get<PayoutBank[]>('/api/v1/instructor/payout-banks', token()),
+
+  /** BE trả 204 khi chưa có tài khoản → `undefined`; TanStack Query không cho data undefined nên đổi thành null. */
+  account: async (): Promise<PayoutAccount | null> =>
+    (await api.get<PayoutAccount | undefined>('/api/v1/instructor/payout-account', token())) ?? null,
+
+  /** Mọi tài khoản đang dùng hoặc chờ xác nhận, tài khoản mặc định lên đầu. */
+  accounts: () => api.get<PayoutAccount[]>('/api/v1/instructor/payout-accounts', token()),
+
+  editAccount: (id: number, req: EditPayoutAccountReq) =>
+    api.put<PayoutAccount>(`/api/v1/instructor/payout-accounts/${id}`, req, token()),
+
+  setPrimaryAccount: (id: number) =>
+    api.post<PayoutAccount>(`/api/v1/instructor/payout-accounts/${id}/default`, {}, token()),
+
+  removeAccount: (id: number) => api.delete<void>(`/api/v1/instructor/payout-accounts/${id}`, token()),
+
+  /** Đổi tài khoản nhận của yêu cầu rút CHƯA được duyệt. */
+  changePayoutAccount: (payoutId: number, accountId: number) =>
+    api.put<PayoutRequest>(`/api/v1/instructor/payouts/${payoutId}/account`, { accountId }, token()),
+
+  linkAccount: (req: LinkPayoutAccountReq) =>
+    api.post<PayoutAccount>('/api/v1/instructor/payout-account', req, token()),
+
+  /** Xác nhận bằng token trong email (tài khoản nhận tiền hoặc yêu cầu rút). */
+  confirm: (confirmToken: string) =>
+    api.post<ConfirmResult>('/api/v1/instructor/finance/confirm', { token: confirmToken }, token()),
+
+  payouts: () => api.get<PayoutRequest[]>('/api/v1/instructor/payouts', token()),
+
+  /** `idempotencyKey`: sinh 1 lần cho mỗi lần bấm → bấm đúp không tạo 2 yêu cầu. */
+  requestPayout: (amount: number, idempotencyKey: string, accountId?: number) =>
+    api.post<PayoutRequest>('/api/v1/instructor/payouts', { amount, accountId }, {
+      ...token(),
+      headers: { 'Idempotency-Key': idempotencyKey },
+    }),
+
+  cancelPayout: (id: number) => api.post<PayoutRequest>(`/api/v1/instructor/payouts/${id}/cancel`, {}, token()),
+};
+
+/** Admin duyệt/chi/từ chối yêu cầu rút tiền (11/11/2026). */
+export const adminPayoutsApi = {
+  /** Yêu cầu rút cho admin: lọc trạng thái, tìm theo mã yêu cầu/email/tên giảng viên; chỉ lấy {@code size} dòng đầu (tăng size để xem thêm). */
+  list: (status?: PayoutStatus, q = '', size = 30) => {
+    const p = new URLSearchParams({ page: '0', size: String(size) });
+    if (status) p.set('status', status);
+    if (q.trim()) p.set('q', q.trim());
+    return api.get<AdminPayout[]>(`/api/v1/admin/payouts?${p.toString()}`, token());
+  },
+
+  approve: (id: number) => api.post<AdminPayout>(`/api/v1/admin/payouts/${id}/approve`, {}, token()),
+
+  markPaid: (id: number, transferRef: string, proofUrl?: string) =>
+    api.post<AdminPayout>(`/api/v1/admin/payouts/${id}/mark-paid`, { transferRef, proofUrl: proofUrl || undefined }, token()),
+
+  reject: (id: number, reason: string) =>
+    api.post<AdminPayout>(`/api/v1/admin/payouts/${id}/reject`, { reason }, token()),
+
+  markFailed: (id: number, reason: string) =>
+    api.post<AdminPayout>(`/api/v1/admin/payouts/${id}/mark-failed`, { reason }, token()),
+
+  /** Mỗi lần xem số tài khoản đầy đủ đều được BE ghi nhật ký. */
+  reveal: (id: number) => api.get<AccountReveal>(`/api/v1/admin/payouts/${id}/account`, token()),
+
+  exportCsv: () => apiBlob('/api/v1/admin/payouts/export.csv'),
+};
+
+/** Khóa của giảng viên + mã giới thiệu + đơn theo nguồn (11/11/2026, Giai đoạn D). `from`/`to` dạng YYYY-MM-DD, bỏ trống = toàn thời gian. */
+export const shareApi = {
+  courses: (from?: string, to?: string) => {
+    const params = new URLSearchParams();
+    if (from) params.set('from', from);
+    if (to) params.set('to', to);
+    const query = params.toString();
+    return api.get<CourseShare[]>(`/api/v1/instructor/share/courses${query ? `?${query}` : ''}`, token());
+  },
+};

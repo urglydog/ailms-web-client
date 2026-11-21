@@ -43,10 +43,12 @@ export interface PageRes<T> {
 }
 
 export const qaApi = {
-  listQuestions: (params: { courseId?: number; onlyUnanswered?: boolean; page?: number }) => {
+  listQuestions: (params: { courseId?: number; onlyUnanswered?: boolean; search?: string; sort?: 'newest' | 'oldest'; page?: number }) => {
     const qs = new URLSearchParams();
     if (params.courseId) qs.set('courseId', String(params.courseId));
     if (params.onlyUnanswered) qs.set('onlyUnanswered', 'true');
+    if (params.search?.trim()) qs.set('search', params.search.trim());
+    if (params.sort) qs.set('sort', params.sort);
     qs.set('page', String(params.page ?? 0));
     return api.get<PageRes<QaQuestion>>(`/api/v1/instructor/qa/questions?${qs.toString()}`, { token: authToken() });
   },

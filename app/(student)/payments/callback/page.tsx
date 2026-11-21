@@ -1,12 +1,14 @@
 'use client';
 
 import { Suspense, useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { toast } from 'sonner';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { paymentsApi } from '@/lib/api/payments';
+import { flagPayosCancelledNotice, takePayosReturn } from '@/lib/payosReturn';
 import Link from 'next/link';
 
 function PayosReturnContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
 
   useEffect(() => {
@@ -23,15 +25,26 @@ function PayosReturnContent() {
 
     if ((customStatus === 'success' || customStatus === 'PAID') && !isCancelled) {
       setStatus('success');
-      toast.success('Thanh toán thành công! Hệ thống đang xử lý ghi danh.');
       
       // Ở đây LUÔN KHÔNG GỌI /ipn-mock vì chúng ta phải tuân thủ nguyên tắc chạy thật.
       // Database sẽ được update khi Backend nhận được webhook thực sự từ PayOS.
     } else {
       setStatus('error');
-      toast.error('Thanh toán thất bại hoặc bị hủy!');
+      // Báo BE đánh dấu đơn PENDING của chính mình là FAILED (best-effort — lỗi không chặn UI), rồi
+      // đưa học viên về thẳng trang thanh toán, bỏ qua trang PayOS trong lịch sử (xem lib/payosReturn).
+      const ret = takePayosReturn();
+      paymentsApi.cancel(orderCode).catch(() => {}).finally(() => {
+        if (!ret) return; // không biết quay về đâu (mở trực tiếp) — giữ thẻ kết quả để bấm nút.
+        flagPayosCancelledNotice();
+        // Lịch sử đúng như dự kiến [Checkout, PayOS, Callback] → lùi 2 bước; lệch thì chuyển thẳng.
+        if (window.history.length === ret.historyLength + 2) {
+          window.history.go(-2);
+        } else {
+          router.replace(ret.url);
+        }
+      });
     }
-  }, [searchParams]);
+  }, [searchParams, router]);
 
   return (
     <div className="shell flex min-h-[60vh] flex-col items-center justify-center py-20 text-center">

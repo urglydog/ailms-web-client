@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import { Flame, Settings, Share2 } from 'lucide-react';
@@ -40,7 +39,8 @@ export function ProfileBanner({
       <div className="shell flex flex-col gap-6 py-8 md:flex-row md:items-center">
         <div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-full bg-accent font-display text-4xl font-bold text-white">
           {avatarUrl ? (
-            <Image src={avatarUrl} alt="" width={96} height={96} className="h-full w-full object-cover" />
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={avatarUrl} alt="" className="h-full w-full object-cover" />
           ) : (
             fullName.charAt(0).toUpperCase()
           )}

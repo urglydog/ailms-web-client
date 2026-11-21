@@ -65,6 +65,10 @@ export async function handleGoogleSuccess(credentialResponse: GoogleCredentialRe
       console.error('Lỗi giải mã token lúc đăng nhập Google:', e);
     }
 
+    // `?next=` (chỉ nhận đường dẫn nội bộ, chặn `//host` và `/\\host` — open redirect)
+    const next = new URLSearchParams(window.location.search).get('next');
+    if (next && /^\/(?![/\\])/.test(next)) targetUrl = next;
+
     toast.success('Đăng nhập thành công!');
     setTimeout(() => {
       window.location.href = targetUrl;

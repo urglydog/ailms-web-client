@@ -104,7 +104,9 @@ function redirectToLoginWithReason(reason: string | null) {
       /* Safari riêng tư chặn sessionStorage — bỏ qua, chỉ mất phần thông báo lý do */
     }
   }
-  window.location.href = '/login';
+  // Kèm `next` để đăng nhập xong quay lại đúng trang đang làm dở (thanh toán, xác nhận email...).
+  const here = window.location.pathname + window.location.search;
+  window.location.href = here.startsWith('/login') ? '/login' : `/login?next=${encodeURIComponent(here)}`;
 }
 
 /**
@@ -169,13 +171,19 @@ async function fetchWithRefresh(
             processQueue(new Error('Refresh failed'));
             localStorage.removeItem('accessToken');
             localStorage.removeItem('refreshToken');
-            redirectToLoginWithReason(reason);
+            // Trang công khai (xem khóa học qua link/QR chia sẻ) KHÔNG cần đăng nhập: token cũ còn sót
+            // trên thiết bị (vd điện thoại) chỉ cần dọn đi, không được đẩy khách về /login kèm
+            // "refresh token hết hạn".
+            const p = window.location.pathname;
+            const isPublicPage = p === '/' || p.startsWith('/courses') || p.startsWith('/legal');
+            if (!isPublicPage) redirectToLoginWithReason(reason);
           }
         } catch (err) {
+          // Lỗi MẠNG khi refresh (vd "Failed to fetch" lúc BE đang khởi động lại / mất mạng thoáng
+          // qua) KHÔNG có nghĩa phiên hết hạn — không được xoá token/đẩy về /login, chỉ để yêu cầu
+          // này thất bại; lần gọi sau sẽ tự thử refresh lại. Chỉ khi BE TRẢ LỜI từ chối refresh
+          // (nhánh `!refreshRes.ok` ở trên) mới đăng xuất.
           processQueue(err as Error);
-          localStorage.removeItem('accessToken');
-          localStorage.removeItem('refreshToken');
-          redirectToLoginWithReason(null);
         } finally {
           isRefreshing = false;
         }

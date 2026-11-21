@@ -14,6 +14,8 @@ import { useModerationQueue } from '@/hooks/useCourses';
 import { getCurrentRole, getAccessToken } from '@/lib/auth/token';
 import { activeAdminItem } from '@/lib/admin/nav';
 import { disputesApi } from '@/lib/api/disputes';
+import { adminPayoutsApi } from '@/lib/api/finance';
+import { adminPromotionsApi } from '@/lib/api/promotions';
 import { supportApi } from '@/lib/api/support';
 
 const COLLAPSED_KEY = 'admin-sidebar-collapsed';
@@ -74,13 +76,37 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const { data: pendingPage } = useModerationQueue({ status: 'PENDING', size: 1 });
   const pendingCourses = pendingPage?.totalElements ?? 0;
 
-  const { data: openDisputesList } = useQuery({
+  // Khiếu nại CẦN ADMIN LÀM GÌ ĐÓ: chưa xử lý/mở lại, đã duyệt hoàn nhưng chưa chuyển tiền, hoặc giảng viên khiếu nại quyết định đang chờ.
+  // Chỉ lấy SỐ ĐẾM từ máy chủ (trước đây tải toàn bộ khiếu nại mỗi 30 giây rồi đếm ở trình duyệt).
+  const { data: openDisputeCount } = useQuery({
     queryKey: ['admin', 'disputes', 'open-count'],
-    queryFn: () => disputesApi.listAllAdmin('OPEN'),
+    queryFn: () => disputesApi.openCount(),
     enabled: !!getAccessToken(),
     refetchInterval: 30000,
   });
-  const openDisputes = openDisputesList?.length ?? 0;
+  const openDisputes = openDisputeCount?.open ?? 0;
+
+  // Yêu cầu rút: chờ duyệt (REQUESTED) + đã duyệt chờ chi (APPROVED). Quảng bá: chờ duyệt.
+  const { data: requestedPayouts } = useQuery({
+    queryKey: ['admin', 'payouts', 'open-count', 'REQUESTED'],
+    queryFn: () => adminPayoutsApi.list('REQUESTED', '', 100),
+    enabled: !!getAccessToken(),
+    refetchInterval: 30000,
+  });
+  const { data: approvedPayouts } = useQuery({
+    queryKey: ['admin', 'payouts', 'open-count', 'APPROVED'],
+    queryFn: () => adminPayoutsApi.list('APPROVED', '', 100),
+    enabled: !!getAccessToken(),
+    refetchInterval: 30000,
+  });
+  const openPayouts = (requestedPayouts?.length ?? 0) + (approvedPayouts?.length ?? 0);
+  const { data: requestedPromotions } = useQuery({
+    queryKey: ['admin', 'promotions', 'open-count'],
+    queryFn: () => adminPromotionsApi.list('REQUESTED'),
+    enabled: !!getAccessToken(),
+    refetchInterval: 30000,
+  });
+  const openPromotions = requestedPromotions?.length ?? 0;
 
   const { data: openSupportCount } = useQuery({
     queryKey: ['admin', 'support', 'open-count'],
@@ -95,8 +121,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <div className="flex min-h-dvh bg-surface font-sans text-ink">
-      <AdminSidebar pathname={pathname} collapsed={collapsed} onToggleCollapsed={toggleCollapsed} pendingCourses={pendingCourses} openDisputes={openDisputes} openSupport={openSupport} />
-      <AdminNavDrawer open={mobileNavOpen} onClose={closeMobileNav} pathname={pathname} pendingCourses={pendingCourses} openDisputes={openDisputes} openSupport={openSupport} />
+      <AdminSidebar pathname={pathname} collapsed={collapsed} onToggleCollapsed={toggleCollapsed} pendingCourses={pendingCourses} openDisputes={openDisputes} openSupport={openSupport} openPayouts={openPayouts} openPromotions={openPromotions} />
+      <AdminNavDrawer open={mobileNavOpen} onClose={closeMobileNav} pathname={pathname} pendingCourses={pendingCourses} openDisputes={openDisputes} openSupport={openSupport} openPayouts={openPayouts} openPromotions={openPromotions} />
 
       <div className="flex min-w-0 flex-1 flex-col">
         <AdminTopbar

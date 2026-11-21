@@ -2,10 +2,13 @@
 
 import { Modal } from '@/components/ui/Modal';
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { ColumnsIcon, ListIcon } from '@/components/instructor/SidebarIcons';
 import { CourseFilterDropdown } from '@/components/instructor/communication/CourseFilterDropdown';
+import { ListSearch } from '@/components/ui/ListSearch';
+import { Pager } from '@/components/ui/SearchPanel';
+import { useDebounce } from '@/hooks/useDebounce';
 import { useInstructorCourseOptions } from '@/hooks/useDashboard';
 import { useQaQuestions, useQaThread, useReplyToQuestion } from '@/hooks/useCommunication';
 import { Avatar } from '@/components/ui/Avatar';
@@ -28,15 +31,18 @@ export default function InstructorQaPage() {
   const [showSortMenu, setShowSortMenu] = useState(false);
 
   const { data: courses } = useInstructorCourseOptions();
+  const [page, setPage] = useState(0);
+  const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search, 350);
+  // Tìm kiếm, lọc "chưa trả lời" và sắp xếp đều chạy ở máy chủ nên đúng trên mọi trang (20 câu/trang).
   const { data: questionsPage, isLoading } = useQaQuestions({
     courseId: courseId || undefined,
     onlyUnanswered,
+    search: debouncedSearch,
+    sort,
+    page,
   });
-
-  const questions = useMemo(() => {
-    const list = questionsPage?.content ?? [];
-    return sort === 'newest' ? list : [...list].reverse();
-  }, [questionsPage, sort]);
+  const questions = questionsPage?.content ?? [];
 
   const selectedInDoubleView = viewMode === 'double' ? activeQuestionId : null;
 
@@ -45,7 +51,8 @@ export default function InstructorQaPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="m-0 font-display text-[20px] font-bold text-ink">{t('qa.title')}</h1>
         <div className="flex items-center gap-2">
-          <CourseFilterDropdown courses={courses ?? []} value={courseId} onChange={setCourseId} />
+          <ListSearch label="Tìm câu hỏi" value={search} onChange={(v) => { setSearch(v); setPage(0); }} placeholder="Tìm câu hỏi: học viên, bài học, khóa học, nội dung..." />
+          <CourseFilterDropdown courses={courses ?? []} value={courseId} onChange={(v) => { setCourseId(v); setPage(0); }} />
 
           <div className="relative">
             <button
@@ -63,7 +70,7 @@ export default function InstructorQaPage() {
                     <button
                       key={option}
                       type="button"
-                      onClick={() => { setSort(option); setShowSortMenu(false); }}
+                      onClick={() => { setSort(option); setPage(0); setShowSortMenu(false); }}
                       className={`block w-full px-3 py-1.5 text-left text-[12.5px] hover:bg-surface ${sort === option ? 'font-bold text-accent-dark' : 'text-ink'}`}
                     >
                       {option === 'newest' ? t('qa.newest') : t('qa.oldest')}
@@ -101,7 +108,10 @@ export default function InstructorQaPage() {
         <input
           type="checkbox"
           checked={onlyUnanswered}
-          onChange={(e) => setOnlyUnanswered(e.target.checked)}
+          onChange={(e) => {
+            setOnlyUnanswered(e.target.checked);
+            setPage(0);
+          }}
           className="accent-cyan-600"
         />
         {t('qa.onlyUnanswered')}
@@ -155,6 +165,9 @@ export default function InstructorQaPage() {
             </div>
             <QaThreadPanel questionId={activeQuestionId} />
           </Modal>
+      )}
+      {!isLoading && questionsPage && questionsPage.totalPages > 1 && (
+        <Pager page={page} totalPages={questionsPage.totalPages} total={questionsPage.totalElements} onPage={setPage} />
       )}
     </>
   );

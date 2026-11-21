@@ -11,14 +11,17 @@ import { BillingForm } from '@/components/checkout/BillingForm';
 import { plainSummary } from '@/lib/text/richText';
 import { CheckoutSteps } from '@/components/checkout/CheckoutSteps';
 import { CouponBox } from '@/components/checkout/CouponBox';
+import { CouponPicker } from '@/components/checkout/CouponPicker';
 import { OrderTotals } from '@/components/checkout/OrderTotals';
 import { PayosButton } from '@/components/checkout/PayosButton';
 import { publicCoursesApi } from '@/lib/api/publicCourses';
 import { couponsApi } from '@/lib/api/coupons';
 import { ApiError } from '@/lib/api/client';
 import { paymentsApi } from '@/lib/api/payments';
+import { rememberPayosReturn, takePayosCancelledNotice } from '@/lib/payosReturn';
+import { useRequireLogin } from '@/hooks/useRequireLogin';
 import { getReferralCode } from '@/lib/referral';
-import type { CourseDetail } from '@/types/domain';
+import type { AvailableCoupon, CourseDetail } from '@/types/domain';
 
 function Spinner() {
   return (
@@ -35,10 +38,24 @@ function CheckoutPageContent() {
   const params = useParams();
   const searchParams = useSearchParams();
   const courseSlug = decodeURIComponent(params.slug as string);
+  useRequireLogin();
 
   const [course, setCourse] = useState<CourseDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [payingMethod, setPayingMethod] = useState<string | null>(null);
+
+  // Bấm Back từ trang PayOS: trình duyệt khôi phục trang này từ bfcache với `payingMethod` còn
+  // nguyên → nút PayOS quay mãi, không bấm được. Reset khi trang được hiện lại.
+  useEffect(() => {
+    const notifyCancelled = () => { if (takePayosCancelledNotice()) toast.info('Đã hủy thanh toán.'); };
+    notifyCancelled();
+    const onPageShow = (e: PageTransitionEvent) => {
+      if (e.persisted) setPayingMethod(null);
+      notifyCancelled();
+    };
+    window.addEventListener('pageshow', onPageShow);
+    return () => window.removeEventListener('pageshow', onPageShow);
+  }, []);
 
   const [billingName, setBillingName] = useState('');
   const [billingPhone, setBillingPhone] = useState('');
@@ -51,6 +68,11 @@ function CheckoutPageContent() {
   const [appliedCode, setAppliedCode] = useState<string | null>(null);
   const [preview, setPreview] = useState<{ finalPrice: number; discountPercent: number | null } | null>(null);
   const [applying, setApplying] = useState(false);
+  // Khuyến mãi học viên TỰ CHỌN (không áp ngầm): undefined = chưa quyết định (sẽ chọn sẵn mức giảm
+  // nhiều nhất khi tải xong), null = chủ động không dùng.
+  const [availableCoupons, setAvailableCoupons] = useState<AvailableCoupon[]>([]);
+  const [couponsLoading, setCouponsLoading] = useState(true);
+  const [selectedCouponId, setSelectedCouponId] = useState<number | null | undefined>(undefined);
 
   useEffect(() => {
     if (!courseSlug) return;
@@ -67,6 +89,31 @@ function CheckoutPageContent() {
   }, [courseSlug, router]);
 
   useEffect(() => {
+    if (!course) return;
+    setCouponsLoading(true);
+    couponsApi.available([course.id])
+      .then((list) => {
+        setAvailableCoupons(list);
+        setSelectedCouponId((prev) => (prev === undefined ? (list[0]?.id ?? null) : prev));
+      })
+      .catch(() => setSelectedCouponId((prev) => (prev === undefined ? null : prev)))
+      .finally(() => setCouponsLoading(false));
+  }, [course]);
+
+  // Tính lại giá mỗi khi đổi khuyến mãi đã chọn hoặc mã nhập tay.
+  useEffect(() => {
+    if (!course || selectedCouponId === undefined) return;
+    couponsApi.preview({
+      courseId: course.id,
+      code: appliedCode ?? undefined,
+      couponId: selectedCouponId ?? undefined,
+      manualCoupon: true,
+    })
+      .then((r) => setPreview({ finalPrice: r.finalPrice, discountPercent: r.discountPercent }))
+      .catch(() => setPreview(null));
+  }, [course, selectedCouponId, appliedCode]);
+
+  useEffect(() => {
     const preset = searchParams.get('coupon');
     if (preset && course && !appliedCode) {
       void applyCoupon(preset);
@@ -79,7 +126,12 @@ function CheckoutPageContent() {
     if (!trimmed || !course) return;
     setApplying(true);
     try {
-      const result = await couponsApi.preview({ courseId: course.id, code: trimmed });
+      const result = await couponsApi.preview({
+        courseId: course.id,
+        code: trimmed,
+        couponId: selectedCouponId ?? undefined,
+        manualCoupon: true,
+      });
       if (!result.enteredCodeValid) {
         toast.error(t('coupon.invalidOne'));
         return;
@@ -94,7 +146,7 @@ function CheckoutPageContent() {
     }
   };
 
-  const finalPrice = preview?.finalPrice ?? course?.finalPrice ?? course?.price ?? 0;
+  const finalPrice = preview?.finalPrice ?? course?.price ?? 0;
 
   const handlePay = async (method: string) => {
     if (!course) return;
@@ -106,9 +158,12 @@ function CheckoutPageContent() {
         billingName,
         billingPhone,
         couponCode: appliedCode ?? undefined,
+        couponId: selectedCouponId ?? undefined,
+        manualCoupon: true,
         courseAccessPassword: course.requiresPassword ? courseAccessPassword : undefined,
         referralCode: getReferralCode(course.id),
       });
+      rememberPayosReturn();
       window.location.href = res.paymentUrl;
     } catch (err: unknown) {
       // BUG THẬT (25/09/2026): `ApiError` không có field `.detail` (chỉ có `.message`, xem
@@ -180,7 +235,13 @@ function CheckoutPageContent() {
               <h2 className="mb-4 font-display text-lg font-bold text-ink">{t('summary.title')}</h2>
               <OrderTotals count={1} original={course.price} total={finalPrice} />
 
-              <div className="my-4 border-t border-line-soft pt-4">
+              <div className="my-4 flex flex-col gap-4 border-t border-line-soft pt-4">
+                <CouponPicker
+                  coupons={availableCoupons}
+                  loading={couponsLoading}
+                  selectedId={selectedCouponId ?? null}
+                  onSelect={setSelectedCouponId}
+                />
                 <CouponBox
                   value={couponCode}
                   appliedCode={appliedCode}
@@ -189,7 +250,6 @@ function CheckoutPageContent() {
                   onApply={() => void applyCoupon(couponCode)}
                   onRemove={() => {
                     setAppliedCode(null);
-                    setPreview(null);
                   }}
                 />
               </div>
