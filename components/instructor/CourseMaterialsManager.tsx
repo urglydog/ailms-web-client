@@ -1230,6 +1230,8 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
   const [durationMinutes, setDurationMinutes] = useState<string>(quiz.durationMinutes ? String(quiz.durationMinutes) : '15');
   const [allowReview, setAllowReview] = useState<boolean>(quiz.allowReview ?? true);
   const [isProctored, setIsProctored] = useState<boolean>(quiz.isProctored ?? false);
+  // Loại bài: Quick Check bỏ qua giờ làm bài, số lượt và giám sát; Thi chính thức áp dụng đủ các cấu hình bên dưới.
+  const [quizTypeChoice, setQuizTypeChoice] = useState<'LECTURE_QUIZ' | 'OFFICIAL_EXAM'>(quiz.quizType === 'LECTURE_QUIZ' ? 'LECTURE_QUIZ' : 'OFFICIAL_EXAM');
   const [maxViolations, setMaxViolations] = useState<string>(quiz.maxViolations ? String(quiz.maxViolations) : '3');
   const [startTime, setStartTime] = useState<string>(quiz.startTime ? quiz.startTime.substring(0, 16) : '');
   const [endTime, setEndTime] = useState<string>(quiz.endTime ? quiz.endTime.substring(0, 16) : '');
@@ -1298,7 +1300,8 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
       endTime: endTime ? endTime + ":00" : null,
       allowReview,
       isProctored,
-      maxViolations: viol
+      maxViolations: viol,
+      quizType: quizTypeChoice,
     });
   };
 
@@ -1315,6 +1318,26 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
             )}
           </div>
           <p className="text-sm text-ink-muted mt-1">Quản lý thời gian, số lượt làm bài, sinh đề ngẫu nhiên và tính năng giám sát</p>
+          <div role="group" aria-label="Loại bài" className="mt-3 flex flex-wrap items-center gap-2">
+            {([['LECTURE_QUIZ', 'Quick Check'], ['OFFICIAL_EXAM', 'Thi chính thức']] as const).map(([value, label]) => (
+              <button
+                key={value}
+                type="button"
+                aria-pressed={quizTypeChoice === value}
+                onClick={() => setQuizTypeChoice(value)}
+                className={`rounded-full px-3.5 py-1.5 text-[13px] font-semibold ${quizTypeChoice === value ? 'bg-accent text-white' : 'border border-line bg-surface-raised text-ink-muted hover:text-ink'}`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          {quizTypeChoice === 'LECTURE_QUIZ' ? (
+            <p className="mt-2 max-w-xl text-xs text-ink-muted">
+              Quick Check không áp dụng giờ làm bài, số lượt và giám sát; học viên xem đáp án ngay sau mỗi câu. Chọn Thi chính thức để các cấu hình bên dưới có hiệu lực.
+            </p>
+          ) : (
+            <p className="mt-2 max-w-xl text-xs text-ink-muted">Bài đã có học viên làm sẽ không đổi được loại. Nhấn Lưu Cấu Hình để áp dụng.</p>
+          )}
         </div>
         <button
           onClick={handleSave}
@@ -1570,6 +1593,7 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
       difficultyLevel,
       quantityLevel,
       language,
+      quizType: materialType === 'QUIZ' ? quizType : undefined,
       // Pass the template to backend if needed (e.g. via metadata or extra param)
       extraConfig: materialType === 'MINDMAP' ? { mapTemplate } : undefined,
     });
