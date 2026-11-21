@@ -19,6 +19,8 @@ export interface MaterialGenerationReq {
   customLessonIds?: number[];
   quantityLevel?: string;
   difficultyLevel?: string;
+  /** Chỉ dùng khi tạo Quiz: Thi chính thức chỉ được nhận từ giảng viên của khóa học, còn lại là Quick Check. */
+  quizType?: 'LECTURE_QUIZ' | 'OFFICIAL_EXAM';
   extraConfig?: Record<string, unknown>;
 }
 
