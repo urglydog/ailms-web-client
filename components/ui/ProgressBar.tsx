@@ -17,6 +17,7 @@ const TRACK: Record<Tone, string> = {
 const FILL: Record<Tone, string> = {
   accent: 'bg-accent',
   success: 'bg-success',
+  // eslint-disable-next-line no-restricted-syntax -- thanh tiến độ trắng nằm trên nền accent
   onAccent: 'bg-white',
 };
 

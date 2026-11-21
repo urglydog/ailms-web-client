@@ -277,11 +277,11 @@ function SuccessScreen() {
   return (
     <div className="fixed inset-0 z-40 flex flex-col items-center justify-center gap-5 bg-surface-raised px-4 text-center">
       <div className="success-circle flex h-24 w-24 items-center justify-center rounded-full bg-success/10">
-        <svg width="52" height="52" viewBox="0 0 24 24" fill="none">
+        <svg width="52" height="52" viewBox="0 0 24 24" fill="none" className="text-success">
           <path
             className="success-check"
             d="M5 13l4 4L19 7"
-            stroke="#16A34A"
+            stroke="currentColor"
             strokeWidth="2.5"
             strokeLinecap="round"
             strokeLinejoin="round"

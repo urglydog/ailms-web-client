@@ -263,7 +263,7 @@ export function LessonEditorRow({
                   type="button"
                   draggable={false}
                   onClick={onManageVideo}
-                  className="mt-0.5 inline-flex items-center gap-1 text-[11.5px] font-semibold text-purple-700 dark:text-purple-300 hover:underline"
+                  className="mt-0.5 inline-flex items-center gap-1 text-[11.5px] font-semibold text-accent-dark hover:underline"
                 >
                   <PencilIcon className="h-3 w-3" /> Chỉnh sửa nội dung
                 </button>
@@ -274,7 +274,7 @@ export function LessonEditorRow({
                     type="button"
                     draggable={false}
                     onClick={() => setShowPreviewMenu((v) => !v)}
-                    className="flex items-center gap-1 rounded-lg bg-purple-600 px-3 py-1.5 text-[12px] font-bold text-white hover:bg-purple-700"
+                    className="flex items-center gap-1 rounded-lg bg-accent px-3 py-1.5 text-[12px] font-bold text-white hover:bg-accent-dark"
                   >
                     Xem trước <ChevronDownIcon className="h-3.5 w-3.5" expanded={showPreviewMenu} />
                   </button>
@@ -316,7 +316,7 @@ export function LessonEditorRow({
             type="button"
             draggable={false}
             onClick={() => setShowDescriptionPanel((v) => !v)}
-            className="self-start rounded-full border border-line px-3 py-1.5 text-[12px] font-bold text-purple-700 dark:text-purple-300 hover:bg-tint transition-colors"
+            className="self-start rounded-full border border-line px-3 py-1.5 text-[12px] font-bold text-accent-dark hover:bg-tint transition-colors"
           >
             + Sự miêu tả
           </button>
@@ -363,7 +363,7 @@ export function LessonEditorRow({
             type="button"
             draggable={false}
             onClick={() => setShowResourcePanel((v) => !v)}
-            className="self-start rounded-full border border-line px-3 py-1.5 text-[12px] font-bold text-purple-700 dark:text-purple-300 hover:bg-tint transition-colors"
+            className="self-start rounded-full border border-line px-3 py-1.5 text-[12px] font-bold text-accent-dark hover:bg-tint transition-colors"
           >
             + Tài nguyên
           </button>
@@ -373,7 +373,7 @@ export function LessonEditorRow({
             type="button"
             draggable={false}
             onClick={() => setShowAssignmentPanel((v) => !v)}
-            className="self-start rounded-full border border-line px-3 py-1.5 text-[12px] font-bold text-purple-700 dark:text-purple-300 hover:bg-tint transition-colors"
+            className="self-start rounded-full border border-line px-3 py-1.5 text-[12px] font-bold text-accent-dark hover:bg-tint transition-colors"
           >
             + Bài tập
           </button>

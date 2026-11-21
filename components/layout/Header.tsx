@@ -337,21 +337,22 @@ export function Header() {
             )}
 
             {/* Đã đăng nhập: đổi giao diện trong menu avatar; khách: nút riêng ở đây */}
-            {!isLoggedIn && <ThemeToggle />}
+            {!isLoggedIn && <ThemeToggle className="hidden sm:flex" />}
 
             {/* Trợ giúp & Hỗ trợ (05/11/2026) — icon "?" luôn hiện, kể cả khách chưa đăng nhập (vd quên mật khẩu) */}
             <Link
               href="/help"
               aria-label={t('help')}
               title={t('help')}
-              className="relative flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-surface text-ink hover:bg-surface-hover"
+              className="relative hidden sm:flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-surface text-ink hover:bg-surface-hover"
             >
               <CircleHelp size={17} aria-hidden />
             </Link>
 
             {/* Wishlist Icon + dropdown xem nhanh (14/09/2026, mở rộng ngoài đặc tả gốc) */}
+            {/* Dưới 640px: trợ giúp, yêu thích, đổi giao diện chuyển vào ngăn kéo để header không tràn (UI v2, A6) */}
             <div
-              className="relative"
+              className="relative hidden sm:block"
               onMouseEnter={() => headerDropdown.openNow('wishlist')}
               onMouseLeave={() => headerDropdown.closeWithDelay('wishlist')}
             >
@@ -520,7 +521,7 @@ export function Header() {
                 </Link>
                 <Link
                   href="/register"
-                  className="btn-tactile cursor-pointer whitespace-nowrap rounded-md bg-accent px-4 py-2 text-[13.5px] font-semibold text-white no-underline hover:bg-accent-dark hover:text-white"
+                  className="btn-tactile hidden sm:inline-block cursor-pointer whitespace-nowrap rounded-md bg-accent px-4 py-2 text-[13.5px] font-semibold text-white no-underline hover:bg-accent-dark hover:text-white"
                 >
                   {t('auth.getStarted')}
                 </Link>

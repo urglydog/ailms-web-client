@@ -18,7 +18,7 @@ export function CourseRow({ course }: { course: EnrolledCourse }) {
     <div
       className="group relative grid grid-cols-[88px_minmax(0,1fr)_auto] items-center gap-4 rounded-card border border-line bg-surface-raised p-2.5
                  transition-[transform,box-shadow,border-color] duration-200 ease-soft
-                 hover:-translate-y-0.5 hover:border-accent hover:shadow-card-hover
+                 hover:border-accent hover:shadow-card-hover
                  has-[.cert-link:hover]:translate-y-0 has-[.cert-link:hover]:border-line has-[.cert-link:hover]:shadow-none"
     >
       <CourseThumb thumbnailUrl={course.thumbnailUrl} title={course.courseTitle} className="aspect-[16/10] rounded-md" />

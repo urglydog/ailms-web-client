@@ -24,6 +24,7 @@ function Switch({ checked, onChange, label }: { checked: boolean; onChange: (v: 
       onClick={() => onChange(!checked)}
       className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${checked ? 'bg-accent' : 'bg-line-dot'}`}
     >
+      {/* eslint-disable-next-line no-restricted-syntax -- núm công tắc luôn trắng */}
       <span aria-hidden className={`inline-block h-5 w-5 rounded-full bg-white shadow transition-transform ${checked ? 'translate-x-5' : 'translate-x-0.5'}`} />
     </button>
   );

@@ -14,8 +14,6 @@ import { fillMissingDaysMulti, formatShortDate } from '@/lib/instructorInsights'
 import { formatMoney as formatMoneyIn } from '@/lib/shop/money';
 import type { PerformanceRange } from '@/lib/api/dashboard';
 
-const COLOR_ORGANIC = '#059669';
-const COLOR_REFERRAL = '#0891b2';
 
 type Mode = 'preset' | 'custom';
 
@@ -39,6 +37,9 @@ function daysAgoIso(days: number): string {
 export default function RevenuePage() {
   // Lưới/trục/tooltip theo theme sáng-tối (thuộc tính SVG không nhận biến CSS).
   const palette = useThemeColors();
+  // UI v2: màu chuỗi biểu đồ lấy từ token (đổi theo sáng/tối) thay vì mã hex cứng.
+  const COLOR_ORGANIC = palette.success;
+  const COLOR_REFERRAL = palette.accent;
   const t = useTranslations('instructor.perf');
   const locale = useLocale();
   const formatMoney = (value: number) => formatMoneyIn(value, locale);
@@ -258,7 +259,7 @@ export default function RevenuePage() {
                       formatter={(value) => [formatMoney(Number(value ?? 0)), t('list.chart.cumulative')]}
                       labelFormatter={(label) => t('list.chart.day', { date: formatShortDate(String(label ?? '')) })}
                     />
-                    <Area type="monotone" dataKey="total" stroke="#7c3aed" fill="#7c3aed" fillOpacity={0.12} />
+                    <Area type="monotone" dataKey="total" stroke={palette.accent} fill={palette.accent} fillOpacity={0.12} />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
