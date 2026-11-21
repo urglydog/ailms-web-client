@@ -91,9 +91,9 @@ export default function InstructorGradebookPage() {
             <div className="text-xs font-bold uppercase tracking-wider text-ink-muted">Tỷ lệ Đạt (Pass Rate)</div>
             <div className="text-3xl font-extrabold text-warning mt-2">{gradebook.passRatePercentage}%</div>
           </div>
-          <div className="card p-6 border-l-4 border-purple-500">
+          <div className="card p-6 border-l-4 border-accent">
             <div className="text-xs font-bold uppercase tracking-wider text-ink-muted">Tổng số lượt làm bài</div>
-            <div className="text-3xl font-extrabold text-purple-600 dark:text-purple-300 mt-2">{gradebook.totalAttempts} <span className="text-sm font-normal text-ink-muted">lượt</span></div>
+            <div className="text-3xl font-extrabold text-accent-dark mt-2">{gradebook.totalAttempts} <span className="text-sm font-normal text-ink-muted">lượt</span></div>
           </div>
         </div>
 

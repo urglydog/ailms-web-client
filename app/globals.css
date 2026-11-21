@@ -3,9 +3,35 @@
 @tailwind utilities;
 
 @layer base {
+  /* Token chuyển động (UI v2) — cùng giá trị với app mobile, xem doc/feat/uiux/DESIGN_RULES_Web_Mobile.md mục 4. */
+  :root {
+    --dur-fast: 120ms;
+    --dur-base: 200ms;
+    --dur-slow: 320ms;
+    --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+    --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  }
+
+  /* Đổi sáng/tối: tắt transition trong 1 frame để mọi thứ đổi màu cùng lúc, không nhấp nháy từng phần. */
+  .no-transitions,
+  .no-transitions *,
+  .no-transitions *::before,
+  .no-transitions *::after {
+    transition: none !important;
+  }
+
   html {
     font-size: 14px;
     -webkit-text-size-adjust: 100%;
+  }
+
+  /* iOS tự phóng to khi chạm ô nhập có chữ < 16px (UI v2, A7). Chỉ áp ở màn hẹp để không đổi bố cục desktop. */
+  @media (max-width: 639px) {
+    input:not([type='checkbox']):not([type='radio']):not([type='range']),
+    select,
+    textarea {
+      font-size: 16px !important;
+    }
   }
 
   body {
@@ -48,15 +74,15 @@
     @apply rounded-lg border border-line bg-surface-raised;
   }
 
-  /* Thẻ tương tác: nâng 4px + bóng mềm khi hover (spec mục 9). Chỉ động transform/shadow/viền. */
+  /* Thẻ tương tác (UI v2): KHÔNG nâng thẻ nữa — chỉ đổi viền + bóng nhẹ khi hover, lún rất nhẹ khi nhấn. */
   .card-interactive {
-    @apply card cursor-pointer transition-[transform,box-shadow,border-color] duration-[250ms] ease-soft
-           hover:-translate-y-1 hover:border-accent hover:shadow-card-hover active:scale-[0.99];
+    @apply card cursor-pointer transition-[transform,box-shadow,border-color] duration-base ease-out
+           hover:border-accent hover:shadow-card-hover active:scale-[0.99];
   }
 
   /* Nút bấm: lún nhẹ 150ms khi nhấn (spec mục 9) */
   .btn-tactile {
-    @apply transition-[transform,background-color,border-color,color] duration-150 ease-soft active:scale-[0.97];
+    @apply transition-[transform,background-color,border-color,color] duration-fast ease-out active:scale-[0.97];
   }
 
   /* Nhãn phân loại — dùng cho danh mục, ngôn ngữ, bộ lọc. Chuẩn Academic không dùng hình viên thuốc (pill) */
@@ -130,7 +156,7 @@
   /* Hào quang vàng nhẹ quanh hạng #1 — CHỈ hạng 1 (01/10/2026), lặp vô hạn nhưng chậm/tinh tế,
    * không chói như "AI vibe" cũ (xem docblock đầu tailwind.config.ts). */
   .ranking-rank-1-glow {
-    animation: ranking-gold-pulse 2.4s ease-in-out infinite;
+    animation: ranking-gold-pulse 2.4s ease-in-out 2; /* UI v2: chạy 2 lần rồi dừng, không lặp vô hạn */
   }
 }
 

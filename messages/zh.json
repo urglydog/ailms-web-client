@@ -18,6 +18,7 @@
       "title": "导航菜单"
     },
     "wishlist": {
+      "title": "收藏夹",
       "viewAll": "前往收藏夹",
       "empty": "收藏夹是空的。",
       "free": "免费",

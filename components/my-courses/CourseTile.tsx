@@ -17,7 +17,7 @@ export function CourseTile({ course }: { course: EnrolledCourse }) {
     <div
       className="group relative flex flex-col overflow-hidden rounded-card border border-line bg-surface-raised
                  transition-[transform,box-shadow,border-color] duration-[250ms] ease-soft
-                 hover:-translate-y-1 hover:border-accent hover:shadow-card-hover
+                 hover:border-accent hover:shadow-card-hover
                  has-[.cert-link:hover]:translate-y-0 has-[.cert-link:hover]:border-line has-[.cert-link:hover]:shadow-none"
     >
       <div className="relative">

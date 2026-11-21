@@ -31,7 +31,11 @@ export function useThemeMode() {
 
   const toggle = () => {
     const next: ThemeMode = (mode ?? resolveTheme(readStored(), prefersDark())) === 'dark' ? 'light' : 'dark';
-    document.documentElement.classList.toggle('dark', next === 'dark');
+    const root = document.documentElement;
+    root.classList.add('no-transitions');
+    root.classList.toggle('dark', next === 'dark');
+    // Bỏ lớp sau 2 frame: trình duyệt đã vẽ màu mới, transition hover/focus hoạt động lại như cũ.
+    requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove('no-transitions')));
     try {
       localStorage.setItem(THEME_STORAGE_KEY, next);
     } catch {

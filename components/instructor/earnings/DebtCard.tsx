@@ -145,7 +145,10 @@ export function DebtCard() {
         <div className="flex flex-col items-center gap-2 rounded-lg border border-line bg-surface-raised p-4 text-center">
           <p className="m-0 text-sm font-semibold text-ink">Quét mã để trả {money(pending.amount)}</p>
           {pending.qrCode ? (
-            <div className="rounded-lg bg-white p-3">
+            <div
+              // eslint-disable-next-line no-restricted-syntax -- nền QR phải trắng để quét được
+              className="rounded-lg bg-white p-3"
+            >
               <QRCodeSVG value={pending.qrCode} size={176} />
             </div>
           ) : null}

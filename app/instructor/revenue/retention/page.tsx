@@ -115,7 +115,7 @@ export default function RetentionPage() {
                 <XAxis dataKey="label" tick={{ fontSize: 11, fill: palette.inkMuted }} />
                 <YAxis domain={[0, 100]} tickFormatter={(v: number) => `${v}%`} tick={{ fontSize: 11, fill: palette.inkMuted }} />
                 <Tooltip contentStyle={{ background: palette.surfaceRaised, borderColor: palette.line, color: palette.ink }} formatter={(value) => [`${Number(value).toFixed(1)}%`, t('retention.tooltip')]} labelFormatter={(label) => t('retention.label', { label: String(label) })} />
-                <Bar dataKey="retainedPercent" fill="#0891b2" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="retainedPercent" fill={palette.accent} radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>

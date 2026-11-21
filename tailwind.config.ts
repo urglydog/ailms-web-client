@@ -67,16 +67,28 @@ const config: Config = {
         sans: ['var(--font-jakarta)', 'sans-serif'],
         mono: ['var(--font-plex-mono)', 'monospace'],
       },
+      // Bán kính có phân cấp (UI v2, DESIGN_RULES_Web_Mobile.md mục 3): chip 6, input/nút 8, card 12, modal/sheet 16.
       borderRadius: {
-        card: '10px',
+        chip: '6px',
+        control: '8px',
+        card: '12px',
         panel: '12px',
+        sheet: '16px',
       },
       boxShadow: {
         card: '0 1px 2px 0 rgba(10, 37, 64, 0.05)',
         'card-hover': '0 10px 20px rgba(10, 37, 64, 0.12)',
       },
+      // Token chuyển động dùng chung web/mobile (UI v2): fast 120 nhấn, base 200 hover/popover, slow 320 modal/trang.
       transitionTimingFunction: {
         soft: 'cubic-bezier(.2, .7, .2, 1)',
+        out: 'var(--ease-out)',
+        in: 'var(--ease-in)',
+      },
+      transitionDuration: {
+        fast: 'var(--dur-fast)',
+        base: 'var(--dur-base)',
+        slow: 'var(--dur-slow)',
       },
       maxWidth: {
         shell: '1280px',
