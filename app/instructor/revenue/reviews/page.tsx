@@ -95,7 +95,7 @@ export default function InstructorReviewsPage() {
                   <Tooltip contentStyle={{ background: palette.surfaceRaised, borderColor: palette.line, color: palette.ink }} formatter={(value) => [t('reviews.tooltip', { count: Number(value) }), '']} />
                   <Bar dataKey="count" radius={[0, 4, 4, 0]}>
                     {stats.distribution.map((d) => (
-                      <Cell key={d.star} fill={d.star === '1★' || d.star === '2★' ? '#dc2626' : '#f59e0b'} />
+                      <Cell key={d.star} fill={d.star === '1★' || d.star === '2★' ? palette.danger : palette.star} />
                     ))}
                   </Bar>
                 </BarChart>
