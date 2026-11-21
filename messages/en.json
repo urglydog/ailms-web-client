@@ -18,6 +18,7 @@
       "title": "Navigation menu"
     },
     "wishlist": {
+      "title": "Wishlist",
       "viewAll": "Go to wishlist",
       "empty": "Your wishlist is empty.",
       "free": "Free",

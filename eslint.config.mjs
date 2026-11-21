@@ -14,6 +14,15 @@ const eslintConfig = [
       // Quy chuẩn dự án: ZERO `any` (lms-frontend-rules mục 1)
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      // UI v2: nền trắng cứng không đổi theo dark mode — dùng `bg-surface-raised`. `bg-white/xx` (lớp phủ
+      // trên nền tối) vẫn được phép. Cố ý giữ trắng (núm công tắc, chứng chỉ in) thì eslint-disable kèm lý do.
+      'no-restricted-syntax': [
+        'warn',
+        {
+          selector: "Literal[value=/(^| )bg-white( |$)/], TemplateElement[value.raw=/(^| )bg-white( |$)/]",
+          message: 'Dùng token bg-surface-raised thay cho bg-white (xem doc/feat/uiux/DESIGN_RULES_Web_Mobile.md).',
+        },
+      ],
     },
   },
   {

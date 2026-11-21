@@ -33,7 +33,13 @@ export function useReveal<T extends HTMLElement>(): [RefCallback<T>, boolean] {
       { threshold: 0.15 },
     );
     io.observe(element);
-    return () => io.disconnect();
+    // Dự phòng: observer không bắn (tab nền, phần tử nằm ngoài khung khi đo) thì vẫn hiện nội dung,
+    // tránh khoảng trắng "Đang thịnh hành" ở trang chủ (A5 trong DeXuat_CaiTien_UIUX_v2.md).
+    const fallback = window.setTimeout(() => setShown(true), 600);
+    return () => {
+      io.disconnect();
+      window.clearTimeout(fallback);
+    };
   }, [element, shown]);
 
   return [setElement, shown];

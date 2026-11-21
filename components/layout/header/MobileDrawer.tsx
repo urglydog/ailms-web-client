@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
-import { BookOpen, Radio, Search, Users, Info, X, Library } from 'lucide-react';
+import { BookOpen, Radio, Search, Users, Info, X, Library, Heart, CircleHelp } from 'lucide-react';
+import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { useTranslations } from 'next-intl';
 import type { Category } from '@/types/domain';
 import { isNavItemActive } from './navModel';
@@ -145,7 +146,22 @@ export function MobileDrawer({
               <Info size={17} aria-hidden className="text-accent" />
               {t('nav.about')}
             </Link>
+            {/* Các nút ẩn khỏi header ở màn hẹp (UI v2, A6) */}
+            <Link href="/wishlist" onClick={onClose} className={`${linkClass('/wishlist')} sm:hidden`}>
+              <Heart size={17} aria-hidden className="text-accent" />
+              {t('wishlist.title')}
+            </Link>
+            <Link href="/help" onClick={onClose} className={`${linkClass('/help')} sm:hidden`}>
+              <CircleHelp size={17} aria-hidden className="text-accent" />
+              {t('help')}
+            </Link>
           </nav>
+          {!isLoggedIn && (
+            <div className="mt-3 flex items-center justify-between rounded-lg px-3 py-1.5 sm:hidden">
+              <span className="text-sm font-semibold text-ink">{t('theme.label')}</span>
+              <ThemeToggle />
+            </div>
+          )}
         </div>
 
         {!isLoggedIn && (

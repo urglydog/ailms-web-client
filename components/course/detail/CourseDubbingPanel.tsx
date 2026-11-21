@@ -1,5 +1,6 @@
 'use client';
 
+import { languageLabel } from '@/lib/text/languageLabel';
 import { Languages } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
@@ -20,7 +21,7 @@ export function CourseDubbingPanel({ languages }: { languages: string[] }) {
       <div className="flex flex-wrap gap-2">
         {languages.map((lang) => (
           <span key={lang} className="rounded-full border border-line bg-surface-raised px-3 py-1 text-[13px] font-semibold text-accent-dark">
-            {lang}
+            {languageLabel(lang)}
           </span>
         ))}
       </div>

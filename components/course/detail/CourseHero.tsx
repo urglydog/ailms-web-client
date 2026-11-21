@@ -1,5 +1,6 @@
 'use client';
 
+import { languageLabel } from '@/lib/text/languageLabel';
 import Link from 'next/link';
 import { Globe, Star } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
@@ -49,7 +50,7 @@ export function CourseHero({ course }: { course: CourseDetail }) {
               <span aria-hidden>·</span>
               <span className="flex items-center gap-1">
                 <Globe size={14} aria-hidden />
-                {course.sourceLanguage}
+                {languageLabel(course.sourceLanguage)}
               </span>
             </>
           )}
@@ -63,7 +64,7 @@ export function CourseHero({ course }: { course: CourseDetail }) {
                 key={lang}
                 className="rounded-full border border-line bg-surface-raised px-2.5 py-1 text-[12.5px] text-accent-dark"
               >
-                {lang}
+                {languageLabel(lang)}
               </span>
             ))}
           </div>
