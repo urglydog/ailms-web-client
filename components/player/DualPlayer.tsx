@@ -6,6 +6,7 @@ import { KeyboardShortcutsModal } from '@/components/player/KeyboardShortcutsMod
 import { PlayerControls, SPEED_OPTIONS } from '@/components/player/PlayerControls';
 import { SubtitlePositionEditor } from '@/components/player/SubtitlePositionEditor';
 import { resolveOriginalCaption } from '@/lib/player/captionMode';
+import { resolveAudio } from '@/lib/player/resolveAudio';
 import { SubtitleSettingsModal } from '@/components/player/SubtitleSettingsModal';
 import {
   buildSubtitleAppearance,
@@ -96,11 +97,6 @@ function findActiveSegment(segments: SubtitleSegment[], currentSec: number): Sub
   return segments.find((s) => currentSec >= s.startSec && currentSec < s.endSec) ?? null;
 }
 
-interface ResolvedAudio {
-  src: string | null;
-  /** Mốc bắt đầu (giây, tuyệt đối theo video) của file đang phát — 0 nếu là `finalUrl`. */
-  offsetSec: number;
-}
 
 /** UC30 — cho phép trang cha (Gia sư AI, `TutorEmbedded`) ra lệnh tua tới mốc thời gian, bất kể
  * nguồn video là UPLOAD (`<video>`) hay YOUTUBE (IFrame Player API) — 2 cơ chế tua khác hẳn
@@ -109,20 +105,6 @@ export interface DualPlayerHandle {
   seekTo: (seconds: number) => void;
   pause: () => void;
   play: () => void;
-}
-
-/** Chọn URL audio + offset đồng bộ hiện tại theo BR-CHUNK-05. */
-function resolveAudio(track: AudioTrackInfo | null, currentSec: number): ResolvedAudio {
-  if (!track) {
-    return { src: null, offsetSec: 0 };
-  }
-  if (track.finalUrl) {
-    return { src: track.finalUrl, offsetSec: 0 };
-  }
-  // Chưa ghép xong -> tìm chunk chứa mốc thời gian hiện tại
-  const chunk =
-    track.chunks.find((c) => currentSec >= c.startSec && currentSec < c.endSec) ?? track.chunks[0];
-  return { src: chunk?.fileUrl ?? null, offsetSec: chunk?.startSec ?? 0 };
 }
 
 export const DualPlayer = forwardRef<DualPlayerHandle, DualPlayerProps>(function DualPlayer({
@@ -191,7 +173,7 @@ export const DualPlayer = forwardRef<DualPlayerHandle, DualPlayerProps>(function
 
   const isYoutube = videoSource === 'YOUTUBE' && !!youtubeId;
   // Nút "Gốc": transcript của project nếu đã có; chưa có mà là video YouTube thì bật/tắt phụ đề CC của YouTube.
-  const { src: audioSrc, offsetSec } = resolveAudio(track, currentSec);
+  const { src: audioSrc, offsetSec, pending: dubPending } = resolveAudio(track, currentSec);
   const originalCaption = resolveOriginalCaption({
     isYoutube,
     projectSubtitleCount: originalSubtitles.length,
@@ -504,11 +486,13 @@ export const DualPlayer = forwardRef<DualPlayerHandle, DualPlayerProps>(function
 
       {track?.status === 'PARTIAL' && (
         <span
+          role="status"
           className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-ink/70
                      px-2.5 py-1 text-[11px] font-semibold text-white"
         >
           <span className="h-1.5 w-1.5 animate-ai-pulse rounded-full bg-accent" aria-hidden />
-          Đang xử lý phần còn lại
+          {/* Học viên tua tới đoạn chưa lồng tiếng xong -> đang tạm nghe tiếng gốc (xem resolveAudio). */}
+          {dubPending ? 'Đoạn này đang được lồng tiếng — tạm phát tiếng gốc' : 'Đang xử lý phần còn lại'}
         </span>
       )}
 
