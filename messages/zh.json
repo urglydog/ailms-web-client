@@ -295,7 +295,11 @@
   },
   "learn": {
     "header": {
-      "back": "我的课程"
+      "back": "我的课程",
+      "browse": "浏览课程",
+      "help": "帮助",
+      "menu": "打开课程菜单",
+      "progress": "你的进度"
     },
     "dubbing": {
       "groupAria": "选择 AI 配音声音",
@@ -310,7 +314,8 @@
       "processing": "正在生成 {percent}%",
       "create": "生成配音",
       "sourceTag": "原语言",
-      "sourceTitle": "本课程本身就是你选择的语言"
+      "sourceTitle": "本课程本身就是你选择的语言",
+      "voice": "声音"
     },
     "tabs": {
       "overview": "概览",
@@ -318,7 +323,11 @@
       "qna": "问答",
       "materials": "学习资料",
       "gradebook": "成绩单",
-      "reviews": "评价"
+      "reviews": "评价",
+      "transcript": "文字记录",
+      "lessons": "课程内容",
+      "tutor": "AI 导师",
+      "ariaLabel": "课程内容"
     },
     "materials": {
       "courseResources": "课程资源"
@@ -333,7 +342,15 @@
       "current": "正在学习",
       "notStarted": "未开始",
       "hasAttachments": "含附件",
-      "signInPrompt": "登录后可查看完整课程大纲并跟踪学习进度。"
+      "signInPrompt": "登录后可查看完整课程大纲并跟踪学习进度。",
+      "lectures": "课程内容",
+      "chapterStats": "{done}/{total} · {duration}",
+      "locked": "已锁定——购买课程后解锁",
+      "expandChapter": "展开/收起章节"
+    },
+    "theatre": {
+      "on": "影院模式",
+      "off": "退出影院模式"
     }
   },
   "profile": {

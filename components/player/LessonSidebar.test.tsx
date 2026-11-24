@@ -59,3 +59,28 @@ describe('LessonSidebar', () => {
     expect(within(screen.getByRole('link', { name: /Bài 1/ })).queryByLabelText('Có tài liệu đính kèm')).toBeNull();
   });
 });
+
+describe('LessonSidebar — accordion chương', () => {
+  const TWO: ChapterNav[] = [
+    ...CHAPTERS,
+    {
+      chapterId: 2,
+      chapterTitle: 'Chương 2',
+      displayOrder: 2,
+      lessons: [{ lessonId: 31, lessonTitle: 'Bài 4', displayOrder: 1, durationSec: 60, isPreview: true, isCompleted: false }],
+    },
+  ];
+
+  it('chương có bài đang học mở sẵn, chương khác thu gọn, hiện đã xong/tổng', () => {
+    renderWithIntl(<LessonSidebar chapters={TWO} currentLessonId={22} />);
+    expect(screen.getByRole('button', { name: /Chương 1/ })).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByRole('button', { name: /Chương 2/ })).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.getByText(/^1\/3 ·/)).toBeInTheDocument();
+  });
+
+  it('chưa sở hữu: bài không phải xem thử bị khóa, không có liên kết', () => {
+    renderWithIntl(<LessonSidebar chapters={CHAPTERS} currentLessonId={22} enrolled={false} />);
+    expect(screen.queryByRole('link', { name: /Bài 1/ })).toBeNull();
+    expect(screen.getAllByLabelText(/Bài bị khóa/).length).toBe(2);
+  });
+});

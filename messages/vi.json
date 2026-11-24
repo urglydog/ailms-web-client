@@ -295,7 +295,11 @@
   },
   "learn": {
     "header": {
-      "back": "Khóa học của tôi"
+      "back": "Khóa học của tôi",
+      "browse": "Kho khóa học",
+      "help": "Trợ giúp",
+      "menu": "Mở menu bài học",
+      "progress": "Tiến độ của bạn"
     },
     "dubbing": {
       "groupAria": "Chọn giọng lồng tiếng AI",
@@ -310,7 +314,8 @@
       "processing": "Đang tạo {percent}%",
       "create": "Tạo giọng",
       "sourceTag": "gốc",
-      "sourceTitle": "Bài giảng này vốn đã sử dụng ngôn ngữ bạn chọn"
+      "sourceTitle": "Bài giảng này vốn đã sử dụng ngôn ngữ bạn chọn",
+      "voice": "Giọng"
     },
     "tabs": {
       "overview": "Tổng quan",
@@ -318,7 +323,11 @@
       "qna": "Hỏi đáp",
       "materials": "Học liệu",
       "gradebook": "Bảng điểm",
-      "reviews": "Đánh giá"
+      "reviews": "Đánh giá",
+      "transcript": "Transcript",
+      "lessons": "Bài giảng",
+      "tutor": "AI Gia sư",
+      "ariaLabel": "Nội dung bài học"
     },
     "materials": {
       "courseResources": "Tài nguyên khóa học"
@@ -333,7 +342,15 @@
       "current": "Đang học",
       "notStarted": "Chưa học",
       "hasAttachments": "Có tài liệu đính kèm",
-      "signInPrompt": "Đăng nhập để xem toàn bộ chương trình học và theo dõi tiến độ của khóa này."
+      "signInPrompt": "Đăng nhập để xem toàn bộ chương trình học và theo dõi tiến độ của khóa này.",
+      "lectures": "Bài giảng",
+      "chapterStats": "{done}/{total} · {duration}",
+      "locked": "Bài bị khóa — cần sở hữu khóa học",
+      "expandChapter": "Mở/đóng chương"
+    },
+    "theatre": {
+      "on": "Chế độ rạp",
+      "off": "Thoát chế độ rạp"
     }
   },
   "profile": {

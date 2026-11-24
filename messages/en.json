@@ -295,7 +295,11 @@
   },
   "learn": {
     "header": {
-      "back": "My courses"
+      "back": "My courses",
+      "browse": "Browse courses",
+      "help": "Help",
+      "menu": "Open lesson menu",
+      "progress": "Your progress"
     },
     "dubbing": {
       "groupAria": "Choose the AI dubbing voice",
@@ -310,7 +314,8 @@
       "processing": "Creating {percent}%",
       "create": "Create voice",
       "sourceTag": "original",
-      "sourceTitle": "This lesson is already in the language you picked"
+      "sourceTitle": "This lesson is already in the language you picked",
+      "voice": "Voice"
     },
     "tabs": {
       "overview": "Overview",
@@ -318,7 +323,11 @@
       "qna": "Q&A",
       "materials": "Materials",
       "gradebook": "Gradebook",
-      "reviews": "Reviews"
+      "reviews": "Reviews",
+      "transcript": "Transcript",
+      "lessons": "Lectures",
+      "tutor": "AI Tutor",
+      "ariaLabel": "Lesson content"
     },
     "materials": {
       "courseResources": "Course resources"
@@ -333,7 +342,15 @@
       "current": "Now studying",
       "notStarted": "Not started",
       "hasAttachments": "Has attachments",
-      "signInPrompt": "Sign in to see the full curriculum and track your progress in this course."
+      "signInPrompt": "Sign in to see the full curriculum and track your progress in this course.",
+      "lectures": "Lectures",
+      "chapterStats": "{done}/{total} · {duration}",
+      "locked": "Locked — enrol to unlock",
+      "expandChapter": "Toggle section"
+    },
+    "theatre": {
+      "on": "Theatre mode",
+      "off": "Exit theatre mode"
     }
   },
   "profile": {

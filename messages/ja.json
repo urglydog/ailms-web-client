@@ -295,7 +295,11 @@
   },
   "learn": {
     "header": {
-      "back": "マイコース"
+      "back": "マイコース",
+      "browse": "コース一覧",
+      "help": "ヘルプ",
+      "menu": "レッスンメニューを開く",
+      "progress": "あなたの進捗"
     },
     "dubbing": {
       "groupAria": "AI吹き替えの音声を選ぶ",
@@ -310,7 +314,8 @@
       "processing": "作成中 {percent}%",
       "create": "音声を作成",
       "sourceTag": "原語",
-      "sourceTitle": "この講義はすでに選んだ言語です"
+      "sourceTitle": "この講義はすでに選んだ言語です",
+      "voice": "音声"
     },
     "tabs": {
       "overview": "概要",
@@ -318,7 +323,11 @@
       "qna": "質問",
       "materials": "教材",
       "gradebook": "成績表",
-      "reviews": "レビュー"
+      "reviews": "レビュー",
+      "transcript": "文字起こし",
+      "lessons": "レクチャー",
+      "tutor": "AIチューター",
+      "ariaLabel": "レッスン内容"
     },
     "materials": {
       "courseResources": "講座リソース"
@@ -333,7 +342,15 @@
       "current": "学習中",
       "notStarted": "未学習",
       "hasAttachments": "添付資料あり",
-      "signInPrompt": "ログインすると全カリキュラムと学習の進捗を確認できます。"
+      "signInPrompt": "ログインすると全カリキュラムと学習の進捗を確認できます。",
+      "lectures": "レクチャー",
+      "chapterStats": "{done}/{total} · {duration}",
+      "locked": "ロック中 — 受講登録で解除",
+      "expandChapter": "セクションの開閉"
+    },
+    "theatre": {
+      "on": "シアターモード",
+      "off": "シアターモードを終了"
     }
   },
   "profile": {

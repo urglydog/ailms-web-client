@@ -21,7 +21,7 @@ interface VoicePickerProps {
 }
 
 /** "vi-VN-HoaiMyNeural" -> "Hoài My" (không dấu vì API không trả sẵn tên có dấu, chỉ tách từ ID). */
-function prettyVoiceName(voiceName: string): string {
+export function prettyVoiceName(voiceName: string): string {
   const base = voiceName.replace(/^.*-/, '').replace(/Neural$/, '');
   return base.replace(/([a-z0-9])([A-Z])/g, '$1 $2');
 }
