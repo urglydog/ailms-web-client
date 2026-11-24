@@ -434,7 +434,11 @@
       "title": "講座の内容",
       "summary": "{chapters} 章 · {lessons} レッスン",
       "lessons": "{count} レッスン",
-      "preview": "試聴"
+      "preview": "試聴",
+      "expandAll": "すべて展開",
+      "collapseAll": "すべて折りたたむ",
+      "previewLink": "プレビュー",
+      "totalSummary": "{chapters} セクション · {lessons} レクチャー · 合計 {duration}"
     },
     "reviews": "受講生のレビュー",
     "price": {
@@ -465,6 +469,24 @@
       "wishlistRemove": "お気に入りから削除",
       "toastSuccess": "登録しました！",
       "toastError": "エラーが発生しました"
+    },
+    "time": {
+      "hour": "時間",
+      "minute": "分"
+    },
+    "includesTitle": "このコースに含まれるもの",
+    "description": {
+      "title": "説明",
+      "showMore": "もっと見る",
+      "showLess": "閉じる"
+    },
+    "instructorBlock": {
+      "title": "講師",
+      "stats": "★ {rating} · 受講者 {learners} 人"
+    },
+    "coupon": {
+      "note": "クーポンをお持ちですか？",
+      "link": "お支払い時に適用"
     }
   },
   "courseList": {

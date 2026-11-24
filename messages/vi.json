@@ -434,7 +434,11 @@
       "title": "Nội dung khóa học",
       "summary": "{chapters} chương · {lessons} bài",
       "lessons": "{count} bài",
-      "preview": "Học thử"
+      "preview": "Học thử",
+      "expandAll": "Mở rộng tất cả",
+      "collapseAll": "Thu gọn tất cả",
+      "previewLink": "Xem thử",
+      "totalSummary": "{chapters} chương · {lessons} bài · tổng {duration}"
     },
     "reviews": "Đánh giá từ học viên",
     "price": {
@@ -465,6 +469,24 @@
       "wishlistRemove": "Bỏ khỏi danh sách yêu thích",
       "toastSuccess": "Đăng ký thành công!",
       "toastError": "Có lỗi xảy ra khi thực hiện"
+    },
+    "time": {
+      "hour": "giờ",
+      "minute": "phút"
+    },
+    "includesTitle": "Khóa học bao gồm",
+    "description": {
+      "title": "Mô tả",
+      "showMore": "Xem thêm",
+      "showLess": "Thu gọn"
+    },
+    "instructorBlock": {
+      "title": "Giảng viên",
+      "stats": "★ {rating} · {learners} học viên"
+    },
+    "coupon": {
+      "note": "Có mã giảm giá?",
+      "link": "Áp dụng khi thanh toán"
     }
   },
   "courseList": {

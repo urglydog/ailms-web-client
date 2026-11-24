@@ -23,9 +23,11 @@ interface ChapterAccordionProps {
   enrolled: boolean;
   /** Mã/nhãn ngôn ngữ gốc của khóa — quyết định nhãn "Phần/Bài" hay "Section/Lesson". */
   sourceLanguage?: string | null;
+  /** Dòng tóm tắt "N chương · N bài · tổng thời lượng" hiện cạnh nút Mở rộng tất cả. */
+  summary?: string;
 }
 
-export function ChapterAccordion({ chapters, enrolled, sourceLanguage }: ChapterAccordionProps) {
+export function ChapterAccordion({ chapters, enrolled, sourceLanguage, summary }: ChapterAccordionProps) {
   const t = useTranslations('courseDetail.content');
   const lang = detectOutlineLang(
     sourceLanguage,
@@ -45,26 +47,38 @@ export function ChapterAccordion({ chapters, enrolled, sourceLanguage }: Chapter
   const toggle = (id: number) =>
     setOpenIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
 
+  const allOpen = chapters.length > 0 && openIds.length === chapters.length;
+  const toggleAll = () => setOpenIds(allOpen ? [] : chapters.map((c) => c.id));
+
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col">
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2 text-[13px] text-ink-muted">
+        {summary ? <span>{summary}</span> : <span />}
+        {chapters.length > 1 && (
+          <button type="button" onClick={toggleAll} className="min-h-10 font-semibold text-accent-dark hover:underline">
+            {allOpen ? t('collapseAll') : t('expandAll')}
+          </button>
+        )}
+      </div>
+      <div className="overflow-hidden rounded-card border border-line">
       {chapters.map((chapter, chapterIdx) => {
         const isOpen = openIds.includes(chapter.id);
         const totalSec = chapter.lessons.reduce((sum, l) => sum + l.durationSec, 0);
 
         return (
-          <div key={chapter.id} className="card overflow-hidden">
+          <div key={chapter.id} className="border-b border-line bg-surface-raised last:border-b-0">
             <button
               type="button"
               onClick={() => toggle(chapter.id)}
               aria-expanded={isOpen}
-              className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left"
+              className="flex w-full items-center justify-between gap-4 bg-surface px-5 py-4 text-left hover:bg-tint"
             >
               <span className="font-display text-[15px] font-semibold text-ink">{sectionLabel(lang, chapterIdx + 1, chapter.title)}</span>
               <span className="flex shrink-0 items-center gap-3 text-[13px] text-ink-muted">
                 <span>
                   {t('lessons', { count: chapter.lessons.length })} · {formatDuration(totalSec)}
                 </span>
-                <span aria-hidden className={isOpen ? 'rotate-180 transition-transform' : 'transition-transform'}>
+                <span aria-hidden className={`transition-transform motion-reduce:transition-none ${isOpen ? 'rotate-180' : ''}`}>
                   ▾
                 </span>
               </span>
@@ -105,8 +119,13 @@ export function ChapterAccordion({ chapters, enrolled, sourceLanguage }: Chapter
                           </Badge>
                         )}
                       </span>
-                      <span className="shrink-0 font-mono text-xs text-ink-faint">
-                        {formatDuration(lesson.durationSec)}
+                      <span className="flex shrink-0 items-center gap-3">
+                        {lesson.isPreview && !enrolled && (
+                          <Link href={`/learn/${lesson.id}`} className="text-[13px] font-semibold text-accent-dark underline">
+                            {t('previewLink')}
+                          </Link>
+                        )}
+                        <span className="font-mono text-xs text-ink-faint">{formatDuration(lesson.durationSec)}</span>
                       </span>
                     </li>
                   );
@@ -116,6 +135,7 @@ export function ChapterAccordion({ chapters, enrolled, sourceLanguage }: Chapter
           </div>
         );
       })}
+      </div>
     </div>
   );
 }

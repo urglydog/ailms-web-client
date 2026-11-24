@@ -434,7 +434,11 @@
       "title": "课程内容",
       "summary": "{chapters} 章 · {lessons} 节",
       "lessons": "{count} 节",
-      "preview": "试看"
+      "preview": "试看",
+      "expandAll": "展开全部",
+      "collapseAll": "收起全部",
+      "previewLink": "试看",
+      "totalSummary": "{chapters} 章 · {lessons} 节 · 共 {duration}"
     },
     "reviews": "学员评价",
     "price": {
@@ -465,6 +469,24 @@
       "wishlistRemove": "取消收藏",
       "toastSuccess": "报名成功！",
       "toastError": "操作出错"
+    },
+    "time": {
+      "hour": "小时",
+      "minute": "分钟"
+    },
+    "includesTitle": "本课程包含",
+    "description": {
+      "title": "课程描述",
+      "showMore": "显示更多",
+      "showLess": "收起"
+    },
+    "instructorBlock": {
+      "title": "讲师",
+      "stats": "★ {rating} · {learners} 名学员"
+    },
+    "coupon": {
+      "note": "有优惠码？",
+      "link": "结账时使用"
     }
   },
   "courseList": {

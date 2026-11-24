@@ -434,7 +434,11 @@
       "title": "Course content",
       "summary": "{chapters} chapters · {lessons} lessons",
       "lessons": "{count} lessons",
-      "preview": "Preview"
+      "preview": "Preview",
+      "expandAll": "Expand all sections",
+      "collapseAll": "Collapse all sections",
+      "previewLink": "Preview",
+      "totalSummary": "{chapters} sections · {lessons} lectures · {duration} total"
     },
     "reviews": "Learner reviews",
     "price": {
@@ -465,6 +469,24 @@
       "wishlistRemove": "Remove from wishlist",
       "toastSuccess": "Signed up successfully!",
       "toastError": "Something went wrong"
+    },
+    "time": {
+      "hour": "h",
+      "minute": "min"
+    },
+    "includesTitle": "This course includes",
+    "description": {
+      "title": "Description",
+      "showMore": "Show more",
+      "showLess": "Show less"
+    },
+    "instructorBlock": {
+      "title": "Instructor",
+      "stats": "★ {rating} · {learners} learners"
+    },
+    "coupon": {
+      "note": "Have a coupon?",
+      "link": "Apply at checkout"
     }
   },
   "courseList": {
