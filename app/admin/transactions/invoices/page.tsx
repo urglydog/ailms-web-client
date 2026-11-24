@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FileDown, FileText, Mail, Table2, X } from 'lucide-react';
 import { toast } from 'sonner';
-import { InvoiceDetailBody } from '@/components/invoices/InvoiceDetailBody';
+import dynamic from 'next/dynamic';
 import { PageHeader } from '@/components/instructor/ui/PageHeader';
 import { ExportMenu } from '@/components/ui/ExportMenu';
 import { Modal } from '@/components/ui/Modal';
@@ -15,6 +15,9 @@ import { getAccessToken } from '@/lib/auth/token';
 import { dateTime, money } from '@/lib/finance';
 import { INVOICE_TYPE_CLASS, INVOICE_TYPE_LABEL, saveBlob } from '@/lib/invoices';
 import type { AdminInvoice, AdminInvoiceFilter, InvoiceType } from '@/types/invoice';
+
+// Hiệu năng đợt 7 (B6): biểu đồ recharts trong chi tiết hóa đơn chỉ tải khi mở chi tiết.
+const InvoiceDetailBody = dynamic(() => import('@/components/invoices/InvoiceDetailBody').then((m) => m.InvoiceDetailBody), { ssr: false });
 
 const TYPES: InvoiceType[] = ['RECEIPT', 'REFUND', 'PAYOUT', 'DEBT_RECEIPT', 'STATEMENT'];
 const PAGE_SIZE = 10;
