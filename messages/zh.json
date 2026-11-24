@@ -74,9 +74,19 @@
       "categories": "分类",
       "more": "更多",
       "liveNow": "直播中",
-      "groups": { "it": "信息技术", "soft": "软技能", "other": "其他领域" }
+      "groups": {
+        "it": "信息技术",
+        "soft": "软技能",
+        "other": "其他领域"
+      }
     },
-    "theme": { "toDark": "切换到深色模式", "toLight": "切换到浅色模式", "label": "外观", "dark": "深色", "light": "浅色" },
+    "theme": {
+      "toDark": "切换到深色模式",
+      "toLight": "切换到浅色模式",
+      "label": "外观",
+      "dark": "深色",
+      "light": "浅色"
+    },
     "skipToContent": "跳到主要内容",
     "help": "Help & Support"
   },
@@ -186,7 +196,10 @@
       "empty": "此分类暂无课程。"
     },
     "shelves": {
-      "featured": { "title": "Recommended", "subtitle": "Courses recommended for you by LinguaLearn." },
+      "featured": {
+        "title": "Recommended",
+        "subtitle": "Courses recommended for you by LinguaLearn."
+      },
       "newest": {
         "title": "新上线",
         "subtitle": "LinguaLearn 最近新增的课程"
@@ -438,8 +451,17 @@
     }
   },
   "courseList": {
-    "loadMore": { "button": "加载更多课程", "loading": "正在加载更多课程…", "end": "已显示全部符合条件的课程。" },
-    "pagination": { "nav": "分页", "prev": "上一页", "next": "下一页", "page": "第 {page} 页" },
+    "loadMore": {
+      "button": "加载更多课程",
+      "loading": "正在加载更多课程…",
+      "end": "已显示全部符合条件的课程。"
+    },
+    "pagination": {
+      "nav": "分页",
+      "prev": "上一页",
+      "next": "下一页",
+      "page": "第 {page} 页"
+    },
     "title": "课程库",
     "subtitle": "每门课程都可以配音成你选择的语言。",
     "all": "全部",
@@ -1007,7 +1029,10 @@
           "title": "课程组合",
           "description": "把多门课程打包并给出优惠，方便学员整套购买。"
         },
-        "share": { "title": "Share & Promote", "description": "Get your own referral link for each course, share it on social media and see the orders that came through your links." }
+        "share": {
+          "title": "Share & Promote",
+          "description": "Get your own referral link for each course, share it on social media and see the orders that came through your links."
+        }
       }
     },
     "live": {
@@ -3300,5 +3325,29 @@
     "requestThis": "Didn't solve it? Send a request",
     "otherInGroup": "Something else in this topic",
     "otherLabel": "Other issue"
+  },
+  "courseCard": {
+    "aiDub": "AI 配音",
+    "instructor": "讲师 {name}",
+    "free": "免费",
+    "owned": "已拥有",
+    "viewCertificate": "查看证书",
+    "addToCart": "加入购物车",
+    "adding": "正在添加...",
+    "goToCart": "前往购物车",
+    "wishlistAdd": "加入收藏",
+    "wishlistRemove": "从收藏中移除",
+    "coverPlaceholder": "课程封面",
+    "originalPrice": "原价",
+    "level": {
+      "BEGINNER": "初级",
+      "INTERMEDIATE": "中级",
+      "ADVANCED": "高级"
+    }
+  },
+  "common": {
+    "layout": {
+      "viewAll": "查看全部"
+    }
   }
 }

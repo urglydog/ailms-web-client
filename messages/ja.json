@@ -74,9 +74,19 @@
       "categories": "カテゴリ",
       "more": "その他",
       "liveNow": "配信中",
-      "groups": { "it": "情報技術", "soft": "ソフトスキル", "other": "その他の分野" }
+      "groups": {
+        "it": "情報技術",
+        "soft": "ソフトスキル",
+        "other": "その他の分野"
+      }
     },
-    "theme": { "toDark": "ダークモードに切り替え", "toLight": "ライトモードに切り替え", "label": "表示", "dark": "ダーク", "light": "ライト" },
+    "theme": {
+      "toDark": "ダークモードに切り替え",
+      "toLight": "ライトモードに切り替え",
+      "label": "表示",
+      "dark": "ダーク",
+      "light": "ライト"
+    },
     "skipToContent": "本文へスキップ",
     "help": "Help & Support"
   },
@@ -186,7 +196,10 @@
       "empty": "このカテゴリにはまだ講座がありません。"
     },
     "shelves": {
-      "featured": { "title": "Recommended", "subtitle": "Courses recommended for you by LinguaLearn." },
+      "featured": {
+        "title": "Recommended",
+        "subtitle": "Courses recommended for you by LinguaLearn."
+      },
       "newest": {
         "title": "新着講座",
         "subtitle": "LinguaLearn に追加されたばかりの講座"
@@ -438,8 +451,17 @@
     }
   },
   "courseList": {
-    "loadMore": { "button": "もっと見る", "loading": "講座を読み込み中…", "end": "該当する講座はすべて表示しました。" },
-    "pagination": { "nav": "ページ送り", "prev": "前のページ", "next": "次のページ", "page": "{page} ページ" },
+    "loadMore": {
+      "button": "もっと見る",
+      "loading": "講座を読み込み中…",
+      "end": "該当する講座はすべて表示しました。"
+    },
+    "pagination": {
+      "nav": "ページ送り",
+      "prev": "前のページ",
+      "next": "次のページ",
+      "page": "{page} ページ"
+    },
     "title": "講座一覧",
     "subtitle": "すべての講座を、選んだ言語に吹き替えできます。",
     "all": "すべて",
@@ -1007,7 +1029,10 @@
           "title": "講座セット",
           "description": "複数の講座をお得な割引つきのセットにして、まとめて購入してもらえます。"
         },
-        "share": { "title": "Share & Promote", "description": "Get your own referral link for each course, share it on social media and see the orders that came through your links." }
+        "share": {
+          "title": "Share & Promote",
+          "description": "Get your own referral link for each course, share it on social media and see the orders that came through your links."
+        }
       }
     },
     "live": {
@@ -3300,5 +3325,29 @@
     "requestThis": "Didn't solve it? Send a request",
     "otherInGroup": "Something else in this topic",
     "otherLabel": "Other issue"
+  },
+  "courseCard": {
+    "aiDub": "AI吹き替え",
+    "instructor": "講師 {name}",
+    "free": "無料",
+    "owned": "購入済み",
+    "viewCertificate": "修了証を見る",
+    "addToCart": "カートに追加",
+    "adding": "追加中...",
+    "goToCart": "カートへ進む",
+    "wishlistAdd": "お気に入りに追加",
+    "wishlistRemove": "お気に入りから削除",
+    "coverPlaceholder": "コース画像",
+    "originalPrice": "通常価格",
+    "level": {
+      "BEGINNER": "初級",
+      "INTERMEDIATE": "中級",
+      "ADVANCED": "上級"
+    }
+  },
+  "common": {
+    "layout": {
+      "viewAll": "すべて表示"
+    }
   }
 }

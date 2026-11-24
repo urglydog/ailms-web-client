@@ -30,10 +30,10 @@ export function CourseShelf({ title, subtitle, href, courses, tone = 'plain' }: 
 
   return (
     <section className={tone === 'tint' ? 'bg-surface' : 'bg-surface-raised'}>
-      <div className="shell py-10">
-        <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+      <div className="shell section-block">
+        <div className="section-head">
           <div>
-            <h2 className="m-0 font-display text-lg font-semibold text-ink">{title}</h2>
+            <h2 className="section-title">{title}</h2>
             {subtitle && <p className="m-0 mt-0.5 text-sm text-ink-muted">{subtitle}</p>}
           </div>
           <Link href={href} className="text-sm font-semibold text-accent-dark no-underline hover:underline">

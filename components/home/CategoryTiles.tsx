@@ -34,8 +34,8 @@ export function CategoryTiles() {
 
   return (
     <section className="bg-surface-raised">
-      <div className="shell py-10">
-        <h2 className="m-0 font-display text-lg font-semibold text-ink">{t('title')}</h2>
+      <div className="shell section-block">
+        <h2 className="section-title">{t('title')}</h2>
         <p className="m-0 mb-4 mt-0.5 text-sm text-ink-muted">{t('subtitle')}</p>
         <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
           {categories.map((c) => {

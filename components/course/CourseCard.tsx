@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { type MouseEvent } from 'react';
 import { Award } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
@@ -13,45 +14,37 @@ import { useAddToCart, useCart } from '@/hooks/useCart';
 import { useAddToWishlist, useRemoveFromWishlist, useWishlist } from '@/hooks/useWishlist';
 
 /**
- * Thẻ khoá học — dịch từ `CourseCard.dc.html` của Claude Design.
+ * Thẻ khoá học DUY NHẤT cho mọi kệ / lưới / gợi ý (doc/feat/uiux/UDEMY_LAYOUT_ANALYSIS.md mục 1).
  *
- * Prop trong design đã có `tsType` sẵn nên map gần như 1-1; điểm khác duy nhất là
- * ở đây nhận nguyên object `CourseSummary` thay vì 11 prop rời, để khi backend đổi
- * DTO thì chỉ sửa một chỗ.
+ * Thứ tự cố định: ảnh 16:9 → tên (2 dòng) → giảng viên → nhãn lồng tiếng + ★ + số đánh giá →
+ * giá (giá gốc gạch ngang) → hành động (thêm vào giỏ / xem chứng chỉ).
  *
- * Ảnh bìa: khi `thumbnailUrl` còn null thì dùng dải gradient chéo theo hai màu của
- * khoá học — giữ đúng cách design xử lý placeholder, tránh khoảng trống trắng.
+ * Ảnh bìa: khi `thumbnailUrl` còn null thì dùng dải gradient chéo theo hai màu của khoá học
+ * (màu dữ liệu của từng khóa, không phải màu giao diện).
  */
-
-const LEVEL_LABEL: Record<CourseSummary['level'], string> = {
-  BEGINNER: 'Cơ bản',
-  INTERMEDIATE: 'Trung cấp',
-  ADVANCED: 'Nâng cao',
-};
 
 function formatPrice(price: number): string {
   return `${price.toLocaleString('vi-VN')}đ`;
 }
 
 export function CourseCard({ course }: { course: CourseSummary }) {
+  const t = useTranslations('courseCard');
   const router = useRouter();
   const { data: enrollments } = useMyEnrollments();
   const enrollment = enrollments?.find((e) => e.courseId === course.id);
   const isOwned = !!enrollment;
 
-  // Giỏ hàng (06/09/2026, mở rộng ngoài đặc tả gốc) — chỉ khóa TRẢ PHÍ, CHƯA sở hữu mới cần
-  // nút này (khóa miễn phí ghi danh thẳng, không qua giỏ hàng).
+  // Giỏ hàng — chỉ khóa TRẢ PHÍ, CHƯA sở hữu mới cần nút này (khóa miễn phí ghi danh thẳng).
   const { data: cartItems } = useCart();
   const inCart = cartItems?.some((item) => item.courseId === course.id) ?? false;
   const addToCart = useAddToCart();
   const canAddToCart = !isOwned && !course.isFree;
 
   const handleAddToCart = (e: MouseEvent) => {
-    // Cả thẻ là 1 <Link> — chặn điều hướng mặc định (vào trang chi tiết) khi bấm đúng nút này.
+    // Cả thẻ là 1 <Link> — chặn điều hướng mặc định khi bấm đúng nút này.
     e.preventDefault();
     e.stopPropagation();
-    // Đã có trong giỏ — kiểu Udemy: đổi hẳn thành lối tắt "Đi đến giỏ hàng" thay vì no-op
-    // (BR-CART-02 vẫn đúng: bấm lại không tạo dòng giỏ hàng trùng, chỉ đổi ý nghĩa nút bấm).
+    // Đã có trong giỏ thì nút thành lối tắt "Đi đến giỏ hàng" (BR-CART-02: không tạo dòng trùng).
     if (inCart) {
       router.push('/cart');
       return;
@@ -60,8 +53,7 @@ export function CourseCard({ course }: { course: CourseSummary }) {
     addToCart.mutate(course.id);
   };
 
-  // Danh sách yêu thích (14/09/2026, mở rộng ngoài đặc tả gốc) — không có lý do wishlist 1
-  // khóa đã sở hữu rồi, ẩn hẳn nút cho gọn thay vì disable.
+  // Danh sách yêu thích — ẩn với khóa đã sở hữu.
   const { data: wishlistItems } = useWishlist();
   const inWishlist = wishlistItems?.some((item) => item.courseId === course.id) ?? false;
   const addToWishlist = useAddToWishlist();
@@ -80,9 +72,7 @@ export function CourseCard({ course }: { course: CourseSummary }) {
     ? `/learn/${enrollment.firstLessonId}`
     : `/courses/${course.slug}`;
 
-  // doc/DacTa_ChucNangChungChi.md (26/09/2026, sửa lỗi) — trước đây bấm là tải PDF thẳng, không
-  // cho xem trước/chia sẻ LinkedIn/sao chép link xác thực. Giờ điều hướng tới trang chứng chỉ
-  // ("/certificates/{code}"), nơi có đủ các hành động đó — chỉ tải PDF là 1 trong số đó.
+  // Điều hướng tới trang chứng chỉ (xem trước / chia sẻ / tải PDF).
   const handleGoToCertificate = (e: MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -94,7 +84,7 @@ export function CourseCard({ course }: { course: CourseSummary }) {
       href={targetHref}
       className="card-interactive group flex h-full flex-col overflow-hidden no-underline hover:no-underline"
     >
-      {/* Ảnh bìa */}
+      {/* 1. Ảnh bìa 16:9 */}
       <div
         className="relative flex aspect-video items-center justify-center overflow-hidden"
         style={
@@ -111,59 +101,60 @@ export function CourseCard({ course }: { course: CourseSummary }) {
             alt={course.title}
             fill
             sizes="(min-width: 1280px) 25vw, (min-width: 640px) 33vw, 100vw"
-            className="object-cover transition-transform duration-300 ease-soft group-hover:scale-[1.03]"
+            className="object-cover transition-transform duration-300 ease-soft group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
           />
         ) : (
           <span className="rounded-full bg-ink/35 px-2.5 py-1 font-mono text-[11px] tracking-wide text-white/85">
-            ảnh bìa khoá học
+            {t('coverPlaceholder')}
           </span>
         )}
 
-        {/* Nút yêu thích (14/09/2026, mở rộng) */}
         {!isOwned && (
           <button
             type="button"
             onClick={handleToggleWishlist}
             disabled={wishlistPending}
-            aria-label={inWishlist ? 'Bỏ khỏi danh sách yêu thích' : 'Thêm vào danh sách yêu thích'}
+            aria-label={inWishlist ? t('wishlistRemove') : t('wishlistAdd')}
             aria-pressed={inWishlist}
-            className={`absolute right-2.5 top-2.5 flex h-9 w-9 items-center justify-center rounded-full shadow-sm transition-colors ${
-              inWishlist ? 'bg-surface-raised text-danger' : 'bg-white/90 text-ink-faint hover:text-danger'
+            className={`absolute right-2.5 top-2.5 flex h-9 w-9 items-center justify-center rounded-full bg-surface-raised/90 shadow-sm transition-colors ${
+              inWishlist ? 'text-danger' : 'text-ink-faint hover:text-danger'
             }`}
           >
-            {/* SVG duy nhất cho cả 2 trạng thái, chỉ đổi fill — tránh lệch hình dạng như 2 ký tự Unicode ♥/♡ cũ. */}
-            <svg width="18" height="18" viewBox="0 0 24 24" fill={inWishlist ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill={inWishlist ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
             </svg>
           </button>
         )}
 
-        {/* Nhãn góc trên trái: Miễn phí (nếu có) và AI lồng tiếng (thay hàng cờ ngôn ngữ cũ — spec mục 4) */}
-        <div className="absolute left-2.5 top-2.5 flex flex-col items-start gap-1">
-          {course.isFree && <Badge tone="success">Miễn phí</Badge>}
-          {/* Mọi khóa đều hỗ trợ lồng tiếng AI; API công khai chưa trả danh sách giọng (`langs` luôn rỗng)
-              nên nhãn luôn hiện, chỉ có tooltip khi danh sách có dữ liệu. */}
-          <span
-            title={course.langs.length > 0 ? course.langs.map((l) => l.label).join(', ') : undefined}
-            className="rounded-full bg-surface-raised px-2 py-0.5 text-[11px] font-medium text-accent-dark shadow-sm"
-          >
-            AI lồng tiếng
-          </span>
-        </div>
+        {course.isFree && (
+          <div className="absolute left-2.5 top-2.5">
+            <Badge tone="success">{t('free')}</Badge>
+          </div>
+        )}
       </div>
 
-      {/* Nội dung */}
       <div className="flex flex-1 flex-col gap-1.5 p-3">
+        {/* 2. Tên — 2 dòng */}
         <span className="line-clamp-2 min-h-[38px] font-display text-sm font-semibold leading-snug text-ink">
           {course.title}
         </span>
-        <span className="text-xs text-ink-muted">GV. {course.instructorName}</span>
+        {/* 3. Giảng viên */}
+        <span className="truncate text-xs text-ink-muted">{t('instructor', { name: course.instructorName })}</span>
 
-        <StarRating
-          rating={course.avgRating}
-          reviewCount={course.reviewCount}
-          levelLabel={LEVEL_LABEL[course.level]}
-        />
+        {/* 4. Nhãn lồng tiếng (thay "Bestseller") + ★ + số đánh giá */}
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+          <span
+            title={course.langs.length > 0 ? course.langs.map((l) => l.label).join(', ') : undefined}
+            className="rounded-chip bg-tint px-1.5 py-0.5 text-[11px] font-semibold text-ink"
+          >
+            {t('aiDub')}
+          </span>
+          <StarRating
+            rating={course.avgRating}
+            reviewCount={course.reviewCount}
+            levelLabel={t(`level.${course.level}`)}
+          />
+        </div>
 
         {isOwned && (
           <div className="flex items-center gap-2">
@@ -179,30 +170,33 @@ export function CourseCard({ course }: { course: CourseSummary }) {
           </div>
         )}
 
+        {/* 5. Giá + 6. hành động */}
         <div className="mt-auto flex items-center justify-between gap-2 border-t border-line-soft pt-2">
           {isOwned ? (
             enrollment.progressPct >= 100 && enrollment.certificateCode ? (
               <button
                 type="button"
                 onClick={handleGoToCertificate}
-                className="flex items-center gap-1.5 font-display text-[13px] font-bold text-accent hover:text-accent-dark transition-colors"
+                className="flex items-center gap-1.5 font-display text-[13px] font-bold text-accent transition-colors hover:text-accent-dark"
               >
-                <Award className="w-3.5 h-3.5" strokeWidth={1.75} />
-                Xem chứng chỉ
+                <Award className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden />
+                {t('viewCertificate')}
               </button>
             ) : (
-              <span className="font-display text-[15px] font-bold text-accent">Đã sở hữu</span>
+              <span className="font-display text-[15px] font-bold text-ink">{t('owned')}</span>
             )
           ) : course.isFree ? (
-            <span className="font-display text-[15px] font-bold text-success">Miễn phí</span>
+            <span className="font-display text-[15px] font-bold text-success">{t('free')}</span>
           ) : course.discountPercent ? (
-            // Mã giảm giá (15/09/2026, mở rộng) — chỉ coupon `autoApply=true` hiện trực tiếp ở
-            // thẻ khóa học, không cần nhập mã (BR-COUPON-04).
+            // Chỉ coupon `autoApply=true` hiện trực tiếp ở thẻ khóa học (BR-COUPON-04).
             <div className="flex items-baseline gap-1.5">
               <span className="font-display text-[15px] font-bold text-ink">
                 {formatPrice(course.finalPrice)}
               </span>
-              <span className="text-xs text-ink-faint line-through">{formatPrice(course.price)}</span>
+              <span className="text-xs text-ink-faint line-through">
+                <span className="sr-only">{t('originalPrice')} </span>
+                {formatPrice(course.price)}
+              </span>
               <span className="rounded bg-danger/10 px-1.5 py-0.5 text-[11px] font-bold text-danger">
                 -{course.discountPercent}%
               </span>
@@ -213,9 +207,6 @@ export function CourseCard({ course }: { course: CourseSummary }) {
             </span>
           )}
 
-          {/* Giỏ hàng (06/09/2026, mở rộng ngoài đặc tả gốc) — thay hẳn gợi ý "Xem chi tiết →"
-              cũ: cả thẻ đã là 1 <Link> nên bấm đâu cũng vào được trang chi tiết, không cần
-              nhắc lại; chỗ này dành cho hành động THẬT SỰ hữu ích hơn — thêm vào giỏ. */}
           {canAddToCart && (
             <button
               type="button"
@@ -227,7 +218,7 @@ export function CourseCard({ course }: { course: CourseSummary }) {
                   : 'bg-accent text-white hover:bg-accent-dark hover:text-white'
               } disabled:cursor-not-allowed`}
             >
-              {inCart ? 'Đi đến giỏ hàng' : addToCart.isPending ? 'Đang thêm...' : 'Thêm vào giỏ hàng'}
+              {inCart ? t('goToCart') : addToCart.isPending ? t('adding') : t('addToCart')}
             </button>
           )}
         </div>

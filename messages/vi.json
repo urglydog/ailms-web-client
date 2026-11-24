@@ -74,9 +74,19 @@
       "categories": "DANH MỤC",
       "more": "KHÁM PHÁ THÊM",
       "liveNow": "Đang diễn ra",
-      "groups": { "it": "Công nghệ thông tin", "soft": "Kỹ năng mềm", "other": "Lĩnh vực khác" }
+      "groups": {
+        "it": "Công nghệ thông tin",
+        "soft": "Kỹ năng mềm",
+        "other": "Lĩnh vực khác"
+      }
     },
-    "theme": { "toDark": "Chuyển sang giao diện tối", "toLight": "Chuyển sang giao diện sáng", "label": "Giao diện", "dark": "Tối", "light": "Sáng" },
+    "theme": {
+      "toDark": "Chuyển sang giao diện tối",
+      "toLight": "Chuyển sang giao diện sáng",
+      "label": "Giao diện",
+      "dark": "Tối",
+      "light": "Sáng"
+    },
     "skipToContent": "Bỏ qua tới nội dung",
     "help": "Trợ giúp & Hỗ trợ"
   },
@@ -186,7 +196,10 @@
       "empty": "Chưa có khóa học nào trong danh mục này."
     },
     "shelves": {
-      "featured": { "title": "Được đề xuất", "subtitle": "Các khóa học được LinguaLearn đề xuất cho bạn." },
+      "featured": {
+        "title": "Được đề xuất",
+        "subtitle": "Các khóa học được LinguaLearn đề xuất cho bạn."
+      },
       "newest": {
         "title": "Mới ra mắt",
         "subtitle": "Những khóa học vừa được thêm vào LinguaLearn"
@@ -438,8 +451,17 @@
     }
   },
   "courseList": {
-    "loadMore": { "button": "Xem thêm khóa học", "loading": "Đang tải thêm khóa học…", "end": "Bạn đã xem hết khóa học phù hợp." },
-    "pagination": { "nav": "Phân trang", "prev": "Trang trước", "next": "Trang sau", "page": "Trang {page}" },
+    "loadMore": {
+      "button": "Xem thêm khóa học",
+      "loading": "Đang tải thêm khóa học…",
+      "end": "Bạn đã xem hết khóa học phù hợp."
+    },
+    "pagination": {
+      "nav": "Phân trang",
+      "prev": "Trang trước",
+      "next": "Trang sau",
+      "page": "Trang {page}"
+    },
     "title": "Kho khóa học",
     "subtitle": "Mọi khóa học đều có thể lồng tiếng sang ngôn ngữ bạn chọn.",
     "all": "Tất cả",
@@ -1007,7 +1029,10 @@
           "title": "Gói khóa học",
           "description": "Gộp nhiều khóa thành một gói với mức giảm giá hấp dẫn để học viên mua trọn bộ."
         },
-        "share": { "title": "Chia sẻ & Quảng bá", "description": "Lấy link giới thiệu riêng cho từng khóa, chia sẻ lên mạng xã hội và xem số đơn đến từ link của bạn." }
+        "share": {
+          "title": "Chia sẻ & Quảng bá",
+          "description": "Lấy link giới thiệu riêng cho từng khóa, chia sẻ lên mạng xã hội và xem số đơn đến từ link của bạn."
+        }
       }
     },
     "live": {
@@ -3300,5 +3325,29 @@
     "requestThis": "Vấn đề này chưa được giải quyết? Gửi yêu cầu",
     "otherInGroup": "Vấn đề khác trong nhóm này",
     "otherLabel": "Vấn đề khác"
+  },
+  "courseCard": {
+    "aiDub": "AI lồng tiếng",
+    "instructor": "GV. {name}",
+    "free": "Miễn phí",
+    "owned": "Đã sở hữu",
+    "viewCertificate": "Xem chứng chỉ",
+    "addToCart": "Thêm vào giỏ hàng",
+    "adding": "Đang thêm...",
+    "goToCart": "Đi đến giỏ hàng",
+    "wishlistAdd": "Thêm vào danh sách yêu thích",
+    "wishlistRemove": "Bỏ khỏi danh sách yêu thích",
+    "coverPlaceholder": "ảnh bìa khoá học",
+    "originalPrice": "Giá gốc",
+    "level": {
+      "BEGINNER": "Cơ bản",
+      "INTERMEDIATE": "Trung cấp",
+      "ADVANCED": "Nâng cao"
+    }
+  },
+  "common": {
+    "layout": {
+      "viewAll": "Xem tất cả"
+    }
   }
 }
