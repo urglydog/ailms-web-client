@@ -3,7 +3,6 @@
 import { useTranslations } from 'next-intl';
 import type { CategoryShelfData } from '@/lib/home/categoryShelves';
 import type { CourseSummary } from '@/types/domain';
-import { CategoryTiles } from './CategoryTiles';
 import { CourseShelf } from './CourseShelf';
 
 interface HomeShelvesProps {
@@ -34,7 +33,6 @@ export function HomeShelves({ newest, free, beginner, categoryShelves = [] }: Ho
         href="/courses"
         courses={beginner}
       />
-      <CategoryTiles />
       {categoryShelves.map((shelf, i) => (
         <CourseShelf
           key={shelf.slug}

@@ -122,8 +122,8 @@
   "home": {
     "hero": {
       "tag": "全新 · AI 配音",
-      "titleBefore": "所有课程，用",
-      "titleHighlight": "你的语言",
+      "titleBefore": "任何课程，都能用",
+      "titleHighlight": "你的语言学习",
       "description": "AI 将国际课程配音成你选择的语言，与原视频同步，无需字幕。",
       "cta": "探索课程",
       "demoLink": "观看演示 →"
@@ -214,11 +214,37 @@
       },
       "byCategory": {
         "subtitle": "{name} 热门课程"
-      }
+      },
+      "prev": "上一组",
+      "next": "下一组"
     },
     "topics": {
       "title": "按主题探索",
       "subtitle": "选择你想学习的领域"
+    },
+    "continue": {
+      "title": "继续学习",
+      "all": "我的课程",
+      "streak": "连续 {count} 天",
+      "studiedToday": "今天已学习，继续保持！",
+      "notStudiedToday": "今天学一节课以保持连续记录"
+    },
+    "ai": {
+      "title": "与 AI 一起，按你的方式学习",
+      "subtitle": "每门 LinguaLearn 课程都附带三款 AI 工具。",
+      "dubbing": {
+        "title": "AI 配音",
+        "body": "用你选择的语言收听课程，与原视频同步。"
+      },
+      "tutor": {
+        "title": "AI 导师",
+        "body": "随时提问；导师引导思考并跳转到相关片段。"
+      },
+      "plan": {
+        "title": "AI 学习计划",
+        "body": "根据你的时间和进度定制的个性化计划。"
+      },
+      "cta": "浏览课程"
     }
   },
   "myCourses": {

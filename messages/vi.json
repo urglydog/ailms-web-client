@@ -122,7 +122,7 @@
   "home": {
     "hero": {
       "tag": "Mới · AI lồng tiếng",
-      "titleBefore": "Mọi khóa học bằng",
+      "titleBefore": "Học mọi khóa học bằng",
       "titleHighlight": "ngôn ngữ của bạn",
       "description": "AI lồng tiếng khóa học quốc tế sang ngôn ngữ bạn chọn, đồng bộ với video gốc. Hiểu ngay, không cần phụ đề.",
       "cta": "Khám phá khóa học",
@@ -214,11 +214,37 @@
       },
       "byCategory": {
         "subtitle": "Những khóa học nổi bật về {name}"
-      }
+      },
+      "prev": "Trước",
+      "next": "Tiếp"
     },
     "topics": {
       "title": "Khám phá theo chủ đề",
       "subtitle": "Chọn lĩnh vực bạn muốn học"
+    },
+    "continue": {
+      "title": "Tiếp tục học",
+      "all": "Khóa học của tôi",
+      "streak": "Chuỗi {count} ngày",
+      "studiedToday": "Hôm nay bạn đã học — giữ vững nhé!",
+      "notStudiedToday": "Học một bài hôm nay để giữ chuỗi"
+    },
+    "ai": {
+      "title": "Học cùng AI, theo cách của bạn",
+      "subtitle": "Ba công cụ AI đi kèm mọi khóa học trên LinguaLearn.",
+      "dubbing": {
+        "title": "Lồng tiếng AI",
+        "body": "Nghe bài giảng bằng ngôn ngữ bạn chọn, đồng bộ với video gốc."
+      },
+      "tutor": {
+        "title": "Gia sư AI",
+        "body": "Hỏi ngay khi chưa hiểu; gia sư gợi mở và dẫn tới đúng đoạn video."
+      },
+      "plan": {
+        "title": "Lộ trình học AI",
+        "body": "Kế hoạch học cá nhân hóa theo thời gian và tiến độ của bạn."
+      },
+      "cta": "Khám phá khóa học"
     }
   },
   "myCourses": {

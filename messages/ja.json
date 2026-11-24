@@ -122,7 +122,7 @@
   "home": {
     "hero": {
       "tag": "新機能 · AI吹き替え",
-      "titleBefore": "すべての講座を",
+      "titleBefore": "どんな講座も",
       "titleHighlight": "あなたの言語で",
       "description": "AIが海外の講座を選んだ言語に吹き替え、元の映像と同期。字幕は不要です。",
       "cta": "講座を探す",
@@ -214,11 +214,37 @@
       },
       "byCategory": {
         "subtitle": "{name}の人気コース"
-      }
+      },
+      "prev": "前へ",
+      "next": "次へ"
     },
     "topics": {
       "title": "テーマから探す",
       "subtitle": "学びたい分野を選びましょう"
+    },
+    "continue": {
+      "title": "学習を続ける",
+      "all": "マイラーニング",
+      "streak": "{count}日連続",
+      "studiedToday": "今日も学習済み — その調子！",
+      "notStudiedToday": "今日1レッスン学んで連続記録を維持"
+    },
+    "ai": {
+      "title": "AIと一緒に、自分のペースで",
+      "subtitle": "LinguaLearnのすべてのコースに3つのAIツールが付いています。",
+      "dubbing": {
+        "title": "AI吹き替え",
+        "body": "選んだ言語で講義を聞けます。元の動画と同期します。"
+      },
+      "tutor": {
+        "title": "AIチューター",
+        "body": "分からない時にすぐ質問。チューターが考え方を導き、該当箇所へ移動します。"
+      },
+      "plan": {
+        "title": "AI学習プラン",
+        "body": "あなたの時間と進捗に合わせた個別プラン。"
+      },
+      "cta": "コースを探す"
     }
   },
   "myCourses": {

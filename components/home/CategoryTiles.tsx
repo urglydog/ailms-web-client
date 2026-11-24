@@ -36,8 +36,8 @@ export function CategoryTiles() {
     <section className="bg-surface-raised">
       <div className="shell section-block">
         <h2 className="section-title">{t('title')}</h2>
-        <p className="m-0 mb-4 mt-0.5 text-sm text-ink-muted">{t('subtitle')}</p>
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
+        <p className="m-0 mb-6 mt-1 text-sm text-ink-muted">{t('subtitle')}</p>
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 lg:gap-5">
           {categories.map((c) => {
             const visual = categoryVisual(c.slug, c.id);
             const Icon = ICONS[visual.icon];
@@ -53,7 +53,7 @@ export function CategoryTiles() {
                     alt=""
                     fill
                     sizes="(min-width: 1024px) 20vw, (min-width: 768px) 33vw, 50vw"
-                    className="object-cover transition-transform duration-300 group-hover:scale-105"
+                    className="object-cover transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
                   />
                 ) : (
                   <Icon
@@ -66,7 +66,7 @@ export function CategoryTiles() {
                 <span className="absolute left-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/25 text-white backdrop-blur-sm">
                   <Icon aria-hidden className="h-[18px] w-[18px]" />
                 </span>
-                <span className="absolute inset-x-0 bottom-0 p-3 font-display text-sm font-semibold text-white">
+                <span className="absolute inset-x-0 bottom-0 p-3 font-display text-base font-semibold text-white lg:text-lg">
                   {c.name}
                 </span>
               </Link>

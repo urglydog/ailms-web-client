@@ -23,14 +23,27 @@ describe('CourseShelf', () => {
     expect(screen.getByRole('link', { name: /Xem tất cả/ })).toHaveAttribute('href', '/courses?sort=newest');
   });
 
-  it('bỏ khóa đã sở hữu và hiện tối đa 4 thẻ', () => {
+  it('bỏ khóa đã sở hữu, giữ thứ tự', () => {
     renderWithIntl(<CourseShelf title="T" href="/courses" courses={COURSES} />);
     expect(screen.getAllByTestId('card').map((c) => c.textContent)).toEqual([
       'Khóa học 1',
       'Khóa học 3',
       'Khóa học 4',
       'Khóa học 5',
+      'Khóa học 6',
     ]);
+  });
+
+  it('kệ nhiều hơn 4 thẻ có mũi tên trái/phải', () => {
+    renderWithIntl(<CourseShelf title="T" href="/courses" courses={COURSES} />);
+    expect(screen.getByRole('button', { name: 'Trước' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Tiếp' })).toBeInTheDocument();
+  });
+
+  it('tối đa 12 thẻ', () => {
+    const many = Array.from({ length: 20 }, (_, i) => makeCourse(100 + i));
+    renderWithIntl(<CourseShelf title="T" href="/courses" courses={many} />);
+    expect(screen.getAllByTestId('card')).toHaveLength(12);
   });
 
   it('không có khóa nào để hiện thì không vẽ gì', () => {

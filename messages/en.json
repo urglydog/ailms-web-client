@@ -122,7 +122,7 @@
   "home": {
     "hero": {
       "tag": "New · AI dubbing",
-      "titleBefore": "Every course in",
+      "titleBefore": "Learn any course in",
       "titleHighlight": "your language",
       "description": "AI dubs international courses into the language you choose, in sync with the original video. No subtitles needed.",
       "cta": "Explore courses",
@@ -214,11 +214,37 @@
       },
       "byCategory": {
         "subtitle": "Top courses in {name}"
-      }
+      },
+      "prev": "Previous",
+      "next": "Next"
     },
     "topics": {
       "title": "Explore by topic",
       "subtitle": "Pick the field you want to learn"
+    },
+    "continue": {
+      "title": "Continue learning",
+      "all": "My learning",
+      "streak": "{count}-day streak",
+      "studiedToday": "You studied today — keep it up!",
+      "notStudiedToday": "Study one lesson today to keep your streak"
+    },
+    "ai": {
+      "title": "Learn with AI, your way",
+      "subtitle": "Three AI tools come with every LinguaLearn course.",
+      "dubbing": {
+        "title": "AI dubbing",
+        "body": "Hear lectures in the language you choose, synced with the original video."
+      },
+      "tutor": {
+        "title": "AI tutor",
+        "body": "Ask whenever you're stuck; the tutor guides you and jumps to the right moment."
+      },
+      "plan": {
+        "title": "AI study plan",
+        "body": "A personalised plan that fits your schedule and progress."
+      },
+      "cta": "Explore courses"
     }
   },
   "myCourses": {
