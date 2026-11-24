@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import { Bot, Languages, Route } from 'lucide-react';
 import { useTranslations } from 'next-intl';
