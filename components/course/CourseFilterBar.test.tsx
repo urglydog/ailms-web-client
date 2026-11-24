@@ -47,3 +47,19 @@ describe('CourseFilterBar', () => {
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
   });
 });
+
+describe('CourseFilterBar — Tất cả bộ lọc', () => {
+  it('mở hộp thoại liệt kê đủ 5 nhóm, Xóa bộ lọc giữ từ khóa', () => {
+    const onChange = vi.fn();
+    renderWithIntl(
+      <CourseFilterBar filters={{ ...EMPTY_FILTERS, keyword: 'unity', level: 'BEGINNER' }} onChange={onChange} categories={CATS} />,
+    );
+    fireEvent.click(screen.getByRole('button', { name: /Tất cả bộ lọc/ }));
+    const dialog = screen.getByRole('dialog');
+    for (const name of ['Danh mục', 'Đánh giá', 'Thời lượng video', 'Học phí', 'Trình độ']) {
+      expect(dialog).toHaveTextContent(name);
+    }
+    fireEvent.click(screen.getByRole('button', { name: 'Xóa bộ lọc' }));
+    expect(onChange).toHaveBeenCalledWith({ ...EMPTY_FILTERS, keyword: 'unity' });
+  });
+});

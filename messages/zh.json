@@ -556,8 +556,12 @@
       "free": "免费",
       "paid": "付费",
       "showMore": "显示更多（{count}）",
-      "showLess": "收起"
-    }
+      "showLess": "收起",
+      "all": "全部筛选",
+      "done": "查看结果"
+    },
+    "resultsFor": "“{q}” 的 {count} 个结果",
+    "resultsCount": "{count} 门课程"
   },
   "shop": {
     "steps": {

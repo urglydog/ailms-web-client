@@ -556,8 +556,12 @@
       "free": "Miễn phí",
       "paid": "Trả phí",
       "showMore": "Hiện thêm ({count})",
-      "showLess": "Hiện ít hơn"
-    }
+      "showLess": "Hiện ít hơn",
+      "all": "Tất cả bộ lọc",
+      "done": "Xem kết quả"
+    },
+    "resultsFor": "{count} kết quả cho “{q}”",
+    "resultsCount": "{count} khóa học"
   },
   "shop": {
     "steps": {

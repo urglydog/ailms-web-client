@@ -556,8 +556,12 @@
       "free": "Free",
       "paid": "Paid",
       "showMore": "Show more ({count})",
-      "showLess": "Show less"
-    }
+      "showLess": "Show less",
+      "all": "All filters",
+      "done": "Show results"
+    },
+    "resultsFor": "{count} results for “{q}”",
+    "resultsCount": "{count} courses"
   },
   "shop": {
     "steps": {

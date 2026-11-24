@@ -556,8 +556,12 @@
       "free": "無料",
       "paid": "有料",
       "showMore": "もっと見る（{count}）",
-      "showLess": "閉じる"
-    }
+      "showLess": "閉じる",
+      "all": "すべてのフィルター",
+      "done": "結果を表示"
+    },
+    "resultsFor": "「{q}」の検索結果 {count} 件",
+    "resultsCount": "{count} コース"
   },
   "shop": {
     "steps": {

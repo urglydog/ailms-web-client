@@ -16,6 +16,7 @@ import { useMyEnrollments } from '@/hooks/useEnrollments';
 import { useCourseSearchInfinite } from '@/hooks/usePublicCourses';
 import { useLoadMoreOnScroll } from '@/hooks/useLoadMoreOnScroll';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { EMPTY_FILTERS } from '@/lib/api/publicCourses';
 import { clearFilter } from '@/lib/courses/filterChips';
 import { resolveCategoryParam } from '@/lib/courses/categoryParam';
@@ -57,7 +58,10 @@ function CoursesPageContent() {
   const searchParams = useSearchParams();
   const [filters, setFilters] = useState<CourseFilterState>(EMPTY_FILTERS);
   const [sortBy, setSortBy] = useState<CourseSortBy>('newest');
-  const [view, setView] = useState<CourseListView>('grid');
+  const [storedView, setView] = useState<CourseListView>('grid');
+  // Mobile (< 640px) luôn là danh sách dọc (UDEMY_LAYOUT_ANALYSIS mục 3); từ sm trở lên theo lựa chọn của người dùng.
+  const isPhone = useMediaQuery('(max-width: 639px)');
+  const view: CourseListView = isPhone ? 'list' : storedView;
   const { data: loadedCategories } = useCategories();
   // Danh mục có thể đã nằm sẵn trong cache của trình duyệt khi hydrate còn máy chủ thì chưa có; chỉ dùng sau khi đã
   // mount để HTML hai bên khớp nhau (cùng cách xử lý với trang Khóa học của tôi).
@@ -119,18 +123,20 @@ function CoursesPageContent() {
   };
 
   const gridClass = 'grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4';
+  // API trả Slice (không có tổng) — đếm số khóa đã tải, thêm "+" khi còn trang sau.
+  const countLabel = `${courses.length}${hasNextPage ? '+' : ''}`;
 
   return (
     <div>
-      <div className="border-b border-line bg-tint">
-        <div className="shell py-8">
-          <h1 className="mb-1 font-display text-3xl font-bold text-ink">{t('title')}</h1>
-          <p className="text-sm text-ink-muted">{t('subtitle')}</p>
-        </div>
+      <div className="shell pt-8 lg:pt-10">
+        <h1 className="section-title">
+          {filters.keyword ? t('resultsFor', { count: countLabel, q: filters.keyword }) : t('title')}
+        </h1>
+        {!filters.keyword && <p className="m-0 mt-2 text-sm text-ink-muted">{t('subtitle')}</p>}
       </div>
 
-      <div className="shell py-6">
-        {/* Thanh công cụ: bộ lọc ngang (trái), sắp xếp + dạng hiển thị (phải) */}
+      <div className="shell pb-12 pt-6">
+        {/* Thanh công cụ: hàng chip lọc ngang + "Tất cả bộ lọc" (trái), sắp xếp + dạng hiển thị (phải) */}
         <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
           <CourseFilterBar filters={filters} onChange={setFilters} categories={categories ?? []} />
           <div className="flex items-center gap-3">
@@ -148,9 +154,15 @@ function CoursesPageContent() {
                 ))}
               </select>
             </label>
-            <ViewToggle view={view} onChange={changeView} />
+            <div className="hidden sm:block">
+              <ViewToggle view={view} onChange={changeView} />
+            </div>
           </div>
         </div>
+
+        {!isLoading && !filters.keyword && courses.length > 0 && (
+          <p role="status" className="m-0 mb-3 text-sm text-ink-muted">{t('resultsCount', { count: countLabel })}</p>
+        )}
 
         <ActiveFilters
           filters={filters}
