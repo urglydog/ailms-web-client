@@ -75,6 +75,9 @@ interface RawDetail extends RawSummary {
   dubbedLanguages: string[];
   learnerCount: number;
   requiresPassword: boolean;
+  learningOutcomes?: string[] | null;
+  requirements?: string[] | null;
+  targetAudience?: string[] | null;
 }
 
 /**
@@ -138,6 +141,10 @@ function toDetail(raw: RawDetail): CourseDetail {
     dubbedLanguages: raw.dubbedLanguages,
     learnerCount: raw.learnerCount,
     requiresPassword: raw.requiresPassword,
+    // "Bạn sẽ học được gì" / "Yêu cầu" / "Dành cho ai" (V176) — thiếu 3 dòng này thì trang không hiện các khối đó.
+    learningOutcomes: raw.learningOutcomes ?? [],
+    requirements: raw.requirements ?? [],
+    targetAudience: raw.targetAudience ?? [],
   };
 }
 
