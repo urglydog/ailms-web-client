@@ -572,6 +572,17 @@
       "outcomesTitle": "Bạn sẽ học được gì",
       "requirementsTitle": "Yêu cầu",
       "audienceTitle": "Khoá học này dành cho ai"
+    },
+    "promo": {
+      "endsIn": "Ưu đãi kết thúc sau",
+      "days": "{d} ngày {h} giờ"
+    },
+    "shareGift": {
+      "share": "Chia sẻ",
+      "gift": "Tặng khóa học",
+      "soon": "Sắp ra mắt",
+      "copied": "Đã chép liên kết khóa học",
+      "copyFailed": "Không chép được liên kết"
     }
   },
   "courseList": {
@@ -1089,7 +1100,14 @@
           "title": "Doanh thu thực nhận theo ngày (30 ngày qua)",
           "aria": "Biểu đồ cột doanh thu theo ngày, tổng {total} trong 30 ngày, ngày cao nhất {peak}",
           "empty": "Chưa có doanh thu trong 30 ngày qua.",
-          "titleRange": "Doanh thu thực nhận — {range}"
+          "titleRange": "Doanh thu thực nhận — {range}",
+          "ariaRange": "Biểu đồ cột doanh thu ({range}), tổng {total}, cột cao nhất {peak}",
+          "emptyRange": {
+            "7d": "Chưa có doanh thu trong 7 ngày qua.",
+            "30d": "Chưa có doanh thu trong 30 ngày qua.",
+            "12m": "Chưa có doanh thu trong 12 tháng qua.",
+            "all": "Chưa có doanh thu nào."
+          }
         },
         "growth": {
           "start": "Bắt đầu có doanh thu trong kỳ này",

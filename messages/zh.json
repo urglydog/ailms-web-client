@@ -572,6 +572,17 @@
       "outcomesTitle": "你将学到什么",
       "requirementsTitle": "要求",
       "audienceTitle": "本课程适合谁"
+    },
+    "promo": {
+      "endsIn": "优惠结束还剩",
+      "days": "{d} 天 {h} 小时"
+    },
+    "shareGift": {
+      "share": "分享",
+      "gift": "赠送课程",
+      "soon": "即将推出",
+      "copied": "已复制课程链接",
+      "copyFailed": "无法复制链接"
     }
   },
   "courseList": {
@@ -1089,7 +1100,14 @@
           "title": "每日实际收入（近 30 天）",
           "aria": "每日收入柱状图，30 天共 {total}，最高一天 {peak}",
           "empty": "近 30 天暂无收入。",
-          "titleRange": "实收收入 — {range}"
+          "titleRange": "实收收入 — {range}",
+          "ariaRange": "收入柱状图（{range}），共 {total}，最高一柱 {peak}",
+          "emptyRange": {
+            "7d": "近 7 天暂无收入。",
+            "30d": "近 30 天暂无收入。",
+            "12m": "近 12 个月暂无收入。",
+            "all": "暂无收入。"
+          }
         },
         "growth": {
           "start": "本期开始有收入",

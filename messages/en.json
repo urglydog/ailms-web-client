@@ -572,6 +572,17 @@
       "outcomesTitle": "What you'll learn",
       "requirementsTitle": "Requirements",
       "audienceTitle": "Who this course is for"
+    },
+    "promo": {
+      "endsIn": "Offer ends in",
+      "days": "{d}d {h}h"
+    },
+    "shareGift": {
+      "share": "Share",
+      "gift": "Gift this course",
+      "soon": "Coming soon",
+      "copied": "Course link copied",
+      "copyFailed": "Couldn't copy the link"
     }
   },
   "courseList": {
@@ -1089,7 +1100,14 @@
           "title": "Daily net revenue (last 30 days)",
           "aria": "Bar chart of daily revenue, {total} in total over 30 days, best day {peak}",
           "empty": "No revenue in the last 30 days.",
-          "titleRange": "Net earnings — {range}"
+          "titleRange": "Net earnings — {range}",
+          "ariaRange": "Revenue bar chart ({range}), {total} in total, highest bar {peak}",
+          "emptyRange": {
+            "7d": "No revenue in the last 7 days.",
+            "30d": "No revenue in the last 30 days.",
+            "12m": "No revenue in the last 12 months.",
+            "all": "No revenue yet."
+          }
         },
         "growth": {
           "start": "Revenue started this period",

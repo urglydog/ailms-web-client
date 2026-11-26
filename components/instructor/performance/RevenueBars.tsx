@@ -3,22 +3,31 @@
 import { useLocale, useTranslations } from 'next-intl';
 import { formatShortDate } from '@/lib/instructorInsights';
 import { formatMoney } from '@/lib/shop/money';
+import type { PerformanceRange } from '@/lib/api/dashboard';
 
 /** Biểu đồ cột doanh thu theo ngày bằng div (không cần thư viện); cột cao nhất chiếm 100% chiều cao, ngày không có doanh thu
  * vẫn có vạch mỏng 2px. Không có doanh thu nào thì hiện lời báo trống. Mô tả tổng và ngày cao nhất qua aria-label. */
-export function RevenueBars({ series }: { series: ReadonlyArray<{ day: string; value: number }> }) {
+export function RevenueBars({
+  series,
+  range = '30d',
+}: {
+  series: ReadonlyArray<{ day: string; value: number }>;
+  /** Khoảng đang chọn — nhãn đọc màn hình và lời báo trống nói đúng khoảng này (26/11/2026). */
+  range?: PerformanceRange;
+}) {
   const t = useTranslations('instructor.performance.overview.chart');
+  const tRange = useTranslations('instructor.performance.range');
   const locale = useLocale();
   const total = series.reduce((sum, p) => sum + p.value, 0);
   const peak = series.reduce((best, p) => (p.value > best.value ? p : best), { day: '', value: 0 });
 
-  if (total === 0) return <p className="m-0 text-sm text-ink-muted">{t('empty')}</p>;
+  if (total === 0) return <p className="m-0 text-sm text-ink-muted">{t(`emptyRange.${range}`)}</p>;
 
   return (
     <div>
       <div
         role="img"
-        aria-label={t('aria', { total: formatMoney(total, locale), peak: formatMoney(peak.value, locale) })}
+        aria-label={t('ariaRange', { range: tRange(range), total: formatMoney(total, locale), peak: formatMoney(peak.value, locale) })}
         className="flex h-40 items-end gap-[3px]"
       >
         {series.map((p) => (

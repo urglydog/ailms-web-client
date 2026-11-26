@@ -572,6 +572,17 @@
       "outcomesTitle": "学習内容",
       "requirementsTitle": "前提条件",
       "audienceTitle": "このコースの対象者"
+    },
+    "promo": {
+      "endsIn": "セール終了まで",
+      "days": "{d}日{h}時間"
+    },
+    "shareGift": {
+      "share": "共有",
+      "gift": "コースをギフト",
+      "soon": "近日公開",
+      "copied": "コースのリンクをコピーしました",
+      "copyFailed": "リンクをコピーできませんでした"
     }
   },
   "courseList": {
@@ -1089,7 +1100,14 @@
           "title": "日別の実収益（過去 30 日間）",
           "aria": "日別収益の棒グラフ。30 日間の合計 {total}、最も多い日 {peak}",
           "empty": "過去 30 日間の収益はありません。",
-          "titleRange": "純収益 — {range}"
+          "titleRange": "純収益 — {range}",
+          "ariaRange": "収益の棒グラフ（{range}）。合計 {total}、最も高い棒 {peak}",
+          "emptyRange": {
+            "7d": "過去 7 日間の収益はありません。",
+            "30d": "過去 30 日間の収益はありません。",
+            "12m": "過去 12 か月の収益はありません。",
+            "all": "まだ収益はありません。"
+          }
         },
         "growth": {
           "start": "今期から収益が発生しました",
