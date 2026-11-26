@@ -1080,12 +1080,15 @@
           "revenue": "Doanh thu thực nhận (30 ngày)",
           "enrollments": "Lượt đăng ký mới",
           "rating": "Điểm đánh giá trung bình",
-          "hardQuestions": "Câu hỏi khó"
+          "hardQuestions": "Câu hỏi khó",
+          "revenueRange": "Doanh thu thực nhận ({range})",
+          "sales": "Lượt mua (khoá đã chọn)"
         },
         "chart": {
           "title": "Doanh thu thực nhận theo ngày (30 ngày qua)",
           "aria": "Biểu đồ cột doanh thu theo ngày, tổng {total} trong 30 ngày, ngày cao nhất {peak}",
-          "empty": "Chưa có doanh thu trong 30 ngày qua."
+          "empty": "Chưa có doanh thu trong 30 ngày qua.",
+          "titleRange": "Doanh thu thực nhận — {range}"
         },
         "growth": {
           "start": "Bắt đầu có doanh thu trong kỳ này",
@@ -1095,7 +1098,15 @@
           "down": "Doanh thu giảm {percent}% so với kỳ trước"
         },
         "hard": "Có {count} câu hỏi đang bị hơn 60% học viên trả lời sai, nên xem lại nội dung liên quan.",
-        "lowRating": "Có đánh giá {rating}★ mới từ {student} ở khóa \"{course}\", nên phản hồi sớm."
+        "lowRating": "Có đánh giá {rating}★ mới từ {student} ở khóa \"{course}\", nên phản hồi sớm.",
+        "exportCsv": "Xuất CSV",
+        "csv": {
+          "date": "Ngày",
+          "course": "Khoá học",
+          "amount": "Số tiền",
+          "earning": "Thực nhận",
+          "coupon": "Mã giảm giá"
+        }
       }
     },
     "refunds": {

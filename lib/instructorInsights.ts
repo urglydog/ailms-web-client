@@ -99,3 +99,31 @@ export function dailyEarnings(
   }
   return series;
 }
+
+/** Doanh thu thực nhận theo THÁNG cho `months` tháng gần nhất (cột = ngày 01 của tháng) — biểu đồ khoảng 12 tháng / mọi lúc. */
+export function monthlyEarnings(
+  rows: ReadonlyArray<{ paidAt: string; instructorEarning: number }>,
+  months: number,
+  now: Date = new Date(),
+): { day: string; value: number }[] {
+  const byMonth = new Map<string, number>();
+  for (const r of rows) {
+    const d = new Date(r.paidAt);
+    const key = localDay(new Date(d.getFullYear(), d.getMonth(), 1));
+    byMonth.set(key, (byMonth.get(key) ?? 0) + r.instructorEarning);
+  }
+  const series: { day: string; value: number }[] = [];
+  for (let i = months - 1; i >= 0; i -= 1) {
+    const key = localDay(new Date(now.getFullYear(), now.getMonth() - i, 1));
+    series.push({ day: key, value: byMonth.get(key) ?? 0 });
+  }
+  return series;
+}
+
+/** Giao dịch nằm trong khoảng thời gian chọn (`all` = mọi giao dịch). */
+export function rowsInRange<T extends { paidAt: string }>(rows: ReadonlyArray<T>, range: '7d' | '30d' | '12m' | 'all', now: Date = new Date()): T[] {
+  if (range === 'all') return [...rows];
+  const days = range === '7d' ? 7 : range === '30d' ? 30 : 365;
+  const from = now.getTime() - days * 24 * 60 * 60 * 1000;
+  return rows.filter((r) => new Date(r.paidAt).getTime() >= from);
+}

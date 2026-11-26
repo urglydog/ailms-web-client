@@ -1080,12 +1080,15 @@
           "revenue": "Net revenue (30 days)",
           "enrollments": "New sign-ups",
           "rating": "Average rating",
-          "hardQuestions": "Hard questions"
+          "hardQuestions": "Hard questions",
+          "revenueRange": "Net earnings ({range})",
+          "sales": "Sales (selected course)"
         },
         "chart": {
           "title": "Daily net revenue (last 30 days)",
           "aria": "Bar chart of daily revenue, {total} in total over 30 days, best day {peak}",
-          "empty": "No revenue in the last 30 days."
+          "empty": "No revenue in the last 30 days.",
+          "titleRange": "Net earnings — {range}"
         },
         "growth": {
           "start": "Revenue started this period",
@@ -1095,7 +1098,15 @@
           "down": "Revenue is down {percent}% from the previous period"
         },
         "hard": "{count} questions are answered wrong by over 60% of learners, so review the related content.",
-        "lowRating": "A new {rating}★ review from {student} on \"{course}\", worth replying to soon."
+        "lowRating": "A new {rating}★ review from {student} on \"{course}\", worth replying to soon.",
+        "exportCsv": "Export CSV",
+        "csv": {
+          "date": "Date",
+          "course": "Course",
+          "amount": "Amount",
+          "earning": "Net earning",
+          "coupon": "Coupon"
+        }
       }
     },
     "refunds": {

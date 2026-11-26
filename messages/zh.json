@@ -1080,12 +1080,15 @@
           "revenue": "实际收入（30 天）",
           "enrollments": "新增报名",
           "rating": "平均评分",
-          "hardQuestions": "难题"
+          "hardQuestions": "难题",
+          "revenueRange": "实收收入（{range}）",
+          "sales": "购买次数（所选课程）"
         },
         "chart": {
           "title": "每日实际收入（近 30 天）",
           "aria": "每日收入柱状图，30 天共 {total}，最高一天 {peak}",
-          "empty": "近 30 天暂无收入。"
+          "empty": "近 30 天暂无收入。",
+          "titleRange": "实收收入 — {range}"
         },
         "growth": {
           "start": "本期开始有收入",
@@ -1095,7 +1098,15 @@
           "down": "收入比上一期下降 {percent}%"
         },
         "hard": "有 {count} 道题超过 60% 的学员答错，建议回顾相关内容。",
-        "lowRating": "{student} 在“{course}”给出了新的 {rating}★ 评价，建议尽快回复。"
+        "lowRating": "{student} 在“{course}”给出了新的 {rating}★ 评价，建议尽快回复。",
+        "exportCsv": "导出 CSV",
+        "csv": {
+          "date": "日期",
+          "course": "课程",
+          "amount": "金额",
+          "earning": "实收",
+          "coupon": "优惠码"
+        }
       }
     },
     "refunds": {

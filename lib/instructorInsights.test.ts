@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { dailyEarnings, growthTrend } from './instructorInsights';
+import { dailyEarnings, growthTrend, monthlyEarnings, rowsInRange } from './instructorInsights';
 
 describe('growthTrend', () => {
   it('kỳ trước bằng 0: có doanh thu thì bắt đầu, không thì chưa có', () => {
@@ -34,5 +34,23 @@ describe('dailyEarnings', () => {
   it('bỏ giao dịch ngoài khoảng', () => {
     const series = dailyEarnings([{ paidAt: '2026-09-01T00:00:00', instructorEarning: 999 }], 3, now);
     expect(series.every((p) => p.value === 0)).toBe(true);
+  });
+});
+
+describe('monthlyEarnings / rowsInRange', () => {
+  const now = new Date(2026, 10, 26);
+  const rows = [
+    { paidAt: new Date(2026, 10, 20).toISOString(), instructorEarning: 100 },
+    { paidAt: new Date(2026, 9, 5).toISOString(), instructorEarning: 50 },
+    { paidAt: new Date(2025, 0, 5).toISOString(), instructorEarning: 7 },
+  ];
+  it('gom theo tháng, đủ số tháng, tháng trống = 0', () => {
+    const s = monthlyEarnings(rows, 3, now);
+    expect(s.map((p) => p.value)).toEqual([0, 50, 100]);
+  });
+  it('lọc theo khoảng thời gian', () => {
+    expect(rowsInRange(rows, '7d', now)).toHaveLength(1);
+    expect(rowsInRange(rows, '12m', now)).toHaveLength(2);
+    expect(rowsInRange(rows, 'all', now)).toHaveLength(3);
   });
 });
