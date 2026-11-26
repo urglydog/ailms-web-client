@@ -10,9 +10,9 @@ import { PerformanceTabs } from '@/components/instructor/performance/Performance
 export default function RevenueLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:gap-8">
       <PerformanceTabs pathname={pathname} />
-      <div className="flex flex-col gap-5">{children}</div>
+      <div className="flex min-w-0 flex-1 flex-col gap-5">{children}</div>
     </div>
   );
 }
