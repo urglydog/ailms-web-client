@@ -12,6 +12,7 @@ import { ReviewsSection } from '@/components/course/ReviewsSection';
 import { CourseDubbingPanel } from '@/components/course/detail/CourseDubbingPanel';
 import { CourseHero } from '@/components/course/detail/CourseHero';
 import { RelatedCourses } from '@/components/course/detail/RelatedCourses';
+import { PromoCountdown, ShareGiftButtons } from '@/components/course/detail/PurchaseExtras';
 import { BundleUpsellWidget } from '@/components/bundles/BundleUpsellWidget';
 import { CourseLiveBanner } from '@/components/live/CourseLiveBanner';
 import { Avatar } from '@/components/ui/Avatar';
@@ -196,6 +197,7 @@ export function CourseDetailView({ course }: { course: CourseDetail }) {
 
               <div className="flex flex-col gap-4 p-6">
                 {priceBlock}
+                {!course.isFree && course.discountPercent ? <PromoCountdown endsAt={course.discountEndsAt} /> : null}
 
                 <EnrollButton
                   courseId={course.id}
@@ -215,6 +217,8 @@ export function CourseDetailView({ course }: { course: CourseDetail }) {
                     </Link>
                   </p>
                 )}
+
+                <ShareGiftButtons title={course.title} slug={course.slug} />
 
                 <BundleUpsellWidget courseId={course.id} />
               </div>

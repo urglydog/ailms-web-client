@@ -157,6 +157,8 @@ export interface CourseDetail extends CourseSummary {
   learningOutcomes?: string[];
   requirements?: string[];
   targetAudience?: string[];
+  /** Hết hạn ưu đãi tự động đang áp (26/11/2026) — null khi không có, FE hiện đếm ngược. */
+  discountEndsAt?: string | null;
 }
 
 export interface Chapter {

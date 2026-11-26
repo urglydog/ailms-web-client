@@ -78,6 +78,7 @@ interface RawDetail extends RawSummary {
   learningOutcomes?: string[] | null;
   requirements?: string[] | null;
   targetAudience?: string[] | null;
+  discountEndsAt?: string | null;
 }
 
 /**
@@ -145,6 +146,7 @@ function toDetail(raw: RawDetail): CourseDetail {
     learningOutcomes: raw.learningOutcomes ?? [],
     requirements: raw.requirements ?? [],
     targetAudience: raw.targetAudience ?? [],
+    discountEndsAt: raw.discountEndsAt ?? null,
   };
 }
 
