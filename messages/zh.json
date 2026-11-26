@@ -259,7 +259,9 @@
     "title": "我的课程",
     "tabs": {
       "all": "全部课程",
-      "wishlist": "收藏"
+      "wishlist": "收藏",
+      "certificates": "证书",
+      "ariaLabel": "学习栏目"
     },
     "count": "{count} 门课程",
     "loading": "加载中…",
@@ -325,6 +327,13 @@
     "suggestions": {
       "title": "接下来推荐",
       "trending": "热门课程"
+    },
+    "hubTitle": "我的学习",
+    "certificates": {
+      "subtitle": "完成课程 100% 后将自动颁发证书。",
+      "loading": "加载中...",
+      "empty": "你还没有证书。完成一门课程的 100% 即可获得第一张证书！",
+      "issuedOn": "颁发于 {date}"
     }
   },
   "learn": {
@@ -694,7 +703,11 @@
       "bundleSuggest": "再加入 <b>{title}</b>（+{price}），即可享受“{bundle}”组合 <b>{percent}%</b> 折扣",
       "addToCart": "加入购物车",
       "emptyTitle": "你的购物车是空的。",
-      "emptyCta": "探索课程"
+      "emptyCta": "探索课程",
+      "moveToWishlist": "移至收藏",
+      "movedToWishlist": "已移至收藏夹",
+      "originalPrice": "原价",
+      "percentOff": "优惠 {percent}%"
     },
     "checkout": {
       "titleOne": "课程付款",

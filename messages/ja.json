@@ -259,7 +259,9 @@
     "title": "マイコース",
     "tabs": {
       "all": "すべての講座",
-      "wishlist": "お気に入り"
+      "wishlist": "お気に入り",
+      "certificates": "修了証",
+      "ariaLabel": "学習セクション"
     },
     "count": "{count} 講座",
     "loading": "読み込み中…",
@@ -325,6 +327,13 @@
     "suggestions": {
       "title": "次のおすすめ",
       "trending": "人気の講座"
+    },
+    "hubTitle": "マイラーニング",
+    "certificates": {
+      "subtitle": "コースを 100% 修了すると修了証が自動で発行されます。",
+      "loading": "読み込み中...",
+      "empty": "まだ修了証はありません。コースを 100% 修了して最初の修了証を手に入れましょう！",
+      "issuedOn": "{date} 発行"
     }
   },
   "learn": {
@@ -694,7 +703,11 @@
       "bundleSuggest": "<b>{title}</b>（+{price}）を追加すると、「{bundle}」セットで <b>{percent}%</b> 割引になります",
       "addToCart": "カートに追加",
       "emptyTitle": "カートは空です。",
-      "emptyCta": "講座を探す"
+      "emptyCta": "講座を探す",
+      "moveToWishlist": "ウィッシュリストに移動",
+      "movedToWishlist": "ウィッシュリストに移動しました",
+      "originalPrice": "元の価格",
+      "percentOff": "{percent}% オフ"
     },
     "checkout": {
       "titleOne": "講座のお支払い",

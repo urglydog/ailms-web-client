@@ -259,7 +259,9 @@
     "title": "My courses",
     "tabs": {
       "all": "All courses",
-      "wishlist": "Wishlist"
+      "wishlist": "Wishlist",
+      "certificates": "Certificates",
+      "ariaLabel": "Learning sections"
     },
     "count": "{count} courses",
     "loading": "Loading…",
@@ -325,6 +327,13 @@
     "suggestions": {
       "title": "Suggested next",
       "trending": "Trending now"
+    },
+    "hubTitle": "My learning",
+    "certificates": {
+      "subtitle": "Certificates are issued automatically when you complete 100% of a course.",
+      "loading": "Loading...",
+      "empty": "You have no certificates yet. Complete 100% of a course to earn your first one!",
+      "issuedOn": "Issued {date}"
     }
   },
   "learn": {
@@ -694,7 +703,11 @@
       "bundleSuggest": "Add <b>{title}</b> (+{price}) to get <b>{percent}%</b> off with the \"{bundle}\" bundle",
       "addToCart": "Add to cart",
       "emptyTitle": "Your cart is empty.",
-      "emptyCta": "Explore courses"
+      "emptyCta": "Explore courses",
+      "moveToWishlist": "Move to wishlist",
+      "movedToWishlist": "Moved to your wishlist",
+      "originalPrice": "Original price",
+      "percentOff": "{percent}% off"
     },
     "checkout": {
       "titleOne": "Pay for course",

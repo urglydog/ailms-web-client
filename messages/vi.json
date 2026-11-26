@@ -259,7 +259,9 @@
     "title": "Khóa học của tôi",
     "tabs": {
       "all": "Tất cả khóa học",
-      "wishlist": "Yêu thích"
+      "wishlist": "Yêu thích",
+      "certificates": "Chứng chỉ",
+      "ariaLabel": "Mục học tập"
     },
     "count": "{count} khóa học",
     "loading": "Đang tải…",
@@ -325,6 +327,13 @@
     "suggestions": {
       "title": "Gợi ý cho bạn tiếp theo",
       "trending": "Đang thịnh hành"
+    },
+    "hubTitle": "Học tập",
+    "certificates": {
+      "subtitle": "Chứng chỉ được cấp tự động khi bạn hoàn thành 100% một khóa học.",
+      "loading": "Đang tải...",
+      "empty": "Bạn chưa có chứng chỉ nào. Hoàn thành 100% một khóa học để nhận chứng chỉ đầu tiên nhé!",
+      "issuedOn": "Cấp ngày {date}"
     }
   },
   "learn": {
@@ -694,7 +703,11 @@
       "bundleSuggest": "Thêm <b>{title}</b> (+{price}) để được giảm <b>{percent}%</b> theo gói \"{bundle}\"",
       "addToCart": "Thêm vào giỏ",
       "emptyTitle": "Giỏ hàng của bạn đang trống.",
-      "emptyCta": "Khám phá khóa học"
+      "emptyCta": "Khám phá khóa học",
+      "moveToWishlist": "Chuyển vào yêu thích",
+      "movedToWishlist": "Đã chuyển vào danh sách yêu thích",
+      "originalPrice": "Giá gốc",
+      "percentOff": "Giảm {percent}%"
     },
     "checkout": {
       "titleOne": "Thanh toán khóa học",
