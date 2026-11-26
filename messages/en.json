@@ -1185,7 +1185,8 @@
         "qa": "Q&A",
         "messages": "Messages",
         "assignments": "Assignments",
-        "announcements": "Announcements"
+        "announcements": "Announcements",
+        "insights": "AI Insights"
       }
     },
     "tools": {
@@ -1408,7 +1409,13 @@
         "youAnswered": "You replied",
         "instructorTag": " (Instructor)",
         "placeholder": "Reply to the learner...",
-        "send": "Send"
+        "send": "Send",
+        "filtersAria": "Filter questions",
+        "filter": {
+          "all": "All",
+          "unanswered": "No answers",
+          "noInstructor": "No instructor answer"
+        }
       },
       "assignments": {
         "title": "Assignments",
@@ -1455,6 +1462,41 @@
         "search": "Search courses...",
         "notFound": "No courses found."
       }
+    },
+    "insights": {
+      "title": "AI tutor insights",
+      "subtitle": "What learners ask the AI tutor — aggregated, with no names or individual questions.",
+      "noCourses": "You don't have any courses yet.",
+      "loadError": "Couldn't load insights. Please try again.",
+      "lessonFilter": "Filter by lesson",
+      "allLessons": "All lessons",
+      "noQuestions": "No learner has asked the AI tutor in the last {days} days.",
+      "lessonsTitle": "Common topics by lesson",
+      "noLessonQuestions": "No questions for this lesson yet.",
+      "unusual": "Unusually many questions",
+      "lessonCounts": "{questions} questions · {learners} learners",
+      "topicsAria": "Common topics in {lesson}",
+      "learners": "{count} learners",
+      "noTopics": "No topic has been asked by 2 or more learners yet.",
+      "poorCount": "{count} questions answered poorly",
+      "poorTitle": "Answered poorly by the tutor",
+      "poorHint": "Learners asked again, or the tutor said the content isn't in the lesson.",
+      "noPoor": "No topics detected yet.",
+      "reasonRepeat": "asked repeatedly",
+      "reasonNotCovered": "not covered in the lesson",
+      "statQuestions": "Questions ({days} days)",
+      "statLearners": "Learners who asked",
+      "statUnusual": "Lessons to review",
+      "summaryTitle": "AI summary & suggestions",
+      "generate": "Generate summary",
+      "refresh": "Refresh",
+      "summaryPending": "AI is writing the summary, please wait a moment…",
+      "summaryFailed": "Couldn't generate a summary. Please try again in a few minutes.",
+      "summaryNone": "No summary yet. It's generated daily, or click “Generate summary”.",
+      "summaryNoData": "A summary will appear once learners start asking the AI tutor.",
+      "actionsTitle": "Suggested actions",
+      "generatedAt": "Updated {time}",
+      "privacy": "Topics only appear when 2 or more learners asked; labels are shared keywords, never verbatim questions."
     }
   },
   "coupons": {

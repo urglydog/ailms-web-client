@@ -1185,7 +1185,8 @@
         "qa": "Hỏi đáp",
         "messages": "Tin nhắn",
         "assignments": "Bài tập",
-        "announcements": "Thông báo"
+        "announcements": "Thông báo",
+        "insights": "Insight AI"
       }
     },
     "tools": {
@@ -1408,7 +1409,13 @@
         "youAnswered": "Bạn đã trả lời",
         "instructorTag": " (Giảng viên)",
         "placeholder": "Trả lời học viên...",
-        "send": "Gửi"
+        "send": "Gửi",
+        "filtersAria": "Lọc câu hỏi",
+        "filter": {
+          "all": "Tất cả",
+          "unanswered": "Chưa trả lời",
+          "noInstructor": "Giảng viên chưa trả lời"
+        }
       },
       "assignments": {
         "title": "Bài tập",
@@ -1455,6 +1462,41 @@
         "search": "Tìm khóa học...",
         "notFound": "Không tìm thấy khóa học nào."
       }
+    },
+    "insights": {
+      "title": "Insight từ AI gia sư",
+      "subtitle": "Học viên đang hỏi Gia sư AI những gì — số liệu đã gộp, không hiện tên hay câu hỏi riêng.",
+      "noCourses": "Bạn chưa có khóa học nào.",
+      "loadError": "Không tải được Insight. Vui lòng thử lại.",
+      "lessonFilter": "Lọc theo bài học",
+      "allLessons": "Tất cả bài học",
+      "noQuestions": "Chưa có học viên nào hỏi Gia sư AI trong {days} ngày qua.",
+      "lessonsTitle": "Chủ đề hay hỏi theo bài",
+      "noLessonQuestions": "Bài này chưa có câu hỏi nào.",
+      "unusual": "Nhiều câu hỏi bất thường",
+      "lessonCounts": "{questions} câu hỏi · {learners} học viên",
+      "topicsAria": "Chủ đề hay hỏi ở {lesson}",
+      "learners": "{count} học viên",
+      "noTopics": "Chưa có chủ đề nào được từ 2 học viên trở lên cùng hỏi.",
+      "poorCount": "{count} câu Gia sư trả lời chưa tốt",
+      "poorTitle": "Gia sư trả lời chưa tốt",
+      "poorHint": "Học viên hỏi lại nhiều lần, hoặc Gia sư báo nội dung không có trong bài.",
+      "noPoor": "Chưa phát hiện chủ đề nào.",
+      "reasonRepeat": "hỏi lại nhiều lần",
+      "reasonNotCovered": "ngoài nội dung bài",
+      "statQuestions": "Câu hỏi ({days} ngày)",
+      "statLearners": "Học viên đã hỏi",
+      "statUnusual": "Bài cần chú ý",
+      "summaryTitle": "Tóm tắt & đề xuất từ AI",
+      "generate": "Tạo tóm tắt",
+      "refresh": "Làm mới",
+      "summaryPending": "AI đang viết tóm tắt, vui lòng đợi trong giây lát…",
+      "summaryFailed": "Chưa tạo được tóm tắt. Hãy thử lại sau ít phút.",
+      "summaryNone": "Chưa có tóm tắt. Tóm tắt được tạo tự động mỗi ngày, hoặc bấm “Tạo tóm tắt”.",
+      "summaryNoData": "Tóm tắt sẽ xuất hiện khi học viên bắt đầu hỏi Gia sư AI.",
+      "actionsTitle": "Đề xuất cho bạn",
+      "generatedAt": "Cập nhật lúc {time}",
+      "privacy": "Chủ đề chỉ hiện khi có từ 2 học viên trở lên cùng hỏi; nhãn là từ khoá chung, không phải câu hỏi nguyên văn."
     }
   },
   "coupons": {

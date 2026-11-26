@@ -1185,7 +1185,8 @@
         "qa": "Q&A",
         "messages": "メッセージ",
         "assignments": "課題",
-        "announcements": "お知らせ"
+        "announcements": "お知らせ",
+        "insights": "AIインサイト"
       }
     },
     "tools": {
@@ -1408,7 +1409,13 @@
         "youAnswered": "回答済み",
         "instructorTag": "（講師）",
         "placeholder": "受講生に返信...",
-        "send": "送信"
+        "send": "送信",
+        "filtersAria": "質問を絞り込む",
+        "filter": {
+          "all": "すべて",
+          "unanswered": "未回答",
+          "noInstructor": "講師が未回答"
+        }
       },
       "assignments": {
         "title": "課題",
@@ -1455,6 +1462,41 @@
         "search": "講座を検索...",
         "notFound": "講座が見つかりません。"
       }
+    },
+    "insights": {
+      "title": "AIチューターのインサイト",
+      "subtitle": "受講者がAIチューターに何を質問しているか（集計データのみ。氏名や個別の質問は表示しません）。",
+      "noCourses": "まだコースがありません。",
+      "loadError": "インサイトを読み込めませんでした。もう一度お試しください。",
+      "lessonFilter": "レッスンで絞り込み",
+      "allLessons": "すべてのレッスン",
+      "noQuestions": "過去{days}日間、AIチューターへの質問はありません。",
+      "lessonsTitle": "レッスン別のよくある話題",
+      "noLessonQuestions": "このレッスンにはまだ質問がありません。",
+      "unusual": "質問が異常に多い",
+      "lessonCounts": "質問{questions}件 · 受講者{learners}人",
+      "topicsAria": "{lesson}のよくある話題",
+      "learners": "受講者{count}人",
+      "noTopics": "2人以上が質問した話題はまだありません。",
+      "poorCount": "十分に回答できなかった質問 {count}件",
+      "poorTitle": "チューターの回答が不十分",
+      "poorHint": "受講者が何度も質問した、またはチューターがレッスンに含まれないと回答した話題です。",
+      "noPoor": "該当する話題はまだありません。",
+      "reasonRepeat": "繰り返し質問",
+      "reasonNotCovered": "レッスン外の内容",
+      "statQuestions": "質問数（{days}日）",
+      "statLearners": "質問した受講者",
+      "statUnusual": "要確認のレッスン",
+      "summaryTitle": "AIによる要約と提案",
+      "generate": "要約を作成",
+      "refresh": "更新",
+      "summaryPending": "AIが要約を作成しています。少々お待ちください…",
+      "summaryFailed": "要約を作成できませんでした。数分後にもう一度お試しください。",
+      "summaryNone": "まだ要約がありません。毎日自動で作成されます。「要約を作成」を押すこともできます。",
+      "summaryNoData": "受講者がAIチューターに質問し始めると要約が表示されます。",
+      "actionsTitle": "おすすめのアクション",
+      "generatedAt": "{time} 更新",
+      "privacy": "話題は2人以上が質問した場合のみ表示され、ラベルは共通キーワードで質問の原文ではありません。"
     }
   },
   "coupons": {

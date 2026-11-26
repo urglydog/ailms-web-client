@@ -1185,7 +1185,8 @@
         "qa": "问答",
         "messages": "消息",
         "assignments": "作业",
-        "announcements": "公告"
+        "announcements": "公告",
+        "insights": "AI 洞察"
       }
     },
     "tools": {
@@ -1408,7 +1409,13 @@
         "youAnswered": "你已回答",
         "instructorTag": "（讲师）",
         "placeholder": "回复学员...",
-        "send": "发送"
+        "send": "发送",
+        "filtersAria": "筛选问题",
+        "filter": {
+          "all": "全部",
+          "unanswered": "未回答",
+          "noInstructor": "讲师未回答"
+        }
       },
       "assignments": {
         "title": "作业",
@@ -1455,6 +1462,41 @@
         "search": "搜索课程...",
         "notFound": "没有找到课程。"
       }
+    },
+    "insights": {
+      "title": "AI 辅导洞察",
+      "subtitle": "学员向 AI 辅导提了哪些问题——仅汇总数据，不显示姓名或个人问题。",
+      "noCourses": "你还没有课程。",
+      "loadError": "无法加载洞察，请重试。",
+      "lessonFilter": "按课时筛选",
+      "allLessons": "全部课时",
+      "noQuestions": "过去 {days} 天内没有学员向 AI 辅导提问。",
+      "lessonsTitle": "各课时的常见话题",
+      "noLessonQuestions": "该课时暂无问题。",
+      "unusual": "问题异常多",
+      "lessonCounts": "{questions} 个问题 · {learners} 位学员",
+      "topicsAria": "{lesson} 的常见话题",
+      "learners": "{count} 位学员",
+      "noTopics": "暂无由 2 位及以上学员提出的话题。",
+      "poorCount": "{count} 个问题回答欠佳",
+      "poorTitle": "辅导回答欠佳",
+      "poorHint": "学员反复提问，或辅导表示内容不在课时中。",
+      "noPoor": "暂未发现相关话题。",
+      "reasonRepeat": "反复提问",
+      "reasonNotCovered": "超出课时内容",
+      "statQuestions": "问题数（{days} 天）",
+      "statLearners": "提问学员",
+      "statUnusual": "需关注的课时",
+      "summaryTitle": "AI 摘要与建议",
+      "generate": "生成摘要",
+      "refresh": "刷新",
+      "summaryPending": "AI 正在撰写摘要，请稍候…",
+      "summaryFailed": "暂时无法生成摘要，请几分钟后重试。",
+      "summaryNone": "暂无摘要。系统每天自动生成，也可点击“生成摘要”。",
+      "summaryNoData": "学员开始向 AI 辅导提问后，这里会显示摘要。",
+      "actionsTitle": "建议操作",
+      "generatedAt": "更新于 {time}",
+      "privacy": "仅当 2 位及以上学员提问时才显示话题；标签为共同关键词，而非原始问题。"
     }
   },
   "coupons": {
