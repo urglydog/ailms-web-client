@@ -566,6 +566,11 @@
     "coupon": {
       "note": "Have a coupon?",
       "link": "Apply at checkout"
+    },
+    "goals": {
+      "outcomesTitle": "What you'll learn",
+      "requirementsTitle": "Requirements",
+      "audienceTitle": "Who this course is for"
     }
   },
   "courseList": {
@@ -961,8 +966,9 @@
       "back": "Back to courses",
       "tabsAria": "Course editing sections",
       "groups": {
-        "content": "Course content",
-        "publish": "Publish"
+        "content": "Create your content",
+        "publish": "Publish your course",
+        "plan": "Plan your course"
       },
       "tabs": {
         "curriculum": "Curriculum",
@@ -971,7 +977,8 @@
         "proctoring": "Exam proctoring",
         "basics": "Basic information",
         "pricing": "Pricing",
-        "promotions": "Promotions"
+        "promotions": "Promotions",
+        "goals": "Intended learners"
       },
       "completion": {
         "label": "{percent}% complete",
@@ -1013,6 +1020,37 @@
         "archiveConfirm": "Remove",
         "cancel": "Cancel",
         "coInstructor": "Co-instructor management is in development and will arrive in a later update."
+      },
+      "stepDone": "Done",
+      "checklist": {
+        "submitting": "Submitting..."
+      },
+      "goals": {
+        "title": "Intended learners",
+        "intro": "These descriptions appear on your course landing page and help learners decide whether the course is right for them.",
+        "learningOutcomes": {
+          "label": "What will students learn?",
+          "hint": "Add at least {min} items, up to {max} characters each.",
+          "placeholder": "e.g. Handle everyday conversations with confidence"
+        },
+        "requirements": {
+          "label": "Requirements",
+          "hint": "Skills, tools or knowledge learners need. If none, say so to reassure beginners.",
+          "placeholder": "e.g. No prior knowledge needed"
+        },
+        "targetAudience": {
+          "label": "Who is this course for?",
+          "hint": "Describe the learners who will benefit most.",
+          "placeholder": "e.g. Beginners preparing for a trip"
+        },
+        "itemLabel": "{section} — item {n}",
+        "remove": "Remove item {n}",
+        "add": "Add item",
+        "recommendMin": "{count}/{min} items so far — add more to reach {min}.",
+        "save": "Save",
+        "saving": "Saving...",
+        "saved": "Course goals saved",
+        "saveFailed": "Could not save, please try again."
       }
     },
     "performance": {

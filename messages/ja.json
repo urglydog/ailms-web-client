@@ -566,6 +566,11 @@
     "coupon": {
       "note": "クーポンをお持ちですか？",
       "link": "お支払い時に適用"
+    },
+    "goals": {
+      "outcomesTitle": "学習内容",
+      "requirementsTitle": "前提条件",
+      "audienceTitle": "このコースの対象者"
     }
   },
   "courseList": {
@@ -961,8 +966,9 @@
       "back": "講座一覧に戻る",
       "tabsAria": "講座編集のセクション",
       "groups": {
-        "content": "講座の内容",
-        "publish": "公開"
+        "content": "コンテンツを作成",
+        "publish": "コースを公開",
+        "plan": "コースを計画"
       },
       "tabs": {
         "curriculum": "カリキュラム",
@@ -971,7 +977,8 @@
         "proctoring": "試験の監督",
         "basics": "基本情報",
         "pricing": "価格",
-        "promotions": "プロモーション"
+        "promotions": "プロモーション",
+        "goals": "対象受講者"
       },
       "completion": {
         "label": "{percent}% 完了",
@@ -1013,6 +1020,37 @@
         "archiveConfirm": "削除",
         "cancel": "キャンセル",
         "coInstructor": "共同講師の管理は開発中で、今後のアップデートで追加されます。"
+      },
+      "stepDone": "完了",
+      "checklist": {
+        "submitting": "送信中..."
+      },
+      "goals": {
+        "title": "対象受講者",
+        "intro": "これらの説明はコース紹介ページに表示され、受講者が自分に合うか判断する助けになります。",
+        "learningOutcomes": {
+          "label": "受講者は何を学べますか？",
+          "hint": "{min} 項目以上、各 {max} 文字以内をおすすめします。",
+          "placeholder": "例：日常の基本的な会話ができる"
+        },
+        "requirements": {
+          "label": "受講の前提条件",
+          "hint": "必要なスキル・ツール・知識。不要な場合もその旨を書くと初心者が安心します。",
+          "placeholder": "例：予備知識は不要"
+        },
+        "targetAudience": {
+          "label": "このコースの対象者",
+          "hint": "最も役立つ受講者像を説明してください。",
+          "placeholder": "例：旅行の準備をする初心者"
+        },
+        "itemLabel": "{section} — {n} 項目目",
+        "remove": "{n} 項目目を削除",
+        "add": "項目を追加",
+        "recommendMin": "現在 {count}/{min} 項目 — {min} 項目まで追加しましょう。",
+        "save": "保存",
+        "saving": "保存中...",
+        "saved": "コース目標を保存しました",
+        "saveFailed": "保存できませんでした。もう一度お試しください。"
       }
     },
     "performance": {

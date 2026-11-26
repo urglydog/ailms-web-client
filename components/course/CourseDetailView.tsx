@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { Bot, ChevronDown, Infinity as InfinityIcon, Layers, PlayCircle, Tag } from 'lucide-react';
+import { Bot, Check, ChevronDown, Infinity as InfinityIcon, Layers, PlayCircle, Tag } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { ChapterAccordion } from '@/components/course/ChapterAccordion';
 import { CoursePreview } from '@/components/course/CoursePreview';
@@ -85,6 +85,21 @@ export function CourseDetailView({ course }: { course: CourseDetail }) {
             <CourseLiveBanner courseId={course.id} />
             <CourseDubbingPanel languages={course.dubbedLanguages} />
 
+            {/* "Bạn sẽ học được gì" — chỉ khi giảng viên đã điền (UDEMY_LAYOUT_ANALYSIS mục 12). */}
+            {(course.learningOutcomes?.length ?? 0) > 0 && (
+              <section aria-labelledby="outcomes-title" className="rounded-card border border-line p-5 sm:p-6">
+                <h2 id="outcomes-title" className="section-title mb-4">{t('goals.outcomesTitle')}</h2>
+                <ul className="m-0 grid list-none gap-x-6 gap-y-3 p-0 sm:grid-cols-2">
+                  {course.learningOutcomes?.map((line) => (
+                    <li key={line} className="flex items-start gap-2.5 text-sm text-ink">
+                      <Check size={18} aria-hidden className="mt-0.5 shrink-0 text-success" />
+                      <span>{line}</span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+
             <section aria-labelledby="includes-title">
               <h2 id="includes-title" className="section-title mb-5">{t('includesTitle')}</h2>
               <ul className="m-0 grid list-none gap-x-6 gap-y-3 p-0 sm:grid-cols-2">
@@ -114,6 +129,15 @@ export function CourseDetailView({ course }: { course: CourseDetail }) {
               />
             </section>
 
+            {(course.requirements?.length ?? 0) > 0 && (
+              <section aria-labelledby="requirements-title">
+                <h2 id="requirements-title" className="section-title mb-4">{t('goals.requirementsTitle')}</h2>
+                <ul className="m-0 flex list-disc flex-col gap-2 pl-5 text-sm text-ink">
+                  {course.requirements?.map((line) => <li key={line}>{line}</li>)}
+                </ul>
+              </section>
+            )}
+
             {course.description && (
               <section aria-labelledby="desc-title">
                 <h2 id="desc-title" className="section-title mb-4">{t('description.title')}</h2>
@@ -134,6 +158,15 @@ export function CourseDetailView({ course }: { course: CourseDetail }) {
                     <ChevronDown size={16} aria-hidden className={descOpen ? 'rotate-180' : ''} />
                   </button>
                 )}
+              </section>
+            )}
+
+            {(course.targetAudience?.length ?? 0) > 0 && (
+              <section aria-labelledby="audience-title">
+                <h2 id="audience-title" className="section-title mb-4">{t('goals.audienceTitle')}</h2>
+                <ul className="m-0 flex list-disc flex-col gap-2 pl-5 text-sm text-ink">
+                  {course.targetAudience?.map((line) => <li key={line}>{line}</li>)}
+                </ul>
               </section>
             )}
 

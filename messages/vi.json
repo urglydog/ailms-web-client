@@ -566,6 +566,11 @@
     "coupon": {
       "note": "Có mã giảm giá?",
       "link": "Áp dụng khi thanh toán"
+    },
+    "goals": {
+      "outcomesTitle": "Bạn sẽ học được gì",
+      "requirementsTitle": "Yêu cầu",
+      "audienceTitle": "Khoá học này dành cho ai"
     }
   },
   "courseList": {
@@ -961,8 +966,9 @@
       "back": "Quay lại các khóa học",
       "tabsAria": "Các mục chỉnh sửa khóa học",
       "groups": {
-        "content": "Nội dung khóa học",
-        "publish": "Đăng tải khóa học"
+        "content": "Tạo nội dung",
+        "publish": "Xuất bản",
+        "plan": "Lập kế hoạch"
       },
       "tabs": {
         "curriculum": "Chương trình giảng dạy",
@@ -971,7 +977,8 @@
         "proctoring": "Giám sát thi",
         "basics": "Thông tin cơ bản",
         "pricing": "Giá cả",
-        "promotions": "Khuyến mãi"
+        "promotions": "Khuyến mãi",
+        "goals": "Học viên mục tiêu"
       },
       "completion": {
         "label": "Hoàn thiện {percent}%",
@@ -1013,6 +1020,37 @@
         "archiveConfirm": "Gỡ bỏ",
         "cancel": "Hủy",
         "coInstructor": "Quản lý đồng giảng viên đang được phát triển, sẽ bổ sung ở bản cập nhật sau."
+      },
+      "stepDone": "Đã xong",
+      "checklist": {
+        "submitting": "Đang gửi..."
+      },
+      "goals": {
+        "title": "Học viên mục tiêu",
+        "intro": "Các mô tả này hiện ở trang giới thiệu khoá học và giúp học viên biết khoá có phù hợp với mình không.",
+        "learningOutcomes": {
+          "label": "Học viên sẽ học được gì?",
+          "hint": "Nên có ít nhất {min} mục, mỗi mục tối đa {max} ký tự.",
+          "placeholder": "Ví dụ: Giao tiếp được các tình huống cơ bản hằng ngày"
+        },
+        "requirements": {
+          "label": "Yêu cầu trước khi học",
+          "hint": "Kỹ năng, công cụ hoặc kiến thức cần có. Không có thì ghi rõ để người mới yên tâm.",
+          "placeholder": "Ví dụ: Không cần kiến thức nền"
+        },
+        "targetAudience": {
+          "label": "Khoá học này dành cho ai?",
+          "hint": "Mô tả nhóm học viên sẽ thấy khoá học hữu ích nhất.",
+          "placeholder": "Ví dụ: Người mới bắt đầu muốn đi du lịch"
+        },
+        "itemLabel": "{section} — mục {n}",
+        "remove": "Xoá mục {n}",
+        "add": "Thêm mục",
+        "recommendMin": "Mới có {count}/{min} mục — nên thêm cho đủ {min}.",
+        "save": "Lưu",
+        "saving": "Đang lưu...",
+        "saved": "Đã lưu mục tiêu khoá học",
+        "saveFailed": "Không lưu được, thử lại sau."
       }
     },
     "performance": {

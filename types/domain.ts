@@ -153,6 +153,10 @@ export interface CourseDetail extends CourseSummary {
   /** "Đăng ký (Quyền riêng tư)" kiểu Udemy (19/09/2026) — true khi cần nhập đúng mật khẩu mới
    * ghi danh được (chế độ PRIVATE_PASSWORD). Không ảnh hưởng việc XEM trang chi tiết. */
   requiresPassword: boolean;
+  /** "Bạn sẽ học được gì" / "Yêu cầu" / "Đối tượng" (26/11/2026) — có thể thiếu ở BE bản cũ. */
+  learningOutcomes?: string[];
+  requirements?: string[];
+  targetAudience?: string[];
 }
 
 export interface Chapter {
@@ -469,6 +473,17 @@ export interface CourseEditDetail {
   /** Chia doanh thu 2 mức (20/09/2026) — dựng liên kết giới thiệu `/courses/{slug}?ref=
    * {referralCode}`. Chỉ trả về ở đây (CHÍNH chủ khóa học), không lộ qua API công khai. */
   referralCode: string;
+  /** Mục tiêu khoá học (26/11/2026) — rỗng khi chưa điền (BE bản cũ có thể không trả). */
+  learningOutcomes?: string[];
+  requirements?: string[];
+  targetAudience?: string[];
+}
+
+/** Mục tiêu khoá học (26/11/2026) — mỗi danh sách ≤ 10 mục, mỗi mục ≤ 160 ký tự. */
+export interface CourseGoalsInput {
+  learningOutcomes: string[];
+  requirements: string[];
+  targetAudience: string[];
 }
 
 export interface CreateChapterInput {

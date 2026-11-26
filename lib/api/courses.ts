@@ -2,6 +2,7 @@ import { api, uploadFile } from '@/lib/api/client';
 import { getAccessToken } from '@/lib/auth/token';
 import type {
   CourseEditDetail,
+  CourseGoalsInput,
   CourseStatus,
   CourseVisibility,
   CreateCourseInput,
@@ -75,6 +76,10 @@ export const coursesApi = {
   /** "Đăng ký (Quyền riêng tư)" kiểu Udemy (19/09/2026) — Cài đặt khóa học. */
   updateVisibility: (id: number, input: { visibility: CourseVisibility; password?: string | null }) =>
     api.put<CourseEditDetail>(`/api/v1/courses/mine/${id}/visibility`, input, { token: authToken() }),
+
+  /** Mục tiêu khoá học (26/11/2026) — học được gì / yêu cầu / đối tượng. */
+  updateGoals: (id: number, input: CourseGoalsInput) =>
+    api.put<CourseEditDetail>(`/api/v1/courses/mine/${id}/goals`, input, { token: authToken() }),
 
   listInvites: (id: number) =>
     api.get<string[]>(`/api/v1/courses/mine/${id}/invites`, { token: authToken() }),

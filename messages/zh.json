@@ -566,6 +566,11 @@
     "coupon": {
       "note": "有优惠码？",
       "link": "结账时使用"
+    },
+    "goals": {
+      "outcomesTitle": "你将学到什么",
+      "requirementsTitle": "要求",
+      "audienceTitle": "本课程适合谁"
     }
   },
   "courseList": {
@@ -961,8 +966,9 @@
       "back": "返回课程列表",
       "tabsAria": "课程编辑栏目",
       "groups": {
-        "content": "课程内容",
-        "publish": "发布课程"
+        "content": "制作内容",
+        "publish": "发布课程",
+        "plan": "规划课程"
       },
       "tabs": {
         "curriculum": "课程大纲",
@@ -971,7 +977,8 @@
         "proctoring": "考试监考",
         "basics": "基本信息",
         "pricing": "定价",
-        "promotions": "促销"
+        "promotions": "促销",
+        "goals": "目标学员"
       },
       "completion": {
         "label": "已完成 {percent}%",
@@ -1013,6 +1020,37 @@
         "archiveConfirm": "移除",
         "cancel": "取消",
         "coInstructor": "协作讲师管理正在开发中，将在后续更新中提供。"
+      },
+      "stepDone": "已完成",
+      "checklist": {
+        "submitting": "提交中..."
+      },
+      "goals": {
+        "title": "目标学员",
+        "intro": "这些描述会显示在课程介绍页，帮助学员判断课程是否适合自己。",
+        "learningOutcomes": {
+          "label": "学员将学到什么？",
+          "hint": "建议至少 {min} 项，每项最多 {max} 个字符。",
+          "placeholder": "例如：能应对日常基本会话"
+        },
+        "requirements": {
+          "label": "学习要求",
+          "hint": "需要的技能、工具或知识。若无要求也请注明，让新手放心。",
+          "placeholder": "例如：无需基础"
+        },
+        "targetAudience": {
+          "label": "本课程适合谁？",
+          "hint": "描述最能从课程中受益的学员。",
+          "placeholder": "例如：准备出国旅行的初学者"
+        },
+        "itemLabel": "{section} — 第 {n} 项",
+        "remove": "删除第 {n} 项",
+        "add": "添加一项",
+        "recommendMin": "目前 {count}/{min} 项——建议补足 {min} 项。",
+        "save": "保存",
+        "saving": "保存中...",
+        "saved": "已保存课程目标",
+        "saveFailed": "保存失败，请稍后再试。"
       }
     },
     "performance": {
