@@ -52,7 +52,9 @@ export function useUpdateCourse(id: number) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (input: UpdateCourseInput) => coursesApi.update(id, input),
-    onSuccess: () => {
+    // Ghi ngay bản trả về vào cache để checklist ✓ và % hoàn thiện đổi tức thì, rồi vẫn refetch cho chắc.
+    onSuccess: (saved) => {
+      if (saved) queryClient.setQueryData(['courses', 'mine', id], saved);
       queryClient.invalidateQueries({ queryKey: ['courses', 'mine', id] });
       queryClient.invalidateQueries({ queryKey: ['courses', 'mine'] });
     },
@@ -105,7 +107,11 @@ export function useUpdateCourseGoals(id: number) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (input: CourseGoalsInput) => coursesApi.updateGoals(id, input),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['courses', 'mine', id] }),
+    onSuccess: (saved) => {
+      if (saved) queryClient.setQueryData(['courses', 'mine', id], saved);
+      queryClient.invalidateQueries({ queryKey: ['courses', 'mine', id] });
+      queryClient.invalidateQueries({ queryKey: ['courses', 'mine'] });
+    },
   });
 }
 

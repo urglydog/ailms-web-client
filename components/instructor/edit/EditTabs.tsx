@@ -63,7 +63,7 @@ export function EditTabs({ courseId, pathname, settingsOpen, course, submit }: E
                       {done !== null && (
                         <span
                           aria-hidden
-                          className={`hidden h-4 w-4 shrink-0 items-center justify-center rounded-full border lg:flex ${
+                          className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${
                             done ? 'border-success bg-success text-surface-raised' : 'border-line'
                           }`}
                         >
