@@ -1,4 +1,3 @@
-import { CategoryTiles } from '@/components/home/CategoryTiles';
 import { FeaturedShelf } from '@/components/home/FeaturedShelf';
 import { HomeAiFeatures } from '@/components/home/HomeAiFeatures';
 import { HomeContinue } from '@/components/home/HomeContinue';
@@ -48,7 +47,8 @@ async function safeFeatured() {
 }
 
 /**
- * Trang chủ (UDEMY_LAYOUT_ANALYSIS mục 2): hero → (đã đăng nhập) Tiếp tục học + streak → thẻ chủ đề lớn →
+ * Trang chủ (UDEMY_LAYOUT_ANALYSIS mục 2): hero → (đã đăng nhập) Tiếp tục học + streak →
+ * (bỏ khối thẻ chủ đề ở đầu trang theo phản hồi 26/11/2026 — trang chủ tập trung giới thiệu khoá học) →
  * kệ Đề xuất / Thịnh hành / Mới / Miễn phí / Người mới / theo danh mục → khối tối giới thiệu AI → bảng xếp hạng thu gọn.
  */
 export default async function HomePage() {
@@ -71,7 +71,6 @@ export default async function HomePage() {
     <>
       <HomeHero />
       <HomeContinue />
-      <CategoryTiles />
       <FeaturedShelf courses={featured} />
       <TrendingCourses initialCourses={courses} />
       <HomeShelves newest={newest} free={free} beginner={beginner} categoryShelves={categoryShelves} />

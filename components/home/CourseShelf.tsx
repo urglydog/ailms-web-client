@@ -22,7 +22,7 @@ interface CourseShelfProps {
 }
 
 /**
- * Một kệ khóa học trên trang chủ (UDEMY_LAYOUT_ANALYSIS mục 2): tiêu đề + "Xem tất cả", hàng thẻ cuộn ngang
+ * Một kệ khóa học trên trang chủ (UDEMY_LAYOUT_ANALYSIS mục 2): tiêu đề + mũi tên trái/phải (kệ ngắn thì "Xem tất cả"), hàng thẻ cuộn ngang
  * có mũi tên trái/phải (desktop), vuốt trên mobile. Bỏ khóa đã sở hữu; không có khóa nào thì không vẽ gì.
  */
 export function CourseShelf({ title, subtitle, href, courses, tone = 'plain' }: CourseShelfProps) {
@@ -53,10 +53,8 @@ export function CourseShelf({ title, subtitle, href, courses, tone = 'plain' }: 
             {subtitle && <p className="m-0 mt-1 text-sm text-ink-muted">{subtitle}</p>}
           </div>
           <div className="flex items-center gap-2">
-            <Link href={href} className="mr-2 text-sm font-semibold text-accent-dark no-underline hover:underline">
-              {t('viewAll')} →
-            </Link>
-            {visible.length > 4 && (
+            {/* Có mũi tên cuộn thì không cần thêm "Xem tất cả" (phản hồi 26/11/2026); kệ ngắn không cuộn mới hiện liên kết. */}
+            {visible.length > 4 ? (
               <>
                 <button type="button" onClick={() => scroll(-1)} aria-label={tShelf('prev')} className={arrow}>
                   <ChevronLeft size={18} aria-hidden />
@@ -65,6 +63,10 @@ export function CourseShelf({ title, subtitle, href, courses, tone = 'plain' }: 
                   <ChevronRight size={18} aria-hidden />
                 </button>
               </>
+            ) : (
+              <Link href={href} className="text-sm font-semibold text-accent-dark no-underline hover:underline">
+                {t('viewAll')} →
+              </Link>
             )}
           </div>
         </div>
