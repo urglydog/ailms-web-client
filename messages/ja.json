@@ -429,7 +429,8 @@
         "hardest": "{lesson} で一番難しい概念を説明して",
         "relation": "このレッスンは {previous} とどう関係しますか？",
         "chapter": "章 {chapter} の要点は何ですか？"
-      }
+      },
+      "aiGenerated": "レッスン内容からAIが生成"
     }
   },
   "profile": {

@@ -429,7 +429,8 @@
         "hardest": "Explain the hardest concept in {lesson}",
         "relation": "How does this lesson relate to {previous}?",
         "chapter": "What is the main idea of the chapter {chapter}?"
-      }
+      },
+      "aiGenerated": "AI-generated from the lesson content"
     }
   },
   "profile": {

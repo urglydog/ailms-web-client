@@ -429,7 +429,8 @@
         "hardest": "Giải thích khái niệm khó nhất trong {lesson}",
         "relation": "Bài này liên quan gì tới {previous}?",
         "chapter": "Ý chính của chương {chapter} là gì?"
-      }
+      },
+      "aiGenerated": "gợi ý do AI tạo từ nội dung bài"
     }
   },
   "profile": {

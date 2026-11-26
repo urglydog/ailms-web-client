@@ -25,7 +25,8 @@ export function useSuggestionText() {
 
 /**
  * Trạng thái rỗng của AI Gia sư (UDEMY_LAYOUT_ANALYSIS mục 9): 4 thẻ câu hỏi gợi ý theo bài đang
- * học — câu hỏi phổ biến của học viên khác trước, rồi câu mẫu điền tên bài/chương. Bấm thẻ là gửi.
+ * học — câu hỏi phổ biến của học viên khác trước, rồi câu AI sinh từ nội dung bài, rồi câu mẫu
+ * điền tên bài/chương. Bấm thẻ là gửi.
  */
 export function TutorSuggestions({ lessonId, onPick, disabled }: { lessonId: number; onPick: (q: string) => void; disabled?: boolean }) {
   const t = useTranslations('learn.tutorSuggest');
@@ -54,6 +55,7 @@ export function TutorSuggestions({ lessonId, onPick, disabled }: { lessonId: num
                 <span>
                   {text}
                   {s.source === 'POPULAR' && <span className="sr-only"> ({t('popular')})</span>}
+                  {s.source === 'AI' && <span className="sr-only"> ({t('aiGenerated')})</span>}
                 </span>
               </button>
             </li>

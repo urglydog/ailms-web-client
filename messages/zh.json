@@ -429,7 +429,8 @@
         "hardest": "解释 {lesson} 中最难的概念",
         "relation": "这节课和 {previous} 有什么关系？",
         "chapter": "章节 {chapter} 的主要内容是什么？"
-      }
+      },
+      "aiGenerated": "AI 根据课程内容生成"
     }
   },
   "profile": {

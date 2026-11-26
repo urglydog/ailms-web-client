@@ -8,6 +8,7 @@ vi.mock('@/hooks/useLessonNotes', () => ({
     data: [
       { text: 'Khi nào dùng thì hiện tại?', source: 'POPULAR', key: null, params: {} },
       { text: 'Tóm tắt bài X', source: 'TEMPLATE', key: 'summary', params: { lesson: 'Thì hiện tại' } },
+      { text: 'Dấu hiệu của thì hiện tại là gì?', source: 'AI', key: null, params: {} },
       { text: 'x', source: 'TEMPLATE', key: 'relation', params: { lesson: 'A', previous: 'Mở đầu' } },
     ],
   }),
@@ -21,5 +22,6 @@ describe('TutorSuggestions', () => {
     expect(screen.getByText('Bài này liên quan gì tới Mở đầu?')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Tóm tắt bài Thì hiện tại' }));
     expect(onPick).toHaveBeenCalledWith('Tóm tắt bài Thì hiện tại');
+    expect(screen.getByRole('button', { name: /gợi ý do AI/ })).toBeInTheDocument();
   });
 });

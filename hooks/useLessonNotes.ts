@@ -44,5 +44,14 @@ export function useTutorSuggestions(lessonId: number, enabled = true) {
     queryFn: () => tutorSuggestionsApi.list(lessonId),
     enabled,
     staleTime: 10 * 60 * 1000,
+    // Câu hỏi AI được máy chủ sinh nền (không chặn request) — khi còn chỗ trống mà chưa có câu
+    // AI thì hỏi lại vài lần, cách 45 giây, để thay dần câu mẫu bằng câu AI khi đã sẵn sàng.
+    refetchInterval: (query) => {
+      const data = query.state.data;
+      if (!data || query.state.dataUpdateCount >= 4) return false;
+      const hasAi = data.some((s) => s.source === 'AI');
+      const full = data.filter((s) => s.source === 'POPULAR').length >= 4;
+      return hasAi || full ? false : 45_000;
+    },
   });
 }
