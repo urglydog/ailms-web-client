@@ -3,7 +3,7 @@ import { MAIN_TAB_KEYS, resolveLearnTab, resolveMainTab } from './mainTabs';
 
 describe('MAIN_TAB_KEYS', () => {
   it('7 tab theo thứ tự, có Transcript, Tài nguyên đã gộp vào Học liệu', () => {
-    expect(MAIN_TAB_KEYS).toEqual(['overview', 'study-plan', 'qna', 'materials', 'transcript', 'gradebook', 'reviews']);
+    expect(MAIN_TAB_KEYS).toEqual(['overview', 'study-plan', 'qna', 'notes', 'materials', 'transcript', 'gradebook', 'reviews']);
     expect(MAIN_TAB_KEYS).not.toContain('resources');
   });
 });

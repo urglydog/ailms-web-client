@@ -361,7 +361,8 @@
       "transcript": "文字记录",
       "lessons": "课程内容",
       "tutor": "AI 导师",
-      "ariaLabel": "课程内容"
+      "ariaLabel": "课程内容",
+      "notes": "笔记"
     },
     "materials": {
       "courseResources": "课程资源"
@@ -385,6 +386,41 @@
     "theatre": {
       "on": "影院模式",
       "off": "退出影院模式"
+    },
+    "qnaBanner": {
+      "text": "先问 AI 导师，立即获得解答",
+      "cta": "问 AI 导师"
+    },
+    "notes": {
+      "createAt": "在 {time} 创建笔记",
+      "newAt": "{time} 的新笔记",
+      "save": "保存笔记",
+      "cancel": "取消",
+      "filter": "显示",
+      "scopeLesson": "当前课时",
+      "scopeCourse": "课程内所有课时",
+      "loading": "正在加载笔记…",
+      "errorLoad": "无法加载笔记。",
+      "errorSave": "无法保存笔记，请稍后再试。",
+      "errorDelete": "无法删除笔记，请稍后再试。",
+      "empty": "还没有笔记。点击上方输入框，记下当前时刻的要点。",
+      "seekTo": "跳转到 {time}",
+      "edit": "编辑笔记",
+      "editLabel": "笔记内容",
+      "delete": "删除笔记",
+      "confirmDelete": "删除这条笔记？"
+    },
+    "tutorSuggest": {
+      "title": "推荐问题",
+      "popular": "其他学员也问过",
+      "disclaimer": "AI 可能出错——请对照课程内容核实。",
+      "templates": {
+        "summary": "总结课时 {lesson}",
+        "quiz": "就 {lesson} 出 3 道题考我",
+        "hardest": "解释 {lesson} 中最难的概念",
+        "relation": "这节课和 {previous} 有什么关系？",
+        "chapter": "章节 {chapter} 的主要内容是什么？"
+      }
     }
   },
   "profile": {

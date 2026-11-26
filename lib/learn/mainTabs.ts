@@ -1,8 +1,8 @@
 /**
- * Tab dưới video của trang học bài (UDEMY_LAYOUT_ANALYSIS mục 5): Tổng quan | Lộ trình AI | Hỏi đáp |
+ * Tab dưới video của trang học bài (UDEMY_LAYOUT_ANALYSIS mục 5, 9): Tổng quan | Lộ trình AI | Hỏi đáp | Ghi chú |
  * Học liệu | Transcript | Bảng điểm | Đánh giá. "Tài nguyên" đã gộp vào "Học liệu".
  */
-export const MAIN_TAB_KEYS = ['overview', 'study-plan', 'qna', 'materials', 'transcript', 'gradebook', 'reviews'] as const;
+export const MAIN_TAB_KEYS = ['overview', 'study-plan', 'qna', 'notes', 'materials', 'transcript', 'gradebook', 'reviews'] as const;
 
 export type MainTab = (typeof MAIN_TAB_KEYS)[number];
 

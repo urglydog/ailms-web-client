@@ -361,7 +361,8 @@
       "transcript": "文字起こし",
       "lessons": "レクチャー",
       "tutor": "AIチューター",
-      "ariaLabel": "レッスン内容"
+      "ariaLabel": "レッスン内容",
+      "notes": "メモ"
     },
     "materials": {
       "courseResources": "講座リソース"
@@ -385,6 +386,41 @@
     "theatre": {
       "on": "シアターモード",
       "off": "シアターモードを終了"
+    },
+    "qnaBanner": {
+      "text": "まず AI チューターに聞けばすぐに答えが得られます",
+      "cta": "AI チューターに聞く"
+    },
+    "notes": {
+      "createAt": "{time} にメモを作成",
+      "newAt": "{time} の新しいメモ",
+      "save": "メモを保存",
+      "cancel": "キャンセル",
+      "filter": "表示",
+      "scopeLesson": "現在のレッスン",
+      "scopeCourse": "コース内のすべてのレッスン",
+      "loading": "メモを読み込み中…",
+      "errorLoad": "メモを読み込めませんでした。",
+      "errorSave": "メモを保存できませんでした。もう一度お試しください。",
+      "errorDelete": "メモを削除できませんでした。もう一度お試しください。",
+      "empty": "まだメモはありません。上の欄から、今見ている時点の要点を記録しましょう。",
+      "seekTo": "{time} に移動",
+      "edit": "メモを編集",
+      "editLabel": "メモの内容",
+      "delete": "メモを削除",
+      "confirmDelete": "このメモを削除しますか？"
+    },
+    "tutorSuggest": {
+      "title": "おすすめの質問",
+      "popular": "他の受講者も質問しています",
+      "disclaimer": "AI は間違えることがあります。レッスン内容で確認してください。",
+      "templates": {
+        "summary": "レッスン {lesson} を要約して",
+        "quiz": "{lesson} について 3 問クイズを出して",
+        "hardest": "{lesson} で一番難しい概念を説明して",
+        "relation": "このレッスンは {previous} とどう関係しますか？",
+        "chapter": "章 {chapter} の要点は何ですか？"
+      }
     }
   },
   "profile": {

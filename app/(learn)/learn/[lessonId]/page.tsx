@@ -22,6 +22,7 @@ import { materialsApi } from '@/lib/api/materials';
 import { PipelineProgress } from '@/components/player/PipelineProgress';
 import { TranscriptPanel } from '@/components/player/TranscriptPanel';
 import { TutorEmbedded } from '@/components/tutor/TutorEmbedded';
+import { NotesPanel } from '@/components/learn/NotesPanel';
 import { useActivateDubbing, useCancelDubbing } from '@/hooks/useDubbing';
 import { useDubbingSocket } from '@/hooks/useDubbingSocket';
 import { useEnrolledLessonPlayer } from '@/hooks/useEnrolledLessonPlayer';
@@ -33,7 +34,7 @@ import { useVoiceOptions } from '@/hooks/useVoiceOptions';
 import { api, ApiError, getOrCreateStreamSessionId } from '@/lib/api/client';
 import { lessonPlayerApi } from '@/lib/api/lessonPlayer';
 import type { CourseResource } from '@/lib/api/courseResourcesApi';
-import { MonitorPlay, PanelRightClose } from 'lucide-react';
+import { MonitorPlay, PanelRightClose, Sparkles } from 'lucide-react';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useTranslations } from 'next-intl';
 import { MAIN_TAB_KEYS, MOBILE_ONLY_TAB_KEYS, resolveLearnTab, type LearnTab, type MainTab } from '@/lib/learn/mainTabs';
@@ -52,6 +53,7 @@ const TAB_LABEL_KEYS: Record<LearnTab, string> = {
   overview: 'overview',
   'study-plan': 'studyPlan',
   qna: 'qna',
+  notes: 'notes',
   materials: 'materials',
   transcript: 'transcript',
   gradebook: 'gradebook',
@@ -271,6 +273,15 @@ function LearnPageContent() {
   };
 
   const [sidebarTab, setSidebarTab] = useState<SidebarTab>('content');
+  // Banner đầu tab Hỏi đáp: "Hỏi AI Gia sư trước" — desktop mở tab Gia sư ở sidebar, mobile chuyển tab.
+  const openTutor = () => {
+    if (isDesktop) {
+      setSidebarCollapsed(false);
+      setSidebarTab('tutor');
+    } else {
+      setMainTab('tutor');
+    }
+  };
   // (20/09/2026, tính năng mới) — thu gọn cột "Nội dung khóa học/AI Gia sư" để nhường thêm không
   // gian ngang cho video, chỉ áp dụng ở màn hình rộng (`lg:`) — dưới `lg` layout đã tự xếp chồng
   // dọc nên thu gọn không có ý nghĩa.
@@ -866,6 +877,31 @@ function LearnPageContent() {
                   )
                 )}
 
+                {mainTab === 'notes' && (
+                  lesson.enrolled ? (
+                    <NotesPanel
+                      lessonId={lesson.lessonId}
+                      currentSec={playerCurrentSec}
+                      onSeek={(sec, noteLessonId) => handleSeekToTimestamp(sec, noteLessonId)}
+                    />
+                  ) : (
+                    <LockedFeatureNotice feature={t('tabs.notes')} courseSlug={lesson.courseSlug} />
+                  )
+                )}
+
+                {mainTab === 'qna' && lesson.enrolled && (
+                  <div className="mb-4 flex flex-col gap-3 rounded-card border border-line bg-tint p-4 sm:flex-row sm:items-center sm:justify-between">
+                    <p className="m-0 text-sm font-semibold text-ink">{t('qnaBanner.text')}</p>
+                    <button
+                      type="button"
+                      onClick={openTutor}
+                      className="inline-flex shrink-0 items-center justify-center gap-2 rounded-md bg-accent px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-accent-dark motion-reduce:transition-none"
+                    >
+                      <Sparkles size={16} aria-hidden />
+                      {t('qnaBanner.cta')}
+                    </button>
+                  </div>
+                )}
                 {mainTab === 'qna' && (
                   lesson.enrolled ? (
                     <LiveChatPanel

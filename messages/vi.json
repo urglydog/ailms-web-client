@@ -361,7 +361,8 @@
       "transcript": "Transcript",
       "lessons": "Bài giảng",
       "tutor": "AI Gia sư",
-      "ariaLabel": "Nội dung bài học"
+      "ariaLabel": "Nội dung bài học",
+      "notes": "Ghi chú"
     },
     "materials": {
       "courseResources": "Tài nguyên khóa học"
@@ -385,6 +386,41 @@
     "theatre": {
       "on": "Chế độ rạp",
       "off": "Thoát chế độ rạp"
+    },
+    "qnaBanner": {
+      "text": "Hỏi AI Gia sư trước để có câu trả lời ngay",
+      "cta": "Hỏi AI Gia sư"
+    },
+    "notes": {
+      "createAt": "Tạo ghi chú tại {time}",
+      "newAt": "Ghi chú mới tại {time}",
+      "save": "Lưu ghi chú",
+      "cancel": "Huỷ",
+      "filter": "Hiển thị",
+      "scopeLesson": "Bài hiện tại",
+      "scopeCourse": "Mọi bài trong khoá",
+      "loading": "Đang tải ghi chú…",
+      "errorLoad": "Không tải được ghi chú.",
+      "errorSave": "Không lưu được ghi chú, thử lại sau.",
+      "errorDelete": "Không xoá được ghi chú, thử lại sau.",
+      "empty": "Chưa có ghi chú nào. Bấm ô phía trên để ghi lại ý chính tại thời điểm đang xem.",
+      "seekTo": "Tua video tới {time}",
+      "edit": "Sửa ghi chú",
+      "editLabel": "Nội dung ghi chú",
+      "delete": "Xoá ghi chú",
+      "confirmDelete": "Xoá ghi chú này?"
+    },
+    "tutorSuggest": {
+      "title": "Gợi ý câu hỏi",
+      "popular": "học viên khác cũng hỏi",
+      "disclaimer": "AI có thể sai — hãy kiểm tra lại với nội dung bài giảng.",
+      "templates": {
+        "summary": "Tóm tắt bài {lesson}",
+        "quiz": "Đố tôi 3 câu về {lesson}",
+        "hardest": "Giải thích khái niệm khó nhất trong {lesson}",
+        "relation": "Bài này liên quan gì tới {previous}?",
+        "chapter": "Ý chính của chương {chapter} là gì?"
+      }
     }
   },
   "profile": {

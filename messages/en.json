@@ -361,7 +361,8 @@
       "transcript": "Transcript",
       "lessons": "Lectures",
       "tutor": "AI Tutor",
-      "ariaLabel": "Lesson content"
+      "ariaLabel": "Lesson content",
+      "notes": "Notes"
     },
     "materials": {
       "courseResources": "Course resources"
@@ -385,6 +386,41 @@
     "theatre": {
       "on": "Theatre mode",
       "off": "Exit theatre mode"
+    },
+    "qnaBanner": {
+      "text": "Ask the AI Tutor first for an instant answer",
+      "cta": "Ask the AI Tutor"
+    },
+    "notes": {
+      "createAt": "Create a note at {time}",
+      "newAt": "New note at {time}",
+      "save": "Save note",
+      "cancel": "Cancel",
+      "filter": "Show",
+      "scopeLesson": "Current lesson",
+      "scopeCourse": "All lessons in course",
+      "loading": "Loading notes…",
+      "errorLoad": "Couldn't load notes.",
+      "errorSave": "Couldn't save the note, please try again.",
+      "errorDelete": "Couldn't delete the note, please try again.",
+      "empty": "No notes yet. Use the box above to capture a key idea at the current moment.",
+      "seekTo": "Jump video to {time}",
+      "edit": "Edit note",
+      "editLabel": "Note content",
+      "delete": "Delete note",
+      "confirmDelete": "Delete this note?"
+    },
+    "tutorSuggest": {
+      "title": "Suggested questions",
+      "popular": "other learners asked this too",
+      "disclaimer": "AI can make mistakes — check it against the lesson.",
+      "templates": {
+        "summary": "Summarise the lesson {lesson}",
+        "quiz": "Quiz me with 3 questions on {lesson}",
+        "hardest": "Explain the hardest concept in {lesson}",
+        "relation": "How does this lesson relate to {previous}?",
+        "chapter": "What is the main idea of the chapter {chapter}?"
+      }
     }
   },
   "profile": {
