@@ -133,7 +133,7 @@ function NoteItem({ note, showLesson, onSeek }: { note: LessonNote; showLesson: 
         type="button"
         onClick={() => onSeek(note.timestampSec, note.lessonId)}
         aria-label={t('seekTo', { time: formatTimestamp(note.timestampSec) })}
-        className="h-fit shrink-0 rounded-full bg-ink px-2.5 py-1 font-mono text-xs font-semibold text-surface-raised transition-opacity hover:opacity-85"
+        className="h-fit shrink-0 rounded-full bg-accent/15 px-2.5 py-1 font-mono text-xs font-semibold text-accent-dark transition-opacity hover:opacity-85"
       >
         {formatTimestamp(note.timestampSec)}
       </button>
