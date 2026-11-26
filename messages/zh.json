@@ -1484,7 +1484,7 @@
     "insights": {
       "title": "AI 辅导洞察",
       "subtitle": "学员向 AI 辅导提了哪些问题——仅汇总数据，不显示姓名或个人问题。",
-      "noCourses": "你还没有课程。",
+      "noCourses": "还没有已发布的课程。学员学习并向 AI 辅导提问后，这里会显示洞察。",
       "loadError": "无法加载洞察，请重试。",
       "lessonFilter": "按课时筛选",
       "allLessons": "全部课时",

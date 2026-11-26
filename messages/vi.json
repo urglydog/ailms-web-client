@@ -1484,7 +1484,7 @@
     "insights": {
       "title": "Insight từ AI gia sư",
       "subtitle": "Học viên đang hỏi Gia sư AI những gì — số liệu đã gộp, không hiện tên hay câu hỏi riêng.",
-      "noCourses": "Bạn chưa có khóa học nào.",
+      "noCourses": "Chưa có khóa học đã xuất bản. Insight sẽ xuất hiện khi học viên học và hỏi Gia sư AI.",
       "loadError": "Không tải được Insight. Vui lòng thử lại.",
       "lessonFilter": "Lọc theo bài học",
       "allLessons": "Tất cả bài học",

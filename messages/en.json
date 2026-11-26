@@ -1484,7 +1484,7 @@
     "insights": {
       "title": "AI tutor insights",
       "subtitle": "What learners ask the AI tutor — aggregated, with no names or individual questions.",
-      "noCourses": "You don't have any courses yet.",
+      "noCourses": "No published courses yet. Insights appear once learners study and ask the AI tutor.",
       "loadError": "Couldn't load insights. Please try again.",
       "lessonFilter": "Filter by lesson",
       "allLessons": "All lessons",
