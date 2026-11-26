@@ -43,10 +43,11 @@ export interface PageRes<T> {
 }
 
 export const qaApi = {
-  listQuestions: (params: { courseId?: number; onlyUnanswered?: boolean; search?: string; sort?: 'newest' | 'oldest'; page?: number }) => {
+  listQuestions: (params: { courseId?: number; onlyUnanswered?: boolean; noInstructorAnswer?: boolean; search?: string; sort?: 'newest' | 'oldest'; page?: number }) => {
     const qs = new URLSearchParams();
     if (params.courseId) qs.set('courseId', String(params.courseId));
     if (params.onlyUnanswered) qs.set('onlyUnanswered', 'true');
+    if (params.noInstructorAnswer) qs.set('noInstructorAnswer', 'true');
     if (params.search?.trim()) qs.set('search', params.search.trim());
     if (params.sort) qs.set('sort', params.sort);
     qs.set('page', String(params.page ?? 0));

@@ -12,9 +12,11 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { useInstructorCourseOptions } from '@/hooks/useDashboard';
 import { useQaQuestions, useQaThread, useReplyToQuestion } from '@/hooks/useCommunication';
 import { Avatar } from '@/components/ui/Avatar';
+import { Chip } from '@/components/ui/Chip';
 import type { QaQuestion } from '@/lib/api/communication';
 
 type SortOption = 'newest' | 'oldest';
+type QaFilter = 'all' | 'unanswered' | 'noInstructor';
 type ViewMode = 'single' | 'double';
 
 /** "Giao tiếp > Hỏi đáp" (19/09/2026, xây mới; bổ sung tìm kiếm/sắp xếp/2 kiểu xem — giao diện
@@ -24,7 +26,7 @@ type ViewMode = 'single' | 'double';
 export default function InstructorQaPage() {
   const t = useTranslations('instructor.comm');
   const [courseId, setCourseId] = useState<number | ''>('');
-  const [onlyUnanswered, setOnlyUnanswered] = useState(false);
+  const [filter, setFilter] = useState<QaFilter>('all');
   const [sort, setSort] = useState<SortOption>('newest');
   const [viewMode, setViewMode] = useState<ViewMode>('single');
   const [activeQuestionId, setActiveQuestionId] = useState<string | null>(null);
@@ -37,7 +39,8 @@ export default function InstructorQaPage() {
   // Tìm kiếm, lọc "chưa trả lời" và sắp xếp đều chạy ở máy chủ nên đúng trên mọi trang (20 câu/trang).
   const { data: questionsPage, isLoading } = useQaQuestions({
     courseId: courseId || undefined,
-    onlyUnanswered,
+    onlyUnanswered: filter === 'unanswered',
+    noInstructorAnswer: filter === 'noInstructor',
     search: debouncedSearch,
     sort,
     page,
@@ -104,18 +107,22 @@ export default function InstructorQaPage() {
         </div>
       </div>
 
-      <label className="flex w-fit items-center gap-1.5 text-[13px] font-semibold text-ink-muted">
-        <input
-          type="checkbox"
-          checked={onlyUnanswered}
-          onChange={(e) => {
-            setOnlyUnanswered(e.target.checked);
-            setPage(0);
-          }}
-          className="accent-cyan-600"
-        />
-        {t('qa.onlyUnanswered')}
-      </label>
+      {/* Bộ lọc kiểu Udemy (26/11/2026). "Chưa đọc" và "Chưa có câu trả lời hay nhất" chưa có vì
+          hệ thống chưa lưu trạng thái đã đọc / câu trả lời hay nhất cho Hỏi đáp. */}
+      <div role="group" aria-label={t('qa.filtersAria')} className="flex flex-wrap items-center gap-2">
+        {(['all', 'unanswered', 'noInstructor'] as QaFilter[]).map((f) => (
+          <Chip
+            key={f}
+            active={filter === f}
+            onClick={() => {
+              setFilter(f);
+              setPage(0);
+            }}
+          >
+            {t(`qa.filter.${f}`)}
+          </Chip>
+        ))}
+      </div>
 
       {isLoading && <div className="p-10 text-center text-sm text-ink-muted">{t('loading')}</div>}
       {!isLoading && questions.length === 0 && (

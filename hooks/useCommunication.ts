@@ -7,9 +7,9 @@ import { getAccessToken } from '@/lib/auth/token';
 
 // ==================== Q&A ====================
 
-export function useQaQuestions(params: { courseId?: number; onlyUnanswered?: boolean; search?: string; sort?: 'newest' | 'oldest'; page?: number }) {
+export function useQaQuestions(params: { courseId?: number; onlyUnanswered?: boolean; noInstructorAnswer?: boolean; search?: string; sort?: 'newest' | 'oldest'; page?: number }) {
   return useQuery({
-    queryKey: ['qa', 'questions', params.courseId ?? 'all', params.onlyUnanswered ?? false, params.search ?? '', params.sort ?? 'newest', params.page ?? 0],
+    queryKey: ['qa', 'questions', params.courseId ?? 'all', params.onlyUnanswered ?? false, params.noInstructorAnswer ?? false, params.search ?? '', params.sort ?? 'newest', params.page ?? 0],
     queryFn: () => qaApi.listQuestions(params),
     enabled: !!getAccessToken(),
     placeholderData: (prev) => prev,
