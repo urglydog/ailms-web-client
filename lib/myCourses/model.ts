@@ -77,3 +77,9 @@ export function resolveViewMode(stored: string | null): ViewMode {
   if (stored === 'list' || stored === 'grid') return stored;
   return 'grid';
 }
+
+/** Mọi khóa đang học, truy cập gần nhất trước (chưa học bài nào thì theo ngày ghi danh) — hàng "Tiếp tục học" trang chủ. */
+export function pickInProgress(courses: EnrolledCourse[]): EnrolledCourse[] {
+  const touched = (c: EnrolledCourse) => time(c.lastAccessedAt) || time(c.enrolledAt);
+  return courses.filter((c) => statusOf(c) === 'in-progress').sort((a, b) => touched(b) - touched(a));
+}

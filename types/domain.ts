@@ -608,6 +608,9 @@ export interface EnrolledCourse {
   resumeLessonId?: number | null;
   /** Vị trí (giây) mở `resumeLessonId`; trình phát tự khôi phục từ tiến độ đã lưu nên FE chỉ cần id bài. */
   resumePositionSec?: number | null;
+  /** Tên + thời lượng (giây) bài `resumeLessonId` — hàng thẻ "Tiếp tục học" trang chủ (26/11/2026). */
+  resumeLessonTitle?: string | null;
+  resumeLessonDurationSec?: number | null;
 }
 
 // ── F6.2: Tiến độ học tập (UC21, UC22) ───────────────────────────

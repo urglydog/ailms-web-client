@@ -227,7 +227,12 @@
       "all": "My learning",
       "streak": "{count}-day streak",
       "studiedToday": "You studied today — keep it up!",
-      "notStudiedToday": "Study one lesson today to keep your streak"
+      "notStudiedToday": "Study one lesson today to keep your streak",
+      "becauseViewed": "Because you viewed “{title}”",
+      "resumeFallback": "Resume your lesson",
+      "lessonMeta": "Lecture · {minutes} min",
+      "lessonLabel": "Lecture",
+      "progress": "{pct}% of course"
     },
     "ai": {
       "title": "Learn with AI, your way",
@@ -245,6 +250,9 @@
         "body": "A personalised plan that fits your schedule and progress."
       },
       "cta": "Explore courses"
+    },
+    "categoryBar": {
+      "label": "Course categories"
     }
   },
   "myCourses": {

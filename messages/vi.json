@@ -227,7 +227,12 @@
       "all": "Khóa học của tôi",
       "streak": "Chuỗi {count} ngày",
       "studiedToday": "Hôm nay bạn đã học — giữ vững nhé!",
-      "notStudiedToday": "Học một bài hôm nay để giữ chuỗi"
+      "notStudiedToday": "Học một bài hôm nay để giữ chuỗi",
+      "becauseViewed": "Vì bạn đã xem “{title}”",
+      "resumeFallback": "Học tiếp bài đang dở",
+      "lessonMeta": "Bài giảng · {minutes} phút",
+      "lessonLabel": "Bài giảng",
+      "progress": "{pct}% khoá"
     },
     "ai": {
       "title": "Học cùng AI, theo cách của bạn",
@@ -245,6 +250,9 @@
         "body": "Kế hoạch học cá nhân hóa theo thời gian và tiến độ của bạn."
       },
       "cta": "Khám phá khóa học"
+    },
+    "categoryBar": {
+      "label": "Danh mục khoá học"
     }
   },
   "myCourses": {

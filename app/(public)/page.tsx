@@ -1,5 +1,6 @@
 import { FeaturedShelf } from '@/components/home/FeaturedShelf';
 import { HomeAiFeatures } from '@/components/home/HomeAiFeatures';
+import { HomeCategoryBar } from '@/components/home/HomeCategoryBar';
 import { HomeContinue } from '@/components/home/HomeContinue';
 import { HomeHero } from '@/components/home/HomeHero';
 import { HomeShelves } from '@/components/home/HomeShelves';
@@ -69,8 +70,11 @@ export default async function HomePage() {
 
   return (
     <>
+      <HomeCategoryBar categories={categories} />
       <HomeHero />
-      <HomeContinue />
+      <HomeContinue
+        categoryCourses={categories.map((c, i) => ({ slug: c.slug, name: c.name, courses: perCategory[i] ?? [] }))}
+      />
       <FeaturedShelf courses={featured} />
       <TrendingCourses initialCourses={courses} />
       <HomeShelves newest={newest} free={free} beginner={beginner} categoryShelves={categoryShelves} />

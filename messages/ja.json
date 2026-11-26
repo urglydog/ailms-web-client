@@ -227,7 +227,12 @@
       "all": "マイラーニング",
       "streak": "{count}日連続",
       "studiedToday": "今日も学習済み — その調子！",
-      "notStudiedToday": "今日1レッスン学んで連続記録を維持"
+      "notStudiedToday": "今日1レッスン学んで連続記録を維持",
+      "becauseViewed": "「{title}」を見たあなたへ",
+      "resumeFallback": "途中のレッスンを再開",
+      "lessonMeta": "レクチャー · {minutes}分",
+      "lessonLabel": "レクチャー",
+      "progress": "コース {pct}%"
     },
     "ai": {
       "title": "AIと一緒に、自分のペースで",
@@ -245,6 +250,9 @@
         "body": "あなたの時間と進捗に合わせた個別プラン。"
       },
       "cta": "コースを探す"
+    },
+    "categoryBar": {
+      "label": "コースカテゴリ"
     }
   },
   "myCourses": {

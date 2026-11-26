@@ -227,7 +227,12 @@
       "all": "我的课程",
       "streak": "连续 {count} 天",
       "studiedToday": "今天已学习，继续保持！",
-      "notStudiedToday": "今天学一节课以保持连续记录"
+      "notStudiedToday": "今天学一节课以保持连续记录",
+      "becauseViewed": "因为你看过“{title}”",
+      "resumeFallback": "继续学习未完成的课",
+      "lessonMeta": "讲座 · {minutes} 分钟",
+      "lessonLabel": "讲座",
+      "progress": "课程完成 {pct}%"
     },
     "ai": {
       "title": "与 AI 一起，按你的方式学习",
@@ -245,6 +250,9 @@
         "body": "根据你的时间和进度定制的个性化计划。"
       },
       "cta": "浏览课程"
+    },
+    "categoryBar": {
+      "label": "课程分类"
     }
   },
   "myCourses": {
