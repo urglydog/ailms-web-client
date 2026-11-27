@@ -10,7 +10,7 @@ import { useMyCourseDetail } from "@/hooks/useCourses";
 import { toast } from 'sonner';
 import React, { useState, useEffect } from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
-import { MindmapEditor } from '@/components/materials/MindmapEditor';
+import dynamic from 'next/dynamic';
 import { MermaidCodeEditor } from '@/components/materials/MermaidCodeEditor';
 import { MermaidViewer } from '@/components/materials/MermaidViewer';
 import { MaterialLanguagePicker } from '@/components/materials/MaterialLanguagePicker';
@@ -24,6 +24,9 @@ import { CautionProgressBar } from '@/components/materials/ui/CautionProgressBar
 
 import { DndContext, useDraggable, useDroppable, DragOverlay, DragStartEvent, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { GripVertical, Trash2, FileText, Plus, Layers, LayoutGrid, List, Search, X, FileQuestion, Workflow, File, Folder, Link as LinkIcon, History, FileEdit, Sparkles, Lock, ShieldAlert, Check, Save, GitBranch, Network, AlertTriangle, PencilLine, Upload } from 'lucide-react';
+
+// Hiệu năng đợt 7 (B6): MindmapEditor kéo theo @xyflow + dagre + html-to-image — chỉ tải khi mở trình sửa mindmap.
+const MindmapEditor = dynamic(() => import('@/components/materials/MindmapEditor').then((m) => m.MindmapEditor), { ssr: false });
 
 
 interface CourseMaterialsManagerProps {

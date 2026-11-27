@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import mermaid from 'mermaid';
 import { toast } from 'sonner';
 import { ArrowDown, ArrowRight, ArrowUp, ArrowLeft } from 'lucide-react';
 
@@ -27,17 +26,19 @@ export function MermaidViewer({ chart, readOnly = false }: MermaidViewerProps) {
 
 
   useEffect(() => {
-    mermaid.initialize({
-      startOnLoad: false,
-      theme: 'default',
-      securityLevel: 'loose',
-      fontFamily: 'Inter, sans-serif',
-      flowchart: { htmlLabels: false }
-    });
-
     const renderChart = async () => {
       try {
         if (!chart) return;
+        // Hiệu năng đợt 7 (B6): mermaid ~1 MB chỉ tải khi thật sự có sơ đồ cần vẽ, không nằm trong bundle
+        // ban đầu của trang. Trình duyệt cache module nên lần vẽ sau không tải lại.
+        const mermaid = (await import('mermaid')).default;
+        mermaid.initialize({
+          startOnLoad: false,
+          theme: 'default',
+          securityLevel: 'loose',
+          fontFamily: 'Inter, sans-serif',
+          flowchart: { htmlLabels: false }
+        });
         setLoading(true);
         setError(null);
         

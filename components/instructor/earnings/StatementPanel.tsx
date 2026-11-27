@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { FileDown } from 'lucide-react';
 import { toast } from 'sonner';
-import { InvoiceDetailBody } from '@/components/invoices/InvoiceDetailBody';
+import dynamic from 'next/dynamic';
 import { ExportMenu } from '@/components/ui/ExportMenu';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useMyInvoices } from '@/hooks/useInvoices';
@@ -14,6 +14,9 @@ import { getAccessToken } from '@/lib/auth/token';
 import { dateTime, money } from '@/lib/finance';
 import { saveBlob } from '@/lib/invoices';
 import type { Invoice } from '@/types/invoice';
+
+// Hiệu năng đợt 7 (B6): biểu đồ recharts trong chi tiết hóa đơn chỉ tải khi mở chi tiết.
+const InvoiceDetailBody = dynamic(() => import('@/components/invoices/InvoiceDetailBody').then((m) => m.InvoiceDetailBody), { ssr: false });
 
 const monthLabel = (period: string) => `Tháng ${period.slice(4, 6)}/${period.slice(0, 4)}`;
 
