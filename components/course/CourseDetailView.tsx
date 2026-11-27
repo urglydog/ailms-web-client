@@ -229,8 +229,8 @@ export function CourseDetailView({ course }: { course: CourseDetail }) {
 
       <RelatedCourses categorySlug={course.categorySlug} courseId={course.id} />
 
-      {/* Thanh giá + CTA dính đáy trên mobile — CTA cuộn tới thẻ mua để dùng đúng luồng mua/đăng ký. */}
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface-raised px-4 py-2.5 lg:hidden">
+      {/* Thanh giá + CTA dính đáy trên mobile — CTA cuộn tới thẻ mua để dùng đúng luồng mua/đăng ký. pr-24 chừa chỗ nút chat nổi (fixed bottom-6 right-6) để không che nút CTA (27/11/2026). */}
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface-raised py-2.5 pl-4 pr-24 lg:hidden">
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
             <p className="m-0 truncate text-[13px] font-semibold text-ink">{course.title}</p>
