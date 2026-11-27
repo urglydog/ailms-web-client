@@ -258,6 +258,8 @@ export interface PlayerLesson {
   chapters: ChapterNav[];
   /** Phụ đề ngôn ngữ GỐC — rỗng nếu bài học chưa từng lồng tiếng lần nào. */
   originalSubtitles: SubtitleSegment[];
+  /** (27/11/2026) Giảng viên sở hữu khoá đang xem như học viên — bỏ qua API chỉ dành cho học viên (bảng điểm). */
+  viewerIsOwner?: boolean;
 }
 
 export interface ChapterNav {

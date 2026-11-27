@@ -92,6 +92,7 @@ interface RawEnrolledPlayerLesson {
   languages: RawLanguage[];
   chapters: RawChapterNav[];
   originalSubtitles: RawSubtitleSegment[];
+  viewerIsOwner?: boolean;
 }
 
 function toSubtitleSegment(raw: RawSubtitleSegment): SubtitleSegment {
@@ -164,6 +165,7 @@ function toPlayerLesson(raw: RawEnrolledPlayerLesson): PlayerLesson {
     languages: raw.languages.map(toDubLanguage),
     chapters: raw.chapters.map(toChapterNav),
     originalSubtitles: raw.originalSubtitles.map(toSubtitleSegment),
+    viewerIsOwner: raw.viewerIsOwner === true,
     // Không dùng field này nữa ở luồng đã đăng nhập — track được lấy từ `languages[].track`
     // (xem `learn/[lessonId]/page.tsx`). Giữ lại vì `PlayerLesson` dùng chung với UC11.
     activeTrack: null,

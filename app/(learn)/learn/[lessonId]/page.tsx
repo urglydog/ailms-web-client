@@ -217,7 +217,8 @@ function LearnPageContent() {
 
   // Dọn dẹp Draft rác của các Quiz đã bị xóa mềm (Graceful In-flight cleanup)
   useEffect(() => {
-    if (lesson?.courseId && userId) {
+    // Chủ khoá (xem như học viên) không có bảng điểm học viên -> API trả 403; bỏ qua (27/11/2026).
+    if (lesson?.courseId && userId && !lesson.viewerIsOwner) {
       api.get<{quizzes: {quizId: number, isDeleted: boolean}[]}>(`/api/v1/student/courses/${lesson.courseId}/gradebook`, { token: getAccessToken() ?? undefined }).then(gradebook => {
         const deletedQuizIds = new Set(gradebook.quizzes.filter(q => q.isDeleted).map(q => q.quizId.toString()));
         const keysToRemove: string[] = [];
@@ -235,7 +236,7 @@ function LearnPageContent() {
         } catch {}
       }).catch(() => {});
     }
-  }, [lesson?.courseId, userId]);
+  }, [lesson?.courseId, lesson?.viewerIsOwner, userId]);
 
   // `languages[].track` chỉ mới sau khi gọi lại API — cần refetch mỗi khi có track mới sẵn sàng
   // (BR-DUB-04 trả AVAILABLE ngay, hoặc job vừa COMPLETED), nếu không `available`/`track` trong
@@ -915,7 +916,14 @@ function LearnPageContent() {
                 )}
 
                 {mainTab === 'reviews' && <ReviewsSection courseId={lesson.courseId} />}
-                {mainTab === 'gradebook' && <CourseGradebookTab courseId={lesson.courseId} />}
+                {mainTab === 'gradebook' && (lesson.viewerIsOwner ? (
+                  <div className="py-8 text-center text-sm text-ink-muted">
+                    Bảng điểm chỉ dành cho học viên.{' '}
+                    <Link href={`/instructor/courses/${lesson.courseId}/gradebook`} className="font-semibold text-accent-dark underline">
+                      Xem bảng điểm của lớp
+                    </Link>
+                  </div>
+                ) : <CourseGradebookTab courseId={lesson.courseId} />)}
                 {mainTab === 'materials' && (
                   lesson.enrolled ? (
                     <div className="flex flex-col gap-5">
