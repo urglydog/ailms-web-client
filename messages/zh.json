@@ -583,6 +583,11 @@
       "soon": "即将推出",
       "copied": "已复制课程链接",
       "copyFailed": "无法复制链接"
+    },
+    "owner": {
+      "note": "这是您的课程。",
+      "edit": "编辑课程",
+      "learn": "以学员身份查看"
     }
   },
   "courseList": {
@@ -1523,7 +1528,9 @@
       "summaryNoData": "学员开始向 AI 辅导提问后，这里会显示摘要。",
       "actionsTitle": "建议操作",
       "generatedAt": "更新于 {time}",
-      "privacy": "仅当 2 位及以上学员提问时才显示话题；标签为共同关键词，而非原始问题。"
+      "privacy": "仅当 2 位及以上学员提问时才显示话题；标签为共同关键词，而非原始问题。",
+      "retry": "重试",
+      "retryAfter": "可在 {time} 重试（每 10 分钟最多一次）。"
     }
   },
   "coupons": {

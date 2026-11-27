@@ -583,6 +583,11 @@
       "soon": "Coming soon",
       "copied": "Course link copied",
       "copyFailed": "Couldn't copy the link"
+    },
+    "owner": {
+      "note": "This is your course.",
+      "edit": "Edit course",
+      "learn": "Open as a learner"
     }
   },
   "courseList": {
@@ -1523,7 +1528,9 @@
       "summaryNoData": "A summary will appear once learners start asking the AI tutor.",
       "actionsTitle": "Suggested actions",
       "generatedAt": "Updated {time}",
-      "privacy": "Topics only appear when 2 or more learners asked; labels are shared keywords, never verbatim questions."
+      "privacy": "Topics only appear when 2 or more learners asked; labels are shared keywords, never verbatim questions.",
+      "retry": "Retry",
+      "retryAfter": "You can retry at {time} (at most once every 10 minutes)."
     }
   },
   "coupons": {

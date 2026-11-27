@@ -583,6 +583,11 @@
       "soon": "Sắp ra mắt",
       "copied": "Đã chép liên kết khóa học",
       "copyFailed": "Không chép được liên kết"
+    },
+    "owner": {
+      "note": "Đây là khoá học của bạn.",
+      "edit": "Chỉnh sửa khoá học",
+      "learn": "Vào học (xem như học viên)"
     }
   },
   "courseList": {
@@ -1523,7 +1528,9 @@
       "summaryNoData": "Tóm tắt sẽ xuất hiện khi học viên bắt đầu hỏi Gia sư AI.",
       "actionsTitle": "Đề xuất cho bạn",
       "generatedAt": "Cập nhật lúc {time}",
-      "privacy": "Chủ đề chỉ hiện khi có từ 2 học viên trở lên cùng hỏi; nhãn là từ khoá chung, không phải câu hỏi nguyên văn."
+      "privacy": "Chủ đề chỉ hiện khi có từ 2 học viên trở lên cùng hỏi; nhãn là từ khoá chung, không phải câu hỏi nguyên văn.",
+      "retry": "Thử lại",
+      "retryAfter": "Có thể thử lại lúc {time} (tối đa 1 lần mỗi 10 phút)."
     }
   },
   "coupons": {

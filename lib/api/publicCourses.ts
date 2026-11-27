@@ -258,6 +258,13 @@ export const publicCoursesApi = {
     return toDetail(raw);
   },
 
+  /** Cờ theo NGƯỜI XEM đã đăng nhập (27/11/2026): trang chi tiết render ẩn danh ở server nên
+   * gọi lại phía client kèm token để biết người xem có phải giảng viên sở hữu khoá không. */
+  getViewerFlags: async (slug: string, token: string): Promise<{ viewerIsOwner: boolean }> => {
+    const raw = await api.get<{ viewerIsOwner?: boolean }>(`/api/v1/courses/${slug}`, { token });
+    return { viewerIsOwner: raw.viewerIsOwner === true };
+  },
+
   /** UC11 — Học thử Preview: chỉ trả về được nếu bài học đánh dấu Preview (BR-ENROLL-02). */
   getLessonPlayer: async (lessonId: number): Promise<PlayerLesson> => {
     const raw = await api.get<RawPlayerLesson>(`/api/v1/courses/lessons/${lessonId}/player`);

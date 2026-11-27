@@ -2,6 +2,9 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { getAccessToken } from '@/lib/auth/token';
+import { publicCoursesApi } from '@/lib/api/publicCourses';
 import { Bot, Check, ChevronDown, Infinity as InfinityIcon, Layers, PlayCircle, Tag } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { ChapterAccordion } from '@/components/course/ChapterAccordion';
@@ -48,6 +51,17 @@ export function CourseDetailView({ course }: { course: CourseDetail }) {
   const totalSec = allLessons.reduce((sum, l) => sum + (l.durationSec || 0), 0);
   const previewLessons = allLessons.filter((lesson) => lesson.isPreview);
   const firstLesson = allLessons[0] ?? null;
+  // Giảng viên xem trang của CHÍNH khoá mình (27/11/2026): thay nút mua/giỏ hàng/yêu thích/tặng bằng
+  // "Chỉnh sửa khoá học" + "Vào học". Cờ do máy chủ tính (viewerIsOwner), không đoán ở FE.
+  const token = typeof window === 'undefined' ? null : getAccessToken();
+  const { data: viewer } = useQuery({
+    queryKey: ['course-viewer', course.slug, !!token],
+    queryFn: () => publicCoursesApi.getViewerFlags(course.slug, token as string),
+    enabled: !!token,
+    staleTime: 60_000,
+  });
+  const isOwner = viewer?.viewerIsOwner === true;
+  const editHref = `/instructor/courses/${course.id}/edit`;
   const money = (n: number) => `${n.toLocaleString(locale)}đ`;
   const longDescription = (course.description ?? '').length > 600;
 
@@ -199,6 +213,26 @@ export function CourseDetailView({ course }: { course: CourseDetail }) {
                 {priceBlock}
                 {!course.isFree && course.discountPercent ? <PromoCountdown endsAt={course.discountEndsAt} /> : null}
 
+                {isOwner ? (
+                  <div className="flex flex-col gap-2.5">
+                    <p className="m-0 rounded-control bg-tint px-3 py-2 text-[13px] text-accent-dark">{t('owner.note')}</p>
+                    <Link
+                      href={editHref}
+                      className="flex min-h-11 items-center justify-center rounded-control bg-accent px-4 text-sm font-semibold text-white no-underline hover:bg-accent-dark hover:text-white"
+                    >
+                      {t('owner.edit')}
+                    </Link>
+                    {firstLesson && (
+                      <Link
+                        href={`/learn/${firstLesson.id}`}
+                        className="flex min-h-11 items-center justify-center rounded-control border border-line px-4 text-sm font-semibold text-ink no-underline hover:border-accent"
+                      >
+                        {t('owner.learn')}
+                      </Link>
+                    )}
+                  </div>
+                ) : (
+                <>
                 <EnrollButton
                   courseId={course.id}
                   courseSlug={course.slug}
@@ -219,6 +253,8 @@ export function CourseDetailView({ course }: { course: CourseDetail }) {
                 )}
 
                 <ShareGiftButtons title={course.title} slug={course.slug} />
+                </>
+                )}
 
                 <BundleUpsellWidget courseId={course.id} />
               </div>
@@ -241,7 +277,14 @@ export function CourseDetailView({ course }: { course: CourseDetail }) {
               ) : null}
             </p>
           </div>
-          {course.enrolled && firstLesson ? (
+          {isOwner ? (
+            <Link
+              href={editHref}
+              className="flex min-h-11 shrink-0 items-center rounded-control bg-accent px-4 text-sm font-semibold text-white no-underline hover:bg-accent-dark hover:text-white"
+            >
+              {t('owner.edit')}
+            </Link>
+          ) : course.enrolled && firstLesson ? (
             <Link
               href={`/learn/${firstLesson.id}`}
               className="flex min-h-11 shrink-0 items-center rounded-control bg-accent px-4 text-sm font-semibold text-white no-underline hover:bg-accent-dark hover:text-white"
