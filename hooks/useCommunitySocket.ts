@@ -19,6 +19,13 @@ export interface ChatMessage {
   parentId?: string;
   /** true nếu người gửi là giảng viên sở hữu khóa học — dùng để gắn nhãn "Giảng viên". */
   isInstructor: boolean;
+  /** Chỉ có trên tin GỐC (27/11/2026): id câu trả lời hay nhất, null/undefined nếu chưa có. */
+  bestAnswerId?: string | null;
+}
+
+/** Áp id câu trả lời hay nhất mới cho câu hỏi gốc {@code questionId} (rỗng = bỏ đánh dấu). */
+export function applyBestAnswer(messages: ChatMessage[], questionId: string, bestAnswerId: string | null): ChatMessage[] {
+  return messages.map((m) => (m.id === questionId ? { ...m, bestAnswerId: bestAnswerId || null } : m));
 }
 
 export function useCommunitySocket(lessonId: number | null) {
@@ -56,6 +63,14 @@ export function useCommunitySocket(lessonId: number | null) {
           // Ignore invalid messages
         }
       });
+      client.subscribe(`/topic/lesson/${lessonId}/best-answer`, (message) => {
+        try {
+          const evt = JSON.parse(message.body) as { questionId: string; bestAnswerId: string };
+          setMessages((prev) => applyBestAnswer(prev, evt.questionId, evt.bestAnswerId));
+        } catch {
+          // Ignore invalid messages
+        }
+      });
     };
 
     client.activate();
@@ -89,5 +104,21 @@ export function useCommunitySocket(lessonId: number | null) {
     }
   };
 
-  return { messages, sendMessage };
+  /** Đánh dấu / bỏ câu trả lời hay nhất (27/11/2026) — cập nhật lạc quan, lỗi thì hoàn tác. */
+  const setBestAnswer = async (questionId: string, answerId: string | null) => {
+    if (lessonId == null) return;
+    let previous: ChatMessage[] = [];
+    setMessages((prev) => {
+      previous = prev;
+      return applyBestAnswer(prev, questionId, answerId);
+    });
+    try {
+      await api.put<void>(`/api/v1/lessons/${lessonId}/chats/${questionId}/best-answer`, { answerId });
+    } catch (err) {
+      setMessages(previous);
+      throw err;
+    }
+  };
+
+  return { messages, sendMessage, setBestAnswer };
 }

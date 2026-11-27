@@ -1432,8 +1432,17 @@
         "filter": {
           "all": "Tất cả",
           "unanswered": "Chưa trả lời",
-          "noInstructor": "Giảng viên chưa trả lời"
-        }
+          "noInstructor": "Giảng viên chưa trả lời",
+          "unread": "Chưa đọc",
+          "noBest": "Chưa có câu trả lời hay nhất"
+        },
+        "mostReplies": "Nhiều trả lời nhất",
+        "unreadDot": "Chưa đọc",
+        "best": "Câu trả lời hay nhất",
+        "hasBest": "Đã có câu hay nhất",
+        "markBest": "Đánh dấu là câu trả lời hay nhất",
+        "unmarkBest": "Bỏ đánh dấu hay nhất",
+        "markUnread": "Đánh dấu chưa đọc"
       },
       "assignments": {
         "title": "Bài tập",

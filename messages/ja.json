@@ -1432,8 +1432,17 @@
         "filter": {
           "all": "すべて",
           "unanswered": "未回答",
-          "noInstructor": "講師が未回答"
-        }
+          "noInstructor": "講師が未回答",
+          "unread": "未読",
+          "noBest": "ベストアンサーなし"
+        },
+        "mostReplies": "回答が多い順",
+        "unreadDot": "未読",
+        "best": "ベストアンサー",
+        "hasBest": "ベストアンサーあり",
+        "markBest": "ベストアンサーに選ぶ",
+        "unmarkBest": "ベストアンサーを解除",
+        "markUnread": "未読にする"
       },
       "assignments": {
         "title": "課題",

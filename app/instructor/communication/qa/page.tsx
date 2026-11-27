@@ -10,13 +10,15 @@ import { ListSearch } from '@/components/ui/ListSearch';
 import { Pager } from '@/components/ui/SearchPanel';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useInstructorCourseOptions } from '@/hooks/useDashboard';
-import { useQaQuestions, useQaThread, useReplyToQuestion } from '@/hooks/useCommunication';
+import { useQaQuestions, useQaThread, useReplyToQuestion, useSetBestAnswer, useSetQuestionRead } from '@/hooks/useCommunication';
 import { Avatar } from '@/components/ui/Avatar';
 import { Chip } from '@/components/ui/Chip';
-import type { QaQuestion } from '@/lib/api/communication';
+import type { QaQuestion, QaSort } from '@/lib/api/communication';
 
-type SortOption = 'newest' | 'oldest';
-type QaFilter = 'all' | 'unanswered' | 'noInstructor';
+type SortOption = QaSort;
+type QaFilter = 'all' | 'unread' | 'unanswered' | 'noInstructor' | 'noBest';
+const SORT_OPTIONS: SortOption[] = ['newest', 'oldest', 'most_replies'];
+const FILTERS: QaFilter[] = ['all', 'unread', 'unanswered', 'noInstructor', 'noBest'];
 type ViewMode = 'single' | 'double';
 
 /** "Giao tiếp > Hỏi đáp" (19/09/2026, xây mới; bổ sung tìm kiếm/sắp xếp/2 kiểu xem — giao diện
@@ -41,6 +43,8 @@ export default function InstructorQaPage() {
     courseId: courseId || undefined,
     onlyUnanswered: filter === 'unanswered',
     noInstructorAnswer: filter === 'noInstructor',
+    unread: filter === 'unread',
+    noBestAnswer: filter === 'noBest',
     search: debouncedSearch,
     sort,
     page,
@@ -48,6 +52,8 @@ export default function InstructorQaPage() {
   const questions = questionsPage?.content ?? [];
 
   const selectedInDoubleView = viewMode === 'double' ? activeQuestionId : null;
+  const sortLabel = (option: SortOption) =>
+    option === 'newest' ? t('qa.newest') : option === 'oldest' ? t('qa.oldest') : t('qa.mostReplies');
 
   return (
     <>
@@ -63,20 +69,20 @@ export default function InstructorQaPage() {
               onClick={() => setShowSortMenu((v) => !v)}
               className="rounded-lg border border-line bg-surface-raised px-3.5 py-2 text-[13px] font-semibold text-ink hover:border-accent"
             >
-              {t('qa.sortLabel', { value: sort === 'newest' ? t('qa.newest') : t('qa.oldest') })} ▾
+              {t('qa.sortLabel', { value: sortLabel(sort) })} ▾
             </button>
             {showSortMenu && (
               <>
                 <div className="fixed inset-0 z-10" onClick={() => setShowSortMenu(false)} />
-                <div className="absolute right-0 top-full z-20 mt-1 w-36 overflow-hidden rounded-lg border border-line bg-surface-raised py-1 shadow-lg">
-                  {(['newest', 'oldest'] as SortOption[]).map((option) => (
+                <div className="absolute right-0 top-full z-20 mt-1 w-44 overflow-hidden rounded-lg border border-line bg-surface-raised py-1 shadow-lg">
+                  {SORT_OPTIONS.map((option) => (
                     <button
                       key={option}
                       type="button"
                       onClick={() => { setSort(option); setPage(0); setShowSortMenu(false); }}
                       className={`block w-full px-3 py-1.5 text-left text-[12.5px] hover:bg-surface ${sort === option ? 'font-bold text-accent-dark' : 'text-ink'}`}
                     >
-                      {option === 'newest' ? t('qa.newest') : t('qa.oldest')}
+                      {sortLabel(option)}
                     </button>
                   ))}
                 </div>
@@ -107,10 +113,9 @@ export default function InstructorQaPage() {
         </div>
       </div>
 
-      {/* Bộ lọc kiểu Udemy (26/11/2026). "Chưa đọc" và "Chưa có câu trả lời hay nhất" chưa có vì
-          hệ thống chưa lưu trạng thái đã đọc / câu trả lời hay nhất cho Hỏi đáp. */}
+      {/* Bộ lọc kiểu Udemy (26/11/2026; 27/11/2026 thêm "Chưa đọc" và "Chưa có câu trả lời hay nhất"). */}
       <div role="group" aria-label={t('qa.filtersAria')} className="flex flex-wrap items-center gap-2">
-        {(['all', 'unanswered', 'noInstructor'] as QaFilter[]).map((f) => (
+        {FILTERS.map((f) => (
           <Chip
             key={f}
             active={filter === f}
@@ -192,7 +197,12 @@ function QuestionRow({ question: q, active, onClick }: { question: QaQuestion; a
       }`}
     >
       <div className="flex items-center justify-between gap-3">
-        <span className="truncate text-[12px] font-semibold text-accent-dark">{q.courseTitle} · {q.lessonTitle}</span>
+        <span className="flex min-w-0 items-center gap-1.5">
+          {!q.read && (
+            <span className="h-2 w-2 shrink-0 rounded-full bg-accent" role="img" aria-label={t('qa.unreadDot')} title={t('qa.unreadDot')} />
+          )}
+          <span className={`truncate text-[12px] text-accent-dark ${q.read ? 'font-semibold' : 'font-bold'}`}>{q.courseTitle} · {q.lessonTitle}</span>
+        </span>
         <span className="shrink-0 text-[11.5px] text-ink-muted">{new Date(q.createdAt).toLocaleDateString(locale)}</span>
       </div>
       <p className="line-clamp-2 flex items-start gap-1.5 text-[13.5px] text-ink">
@@ -200,11 +210,14 @@ function QuestionRow({ question: q, active, onClick }: { question: QaQuestion; a
         <span><span className="font-semibold">{q.userName}: </span>{q.content}</span>
       </p>
       <div className="flex items-center gap-2 text-[11.5px]">
-        <span className={`rounded-full px-2 py-0.5 font-semibold ${q.answerCount === 0 ? 'bg-surface-raised text-ink' : 'bg-line-soft text-ink-muted'}`}>
+        <span className={`rounded-full px-2 py-0.5 font-semibold ${q.answerCount === 0 ? 'bg-surface text-ink ring-1 ring-line' : 'bg-line-soft text-ink-muted'}`}>
           {q.answerCount === 0 ? t('qa.noAnswer') : t('qa.answers', { count: q.answerCount })}
         </span>
         {q.hasInstructorAnswer && (
           <span className="rounded-full bg-tint px-2 py-0.5 font-semibold text-accent-dark">{t('qa.youAnswered')}</span>
+        )}
+        {q.bestAnswerId && (
+          <span className="rounded-full bg-success-tint px-2 py-0.5 font-semibold text-success-ink">✓ {t('qa.hasBest')}</span>
         )}
       </div>
     </button>
@@ -216,6 +229,8 @@ function QaThreadPanel({ questionId }: { questionId: string }) {
   const locale = useLocale();
   const { data: thread, isLoading } = useQaThread(questionId);
   const replyMutation = useReplyToQuestion();
+  const bestMutation = useSetBestAnswer();
+  const readMutation = useSetQuestionRead();
   const [content, setContent] = useState('');
 
   const handleReply = () => {
@@ -237,12 +252,22 @@ function QaThreadPanel({ questionId }: { questionId: string }) {
                   <span>{new Date(thread.question.createdAt).toLocaleString(locale)}</span>
                 </div>
                 <p className="text-[13.5px] text-ink">{thread.question.content}</p>
-                <p className="mt-1.5 text-[11.5px] text-ink-muted">{thread.question.courseTitle} · {thread.question.lessonTitle}</p>
+                <div className="mt-1.5 flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-[11.5px] text-ink-muted">{thread.question.courseTitle} · {thread.question.lessonTitle}</p>
+                  <button
+                    type="button"
+                    onClick={() => readMutation.mutate({ questionId, read: false })}
+                    disabled={readMutation.isPending}
+                    className="text-[11.5px] font-semibold text-ink-muted hover:text-accent-dark hover:underline"
+                  >
+                    {t('qa.markUnread')}
+                  </button>
+                </div>
               </div>
             </div>
 
             {thread.answers.map((a) => (
-              <div key={a.id} className={`flex items-start gap-2 rounded-lg p-3 ${a.isInstructor ? 'bg-tint' : 'bg-surface'}`}>
+              <div key={a.id} className={`flex items-start gap-2 rounded-lg p-3 ${a.isInstructor ? 'bg-tint' : 'bg-surface'} ${a.isBest ? 'ring-1 ring-success' : ''}`}>
                 <Avatar name={a.userName} avatarUrl={a.userAvatarUrl} size={26} />
                 <div className="min-w-0 flex-1">
                   <div className="mb-1 flex items-center justify-between text-[12px] text-ink-muted">
@@ -252,6 +277,20 @@ function QaThreadPanel({ questionId }: { questionId: string }) {
                     <span>{new Date(a.createdAt).toLocaleString(locale)}</span>
                   </div>
                   <p className="text-[13.5px] text-ink">{a.content}</p>
+                  <div className="mt-1.5 flex flex-wrap items-center gap-2">
+                    {a.isBest && (
+                      <span className="rounded-full bg-success-tint px-2 py-0.5 text-[11px] font-bold text-success-ink">✓ {t('qa.best')}</span>
+                    )}
+                    <button
+                      type="button"
+                      aria-pressed={a.isBest}
+                      disabled={bestMutation.isPending}
+                      onClick={() => bestMutation.mutate({ questionId, answerId: a.isBest ? null : a.id })}
+                      className="text-[11.5px] font-semibold text-ink-muted hover:text-success-ink hover:underline disabled:opacity-50"
+                    >
+                      {a.isBest ? t('qa.unmarkBest') : t('qa.markBest')}
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -265,7 +304,7 @@ function QaThreadPanel({ questionId }: { questionId: string }) {
           onChange={(e) => setContent(e.target.value)}
           rows={2}
           placeholder={t('qa.placeholder')}
-          className="flex-1 resize-none rounded-lg border border-line px-3 py-2 text-[13px] focus:border-accent focus:outline-none"
+          className="flex-1 resize-none rounded-lg border border-line bg-surface px-3 py-2 text-[13px] text-ink placeholder:text-ink-muted focus:border-accent focus:outline-none"
         />
         <button
           type="button"

@@ -19,6 +19,10 @@ export interface QaQuestion {
   createdAt: string;
   answerCount: number;
   hasInstructorAnswer: boolean;
+  /** Id câu trả lời hay nhất, null nếu chưa có (27/11/2026). */
+  bestAnswerId: string | null;
+  /** Giảng viên đã mở câu hỏi (kể từ trả lời mới nhất của người khác). */
+  read: boolean;
 }
 
 export interface QaAnswer {
@@ -28,6 +32,7 @@ export interface QaAnswer {
   content: string;
   createdAt: string;
   isInstructor: boolean;
+  isBest: boolean;
 }
 
 export interface QaThread {
@@ -42,12 +47,29 @@ export interface PageRes<T> {
   number: number;
 }
 
+export type QaSort = 'newest' | 'oldest' | 'most_replies';
+
+export interface QaListParams {
+  courseId?: number;
+  onlyUnanswered?: boolean;
+  noInstructorAnswer?: boolean;
+  /** Giảng viên chưa mở (27/11/2026). */
+  unread?: boolean;
+  /** Chưa có câu trả lời hay nhất (27/11/2026). */
+  noBestAnswer?: boolean;
+  search?: string;
+  sort?: QaSort;
+  page?: number;
+}
+
 export const qaApi = {
-  listQuestions: (params: { courseId?: number; onlyUnanswered?: boolean; noInstructorAnswer?: boolean; search?: string; sort?: 'newest' | 'oldest'; page?: number }) => {
+  listQuestions: (params: QaListParams) => {
     const qs = new URLSearchParams();
     if (params.courseId) qs.set('courseId', String(params.courseId));
     if (params.onlyUnanswered) qs.set('onlyUnanswered', 'true');
     if (params.noInstructorAnswer) qs.set('noInstructorAnswer', 'true');
+    if (params.unread) qs.set('unread', 'true');
+    if (params.noBestAnswer) qs.set('noBestAnswer', 'true');
     if (params.search?.trim()) qs.set('search', params.search.trim());
     if (params.sort) qs.set('sort', params.sort);
     qs.set('page', String(params.page ?? 0));
@@ -57,6 +79,11 @@ export const qaApi = {
     api.get<QaThread>(`/api/v1/instructor/qa/questions/${questionId}`, { token: authToken() }),
   reply: (questionId: string, content: string) =>
     api.post<void>(`/api/v1/instructor/qa/questions/${questionId}/reply`, { content }, { token: authToken() }),
+  /** answerId null = bỏ đánh dấu. */
+  setBestAnswer: (questionId: string, answerId: string | null) =>
+    api.put<void>(`/api/v1/instructor/qa/questions/${questionId}/best-answer`, { answerId }, { token: authToken() }),
+  setRead: (questionId: string, read: boolean) =>
+    api.put<void>(`/api/v1/instructor/qa/questions/${questionId}/read?read=${read}`, undefined, { token: authToken() }),
 };
 
 // ==================== Thông báo (Announcements) ====================

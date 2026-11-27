@@ -24,7 +24,7 @@ const REPLIES_PAGE_SIZE = 3;
  *      khi đã hiện hết — không còn nút "Ẩn bớt" gộp chung nữa (đúng khuôn phân trang comment).
  */
 export function LiveChatPanel({ lessonId, userName, currentUserId }: LiveChatPanelProps) {
-  const { messages, sendMessage } = useCommunitySocket(lessonId);
+  const { messages, sendMessage, setBestAnswer } = useCommunitySocket(lessonId);
   const [inputValue, setInputValue] = useState('');
   const [replyingTo, setReplyingTo] = useState<ChatMessage | null>(null);
   const [visibleCounts, setVisibleCounts] = useState<Record<string, number>>({});
@@ -60,6 +60,15 @@ export function LiveChatPanel({ lessonId, userName, currentUserId }: LiveChatPan
     inputRef.current?.focus();
   };
 
+  /** Người hỏi hoặc giảng viên khoá mới được chọn câu trả lời hay nhất (BE kiểm tra lại). */
+  const isCourseInstructor = !!currentUserId && messages.some((m) => m.isInstructor && m.senderId === currentUserId);
+  const canMarkBest = (root: ChatMessage) => !!currentUserId && (root.senderId === currentUserId || isCourseInstructor);
+
+  const toggleBest = (root: ChatMessage, reply: ChatMessage) => {
+    const next = root.bestAnswerId === reply.id ? null : reply.id;
+    setBestAnswer(root.id, next).catch(() => toast.error('Không cập nhật được câu trả lời hay nhất, thử lại sau.'));
+  };
+
   const showMoreReplies = (rootId: string) => {
     setVisibleCounts(prev => ({ ...prev, [rootId]: (prev[rootId] ?? 0) + REPLIES_PAGE_SIZE }));
   };
@@ -73,9 +82,12 @@ export function LiveChatPanel({ lessonId, userName, currentUserId }: LiveChatPan
     return acc;
   }, {});
 
-  /** Câu trả lời (replies) xếp CŨ NHẤT lên trên để đọc hội thoại xuôi dòng. */
-  const orderReplies = (replies: ChatMessage[]): ChatMessage[] => {
-    return replies.slice().sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+  /** Câu trả lời (replies) xếp CŨ NHẤT lên trên để đọc hội thoại xuôi dòng; câu hay nhất ghim đầu. */
+  const orderReplies = (replies: ChatMessage[], bestId?: string | null): ChatMessage[] => {
+    return replies.slice().sort((a, b) => {
+      if (bestId && (a.id === bestId) !== (b.id === bestId)) return a.id === bestId ? -1 : 1;
+      return new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
+    });
   };
 
   /** Câu hỏi gốc (root) xếp MỚI NHẤT lên trên. */
@@ -83,15 +95,22 @@ export function LiveChatPanel({ lessonId, userName, currentUserId }: LiveChatPan
     .filter(m => !m.parentId)
     .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
-  const renderMessage = (msg: ChatMessage, isReply: boolean = false) => (
+  const renderMessage = (msg: ChatMessage, isReply: boolean = false, root?: ChatMessage) => {
+    const isBest = !!root && root.bestAnswerId === msg.id;
+    return (
     <div key={msg.id} className={`flex items-start gap-3 ${isReply ? 'mt-4' : 'border-b border-line-soft pb-4'}`}>
       <Avatar name={msg.senderName} avatarUrl={msg.senderAvatarUrl} size={isReply ? 28 : 36} />
       <div className="flex min-w-0 flex-col flex-1">
         <div className="flex items-center gap-2">
           <span className="text-[14px] font-bold text-ink">{msg.senderName}</span>
           {msg.isInstructor && (
-            <span className="rounded bg-ink px-1.5 py-0.5 text-[10px] font-bold text-white">
+            <span className="rounded bg-ink px-1.5 py-0.5 text-[10px] font-bold text-surface">
               Giảng viên
+            </span>
+          )}
+          {isBest && (
+            <span className="rounded-full bg-success-tint px-2 py-0.5 text-[10.5px] font-bold text-success-ink">
+              ✓ Câu trả lời hay nhất
             </span>
           )}
           <span className="text-[12px] text-ink-muted">
@@ -101,15 +120,28 @@ export function LiveChatPanel({ lessonId, userName, currentUserId }: LiveChatPan
         <p className="text-[14px] text-ink mt-1 whitespace-pre-wrap leading-relaxed">
           {msg.content}
         </p>
-        <button
-          onClick={() => handleReplyClick(msg)}
-          className="text-[13px] text-accent font-medium mt-1 w-fit hover:underline"
-        >
-          Trả lời
-        </button>
+        <div className="mt-1 flex flex-wrap items-center gap-3">
+          <button
+            onClick={() => handleReplyClick(msg)}
+            className="text-[13px] text-accent font-medium w-fit hover:underline"
+          >
+            Trả lời
+          </button>
+          {isReply && root && canMarkBest(root) && (
+            <button
+              type="button"
+              onClick={() => toggleBest(root, msg)}
+              aria-pressed={isBest}
+              className="text-[13px] font-medium text-ink-muted w-fit hover:text-success-ink hover:underline"
+            >
+              {isBest ? 'Bỏ đánh dấu hay nhất' : 'Đánh dấu là câu trả lời hay nhất'}
+            </button>
+          )}
+        </div>
       </div>
     </div>
-  );
+    );
+  };
 
   return (
     <div className="flex flex-col gap-6">
@@ -164,7 +196,7 @@ export function LiveChatPanel({ lessonId, userName, currentUserId }: LiveChatPan
           </div>
         ) : (
           rootMessages.map((msg) => {
-            const orderedReplies = orderReplies(repliesByParent[msg.id] || []);
+            const orderedReplies = orderReplies(repliesByParent[msg.id] || [], msg.bestAnswerId);
             const visibleCount = visibleCounts[msg.id] ?? Math.min(REPLIES_PAGE_SIZE, orderedReplies.length);
             const visibleReplies = orderedReplies.slice(0, visibleCount);
             const hasMore = visibleCount < orderedReplies.length;
@@ -175,7 +207,7 @@ export function LiveChatPanel({ lessonId, userName, currentUserId }: LiveChatPan
 
                 {orderedReplies.length > 0 && (
                   <div className="ml-10 mt-1 flex flex-col pl-4 border-l-2 border-line-soft">
-                    {visibleReplies.map(reply => renderMessage(reply, true))}
+                    {visibleReplies.map(reply => renderMessage(reply, true, msg))}
                     {hasMore && (
                       <button
                         onClick={() => showMoreReplies(msg.id)}

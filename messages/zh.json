@@ -1432,8 +1432,17 @@
         "filter": {
           "all": "全部",
           "unanswered": "未回答",
-          "noInstructor": "讲师未回答"
-        }
+          "noInstructor": "讲师未回答",
+          "unread": "未读",
+          "noBest": "尚无最佳答案"
+        },
+        "mostReplies": "回复最多",
+        "unreadDot": "未读",
+        "best": "最佳答案",
+        "hasBest": "已有最佳答案",
+        "markBest": "标记为最佳答案",
+        "unmarkBest": "取消最佳答案",
+        "markUnread": "标记为未读"
       },
       "assignments": {
         "title": "作业",

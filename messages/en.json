@@ -1432,8 +1432,17 @@
         "filter": {
           "all": "All",
           "unanswered": "No answers",
-          "noInstructor": "No instructor answer"
-        }
+          "noInstructor": "No instructor answer",
+          "unread": "Unread",
+          "noBest": "No top answer"
+        },
+        "mostReplies": "Most replies",
+        "unreadDot": "Unread",
+        "best": "Top answer",
+        "hasBest": "Has top answer",
+        "markBest": "Mark as top answer",
+        "unmarkBest": "Unmark top answer",
+        "markUnread": "Mark as unread"
       },
       "assignments": {
         "title": "Assignments",
