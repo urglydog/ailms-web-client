@@ -73,4 +73,21 @@ describe('TutorInsightsView', () => {
     fireEvent.click(screen.getByRole('button', { name: /Làm mới/ }));
     expect(mutate).toHaveBeenCalled();
   });
+  it('tóm tắt lỗi: báo lỗi rõ + nút Thử lại; đang trong 10 phút giới hạn thì khoá nút và báo giờ thử lại', () => {
+    const lessons = [{ lessonId: 1, lessonTitle: 'B1', questionCount: 3, learnerCount: 2, unusual: false, poorCount: 0, topics: [] }];
+    insight = { ...base, totalQuestions: 3, learnerCount: 2, lessons,
+      summary: { status: 'FAILED', text: null, actions: [], generatedAt: null, retryAfter: new Date(Date.now() + 5 * 60_000).toISOString() } };
+    const { unmount } = renderWithIntl(<TutorInsightsView />);
+    expect(screen.getByRole('alert')).toHaveTextContent('Chưa tạo được tóm tắt');
+    expect(screen.getByRole('alert')).toHaveTextContent(/Có thể thử lại lúc/);
+    expect(screen.getByRole('button', { name: /Thử lại/ })).toBeDisabled();
+    unmount();
+
+    insight = { ...insight, summary: { ...insight.summary, retryAfter: null } };
+    renderWithIntl(<TutorInsightsView />);
+    const retry = screen.getByRole('button', { name: /Thử lại/ });
+    expect(retry).toBeEnabled();
+    fireEvent.click(retry);
+    expect(mutate).toHaveBeenCalled();
+  });
 });

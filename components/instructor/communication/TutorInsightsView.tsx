@@ -185,6 +185,9 @@ function SummaryCard({ courseId, summary, hasData }: { courseId: number; summary
   const locale = useLocale();
   const refresh = useRefreshInsightSummary(courseId);
   const pending = summary.status === 'PENDING' || refresh.isPending;
+  const retryAt = summary.retryAfter ? new Date(summary.retryAfter) : null;
+  const cooling = !!retryAt && retryAt.getTime() > Date.now();
+  const retryTime = retryAt ? retryAt.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' }) : '';
   return (
     <section aria-labelledby="insight-summary" aria-live="polite" className="rounded-xl border border-accent/30 bg-tint p-4 sm:p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -193,9 +196,9 @@ function SummaryCard({ courseId, summary, hasData }: { courseId: number; summary
           {t('summaryTitle')}
         </h2>
         {hasData && (
-          <Button size="sm" variant="secondary" onClick={() => refresh.mutate()} disabled={pending} className="inline-flex items-center gap-1.5">
+          <Button size="sm" variant="secondary" onClick={() => refresh.mutate()} disabled={pending || cooling} title={cooling ? String(t('retryAfter', { time: retryTime })) : undefined} className="inline-flex items-center gap-1.5">
             <RefreshCw size={14} aria-hidden className={pending ? 'animate-spin motion-reduce:animate-none' : ''} />
-            {summary.status === 'NONE' ? t('generate') : t('refresh')}
+            {summary.status === 'NONE' ? t('generate') : summary.status === 'FAILED' ? t('retry') : t('refresh')}
           </Button>
         )}
       </div>
@@ -222,7 +225,10 @@ function SummaryCard({ courseId, summary, hasData }: { courseId: number; summary
           )}
         </>
       ) : summary.status === 'FAILED' ? (
-        <p className="m-0 mt-2 text-[13px] text-danger">{t('summaryFailed')}</p>
+        <div role="alert" className="m-0 mt-2 text-[13px]">
+          <p className="m-0 font-semibold text-danger">{t('summaryFailed')}</p>
+          {cooling && <p className="m-0 mt-1 text-ink-muted">{t('retryAfter', { time: retryTime })}</p>}
+        </div>
       ) : (
         <p className="m-0 mt-2 text-[13px] text-ink-muted">{hasData ? t('summaryNone') : t('summaryNoData')}</p>
       )}

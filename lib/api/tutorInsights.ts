@@ -31,6 +31,8 @@ export interface InsightSummary {
   text: string | null;
   actions: string[];
   generatedAt: string | null;
+  /** Sớm nhất được bấm làm mới / thử lại (giới hạn 10 phút); null = được ngay (27/11/2026). */
+  retryAfter?: string | null;
 }
 
 export interface CourseInsight {
