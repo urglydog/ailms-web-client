@@ -61,7 +61,7 @@ export default function InstructorQaPage() {
         <h1 className="m-0 font-display text-[20px] font-bold text-ink">{t('qa.title')}</h1>
         <div className="flex items-center gap-2">
           <ListSearch label="Tìm câu hỏi" value={search} onChange={(v) => { setSearch(v); setPage(0); }} placeholder="Tìm câu hỏi: học viên, bài học, khóa học, nội dung..." />
-          <CourseFilterDropdown courses={courses ?? []} value={courseId} onChange={(v) => { setCourseId(v); setPage(0); }} />
+          <CourseFilterDropdown align="right" courses={courses ?? []} value={courseId} onChange={(v) => { setCourseId(v); setPage(0); }} />
 
           <div className="relative">
             <button

@@ -31,7 +31,7 @@ export default function InstructorAssignmentsPage() {
         <h1 className="m-0 font-display text-[20px] font-bold text-ink">{t('assignments.title')}</h1>
         <div className="flex flex-wrap items-center gap-2">
           <ListSearch label="Tìm bài tập" value={list.query} onChange={list.setQuery} placeholder="Tên bài tập, khóa học hoặc bài học..." />
-          <CourseFilterDropdown courses={courses ?? []} value={courseId} onChange={setCourseId} />
+          <CourseFilterDropdown align="right" courses={courses ?? []} value={courseId} onChange={setCourseId} />
         </div>
       </div>
 

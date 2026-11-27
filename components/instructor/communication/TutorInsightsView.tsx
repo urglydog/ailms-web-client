@@ -27,8 +27,8 @@ export function TutorInsightsView() {
   }, [courses, courseId]);
 
   const { data, isLoading, isError } = useTutorInsights(courseId);
-
-  if (!coursesLoading && (courses?.length ?? 0) === 0) {
+  // Chỉ báo "chưa có khoá" khi ĐÃ có dữ liệu: lúc SSR (chưa có token, query tắt) `courses` là undefined — trước đây hiện thẻ rỗng ở server rồi lệch hydrate trên client.
+  if (!coursesLoading && courses && courses.length === 0) {
     return <EmptyCard text={t('noCourses')} />;
   }
 

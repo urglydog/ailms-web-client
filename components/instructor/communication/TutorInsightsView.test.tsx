@@ -6,9 +6,10 @@ import { TutorInsightsView } from './TutorInsightsView';
 
 const mutate = vi.fn();
 let insight: CourseInsight | undefined;
+let courseOptions: { id: number; title: string }[] | undefined = [{ id: 5, title: 'Java' }];
 
 vi.mock('@/hooks/useDashboard', () => ({
-  useInstructorCourseOptions: () => ({ data: [{ id: 5, title: 'Java' }], isLoading: false }),
+  useInstructorCourseOptions: () => ({ data: courseOptions, isLoading: false }),
 }));
 vi.mock('@/hooks/useTutorInsights', () => ({
   useTutorInsights: () => ({ data: insight, isLoading: false, isError: false }),
@@ -26,7 +27,23 @@ const base: CourseInsight = {
 };
 
 describe('TutorInsightsView', () => {
-  beforeEach(() => mutate.mockReset());
+  beforeEach(() => {
+    mutate.mockReset();
+    courseOptions = [{ id: 5, title: 'Java' }];
+  });
+
+  it('chưa có dữ liệu khoá (SSR, query tắt) thì KHÔNG hiện thẻ "chưa có khoá" — tránh lệch hydrate', () => {
+    courseOptions = undefined;
+    insight = undefined;
+    renderWithIntl(<TutorInsightsView />);
+    expect(screen.queryByText(/Chưa có khóa học đã xuất bản/)).toBeNull();
+  });
+
+  it('danh sách khoá rỗng thì hiện thẻ "chưa có khoá"', () => {
+    courseOptions = [];
+    renderWithIntl(<TutorInsightsView />);
+    expect(screen.getByText(/Chưa có khóa học đã xuất bản/)).toBeInTheDocument();
+  });
 
   it('trạng thái rỗng khi chưa có câu hỏi', () => {
     insight = base;
