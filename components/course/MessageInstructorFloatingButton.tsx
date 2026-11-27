@@ -24,7 +24,9 @@ const PREVIEW_AUTO_HIDE_MS = 6000;
  * {@link PREVIEW_AUTO_HIDE_MS}, hiện lại khi hover vào cả icon lẫn chính nhãn. Nhãn tự co giãn
  * theo độ dài tin nhắn nhưng bị chặn ở `max-w` — `truncate` tự thêm "..." khi vượt quá.
  */
-export function MessageInstructorFloatingButton({ courseId }: { courseId: number }) {
+/** {@code leftOnDesktop} (27/11/2026): trang học có cột Gia sư AI bên phải — nút nổi góc phải che nút gửi của khung chat Gia sư, nên từ `lg` chuyển sang góc trái. */
+export function MessageInstructorFloatingButton({ courseId, leftOnDesktop = false }: { courseId: number; leftOnDesktop?: boolean }) {
+  const side = leftOnDesktop ? 'right-6 lg:left-6 lg:right-auto' : 'right-6';
   const [open, setOpen] = useState(false);
   const [conversationId, setConversationId] = useState<number | null>(null);
   const [showPreview, setShowPreview] = useState(false);
@@ -76,7 +78,7 @@ export function MessageInstructorFloatingButton({ courseId }: { courseId: number
   return (
     <>
       {open && conversationId && (
-        <div className="fixed bottom-24 right-6 z-40 flex h-[min(440px,70vh)] w-[calc(100vw-2rem)] max-w-[340px] flex-col overflow-hidden rounded-2xl border border-line bg-surface-raised shadow-2xl">
+        <div className={`fixed bottom-24 ${side} z-40 flex h-[min(440px,70vh)] w-[calc(100vw-2rem)] max-w-[340px] flex-col overflow-hidden rounded-2xl border border-line bg-surface-raised shadow-2xl`}>
           <div className="flex items-center gap-2.5 border-b border-line px-4 py-3">
             {conversation && <Avatar name={conversation.otherUserName} avatarUrl={conversation.otherUserAvatarUrl} size={28} />}
             <span className="flex-1 truncate font-display text-[14px] font-bold text-ink">
@@ -96,7 +98,7 @@ export function MessageInstructorFloatingButton({ courseId }: { courseId: number
       )}
 
       <div
-        className="fixed bottom-6 right-6 z-40 flex items-center gap-2"
+        className={`fixed bottom-6 ${side} z-40 flex items-center gap-2`}
         onMouseEnter={() => setHovering(true)}
         onMouseLeave={() => setHovering(false)}
       >

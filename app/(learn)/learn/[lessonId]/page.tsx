@@ -1001,7 +1001,7 @@ function LearnPageContent() {
       )}
 
       {lesson?.enrolled && lesson.courseId && (
-        <MessageInstructorFloatingButton courseId={lesson.courseId} />
+        <MessageInstructorFloatingButton courseId={lesson.courseId} leftOnDesktop />
       )}
     </div>
   );
