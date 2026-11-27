@@ -32,6 +32,11 @@ describe('editCompletion', () => {
     expect(editCompletion({ canSubmit: true, missingConditions: [] })).toBe(100);
     expect(editCompletion({ canSubmit: false, missingConditions: ['a', 'b'] })).toBe(60);
   });
+  it('dùng % của máy chủ (khớp danh sách khoá) dù missingConditions có điều kiện tài khoản', () => {
+    // Thiếu xác minh định danh + 4 điều kiện nội dung: danh sách hiện 20% nên trình soạn cũng 20%, không phải 0%.
+    expect(editCompletion({ canSubmit: false, missingConditions: ['verify', 'b', 'c', 'd', 'e'], completionPercent: 20 })).toBe(20);
+    expect(editCompletion({ canSubmit: false, missingConditions: ['verify'], completionPercent: 100 })).toBe(100);
+  });
   it('không âm dù thiếu nhiều', () => {
     expect(editCompletion({ canSubmit: false, missingConditions: ['a', 'b', 'c', 'd', 'e', 'f', 'g'] })).toBe(0);
   });

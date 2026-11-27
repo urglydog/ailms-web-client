@@ -470,6 +470,8 @@ export interface CourseEditDetail {
   chapters: ChapterEditItem[];
   missingConditions: string[];
   canSubmit: boolean;
+  /** % hoàn thiện nội dung do máy chủ tính — CÙNG nguồn với `completionPercent` ở danh sách khoá (27/11/2026). */
+  completionPercent?: number;
   visibility: CourseVisibility;
   hasEnrollPassword: boolean;
   /** Chia doanh thu 2 mức (20/09/2026) — dựng liên kết giới thiệu `/courses/{slug}?ref=

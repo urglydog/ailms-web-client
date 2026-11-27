@@ -36,8 +36,14 @@ export function activeEditTab(pathname: string, courseId: number): EditTabKey | 
 /** Số điều kiện gửi duyệt của một khóa (tiêu đề, mô tả, ảnh bìa, có chương, có bài học sẵn sàng). */
 const SUBMIT_CONDITIONS = 5;
 
-/** Phần trăm hoàn thiện để gửi duyệt: đủ điều kiện là 100, mỗi điều kiện còn thiếu trừ 20, không âm. */
-export function editCompletion(course: { canSubmit: boolean; missingConditions: string[] }): number {
+/**
+ * Phần trăm hoàn thiện trên thanh trình soạn. Ưu tiên `completionPercent` của máy chủ — cùng giá trị
+ * với danh sách khoá học (27/11/2026, sửa lỗi: trước đây đếm cả điều kiện cấp tài khoản như xác minh
+ * định danh trong `missingConditions` nên trình soạn hiện 0% khi danh sách hiện 20%). Chỉ khi máy chủ
+ * cũ chưa trả trường này mới ước lượng: đủ điều kiện là 100, mỗi điều kiện thiếu trừ 20, không âm.
+ */
+export function editCompletion(course: { canSubmit: boolean; missingConditions: string[]; completionPercent?: number | null }): number {
+  if (typeof course.completionPercent === 'number') return Math.min(100, Math.max(0, course.completionPercent));
   if (course.canSubmit) return 100;
   return Math.max(0, Math.round(((SUBMIT_CONDITIONS - course.missingConditions.length) / SUBMIT_CONDITIONS) * 100));
 }
