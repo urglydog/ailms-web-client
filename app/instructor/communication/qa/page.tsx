@@ -67,7 +67,7 @@ export default function InstructorQaPage() {
             <button
               type="button"
               onClick={() => setShowSortMenu((v) => !v)}
-              className="rounded-lg border border-line bg-surface-raised px-3.5 py-2 text-[13px] font-semibold text-ink hover:border-accent"
+              className="whitespace-nowrap rounded-lg border border-line bg-surface-raised px-3.5 py-2 text-[13px] font-semibold text-ink hover:border-accent"
             >
               {t('qa.sortLabel', { value: sortLabel(sort) })} ▾
             </button>
@@ -130,7 +130,8 @@ export default function InstructorQaPage() {
       </div>
 
       {isLoading && <div className="p-10 text-center text-sm text-ink-muted">{t('loading')}</div>}
-      {!isLoading && questions.length === 0 && (
+      {/* Chỉ báo rỗng khi ĐÃ có dữ liệu — lúc SSR query tắt (chưa có token), tránh lệch hydrate. */}
+      {!isLoading && questionsPage && questions.length === 0 && (
         <div className="rounded-xl border border-line bg-surface-raised p-10 text-center text-sm text-ink-muted shadow-sm">
           {t('qa.empty')}
         </div>
@@ -205,10 +206,10 @@ function QuestionRow({ question: q, active, onClick }: { question: QaQuestion; a
         </span>
         <span className="shrink-0 text-[11.5px] text-ink-muted">{new Date(q.createdAt).toLocaleDateString(locale)}</span>
       </div>
-      <p className="line-clamp-2 flex items-start gap-1.5 text-[13.5px] text-ink">
+      <div className="line-clamp-2 flex items-start gap-1.5 text-[13.5px] text-ink">
         <Avatar name={q.userName} avatarUrl={q.userAvatarUrl} size={18} />
         <span><span className="font-semibold">{q.userName}: </span>{q.content}</span>
-      </p>
+      </div>
       <div className="flex items-center gap-2 text-[11.5px]">
         <span className={`rounded-full px-2 py-0.5 font-semibold ${q.answerCount === 0 ? 'bg-surface text-ink ring-1 ring-line' : 'bg-line-soft text-ink-muted'}`}>
           {q.answerCount === 0 ? t('qa.noAnswer') : t('qa.answers', { count: q.answerCount })}

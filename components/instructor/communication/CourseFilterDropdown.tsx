@@ -43,7 +43,7 @@ export function CourseFilterDropdown({
         type="button"
         onClick={() => setOpen((v) => !v)}
         className={`rounded-lg border border-line bg-surface-raised px-3.5 py-2 text-[13px] font-semibold text-ink hover:border-accent ${
-          fullWidth ? 'w-full text-left' : ''
+          fullWidth ? 'w-full text-left' : 'max-w-[16rem] truncate whitespace-nowrap'
         }`}
       >
         {selected ? selected.title : emptyLabel} ▾
