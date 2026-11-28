@@ -55,4 +55,9 @@ describe('CourseShelf', () => {
     const { container } = renderWithIntl(<CourseShelf title="T" href="/courses" courses={[]} />);
     expect(container).toBeEmptyDOMElement();
   });
+
+  it('vùng cuộn ngang là containing block (relative) để chữ sr-only không làm tràn ngang cả trang', () => {
+    renderWithIntl(<CourseShelf title="T" href="/courses" courses={COURSES} />);
+    expect(screen.getAllByTestId('shelf-item')[0]!.parentElement).toHaveClass('overflow-x-auto', 'relative');
+  });
 });

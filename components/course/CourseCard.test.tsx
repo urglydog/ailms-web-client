@@ -69,4 +69,10 @@ describe('CourseCard — thứ tự thông tin', () => {
     expect(iDub).toBeLessThan(iPrice);
     expect(screen.getByText('Giá gốc', { exact: false }).parentElement).toHaveClass('line-through');
   });
+
+  it('thẻ là containing block (relative) để chữ sr-only bên trong bị cắt theo thẻ, không tràn ra ngoài vùng cuộn', () => {
+    render(<CourseCard course={makeCourse(9)} />);
+    const root = screen.getByText(makeCourse(9).title).closest('a');
+    expect(root).toHaveClass('relative', 'overflow-hidden');
+  });
 });

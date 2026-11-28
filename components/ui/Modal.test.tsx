@@ -63,4 +63,16 @@ describe('Modal', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Mở' }));
     expect(document.body.style.overflow).toBe('hidden');
   });
+
+  it('đang chạy hiệu ứng thoát thì lớp phủ không nhận chuột (không nuốt cú bấm kế tiếp)', async () => {
+    render(<Harness />);
+    fireEvent.click(screen.getByRole('button', { name: 'Mở' }));
+    const layer = screen.getByRole('dialog').closest('.fixed');
+    expect(layer).not.toHaveClass('pointer-events-none');
+    fireEvent.keyDown(document, { key: 'Escape' });
+    // Lớp phủ vẫn còn trong DOM suốt hiệu ứng thoát nhưng phải xuyên chuột.
+    expect(document.body.contains(layer)).toBe(true);
+    expect(layer).toHaveClass('pointer-events-none');
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+  });
 });

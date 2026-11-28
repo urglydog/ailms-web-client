@@ -87,7 +87,7 @@ export function HomeContinue({ categoryCourses = [] }: { categoryCourses?: Categ
           {courses.length > 0 && (
             <ul
               ref={trackRef}
-              className="m-0 flex list-none snap-x gap-4 overflow-x-auto p-0 pb-1 [scrollbar-width:none]"
+              className="relative m-0 flex list-none snap-x gap-4 overflow-x-auto p-0 pb-1 [scrollbar-width:none]"
             >
               {courses.map((c) => (
                 <li key={c.courseId} className="w-[280px] shrink-0 snap-start">
@@ -115,7 +115,7 @@ function ContinueLessonCard({ course }: { course: EnrolledCourse }) {
   return (
     <Link
       href={learnHref(course)}
-      className="card-interactive group flex h-full items-stretch gap-3 overflow-hidden p-2 no-underline hover:no-underline"
+      className="card-interactive group relative flex h-full items-stretch gap-3 overflow-hidden p-2 no-underline hover:no-underline"
     >
       <div className="relative w-24 shrink-0 self-center">
         <CourseThumb thumbnailUrl={course.thumbnailUrl} title={course.courseTitle} className="aspect-video rounded-md" />
