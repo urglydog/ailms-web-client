@@ -1,5 +1,7 @@
 'use client';
 
+import dynamic from 'next/dynamic';
+
 import { Modal } from '@/components/ui/Modal';
 
 import { useQueryClient, useQuery } from '@tanstack/react-query';
@@ -8,12 +10,6 @@ import { useParams, useRouter, useSearchParams, usePathname } from 'next/navigat
 import { useCallback, useEffect, useRef, useState, Suspense } from 'react';
 import { toast } from 'sonner';
 import { CourseOverviewTab } from '@/components/course/CourseOverviewTab';
-import { CourseGradebookTab } from '@/components/course/CourseGradebookTab';
-import { CourseStudyPlanTab } from '@/components/course/CourseStudyPlanTab';
-import { LessonAssignmentsList } from '@/components/course/LessonAssignmentsList';
-import { CourseResourcesTab } from '@/components/course/CourseResourcesTab';
-import { ReviewsSection } from '@/components/course/ReviewsSection';
-import { MaterialManager } from '@/components/materials/MaterialManager';
 import { DualPlayer, type DualPlayerHandle } from '@/components/player/DualPlayer';
 import { DubbingActivatePanel } from '@/components/player/DubbingActivatePanel';
 import { DubbingBar } from '@/components/player/DubbingBar';
@@ -21,8 +17,6 @@ import { LessonSidebar } from '@/components/player/LessonSidebar';
 import { materialsApi } from '@/lib/api/materials';
 import { PipelineProgress } from '@/components/player/PipelineProgress';
 import { TranscriptPanel } from '@/components/player/TranscriptPanel';
-import { TutorEmbedded } from '@/components/tutor/TutorEmbedded';
-import { NotesPanel } from '@/components/learn/NotesPanel';
 import { useActivateDubbing, useCancelDubbing } from '@/hooks/useDubbing';
 import { useDubbingSocket } from '@/hooks/useDubbingSocket';
 import { useEnrolledLessonPlayer } from '@/hooks/useEnrolledLessonPlayer';
@@ -38,11 +32,23 @@ import { MonitorPlay, PanelRightClose, Sparkles } from 'lucide-react';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useTranslations } from 'next-intl';
 import { MAIN_TAB_KEYS, MOBILE_ONLY_TAB_KEYS, resolveLearnTab, type LearnTab, type MainTab } from '@/lib/learn/mainTabs';
-import { LiveChatPanel } from '@/components/community/LiveChatPanel';
 import { MessageInstructorFloatingButton } from '@/components/course/MessageInstructorFloatingButton';
 import { useSetLearnTitle, useSetLearnProgress } from '@/components/layout/LearnTitleContext';
 import { getAccessToken } from '@/lib/auth/token';
 import type { PipelineStep } from '@/types/domain';
+
+// Hiệu năng đợt 9: trang học bài là trang nặng nhất của học viên. Các tab/panel dưới đây chỉ hiện khi người học
+// bấm vào tab tương ứng (render có điều kiện theo mainTab/sidebarTab), nên tách thành chunk riêng, tải khi cần.
+// Tab mặc định (Tổng quan, Transcript) và trình phát giữ import tĩnh để video hiện ngay.
+const CourseGradebookTab = dynamic(() => import('@/components/course/CourseGradebookTab').then((m) => m.CourseGradebookTab), { ssr: false });
+const CourseStudyPlanTab = dynamic(() => import('@/components/course/CourseStudyPlanTab').then((m) => m.CourseStudyPlanTab), { ssr: false });
+const LessonAssignmentsList = dynamic(() => import('@/components/course/LessonAssignmentsList').then((m) => m.LessonAssignmentsList), { ssr: false });
+const CourseResourcesTab = dynamic(() => import('@/components/course/CourseResourcesTab').then((m) => m.CourseResourcesTab), { ssr: false });
+const ReviewsSection = dynamic(() => import('@/components/course/ReviewsSection').then((m) => m.ReviewsSection), { ssr: false });
+const MaterialManager = dynamic(() => import('@/components/materials/MaterialManager').then((m) => m.MaterialManager), { ssr: false });
+const TutorEmbedded = dynamic(() => import('@/components/tutor/TutorEmbedded').then((m) => m.TutorEmbedded), { ssr: false });
+const NotesPanel = dynamic(() => import('@/components/learn/NotesPanel').then((m) => m.NotesPanel), { ssr: false });
+const LiveChatPanel = dynamic(() => import('@/components/community/LiveChatPanel').then((m) => m.LiveChatPanel), { ssr: false });
 
 type SidebarTab = 'content' | 'tutor';
 
