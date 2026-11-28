@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import {
   buildSubtitleAppearance,
@@ -39,6 +40,7 @@ type Tab = 'original' | 'translated';
 /** Ô chọn màu: bảng màu nhanh + bảng chọn màu gốc trình duyệt (`<input type="color">`, đúng ý
  * "chọn trên mã màu có sẵn như các app vẽ màu") + ô tự nhập mã hex. */
 function ColorPickerRow({ label, value, onChange }: { label: string; value: string; onChange: (hex: string) => void }) {
+  const t = useTranslations('learn.player.subtitle');
   const [draft, setDraft] = useState(value);
 
   useEffect(() => setDraft(value), [value]);
@@ -69,7 +71,7 @@ function ColorPickerRow({ label, value, onChange }: { label: string; value: stri
           type="color"
           value={normalizeHex(value) ?? '#000000'}
           onChange={(e) => onChange(e.target.value)}
-          aria-label="Chọn màu tuỳ ý"
+          aria-label={t('pickColor')}
           className="h-7 w-7 cursor-pointer rounded-full border-2 border-white/30 bg-transparent p-0"
         />
         <input
@@ -89,6 +91,7 @@ function ColorPickerRow({ label, value, onChange }: { label: string; value: stri
 }
 
 export function SubtitleSettingsModal({ settings, onChange, onClose, onEditPosition }: SubtitleSettingsModalProps) {
+  const t = useTranslations('learn.player.subtitle');
   const [tab, setTab] = useState<Tab>('original');
   const current = settings[tab];
 
@@ -103,7 +106,7 @@ export function SubtitleSettingsModal({ settings, onChange, onClose, onEditPosit
       <button
         type="button"
         onClick={onClose}
-        aria-label="Đóng"
+        aria-label={t('close')}
         className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-white/10 hover:bg-white/20"
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -111,7 +114,7 @@ export function SubtitleSettingsModal({ settings, onChange, onClose, onEditPosit
         </svg>
       </button>
 
-      <h2 className="mb-4 text-center font-display text-lg font-bold">Kiểu hiển thị phụ đề</h2>
+      <h2 className="mb-4 text-center font-display text-lg font-bold">{t('title')}</h2>
 
       <div className="mx-auto flex w-full max-w-lg flex-col gap-4">
         <div className="flex border-b border-white/15">
@@ -122,7 +125,7 @@ export function SubtitleSettingsModal({ settings, onChange, onClose, onEditPosit
               tab === 'original' ? 'border-accent text-accent' : 'border-transparent text-white/60 hover:text-white'
             }`}
           >
-            Phụ đề gốc
+            {t('tabOriginal')}
           </button>
           <button
             type="button"
@@ -131,12 +134,12 @@ export function SubtitleSettingsModal({ settings, onChange, onClose, onEditPosit
               tab === 'translated' ? 'border-accent text-accent' : 'border-transparent text-white/60 hover:text-white'
             }`}
           >
-            Phụ đề đã dịch
+            {t('tabTranslated')}
           </button>
         </div>
 
         <div>
-          <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-white/50">Cỡ chữ</p>
+          <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-white/50">{t('fontSize')}</p>
           <div className="flex gap-2">
             {FONT_SIZE_OPTIONS.map((opt) => (
               <button
@@ -153,13 +156,13 @@ export function SubtitleSettingsModal({ settings, onChange, onClose, onEditPosit
           </div>
         </div>
 
-        <ColorPickerRow label="Màu chữ" value={current.textColor} onChange={(hex) => updateCurrent({ textColor: hex })} />
-        <ColorPickerRow label="Màu nền" value={current.backgroundColor} onChange={(hex) => updateCurrent({ backgroundColor: hex })} />
+        <ColorPickerRow label={t('textColor')} value={current.textColor} onChange={(hex) => updateCurrent({ textColor: hex })} />
+        <ColorPickerRow label={t('bgColor')} value={current.backgroundColor} onChange={(hex) => updateCurrent({ backgroundColor: hex })} />
 
         <div>
           <div className="mb-1.5 flex items-center justify-between">
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-white/50">Độ đậm nền</p>
-            <span className="text-[12px] text-white/60">{current.backgroundOpacity === 0 ? 'Trong suốt' : `${current.backgroundOpacity}%`}</span>
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-white/50">{t('bgOpacity')}</p>
+            <span className="text-[12px] text-white/60">{current.backgroundOpacity === 0 ? t('transparent') : `${current.backgroundOpacity}%`}</span>
           </div>
           <input
             type="range"
@@ -167,13 +170,13 @@ export function SubtitleSettingsModal({ settings, onChange, onClose, onEditPosit
             max={100}
             value={current.backgroundOpacity}
             onChange={(e) => updateCurrent({ backgroundOpacity: Number(e.target.value) })}
-            aria-label="Độ đậm nền"
+            aria-label={t('bgOpacity')}
             className="h-1.5 w-full accent-accent"
           />
         </div>
 
         <label className="flex cursor-pointer items-center justify-between gap-3">
-          <span className="text-sm">Viền chữ (dễ đọc trên nền sáng)</span>
+          <span className="text-sm">{t('outline')}</span>
           <input
             type="checkbox"
             checked={current.outline}
@@ -183,26 +186,26 @@ export function SubtitleSettingsModal({ settings, onChange, onClose, onEditPosit
         </label>
 
         <div>
-          <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-white/50">Mẫu có sẵn (có thể áp nhiều mẫu liên tiếp)</p>
+          <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-white/50">{t('presets')}</p>
           <div className="flex flex-wrap gap-2">
-            {PRESET_TEMPLATES.map((t) => (
+            {PRESET_TEMPLATES.map((tpl) => (
               <button
-                key={t.label}
+                key={tpl.id}
                 type="button"
-                onClick={() => updateCurrent(t.patch)}
+                onClick={() => updateCurrent(tpl.patch)}
                 className="rounded-md border border-white/20 px-3 py-1.5 text-[13px] hover:border-white/50"
               >
-                {t.label}
+                {t(`${tpl.id}`)}
               </button>
             ))}
           </div>
         </div>
 
         <div>
-          <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-white/50">Xem trước</p>
+          <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-white/50">{t('preview')}</p>
           <div className="flex h-16 items-center justify-center rounded-md bg-black/40">
             <span className={previewAppearance.className} style={previewAppearance.style}>
-              {tab === 'original' ? 'Đây là phụ đề gốc' : 'Đây là phụ đề đã dịch'}
+              {tab === 'original' ? t('sampleOriginal') : t('sampleTranslated')}
             </span>
           </div>
         </div>
@@ -220,7 +223,7 @@ export function SubtitleSettingsModal({ settings, onChange, onClose, onEditPosit
             <line x1="2" y1="12" x2="22" y2="12" />
             <line x1="12" y1="2" x2="12" y2="22" />
           </svg>
-          Tuỳ chỉnh vị trí phụ đề trên video
+          {t('editPosition')}
         </button>
       </div>
     </div>

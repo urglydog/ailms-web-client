@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { flashcardsApi, FlashcardReviewReq, FlashcardUpdateReq, FlashcardAddReq } from '@/lib/api/flashcards';
 import { toast } from 'sonner';
+import { tr } from '@/lib/i18n/translate';
 
 export const useReviewFlashcard = () => {
   const queryClient = useQueryClient();
@@ -16,7 +17,7 @@ export const useReviewFlashcard = () => {
       queryClient.invalidateQueries({ queryKey: ['materials', 'detail'] });
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'Lỗi khi cập nhật tiến độ ôn tập');
+      toast.error(error.message || tr('errors.toast.flashcards.progressFailed'));
     },
   });
 };
@@ -28,12 +29,12 @@ export const useUpdateFlashcard = () => {
     mutationFn: ({ flashcardId, data }: { flashcardId: number; data: FlashcardUpdateReq }) =>
       flashcardsApi.updateFlashcard(flashcardId, data),
     onSuccess: () => {
-      toast.success('Đã cập nhật nội dung flashcard!');
+      toast.success(tr('errors.toast.flashcards.updated'));
       queryClient.invalidateQueries({ queryKey: ['materials', 'detail'] });
       queryClient.invalidateQueries({ queryKey: ['deck-study-cards'] });
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'Lỗi khi cập nhật flashcard');
+      toast.error(error.message || tr('errors.toast.flashcards.updateFailed'));
     },
   });
 };
@@ -53,12 +54,12 @@ export const useAddFlashcard = () => {
     mutationFn: ({ deckId, data }: { deckId: number; data: FlashcardAddReq }) =>
       flashcardsApi.addFlashcard(deckId, data),
     onSuccess: () => {
-      toast.success('Đã thêm flashcard mới!');
+      toast.success(tr('errors.toast.flashcards.added'));
       queryClient.invalidateQueries({ queryKey: ['materials', 'detail'] });
       queryClient.invalidateQueries({ queryKey: ['deck-study-cards'] });
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'Lỗi khi thêm flashcard');
+      toast.error(error.message || tr('errors.toast.flashcards.addFailed'));
     },
   });
 };
@@ -69,12 +70,12 @@ export const useDeleteFlashcard = () => {
   return useMutation({
     mutationFn: (flashcardId: number) => flashcardsApi.deleteFlashcard(flashcardId),
     onSuccess: () => {
-      toast.success('Đã xóa flashcard!');
+      toast.success(tr('errors.toast.flashcards.deleted'));
       queryClient.invalidateQueries({ queryKey: ['materials', 'detail'] });
       queryClient.invalidateQueries({ queryKey: ['deck-study-cards'] });
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'Lỗi khi xóa flashcard');
+      toast.error(error.message || tr('errors.toast.flashcards.deleteFailed'));
     },
   });
 };

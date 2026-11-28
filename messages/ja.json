@@ -88,7 +88,16 @@
       "light": "ライト"
     },
     "skipToContent": "本文へスキップ",
-    "help": "Help & Support"
+    "help": "Help & Support",
+    "streak": {
+      "congrats": "🔥 おめでとうございます!学習ストリークが {days} 日になりました!",
+      "frozen": "🧊 1 日お休みしましたが、{days} 日のストリークを守るため自動で「凍結」されました!今月の残り凍結回数は {remaining} 回です。",
+      "title": "{days} 日ストリーク",
+      "record": "最長記録:{days} 日",
+      "doneToday": "今日の目標を達成しました!",
+      "keepGoing": "1 レッスン学習するかクイズに挑戦してストリークを維持しましょう!",
+      "freezes": "🧊 今月のストリーク凍結は残り {remaining} 回(1 日休むと自動で適用されます)"
+    }
   },
   "footer": {
     "tagline": "学術水準のオンライン学習・試験管理システムです。",
@@ -431,6 +440,450 @@
         "chapter": "章 {chapter} の要点は何ですか？"
       },
       "aiGenerated": "レッスン内容からAIが生成"
+    },
+    "player": {
+      "posterLabel": "レッスン動画フレーム",
+      "playVideo": "動画を再生",
+      "dubPending": "この区間は吹き替え中です — 一時的に原音声を再生します",
+      "dubRemaining": "残りを処理中",
+      "youtubeSubHint": "YouTube の字幕(コースのトランスクリプトはまだありません)",
+      "noOriginalSub": "(原文字幕はまだありません)",
+      "noTranslatedSub": "(翻訳字幕はまだありません)",
+      "controls": {
+        "auto": "自動",
+        "pause": "一時停止",
+        "play": "再生",
+        "back5": "5 秒戻る",
+        "forward5": "5 秒進む",
+        "unmute": "ミュート解除",
+        "mute": "ミュート",
+        "volume": "音量",
+        "originalSub": "原文字幕",
+        "noOriginalSub": "このレッスンには原文字幕がありません",
+        "original": "原文",
+        "translatedSub": "翻訳字幕",
+        "noTranslatedSub": "選択した言語には翻訳字幕がありません",
+        "translated": "翻訳",
+        "transcript": "トランスクリプト",
+        "settings": "設定",
+        "videoQuality": "動画の画質",
+        "autoNext": "次のレッスンを自動再生",
+        "subtitleStyle": "字幕スタイル",
+        "shortcuts": "キーボードショートカット",
+        "exitFullscreen": "全画面を終了",
+        "fullscreen": "全画面"
+      },
+      "subtitle": {
+        "pickColor": "色を自由に選ぶ",
+        "close": "閉じる",
+        "title": "字幕スタイル",
+        "tabOriginal": "原文字幕",
+        "tabTranslated": "翻訳字幕",
+        "fontSize": "文字サイズ",
+        "textColor": "文字色",
+        "bgColor": "背景色",
+        "bgOpacity": "背景の濃さ",
+        "transparent": "透明",
+        "outline": "文字の縁取り(明るい背景で読みやすく)",
+        "presets": "プリセット(続けて複数適用できます)",
+        "preview": "プレビュー",
+        "sampleOriginal": "これは原文字幕です",
+        "sampleTranslated": "これは翻訳字幕です",
+        "editPosition": "動画上の字幕位置を調整",
+        "presetDefault": "デフォルト",
+        "presetBlackBg": "黒背景",
+        "presetYellow": "黄色の文字",
+        "presetOutline": "文字の縁取り",
+        "presetMinimal": "ミニマル(背景なし)"
+      },
+      "shortcuts": {
+        "playPause": "再生 / 一時停止",
+        "slower": "再生速度を下げる",
+        "faster": "再生速度を上げる",
+        "fullscreen": "全画面",
+        "exitFullscreen": "全画面を終了",
+        "back5": "5 秒戻る",
+        "forward5": "5 秒進む",
+        "volumeUp": "音量を上げる",
+        "volumeDown": "音量を下げる",
+        "mute": "ミュート / 解除",
+        "close": "閉じる",
+        "title": "キーボードショートカット"
+      },
+      "activate": {
+        "quotaExceeded": "本日の吹き替えリクエスト上限に達しました。明日もう一度お試しいただくか、すでに利用可能な言語を選択してください。",
+        "noTrack": "言語 <b>{language}</b> の AI 吹き替えはまだありません。",
+        "submitting": "送信中…",
+        "activate": "AI 吹き替えを有効にする",
+        "later": "後で"
+      },
+      "pipeline": {
+        "heading": "AI 吹き替えを処理中",
+        "aria": "吹き替えの進捗",
+        "failedNote": " — この区間は原音声を維持します",
+        "hide": "進捗を隠して動画を見る",
+        "cancelling": "キャンセル中...",
+        "cancel": "吹き替えをキャンセル"
+      },
+      "transcript": {
+        "autoScroll": "セリフに合わせて自動スクロール",
+        "empty": "このレッスンにはまだトランスクリプトがありません。"
+      },
+      "positionEditor": {
+        "hint": "字幕を好きな位置にドラッグしてください",
+        "reset": "デフォルトに戻す",
+        "done": "完了"
+      },
+      "voice": {
+        "default": "デフォルト",
+        "choose": "音声を選択",
+        "female": "女性",
+        "male": "男性"
+      }
+    },
+    "tutor": {
+      "pinned": "ピン留め済み",
+      "options": "オプション",
+      "optionsAria": "会話のオプション",
+      "unpin": "ピン留めを外す",
+      "pin": "ピン留め",
+      "rename": "名前を変更",
+      "delete": "削除",
+      "maxAttachments": "1 回の質問に添付できるのは最大 {max} ファイルです。",
+      "oversized": "ファイル「{name}」は {max}MB を超えています。",
+      "deleteFailed": "この会話を削除できませんでした。",
+      "title": "ソクラテス式 AI チューター",
+      "subtitle": "レッスン内容について質問できます。答えは直接教えません",
+      "newChat": "新しい会話",
+      "newChatAria": "新しい会話を始める",
+      "history": "会話履歴",
+      "historyAria": "会話履歴を見る",
+      "searchPlaceholder": "会話を検索…",
+      "searchAria": "会話を検索",
+      "noHistory": "過去の会話はまだありません",
+      "noMatch": "一致する会話が見つかりません",
+      "dropFiles": "ここにファイルをドロップして添付",
+      "restoring": "会話を再読み込み中…",
+      "greeting": "こんにちは!このレッスン(またはコース内の他のレッスン)について何でも聞いてください。答えを直接教えるのではなく、自分で見つけられるようヒントを出します。",
+      "removeAttachment": "添付ファイル {name} を外す",
+      "attach": "ファイルを添付",
+      "inputPlaceholder": "レッスン内容について質問..."
+    },
+    "studyPlan": {
+      "createdToast": "学習プランを作成しました!",
+      "createError": "プランの作成中にエラーが発生しました。",
+      "deletedToast": "学習プランを削除しました!",
+      "deleteError": "プランの削除中にエラーが発生しました。",
+      "updatedToast": "進捗を更新しました!",
+      "genericError": "エラーが発生しました。",
+      "icsObjective": "目標: {objective}",
+      "icsLessons": "レッスン:",
+      "icsLessonLine": "- {title}({minutes} 分)",
+      "icsSummary": "LMS 学習 - {title}...",
+      "icsDefaultLesson": "レッスン",
+      "exportError": "カレンダーファイルの書き出しに失敗しました",
+      "loading": "読み込み中...",
+      "title": "AI 学習プラン(パーソナライズ)",
+      "subtitle": "あなたの進捗と目標に基づいて AI が自動で配分します。",
+      "exportIcs": "カレンダーを書き出す (.ics)",
+      "updateProgress": "進捗を更新",
+      "adjust": "プランを調整",
+      "createNow": "今すぐプランを作成",
+      "deleteTitle": "プランを削除",
+      "behindTitle": "進捗が遅れています!",
+      "behindBody": "過去のレッスンに未完了のものがあります。<b>進捗を更新</b>を押すと、未学習のレッスンが残りのスケジュールに自動で移動されます。",
+      "emptyTitle": "学習プランはまだありません",
+      "emptyBody": "完了目標日を設定すると、AI が毎日の詳細な学習スケジュールを作成し、進捗を確認しやすくなります。",
+      "startConfig": "設定を開始",
+      "targetLabel": "完了目標:",
+      "commitLabel": "学習時間の目標:",
+      "hoursPerWeek": "{hours} 時間 / 週",
+      "minutes": "{minutes} 分",
+      "noVideo": "動画なし",
+      "configTitle": "AI 学習プランの設定",
+      "expectedDate": "完了予定日",
+      "expectedDateHint": "今日からこの日までスケジュールが均等に配分されます。",
+      "weeklyHours": "学習時間(時間 / 週)",
+      "weeklyHoursHint": "AI はこの上限を超えないように配分します。",
+      "catchUpTitle": "遅れを取り戻すヒント:",
+      "catchUpBody": "レッスンが溜まっているため、プランを実現しやすくするには<b>週の学習時間を増やす</b>か<b>完了日を延ばす</b>必要があるかもしれません。",
+      "cancel": "キャンセル",
+      "analyzing": "分析中...",
+      "createPlan": "プランを作成",
+      "deleteConfirmTitle": "現在のプランを削除しますか?",
+      "deleteConfirmBody": "このプランを削除してもよろしいですか?最初から設定し直す必要があります。",
+      "cancelShort": "キャンセル",
+      "deleting": "削除中...",
+      "deletePlan": "プランを削除",
+      "remaining": "残り:",
+      "remainingValue": "{lessons} レッスン({minutes} 分)",
+      "dueLabel": "期限:",
+      "dueValue": "{date}({days} 日)",
+      "requiredPace": "必要なペース:",
+      "paceValue": "約 {minutes} 分 / 日",
+      "pickNewDate": "新しい完了日を選択",
+      "tooHeavy": "レッスン量が多すぎます。期限を延ばして負担を減らしてください。",
+      "deadlinePassed": "期限が過ぎているか無効です。新しい日付を選択してください。",
+      "updating": "更新中...",
+      "confirmUpdate": "更新を確定"
+    },
+    "materialManager": {
+      "pickLanguage": "言語を選択してください",
+      "requestSent": "教材の生成リクエストを送信しました。AI が処理中です!",
+      "createError": "教材の作成中にエラーが発生しました",
+      "renamed": "教材名を更新しました",
+      "renameError": "名前の更新中にエラーが発生しました",
+      "deleted": "教材を削除しました",
+      "deleteError": "教材の削除中にエラーが発生しました",
+      "untitled": "無題の教材",
+      "createTitle": "新しい AI 教材を作成",
+      "type": "教材の種類",
+      "typeMindmap": "マインドマップ",
+      "typeQuiz": "クイズ",
+      "scope": "範囲",
+      "scopeWhole": "コース全体",
+      "scopeChapter": "章ごと",
+      "scopeCustom": "レッスンを選択",
+      "language": "言語",
+      "sourceNote": "教材は次の吹き替え済み動画から作成されます:",
+      "pickChapter": "章を選択",
+      "availableVideos": "この章で利用可能な動画:",
+      "tickLessons": "レッスンを選択",
+      "sending": "送信中...",
+      "create": "教材を作成",
+      "historyTitle": "個人の作成履歴",
+      "filterAll": "すべて",
+      "filterMindmap": "マインドマップ",
+      "filterQuiz": "クイズ",
+      "sortNewest": "新しい順",
+      "sortOldest": "古い順",
+      "sortName": "名前 A-Z",
+      "refresh": "更新",
+      "loading": "読み込み中...",
+      "enterToSave": "Enter で保存",
+      "clickToRename": "クリックして名前を変更",
+      "rename": "名前を変更",
+      "badgeMindmap": "マインドマップ",
+      "badgeFlashcard": "フラッシュカード",
+      "badgeQuiz": "クイズ",
+      "status": "ステータス:",
+      "statusDone": "完了",
+      "statusFailed": "エラー",
+      "statusStale": "待機時間が長くなっています",
+      "statusProcessing": "処理中",
+      "deleteTitle": "教材を削除",
+      "noFilterMatch": "フィルターに一致する教材が見つかりません。",
+      "noPersonal": "個人教材はまだ作成されていません。",
+      "courseMaterial": "コース教材",
+      "officialExam": "正式試験",
+      "notOpen": "未公開",
+      "closed": "終了",
+      "noAttempts": "受験回数終了",
+      "duration": "時間:",
+      "durationValue": "{minutes} 分",
+      "unlimited": "無制限",
+      "questionCount": "問題数:",
+      "attempts": "受験回数:",
+      "opensAt": "公開日時:",
+      "tabOfficial": "公式教材ライブラリ",
+      "tabPersonal": "個人教材ライブラリ",
+      "listTitle": "教材・試験一覧",
+      "reference": "参考資料",
+      "uploadedAt": "アップロード日: {date}",
+      "noOfficial": "公式教材はまだありません",
+      "noOfficialLesson": "このレッスンには添付教材がありません。",
+      "noOfficialCourse": "講師はこのコースの教材をまだ公開していません。"
+    },
+    "messageInstructor": {
+      "title": "講師にメッセージ",
+      "close": "閉じる",
+      "loading": "読み込み中...",
+      "empty": "まだメッセージがありません。最初の質問を送ってみましょう!",
+      "scrollDown": "最新のメッセージまでスクロール",
+      "placeholder": "メッセージを入力...",
+      "send": "送信"
+    },
+    "mindmapEditor": {
+      "newBranch": "新しいブランチ",
+      "addChild": "子ブランチを追加 (Tab)",
+      "addSibling": "兄弟ブランチを追加 (Enter)",
+      "undo": "元に戻す (Ctrl+Z)",
+      "redo": "やり直し (Ctrl+Y)",
+      "enterContent": "内容を入力",
+      "cancel": "キャンセル",
+      "update": "更新",
+      "hidePanel": "コントロールパネルを隠す",
+      "showPanel": "コントロールパネルを表示",
+      "shapeRect": "四角形",
+      "shapeRounded": "角丸",
+      "shapeCircle": "円形",
+      "fillColor": "塗りつぶし色 (Fill)",
+      "resetDefault": "デフォルトに戻す",
+      "textLabel": "テキスト (Text)",
+      "bold": "太字",
+      "italic": "斜体",
+      "syncNote": "「Save & Apply」を押すとカスタマイズが同期されます",
+      "pickNodeHint": "マップ上のノードをクリックして、形・フォント・背景色・文字色をカスタマイズしてください。"
+    },
+    "mermaid": {
+      "renderError": "マインドマップを描画できません。データの形式が不正な可能性があります。",
+      "copied": "Mermaid コードをコピーしました!",
+      "copyError": "コードのコピーに失敗しました。",
+      "rotate": "図の向きを回転: {direction}",
+      "copyCode": "Mermaid コードをコピー",
+      "downloadTitle": "図を SVG 画像としてダウンロード",
+      "download": "画像をダウンロード (SVG)",
+      "loading": "読み込み中..."
+    },
+    "flashcard": {
+      "empty": "フラッシュカードはまだありません。",
+      "addNew": "新しいカードを追加",
+      "loading": "カードを読み込み中...",
+      "noSpeech": "お使いのブラウザは音声再生に対応していません。",
+      "langUnsupported": "このデッキの言語はまだ発音に対応していません。",
+      "addTitle": "新しいフラッシュカードを追加",
+      "cancel": "キャンセル",
+      "front": "表面 (Front)",
+      "back": "裏面 (Back)",
+      "addSubmit": "カードを追加",
+      "editTitle": "フラッシュカードを編集",
+      "saveChanges": "変更を保存",
+      "editThis": "このカードを編集",
+      "deleteThis": "このカードを削除",
+      "flipHint": "カードをクリックして裏返す",
+      "listen": "発音を聞く ({lang})",
+      "due": "復習期限",
+      "reviewOn": "復習: {date}",
+      "flip": "カードを裏返す"
+    },
+    "flashcardStudy": {
+      "noSpeech": "お使いのブラウザは音声再生に対応していません。",
+      "doneBody": "すべてのカードの復習が完了しました。復習が必要な新しいカードができたらまた来てください。",
+      "doneTitle": "おめでとうございます!このデッキは一旦完了です。",
+      "back": "戻る",
+      "smaller": "文字サイズを小さく",
+      "larger": "文字サイズを大きく",
+      "listen": "発音を聞く",
+      "showAnswer": "クリックして答えを見る",
+      "minutes": "{n} 分",
+      "hours": "{n} 時間",
+      "days": "{n} 日"
+    },
+    "materialPicker": {
+      "group": "教材の言語を選択",
+      "notTranslated": "翻訳はまだありません",
+      "translated": "翻訳あり",
+      "noTranscript": "トランスクリプトなし",
+      "choose": "言語を選択",
+      "search": "言語を検索",
+      "list": "言語リスト",
+      "noLanguage": "言語が見つかりません"
+    },
+    "quiz": {
+      "aiError": "AI への接続でエラーが発生しました。",
+      "explainError": "解説の取得でエラーが発生しました。",
+      "empty": "クイズの問題はまだありません。",
+      "title": "Quick Check: クイックレビュー",
+      "intro": "この演習には、学んだ内容を定着させる {count} 問が含まれています。",
+      "continue": "続ける",
+      "start": "開始する",
+      "doneTitle": "クイズ完了!",
+      "doneBody": "すばらしい!{count} 問を完了しました。",
+      "finish": "完了して戻る",
+      "displayError": "問題の表示エラー。",
+      "questionOf": "{total} 問中 {current} 問目",
+      "askTutor": "なぜ間違いなのか AI チューターに聞く",
+      "tutorExplains": "AI チューターの解説:",
+      "thinking": "考え中...",
+      "finishQuiz": "完了",
+      "next": "次の問題"
+    },
+    "quizEditor": {
+      "updated": "問題を更新しました",
+      "updateFailed": "更新に失敗しました",
+      "added": "問題を追加しました",
+      "addFailed": "追加に失敗しました",
+      "deleted": "問題を削除しました",
+      "addNew": "新しい問題を追加",
+      "addAria": "問題を追加",
+      "editAria": "問題を編集",
+      "addTitle": "問題を追加",
+      "editTitle": "問題を編集",
+      "questionNo": "問題 {n}:",
+      "edit": "編集",
+      "delete": "削除",
+      "correct": "正解",
+      "content": "問題文",
+      "multi": "複数の正解がある問題(複数選択)",
+      "answers": "回答(緑のボックスにチェックして正解を指定)",
+      "answerPh": "回答 {n}",
+      "addOption": "+ 選択肢を追加",
+      "cancel": "キャンセル",
+      "save": "問題を保存"
+    },
+    "overview": {
+      "loading": "読み込み中...",
+      "loadError": "コース情報を読み込めませんでした。",
+      "counts": "{chapters} 章 · {lessons} レッスン",
+      "dubbable": "{count} 言語に吹き替え可能",
+      "instructor": "講師",
+      "messageInstructor": "講師にメッセージ",
+      "announcements": "講師からのお知らせ"
+    },
+    "mermaidEditor": {
+      "label": "Mermaid コード",
+      "insertTemplate": "サンプルの Tree-card を挿入",
+      "preview": "ライブプレビュー",
+      "saving": "保存中...",
+      "save": "保存"
+    },
+    "gradebook": {
+      "error": "成績表の読み込みに失敗しました。",
+      "emptyTitle": "成績データはまだありません",
+      "emptyBody": "このコースではまだ演習を完了していません。学習して演習を行うと、ここに結果が表示されます!",
+      "title": "試験・演習の履歴",
+      "colName": "テスト名",
+      "colLocation": "場所(章/レッスン)",
+      "colType": "種類",
+      "colBest": "最高得点",
+      "colAttempts": "受験回数",
+      "colLatest": "最終提出日",
+      "colAction": "操作",
+      "defaultTitle": "テスト",
+      "archived": "この演習・試験は講師によってアーカイブされました。",
+      "official": "正式試験",
+      "practice": "復習 (AI)",
+      "inProgress": "受験中",
+      "viewHistory": "履歴を見る({count} 回)"
+    },
+    "assignments": {
+      "title": "課題",
+      "due": "提出期限: {date}",
+      "maxScore": "最大 {score} 点",
+      "submitted": "提出済み · {time}",
+      "submittedFile": "提出したファイル",
+      "score": "得点: {score}",
+      "waiting": "講師の採点待ちです。",
+      "placeholder": "回答を入力...",
+      "submitting": "提出中...",
+      "submit": "提出する"
+    },
+    "knowledgeGaps": {
+      "greatTitle": "すばらしい!",
+      "greatBody": "目立った知識の穴はありません。この素晴らしい調子を保ちましょう!",
+      "title": "知識ギャップの分析",
+      "intro": "直近 5 回の受験で、よく間違えているトピックが見つかりました。優先的に復習して得点を伸ばしましょう:",
+      "wrongCount": "{total} 回中 {wrong} 回不正解",
+      "errorRate": "ミス率: {percent}%",
+      "review": "理論を復習",
+      "generalTitle": "このトピックは総合評価に含まれます。すべての教材を見直してください。",
+      "general": "総合知識"
+    },
+    "resources": {
+      "error": "コースリソースの読み込みに失敗しました。",
+      "emptyTitle": "静的リソースはまだありません",
+      "emptyBody": "講師はこのコースの添付資料(PDF、ZIP など)をまだアップロードしていません。",
+      "title": "添付リソース"
     }
   },
   "profile": {
@@ -492,7 +945,15 @@
     "linkedinHint": "このリンクを LinkedIn の「資格・認定」または履歴書の資格欄に貼り付けてください。",
     "loading": "読み込み中...",
     "notFound": "証明書が見つかりません。",
-    "loadError": "証明書を読み込めませんでした。"
+    "loadError": "証明書を読み込めませんでした。",
+    "preview": {
+      "title": "コース修了証明書",
+      "awardedTo": "この証明書は次の方に授与されます",
+      "completed": "コースを見事に修了しました",
+      "duration": "所要時間: {hours} 時間",
+      "instructorLabel": "担当講師",
+      "platformLabel": "プラットフォーム代表"
+    }
   },
   "courseDetail": {
     "breadcrumbAria": "パンくず",
@@ -579,8 +1040,6 @@
     },
     "shareGift": {
       "share": "共有",
-      "gift": "コースをギフト",
-      "soon": "近日公開",
       "copied": "コースのリンクをコピーしました",
       "copyFailed": "リンクをコピーできませんでした"
     },
@@ -588,7 +1047,22 @@
       "note": "これはあなたのコースです。",
       "edit": "コースを編集",
       "learn": "受講者として開く"
-    }
+    },
+    "reviewsList": {
+      "writeTitle": "レビューを書く",
+      "placeholder": "コースについての感想を共有してください(任意)...",
+      "sending": "送信中...",
+      "submit": "レビューを送信",
+      "thanks": "コースを評価していただきありがとうございます!",
+      "loading": "レビューを読み込み中...",
+      "empty": "このコースにはまだレビューがありません。",
+      "starsAria": "5 つ星中 {rating}"
+    },
+    "preview": {
+      "label": "コースのプレビュー",
+      "loading": "動画を読み込み中…"
+    },
+    "loadingCourse": "コースを読み込み中..."
   },
   "courseList": {
     "loadMore": {
@@ -697,7 +1171,11 @@
       "subtotalOne": "小計",
       "discount": "割引",
       "total": "合計",
-      "terms": "お支払いにより、LinguaLearn の<link>利用規約</link>に同意したものとみなされます。"
+      "terms": "お支払いにより、LinguaLearn の<link>利用規約</link>に同意したものとみなされます。",
+      "promotionDiscount": "講座プロモーション",
+      "couponDiscount": "コード {code}",
+      "bundleDiscount": "バンドル割引",
+      "couponNotApplied": "コード {code} はプロモーションと併用できず、より安くならないため適用されませんでした。各講座には最もお得な特典が1つだけ適用されます。"
     },
     "billing": {
       "title": "追加情報",
@@ -877,7 +1355,25 @@
     "viewAll": "すべて見る",
     "rank": "{rank} 位",
     "podiumAria": "ランキング上位 3 名",
-    "listAria": "ランキング"
+    "listAria": "ランキング",
+    "chat": {
+      "ownReply": "自分のメッセージには返信できません!",
+      "bestError": "ベストアンサーを更新できませんでした。後でもう一度お試しください。",
+      "instructor": "講師",
+      "bestAnswer": "✓ ベストアンサー",
+      "reply": "返信",
+      "unmarkBest": "ベストアンサーを解除",
+      "markBest": "ベストアンサーにする",
+      "title": "コメント",
+      "replyingTo": "<b>{name}</b> に返信中",
+      "cancel": "キャンセル",
+      "replyPlaceholder": "返信を入力...",
+      "placeholder": "あなたの感想を共有しましょう ...",
+      "send": "送信",
+      "empty": "コメントはまだありません。",
+      "emptyHint": "最初に感想を共有しましょう!",
+      "showMore": "さらに {count} 件の返信を表示"
+    }
   },
   "instructor": {
     "nav": {
@@ -908,7 +1404,8 @@
       "logoutTitle": "ログアウトの確認",
       "logoutBody": "システムからログアウトしますか？",
       "cancel": "キャンセル",
-      "confirm": "ログアウト"
+      "confirm": "ログアウト",
+      "unreadNotifications": "未読の通知 {count} 件"
     },
     "courses": {
       "title": "マイ講座",
@@ -1001,7 +1498,8 @@
         "label": "{percent}% 完了",
         "ready": "審査に提出できます",
         "missingTitle": "提出に不足している項目",
-        "aria": "講座の完成度：{percent}%"
+        "aria": "講座の完成度：{percent}%",
+        "fixNow": "今すぐ対応"
       },
       "submit": {
         "send": "審査に提出",
@@ -1199,7 +1697,9 @@
         "error": "Could not send the response.",
         "noResponse": "This dispute has been resolved; responding is no longer possible."
       },
-      "note": "An administrator reviews your response and decides. You can respond only once."
+      "note": "An administrator reviews your response and decides. You can respond only once.",
+      "searchLabel": "返金リクエストを検索",
+      "searchPlaceholder": "コース名、注文コード、受講者名..."
     },
     "communication": {
       "tabsAria": "コミュニケーションのセクション",
@@ -1295,7 +1795,8 @@
       }
     },
     "common": {
-      "close": "閉じる"
+      "close": "閉じる",
+      "redirecting": "リダイレクト中..."
     },
     "perf": {
       "common": {
@@ -1447,7 +1948,9 @@
         "hasBest": "ベストアンサーあり",
         "markBest": "ベストアンサーに選ぶ",
         "unmarkBest": "ベストアンサーを解除",
-        "markUnread": "未読にする"
+        "markUnread": "未読にする",
+        "searchLabel": "質問を検索",
+        "searchPlaceholder": "質問を検索：受講者、レッスン、コース、内容..."
       },
       "assignments": {
         "title": "課題",
@@ -1460,7 +1963,10 @@
         "feedback": "フィードバック",
         "save": "保存",
         "gradedLine": "採点済み：{score} 点",
-        "close": "閉じる"
+        "close": "閉じる",
+        "searchLabel": "課題を検索",
+        "searchPlaceholder": "課題名、コース名、レッスン名...",
+        "noMatch": "一致する課題はありません。"
       },
       "announcements": {
         "title": "お知らせ",
@@ -1473,7 +1979,10 @@
         "pickCourse": "講座を選択...",
         "titlePh": "お知らせのタイトル",
         "contentPh": "この講座に登録しているすべての受講生に送るお知らせの内容...",
-        "send": "お知らせを送信"
+        "send": "お知らせを送信",
+        "searchLabel": "お知らせを検索",
+        "searchPlaceholder": "タイトル、内容、コース名...",
+        "noMatch": "一致するお知らせはありません。"
       },
       "messages": {
         "title": "メッセージ"
@@ -1531,6 +2040,931 @@
       "privacy": "話題は2人以上が質問した場合のみ表示され、ラベルは共通キーワードで質問の原文ではありません。",
       "retry": "再試行",
       "retryAfter": "{time} に再試行できます（10分に1回まで）。"
+    },
+    "materials": {
+      "cancel": "キャンセル",
+      "delete": "削除",
+      "edit": "編集",
+      "close": "閉じる",
+      "loading": "読み込み中...",
+      "saving": "保存中...",
+      "deleting": "削除中...",
+      "processingBtn": "処理中...",
+      "confirmBtn": "確認",
+      "saveChanges": "変更を保存",
+      "exporting": "エクスポート中...",
+      "questionsCount": "{count} 問",
+      "cardsCount": "{count} 枚",
+      "dragToDistribute": "ドラッグしてレッスンに配布",
+      "viewEdit": "表示 / 編集",
+      "untitled": "無題の教材",
+      "materialFallback": "教材",
+      "chapterPrefix": "チャプター：{title}",
+      "toast": {
+        "versionUpdated": "新しいバージョンに更新しました",
+        "versionUpdateError": "バージョン更新中にエラーが発生しました",
+        "distributed": "教材を配布しました",
+        "distributeError": "配布中にエラーが発生しました",
+        "moved": "教材を移動しました",
+        "moveError": "教材を移動できません",
+        "duplicated": "教材を複製しました",
+        "duplicateError": "教材を複製できません",
+        "deleted": "教材セットを削除しました",
+        "deleteError": "教材の削除中にエラーが発生しました",
+        "pdfError": "PDFのエクスポートに失敗しました。もう一度お試しください。",
+        "mindmapSaved": "マインドマップを保存しました！",
+        "mindmapSaveError": "図の保存中にエラーが発生しました！",
+        "questionDeleted": "問題を削除しました",
+        "flashcardDeleted": "フラッシュカードを削除しました",
+        "csvImported": "CSVから {count} 行を追加しました。",
+        "csvErrors": "{count} 行でエラー：{details}",
+        "csvEmpty": "CSVファイルに有効なデータ行がありません。",
+        "csvError": "CSVファイルのアップロード中にエラーが発生しました",
+        "quizSettingsSaved": "クイズ設定を保存しました！",
+        "quizSettingsError": "クイズ設定の保存中にエラーが発生しました",
+        "openTimeRequired": "正式試験モードでは試験の開始時刻を設定してください！",
+        "closeAfterOpen": "終了時刻は開始時刻より後にしてください！",
+        "generateSent": "AI教材の生成リクエストを送信しました！",
+        "generateError": "教材を生成できません",
+        "pickType": "作成する教材の種類を選択してください",
+        "enterTitle": "タイトルを入力してください",
+        "pickChapter": "チャプターを選択してください",
+        "pickLesson": "レッスンを選択してください",
+        "questionSaved": "問題の変更を保存しました",
+        "questionSaveError": "問題を保存できません",
+        "questionAdded": "新しい問題を追加しました",
+        "questionAddError": "問題を追加できません",
+        "questionContentRequired": "問題文を入力してください",
+        "flashcardUpdated": "フラッシュカードを更新しました",
+        "flashcardAdded": "新しいフラッシュカードを追加しました",
+        "manualCreated": "空の教材を作成しました！",
+        "manualError": "教材を作成できません",
+        "pickMaterialType": "教材の種類を選択してください",
+        "enterMaterialName": "教材名を入力してください"
+      },
+      "versionConfirm": {
+        "title": "バージョンを更新",
+        "message": "この教材を新しいバージョンに更新しますか？受講者の以前のスコアは保持されます。"
+      },
+      "deleteModal": {
+        "aria": "教材を削除",
+        "title": "教材を削除",
+        "body": "本当に削除しますか？この操作は元に戻せません。",
+        "wait": "削除中です。しばらくお待ちください...",
+        "confirm": "削除を確認"
+      },
+      "distribution": {
+        "title": "配布（ショートカット）",
+        "unassignTitle": "配布を解除",
+        "unassignChapter": "この教材をチャプターから外しますか？",
+        "unassignLesson": "この教材をレッスンから外しますか？",
+        "remove": "外す"
+      },
+      "activityTitle": "最近のアクティビティを表示",
+      "activity": "アクティビティ",
+      "manualBtn": "手動",
+      "searchPlaceholder": "教材を検索...",
+      "filterAll": "すべて",
+      "filterAllStatus": "すべてのステータス",
+      "filterByType": "種類で絞り込み：{label}",
+      "filterByStatus": "ステータスで絞り込み：{label}",
+      "confirmWait": "処理中です。しばらくお待ちください...",
+      "viewer": {
+        "previewOnly": "プレビューモード — ここではコンテンツを編集できません。",
+        "aiMaterial": "AI教材",
+        "type": "種類",
+        "language": "言語",
+        "version": "バージョン",
+        "vietnamese": "ベトナム語",
+        "deleteAllTitle": "この教材をすべて削除",
+        "closeWorkspace": "ワークスペースを閉じる",
+        "loadingAll": "教材データをすべてワークスペースに読み込み中...",
+        "questionBank": "問題バンク（{count}）",
+        "examSettings": "試験設定",
+        "exportBlankTitle": "白紙の問題PDFをエクスポート（解答は最終ページ）",
+        "exportBlank": "白紙の問題",
+        "exportCheatTitle": "解答付きチートシートPDFをエクスポート",
+        "addQuestion": "新しい問題を追加",
+        "questionNo": "問 {n}：",
+        "correctAnswer": "正解",
+        "mindmapBoard": "マインドマップボード（Mindmap）",
+        "mindmapHint": "マウスでドラッグして位置を変更し、テキストをダブルクリックしてブランチ名を編集します。",
+        "modeView": "静的表示",
+        "modeEdit": "編集",
+        "modeCode": "コード編集",
+        "flashcardTitle": "視覚的な両面フラッシュカードセット",
+        "flashcardHint": "カードをクリックして裏返すか、カード下の編集/削除を使用します。",
+        "reviewCards": "{count} 枚の復習カード",
+        "addCard": "新しいカードを追加",
+        "cardNo": "カード #{n}",
+        "back": "裏面（概念）",
+        "front": "表面（用語）",
+        "flipBack": "クリックして戻す",
+        "flipToSee": "クリックして意味を表示"
+      },
+      "csv": {
+        "uploading": "アップロード中...",
+        "upload": "CSVをアップロード"
+      },
+      "dt": {
+        "now": "現在"
+      },
+      "quiz": {
+        "title": "試験設定",
+        "subtitle": "時間、受験回数、ランダム出題、監督機能を管理",
+        "typeAria": "クイズの種類",
+        "officialExam": "正式試験",
+        "lectureNote": "Quick Checkでは制限時間・回数・監督は適用されず、受講者は各問題の直後に解答を確認できます。以下の設定を有効にするには「正式試験」を選択してください。",
+        "officialNote": "受講者が受験済みのクイズは種類を変更できません。「設定を保存」をクリックして適用します。",
+        "save": "設定を保存",
+        "modeLabel": "試験モード",
+        "practice": "練習（無制限）",
+        "practiceDesc": "受講者は何度でも受験でき、最高得点が自動的に保存されます。",
+        "limited": "回数制限つき復習",
+        "limitedDesc": "受験回数を制限します。最高得点が自動的に保存されます。",
+        "attemptsPlaceholder": "回数",
+        "once": "正式試験（1回）",
+        "onceDesc": "受講者は1回のみ受験できます。開始時刻の入力が必須です。",
+        "openLabel": "開始時刻",
+        "closeLabel": "終了時刻",
+        "closeHint": "未設定の場合は無期限で公開",
+        "allowReview": "提出後に受講者が解答を確認できるようにする",
+        "duration": "制限時間（分）",
+        "pickCount": "1回あたりの問題数",
+        "pickDefault": "デフォルト：{count} 問",
+        "proctoring": "AI試験監督（不正防止）",
+        "proctoringDesc": "カメラが必要です。AIが顔を自動監視し、受講者が画面を離れたり別のタブに切り替えたりすると警告します。",
+        "maxViolations": "自動提出までの最大違反回数"
+      },
+      "gen": {
+        "summaryExam": "総括試験",
+        "reviewTitle": "{type} 復習 - {chapter}",
+        "wholeCourseTitle": "{type} - コース",
+        "title": "AI教材を自動作成",
+        "subtitle": "レッスン内容からAIに自動作成させる教材の種類を選択してください。",
+        "quizName": "選択式クイズ",
+        "quizDesc": "解説付きの選択式問題を生成",
+        "flashcardName": "フラッシュカード",
+        "flashcardDesc": "用語と概念を両面カードとして抽出",
+        "mindmapName": "マインドマップ",
+        "mindmapDesc": "知識の流れを視覚的な図にする",
+        "detail": "詳細設定",
+        "quizKind": "クイズの分類",
+        "quickCheck": "クイックチェック（Quick Check）",
+        "quickCheckDesc": "1つのレッスンに紐づけ。常に解説を表示し、回数無制限、時間制限なし。",
+        "officialExam": "正式試験（Official Exam）",
+        "officialExamDesc": "チャプター/コース単位の試験。時間制限あり、成績表に記録、回数を設定可能。",
+        "materialTitle": "教材のタイトル",
+        "scope": "作成範囲",
+        "scopeWhole": "コース全体",
+        "scopeChapter": "特定のチャプター",
+        "scopeLesson": "特定のレッスン",
+        "pickChapter": "チャプターを選択",
+        "pickChapterOpt": "-- チャプターを選択 --",
+        "pickLesson": "レッスンを選択",
+        "pickLessonOpt": "-- レッスンを選択 --",
+        "difficulty": "問題の難易度",
+        "easy": "基礎（Easy）",
+        "medium": "標準（Medium）",
+        "hard": "上級（Hard）",
+        "questionCount": "問題数",
+        "qFew": "少なめ（約10問）",
+        "qStd": "標準（約20問）",
+        "qMore": "多め（約30問）",
+        "cardCount": "フラッシュカード数",
+        "cFew": "少なめ（約10枚）",
+        "cStd": "標準（約20枚）",
+        "cMore": "多め（約30枚）",
+        "template": "図のテンプレート（Template）",
+        "detailLevel": "ブランチの詳細度",
+        "dBasic": "基本、主要ブランチのみ",
+        "dStd": "標準、適度",
+        "dDetail": "詳細、多数の小ブランチに分割",
+        "language": "教材の言語",
+        "calling": "AIを呼び出し中...",
+        "start": "生成を開始"
+      },
+      "qe": {
+        "editAria": "問題内容を編集",
+        "editTitle": "問題内容を編集",
+        "warnAttempted": "注意：この教材にはすでに受験記録があります。解答を変更すると、提出済みの試験の採点結果に影響します。",
+        "content": "問題文",
+        "type": "問題の種類",
+        "single": "単一選択（正解は1つ）",
+        "multiple": "複数選択（正解は複数）",
+        "topicTag": "トピックタグ（Topic Tag）",
+        "topicPlaceholder": "例：論理演算子",
+        "videoTime": "動画のタイムスタンプ（秒）",
+        "sourceLesson": "元のレッスン",
+        "leaveEmpty": "-- 未指定 --",
+        "options": "選択肢",
+        "deleteOption": "選択肢を削除",
+        "optionPlaceholder": "新しい選択肢を入力してEnterを押してください...",
+        "newOption": "新しい選択肢",
+        "optionA": "選択肢 A",
+        "optionB": "選択肢 B",
+        "optionC": "選択肢 C",
+        "optionD": "選択肢 D",
+        "addAria": "新しい問題を追加",
+        "addTitle": "新しい問題を追加",
+        "contentPlaceholder": "問題文を入力...",
+        "adding": "追加中...",
+        "addBtn": "問題を追加"
+      },
+      "fc": {
+        "editAria": "フラッシュカードを編集",
+        "editTitle": "フラッシュカードを編集",
+        "addAria": "新しいフラッシュカードを追加",
+        "addTitle": "新しいフラッシュカードを追加"
+      },
+      "manual": {
+        "title": "教材を手動で作成",
+        "subtitle": "空のレコードを作成し、内容をすべて自分で入力します。",
+        "quizName": "クイズ（Quiz）",
+        "emptyBadge": "空で作成",
+        "name": "教材名",
+        "namePlaceholder": "例：中間試験、基本概念...",
+        "creating": "作成中...",
+        "createEmpty": "空のレコードを作成"
+      },
+      "dblClickPreview": "ダブルクリックでプレビュー",
+      "addCardBtn": "カードを追加"
+    },
+    "gradebook": {
+      "loading": "クラスの成績表を読み込み中...",
+      "loadError": "成績表を読み込めません",
+      "loadErrorHint": "アクセス権がないか、このコースにはまだデータがありません。",
+      "back": "戻る",
+      "crumbInstructor": "講師",
+      "crumbMaterials": "教材・試験ライブラリ",
+      "crumbGradebook": "成績表",
+      "title": "クラス成績表：",
+      "totalStudents": "登録受講者の合計",
+      "students": "人",
+      "avgScore": "クラス平均点",
+      "passRate": "合格率（Pass Rate）",
+      "totalAttempts": "受験回数の合計",
+      "attemptsUnit": "回",
+      "detailList": "成績表の詳細リスト",
+      "noOfficialQuiz": "このコースには公開済みの正式クイズがありません",
+      "colStudent": "受講者",
+      "colAttempts": "受験回数",
+      "colBest": "最高点",
+      "colLatest": "直近の点数",
+      "colSubmitted": "提出日時",
+      "colStatus": "ステータス",
+      "colActions": "操作",
+      "attemptCount": "{count} 回",
+      "notTaken": "未受験",
+      "notJoined": "未参加",
+      "passed": "合格（Passed）✓",
+      "failed": "不合格 ✕",
+      "viewAttempt": "受験の詳細",
+      "noSubmission": "提出なし",
+      "noStudents": "このコースにはまだ登録した受講者がいません。",
+      "modalAria": "受講者の受験詳細",
+      "modalTitle": "受講者の受験詳細：",
+      "submittedAt": "提出日時：",
+      "loadingAttempt": "提出内容の詳細を読み込み中...",
+      "score": "点数",
+      "correctCount": "正解数",
+      "perQuestion": "各問題の選択内容",
+      "questionNo": "問 {n}：",
+      "correct": "正解 ✓",
+      "learnerChoice": "受講者の選択",
+      "correctAnswer": "正解 ✓",
+      "close": "閉じる"
+    },
+    "folderTree": {
+      "createError": "フォルダを作成できません",
+      "deleteFolderError": "フォルダを削除できません",
+      "renamed": "教材名を変更しました",
+      "renameError": "教材名を変更できません",
+      "deleted": "教材を削除しました",
+      "deleteError": "教材を削除できません",
+      "deleteMatTitle": "教材を削除",
+      "thisMaterial": "この教材",
+      "material": "教材",
+      "deleteMatMsg": "「{title}」を削除しますか？この操作は元に戻せません。",
+      "copied": "「{title}」をコピーしました — 移動先フォルダを選んでCtrl+Vで貼り付けます",
+      "cut": "「{title}」を切り取りました — 移動先フォルダを選んでCtrl+Vで貼り付けます",
+      "folderHasMaterialsTitle": "フォルダに教材が含まれています",
+      "deleteFolderTitle": "フォルダを削除",
+      "folderHasMaterialsMsg": "このフォルダには教材が含まれています。削除を続けると、中の教材はルートのワークスペースに移動されます。よろしいですか？",
+      "deleteFolderMsg": "このフォルダを削除しますか？",
+      "emptyFolder": "空のフォルダ",
+      "rootHint": "ルートフォルダ（右クリックで追加 · 教材をここにドラッグするとルートに移動）",
+      "selectedHint": "✓ 選択中 — Del：削除 · Ctrl+C：コピー · Ctrl+X：切り取り · Ctrl+V：貼り付け",
+      "workspaceEmpty": "ワークスペースは空です",
+      "workspaceEmptyHint": "右クリックで新しいフォルダを作成します。",
+      "ctx": {
+        "newFolder": "新しいフォルダを作成",
+        "newSubfolder": "サブフォルダを作成",
+        "deleteFolder": "フォルダを削除",
+        "viewEdit": "表示 / 編集",
+        "rename": "名前を変更",
+        "history": "バージョン履歴",
+        "moveTo": "フォルダに移動...",
+        "deleteMaterial": "教材を削除"
+      },
+      "picker": {
+        "aria": "フォルダを選択",
+        "titleCopy": "コピー先のフォルダを選択",
+        "title": "移動先のフォルダを選択",
+        "search": "フォルダを検索...",
+        "root": "ルートワークスペース",
+        "removeFromFolder": "（フォルダから外す）",
+        "none": "フォルダが見つかりません"
+      },
+      "cancel": "キャンセル",
+      "create": {
+        "aria": "フォルダを作成",
+        "titleChild": "サブフォルダを作成",
+        "titleNew": "新しいフォルダを作成",
+        "placeholder": "フォルダ名...",
+        "submit": "作成"
+      },
+      "rename": {
+        "aria": "教材名を変更",
+        "title": "教材名を変更",
+        "placeholder": "教材名...",
+        "save": "保存"
+      }
+    },
+    "payoutAccount": {
+      "bank": "銀行",
+      "pickBank": "銀行を選択",
+      "accountNumber": "口座番号",
+      "keepNumberPlaceholder": "現在の番号 {mask} を維持する場合は空欄のまま",
+      "holderName": "口座名義人",
+      "holderHint": "アカウント名と一致させてください（アクセント記号なしの大文字でも可）。",
+      "needsEmailNote": "確認メールをお客様のアドレスに送信します。リンクの有効期限は30分です。（編集の場合）以前の口座は確認するまで引き続き使用できます。",
+      "noEmailNote": "口座名義人のみの変更のため、メール確認なしですぐに適用されます。",
+      "sending": "送信中...",
+      "sendConfirm": "確認メールを送信",
+      "save": "保存",
+      "cancel": "キャンセル",
+      "title": "受取口座",
+      "add": "+ 口座を追加",
+      "emptyConfigured": "口座が連携されていません。支払いを受け取るには銀行口座を追加してください。",
+      "emptyNotConfigured": "サーバーで口座連携機能が有効になっていません。",
+      "toast": {
+        "nameUpdated": "口座名義人を更新しました。",
+        "confirmSent": "確認メールを送信しました。30分以内にメールを開いてリンクをクリックしてください。",
+        "editFailed": "口座を編集できません。",
+        "removed": "口座を削除しました。",
+        "removeFailed": "口座を削除できません。",
+        "defaultSet": "デフォルトの受取口座に設定しました。",
+        "defaultFailed": "デフォルト口座を変更できません。",
+        "linkFailed": "口座を連携できません。"
+      },
+      "badge": {
+        "default": "デフォルト",
+        "pending": "メール確認待ち"
+      },
+      "holderLabel": "口座名義人：{name}",
+      "pendingReplace": "この変更はメールで確認すると有効になります。それまでは以前の口座を使用できます。",
+      "pendingNew": "メールを開いて確認リンクをクリックしてください（有効期限30分）。",
+      "mismatch": "口座名義人がアカウント名と一致しません。送金前に管理者が慎重に確認します。",
+      "removeConfirm": "この口座を削除しますか？",
+      "remove": "削除",
+      "setDefault": "デフォルトに設定",
+      "edit": "編集",
+      "addNew": "新しい口座を追加"
+    },
+    "onboarding": {
+      "error": "エラーが発生しました。もう一度お試しください。",
+      "loading": "読み込み中...",
+      "step": "ステップ {step}/{total}",
+      "exit": "終了",
+      "teachingOptions": {
+        "0": "対面（非公式）",
+        "1": "対面（専門的）",
+        "2": "オンライン",
+        "3": "その他"
+      },
+      "videoOptions": {
+        "0": "初心者です",
+        "1": "少し知識があります",
+        "2": "経験があります",
+        "3": "アップロード可能な動画があります"
+      },
+      "audienceOptions": {
+        "0": "今はいません",
+        "1": "少数のフォロワーがいます",
+        "2": "かなり多くのフォロワーがいます"
+      },
+      "step1": {
+        "title": "あなたの知識を共有しよう",
+        "description": "LinguaLearnのコースはすべて動画で学べます。教えた経験があってもなくても、あなたの知識をオンラインコースにするお手伝いをします。",
+        "question": "これまでどのような形式で教えたことがありますか？"
+      },
+      "step2": {
+        "title": "コースを作成",
+        "description": "経験レベルに関係なく、自信を持って講義動画を撮影できるよう、リソースやコツ、サポートを提供します。",
+        "question": "動画制作はどの程度「プロフェッショナル」ですか？"
+      },
+      "step3": {
+        "title": "リーチを広げよう",
+        "description": "コース公開後は、ご自身のマーケティングとLinguaLearn内の検索表示を組み合わせて受講者を増やせます。",
+        "question": "コースを共有できるオーディエンスはいますか？"
+      },
+      "verify": {
+        "title": "本人確認情報の認証",
+        "intro": "最初のコースを審査に提出する前に一度だけ完了すれば、以降のコースでは不要です。",
+        "idNumber": "身分証明書番号",
+        "address": "現住所",
+        "confirm": "これは本人の情報であり、公開するコース内容を所有している、または共有する権利があることを確認します。"
+      },
+      "back": "戻る",
+      "next": "続ける",
+      "processing": "処理中...",
+      "finish": "完了",
+      "done": {
+        "title": "講師になりました！",
+        "body": "認証情報が記録されました。講師チャンネルに移動して、最初のコースの作成を始めましょう...",
+        "go": "今すぐ講師チャンネルへ"
+      }
+    },
+    "chapterEditor": {
+      "dragChapter": "ドラッグしてチャプターの順序を変更",
+      "sectionNo": "セクション {n}：",
+      "sectionTitled": "セクション {n}：{title}",
+      "objectiveQuestion": "このセクションを完了すると、受講者は何ができるようになりますか？",
+      "objectivePlaceholder": "学習目標を入力...",
+      "cancel": "キャンセル",
+      "saveSection": "セクションを保存",
+      "collapse": "セクションを折りたたむ",
+      "expand": "セクションを展開",
+      "lessonCount": "（{count} レッスン）",
+      "renameSection": "セクション名・説明を編集",
+      "deleteChapter": "チャプターを削除",
+      "dragReorder": "ドラッグして順序を変更",
+      "noLessons": "このチャプターにはまだレッスンがありません。",
+      "lessonNo": "レッスン {n}：",
+      "lessonTitlePlaceholder": "レッスンのタイトルを入力",
+      "afterAddHint": "追加後、レッスン行の「+ コンテンツ」をクリックして動画をアップロードするかYouTubeリンクを貼り付けます。",
+      "addLesson": "レッスンを追加",
+      "addCurriculumItem": "+ カリキュラム項目",
+      "noChapters": "チャプターがまだありません。下に最初のチャプターを追加してください。",
+      "newSection": "新しいセクション：",
+      "titlePlaceholder": "タイトルを入力",
+      "addSection": "セクションを追加",
+      "addSectionBtn": "+ セクション",
+      "deleteConfirm": "1つのセクションとその中のすべてのレッスンを削除しようとしています。続行しますか？"
+    },
+    "payoutHistory": {
+      "loadError": "支払伝票を読み込めません。しばらくしてからもう一度お試しください。",
+      "cancelled": "リクエストをキャンセルしました。金額は残高に戻されました。",
+      "cancelFailed": "リクエストをキャンセルできません。",
+      "title": "出金履歴",
+      "searchAria": "出金リクエストを検索",
+      "searchPlaceholder": "リクエストコードまたは取引コード...",
+      "filterAria": "ステータスで絞り込み",
+      "filter": {
+        "all": "すべて",
+        "pending": "処理中",
+        "paid": "受取済み",
+        "closed": "キャンセル / 失敗"
+      },
+      "loading": "読み込み中...",
+      "empty": "出金リクエストはまだありません。",
+      "noMatch": "フィルターに一致するリクエストはありません。",
+      "scheduled": " · 支払予定 {date}",
+      "transferRef": " · 取引コード {ref}",
+      "reason": "理由：{reason}",
+      "slipTitle": "支払伝票をダウンロード（PDF）",
+      "slip": "支払伝票",
+      "changeAccount": "受取口座を変更",
+      "cancel": "キャンセル",
+      "newAccountAria": "新しい受取口座",
+      "pickNewAccount": "新しい受取口座を選択",
+      "defaultSuffix": "（デフォルト）",
+      "accountChanged": "リクエストの受取口座を変更しました。",
+      "accountChangeFailed": "受取口座を変更できません。",
+      "apply": "適用"
+    },
+    "promotions": {
+      "typePercentage": "割合（%）",
+      "typeFixed": "固定額",
+      "referralTitle": "受講者の紹介",
+      "referralBody": "紹介リンクの共有と個別の売上計上機能は計画中で、このバージョンではまだ利用できません。",
+      "couponsTitle": "このコースのクーポン",
+      "couponsHint": "このコース専用です。「自動」クーポンはコースページに割引後の価格をそのまま表示し、受講者がコードを入力する必要はありません。",
+      "create": "+ クーポンを作成",
+      "loading": "読み込み中...",
+      "empty": "このコースにはまだクーポンがありません。",
+      "automatic": "自動",
+      "allCourses": "あなたのすべてのコース",
+      "on": "有効",
+      "off": "無効",
+      "edit": "編集",
+      "delete": "削除",
+      "createTitle": "クーポンを作成",
+      "editTitle": "クーポンを編集",
+      "autoApply": "自動適用（コード入力不要）",
+      "codePlaceholder": "クーポンコード（例：SALE50）",
+      "valuePlaceholder": "値",
+      "start": "開始",
+      "end": "終了",
+      "usageLimit": "使用回数の上限",
+      "perLearnerLimit": "受講者ごとの上限",
+      "cancel": "キャンセル",
+      "saving": "保存中...",
+      "save": "保存"
+    },
+    "lessonRow": {
+      "status": {
+        "DRAFT": "動画なし",
+        "READY": "準備完了",
+        "UNAVAILABLE": "動画エラー"
+      },
+      "youtubeVideo": "YouTube動画",
+      "dragLesson": "ドラッグしてレッスンの順序を変更",
+      "lessonNo": "レッスン {n}：",
+      "titlePlaceholder": "タイトルを入力",
+      "descPlaceholder": "レッスンの説明 — このレッスンの後に受講者が何をできるようになるかを明記してください。",
+      "cancel": "キャンセル",
+      "saveLesson": "レッスンを保存",
+      "lessonTitled": "レッスン {n}：{title}",
+      "rename": "レッスン名・説明を編集",
+      "deleteLesson": "レッスンを削除",
+      "addContent": "+ コンテンツ",
+      "collapse": "折りたたむ",
+      "expand": "展開",
+      "dragReorder": "ドラッグして順序を変更",
+      "editContent": "コンテンツを編集",
+      "preview": "プレビュー",
+      "asInstructor": "講師として",
+      "asLearner": "受講者として",
+      "addDescription": "+ 説明",
+      "descHint": "説明を追加します。レッスン完了後に受講者が何をできるようになるかを明記してください。",
+      "save": "保存",
+      "addResource": "+ リソース",
+      "addAssignment": "+ 課題",
+      "deleteConfirm": "カリキュラム項目を1つ削除しようとしています。続行しますか？"
+    },
+    "newCourse": {
+      "step": "ステップ {step}/{total}",
+      "titleHeading": "それなら、仮のタイトルを付けてみませんか？",
+      "titleHint": "今すぐ良いタイトルが思いつかなくても大丈夫です。後で変更できます。",
+      "titlePlaceholder": "例：Photoshop CS6をゼロから学ぶ",
+      "categoryHeading": "共有する知識に最も合うカテゴリはどれですか？",
+      "categoryHint": "適切なカテゴリが分からない場合は、後で変更できます。",
+      "pickCategory": "カテゴリを選択",
+      "timeHeading": "コース作成に毎週どれくらい時間を割けますか？",
+      "timeHint": "正解・不正解はありません。あまり時間がなくても目標達成をお手伝いします。",
+      "weekly": {
+        "busy": "とても忙しい（0〜2時間）",
+        "offHours": "仕事以外の時間で行います（2〜4時間）",
+        "plenty": "自由な時間がたくさんあります（5時間以上）",
+        "undecided": "時間があるかどうかまだ決めていません"
+      },
+      "back": "戻る",
+      "next": "続ける",
+      "creating": "作成中...",
+      "create": "コースを作成",
+      "profile": {
+        "title": "講師プロフィールを完成させる",
+        "body": "最初のコースを作成する前に、職業上の肩書きと自己紹介を更新する必要があります。",
+        "headline": "職業上の肩書き",
+        "headlinePlaceholder": "例：ソフトウェアエンジニア / 英語講師",
+        "bio": "短い自己紹介（20文字以上）",
+        "cancel": "キャンセル",
+        "saving": "保存中...",
+        "saveContinue": "保存して続行"
+      }
+    },
+    "share": {
+      "range": {
+        "all": "全期間",
+        "30": "30日",
+        "90": "90日"
+      },
+      "filter": {
+        "all": "すべて",
+        "published": "公開済み",
+        "unpublished": "未公開"
+      },
+      "title": "共有とプロモーション",
+      "subtitle": "各コースに専用の紹介リンクがあります。受講者があなたのリンク経由で購入すると、プラットフォームで自分で見つけた場合より高い取り分を得られます。",
+      "rangeAria": "集計期間",
+      "searchPlaceholder": "コースを検索...",
+      "searchAria": "コースを検索",
+      "filterAria": "ステータスで絞り込み",
+      "loadError": "コース一覧を読み込めません。",
+      "empty": "コースがまだありません。",
+      "noMatch": "フィルターに一致するコースはありません。",
+      "published": "公開済み",
+      "notShareable": "未公開 — 利用可能なリンクはまだありません",
+      "shareTitle": "紹介リンクを取得して共有",
+      "publishToShare": "共有するにはコースを公開してください",
+      "share": "共有",
+      "ordersViaLink": "あなたのリンク経由の注文",
+      "earningsViaLink": "リンク経由の収益",
+      "ordersOrganic": "自力で見つけられた注文",
+      "earningsOrganic": "自力で見つけられた収益"
+    },
+    "lessonMedia": {
+      "documentTask": "ドキュメント：{name}",
+      "title": "動画を管理 — {title}",
+      "status": {
+        "READY": "準備完了",
+        "UNAVAILABLE": "動画エラー",
+        "DRAFT": "動画なし"
+      },
+      "source": "ソース：{source}",
+      "sourceUpload": "アップロード",
+      "previewTitle": "動画をプレビュー — {title}",
+      "hasVideo": "このレッスンにはすでに動画があります（{kind}）。別のソースに変更したり新しい動画をアップロードするには、現在の動画を削除してください。",
+      "kindYoutube": "YouTubeリンク",
+      "kindUpload": "アップロードしたMP4",
+      "deleting": "削除中...",
+      "deleteVideo": "動画を削除",
+      "tabUpload": "MP4をアップロード",
+      "tabYoutube": "YouTubeリンクを貼り付け",
+      "uploadingVideo": "動画をアップロード中...",
+      "cancel": "キャンセル",
+      "checking": "確認中...",
+      "saveYoutube": "YouTubeリンクを保存",
+      "attachments": "添付ドキュメント",
+      "loading": "読み込み中...",
+      "delete": "削除",
+      "noDocs": "ドキュメントはまだありません。",
+      "uploadingDoc": "ドキュメントをアップロード中...",
+      "maxDocs": "ドキュメントの上限（{max}件）に達しました。新しく追加するには削除してください。"
+    },
+    "debt": {
+      "level": {
+        "1": "負債があります。保留期間が終了すると新しい収益で自動的に相殺されます。下から自主的に返済することもできます。",
+        "2": "債務が期限を過ぎています。一時的に新しいコースの公開やプロモーション登録ができません。",
+        "3": "長期延滞：コースの新規登録を一時停止しています（購入済みの受講者は通常どおり学習できます）。"
+      },
+      "repayError": "返済コードを作成できません。",
+      "paidToast": "債務の返済を受領しました。",
+      "title": "債務",
+      "since": "{date} から負債（{days}日）。",
+      "daysLeft": "新しいコースの公開とプロモーション登録が制限されるまであと {days} 日です。",
+      "suspendAfter": "負債が {days} 日続くと、コースの新規登録が一時停止されます。",
+      "paused": "返金の申し立てが処理待ちのため、制限は一時停止されています。",
+      "refundFallback": "返金",
+      "cleared": "債務は完済されました。ありがとうございます！",
+      "none": "未払いの債務はありません。",
+      "amountLabel": "返済額（一部返済可、最低 {min}）",
+      "payAll": "全額返済",
+      "exceeds": "債務額（{amount}）を超えています。",
+      "creating": "コードを作成中...",
+      "createQr": "返済用QRコードを作成",
+      "scan": "コードをスキャンして {amount} を支払う",
+      "openPayos": "PayOS決済ページを開く",
+      "autoUpdate": "入金を確認するとシステムが自動的に更新されます。コードには有効期限があり、期限切れの場合は再作成してください。"
+    },
+    "requestPayout": {
+      "blocker": {
+        "notConfigured": "サーバーで出金機能が有効になっていません。",
+        "noAccount": "出金する前に受取口座を連携して確認してください。",
+        "open": "未完了の出金リクエストがあります。",
+        "min": "出金には最低 {amount} が必要です。"
+      },
+      "created": "リクエストを作成しました。30分以内にメールを開いて確認リンクをクリックしてください。",
+      "createFailed": "出金リクエストを作成できません。",
+      "title": "出金リクエスト",
+      "intro": "最低 {min}。メールで確認すると、リクエストは直近の支払いバッチに登録されます（次回：{date}）。申請した全額を受け取れます。送金手数料はLinguaLearnが負担します。",
+      "toAccount": "受取口座",
+      "defaultSuffix": "（デフォルト）",
+      "amountLabel": "出金額（VND）",
+      "all": "全額出金",
+      "exceeds": "出金可能額（{amount}）を超えています。",
+      "sending": "送信中...",
+      "submit": "出金リクエストを送信"
+    },
+    "visibility": {
+      "PUBLIC": {
+        "label": "公開",
+        "helper": "検索とカタログに表示され、誰でも登録できます。"
+      },
+      "PRIVATE_INVITE": {
+        "label": "非公開（招待された人のみ）",
+        "helper": "検索に表示されません。下で招待したメールアドレスのみが閲覧・登録できます。"
+      },
+      "PRIVATE_PASSWORD": {
+        "label": "非公開（パスワード保護）",
+        "helper": "検索に表示されません。リンクを知っていれば誰でもコースページを閲覧できますが、登録には正しいパスワードが必要です。"
+      },
+      "title": "登録（プライバシー）",
+      "passwordKeep": "現在のパスワードを維持する場合は空欄のまま",
+      "passwordNew": "登録用パスワードを入力",
+      "saved": "プライバシー設定を保存しました。",
+      "saving": "保存中...",
+      "save": "保存",
+      "inviteList": "招待メールアドレス一覧",
+      "invite": "+ 招待",
+      "loading": "読み込み中...",
+      "noInvites": "招待したメールアドレスはまだありません。",
+      "remove": "削除"
+    },
+    "proctoringList": {
+      "searchPlaceholder": "試験名で検索...",
+      "from": "開始",
+      "to": "終了",
+      "allRisk": "すべてのリスクレベル",
+      "colLearner": "受講者",
+      "colExam": "試験",
+      "colSubmitted": "提出日時",
+      "colViolationsAbbr": "違反",
+      "colViolationsTitle": "記録された違反数",
+      "colRisk": "リスク",
+      "colRiskTitle": "AIによる不正リスク評価",
+      "colVideoTitle": "証拠動画",
+      "loading": "読み込み中...",
+      "empty": "監督が有効な試験の受験記録はまだありません。",
+      "noMatch": "フィルターに一致する受験記録はありません。"
+    },
+    "resources": {
+      "fileZip": "圧縮ファイル",
+      "uploadPartial": "{ok} 件のファイルをアップロードしました。{fail} 件はエラー（形式が正しくありません）。",
+      "uploadOk": "{count} 件のリソースをアップロードしました",
+      "uploadError": "ファイルのアップロード中にエラーが発生しました",
+      "deleted": "静的リソースを削除しました",
+      "deleteError": "リソースの削除中にエラーが発生しました",
+      "title": "コース全体の静的リソース",
+      "subtitle": "コース全体で共用するPDF、スライド、資料。チャプターごとの教材とは別です。",
+      "uploading": "アップロード中...",
+      "dropHint": "ここにファイルをドラッグ＆ドロップするか、クリックして選択",
+      "supported": "PDF、Word、PowerPoint、ZIPに対応",
+      "loading": "読み込み中...",
+      "empty": "このコースには静的リソースがまだありません。",
+      "deleteTitle": "リソースを削除"
+    },
+    "lessonAssignment": {
+      "title": "課題",
+      "hint": "このレッスンの記述式・ファイル提出課題です。「コミュニケーション > 課題」で手動で採点・返信します。",
+      "loading": "読み込み中...",
+      "submissions": "{count} 件の提出",
+      "delete": "削除",
+      "empty": "課題はまだありません。",
+      "add": "+ 課題を追加",
+      "titlePlaceholder": "課題のタイトル",
+      "instructionsPlaceholder": "課題の説明...",
+      "maxScorePlaceholder": "最高点",
+      "cancel": "キャンセル",
+      "saving": "保存中...",
+      "save": "課題を保存"
+    },
+    "basics": {
+      "level": "レベル",
+      "thumbnailTask": "サムネイル：{title}",
+      "courseTitle": "コースタイトル",
+      "description": "説明",
+      "thumbnail": "サムネイル",
+      "thumbnailAlt": "サムネイルのプレビュー",
+      "uploadingThumbnail": "サムネイルをアップロード中...",
+      "category": "カテゴリ",
+      "pickCategory": "-- カテゴリを選択 --",
+      "saving": "保存中...",
+      "save": "変更を保存"
+    },
+    "lessonResource": {
+      "documentTask": "ドキュメント：{name}",
+      "title": "リソース",
+      "hint": "このレッスンで受講者をサポートする参考ファイルやリンクです。読みやすいファイルにしてください（最大50MB）。",
+      "loading": "読み込み中...",
+      "delete": "削除",
+      "empty": "リソースはまだありません。",
+      "addFile": "デバイスからファイルを追加",
+      "pasteLink": "リンクを貼り付け",
+      "uploadingDoc": "ドキュメントをアップロード中...",
+      "displayName": "表示名",
+      "adding": "追加中...",
+      "addLink": "リンクを追加",
+      "maxReached": "リソースの上限（{max}件）に達しました。新しく追加するには削除してください。"
+    },
+    "financeConfirm": {
+      "title": "メールで確認",
+      "subtitle": "このメールを受信した講師アカウントでログインする必要があります。",
+      "invalid": "無効なリンク：確認コードがありません。",
+      "notLoggedIn": "このブラウザではログインしていません。メールを受信した講師アカウントでログインすると、確認ステップに戻ります。",
+      "login": "ログインして確認",
+      "payoutConfirmed": "出金リクエストを確認しました。送金が完了したらメールでお知らせします。",
+      "accountConfirmed": "受取口座を確認しました。",
+      "backToEarnings": "収益ページに戻る",
+      "clickToFinish": "下のボタンをクリックして確認を完了してください。リンクは一度しか使用できません。",
+      "failed": "確認できませんでした。リンクの有効期限が切れている可能性があります。",
+      "confirming": "確認中...",
+      "confirm": "確認"
+    },
+    "proctoringAttempt": {
+      "violation": {
+        "TAB_SWITCH": "タブの切り替え",
+        "WINDOW_BLUR": "ウィンドウ/アプリの切り替え",
+        "FULLSCREEN_EXIT": "全画面の終了",
+        "NO_FACE": "顔が検出されません",
+        "MULTIPLE_FACES": "複数人",
+        "HEAD_TURNED": "頭を横に向けた",
+        "GAZE_AWAY": "視線が画面から外れた（AI）",
+        "AUDIO_VOICE_DETECTED": "音声を検出",
+        "DEVTOOLS_OPEN": "DevToolsを開いた",
+        "COPY_PASTE_BLOCKED": "コピー/貼り付け/右クリック",
+        "IDLE_TOO_LONG": "長時間操作なし"
+      },
+      "loading": "読み込み中...",
+      "back": "戻る",
+      "aiVerdict": "AIの判定",
+      "noVideo": "動画なし",
+      "violations": "違反（{count}）",
+      "noViolations": "違反はありません。"
+    },
+    "activity": {
+      "justNow": "たった今",
+      "minutesAgo": "{count} 分前",
+      "hoursAgo": "{count} 時間前",
+      "daysAgo": "{count} 日前",
+      "title": "最近のアクティビティ",
+      "close": "閉じる",
+      "loading": "読み込み中...",
+      "empty": "記録されたアクティビティはまだありません。",
+      "system": "システム"
+    },
+    "versionHistory": {
+      "restored": "古いバージョンの内容を最新バージョンとして復元しました",
+      "restoreError": "バージョンを復元できません",
+      "title": "バージョン履歴",
+      "loading": "読み込み中...",
+      "empty": "バージョン履歴はまだありません。",
+      "active": "使用中",
+      "untitled": "無題の教材",
+      "viewTitle": "このバージョンを表示（読み取り専用）",
+      "restoreTitle": "この内容を最新バージョンとして復元"
+    },
+    "balance": {
+      "noCrypto": "サーバーで受取口座機能が有効になっていないため、口座の連携や出金はまだできません。収益は引き続き正しく記録されます。管理者がこの機能を有効にします。",
+      "negative": "支払い後に発生した返金により、残高が {amount} のマイナスになっています。この金額は今後の注文の収益から相殺されます。",
+      "withdrawable": "出金可能",
+      "nextPayout": "次回の支払い：{date}",
+      "holding": "保留中",
+      "holdingHint": "新しい収益。返金期間中は保留されます",
+      "frozen": "凍結",
+      "frozenHint": "異議申し立て中の注文。処理待ち",
+      "paidOut": "受取済み",
+      "paidOutHint": "送金済みの合計額"
+    },
+    "statement": {
+      "month": "{year}年{month}月",
+      "title": "月次収益明細",
+      "chooseMonth": "月を選択",
+      "downloadPdf": "PDFをダウンロード",
+      "downloadHint": "表示中の月の明細",
+      "empty": "その月に収益・返金・出金がある場合、月が終了するとすぐに各月の明細がここに表示されます。",
+      "debtReceipts": "債務返済の領収書",
+      "receiptError": "領収書をダウンロードできません。"
+    },
+    "referral": {
+      "title": "紹介リンク",
+      "body": "あなたのチャンネル（Facebook、YouTubeなど）でこのリンクを共有してください。受講者がこのリンク経由で購入すると収益の <b>{referral}</b> を得られます（プラットフォーム内検索で見つけた場合は {organic}）。",
+      "copied": "コピーしました ✓",
+      "copy": "コピー",
+      "shareTitle": "SNSまたはデバイスのアプリで共有",
+      "share": "共有"
+    },
+    "studentsPage": {
+      "viewAria": "表示モード",
+      "atRisk": "要注意",
+      "all": "すべて",
+      "searchPlaceholder": "名前、メール、コースで検索...",
+      "searchAria": "受講者を検索",
+      "emptyRisk": "要注意の受講者はいません。「すべて」を選択するとすべての受講者を表示します。",
+      "emptyMatch": "一致する受講者はいません。"
+    },
+    "uploadTray": {
+      "uploading": "アップロード中（{count}）",
+      "errors": "{count} 件のタスクでエラー",
+      "done": "アップロード完了",
+      "cancel": "キャンセル",
+      "close": "閉じる"
+    },
+    "submitChecklist": {
+      "title": "審査提出の条件",
+      "ready": "審査提出の条件を満たしています",
+      "fixNow": "今すぐ対応",
+      "recommend": "推奨：演習（クイズ/フラッシュカード/マインドマップ）を追加（任意）"
+    },
+    "pricing": {
+      "title": "コースの価格を設定",
+      "hint": "無料コースの場合は0を入力してください。保存した価格は、コースが公開済みでもすぐに適用されます。",
+      "price": "価格（đ）",
+      "saving": "保存中...",
+      "save": "変更を保存"
+    },
+    "earningsPage": {
+      "title": "収益と出金",
+      "subtitle": "コースの収益は返金期間中は保留され、その後に出金できます。出金はリクエスト制で、メールでの確認が必要です。",
+      "loadError": "収益情報を読み込めません。もう一度お試しください。"
+    },
+    "videoPreview": {
+      "title": "プレビュー — {title}"
+    },
+    "sectionTabs": {
+      "unread": "未読 {count} 件"
     }
   },
   "coupons": {
@@ -1597,6 +3031,15 @@
       "adminHint": "上で講座を検索してください。",
       "none": "まだ講座がありません。",
       "needOne": "講座を 1 つ以上選択してください。"
+    },
+    "listFilter": {
+      "searchLabel": "クーポンを検索",
+      "searchPh": "コードまたは対象コース名で検索...",
+      "statusAria": "ステータスで絞り込み",
+      "all": "すべてのステータス",
+      "active": "有効",
+      "inactive": "無効",
+      "noMatch": "一致するクーポンはありません。"
     }
   },
   "bundles": {
@@ -1635,6 +3078,25 @@
       "update": "セットを更新",
       "create": "セットを作成",
       "close": "閉じる"
+    },
+    "list": {
+      "delete": "削除",
+      "deleteAria": "バンドルを削除: {title}",
+      "searchLabel": "バンドルを検索",
+      "searchPh": "バンドル名またはバンドル内のコース名で検索...",
+      "statusFilter": "ステータスで絞り込み",
+      "statusAll": "すべてのステータス",
+      "statusActive": "販売中",
+      "statusInactive": "無効",
+      "noMatch": "一致するバンドルはありません。",
+      "deleteTitle": "バンドルを削除しますか?",
+      "deleteBody": "バンドル「{title}」は購入者がいなければ完全に削除されます。購入者がいる場合はアーカイブ(販売停止・一覧から非表示)され、注文履歴はそのまま残ります。"
+    },
+    "upsell": {
+      "included": "バンドルに含まれるもの:",
+      "adding": "追加中...",
+      "buy": "バンドルを購入してさらにお得に →",
+      "title": "💡 コンボバンドルでもっとお得に"
     }
   },
   "admin": {
@@ -1774,7 +3236,11 @@
         "next": "次へ",
         "page": "{page} / {total} ページ"
       },
-      "authLocal": "Email"
+      "authLocal": "Email",
+      "prompt": {
+        "title": "情報を入力してユーザーを検索",
+        "body": "アカウントが非常に多いため、初期表示はしません。上の検索欄に名前、メールまたはユーザー ID を入力するか、「ロック中 / スパム判定」グループを選んで注意が必要なアカウントを確認してください。各アカウントのロールは結果に表示されます。"
+      }
     },
     "moderation": {
       "title": "講座の審査",
@@ -1897,7 +3363,7 @@
     },
     "aiAnalytics": {
       "title": "AI 分析",
-      "subtitle": "受講生の API 使用量を確認し、必要に応じて AI の利用をロックします。",
+      "subtitle": "AI API キー（Gemini、Groq）の推定コストを機能別・ユーザー別に把握します。",
       "chartTitle": "日別の AI コスト（直近 30 日）",
       "cost": "コスト",
       "day": "{date}",
@@ -1915,7 +3381,86 @@
       "unlock": "ロック解除",
       "empty": "統計データはまだありません",
       "updated": "ユーザーの AI の状態を更新しました",
-      "error": "エラーが発生しました"
+      "error": "エラーが発生しました",
+      "feature": {
+        "FLASHCARD": "フラッシュカード",
+        "MINDMAP": "マインドマップ",
+        "QUIZ": "クイズ",
+        "DUBBING_TRANSLATE": "吹き替え：台詞の翻訳",
+        "DUBBING_TRANSCRIBE": "吹き替え：音声認識",
+        "TRANSCRIPT_EXTRACTION": "講義の文字起こし",
+        "TUTOR_CHAT": "AI チューター（質疑応答）",
+        "TUTOR_QUIZ_EXPLAIN": "AI チューター：解答の解説",
+        "TUTOR_TITLE": "AI チューター：会話タイトル",
+        "DISCOVERY_CHAT": "AI コース検索",
+        "INSTRUCTOR_AI": "講師向け AI アシスタント",
+        "PROCTORING_RISK": "試験監督：リスク評価",
+        "PROCTORING_FRAME": "試験監督：画像分析",
+        "EMBEDDING_TUTOR": "講義データの埋め込み",
+        "EMBEDDING_COURSE": "コースデータの埋め込み",
+        "UNTAGGED": "未分類"
+      },
+      "filter": {
+        "from": "開始日",
+        "to": "終了日",
+        "feature": "AI 機能",
+        "allFeatures": "すべての機能",
+        "badRange": "終了日は開始日以降にしてください。"
+      },
+      "partial": "{date} 以降、すべての機能のコストを完全に記録しています。それ以前は、フラッシュカード・マインドマップ・クイズは実測値ですが、吹き替えと AI チューターは保存データからの推定値（表示された出力のみで、思考トークンやテスト呼び出しを含まない）のため、この期間の合計は実際より低くなります。差額は下の「請求書との照合」をご覧ください。",
+      "loadError": "AI コストのデータを読み込めませんでした。もう一度お試しください。",
+      "stat": {
+        "cost": "推定コスト",
+        "rate": "{usd} · レート {rate} VND/USD",
+        "requests": "AI 呼び出し回数",
+        "tokens": "合計トークン",
+        "audio": "認識済み音声（Groq）",
+        "hours": "{hours} 時間",
+        "audioHint": "トークンではなく音声時間で課金"
+      },
+      "daily": {
+        "q": "1 日あたりの AI コストと、その内訳となる機能は？",
+        "insight": "最もコストが高い機能：{name}（{amount}、全体の {pct}%）。",
+        "aria": "日別・機能別 AI コストの積み上げ棒グラフ"
+      },
+      "share": {
+        "q": "コストの大部分を占める機能は？",
+        "insight": "コストの大半は上位の数機能に集中しています — まずそれらを管理しましょう。",
+        "empty": "データがまだありません。",
+        "aria": "機能別 AI コスト比率の円グラフ"
+      },
+      "users": {
+        "title": "AI を最も使っているのは誰？",
+        "search": "ユーザーを検索",
+        "searchPh": "メール、名前またはユーザー ID...",
+        "lockedOnly": "AI がロックされたユーザーのみ",
+        "costCol": "推定コスト",
+        "note": "この表には特定のユーザーに紐づく AI 呼び出しのみが含まれます。システムコスト（埋め込み、ゲスト検索など）は上の合計に含まれます。"
+      },
+      "billing": {
+        "title": "請求書との照合",
+        "intro": "トークンに基づく推定コストを、Google AI Studio の実際の請求額（プロジェクトの Usage ページから期間ごとに入力）と比較します。Gemini のみ。Groq は別請求です。",
+        "close": "閉じる",
+        "open": "請求書を入力",
+        "billed": "実際の請求額",
+        "tracked": "機能に割り当て済み",
+        "unexplained": "未割り当て",
+        "ofBill": "請求額の {pct}%",
+        "noRec": "表示中の期間に完全に収まる請求書はありません。入力済みの請求期間をすべて含む期間を選択すると照合が表示されます。",
+        "unexplainedHint": "未割り当て分は主に、非表示の思考トークン、テストや失敗した実行、または未記録の機能（ライブ授業、Google 検索グラウンディング）によるものです。完全な記録が始まると徐々に小さくなります。",
+        "from": "開始日",
+        "to": "終了日",
+        "amount": "金額（VND）",
+        "amountPh": "例：220739",
+        "note": "メモ（任意）",
+        "save": "請求書を保存",
+        "rules": "各期間は 1 回のみ入力でき、既存の期間と重複できません。照合の信頼性を保つため、保存した請求書は編集・削除できません。",
+        "empty": "請求書はまだありません。",
+        "saved": "請求書を保存しました。",
+        "saveError": "請求書を保存できませんでした。しばらくしてからもう一度お試しください。"
+      },
+      "loading": "読み込み中...",
+      "retry": "再試行"
     },
     "voices": {
       "title": "吹き替えの音声",
@@ -2004,6 +3549,55 @@
         "prev": "Previous",
         "next": "Next",
         "page": "Page {page} of {total}"
+      },
+      "view": {
+        "label": "表示",
+        "ATTENTION": "要対応（失敗・成功版なし）",
+        "PROCESSING": "処理中",
+        "PENDING": "待機中",
+        "COMPLETED": "完了",
+        "FAILED": "すべての失敗ジョブ",
+        "SKIPPED": "スキップ済み",
+        "ALL": "すべて"
+      },
+      "state": {
+        "PENDING": "待機中",
+        "PROCESSING": "処理中",
+        "COMPLETED": "完了",
+        "FAILED": "失敗",
+        "SKIPPED": "スキップ済み",
+        "CANCELLED": "キャンセル済み"
+      },
+      "find": {
+        "label": "ジョブを検索",
+        "ph": "コース、レッスン、言語、依頼者またはジョブ ID..."
+      },
+      "from": "開始日",
+      "to": "終了日",
+      "head": {
+        "course": "コース / レッスン",
+        "language": "言語",
+        "requester": "依頼者",
+        "status": "ステータス",
+        "progress": "進捗",
+        "time": "日時",
+        "error": "エラー",
+        "actions": "操作"
+      },
+      "emptyAttention": "対応が必要なジョブはありません。",
+      "emptyFilter": "条件に一致するジョブはありません。",
+      "jobRef": "{lesson} · ジョブ #{id}",
+      "superseded": "成功した吹き替えが既にあります",
+      "retries": "再試行 {count}/3",
+      "created": "作成 {at}",
+      "finished": "完了 {at}",
+      "retryAria": "再試行：{lesson}",
+      "queued": "ジョブを吹き替えキューに再登録しました。",
+      "retryFailed": "ジョブを再試行できませんでした。しばらくしてからもう一度お試しください。",
+      "confirm": {
+        "title": "吹き替えを再試行しますか？",
+        "body": "「{lesson}」（{language}）を最初から翻訳・読み上げし直すため、AI コストが発生します。このレッスンに使える吹き替えがまだないと確信できる場合のみ再試行してください。",
+        "cancel": "キャンセル"
       }
     },
     "payments": {
@@ -2074,6 +3668,17 @@
         "gateway": "Gateway code",
         "notYet": "Not yet",
         "dispute": "View/handle dispute"
+      },
+      "find": {
+        "needCriteria": "注文コード、メール、購入者名またはコース（またはステータス）を入力して検索してください。",
+        "noReceipt": "この取引にはまだ領収書がありません。領収書は取引完了後、通常数分以内に作成されます。",
+        "receiptError": "領収書を読み込めませんでした。もう一度お試しください。",
+        "label": "取引を検索",
+        "ph": "注文コード、決済ゲートウェイ番号、購入者のメール / 名前 / ID、コース...",
+        "promptTitle": "情報を入力して取引を検索",
+        "prompt": "取引が非常に多いため、初期表示はしません。注文コード、決済ゲートウェイ番号、購入者のメール・名前・ID、またはコース名を入力し、結果をクリックすると詳細の確認、領収書のダウンロード、申し立ての対応ができます。",
+        "loading": "読み込み中...",
+        "receipt": "領収書をダウンロード"
       }
     },
     "settings": {
@@ -2141,6 +3746,233 @@
       },
       "env": {
         "title": "環境"
+      },
+      "ui": {
+        "groups": "設定グループ",
+        "unsaved": "未保存の変更があります",
+        "saveRegion": "変更を保存",
+        "pending": "未保存の変更が {count} 件あります",
+        "fixInvalid": " — 無効な値を修正してください",
+        "decrease": "減らす",
+        "increase": "増やす",
+        "slider": "{label}（スライダー）",
+        "daysPicked": "{count}/4 日を選択",
+        "pickHoliday": "祝日を選択",
+        "addDate": "日付を追加",
+        "noHolidays": "祝日はまだありません。",
+        "removeDate": "{date} を削除",
+        "addEmail": "メールを追加",
+        "remove": "{value} を削除"
+      },
+      "schema": {
+        "groups": {
+          "ai": {
+            "title": "AI 利用上限",
+            "description": "ユーザーごとの AI 機能の利用上限です。"
+          },
+          "aicost": {
+            "title": "AI コスト",
+            "description": "現在使用している Gemini モデルの価格表はシステムに登録済みです。以下の単価は価格表にないモデルにのみ適用されるため、通常は変更不要です。請求書に近い数値にするため、提供元の現行価格に合わせて設定してください。"
+          },
+          "revenue": {
+            "title": "収益と分配",
+            "description": "注文ごとに講師が受け取る割合です。保存後に支払いが成功した注文にのみ適用され、過去の注文は適用済みの割合のままです。"
+          },
+          "refund": {
+            "title": "返金と苦情",
+            "description": "受講者向けの返金ポリシーと苦情の対応期限です。"
+          },
+          "payout": {
+            "title": "講師への支払い",
+            "description": "講師の出金ルールと PayOS による自動支払いです。"
+          },
+          "debt": {
+            "title": "講師の債務",
+            "description": "講師がプラットフォームに債務を負っている場合の対応基準です。"
+          },
+          "reports": {
+            "title": "レポートと証憑",
+            "description": "管理者向けの自動財務レポートと、証憑に表示される情報です。"
+          }
+        },
+        "items": {
+          "QUOTA_DUB_STUDENT": {
+            "label": "受講者ごとの吹き替え回数",
+            "help": "受講者が 1 日に利用できる吹き替えの最大回数です。"
+          },
+          "QUOTA_DUB_INSTRUCTOR": {
+            "label": "講師ごとの吹き替え回数",
+            "help": "講師が 1 日に利用できる吹き替えの最大回数です。"
+          },
+          "QUOTA_MATERIALS": {
+            "label": "1 人あたりの教材生成回数",
+            "help": "1 日に AI で教材(クイズ、フラッシュカード、マインドマップ)を作成できる回数です。"
+          },
+          "QUOTA_TUTOR": {
+            "label": "AI チューターのメッセージ数",
+            "help": "1 人が 1 日に AI チューターへ送信できる最大メッセージ数です。"
+          },
+          "QUOTA_GUEST_SEARCH": {
+            "label": "ゲストの AI 検索",
+            "help": "未ログインのユーザーが 1 時間に行える AI 検索の回数です。"
+          },
+          "AI_PRICE_INPUT_USD_PER_M": {
+            "label": "入力トークン単価(価格表にないモデル)",
+            "help": "入力トークン 100 万あたりの USD です。"
+          },
+          "AI_PRICE_OUTPUT_USD_PER_M": {
+            "label": "出力・思考トークン単価(価格表にないモデル)",
+            "help": "出力トークン 100 万あたりの USD です。非表示の思考トークンも同じ単価で計算します。"
+          },
+          "AI_PRICE_EMBED_USD_PER_M": {
+            "label": "埋め込み単価"
+          },
+          "AI_PRICE_AUDIO_USD_PER_HOUR": {
+            "label": "音声認識単価(Groq)",
+            "help": "音声 1 時間あたりの USD です。"
+          },
+          "USD_VND_RATE": {
+            "label": "USD から VND への為替レート",
+            "help": "AI コストをベトナムドンで表示するために使用します。"
+          },
+          "REVENUE_ORGANIC_INSTRUCTOR_PCT": {
+            "label": "受講者が自分でコースを見つけた場合の講師の取り分",
+            "help": "残りはプラットフォームの取り分です。"
+          },
+          "REVENUE_REFERRAL_INSTRUCTOR_PCT": {
+            "label": "講師の紹介リンク経由で購入された場合の講師の取り分",
+            "help": "講師専用の紹介リンクからの注文に適用されます。"
+          },
+          "REFUND_WINDOW_DAYS": {
+            "label": "返金申請の期限",
+            "help": "支払いが成功した時点から数えます。"
+          },
+          "REFUND_MAX_PROGRESS_PCT": {
+            "label": "返金対象となる最大学習進捗",
+            "help": "これを超えると、「気が変わった」ことによる返金申請はポリシーの対象外です。"
+          },
+          "REFUND_HOLIDAYS": {
+            "label": "返金期限を延長する祝日",
+            "help": "祝日を 1 日ずつ選んでリストに追加します。"
+          },
+          "DISPUTE_INSTRUCTOR_RESPONSE_HOURS": {
+            "label": "苦情に対する講師の返答期限"
+          },
+          "DISPUTE_APPEAL_DAYS": {
+            "label": "返金決定に対する講師の異議申し立て期限"
+          },
+          "REFUND_FLAG_RATE_PCT": {
+            "label": "返金率が高いコースの警告",
+            "help": "コースの 30 日間の返金率がこの値を超えたら管理者に通知します。"
+          },
+          "REFUND_FLAG_MIN_COUNT": {
+            "label": "警告する最小返金件数",
+            "help": "返金件数がこれより少ないコースは、新規コースの誤警告を避けるため警告しません。"
+          },
+          "PAYOUT_MIN_AMOUNT": {
+            "label": "最低出金額"
+          },
+          "PAYOUT_DAYS_OF_MONTH": {
+            "label": "月内の支払日",
+            "help": "月に最大 4 日(1 日から 28 日)を選び、分割して支払います。"
+          },
+          "PAYOUT_HOLD_EXTRA_DAYS": {
+            "label": "返金期限後の追加保留日数",
+            "help": "収益は返金期限にこの日数を加えた後にのみ出金できます。"
+          },
+          "PAYOS_PAYOUT_ENABLED": {
+            "label": "PayOS による自動支払い",
+            "help": "オフにすると、管理者は手動の銀行振込のみ行えます。"
+          },
+          "PAYOS_PAYOUT_MAX_AMOUNT": {
+            "label": "自動支払い 1 件あたりの上限額",
+            "help": "これを超える金額は手動で振り込む必要があります。"
+          },
+          "PAYOS_RETRY_COOLDOWN_MINUTES": {
+            "label": "再支払いまでの待機時間",
+            "help": "支払いが失敗した後に適用されます。"
+          },
+          "PAYOS_MAX_ATTEMPTS": {
+            "label": "1 件あたりの支払い失敗の最大回数",
+            "help": "これを超えると手動振込のみとなります。"
+          },
+          "DEBT_RESTRICT_DAYS": {
+            "label": "債務が超過した場合の制限開始",
+            "help": "講師は新しいコースを公開できず、プロモーションにも登録できません。"
+          },
+          "DEBT_SUSPEND_DAYS": {
+            "label": "債務が超過した場合のコース販売停止",
+            "help": "既存の受講者は通常どおり学習できます。新規注文のみ停止します。"
+          },
+          "DEBT_MIN_REPAY": {
+            "label": "1 回あたりの最低返済額",
+            "help": "残額を完済する場合を除きます。"
+          },
+          "REPORT_DAILY_ENABLED": {
+            "label": "日次の財務レポートを送信"
+          },
+          "REPORT_WEEKLY_ENABLED": {
+            "label": "週次の財務レポートを送信",
+            "help": "月曜の朝に、終了したばかりの週について送信します。"
+          },
+          "REPORT_MONTHLY_ENABLED": {
+            "label": "月次の財務レポートを送信",
+            "help": "1 日の朝に、終了したばかりの月について送信します。"
+          },
+          "REPORT_RECIPIENTS": {
+            "label": "レポートの送信先メール",
+            "help": "カンマ区切り。空欄の場合は、メールを受信できるすべての管理者に送信します。"
+          },
+          "STATEMENT_EMAIL_INSTRUCTORS": {
+            "label": "月次の収益明細を講師にメール送信",
+            "help": "オフでも、講師は「収益」ページで明細を閲覧・ダウンロードできます。"
+          },
+          "PUBLIC_INVOICE_LINK_ENABLED": {
+            "label": "PDF の QR コードから証憑を開けるようにする",
+            "help": "緊急用のオフスイッチです。すべての証憑 QR リンクを無効にします。発行済みの PDF はログイン後に閲覧できます。"
+          },
+          "INVOICE_ISSUER_NAME": {
+            "label": "証憑に表示する発行者名"
+          },
+          "INVOICE_ISSUER_NOTE": {
+            "label": "証憑に表示する発行者メモ",
+            "placeholder": "例:税番号、住所"
+          }
+        },
+        "units": {
+          "turnsPerDay": "回/日",
+          "timesPerDay": "回/日",
+          "msgsPerDay": "件/日",
+          "turnsPerHour": "回/時間",
+          "usdPerMTok": "USD / 100 万トークン",
+          "usdPerAudioHour": "USD / 音声 1 時間",
+          "days": "日",
+          "hours": "時間",
+          "minutes": "分",
+          "times": "回",
+          "turns": "回"
+        },
+        "validation": {
+          "needNumber": "数値を入力してください。",
+          "integerOnly": "0 以上の整数のみ入力してください。ピリオド、カンマ、文字は使用できません。",
+          "minValue": "最小値は {min} です。",
+          "maxValue": "最大値は {max} です。",
+          "percentFormat": "0 以上の数値で、小数点以下は最大 2 桁まで入力してください(例: 37 または 97.5)。",
+          "percentRange": "値は {min} から {max} の範囲で指定してください。",
+          "priceFormat": "0 以上の数値で、小数点以下は最大 4 桁まで入力してください(例: 0.30)。",
+          "priceMax": "最大値は {max} です。",
+          "badEmail": "「{value}」は有効なメールアドレスではありません。",
+          "dupEmail": "重複しているメールアドレスがあります。",
+          "daysMin": "少なくとも 1 日を選択してください。",
+          "daysMax": "1 か月に選べる支払日は最大 4 日です。",
+          "daysRange": "支払日は 1 日から 28 日の間で指定してください。",
+          "dupDay": "重複して選択されている日があります。",
+          "datesMax": "最大 60 日です。",
+          "badDate": "「{value}」は有効な日付ではありません。",
+          "issuerRequired": "発行者名は空にできません。",
+          "maxLength": "最大 {max} 文字です。",
+          "badSwitch": "オン/オフの値が無効です。"
+        }
       }
     },
     "categories": {
@@ -2164,7 +3996,10 @@
         "title": "このカテゴリを削除しますか？",
         "body": "カテゴリ「{name}」を削除します。まだ講座が属している場合は拒否されます。",
         "cancel": "キャンセル"
-      }
+      },
+      "search": "カテゴリを検索",
+      "searchPh": "カテゴリ名またはパスで検索...",
+      "noMatch": "一致するカテゴリはありません。"
     },
     "reviews": {
       "title": "レビューの審査",
@@ -2258,6 +4093,37 @@
         "HIGH": "高",
         "MEDIUM": "中",
         "LOW": "低"
+      },
+      "manage": {
+        "updated": "お知らせを更新しました（受信済みのものにも反映）。",
+        "updateError": "お知らせを更新できませんでした。もう一度お試しください。",
+        "restored": "お知らせを復元しました。ユーザーに再び表示されます。",
+        "restoreError": "お知らせを復元できませんでした。もう一度お試しください。",
+        "deleted": "お知らせを削除しました。",
+        "deleteError": "お知らせを削除できませんでした。もう一度お試しください。",
+        "revoked": "お知らせを取り消しました。ユーザーには表示されなくなります。",
+        "revokeError": "お知らせを取り消せませんでした。もう一度お試しください。",
+        "history": "お知らせの履歴",
+        "search": "お知らせを検索",
+        "searchPh": "タイトルまたは本文で検索...",
+        "actions": "操作",
+        "revokedStatus": "取り消し済み",
+        "revokedOn": "{date} に取り消し",
+        "restore": "復元",
+        "delete": "削除",
+        "edit": "編集",
+        "revoke": "取り消し",
+        "more": "もっと見る",
+        "editTitle": "お知らせを編集",
+        "editHint": "変更はユーザーが受信済みのお知らせにも反映されます。送信後は対象と重要度を変更できません。",
+        "cancel": "キャンセル",
+        "saving": "保存中...",
+        "save": "変更を保存",
+        "deleteTitle": "お知らせを完全に削除しますか？",
+        "deleteBody": "「{title}」とユーザーが受信したすべてのコピーが完全に削除され、復元できません。一時的に非表示にしたい場合は、取り消し状態のままにしてください。",
+        "deleteConfirm": "完全に削除",
+        "revokeTitle": "お知らせを取り消しますか？",
+        "revokeBody": "「{title}」は受信したすべてのユーザーから非表示になります（ページ上部のバナーを含む）。記録は履歴に残ります。"
       }
     },
     "disputes": {
@@ -2364,7 +4230,92 @@
         "previousNote": "Previous resolution note",
         "noteOverwriteWarning": "The new note will be saved; the previous note is kept above."
       },
-      "fileSuccess": "Dispute filed."
+      "fileSuccess": "Dispute filed.",
+      "search": "申し立てを検索",
+      "searchPh": "注文コード、送信者のメール・名前、申し立てコード...",
+      "needsAction": "要対応",
+      "awaitingAccount": "受講者の口座更新待ち",
+      "more": "もっと見る",
+      "refundAccount": "返金の受取口座",
+      "awaitingAccountNote": "受講者が登録した口座への振込ができませんでした{summary}。受講者が返金口座を更新するのを待っています。更新されると返金は自動的に「振込待ち」に戻り、再度支払われます。手動で振り込んで下で記録することもできます。",
+      "policy": {
+        "needReason": "このモードの理由コードを選択してください。",
+        "noteShort": "「講師が全額負担」には明確なメモが必要です（10 文字以上）。",
+        "evidenceShort": "証拠を記載してください（20 文字以上：どの証拠が、どこにあるか）。",
+        "waitInstructor": "講師が未回答で、回答期限も過ぎていません — 講師の責任と判断する前に待ってください。",
+        "reasonCode": "理由コード",
+        "optional": "（任意）",
+        "none": "選択しない",
+        "choose": "理由コードを選択",
+        "evidence": "証拠 *（講師に表示されます）",
+        "evidencePh": "例：レッスン 3 がコース X をそのまま複製（リンク ...）、比較画像を申し立てに添付",
+        "evidenceHint": "証拠のある違反があり、講師が回答済みか回答期限が過ぎた場合のみこのモードを選んでください。講師は一度だけ異議を申し立てられます。"
+      },
+      "reasonCode": {
+        "BUYER_REMORSE": "期間内に受講者の気が変わった",
+        "OTHER": "その他の理由（誰の過失でもない）",
+        "TECHNICAL_ISSUE": "システム側の技術的な問題",
+        "DOUBLE_CHARGE": "二重決済",
+        "NOT_ENROLLED": "請求されたが未登録",
+        "PLATFORM_FAULT": "プラットフォーム側の過失",
+        "COPYRIGHT_VIOLATION": "著作権侵害",
+        "CONTENT_MISMATCH": "内容が説明と大きく異なる",
+        "PROHIBITED_CONTENT": "禁止コンテンツ"
+      },
+      "account": {
+        "noStandard": "受講者は標準形式の返金口座を登録していません{free}。手動振込のみ可能です。",
+        "freeNote": "（自由記述：{note}）",
+        "holder": "口座名義：{name} · {state}",
+        "confirmed": "受講者が本人名義を確認済み",
+        "unconfirmed": "本人名義が未確認"
+      },
+      "payos": {
+        "succeeded": "PayOS で送金し、記録しました。",
+        "rejected": "PayOS が拒否しました：{reason}",
+        "unknownReason": "理由不明",
+        "sent": "支払い指示を PayOS に送信しました。結果が出ると自動で更新されます。",
+        "sendError": "支払い指示を送信できませんでした。",
+        "checkAccount": "返金の受取口座を再確認する必要があります",
+        "asked": "受講者に返金口座の更新を依頼しました。",
+        "askError": "依頼を送信できませんでした。",
+        "blocked": "再支払いはロック中です",
+        "needAccount": "受講者が標準口座を登録し本人名義を確認する必要があります",
+        "hint": "PayOS で返金を送金",
+        "retryAt": "{time} 以降に再支払い",
+        "locked": "PayOS 支払いはロック済み",
+        "retry": "PayOS で再支払い",
+        "send": "PayOS で支払う",
+        "askHint": "返金を、受講者が受取口座を確認・更新するのを待つ状態にします",
+        "ask": "受講者に口座更新を依頼",
+        "balance": "支払い口座の残高：{amount}",
+        "unknownBalance": "不明",
+        "notReady": "受講者の標準口座情報が不足しているため自動支払いできません。下で手動で振り込んでください。",
+        "inFlight": "結果の出ていない PayOS 支払いがあります — 今は手動で振り込まないでください（二重払い防止）。結果を待つか「PayOS で支払う」で再送してください。",
+        "accountChanged": "受講者が {time} に返金口座を変更しました。振り込む前に新しい口座を確認してください。",
+        "order": "指示 {ref}：{state}",
+        "ok": "成功",
+        "fail": "失敗",
+        "unknown": "結果不明（再送しても二重払いにはなりません）",
+        "pending": "処理中 — PayOS/銀行の確認待ち。結果が出るとページが自動更新されます",
+        "nameMismatch": " — ⚠ 銀行が返した名義「{name}」が入力した名前と異なります",
+        "cause": {
+          "TRANSIENT": "銀行/PayOS の一時的な障害",
+          "ACCOUNT": "受取口座の問題",
+          "UNKNOWN": "原因不明"
+        }
+      },
+      "appeal": {
+        "decided": "講師の異議申し立てについて決定しました。",
+        "error": "異議申し立てを処理できませんでした。",
+        "title": "講師の異議申し立て",
+        "reason": "決定の理由 *（講師に送信されます）",
+        "reduceHint": "講師は受け取った分のみ返済し、超過したペナルティは返金されます",
+        "reduce": "受け入れて標準モードに減額",
+        "uphold": "決定を維持",
+        "result": "結果：{outcome}",
+        "reduced": "標準モードに減額",
+        "upheld": "決定を維持"
+      }
     },
     "userDetail": {
       "back": "Back",
@@ -3114,7 +5065,351 @@
             ]
           }
         }
+      },
+      "find": {
+        "label": "サポート依頼を検索",
+        "ph": "依頼コード、メールまたは件名...",
+        "more": "もっと見る"
       }
+    },
+    "common": {
+      "loadError": "データを読み込めませんでした。もう一度お試しください。",
+      "retry": "再試行"
+    },
+    "finance": {
+      "title": "財務統計",
+      "subtitle": "プラットフォーム全体の売上、返金、講師への支払い、PayOS の照合。",
+      "gran": {
+        "DAY": "日別",
+        "WEEK": "週別",
+        "MONTH": "月別"
+      },
+      "reportType": {
+        "DAILY": "毎日",
+        "WEEKLY": "毎週",
+        "MONTHLY": "毎月",
+        "MANUAL": "手動"
+      },
+      "reason": {
+        "BUYER_REMORSE": "気が変わった",
+        "OTHER": "その他の理由",
+        "TECHNICAL_ISSUE": "技術的な問題",
+        "DOUBLE_CHARGE": "二重請求",
+        "NOT_ENROLLED": "請求されたが未登録",
+        "PLATFORM_FAULT": "プラットフォームの不具合",
+        "COPYRIGHT_VIOLATION": "著作権侵害",
+        "CONTENT_MISMATCH": "説明と異なる内容",
+        "PROHIBITED_CONTENT": "禁止コンテンツ"
+      },
+      "stage": {
+        "REQUESTED": "承認待ち",
+        "APPROVED": "承認済み・支払い待ち"
+      },
+      "toast": {
+        "emailed": "レポートを作成し、メールで送信しました。",
+        "noEmail": "レポートは保存されましたが、アカウントに受信可能なメールアドレスがないため送信できませんでした。共有ボタンからファイルをダウンロードできます。",
+        "runError": "レポートを作成できませんでした。もう一度お試しください。"
+      },
+      "fileName": "financial-report",
+      "export": {
+        "pdf": "PDF をダウンロード",
+        "pdfHint": "印刷・送付用の概要",
+        "xlsx": "Excel (XLSX) をダウンロード",
+        "xlsxHint": "全データを含む複数シートのブック",
+        "csv": "CSV をダウンロード",
+        "csvHint": "どのソフトでも開ける生データ",
+        "mail": "メールで自分に送る",
+        "mailHint": "レポートを作成して履歴に保存し、ファイルを添付"
+      },
+      "filter": {
+        "from": "開始日",
+        "to": "終了日",
+        "group": "集計単位",
+        "last7": "7 日間",
+        "last30": "30 日間",
+        "thisMonth": "今月",
+        "lastMonth": "先月",
+        "autoConfig": "自動レポートの設定"
+      },
+      "loadError": "数値を読み込めませんでした。期間を確認してもう一度お試しください。",
+      "noData": "データがまだありません。",
+      "stat": {
+        "gross": "総売上",
+        "net": "純売上（返金後）",
+        "refunds": "受講者への返金額",
+        "refundMeta": "{count} 件 · 注文の {pct}%",
+        "platform": "プラットフォームの取り分"
+      },
+      "split": {
+        "platform": "プラットフォームの取り分",
+        "instructor": "講師の取り分",
+        "refunded": "受講者に返金済み"
+      },
+      "source": {
+        "referral": "紹介リンク経由",
+        "organic": "受講者が自分で発見"
+      },
+      "trend": {
+        "q": "売上は増えている？減っている？",
+        "up": "総売上は前期比 {pct}% 増加しました。",
+        "down": "総売上は前期比 {pct}% 減少しました。",
+        "empty": "この期間の取引はありません。",
+        "aria": "期間別の総売上と返金の面グラフ",
+        "gross": "総売上",
+        "refunds": "返金"
+      },
+      "splitChart": {
+        "q": "お金は実際にどこへ？",
+        "insight": "プラットフォームが総売上の {platform}% を保持し、{refunds}% を受講者に返金しました。",
+        "aria": "プラットフォーム・講師・返金の売上配分を示す円グラフ"
+      },
+      "leader": "トップ：{name}（{amount}、{orders} 件）。",
+      "topCourses": {
+        "q": "最も売上の多いコースは？",
+        "aria": "コース別売上の棒グラフ"
+      },
+      "topInstructors": {
+        "q": "最も売上に貢献している講師は？",
+        "aria": "講師別売上の棒グラフ"
+      },
+      "refundRate": {
+        "q": "返金が異常に多いコースは？",
+        "none": "この期間、注文 {min} 件以上で返金のあったコースはありません。",
+        "review": "「{name}」の品質を確認してください：{refunded}/{orders} 件が返金（{pct}%）。",
+        "ok": "警告しきい値を超えるコースはありません。",
+        "empty": "懸念のあるコースはありません。",
+        "aria": "コース別返金率の棒グラフ",
+        "series": "返金率"
+      },
+      "reasons": {
+        "q": "受講者が返金を求める理由は？",
+        "insight": "最も多い理由：{name}（{count} 件、{amount}）。",
+        "empty": "この期間の返金はありません。",
+        "aria": "理由別返金の円グラフ"
+      },
+      "sources": {
+        "q": "売上はどこから？",
+        "insight": "売上の {pct}% は講師の紹介リンク経由です。",
+        "aria": "流入元別売上の円グラフ"
+      },
+      "pipeline": {
+        "q": "講師への未払いはいくら？長く待っている申請は？",
+        "insight": "講師への未払い額：{obligations}。",
+        "receivables": " · 講師からプラットフォームへの未収金：{amount}",
+        "paid": " 期間内の支払い済み：{amount}（{count} 回）。",
+        "empty": "処理待ちの出金申請はありません。",
+        "row": "{stage}：{count} 件 · {amount}",
+        "oldest": "最古 {days} 日",
+        "late": " — 対応が必要",
+        "payosFee": "期間内の PayOS 送金手数料：{amount}（成功した支払い {orders} 件）、プラットフォーム負担。"
+      },
+      "recon": {
+        "q": "PayOS の支払いは帳簿と一致している？",
+        "match": "期間内に成功した PayOS の支払いはすべて、記録済みの返金・支払いと一致しています。",
+        "diff": "{amount} の差異：{direction}。下の差異一覧を確認してください。",
+        "payosMore": "PayOS の支払いが記録より多い",
+        "bookMore": "帳簿の記録が PayOS の支払いより多い",
+        "ok": "一致",
+        "mismatch": "差異あり",
+        "summary": "PayOS 支払い {payos}（{orders} 件）· 帳簿記録 {recorded}（{count} 件）",
+        "refund": "返金",
+        "payout": "講師への支払い"
+      },
+      "history": {
+        "title": "送信済みレポートの履歴",
+        "empty": "レポートはまだありません。定期レポートは設定に従って自動作成されます。共有ボタンの「メールで自分に送る」も使えます。",
+        "range": "{from} ～ {to}",
+        "sent": "{email} に送信済み",
+        "notSent": "メール未送信"
+      }
+    },
+    "payouts": {
+      "title": "講師への支払い",
+      "subtitle": "出金申請を承認し、手動で振り込んでから取引番号を記録します。却下・失敗した分は講師の残高に戻ります。",
+      "status": {
+        "PENDING_EMAIL": "メール確認待ち",
+        "REQUESTED": "承認待ち",
+        "APPROVED": "承認済み・支払い待ち",
+        "PAID": "支払い済み",
+        "REJECTED": "却下",
+        "CANCELLED": "キャンセル",
+        "FAILED": "支払い失敗"
+      },
+      "toast": {
+        "failed": "操作に失敗しました。",
+        "approved": "申請を承認しました。",
+        "paid": "振込を記録し、講師に通知しました。",
+        "rejected": "却下し、金額を講師に返しました。",
+        "markedFailed": "失敗として記録し、金額を講師に返しました。"
+      },
+      "search": "出金申請を検索",
+      "searchPh": "申請コード、メールまたは講師名...",
+      "statusLabel": "ステータス",
+      "all": "すべて",
+      "exportHint": "一括振込用に承認済み申請の CSV をダウンロード（口座番号を全桁含み、記録されます）",
+      "export": "承認済みを CSV 出力",
+      "loadError": "一覧を読み込めませんでした。",
+      "empty": "申請はありません。",
+      "cols": {
+        "code": "コード",
+        "instructor": "講師",
+        "account": "受取口座",
+        "amount": "金額",
+        "status": "ステータス",
+        "time": "日時",
+        "actions": "操作"
+      },
+      "nameMismatch": "口座名義が講師名と一致しません — よく確認してください",
+      "transferRef": "振込番号：{ref}",
+      "created": "作成：{at}",
+      "batch": "支払い回：{at}",
+      "paidAt": "支払い：{at}",
+      "approve": "承認",
+      "reveal": "口座番号を表示",
+      "manual": "手動",
+      "markPaid": "振込済み",
+      "markFailed": "失敗",
+      "reject": "却下",
+      "more": "もっと見る",
+      "revealDlg": {
+        "title": "受取口座番号",
+        "bank": "銀行",
+        "number": "口座番号",
+        "holder": "口座名義",
+        "amount": "金額",
+        "memo": "推奨振込メモ",
+        "audit": "この閲覧は監査ログに記録されました。口座番号を外部に共有しないでください。"
+      },
+      "dlg": {
+        "paidTitle": "振込を記録",
+        "rejectTitle": "出金申請を却下",
+        "failTitle": "振込失敗",
+        "cancel": "キャンセル",
+        "confirm": "確定",
+        "refLabel": "振込の取引番号 *",
+        "reasonLabel": "理由 *（講師に送信されます）",
+        "proofLabel": "証憑画像のリンク（任意）"
+      },
+      "debts": {
+        "title": "講師の未払い残高（{count}）",
+        "level1": "未払いあり",
+        "level2": "公開・宣伝を制限",
+        "level3": "新規販売を停止",
+        "meta": "{email} · {since} から未払い（{days} 日）· {level}",
+        "writeOff": "債務を免除",
+        "reasonPh": "免除の理由（必須、講師に送信されます）",
+        "reasonLabel": "免除の理由",
+        "confirm": "免除を確定",
+        "cancel": "キャンセル",
+        "done": "債務を免除し、講師に通知しました。",
+        "error": "債務を免除できませんでした。"
+      },
+      "payos": {
+        "succeeded": "PayOS で支払い、記録しました。",
+        "rejected": "PayOS が拒否しました：{reason}",
+        "unknownReason": "理由不明",
+        "sent": "支払い指示を PayOS に送信しました。結果が出ると自動で更新されます。",
+        "sendError": "支払い指示を送信できませんでした。",
+        "blocked": "再支払いはロック中です",
+        "hint": "PayOS で {amount} を送金します。支払い口座の残高：{balance}",
+        "unknownBalance": "不明",
+        "sending": "送信中...",
+        "processing": "PayOS 処理中...",
+        "retryAt": "{time} 以降に再支払い",
+        "locked": "PayOS 支払いはロック済み",
+        "retry": "PayOS で再支払い",
+        "send": "PayOS で支払う",
+        "ok": "成功",
+        "fail": "失敗",
+        "unknown": "結果不明",
+        "pending": "処理中 — PayOS/銀行の確認待ち",
+        "nameMismatch": " ⚠ 銀行の名義が入力した名前と異なります",
+        "cause": {
+          "TRANSIENT": "銀行/PayOS の一時的な障害",
+          "ACCOUNT": "受取口座の問題",
+          "UNKNOWN": "原因不明"
+        }
+      }
+    },
+    "promotions": {
+      "title": "コースの宣伝",
+      "subtitle": "講師の宣伝申請を審査します。承認されたコースは、選択した期間中「おすすめ」棚に表示されます。",
+      "status": {
+        "REQUESTED": "承認待ち",
+        "APPROVED": "承認済み",
+        "REJECTED": "却下",
+        "CANCELLED": "キャンセル",
+        "ENDED": "終了"
+      },
+      "placement": {
+        "HOME_FEATURED": "トップページの「おすすめ」棚",
+        "CATEGORY_FEATURED": "カテゴリページの上部"
+      },
+      "toast": {
+        "failed": "操作に失敗しました。",
+        "approved": "承認しました。コースはすぐに棚に並びます。",
+        "rejected": "申請を却下しました。",
+        "ended": "宣伝を取り下げました。講師に通知されます。"
+      },
+      "search": "宣伝申請を検索",
+      "searchPh": "コース名、講師名またはメール...",
+      "statusLabel": "ステータス",
+      "all": "すべて",
+      "loadError": "一覧を読み込めませんでした。",
+      "empty": "申請はありません。",
+      "running": "実施中",
+      "requestNote": "講師のメモ：{note}",
+      "adminNote": "管理者のメモ：{note}",
+      "estimate": "推定：実施中 {during} 件（{revDuring}）、直前の同期間 {before} 件（{revBefore}）。",
+      "approve": "承認",
+      "reject": "却下",
+      "end": "宣伝を取り下げ",
+      "dlg": {
+        "approveTitle": "宣伝を承認",
+        "endTitle": "宣伝を取り下げ",
+        "rejectTitle": "申請を却下",
+        "cancel": "キャンセル",
+        "confirm": "確定",
+        "endAt": "終了日時 *",
+        "endHint": "承認と同時に開始。最長 90 日。",
+        "note": "メモ（任意）",
+        "reason": "理由 *（講師に送信されます）"
+      }
+    },
+    "invoices": {
+      "title": "請求書・証憑",
+      "subtitle": "支払い領収書、返金票、出金支払票、返済領収書、月次収益明細を検索します。証憑は編集・削除できません。",
+      "type": {
+        "RECEIPT": "支払い領収書",
+        "REFUND": "返金票",
+        "PAYOUT": "出金支払票",
+        "DEBT_RECEIPT": "返済領収書",
+        "STATEMENT": "月次収益明細"
+      },
+      "needCriteria": "証憑番号、注文コード、受取人のメールまたは名前、コース名（または種類・期間）を入力して検索してください。",
+      "resent": "証憑を受取人にメールで再送しました。",
+      "resendFailed": "送信できませんでした：受取人に有効なメールアドレスがありません。",
+      "shareResults": "結果を共有",
+      "csv": "一覧をダウンロード（CSV）",
+      "csvHint": "今回の検索結果すべて",
+      "csvName": "documents.csv",
+      "search": "証憑を検索",
+      "searchPh": "証憑番号、注文コード、受取人のメール / 名前 / ID、コース名...",
+      "typeLabel": "証憑の種類",
+      "allTypes": "すべての種類",
+      "from": "開始日",
+      "to": "終了日",
+      "promptTitle": "情報を入力して証憑を検索",
+      "prompt": "発行される証憑が非常に多いため、初期表示はしません。証憑番号、注文コード、受取人のメール・名前・ID、またはコース名を入力し、結果をクリックすると詳細表示、PDF ダウンロード、受取人へのメール再送ができます。",
+      "loadError": "結果を読み込めませんでした。もう一度お試しください。",
+      "empty": "検索条件に一致する証憑はありません。",
+      "detail": "証憑の詳細",
+      "pdf": "PDF をダウンロード",
+      "pdfHint": "保存・印刷用の証憑",
+      "resend": "メールで再送",
+      "resendHint": "{email} に送信",
+      "close": "閉じる",
+      "immutable": "証憑は永続的に保存されます。誤りがある場合は調整票で取り消し、直接編集はしません。"
     }
   },
   "supportHelp": {
@@ -3600,6 +5895,1118 @@
   "common": {
     "layout": {
       "viewAll": "すべて表示"
+    },
+    "ui": {
+      "close": "閉じる"
+    },
+    "notifications": {
+      "flashcardReminder": "フラッシュカードを復習する時間です",
+      "newNotification": "新しい通知"
+    },
+    "markdown": {
+      "lessonFallback": "レッスン #{id}"
+    },
+    "search": {
+      "searching": "検索中...",
+      "search": "検索",
+      "results": "{total} 件の結果",
+      "resultsPage": "{total} 件 · {page}/{pages} ページ",
+      "pagination": "ページ送り",
+      "prev": "前へ",
+      "next": "次へ"
+    },
+    "legal": {
+      "updated": "最終更新: {date}",
+      "stub": "このコンテンツは準備中で、次のバージョンで更新されます。"
+    },
+    "export": {
+      "share": "共有",
+      "failed": "操作に失敗しました。もう一度お試しください。",
+      "busy": "処理中..."
+    },
+    "confirm": {
+      "title": "確認",
+      "ok": "同意する",
+      "cancel": "キャンセル"
+    },
+    "banner": {
+      "close": "お知らせを閉じる"
+    },
+    "delta": {
+      "same": "前期から変化なし",
+      "noPrevious": "前期のデータはありません",
+      "vsPrevious": "{arrow} 前期比 {pct}%"
+    },
+    "select": {
+      "searchPlaceholder": "クイック検索...",
+      "empty": "結果がありません"
+    },
+    "streak": {
+      "freezes": "🧊 今月のストリーク凍結は残り {remaining} 回"
+    },
+    "rating": {
+      "pick": "星の評価を選択"
+    },
+    "pagination": {
+      "prev": "前のページ",
+      "next": "次のページ",
+      "page": "{current}/{total} ページ"
+    },
+    "spinner": {
+      "loading": "読み込み中"
+    },
+    "typing": {
+      "replying": "返信中"
     }
+  },
+  "finance": {
+    "invoiceType": {
+      "RECEIPT": "支払領収書",
+      "REFUND": "返金明細",
+      "PAYOUT": "出金支払票",
+      "DEBT_RECEIPT": "債務返済領収書",
+      "STATEMENT": "月次収益明細書"
+    },
+    "invoiceStatus": {
+      "ISSUED": "発行済み",
+      "VOIDED": "無効"
+    },
+    "invoiceField": {
+      "periodLabel": "明細期間",
+      "orders": "期間内の注文数",
+      "earnings": "コース収益",
+      "refundReversals": "返金による控除",
+      "adjustments": "調整",
+      "debtRepayments": "返済済み債務",
+      "payoutsPaid": "期間内の出金額",
+      "platformShare": "これらの注文のプラットフォーム取り分",
+      "billingName": "請求先氏名",
+      "billingPhone": "電話番号",
+      "paymentMethod": "支払方法",
+      "gatewayTxnNo": "決済ゲートウェイ取引番号",
+      "orderRef": "注文番号",
+      "originalReceipt": "元の領収書",
+      "payoutCode": "出金申請コード",
+      "bankName": "銀行",
+      "accountMasked": "受取口座",
+      "holderName": "口座名義人",
+      "orderCode": "支払コード",
+      "transferRef": "銀行取引番号",
+      "transferredAt": "送金日時"
+    },
+    "invoiceDetail": {
+      "recipient": "受取人",
+      "issuedAt": "発行日",
+      "related": "関連書類",
+      "byCourse": "コース別収益",
+      "byCourseChart": "期間内のコース別収益の棒グラフ",
+      "content": "内容",
+      "amount": "金額",
+      "discount": "割引",
+      "total": "合計",
+      "payoutFeeNote": "送金手数料は LinguaLearn が負担し、受取額からは差し引かれません。"
+    },
+    "refundReason": {
+      "BUYER_REMORSE": "受講者が期限内に購入を取り消した",
+      "OTHER": "その他の理由（過失なし）",
+      "TECHNICAL_ISSUE": "システム側の技術的な問題",
+      "DOUBLE_CHARGE": "二重請求",
+      "NOT_ENROLLED": "請求済みだが受講登録されていない",
+      "PLATFORM_FAULT": "プラットフォーム側の過失",
+      "COPYRIGHT_VIOLATION": "著作権侵害",
+      "CONTENT_MISMATCH": "内容が説明と大きく異なる",
+      "PROHIBITED_CONTENT": "禁止コンテンツ"
+    },
+    "refundResponsibility": {
+      "STANDARD": "標準 — 講師は受け取った分のみを返金",
+      "PLATFORM_COMPENSATES": "プラットフォームが全額負担",
+      "INSTRUCTOR_FAULT": "講師が全額負担"
+    },
+    "instructorPayoutStatus": {
+      "PENDING_EMAIL": "メール確認待ち",
+      "REQUESTED": "承認待ち",
+      "APPROVED": "承認済み · 送金中",
+      "PAID": "受取済み",
+      "REJECTED": "承認されませんでした",
+      "CANCELLED": "キャンセル済み",
+      "FAILED": "送金失敗 · 残高に戻しました"
+    },
+    "ledgerType": {
+      "EARNING": "注文による収益",
+      "REFUND_REVERSAL": "返金による控除",
+      "PAYOUT_RESERVE": "出金",
+      "PAYOUT_RELEASE": "残高返還（出金失敗）",
+      "ADJUSTMENT": "調整"
+    },
+    "ledger": {
+      "title": "収益明細",
+      "group": "項目の種類",
+      "groupALL": "すべて",
+      "groupEARNING": "注文による収益",
+      "groupREFUND": "返金による控除",
+      "groupPAYOUT": "出金",
+      "groupDEBT": "債務返済",
+      "groupADJUSTMENT": "調整",
+      "from": "開始日",
+      "to": "終了日",
+      "clear": "フィルターをクリア",
+      "loading": "読み込み中...",
+      "noMatch": "条件に一致する項目はありません。",
+      "empty": "まだ収益の記録はありません。",
+      "colTime": "日時",
+      "colType": "種類",
+      "colNote": "メモ",
+      "colEffective": "反映状況",
+      "colAmount": "金額",
+      "matured": "残高に反映済み",
+      "heldUntil": "{date} まで保留"
+    },
+    "refundDecision": {
+      "appealSent": "異議申し立てを送信しました。管理者が確認して連絡します。",
+      "appealFailed": "異議申し立てを送信できませんでした。",
+      "title": "返金の決定",
+      "mode": "方式：",
+      "charged": "収益からの控除額：",
+      "reason": "理由：{reason}。",
+      "adminNote": "管理者のメモ：{note}",
+      "evidence": "証拠：{note}",
+      "appealOpen": "異議申し立ては管理者の対応待ちです。",
+      "appealResult": "異議申し立ての結果：{result}",
+      "appealReduced": "認められ、標準方式に軽減されました",
+      "appealUpheld": "決定は維持されました",
+      "appealHint": "同意できませんか？{deadline} までに一度だけ異議申し立てができます。審査中は債務による制限（ある場合）が一時停止されます。",
+      "deadlineFallback": "期限",
+      "placeholder": "理由と証拠を具体的に記入してください（20文字以上）",
+      "sending": "送信中...",
+      "submit": "異議を申し立てる"
+    }
+  },
+  "pages": {
+    "notFound": {
+      "message": "ページが見つかりません。リンクが存在しないか、アクセス権限がない可能性があります。",
+      "home": "ホームに戻る"
+    },
+    "messages": {
+      "title": "メッセージ",
+      "loading": "読み込み中..."
+    },
+    "about": {
+      "title": "LinguaLearn について",
+      "intro": "LinguaLearn は AI を統合したオンライン学習プラットフォーム（LMS）で、卒業研究から生まれました。動画の原語に縛られず、世界中の質の高い講義にベトナムの学習者がアクセスできることを目指しています。",
+      "v1Title": "言語の壁をなくす",
+      "v1Desc": "AI が外国語の講義をベトナム語に自動翻訳・吹き替えし（逆も可能）、元の映像とミリ秒単位で同期します。字幕を読みながら視聴する必要はもうありません。",
+      "v2Title": "見るだけでなく、主体的に学ぶ",
+      "v2Desc": "ソクラテス式チューターが、視聴中のレッスンの文脈に沿って答えを教えるのではなく問いかけを行い、丸暗記ではなく本当の理解を促します。",
+      "v3Title": "学習進捗の見える化",
+      "v3Desc": "各レッスンの進捗、テスト結果、学習ロードマップを、学習者と講師の双方が明確に確認できます。",
+      "footer": "これは学術研究の成果物であり、オンライン教育における AI 機能を示す目的で開発・運用されています。"
+    },
+    "checkout": {
+      "cancelled": "お支払いをキャンセルしました。"
+    },
+    "materials": {
+      "notFound": "コース情報が見つかりません。",
+      "backToCourses": "← コース一覧へ戻る",
+      "back": "← 戻る",
+      "title": "AI 教材の管理",
+      "subtitle": "講義から、マインドマップ、フラッシュカード、演習問題を自動作成します。",
+      "loading": "教材データを読み込み中..."
+    },
+    "verify": {
+      "checking": "修了証を確認中...",
+      "notFoundTitle": "修了証が見つかりません",
+      "notFoundDesc": "この修了証コードはシステムに存在しません。リンクをご確認ください。",
+      "revokedTitle": "修了証は取り消されました",
+      "revokedDesc": "この修了証は管理者により取り消され、有効ではなくなりました。"
+    },
+    "live": {
+      "title": "ライブ配信",
+      "subtitle": "講師と一緒にライブ視聴 — 必要に応じて吹き替え言語を選べます。",
+      "tabPublic": "公開",
+      "tabEnrolled": "マイコース",
+      "emptyPublic": "現在、進行中または予定されている公開ライブはありません。",
+      "emptyEnrolled": "登録済みのコースに、現在進行中または予定されているライブはありません。",
+      "loading": "読み込み中…",
+      "loadError": "ライブ配信の一覧を読み込めませんでした。",
+      "loginTitle": "ログインして、登録済みコースのライブを見る",
+      "loginDesc": "各コース限定のライブは、そのコースに登録した学習者にのみ表示されます。",
+      "login": "ログイン",
+      "register": "新規登録"
+    },
+    "teaching": {
+      "r1Title": "あなたのやり方で教える",
+      "r1Desc": "好きなコースを好きな方法で公開でき、コンテンツの管理権は常にあなたが持ちます。",
+      "r2Title": "学習者にインスピレーションを与える",
+      "r2Desc": "あなたの知識を教え、学習者が興味を見つけ、新しいスキルを身につけ、キャリアを築くのを支援しましょう。",
+      "r3Title": "正当な報酬を得る",
+      "r3Desc": "専門的なネットワークを広げ、個人の信頼を築き、有料登録ごとに収入を得られます。",
+      "planLabel": "カリキュラムを計画する",
+      "planBody": "あなたの情熱と知識から始め、適切なテーマを選びましょう。教え方と内容はあなたが決めます。",
+      "planHelp": "「カリキュラム」エディタで、セクションやレクチャーを分かりやすく整理でき、作成中に審査申請の条件チェックリストも確認できます。",
+      "videoLabel": "動画を撮影する",
+      "videoBody": "高価な機材は不要です。クリアな音声と見やすい映像があれば十分です。動画は直接アップロードするか、YouTube のリンクを使えます。",
+      "videoHelp": "動画をアップロードすると、システムが自動で元の字幕を抽出し、追加の操作なしで多言語の AI 吹き替えに対応します。",
+      "launchLabel": "コースを公開する",
+      "launchBody": "基本情報と価格を整えて、コースを審査に提出します。承認されると、コースが一般公開され、学習者に見つけてもらえます。",
+      "launchHelp": "内容や価格はいつでも編集できます。審査が必要なのは最初の申請のみです。",
+      "reasonsHeading": "始める理由はたくさんあります。",
+      "supportHeading": "あなたは一人ではありません。",
+      "supportBody": "ソクラテス式 AI チューター、自動生成される教材、チェックリスト付きのカリキュラムエディタが、最初のレクチャーからあなたをサポートします。あなたは共有したい知識に集中するだけです。",
+      "ctaHeading": "今日から講師になりましょう！",
+      "ctaSub": "成長を続ける LinguaLearn の講師コミュニティに参加しましょう。",
+      "ctaInstructor": "講師チャンネルへ",
+      "ctaStart": "始める",
+      "heroTitle": "私たちと一緒に教えましょう！",
+      "heroSub": "講師になって、他の人の人生を変えましょう。あなた自身の人生も。",
+      "stepsHeading": "始め方",
+      "helpHeading": "サポート内容"
+    },
+    "changePassword": {
+      "title": "パスワードを変更",
+      "mismatch": "確認用パスワードが一致しません",
+      "tooShort": "パスワードは 8 文字以上にしてください",
+      "success": "パスワードを変更しました！",
+      "genericError": "エラーが発生しました",
+      "current": "現在のパスワード",
+      "new": "新しいパスワード",
+      "confirm": "パスワードの確認",
+      "processing": "処理中...",
+      "cancel": "キャンセル"
+    },
+    "editProfile": {
+      "title": "プロフィールを編集",
+      "error": "エラーが発生しました。もう一度お試しください。",
+      "uploading": "アップロード中...",
+      "changeAvatar": "アイコンを変更",
+      "avatarHint": "JPEG/PNG/WEBP、最大 5MB",
+      "fullName": "氏名",
+      "language": "優先言語",
+      "saving": "保存中...",
+      "save": "保存",
+      "close": "閉じる"
+    },
+    "account": {
+      "loading": "読み込み中...",
+      "loadError": "情報を読み込めません。",
+      "title": "アカウント設定",
+      "role": "ロール：{role}",
+      "preferredLanguage": "優先言語",
+      "joinedAt": "登録日",
+      "editProfile": "プロフィールを編集",
+      "changePassword": "パスワードを変更",
+      "viewPublic": "公開プロフィールを見る",
+      "privacyTitle": "公開プロフィールのプライバシー",
+      "privacyDesc": "他のユーザーが<link>公開プロフィール</link>ページを見たとき、以下でオンにした項目が表示されます。",
+      "showCourses": "受講済みコースを表示",
+      "showWishlist": "お気に入りリストを表示",
+      "securityTitle": "セキュリティとデバイス",
+      "securityDesc": "このアカウントを使用している他のすべてのデバイスからログアウトします。",
+      "lastActive": "最終アクティビティ：{time}",
+      "logoutAllDone": "他のすべてのデバイスからログアウトしました。",
+      "genericError": "エラーが発生しました。もう一度お試しください。",
+      "logoutAll": "他のすべてのデバイスからログアウト"
+    },
+    "payments": {
+      "groupAll": "すべて",
+      "groupSuccess": "成功",
+      "groupPending": "保留中",
+      "groupFailed": "失敗",
+      "groupRefunded": "返金",
+      "loadError": "取引履歴の読み込みに失敗しました",
+      "invoiceError": "書類をダウンロードできませんでした。しばらくしてからもう一度お試しください。",
+      "statusAwaiting": "返金承認済み · 振込待ち",
+      "statusPaid": "成功",
+      "statusPending": "処理待ち",
+      "statusFailed": "失敗",
+      "statusExpired": "期限切れ",
+      "statusRefunded": "返金済み",
+      "title": "取引履歴",
+      "subtitle": "各取引には電子領収書があり、返金された場合は返金票もここからダウンロードできます。",
+      "filterByStatus": "ステータスで絞り込み",
+      "searchLabel": "取引を検索",
+      "searchPlaceholder": "注文コード、決済ゲートウェイのコード、またはコース名...",
+      "fromDate": "開始日",
+      "toDate": "終了日",
+      "clearFilters": "フィルターをクリア",
+      "loading": "データを読み込み中...",
+      "empty": "まだ取引がありません。",
+      "noMatch": "フィルターに一致する取引はありません。",
+      "colRef": "参照コード（システム）",
+      "colGateway": "決済ゲートウェイ取引番号",
+      "colCourse": "コース",
+      "colAmount": "金額",
+      "colMethod": "支払方法",
+      "colStatus": "ステータス",
+      "colPaidAt": "支払日時",
+      "colDocs": "書類",
+      "none": "なし",
+      "downloadTitle": "{kind} {number} をダウンロード（PDF）",
+      "kindRefund": "返金票",
+      "kindReceipt": "領収書",
+      "downloading": "ダウンロード中...",
+      "btnRefund": "返金票",
+      "btnReceipt": "領収書",
+      "creating": "作成中",
+      "creatingHint": "領収書は支払い完了後に作成され、通常は数分で完了します"
+    },
+    "paymentDetail": {
+      "title": "取引の詳細",
+      "amount": "金額",
+      "discounted": "— {amount}đ 割引",
+      "status": "ステータス",
+      "couponUsed": "使用したクーポン",
+      "course": "コース",
+      "billingName": "支払者名",
+      "billingPhone": "電話番号",
+      "none": "なし",
+      "ref": "参照コード（システム）",
+      "gatewayNo": "取引番号（決済ゲートウェイ）",
+      "notYet": "なし",
+      "method": "支払方法",
+      "paidAt": "支払日時",
+      "report": "問題を報告",
+      "reportDisabled": "申立てできるのは支払いが完了した取引のみです",
+      "refundPolicy": "返金ポリシー",
+      "close": "閉じる"
+    },
+    "payosReturn": {
+      "processing": "PayOS の決済結果を処理中...",
+      "successTitle": "お支払いが完了しました",
+      "successNote": "注意：システムが銀行から成功の確認を受け取り次第、コースは自動的に解放されます（通常 1〜2 分）。",
+      "viewHistory": "取引履歴を見る",
+      "backToCourses": "コース一覧に戻る",
+      "failTitle": "取引は成功しませんでした",
+      "failNote": "お支払いがキャンセルされたか、エラーが発生しました。もう一度お試しください。"
+    },
+    "materialDetail": {
+      "exportPdfError": "PDF のエクスポート中にエラーが発生しました。もう一度お試しください。",
+      "imported": "ファイルから {count} 枚のカードを追加しました。",
+      "importErrors": "{count} 行にエラー：{samples}{more}",
+      "importEmpty": ".txt ファイルに有効なデータ行がありません。",
+      "importFail": ".txt ファイルの読み込みエラー",
+      "loading": "教材の詳細を読み込み中...",
+      "removed": "この演習は講師により削除または更新されました。セッションは終了しました。",
+      "notFound": "この教材が見つからないか、閲覧する権限がありません。",
+      "unavailableTitle": "教材は利用できなくなりました",
+      "loadErrorTitle": "データを読み込めません",
+      "back": "← 戻る",
+      "toHome": "ホームへ",
+      "backPlain": "戻る",
+      "home": "ホーム",
+      "typeMindmap": "マインドマップ",
+      "typeFlashcard": "フラッシュカードセット",
+      "heading": "{type} - バージョン {version}",
+      "statusLabel": "ステータス：",
+      "createdAt": "作成日：{date}",
+      "diagram": "図",
+      "quizStudy": "📖 テストを受ける（学習モード）",
+      "quizEdit": "📋 問題を編集（編集モード）",
+      "exportBlankTitle": "答案を最終ページに載せた白紙の問題 PDF を出力",
+      "exportCheatTitle": "答案付きのチートシート PDF を出力",
+      "exporting": "出力中...",
+      "blankPaper": "白紙の問題",
+      "cheatsheet": "チートシート",
+      "quizEmptyDone": "このテストには問題がありません。",
+      "quizProcessing": "テストは AI が処理中です。しばらくしてからお戻りください...",
+      "flashStudy": "📖 復習（学習モード）",
+      "flashBrowse": "📋 すべて閲覧（ブラウズ）",
+      "exportTxtTitle": "Anki/Quizlet 互換の .txt ファイルを出力",
+      "export": "エクスポート",
+      "importTxtTitle": "Anki/Quizlet の .txt ファイルをインポート",
+      "importing": "インポート中...",
+      "import": "インポート",
+      "defaultDeckName": "フラッシュカードセット",
+      "flashEmptyDone": "このフラッシュカードセットにはカードがありません。",
+      "flashProcessing": "フラッシュカードセットは AI が処理中です。しばらくしてからお戻りください...",
+      "unsupported": "この種類の教材はまだ表示に対応していないか、生成時にエラーが発生しました。"
+    },
+    "liveView": {
+      "loading": "読み込み中…",
+      "cannotView": "このライブは視聴できません",
+      "enrolledOnly": "このライブは、コースに登録した学習者のみ視聴できます。",
+      "enrolledOnlyLogin": "このライブは、コースに登録した学習者のみ視聴できます。登録済みの場合は、ログインしてからもう一度お試しください。",
+      "genericError": "エラーが発生しました。しばらくしてからもう一度お試しください。",
+      "login": "ログイン",
+      "upcoming": "ライブがまもなく始まります",
+      "scheduledAt": "開始予定：{time}",
+      "notStarted": "講師はまだ開始していません。後ほどお戻りください。",
+      "ended": "ライブは終了しました",
+      "actionOriginalSub": "元の字幕を見る",
+      "actionDubbing": "吹き替えを聞く",
+      "actionTranslatedSub": "翻訳字幕を見る",
+      "listen": "音声：",
+      "translatedSub": "翻訳字幕：",
+      "noTranslatedSub": "翻訳字幕を表示しない",
+      "originalSub": "元の字幕",
+      "noVideo": "講師がカメラまたは画面共有をオンにしていません",
+      "delayNote": "音声・映像は実際より数秒遅れる場合があります"
+    }
+  },
+  "legal": {
+    "cookies": {
+      "title": "Cookie ポリシー",
+      "s1Title": "1. LinguaLearn は追跡用 Cookie を使用しません",
+      "s1p1": "本システムは現在、行動の追跡、広告、第三者による分析を目的とした <b>Cookie を使用していません</b>。",
+      "s2Title": "2. ブラウザストレージ（localStorage）",
+      "s2p1": "ログイン状態を維持するため、LinguaLearn はお使いのデバイスのブラウザのローカルストレージ（localStorage）に JWT 形式のアクセストークンとリフレッシュトークンを保存します。このデータは使用中のブラウザ上にのみ存在し、第三者には送信されません。",
+      "s2p2": "ブラウザのデータを消去するかログアウトすることで、いつでもこのデータを削除できます。その場合、現在のログインセッションは終了します。"
+    },
+    "accessibility": {
+      "title": "アクセシビリティ宣言"
+    },
+    "sitemap": {
+      "title": "サイトマップ",
+      "g1": "探す",
+      "g2": "アカウント",
+      "g3": "法務・ポリシー",
+      "home": "ホーム",
+      "courses": "コース",
+      "about": "私たちについて",
+      "teaching": "LinguaLearn で教える",
+      "login": "ログイン",
+      "register": "新規登録",
+      "profile": "プロフィール",
+      "myCourses": "マイコース",
+      "wishlist": "お気に入りリスト",
+      "cart": "カート",
+      "payments": "取引履歴",
+      "terms": "利用規約",
+      "privacy": "プライバシーポリシー",
+      "refund": "返金ポリシー",
+      "revenueShare": "講師向け収益分配ポリシー",
+      "moderation": "コンテンツ審査規定",
+      "cookies": "Cookie ポリシー",
+      "accessibility": "アクセシビリティ宣言"
+    },
+    "moderation": {
+      "title": "コース内容の審査規定",
+      "s1Title": "1. コースのライフサイクル",
+      "s1p1": "各コースは次の状態を経ます。<b>下書き</b>（作成中）→ <b>審査待ち</b>（講師が審査を申請）→ <b>公開済み</b>（承認され一般公開）または <b>却下</b>（修正が必要）→ <b>アーカイブ</b>（新規受講者の受付を終了）。",
+      "s1p2": "公開済みのコースのみ、受講者が登録・購入できます。",
+      "s2Title": "2. 審査プロセス",
+      "s2p1": "管理者は審査待ちのコースを確認し、承認または却下を決定します。却下する場合、講師が再申請前に何を修正すべきか分かるよう、管理者は明確な理由（20 文字以上）を記載しなければなりません。",
+      "s3Title": "3. コースレビューの審査",
+      "s3p1": "ルール違反（スパム、不適切な表現など）の受講者レビューも、上記のコース審査とは別の審査の仕組みにより、管理者が非表示または削除することがあります。",
+      "s4Title": "4. コンテンツに対する責任",
+      "s4p1": "審査に通ったことは、LinguaLearn がコンテンツの正確性や著作権を完全に確認したことを意味しません。最終的な責任は、<link>利用規約</link>に基づき、公開した講師にあります。"
+    },
+    "terms": {
+      "title": "利用規約",
+      "intro": "LinguaLearn は AI を統合したオンライン学習プラットフォーム（LMS）で、ホーチミン市工業大学の卒業研究の一環として開発されました。アカウントを作成しシステムを利用することで、以下の規約に同意したものとみなされます。",
+      "s1Title": "1. ユーザーアカウント",
+      "s1p1": "システムには学習者、講師、管理者の 3 つのロールがあります。学習者アカウントは、<link>LinguaLearn で教える</link>ページからいつでも講師にアップグレードでき、それまで学習者として購入したコースの所有権は失われません。",
+      "s1p2": "講師として登録する際は、本人確認情報（身分証番号、住所）の提供と、公開するコンテンツに対する正当な権利の確認が必要です。システムは現在、これらの情報を内部記録のために<b>収集するのみ</b>で、政府機関の eKYC／電子本人確認 API を呼び出して検証することは<b>ありません</b>。",
+      "s2Title": "2. コース内容と著作権",
+      "s2p1": "講師は、公開するコンテンツ（講義動画、添付資料、テスト問題など）の合法性、著作権、正確性について全責任を負います。LinguaLearn は公開前に講師に代わってコンテンツの著作権を確認することはありません。",
+      "s2p2": "すべてのコースは、一般公開前に管理者の審査を受ける必要があります。詳細は<link>コンテンツ審査規定</link>をご覧ください。",
+      "s3Title": "3. 支払いと受講料",
+      "s3p1": "受講料は PayOS による一括払いです。支払い完了後、学習者はすぐに、期限なしでコースにアクセスできます。返金ポリシーの詳細は<link>返金ポリシー</link>をご覧ください。",
+      "s3p2": "収益は、注文の経路に応じた比率で講師とプラットフォームの間で分配されます。詳細は<link>収益分配ポリシー</link>をご覧ください。",
+      "s3aTitle": "3A. 返金、債務、受取口座",
+      "s3ap1": "受取口座（学習者への返金、講師の出金）を申告するユーザーは、情報の正確性に責任を負い、その口座が本人のものであることを確認するものとします。当社は確認済みの情報のとおりに送金します。返金による差引が残高を超えた場合、講師に<b>債務</b>が発生することがあります。債務は新たな収益から相殺されるか自主的に返済され、期限を過ぎると<revenueLink>収益分配ポリシー</revenueLink>に従い、公開・プロモーションの制限や新規登録の受付停止が行われることがあります。申立てと返金の手順は<refundLink>返金ポリシー</refundLink>をご覧ください。",
+      "s4Title": "4. 禁止行為",
+      "s4p1": "ベトナムの法律に違反する、著作権を侵害する、侮辱的または詐欺的なコンテンツの公開、およびシステムの不具合の意図的な悪用は固く禁じます。違反したアカウントは、事前の通知なくロックまたはコンテンツ削除の対象となることがあります。",
+      "s5Title": "5. 責任の制限",
+      "s5p1": "これは学術研究の成果物であり、オンライン教育における AI 機能を示す目的で運用されています。LinguaLearn はサービスの 100% 継続的な提供を保証せず、プラットフォームの利用に起因する間接的な損害について責任を負いません。",
+      "s6Title": "6. 規約の変更",
+      "s6p1": "本規約は、提供中の機能を反映するため、随時更新されることがあります。最新版は常にこのページに掲載されます。"
+    },
+    "privacy": {
+      "title": "プライバシーポリシー",
+      "intro": "本ポリシーは、LinguaLearn が収集する個人データとその利用方法を説明します。",
+      "s1Title": "1. 収集する情報",
+      "s1p1": "アカウント登録時：メールアドレス、氏名、パスワード（Google でログインする場合は Google の基本情報。標準の OAuth スコープに基づくメール・名前・アイコンのみで、その他の Google データにはアクセスしません）。",
+      "s1p2": "利用中：アイコン、紹介見出し（headline）、自己紹介（bio）、表示言語の設定、学習進捗、取引履歴。",
+      "s1p3": "講師アカウントのみ：身分証番号と連絡先住所。内部記録の保管のみを目的とします。詳細は<link>利用規約</link>をご覧ください。",
+      "s2Title": "2. 公開プロフィールの表示設定",
+      "s2p1": "<link>プロフィール</link>ページで、公開プロフィールに表示する「受講済みコース」と「お気に入りリスト」を個別にオン／オフできます。アカウント作成時はどちらも初期設定でオンです。",
+      "s3Title": "3. ログインセッションの保存",
+      "s3p1": "システムは<b>追跡用 Cookie を使用しません</b>。ログインセッションは、ブラウザのローカルストレージ（localStorage）に保存されたアクセストークン（JWT）で維持されます。詳細は <link>Cookie ポリシー</link>をご覧ください。",
+      "s4Title": "4. 第三者とのデータ共有",
+      "s4p1": "LinguaLearn は、決済処理（PayOS 決済ゲートウェイ）とログイン認証（ご利用の場合は Google OAuth）の目的を除き、個人データを第三者に販売・共有しません。",
+      "s5Title": "5. データ削除の依頼",
+      "s5p1": "現在、アカウントの削除は管理者のみが行えます。アカウントと関連データの削除をご希望の場合は、ページ下部のサポート用メールアドレスまでご連絡ください。",
+      "s6Title": "6. ポリシーの変更",
+      "s6p1": "ユーザーデータに関わる新機能がシステムに追加された場合、本ポリシーは更新されることがあります。"
+    },
+    "refund": {
+      "title": "返金ポリシー",
+      "intro": "2026 年 11 月 11 日以降に提出された申立てに適用されます（第 4 項と第 6 項は 2026 年 11 月 14 日に追加）。以下の数値は現行の基準であり、管理者が調整する場合があり、その際は本ページで更新されます。",
+      "s1Title": "1. 返金の対象となる場合",
+      "s1p1": "次の 2 つの条件を同時に満たす場合、支払い済み金額の <b>100%</b> が返金の検討対象となります。支払い完了日から <b>7 日以内</b>に申請していること、そしてコース内容の受講が <b>20% 以下</b>であること。期限の最終日が土曜日・日曜日・祝日の場合は、次の営業日の終わりまで延長されます。",
+      "s1p2": "これは申請が<em>対象条件を満たす</em>と見なされるための条件であり、最終的な判断は、あなたの意見と講師の回答の両方を確認したうえで管理者が行います。",
+      "s2Title": "2. 技術的な不具合は別途審査",
+      "s2p1": "次のケースは期限や学習進捗の制限を受けません。同じ注文で二重に課金された、課金されたのにコースに登録されなかった、システムの不具合により購入したコースを利用できない。申立ての際は正しい問題の種類を選択し、証拠（写真／動画）を添付してください。",
+      "s3Title": "3. 処理の流れ",
+      "s3i1": "<link>取引の申立て</link>から、取引、問題の種類を選び、説明を入力して証拠を添付します。",
+      "s3i2": "コースの講師に通知が送られ、<b>48 時間</b>以内に回答（同意または異議、証拠付き）できます。",
+      "s3i3": "管理者が双方を確認して判断します。結果は理由とともにメールで送信され、申立てページにも表示されます。",
+      "s3i4": "返金が承認された場合、支払い済み金額の <b>100% 全額</b>を、ご指定の口座に振り込みます。振込手数料は LinguaLearn が負担するため、返金額から差し引かれることはありません。振込が完了したらお知らせします。",
+      "s3p1": "1 件の取引につき申立ては 1 回のみです。振込済みと通知されたのに入金がない場合は、7 日以内に 1 回だけ再度連絡できます。",
+      "s4Title": "4. 返金受取口座とお客様の責任",
+      "s4p1": "申立ての際、銀行を選び、口座番号（2 回入力）と口座名義を入力し、<b>ご自身の口座であることを確認</b>します。返金は<b>お客様が申告した情報のとおり</b>に振り込まれるため、その正確性はお客様の責任となります。",
+      "s4i1": "誤った番号を入力しても、それが実在する口座であれば、その口座に入金され、回収は非常に困難です。お客様が確認した情報のとおりに行われた送金について、当社は責任を負いません。",
+      "s4i2": "口座番号が存在しない、または銀行に拒否された場合は送金できません。その際は、送金前に通知／メールで情報の更新をお願いします。",
+      "s4i3": "申立て時に口座情報を入力しなかった場合は、入金前にサポートへ連絡して追加する必要があります。",
+      "s4p2": "ステータス<em>「承認済み · 振込待ち」</em>は、申請は承認されたものの、まだ<b>振り込まれていない</b>ことを意味します。<em>「返金済み」</em>と表示された時点で送金が完了し、振込番号が付与されます。",
+      "s5Title": "5. 返金後",
+      "s5i1": "コースへのアクセス権は取り消され、コースの修了証（ある場合）は失効し、そのコースに対するレビューは非表示になります。",
+      "s5i2": "後でこのコースを再購入した場合、以前の学習進捗は復元されます。",
+      "s5i3": "各コースの返金は、学習者 1 人につき 1 回までです。返金を繰り返す場合は、審査や制限の対象となることがあります。",
+      "s6Title": "6. プラットフォームと講師の責任分担",
+      "s6p1": "お客様には常に支払い済み金額の全額が返金されます。講師とプラットフォームがそれぞれどれだけ負担するかは<link>収益分配ポリシー</link>で定められており、お客様の返金額には影響しません。"
+    },
+    "revenue": {
+      "title": "講師向け収益分配ポリシー",
+      "intro": "2026 年 9 月 20 日以降の新規取引に適用されます。比率は支払い完了時点で確定します。",
+      "s1Title": "1. 学習者がプラットフォーム経由でコースを見つけた場合（オーガニック）",
+      "s1p1": "学習者が LinguaLearn の検索／カテゴリ閲覧から直接コースを見つけて購入した場合：講師は収益の <b>37%</b> を受け取り、プラットフォームはシステム運営のために <b>63%</b> を保持します。",
+      "s2Title": "2. 学習者が専用の共有リンクから購入した場合（リファラル）",
+      "s2p1": "各コースには専用の共有リンク（リファラルリンク）があり、講師は自分のチャンネル（Facebook、YouTube、個人ブログなど）で宣伝できます。学習者がこのリンク経由でコースを購入した場合：講師は収益の <b>97%</b> を受け取り、プラットフォームはインフラ維持費として <b>3%</b> のみを保持します。",
+      "s3Title": "3. 比率の記録",
+      "s3p1": "分配比率は、注文が支払い済みになった時点で確定し、それ以前の取引には遡って適用されません。上記の 2 つの比率は現行の水準であり、管理者が調整することがあります。新しい比率は調整後に発生した取引にのみ適用されます。2026 年 9 月 20 日より前の取引は、発生時点の旧比率（プラットフォーム 30% / 講師 70%）のままです。",
+      "s4Title": "4. 保留期間",
+      "s4p1": "各注文の収益は、返金期間に加えて 3 日間の処理期間が経過してから出金可能残高に計上されます。これは、学習者が返金申請を行い、その申請を処理するための十分な時間を確保するためです。",
+      "s5Title": "5. 注文が返金された場合",
+      "s5p1": "学習者には常に支払い済み金額の全額が返金されます。講師が返還する額は原因によって異なります。",
+      "s5i1": "<b>デフォルト：</b>講師は、その注文から受け取った収益分のみを返還します（例：1.000.000đ のコースを 37% のオーガニック比率で販売した場合、講師は 370.000đ を返還）。期間内の気が変わった場合、システム障害、二重決済、未登録に適用されます。",
+      "s5i2": "<b>プラットフォーム側の過失：</b>学習者がコースを利用できたものの問題がプラットフォーム側にある場合、講師の収益は差し引かれません。",
+      "s5i3": "<b>講師側の過失：</b>名称が特定され証拠のある違反がある場合にのみ適用されます（第 6 項参照）。講師は<b>注文金額の 100%</b> を返還し（追加の手数料や他の計算式は加算されません）、理由と証拠が記録されます。",
+      "s5p2": "差し引かれる額は講師の収益に記録されます。収益がすでに支払われている場合、講師の残高がマイナスになることがあり、その後の収益で相殺されます。講師には通知が送られ、管理者が判断する前に 48 時間以内に証拠付きで回答できます。",
+      "s6Title": "6. 講師に責任を負わせる基準",
+      "s6p1": "管理者は<b>固定の理由コード</b>を選択し、各コードは 1 つの責任区分にのみ対応します。",
+      "s6i1": "<b>デフォルト区分：</b>期間内の学習者の気が変わった場合や、誰にも過失がないその他の理由。",
+      "s6i2": "<b>プラットフォームが負担：</b>技術的な不具合、二重決済、未登録、プラットフォーム側の過失。",
+      "s6i3": "<b>講師が全額負担：</b>著作権侵害、説明と著しく異なる内容、または禁止されたコンテンツの場合のみ。理由のメモ、明確な証拠が必須で、判断の前に講師へ通知され回答の機会が与えられている（回答済みまたは回答期限切れ）ことが必要です。",
+      "s6p2": "講師には、差し引かれた金額と理由、メモ、証拠が必ず通知されます。「講師が全額負担」の判断については、返金承認から <b>7 日以内に 1 回異議を申し立てる</b>ことができます。管理者は判断を維持するか、デフォルト区分に引き下げます（その場合、超過した差引分は残高に戻されます）。システムは返金率の高いコースについて管理者の確認用に警告を送るだけで、自動的に差引やコースの削除は行いません。",
+      "s7Title": "7. 債務",
+      "s7p1": "差し引かれる額が利用可能残高を超えると、講師の残高がマイナスになり、そのマイナス分が<b>債務</b>となります。新たな収益は保留期間の終了後に自動的に債務と相殺され、債務がある間も講師は通常どおりコースを販売できます。講師は PayOS の QR コードで<b>自主的に返済</b>することもでき（一部または全額）、システムは実際に支払われた金額を記録します。",
+      "s7i1": "<b>発生時：</b>講師に通知が送られ、収益ページに債務とその理由が表示されます。",
+      "s7i2": "<b>30 日を超えて未返済：</b>一時的に新規コースの公開とプロモーションへの登録ができなくなります。",
+      "s7i3": "<b>90 日を超えた場合：</b>コースは新規登録の受付を一時停止します。すでに購入した学習者は通常どおり学習でき、その権利に影響はありません。",
+      "s7i4": "申立てが審査中の間は、上記の制限は一時停止されます。債務が完済されると、すべての制限が解除されます。",
+      "s7i5": "債務がアカウントのロックや違反フラグにつながることはありません。管理者は、理由を記録したうえで債務を免除できます。",
+      "s7p2": "30 日と 90 日の基準は現行の水準であり、調整される場合があり、その際は本ページで更新されます。",
+      "s8Title": "8. 出金と受取口座",
+      "s8i1": "認証済みの講師は、最大 5 つの銀行口座を登録し、そのうち 1 つを受取用の既定口座に設定できます。",
+      "s8i2": "口座の追加、または銀行／口座番号の変更にはメールでの確認が必要です。口座名義のみの変更や既定口座の変更は即時に反映されます。",
+      "s8i3": "最低出金額は 100.000đ です。出金申請にはメールでの確認が必要で、バッチ処理で支払われます（既定では毎月 5 日と 20 日）。",
+      "s8i4": "各出金申請は作成時点の口座を保持するため、後から既定口座を変更しても保留中の申請には影響しません。未承認の申請は別の口座に変更できます（例：銀行のメンテナンス時）。",
+      "s8i5": "送金は確認済みの口座情報のとおりに行われ、その正確性は講師の責任となります。銀行に拒否された場合は、金額が残高に戻され、講師は別の口座を選んで申請をやり直せます。",
+      "s9Title": "9. 振込手数料",
+      "s9p1": "講師の出金時や学習者への返金時に発生する振込手数料は <b>LinguaLearn が負担</b>し、第 1 項と第 2 項でプラットフォームが保持する分にすでに含まれています。この手数料が講師の収益からさらに差し引かれることはなく、出金を申請した金額がそのまま受け取る金額になります。"
+    }
+  },
+  "errors": {
+    "api": {
+      "requestFailed": "リクエストに失敗しました(ステータス {status})",
+      "networkError": "サーバーに接続できません",
+      "uploadCancelled": "アップロードをキャンセルしました",
+      "noRefreshToken": "リフレッシュトークンがありません"
+    },
+    "toast": {
+      "flashcards": {
+        "progressFailed": "復習の進捗を更新できませんでした",
+        "updated": "フラッシュカードを更新しました!",
+        "updateFailed": "フラッシュカードを更新できませんでした",
+        "added": "新しいフラッシュカードを追加しました!",
+        "addFailed": "フラッシュカードを追加できませんでした",
+        "deleted": "フラッシュカードを削除しました!",
+        "deleteFailed": "フラッシュカードを削除できませんでした"
+      },
+      "bundles": {
+        "created": "コースバンドルを作成しました",
+        "createFailed": "コースバンドルを作成できませんでした",
+        "updated": "コースバンドルを更新しました",
+        "updateFailed": "コースバンドルを更新できませんでした",
+        "deleted": "コースバンドルを削除しました。",
+        "archived": "このバンドルには購入者がいるためアーカイブされました。販売を停止して一覧から非表示にしますが、注文履歴は保持されます。",
+        "deleteFailed": "コースバンドルを削除できませんでした。もう一度お試しください。"
+      },
+      "coupons": {
+        "created": "クーポンを作成しました",
+        "createFailed": "クーポンを作成できませんでした。しばらくしてからもう一度お試しください。",
+        "updated": "クーポンを更新しました",
+        "updateFailed": "クーポンを更新できませんでした。しばらくしてからもう一度お試しください。",
+        "deleted": "クーポンを削除しました",
+        "deleteFailed": "クーポンを削除できませんでした。しばらくしてからもう一度お試しください。"
+      },
+      "user": {
+        "profileUpdated": "プロフィールを更新しました",
+        "profileUpdateFailed": "プロフィールを更新できませんでした。しばらくしてからもう一度お試しください。",
+        "avatarUpdated": "プロフィール画像を更新しました",
+        "avatarUploadFailed": "画像をアップロードできませんでした。しばらくしてからもう一度お試しください。",
+        "updateFailed": "更新できませんでした。しばらくしてからもう一度お試しください。"
+      },
+      "cart": {
+        "addFailed": "カートに追加できませんでした。しばらくしてからもう一度お試しください。",
+        "removeFailed": "カートから削除できませんでした。しばらくしてからもう一度お試しください。"
+      },
+      "wishlist": {
+        "addFailed": "お気に入りに追加できませんでした。しばらくしてからもう一度お試しください。",
+        "removeFailed": "お気に入りから削除できませんでした。しばらくしてからもう一度お試しください。"
+      },
+      "instructor": {
+        "upgradeFailed": "アカウントをアップグレードできませんでした。しばらくしてからもう一度お試しください。",
+        "verifyFailed": "確認情報を送信できませんでした。しばらくしてからもう一度お試しください。"
+      },
+      "tutor": {
+        "readFileFailed": "ファイルを読み込めませんでした",
+        "quotaExceeded": "本日の質問回数の上限に達しました。明日またご利用ください。",
+        "noResponse": "AI チューターは現在応答できません。数分後にもう一度お試しください。",
+        "pinFailed": "この会話をピン留めできませんでした。"
+      },
+      "upload": {
+        "failed": "アップロードに失敗しました。しばらくしてからもう一度お試しください。"
+      },
+      "google": {
+        "failed": "Google ログインに失敗しました",
+        "success": "ログインしました!",
+        "error": "ログインエラー: {message}",
+        "generic": "エラーが発生しました"
+      }
+    },
+    "lib": {
+      "materialOfficialUsed": "Official — {count} か所で使用中",
+      "materialOfficialDistributed": "Official — 配布済み",
+      "materialPending": "処理待ち",
+      "materialProcessing": "処理中",
+      "materialFailed": "コンテンツの生成に失敗",
+      "payosFailure": {
+        "TRANSIENT": "銀行/PayOS 側の一時的な障害",
+        "ACCOUNT": "受取口座に問題があります",
+        "UNKNOWN": "原因不明"
+      },
+      "retryAfter": "{time} 以降に再支払い可能",
+      "payosLocked": "PayOS での支払いはロックされました",
+      "fileArchive": "圧縮ファイル",
+      "growth": {
+        "start": "今期から収益が発生しました",
+        "none": "まだ収益がありません",
+        "flat": "収益は前期と変わりません",
+        "up": "収益は前期比 {percent}% 増加",
+        "down": "収益は前期比 {percent}% 減少"
+      }
+    }
+  },
+  "exam": {
+    "history": {
+      "invalidId": "試験 ID が無効です",
+      "title": "試験の受験履歴",
+      "attemptNo": "回",
+      "submittedAt": "提出日",
+      "score": "点数",
+      "correctCount": "正解数",
+      "optionLabel": "{n} 回目 — {score}/10（{correct}/{total} 問）",
+      "back": "← 戻る",
+      "loadError": "履歴の読み込み中にエラーが発生しました",
+      "loading": "履歴を読み込み中...",
+      "empty": "この試験の受験履歴はまだありません。",
+      "loadingDetail": "受験内容の詳細を読み込み中...",
+      "correct": "正解",
+      "wrong": "不正解",
+      "blank": "未回答",
+      "answered": "回答済み",
+      "prevPage": "前のページ",
+      "nextPage": "次のページ",
+      "pageOf": "{page}/{total} ページ",
+      "detailError": "詳細を読み込めません",
+      "pickAttempt": "詳細を見る受験回を選択してください",
+      "matrix": "結果マトリクス",
+      "loadingShort": "読み込み中..."
+    },
+    "page": {
+      "defaultTitle": "テスト",
+      "videoUploadWarn": "監督動画を保存できませんでした（試験の点数には影響しません）",
+      "aiError": "AI の呼び出しでエラーが発生しました。もう一度お試しください。",
+      "aiExplainError": "AI の解説を取得中にエラーが発生しました。",
+      "archivedSaved": "提出内容は成績表に保存されました。この試験は講師によりアーカイブされました。",
+      "revoked": "この演習は講師により取り下げられました。",
+      "removedEnded": "この演習は講師により削除または更新されました。受験セッションは終了しました。",
+      "submitError": "提出中にエラーが発生しました。もう一度お試しください。",
+      "violationExceeded": "違反が {max} 回を超えました。システムが自動的に提出します！",
+      "violationWarn": "違反の警告（{count}/{max}）：{reason}",
+      "violationAiWarn": "AI Vision の警告（{count}/{max}）：カメラの異常",
+      "vTabSwitch": "タブの切り替えまたはブラウザの最小化",
+      "vWindowBlur": "別のウィンドウ／アプリへの切り替え",
+      "vFullscreenExit": "全画面モードの終了",
+      "vCopyPaste": "コピー／貼り付けまたは右クリックメニューの操作",
+      "vDevtools": "DevTools が開いていることを検出",
+      "vIdle": "長時間操作がありません",
+      "vAudio": "異常に長い音声を検出",
+      "screenShareSkipped": "画面共有をスキップしました。試験は続行されますが、後で確認できる証拠動画は残りません。",
+      "permissionDenied": "この試験を受けるには、カメラとマイクの使用を許可する必要があります！",
+      "startedProctored": "受験を開始しました。タブを切り替えないでください！",
+      "started": "受験を開始しました！",
+      "removedToast": "この演習は講師により削除または更新されました。",
+      "loadQuizError": "試験を読み込めません。",
+      "timeUp": "⏱ 時間切れです！試験は自動的に提出されました。",
+      "elapsedMinSec": "{m} 分 {s} 秒",
+      "elapsedSec": "{s} 秒",
+      "resultPassed": "素晴らしい！試験を完了しました",
+      "resultSubmitted": "試験を提出しました",
+      "statCorrect": "正解",
+      "statWrong": "不正解",
+      "statTotal": "全問題数",
+      "statTime": "所要時間",
+      "submittedAt": "📅 提出日時：{time}",
+      "backToCourse": "コースに戻る",
+      "backToHistory": "試験履歴に戻る",
+      "detailsTitle": "受験内容の詳細（ソクラテス式チューター）",
+      "questionN": "問題 {n}",
+      "correctMark": "正解 ✓",
+      "wrongMark": "不正解 ✕",
+      "recorded": "記録済み",
+      "blank": "未回答",
+      "topic": "トピック：{topic}",
+      "youChose": "（あなたの選択）",
+      "correctAnswer": "（正解）",
+      "askTutor": "なぜ間違いか AI チューターに聞く",
+      "reviewTheory": "理論を復習する ↗",
+      "tutorExplains": "AI チューターの解説：",
+      "thinking": "考え中...",
+      "prevPage": "前のページ",
+      "nextPage": "次のページ",
+      "pageOf": "{page}/{total} ページ",
+      "myCourses": "マイコース",
+      "quizType": "選択式テスト",
+      "quizTypeProctored": "選択式テスト - カメラ監督あり",
+      "opensAt": "開始：",
+      "closesAt": "終了：",
+      "unlimited": "無制限",
+      "questionCountLabel": "問題数：",
+      "questionCountValue": "{count} 問",
+      "durationLabel": "制限時間：",
+      "durationValue": "{n} 分",
+      "attemptsLabel": "受験回数：",
+      "attemptsValue": "{n} 回",
+      "proctoredNote": "このテストを受けるには、AI が監督できるようカメラをオンにする必要があります。タブの切り替えや画面から離れることは禁止です。",
+      "officialScore": "あなたの公式スコア",
+      "officialNote": "システムは、受験した中で最も高い点数を記録します。",
+      "scorePoints": "{score} 点（10 点満点）",
+      "previousTitle": "これまでの受験の概要",
+      "colAttempt": "受験回",
+      "colStatus": "ステータス",
+      "colResult": "結果",
+      "colReview": "見直し",
+      "noAttempts": "この試験の受験履歴はまだありません。",
+      "done": "完了",
+      "submittedOn": "{time} に提出",
+      "questionsUnit": "問",
+      "scoreOnly": "点数のみ",
+      "noReviewTitle": "この試験では解答の見直しはできません",
+      "viewDetails": "詳細を見る",
+      "preparing": "準備中...",
+      "continueAttempt": "受験を続ける",
+      "notOpen": "試験はまだ開始されていません。後ほどお戻りください。",
+      "closed": "試験は終了しました。これ以上受験できません。",
+      "archivedQuiz": "この試験は講師により取り下げまたは削除されました。",
+      "archivedHistoryOnly": "受験履歴のみ確認できます。",
+      "noAttemptsLeft": "受験回数の上限に達しました（{done}/{max}）",
+      "startNew": "新しく受験を開始",
+      "startWithCamera": "カメラをオンにして試験を開始",
+      "loadingModel": "AI モデルを読み込み中...",
+      "completeAll": "提出前にすべての問題に回答してください",
+      "submittingWait": "提出中です。しばらくお待ちください...",
+      "roomProctored": "オンライン試験会場（監督あり）",
+      "roomPlain": "選択式試験",
+      "quizCode": "試験コード：{id}",
+      "violationLabel": "違反の警告",
+      "confirmTitle": "提出の確認",
+      "answered": "回答済み：<b>{done}/{total}</b> 問",
+      "answeredMark": "✅ 回答済み",
+      "unansweredMark": "❌ 未回答",
+      "prev": "前へ",
+      "next": "次へ",
+      "submitting": "提出中...",
+      "confirmSubmit": "提出を確定",
+      "backToExam": "試験に戻る",
+      "questionHeading": "問題 {n}",
+      "flagForReview": "見直し用にマーク",
+      "multipleHint": "（複数選択可）",
+      "faceDetecting": "顔をスキャン中...",
+      "faceOk": "AI 監督カメラ（正常）",
+      "faceNone": "警告：顔が検出されません",
+      "faceMultiple": "警告：複数の顔を検出",
+      "faceTurned": "警告：顔の向き／画面の外を見ています",
+      "submitExam": "試験を提出",
+      "unavailableTitle": "試験は利用できなくなりました",
+      "scoreShort": "{score} 点"
+    }
+  },
+  "live": {
+    "picker": {
+      "noneLabel": "元の音声",
+      "chooseOther": "← 別の言語を選ぶ",
+      "chooseVoice": "<b>{language}</b> の音声を選んでください。あなたがこの言語を最初に選んだため、この音声は以降の視聴者全員で共有されます。",
+      "searchPlaceholder": "言語を検索…",
+      "noLanguage": "言語が見つかりません",
+      "sourceTitle": "講師がこの言語で話しています — 翻訳するものはありません",
+      "source": "(原語)",
+      "delayHint": "吹き替え音声は映像より数秒遅れることがあります。"
+    },
+    "feedCard": {
+      "upcoming": "まもなく開始"
+    },
+    "chat": {
+      "title": "ライブチャット",
+      "empty": "メッセージはまだありません。",
+      "instructor": "講師",
+      "anonymous": "匿名",
+      "hideTitle": "このメッセージを非表示",
+      "hide": "非表示",
+      "placeholder": "メッセージを入力…",
+      "loginPlaceholder": "チャットするにはログイン",
+      "send": "送信",
+      "loginAction": "ライブ中にメッセージを送信"
+    },
+    "requireLogin": {
+      "title": "ログインが必要です",
+      "body": "{action}にはログインが必要です。ライブの視聴にはログインは不要です。",
+      "login": "ログイン",
+      "register": "新規アカウント登録",
+      "later": "後で"
+    },
+    "banner": {
+      "liveNow": "ライブ中: ",
+      "upcoming": "まもなくライブ: ",
+      "scheduled": "予定 {time}",
+      "watch": "今すぐ視聴 →"
+    }
+  },
+  "disputes": {
+    "page": {
+      "statusOpen": "未対応",
+      "statusRefunded": "返金済み",
+      "statusRejected": "却下",
+      "statusReopened": "再対応待ち",
+      "badgePending": "承認済み · 振込待ち",
+      "badgeAwaitingAccount": "口座情報の更新が必要",
+      "catChangedMind": "気が変わった／コースが合わなかった",
+      "catContentMismatch": "内容が説明と異なる",
+      "catTechnicalError": "技術的な不具合（受講できないなど）",
+      "catDoubleCharge": "二重に課金された",
+      "catNotEnrolled": "課金されたが登録されていない",
+      "catOther": "その他の理由",
+      "filterAll": "すべて",
+      "filterProcessing": "対応中",
+      "filterAwaiting": "振込待ち",
+      "filterRefunded": "返金済み",
+      "filterRejected": "却下",
+      "loadError": "取引データを読み込めませんでした。",
+      "pickBank": "返金を受け取る銀行を選択してください。",
+      "accountDigits": "口座番号は数字のみ（6〜20 桁）で入力してください。",
+      "accountMismatch": "2 回入力した口座番号が一致しません。",
+      "holderRequired": "口座名義人を入力してください。",
+      "ownRequired": "ご自身の口座であることを確認する必要があります。",
+      "reopenSuccess": "再審査のリクエストを送信しました。サポートチームができるだけ早く対応します。",
+      "reopenError": "リクエストを送信できませんでした。もう一度お試しください。",
+      "maxFiles": "添付できる証拠ファイルは最大 {max} 件です。",
+      "submitSuccess": "申立てを送信しました。対応完了後にメールでご連絡します。",
+      "submitError": "申立てを送信できませんでした。もう一度お試しください。",
+      "loading": "読み込み中...",
+      "title": "返金リクエスト／取引の申立て",
+      "intro": "該当する取引を選び、問題を説明し、あれば証拠を添付してください。送信前に<link>返金ポリシー</link>をお読みください。",
+      "tabsLabel": "返金リクエストのエリア",
+      "tabCreate": "新しいリクエストを作成",
+      "tabMine": "自分のリクエスト",
+      "needsAction": "{count} 件要対応",
+      "pickTitle": "新しいリクエストを作成 — 取引を選択",
+      "pickDesc": "支払いが完了した取引のみ表示されます。取引を選んでリクエスト内容を入力してください。",
+      "paySearchPlaceholder": "コース名または取引コードで検索",
+      "paySearchLabel": "取引を検索",
+      "noPayMatch": "キーワードに一致する取引はありません。",
+      "noPaid": "申立ての対象となる支払い完了済みの取引がありません。",
+      "txnLine": "取引コード：{ref} · {amount}đ",
+      "alreadyDisputed": "対応待ちの申立てがあります",
+      "changeTxn": "取引を変更",
+      "categoryLabel": "問題の種類 *",
+      "categoryNote": "返金はポリシーに基づく期間と学習進捗の範囲内で適用され、技術的な不具合は別途審査されます。コースの講師に通知され、判断前に回答できます。",
+      "reasonLabel": "理由 *",
+      "reasonPlaceholder": "例：課金されたがコースに登録できない",
+      "descriptionLabel": "詳細な説明",
+      "accountLegend": "返金受取口座（入力を推奨）",
+      "accountWarning": "返金はお客様が入力した情報のとおりに振り込まれます。慎重に入力してください。口座番号が誤っていても実在する口座であれば、他の人に送金され回収が困難になります。この手順で入力しない場合は、入金前にサポートへ連絡して追加する必要があります。",
+      "bankLabel": "銀行",
+      "bankPlaceholder": "銀行を選択",
+      "accountNumber": "口座番号",
+      "accountNumberAgain": "口座番号（再入力）",
+      "accountHolder": "口座名義人",
+      "ownConfirm": "これは自分自身の口座であり、情報は正しく、その正確性に責任を負うことを確認します。",
+      "evidenceLabel": "証拠（写真／動画、最大 {max} ファイル）",
+      "termsText": "上記の申告内容が事実であることを確認し、<link>返金ポリシー</link>に同意します。",
+      "submitting": "送信中...",
+      "submit": "申立てを送信",
+      "mineDesc": "作成した返金リクエストの状況を確認できます。",
+      "disputeSearchPlaceholder": "コース、取引コード、または理由で検索",
+      "disputeSearchLabel": "リクエストを検索",
+      "filterByStatus": "ステータスで絞り込み",
+      "noneYet": "リクエストはまだありません。<button>新しいリクエストを作成</button>",
+      "noDisputeMatch": "フィルターに一致するリクエストはありません。",
+      "disputeLine": "取引コード：{ref} — {reason}",
+      "categoryLine": "問題の種類：{category}",
+      "instructorAgreed": "講師は返金に同意しました。",
+      "instructorObjected": "講師が回答を送信しました。",
+      "awaitingSupport": "サポートチームによる確認と判断を待っています。",
+      "approvedNote": "返金リクエストは承認され、コースへのアクセス権は取り消されました。システムが申告された口座に返金を行い、完了時にメール／通知でお知らせします。",
+      "transferredTo": "返金は口座 {account} に振り込まれました。まだ受け取っていない場合は、下記からご連絡ください。",
+      "transferredToDefault": "返金は登録済みの口座に振り込まれました。まだ受け取っていない場合は、下記からご連絡ください。",
+      "supportReply": "サポートチームからの回答",
+      "notReceived": "まだ入金されていません",
+      "reopenPrompt": "もう少し詳しく説明してください（例：銀行、確認した日時）",
+      "sendReopen": "再審査をリクエスト",
+      "cancel": "キャンセル"
+    }
+  },
+  "learnPage": {
+    "lockedNotice": "{feature}は、コースを所有している学習者のみ利用できます。",
+    "buyNow": "今すぐコースを購入",
+    "featureTutor": "AI チューター",
+    "featurePath": "パーソナライズ学習ロードマップ",
+    "featureQna": "レッスン Q&A",
+    "featureMaterials": "教材",
+    "stageAsr": "音声を抽出中（STT）",
+    "stageTranslate": "内容を翻訳中",
+    "stageTts": "音声を合成中",
+    "stageUploading": "このセグメントのファイルを保存中",
+    "stepPrepare": "元の音声をダウンロード・解析中",
+    "stepFinalize": "最終ファイルを結合・保存中",
+    "chunkWaiting": "セグメント {n}/{total} — 処理待ち",
+    "chunkStage": "セグメント {n}/{total} — {stage}",
+    "chunkPlain": "セグメント {n}/{total}",
+    "dubCancelled": "リクエストに従って吹き替えをキャンセルしました。",
+    "dubSkipped": "このレッスンには吹き替え対象の音声がありません。",
+    "dubFailed": "吹き替えに失敗しました。しばらくしてからもう一度お試しください。",
+    "dubCancelError": "吹き替えをキャンセルできませんでした。もう一度お試しください。",
+    "resumeError": "再生権を取り戻せませんでした。",
+    "loadingLesson": "レッスンを読み込み中...",
+    "lessonNotFound": "レッスンが見つからないか、コースを所有していないと視聴できません。",
+    "backToCourses": "← コース一覧に戻る",
+    "selectedLanguage": "選択した言語",
+    "nextLesson": "次のレッスンに移動中…",
+    "activateError": "吹き替えを有効にできませんでした。もう一度お試しください。",
+    "switching": "レッスンを切り替え中...",
+    "studentFallback": "学習者",
+    "gradebookOwner": "成績表は学習者専用です。",
+    "viewClassGradebook": "クラスの成績表を見る",
+    "deviceTitle": "別のデバイスが検出されました",
+    "deviceDesc": "お使いのアカウントが別のデバイスで動画を再生しているため、動画を一時停止しました。",
+    "deviceResume": "ここで再生を続ける",
+    "loadingUi": "画面を読み込み中..."
+  },
+  "instructorChat": {
+    "toggleClose": "AI 講師アシスタントを閉じる",
+    "toggleOpen": "AI 講師アシスタントを開く",
+    "title": "AI 講師アシスタント",
+    "heading": "AI 講師アシスタント",
+    "ready": "コースの分析をサポートします",
+    "close": "アシスタントを閉じる",
+    "welcome": "こんにちは!学習者データの分析、レビューの確認、コース改善の提案をお手伝いできます。どのようなサポートが必要ですか?",
+    "revenue": "収益:",
+    "avgRating": "平均評価:",
+    "positive": "ポジティブ: {count}",
+    "negative": "ネガティブ: {count}",
+    "placeholder": "アシスタントに質問(例: 今月の収益は?)...",
+    "maxLength": "1 メッセージあたり {max} 文字の上限に達しました。",
+    "noReply": "応答がありません。",
+    "connectionError": "申し訳ありません。AI への接続に問題が発生しています。確認してもう一度お試しください。"
+  },
+  "promotionPanel": {
+    "submitted": "申請を送信しました。管理者が確認して連絡します。",
+    "submitError": "申請を送信できませんでした。",
+    "cancelled": "申請をキャンセルしました。",
+    "cancelError": "申請をキャンセルできませんでした。",
+    "title": "プラットフォームのプロモーション",
+    "intro": "登録すると、一定期間、ホームページの「おすすめ」欄であなたのコースが紹介されます。無料・任意で、管理者が承認します。",
+    "course": "コース",
+    "pickCourse": "公開済みのコースを選択",
+    "searchCourse": "コースを検索...",
+    "placement": "掲載位置",
+    "note": "メモ(任意)",
+    "sending": "送信中...",
+    "submit": "プロモーション申請を送信",
+    "loading": "読み込み中...",
+    "empty": "プロモーション申請はまだありません。",
+    "running": "実施中",
+    "adminNote": "管理者: {note}",
+    "effect": "効果の目安: 実施期間中は {ordersDuring} 件({revenueDuring})、直前の同じ長さの期間は {ordersBefore} 件({revenueBefore})でした。",
+    "withdraw": "プロモーションを取り下げる",
+    "cancel": "申請をキャンセル",
+    "status": {
+      "REQUESTED": "承認待ち",
+      "APPROVED": "承認済み",
+      "REJECTED": "却下",
+      "CANCELLED": "キャンセル済み",
+      "ENDED": "終了"
+    },
+    "placements": {
+      "HOME_FEATURED": "ホームの「おすすめ」欄",
+      "CATEGORY_FEATURED": "カテゴリページの上部"
+    }
+  },
+  "messaging": {
+    "inbox": {
+      "conversations": "会話",
+      "searchPlaceholder": "名前・内容で検索...",
+      "sort": "並べ替え",
+      "newest": "新しい順",
+      "oldest": "古い順",
+      "loading": "読み込み中...",
+      "noMatch": "一致する会話が見つかりません。",
+      "empty": "会話はまだありません。",
+      "pickOne": "会話を選択してメッセージを表示",
+      "back": "会話リストに戻る",
+      "messagePlaceholder": "メッセージを入力..."
+    }
+  },
+  "refundAccount": {
+    "pickBank": "銀行を選択してください。",
+    "digitsOnly": "口座番号は数字のみ(6〜20 桁)で入力してください。",
+    "mismatch": "口座番号が一致しません。",
+    "needHolder": "口座名義人を入力してください。",
+    "needOwn": "ご自身の口座であることを確認してください。",
+    "updated": "返金先口座を更新しました。",
+    "updateError": "口座を更新できませんでした。",
+    "declared": "登録中の口座: {summary}",
+    "change": "返金先口座を変更",
+    "bank": "銀行",
+    "chooseBank": "銀行を選択",
+    "number": "口座番号",
+    "numberAgain": "口座番号を再入力",
+    "holder": "口座名義人",
+    "own": "これは自分自身の口座であり、上記の情報は正確であることを確認します。",
+    "saving": "保存中...",
+    "save": "口座を保存",
+    "cancel": "キャンセル",
+    "help": "サポートが必要ですか?サポートリクエストを送信"
+  },
+  "discovery": {
+    "chat": {
+      "maxLength": "1 メッセージあたり {max} 文字の上限に達しました。",
+      "noReply": "応答がありません。",
+      "connectionError": "申し訳ありません。AI への接続に問題が発生しています。確認してもう一度お試しください。",
+      "toggleClose": "コース検索アシスタントを閉じる",
+      "toggleOpen": "コース検索アシスタントを開く",
+      "subtitle": "自然な言葉でコースを検索",
+      "welcome": "こんにちは!AI アシスタントです。今日はどんなコースをお探しですか?",
+      "allLevels": "すべてのレベル",
+      "placeholder": "例: 初心者向けの IT コース..."
+    }
+  },
+  "shareDialog": {
+    "copyFailed": "ブラウザが自動コピーを許可していません。リンクを選択して手動でコピーしてください。",
+    "title": "コースを共有",
+    "referral": "このリンクにはあなた専用の紹介コードが含まれています。ここから購入した学習者は紹介としてカウントされます。",
+    "linkAria": "コースのリンク",
+    "copyTitle": "リンクをコピー",
+    "copied": "コピーしました",
+    "copy": "コピー",
+    "qrTitle": "QR コードを表示してスマートフォンで読み取る",
+    "hideQr": "QR コードを隠す",
+    "showQr": "QR コード",
+    "qrOf": "{title} の QR コード",
+    "nativeTitle": "デバイスのアプリで共有",
+    "share": "共有",
+    "via": "{channel} で共有"
   }
 }

@@ -4,6 +4,7 @@
 import { Modal } from '@/components/ui/Modal';
 
 import { useRef, useState, type ChangeEvent } from 'react';
+import { useTranslations } from 'next-intl';
 import { useUpdateProfile, useUploadAvatar } from '@/hooks/useCurrentUser';
 import type { User } from '@/types/domain';
 
@@ -20,6 +21,7 @@ interface EditProfileModalProps {
  * avatar là 1 hành động độc lập, tách khỏi form họ tên/ngôn ngữ bên dưới.
  */
 export default function EditProfileModal({ user, onClose, onSuccess }: EditProfileModalProps) {
+  const t = useTranslations('pages.editProfile');
   const [fullName, setFullName] = useState(user.fullName);
   const [preferredLanguage, setPreferredLanguage] = useState(user.preferredLanguage || 'vi');
   const [error, setError] = useState('');
@@ -42,12 +44,12 @@ export default function EditProfileModal({ user, onClose, onSuccess }: EditProfi
       await updateProfile.mutateAsync({ fullName, preferredLanguage });
       onSuccess();
     } catch {
-      setError('Có lỗi xảy ra, vui lòng thử lại.');
+      setError(t('error'));
     }
   };
 
   return (
-    <Modal open onClose={onClose} title="Chỉnh sửa hồ sơ" closeOnBackdrop={false}>
+    <Modal open onClose={onClose} title={t('title')} closeOnBackdrop={false}>
 
         <div className="mb-5 flex items-center gap-4">
           <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full bg-accent/10 font-display text-2xl font-bold text-accent-dark">
@@ -71,15 +73,15 @@ export default function EditProfileModal({ user, onClose, onSuccess }: EditProfi
               disabled={uploadAvatar.isPending}
               className="rounded-lg border border-line px-3 py-1.5 text-sm font-semibold text-ink hover:border-accent hover:text-accent disabled:opacity-50"
             >
-              {uploadAvatar.isPending ? 'Đang tải lên...' : 'Đổi ảnh đại diện'}
+              {uploadAvatar.isPending ? t('uploading') : t('changeAvatar')}
             </button>
-            <p className="mt-1 text-xs text-ink-faint">JPEG/PNG/WEBP, tối đa 5MB</p>
+            <p className="mt-1 text-xs text-ink-faint">{t('avatarHint')}</p>
           </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-ink-muted mb-1">Họ tên</label>
+            <label className="block text-sm font-medium text-ink-muted mb-1">{t('fullName')}</label>
             <input
               type="text"
               value={fullName}
@@ -89,7 +91,7 @@ export default function EditProfileModal({ user, onClose, onSuccess }: EditProfi
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-ink-muted mb-1">Ngôn ngữ ưa thích</label>
+            <label className="block text-sm font-medium text-ink-muted mb-1">{t('language')}</label>
             <select
               value={preferredLanguage}
               onChange={(e) => setPreferredLanguage(e.target.value)}
@@ -107,14 +109,14 @@ export default function EditProfileModal({ user, onClose, onSuccess }: EditProfi
               disabled={updateProfile.isPending}
               className="flex-1 bg-accent text-white py-2 rounded-lg hover:bg-accent-dark disabled:opacity-50 font-semibold transition-colors"
             >
-              {updateProfile.isPending ? 'Đang lưu...' : 'Lưu'}
+              {updateProfile.isPending ? t('saving') : t('save')}
             </button>
             <button
               type="button"
               onClick={onClose}
               className="flex-1 bg-tint text-ink py-2 rounded-lg hover:bg-line font-semibold transition-colors"
             >
-              Đóng
+              {t('close')}
             </button>
           </div>
         </form>

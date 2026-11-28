@@ -88,7 +88,16 @@
       "light": "浅色"
     },
     "skipToContent": "跳到主要内容",
-    "help": "Help & Support"
+    "help": "Help & Support",
+    "streak": {
+      "congrats": "🔥 恭喜!您的连续学习天数已达 {days} 天!",
+      "frozen": "🧊 您错过了一天——系统已自动“冻结”以保住您 {days} 天的连续记录!本月还剩 {remaining} 次冻结机会。",
+      "title": "连续 {days} 天",
+      "record": "最长纪录:{days} 天",
+      "doneToday": "您已完成今天的目标!",
+      "keepGoing": "学习 1 节课或完成 1 个测验即可保持连续记录!",
+      "freezes": "🧊 本月还剩 {remaining} 次连续记录冻结(漏学 1 天时自动使用)"
+    }
   },
   "footer": {
     "tagline": "学术级在线学习与考试管理系统。",
@@ -431,6 +440,450 @@
         "chapter": "章节 {chapter} 的主要内容是什么？"
       },
       "aiGenerated": "AI 根据课程内容生成"
+    },
+    "player": {
+      "posterLabel": "课程视频画面",
+      "playVideo": "播放视频",
+      "dubPending": "此片段正在配音 — 暂时播放原声",
+      "dubRemaining": "正在处理剩余部分",
+      "youtubeSubHint": "YouTube 字幕(课程暂无文字稿)",
+      "noOriginalSub": "(暂无原文字幕)",
+      "noTranslatedSub": "(暂无翻译字幕)",
+      "controls": {
+        "auto": "自动",
+        "pause": "暂停",
+        "play": "播放",
+        "back5": "后退 5 秒",
+        "forward5": "快进 5 秒",
+        "unmute": "取消静音",
+        "mute": "静音",
+        "volume": "音量",
+        "originalSub": "原文字幕",
+        "noOriginalSub": "本课暂无原文字幕",
+        "original": "原文",
+        "translatedSub": "翻译字幕",
+        "noTranslatedSub": "所选语言暂无翻译字幕",
+        "translated": "翻译",
+        "transcript": "文字稿 (Transcript)",
+        "settings": "设置",
+        "videoQuality": "视频画质",
+        "autoNext": "自动播放下一课",
+        "subtitleStyle": "字幕样式",
+        "shortcuts": "键盘快捷键",
+        "exitFullscreen": "退出全屏",
+        "fullscreen": "全屏"
+      },
+      "subtitle": {
+        "pickColor": "自选颜色",
+        "close": "关闭",
+        "title": "字幕样式",
+        "tabOriginal": "原文字幕",
+        "tabTranslated": "翻译字幕",
+        "fontSize": "字号",
+        "textColor": "文字颜色",
+        "bgColor": "背景颜色",
+        "bgOpacity": "背景不透明度",
+        "transparent": "透明",
+        "outline": "文字描边(在亮色背景上更易读)",
+        "presets": "预设样式(可连续叠加多个)",
+        "preview": "预览",
+        "sampleOriginal": "这是原文字幕",
+        "sampleTranslated": "这是翻译字幕",
+        "editPosition": "调整字幕在视频上的位置",
+        "presetDefault": "默认",
+        "presetBlackBg": "黑色背景",
+        "presetYellow": "黄色文字",
+        "presetOutline": "文字描边",
+        "presetMinimal": "极简(无背景)"
+      },
+      "shortcuts": {
+        "playPause": "播放 / 暂停",
+        "slower": "降低播放速度",
+        "faster": "提高播放速度",
+        "fullscreen": "全屏",
+        "exitFullscreen": "退出全屏",
+        "back5": "后退 5 秒",
+        "forward5": "快进 5 秒",
+        "volumeUp": "增大音量",
+        "volumeDown": "减小音量",
+        "mute": "静音 / 取消静音",
+        "close": "关闭",
+        "title": "键盘快捷键"
+      },
+      "activate": {
+        "quotaExceeded": "您今天的配音请求次数已达上限。请明天再来,或选择已有配音的语言。",
+        "noTrack": "语言 <b>{language}</b> 暂无 AI 配音。",
+        "submitting": "发送中…",
+        "activate": "启用 AI 配音",
+        "later": "稍后再说"
+      },
+      "pipeline": {
+        "heading": "正在处理 AI 配音",
+        "aria": "配音进度",
+        "failedNote": " — 此片段保留原声",
+        "hide": "隐藏进度,观看视频",
+        "cancelling": "正在取消...",
+        "cancel": "取消配音"
+      },
+      "transcript": {
+        "autoScroll": "随台词自动滚动",
+        "empty": "本课暂无文字稿。"
+      },
+      "positionEditor": {
+        "hint": "将字幕拖放到所需位置",
+        "reset": "恢复默认",
+        "done": "完成"
+      },
+      "voice": {
+        "default": "默认",
+        "choose": "选择声音",
+        "female": "女声",
+        "male": "男声"
+      }
+    },
+    "tutor": {
+      "pinned": "已置顶",
+      "options": "选项",
+      "optionsAria": "对话选项",
+      "unpin": "取消置顶",
+      "pin": "置顶",
+      "rename": "重命名",
+      "delete": "删除",
+      "maxAttachments": "每次提问最多附加 {max} 个文件。",
+      "oversized": "文件“{name}”超过 {max}MB。",
+      "deleteFailed": "无法删除此对话。",
+      "title": "苏格拉底式 AI 导师",
+      "subtitle": "询问课程内容,不直接给出答案",
+      "newChat": "新对话",
+      "newChatAria": "开始新对话",
+      "history": "对话历史",
+      "historyAria": "查看对话历史",
+      "searchPlaceholder": "搜索对话…",
+      "searchAria": "搜索对话",
+      "noHistory": "暂无历史对话",
+      "noMatch": "未找到匹配的对话",
+      "dropFiles": "将文件拖放到此处进行附加",
+      "restoring": "正在重新加载对话…",
+      "greeting": "你好!关于本课(或课程中的其他课程)的任何问题都可以问我——我会给你提示,让你自己找到答案,而不是直接给出答案。",
+      "removeAttachment": "移除附件 {name}",
+      "attach": "附加文件",
+      "inputPlaceholder": "询问课程内容..."
+    },
+    "studyPlan": {
+      "createdToast": "学习计划创建成功!",
+      "createError": "创建计划时出错。",
+      "deletedToast": "学习计划已删除!",
+      "deleteError": "删除计划时出错。",
+      "updatedToast": "进度更新成功!",
+      "genericError": "出错了。",
+      "icsObjective": "目标:{objective}",
+      "icsLessons": "课程:",
+      "icsLessonLine": "- {title}({minutes} 分钟)",
+      "icsSummary": "LMS 学习 - {title}...",
+      "icsDefaultLesson": "课程",
+      "exportError": "导出日历文件失败",
+      "loading": "加载中...",
+      "title": "AI 学习计划(个性化)",
+      "subtitle": "由 AI 根据您的进度和目标自动安排。",
+      "exportIcs": "导出日历 (.ics)",
+      "updateProgress": "更新进度",
+      "adjust": "调整计划",
+      "createNow": "立即创建计划",
+      "deleteTitle": "删除计划",
+      "behindTitle": "您的进度已落后!",
+      "behindBody": "您有一些过去的课程尚未完成。请点击<b>更新进度</b>,系统会自动将未学课程移到剩余日程中。",
+      "emptyTitle": "暂无学习计划",
+      "emptyBody": "设置目标完成日期,AI 将生成每日详细学习计划,帮助您轻松跟踪进度。",
+      "startConfig": "开始配置",
+      "targetLabel": "目标完成日期:",
+      "commitLabel": "学习承诺:",
+      "hoursPerWeek": "{hours} 小时 / 周",
+      "minutes": "{minutes} 分钟",
+      "noVideo": "无视频",
+      "configTitle": "配置 AI 学习计划",
+      "expectedDate": "预计完成日期",
+      "expectedDateHint": "学习计划将从今天到该日期平均分配。",
+      "weeklyHours": "学习时间(小时 / 周)",
+      "weeklyHoursHint": "AI 的安排不会超过此上限。",
+      "catchUpTitle": "赶上进度的建议:",
+      "catchUpBody": "由于积压的课程较多,您可能需要<b>增加每周学习时长</b>或<b>推迟完成日期</b>,让计划更可行。",
+      "cancel": "取消",
+      "analyzing": "分析中...",
+      "createPlan": "创建计划",
+      "deleteConfirmTitle": "删除当前计划?",
+      "deleteConfirmBody": "确定要删除此计划吗?您需要重新配置。",
+      "cancelShort": "取消",
+      "deleting": "删除中...",
+      "deletePlan": "删除计划",
+      "remaining": "剩余:",
+      "remainingValue": "{lessons} 节课({minutes} 分钟)",
+      "dueLabel": "截止:",
+      "dueValue": "{date}({days} 天)",
+      "requiredPace": "所需进度:",
+      "paceValue": "约 {minutes} 分钟 / 天",
+      "pickNewDate": "选择新的完成日期",
+      "tooHeavy": "课程量过大。请推迟截止日期以减轻负担。",
+      "deadlinePassed": "截止日期已过或无效。您必须选择新的日期。",
+      "updating": "更新中...",
+      "confirmUpdate": "确认更新"
+    },
+    "materialManager": {
+      "pickLanguage": "请选择语言",
+      "requestSent": "已发送学习资料生成请求。AI 正在处理!",
+      "createError": "创建学习资料时出错",
+      "renamed": "学习资料名称已更新",
+      "renameError": "更新名称时出错",
+      "deleted": "学习资料已删除",
+      "deleteError": "删除学习资料时出错",
+      "untitled": "未命名学习资料",
+      "createTitle": "创建新的 AI 学习资料",
+      "type": "资料类型",
+      "typeMindmap": "思维导图 (Mindmap)",
+      "typeQuiz": "选择题 (Quiz)",
+      "scope": "范围",
+      "scopeWhole": "整个课程",
+      "scopeChapter": "按章节",
+      "scopeCustom": "自选课程",
+      "language": "语言",
+      "sourceNote": "学习资料将根据以下已配音的视频生成:",
+      "pickChapter": "选择章节",
+      "availableVideos": "本章可用的视频:",
+      "tickLessons": "勾选课程",
+      "sending": "发送中...",
+      "create": "创建学习资料",
+      "historyTitle": "个人创建记录",
+      "filterAll": "全部",
+      "filterMindmap": "思维导图",
+      "filterQuiz": "选择题",
+      "sortNewest": "最新",
+      "sortOldest": "最早",
+      "sortName": "名称 A-Z",
+      "refresh": "刷新",
+      "loading": "加载中...",
+      "enterToSave": "按 Enter 保存",
+      "clickToRename": "点击重命名",
+      "rename": "重命名",
+      "badgeMindmap": "思维导图",
+      "badgeFlashcard": "闪卡",
+      "badgeQuiz": "选择题",
+      "status": "状态:",
+      "statusDone": "已完成",
+      "statusFailed": "失败",
+      "statusStale": "等待时间较长",
+      "statusProcessing": "处理中",
+      "deleteTitle": "删除学习资料",
+      "noFilterMatch": "没有符合筛选条件的学习资料。",
+      "noPersonal": "尚未创建任何个人学习资料。",
+      "courseMaterial": "课程学习资料",
+      "officialExam": "正式考试",
+      "notOpen": "未开放",
+      "closed": "已关闭",
+      "noAttempts": "次数已用完",
+      "duration": "时长:",
+      "durationValue": "{minutes} 分钟",
+      "unlimited": "不限",
+      "questionCount": "题数:",
+      "attempts": "考试次数:",
+      "opensAt": "开放时间:",
+      "tabOfficial": "官方学习资料库",
+      "tabPersonal": "个人学习资料库",
+      "listTitle": "学习资料与考试列表",
+      "reference": "参考资料",
+      "uploadedAt": "上传时间:{date}",
+      "noOfficial": "暂无官方学习资料",
+      "noOfficialLesson": "本课暂无附加学习资料。",
+      "noOfficialCourse": "讲师尚未为本课程发布任何学习资料。"
+    },
+    "messageInstructor": {
+      "title": "联系讲师",
+      "close": "关闭",
+      "loading": "加载中...",
+      "empty": "暂无消息——发送您的第一个问题吧!",
+      "scrollDown": "滚动到最新消息",
+      "placeholder": "输入消息...",
+      "send": "发送"
+    },
+    "mindmapEditor": {
+      "newBranch": "新分支",
+      "addChild": "添加子分支 (Tab)",
+      "addSibling": "添加同级分支 (Enter)",
+      "undo": "撤销 (Ctrl+Z)",
+      "redo": "重做 (Ctrl+Y)",
+      "enterContent": "输入内容",
+      "cancel": "取消",
+      "update": "更新",
+      "hidePanel": "隐藏控制面板",
+      "showPanel": "显示控制面板",
+      "shapeRect": "方形",
+      "shapeRounded": "圆角",
+      "shapeCircle": "圆形",
+      "fillColor": "填充颜色 (Fill)",
+      "resetDefault": "恢复默认",
+      "textLabel": "文本 (Text)",
+      "bold": "加粗",
+      "italic": "斜体",
+      "syncNote": "点击“Save & Apply”后,自定义设置将被同步",
+      "pickNodeHint": "请在导图上点击选择某个节点,以自定义其形状、字体、背景色和文字颜色。"
+    },
+    "mermaid": {
+      "renderError": "无法绘制思维导图。数据格式可能有误。",
+      "copied": "已复制 Mermaid 代码!",
+      "copyError": "复制代码失败。",
+      "rotate": "旋转导图方向:{direction}",
+      "copyCode": "复制 Mermaid 代码",
+      "downloadTitle": "将导图下载为 SVG 图片",
+      "download": "下载图片 (SVG)",
+      "loading": "加载中..."
+    },
+    "flashcard": {
+      "empty": "暂无闪卡。",
+      "addNew": "添加新卡片",
+      "loading": "正在加载卡片...",
+      "noSpeech": "您的浏览器不支持语音播放。",
+      "langUnsupported": "该卡组的语言暂不支持发音。",
+      "addTitle": "添加新闪卡",
+      "cancel": "取消",
+      "front": "正面 (Front)",
+      "back": "背面 (Back)",
+      "addSubmit": "添加卡片",
+      "editTitle": "编辑闪卡",
+      "saveChanges": "保存更改",
+      "editThis": "编辑此卡片",
+      "deleteThis": "删除此卡片",
+      "flipHint": "点击卡片翻转",
+      "listen": "收听发音 ({lang})",
+      "due": "到期复习",
+      "reviewOn": "复习:{date}",
+      "flip": "翻转卡片"
+    },
+    "flashcardStudy": {
+      "noSpeech": "您的浏览器不支持语音播放。",
+      "doneBody": "所有卡片均已复习完毕。有新卡片需要复习时再回来吧。",
+      "doneTitle": "恭喜!您暂时完成了这个卡组。",
+      "back": "返回",
+      "smaller": "减小字号",
+      "larger": "增大字号",
+      "listen": "收听发音",
+      "showAnswer": "点击查看答案",
+      "minutes": "{n} 分钟",
+      "hours": "{n} 小时",
+      "days": "{n} 天"
+    },
+    "materialPicker": {
+      "group": "选择学习资料语言",
+      "notTranslated": "暂无现成译文",
+      "translated": "已有现成译文",
+      "noTranscript": "暂无文字稿",
+      "choose": "选择语言",
+      "search": "搜索语言",
+      "list": "语言列表",
+      "noLanguage": "未找到任何语言"
+    },
+    "quiz": {
+      "aiError": "连接 AI 时出错。",
+      "explainError": "获取解释时出错。",
+      "empty": "暂无选择题。",
+      "title": "Quick Check:快速复习",
+      "intro": "本练习共 {count} 道题,帮助您巩固刚学的知识。",
+      "continue": "继续答题",
+      "start": "开始答题",
+      "doneTitle": "测验完成!",
+      "doneBody": "太棒了!您已完成 {count} 道题。",
+      "finish": "完成并返回",
+      "displayError": "显示题目时出错。",
+      "questionOf": "第 {current} 题,共 {total} 题",
+      "askTutor": "问问 AI 导师为什么错了",
+      "tutorExplains": "AI 导师解释:",
+      "thinking": "思考中...",
+      "finishQuiz": "完成",
+      "next": "下一题"
+    },
+    "quizEditor": {
+      "updated": "题目更新成功",
+      "updateFailed": "更新失败",
+      "added": "题目添加成功",
+      "addFailed": "添加失败",
+      "deleted": "题目已删除",
+      "addNew": "添加新题目",
+      "addAria": "添加题目",
+      "editAria": "编辑题目",
+      "addTitle": "添加题目",
+      "editTitle": "编辑题目",
+      "questionNo": "第 {n} 题:",
+      "edit": "编辑",
+      "delete": "删除",
+      "correct": "正确答案",
+      "content": "题目内容",
+      "multi": "该题有多个正确答案(多选)",
+      "answers": "答案(勾选绿色方框以标记正确答案)",
+      "answerPh": "答案 {n}",
+      "addOption": "+ 添加选项",
+      "cancel": "取消",
+      "save": "保存题目"
+    },
+    "overview": {
+      "loading": "加载中...",
+      "loadError": "无法加载课程信息。",
+      "counts": "{chapters} 章 · {lessons} 节课",
+      "dubbable": "可配音为 {count} 种语言",
+      "instructor": "讲师",
+      "messageInstructor": "联系讲师",
+      "announcements": "讲师公告"
+    },
+    "mermaidEditor": {
+      "label": "Mermaid 代码",
+      "insertTemplate": "插入 Tree-card 示例模板",
+      "preview": "实时预览",
+      "saving": "保存中...",
+      "save": "保存"
+    },
+    "gradebook": {
+      "error": "加载成绩单失败。",
+      "emptyTitle": "暂无成绩数据",
+      "emptyBody": "您尚未完成本课程中的任何练习。学习并完成练习后即可在此查看成绩!",
+      "title": "考试与练习记录",
+      "colName": "测验名称",
+      "colLocation": "位置(章/节)",
+      "colType": "类型",
+      "colBest": "最高分",
+      "colAttempts": "作答次数",
+      "colLatest": "最近提交日期",
+      "colAction": "操作",
+      "defaultTitle": "测验",
+      "archived": "该练习/考试已被讲师归档。",
+      "official": "正式考试",
+      "practice": "复习 (AI)",
+      "inProgress": "进行中",
+      "viewHistory": "查看记录({count} 次)"
+    },
+    "assignments": {
+      "title": "作业",
+      "due": "截止日期:{date}",
+      "maxScore": "最高 {score} 分",
+      "submitted": "已提交 · {time}",
+      "submittedFile": "已提交的文件",
+      "score": "分数:{score}",
+      "waiting": "正在等待讲师评分。",
+      "placeholder": "输入作业内容...",
+      "submitting": "提交中...",
+      "submit": "提交作业"
+    },
+    "knowledgeGaps": {
+      "greatTitle": "太棒了!",
+      "greatBody": "您目前没有明显的知识漏洞。请继续保持出色的表现!",
+      "title": "知识漏洞分析",
+      "intro": "系统发现您在最近 5 次作答中经常答错的主题。请优先复习以提高成绩:",
+      "wrongCount": "答错 {wrong}/{total} 次",
+      "errorRate": "错误率:{percent}%",
+      "review": "复习理论",
+      "generalTitle": "此主题属于综合评估。请重新查看全部学习资料。",
+      "general": "综合知识"
+    },
+    "resources": {
+      "error": "加载课程资源失败。",
+      "emptyTitle": "暂无静态资源",
+      "emptyBody": "讲师尚未为本课程上传任何附件(PDF、ZIP 等)。",
+      "title": "附件资源"
     }
   },
   "profile": {
@@ -492,7 +945,15 @@
     "linkedinHint": "将此链接粘贴到 LinkedIn 的“证书”栏或简历的证书部分。",
     "loading": "加载中...",
     "notFound": "找不到该证书。",
-    "loadError": "无法加载证书，请稍后再试。"
+    "loadError": "无法加载证书，请稍后再试。",
+    "preview": {
+      "title": "课程结业证书",
+      "awardedTo": "兹授予",
+      "completed": "已圆满完成课程",
+      "duration": "时长:{hours} 学时",
+      "instructorLabel": "授课讲师",
+      "platformLabel": "平台代表"
+    }
   },
   "courseDetail": {
     "breadcrumbAria": "路径",
@@ -579,8 +1040,6 @@
     },
     "shareGift": {
       "share": "分享",
-      "gift": "赠送课程",
-      "soon": "即将推出",
       "copied": "已复制课程链接",
       "copyFailed": "无法复制链接"
     },
@@ -588,7 +1047,22 @@
       "note": "这是您的课程。",
       "edit": "编辑课程",
       "learn": "以学员身份查看"
-    }
+    },
+    "reviewsList": {
+      "writeTitle": "撰写您的评价",
+      "placeholder": "分享您对课程的感受(选填)...",
+      "sending": "发送中...",
+      "submit": "提交评价",
+      "thanks": "感谢您评价本课程!",
+      "loading": "正在加载评价...",
+      "empty": "本课程暂无评价。",
+      "starsAria": "{rating} 星(满分 5 星)"
+    },
+    "preview": {
+      "label": "课程预览",
+      "loading": "正在加载视频…"
+    },
+    "loadingCourse": "正在加载课程..."
   },
   "courseList": {
     "loadMore": {
@@ -697,7 +1171,11 @@
       "subtotalOne": "小计",
       "discount": "已优惠",
       "total": "合计",
-      "terms": "付款即表示你同意 LinguaLearn 的<link>服务条款</link>。"
+      "terms": "付款即表示你同意 LinguaLearn 的<link>服务条款</link>。",
+      "promotionDiscount": "课程促销",
+      "couponDiscount": "优惠码 {code}",
+      "bundleDiscount": "课程包优惠",
+      "couponNotApplied": "优惠码 {code} 不能与促销叠加，且不会带来更低的价格，因此未生效。每门课程只享受一项最优惠。"
     },
     "billing": {
       "title": "补充信息",
@@ -877,7 +1355,25 @@
     "viewAll": "查看全部",
     "rank": "第 {rank} 名",
     "podiumAria": "排行榜前三名",
-    "listAria": "排行榜"
+    "listAria": "排行榜",
+    "chat": {
+      "ownReply": "您不能回复自己的消息!",
+      "bestError": "无法更新最佳答案,请稍后重试。",
+      "instructor": "讲师",
+      "bestAnswer": "✓ 最佳答案",
+      "reply": "回复",
+      "unmarkBest": "取消最佳标记",
+      "markBest": "标记为最佳答案",
+      "title": "评论",
+      "replyingTo": "正在回复 <b>{name}</b>",
+      "cancel": "取消",
+      "replyPlaceholder": "输入回复...",
+      "placeholder": "分享您的想法 ...",
+      "send": "发送",
+      "empty": "暂无评论。",
+      "emptyHint": "快来分享您的想法吧!",
+      "showMore": "查看更多 {count} 条回复"
+    }
   },
   "instructor": {
     "nav": {
@@ -908,7 +1404,8 @@
       "logoutTitle": "确认退出登录",
       "logoutBody": "确定要退出系统吗？",
       "cancel": "取消",
-      "confirm": "退出登录"
+      "confirm": "退出登录",
+      "unreadNotifications": "{count} 条未读通知"
     },
     "courses": {
       "title": "我的课程",
@@ -1001,7 +1498,8 @@
         "label": "已完成 {percent}%",
         "ready": "可以提交审核",
         "missingTitle": "提交审核还缺少",
-        "aria": "课程完善进度：{percent}%"
+        "aria": "课程完善进度：{percent}%",
+        "fixNow": "立即处理"
       },
       "submit": {
         "send": "提交审核",
@@ -1199,7 +1697,9 @@
         "error": "Could not send the response.",
         "noResponse": "This dispute has been resolved; responding is no longer possible."
       },
-      "note": "An administrator reviews your response and decides. You can respond only once."
+      "note": "An administrator reviews your response and decides. You can respond only once.",
+      "searchLabel": "搜索退款申请",
+      "searchPlaceholder": "课程名称、订单号或学员姓名..."
     },
     "communication": {
       "tabsAria": "沟通栏目",
@@ -1295,7 +1795,8 @@
       }
     },
     "common": {
-      "close": "关闭"
+      "close": "关闭",
+      "redirecting": "正在跳转..."
     },
     "perf": {
       "common": {
@@ -1447,7 +1948,9 @@
         "hasBest": "已有最佳答案",
         "markBest": "标记为最佳答案",
         "unmarkBest": "取消最佳答案",
-        "markUnread": "标记为未读"
+        "markUnread": "标记为未读",
+        "searchLabel": "搜索问题",
+        "searchPlaceholder": "搜索问题：学员、课时、课程、内容..."
       },
       "assignments": {
         "title": "作业",
@@ -1460,7 +1963,10 @@
         "feedback": "反馈",
         "save": "保存",
         "gradedLine": "已批改：{score} 分",
-        "close": "关闭"
+        "close": "关闭",
+        "searchLabel": "搜索作业",
+        "searchPlaceholder": "作业、课程或课时名称...",
+        "noMatch": "没有匹配的作业。"
       },
       "announcements": {
         "title": "公告",
@@ -1473,7 +1979,10 @@
         "pickCourse": "选择课程...",
         "titlePh": "公告标题",
         "contentPh": "发送给本课程所有已报名学员的公告内容...",
-        "send": "发送公告"
+        "send": "发送公告",
+        "searchLabel": "搜索公告",
+        "searchPlaceholder": "标题、内容或课程名称...",
+        "noMatch": "没有匹配的公告。"
       },
       "messages": {
         "title": "消息"
@@ -1531,6 +2040,931 @@
       "privacy": "仅当 2 位及以上学员提问时才显示话题；标签为共同关键词，而非原始问题。",
       "retry": "重试",
       "retryAfter": "可在 {time} 重试（每 10 分钟最多一次）。"
+    },
+    "materials": {
+      "cancel": "取消",
+      "delete": "删除",
+      "edit": "编辑",
+      "close": "关闭",
+      "loading": "加载中...",
+      "saving": "保存中...",
+      "deleting": "删除中...",
+      "processingBtn": "处理中...",
+      "confirmBtn": "确认",
+      "saveChanges": "保存更改",
+      "exporting": "导出中...",
+      "questionsCount": "{count} 道题",
+      "cardsCount": "{count} 张卡片",
+      "dragToDistribute": "拖动以分配到课时",
+      "viewEdit": "查看 / 编辑",
+      "untitled": "未命名学习资料",
+      "materialFallback": "学习资料",
+      "chapterPrefix": "章节：{title}",
+      "toast": {
+        "versionUpdated": "已更新到新版本",
+        "versionUpdateError": "更新版本时出错",
+        "distributed": "学习资料分配成功",
+        "distributeError": "分配时出错",
+        "moved": "已移动学习资料",
+        "moveError": "无法移动学习资料",
+        "duplicated": "已复制学习资料",
+        "duplicateError": "无法复制学习资料",
+        "deleted": "已成功删除学习资料",
+        "deleteError": "删除学习资料时出错",
+        "pdfError": "导出 PDF 时出错，请重试。",
+        "mindmapSaved": "思维导图保存成功！",
+        "mindmapSaveError": "保存导图时出错！",
+        "questionDeleted": "已删除题目",
+        "flashcardDeleted": "已删除闪卡",
+        "csvImported": "已从 CSV 添加 {count} 行。",
+        "csvErrors": "{count} 行出错：{details}",
+        "csvEmpty": "CSV 文件没有有效的数据行。",
+        "csvError": "上传 CSV 文件时出错",
+        "quizSettingsSaved": "测验配置保存成功！",
+        "quizSettingsError": "保存测验配置时出错",
+        "openTimeRequired": "请为正式考试模式设置考试开放时间！",
+        "closeAfterOpen": "关闭时间必须晚于开放时间！",
+        "generateSent": "已成功提交 AI 学习资料生成请求！",
+        "generateError": "无法生成学习资料",
+        "pickType": "请选择要创建的学习资料类型",
+        "enterTitle": "请输入标题",
+        "pickChapter": "请选择一个章节",
+        "pickLesson": "请选择一个课时",
+        "questionSaved": "已保存题目更改",
+        "questionSaveError": "无法保存题目",
+        "questionAdded": "已添加新题目",
+        "questionAddError": "无法添加题目",
+        "questionContentRequired": "请输入题目内容",
+        "flashcardUpdated": "已更新闪卡",
+        "flashcardAdded": "已添加新闪卡",
+        "manualCreated": "已成功创建空白学习资料！",
+        "manualError": "无法创建学习资料",
+        "pickMaterialType": "请选择学习资料类型",
+        "enterMaterialName": "请输入学习资料名称"
+      },
+      "versionConfirm": {
+        "title": "更新版本",
+        "message": "要将此学习资料更新为新版本吗？学员之前的成绩将被保留。"
+      },
+      "deleteModal": {
+        "aria": "删除学习资料",
+        "title": "删除学习资料",
+        "body": "确定要删除吗？此操作无法撤销。",
+        "wait": "正在删除，请稍候...",
+        "confirm": "确认删除"
+      },
+      "distribution": {
+        "title": "分配（快捷方式）",
+        "unassignTitle": "取消分配",
+        "unassignChapter": "确定要将此学习资料从章节中移除吗？",
+        "unassignLesson": "确定要将此学习资料从课时中移除吗？",
+        "remove": "移除"
+      },
+      "activityTitle": "查看最近活动",
+      "activity": "活动",
+      "manualBtn": "手动",
+      "searchPlaceholder": "搜索学习资料...",
+      "filterAll": "全部",
+      "filterAllStatus": "所有状态",
+      "filterByType": "按类型筛选：{label}",
+      "filterByStatus": "按状态筛选：{label}",
+      "confirmWait": "正在处理，请稍候...",
+      "viewer": {
+        "previewOnly": "预览模式 — 无法在此编辑内容。",
+        "aiMaterial": "AI 学习资料",
+        "type": "类型",
+        "language": "语言",
+        "version": "版本",
+        "vietnamese": "越南语",
+        "deleteAllTitle": "删除整个学习资料",
+        "closeWorkspace": "关闭工作区",
+        "loadingAll": "正在将学习资料的全部数据加载到工作区...",
+        "questionBank": "题库（{count}）",
+        "examSettings": "考试配置",
+        "exportBlankTitle": "导出空白试卷 PDF，答案在最后一页",
+        "exportBlank": "空白试卷",
+        "exportCheatTitle": "导出带答案的速查表 PDF",
+        "addQuestion": "添加新题目",
+        "questionNo": "第 {n} 题：",
+        "correctAnswer": "正确答案",
+        "mindmapBoard": "思维导图画板（Mindmap）",
+        "mindmapHint": "用鼠标拖动位置，双击文字可重命名分支。",
+        "modeView": "静态查看",
+        "modeEdit": "编辑",
+        "modeCode": "编写代码",
+        "flashcardTitle": "直观的双面闪卡集",
+        "flashcardHint": "点击卡片翻转，或使用卡片下方的编辑/删除。",
+        "reviewCards": "{count} 张复习卡片",
+        "addCard": "添加新卡片",
+        "cardNo": "卡片 #{n}",
+        "back": "背面（概念）",
+        "front": "正面（术语）",
+        "flipBack": "点击翻回",
+        "flipToSee": "点击查看释义"
+      },
+      "csv": {
+        "uploading": "上传中...",
+        "upload": "上传 CSV"
+      },
+      "dt": {
+        "now": "现在"
+      },
+      "quiz": {
+        "title": "考试配置",
+        "subtitle": "管理时间、作答次数、随机组卷和监考功能",
+        "typeAria": "测验类型",
+        "officialExam": "正式考试",
+        "lectureNote": "Quick Check 不适用作答时长、次数和监考；学员在每题后立即查看答案。选择“正式考试”后，下方配置才会生效。",
+        "officialNote": "已有学员作答的测验无法更改类型。点击“保存配置”以应用。",
+        "save": "保存配置",
+        "modeLabel": "考试模式",
+        "practice": "练习（不限次数）",
+        "practiceDesc": "学生可不限次数作答，自动保存最高分。",
+        "limited": "限次复习",
+        "limitedDesc": "限制作答次数，自动保存最高分。",
+        "attemptsPlaceholder": "次数",
+        "once": "正式考试（1 次）",
+        "onceDesc": "每名学生仅可作答 1 次，必须设置开放时间。",
+        "openLabel": "开放时间",
+        "closeLabel": "关闭时间",
+        "closeHint": "未设置则永久开放",
+        "allowReview": "允许学员在提交后查看答案",
+        "duration": "作答时长（分钟）",
+        "pickCount": "每次作答题数",
+        "pickDefault": "默认：{count} 题",
+        "proctoring": "AI 考试监考（防作弊）",
+        "proctoringDesc": "需要开启摄像头。AI 系统会自动监控人脸，并在学员离开屏幕或切换标签页时发出警告。",
+        "maxViolations": "自动收卷前允许的最大违规次数"
+      },
+      "gen": {
+        "summaryExam": "总结考试",
+        "reviewTitle": "{type} 复习 - {chapter}",
+        "wholeCourseTitle": "{type} - 课程",
+        "title": "自动生成 AI 学习资料",
+        "subtitle": "选择希望 AI 根据课程内容自动汇总的学习资料类型。",
+        "quizName": "选择题测验",
+        "quizDesc": "生成带解析的选择题",
+        "flashcardName": "闪卡",
+        "flashcardDesc": "提取双面术语与概念",
+        "mindmapName": "思维导图",
+        "mindmapDesc": "直观绘制知识脉络图",
+        "detail": "详细配置",
+        "quizKind": "测验分类",
+        "quickCheck": "快速检测（Quick Check）",
+        "quickCheckDesc": "关联到 1 个课时。始终显示解析，不限次数，不计时。",
+        "officialExam": "正式考试（Official Exam）",
+        "officialExamDesc": "按章节/课程考试。计时、计入成绩册，可自定义作答次数。",
+        "materialTitle": "学习资料标题",
+        "scope": "生成范围",
+        "scopeWhole": "整个课程",
+        "scopeChapter": "按指定章节",
+        "scopeLesson": "指定课时",
+        "pickChapter": "选择章节",
+        "pickChapterOpt": "-- 选择章节 --",
+        "pickLesson": "选择课时",
+        "pickLessonOpt": "-- 选择课时 --",
+        "difficulty": "题目难度",
+        "easy": "基础（Easy）",
+        "medium": "中等（Medium）",
+        "hard": "高级（Hard）",
+        "questionCount": "题目数量",
+        "qFew": "少（约 10 题）",
+        "qStd": "中（约 20 题）",
+        "qMore": "多（约 30 题）",
+        "cardCount": "闪卡数量",
+        "cFew": "少（约 10 张）",
+        "cStd": "中（约 20 张）",
+        "cMore": "多（约 30 张）",
+        "template": "导图模板（Template）",
+        "detailLevel": "分支详细程度",
+        "dBasic": "基础，仅主分支",
+        "dStd": "标准，适中",
+        "dDetail": "详细，细分多个小分支",
+        "language": "学习资料语言",
+        "calling": "正在调用 AI...",
+        "start": "开始生成"
+      },
+      "qe": {
+        "editAria": "编辑题目内容",
+        "editTitle": "编辑题目内容",
+        "warnAttempted": "注意：此学习资料已有作答记录。修改题目答案将影响之前已提交试卷的评分结果。",
+        "content": "题目内容",
+        "type": "题目类型",
+        "single": "单选题（1 个正确答案）",
+        "multiple": "多选题（多个正确答案）",
+        "topicTag": "主题标签（Topic Tag）",
+        "topicPlaceholder": "例如：逻辑运算符",
+        "videoTime": "视频时间点（秒）",
+        "sourceLesson": "来源课时",
+        "leaveEmpty": "-- 留空 --",
+        "options": "答案选项",
+        "deleteOption": "删除选项",
+        "optionPlaceholder": "输入新选项并按 Enter...",
+        "newOption": "新选项",
+        "optionA": "选项 A",
+        "optionB": "选项 B",
+        "optionC": "选项 C",
+        "optionD": "选项 D",
+        "addAria": "添加新题目",
+        "addTitle": "添加新题目",
+        "contentPlaceholder": "输入题目内容...",
+        "adding": "添加中...",
+        "addBtn": "添加题目"
+      },
+      "fc": {
+        "editAria": "编辑闪卡",
+        "editTitle": "编辑闪卡",
+        "addAria": "添加新闪卡",
+        "addTitle": "添加新闪卡"
+      },
+      "manual": {
+        "title": "手动创建学习资料",
+        "subtitle": "创建一条空白记录，由您亲自输入全部内容。",
+        "quizName": "测验（Quiz）",
+        "emptyBadge": "创建空白",
+        "name": "学习资料名称",
+        "namePlaceholder": "例如：期中考试、基本概念...",
+        "creating": "创建中...",
+        "createEmpty": "创建空白记录"
+      },
+      "dblClickPreview": "双击预览",
+      "addCardBtn": "添加卡片"
+    },
+    "gradebook": {
+      "loading": "正在加载班级成绩册...",
+      "loadError": "无法加载成绩册",
+      "loadErrorHint": "您可能没有访问权限，或此课程暂无数据。",
+      "back": "返回",
+      "crumbInstructor": "讲师",
+      "crumbMaterials": "学习资料与考试库",
+      "crumbGradebook": "成绩册",
+      "title": "班级成绩册：",
+      "totalStudents": "注册学员总数",
+      "students": "名学员",
+      "avgScore": "班级平均分",
+      "passRate": "通过率（Pass Rate）",
+      "totalAttempts": "作答总次数",
+      "attemptsUnit": "次",
+      "detailList": "详细成绩册列表",
+      "noOfficialQuiz": "该课程尚未发布正式测验",
+      "colStudent": "学员",
+      "colAttempts": "作答次数",
+      "colBest": "最高分",
+      "colLatest": "最近得分",
+      "colSubmitted": "提交时间",
+      "colStatus": "状态",
+      "colActions": "操作",
+      "attemptCount": "{count} 次",
+      "notTaken": "未作答",
+      "notJoined": "未参加",
+      "passed": "通过（Passed）✓",
+      "failed": "未通过 ✕",
+      "viewAttempt": "作答详情",
+      "noSubmission": "无提交",
+      "noStudents": "尚无学员报名此课程。",
+      "modalAria": "学员作答详情",
+      "modalTitle": "学员作答详情：",
+      "submittedAt": "提交时间：",
+      "loadingAttempt": "正在加载提交详情...",
+      "score": "分数",
+      "correctCount": "答对题数",
+      "perQuestion": "每题选择详情",
+      "questionNo": "第 {n} 题：",
+      "correct": "正确 ✓",
+      "learnerChoice": "学员的选择",
+      "correctAnswer": "正确答案 ✓",
+      "close": "关闭"
+    },
+    "folderTree": {
+      "createError": "无法创建文件夹",
+      "deleteFolderError": "无法删除文件夹",
+      "renamed": "已重命名学习资料",
+      "renameError": "无法重命名学习资料",
+      "deleted": "已删除学习资料",
+      "deleteError": "无法删除学习资料",
+      "deleteMatTitle": "删除学习资料",
+      "thisMaterial": "此学习资料",
+      "material": "学习资料",
+      "deleteMatMsg": "确定要删除“{title}”吗？此操作无法撤销。",
+      "copied": "已复制“{title}” — 选择目标文件夹并按 Ctrl+V 粘贴副本",
+      "cut": "已剪切“{title}” — 选择目标文件夹并按 Ctrl+V 粘贴",
+      "folderHasMaterialsTitle": "文件夹中包含学习资料",
+      "deleteFolderTitle": "删除文件夹",
+      "folderHasMaterialsMsg": "此文件夹中包含学习资料。若继续删除，其中的学习资料将被移到根工作区。确定吗？",
+      "deleteFolderMsg": "确定要删除此文件夹吗？",
+      "emptyFolder": "空文件夹",
+      "rootHint": "根文件夹（右键添加 · 将学习资料拖到此处可移至根目录）",
+      "selectedHint": "✓ 已选择 — Del：删除 · Ctrl+C：复制 · Ctrl+X：剪切 · Ctrl+V：粘贴",
+      "workspaceEmpty": "工作区为空",
+      "workspaceEmptyHint": "右键点击以创建新文件夹。",
+      "ctx": {
+        "newFolder": "新建文件夹",
+        "newSubfolder": "新建子文件夹",
+        "deleteFolder": "删除文件夹",
+        "viewEdit": "查看 / 编辑",
+        "rename": "重命名",
+        "history": "版本历史",
+        "moveTo": "移动到文件夹...",
+        "deleteMaterial": "删除学习资料"
+      },
+      "picker": {
+        "aria": "选择文件夹",
+        "titleCopy": "选择副本的目标文件夹",
+        "title": "选择目标文件夹",
+        "search": "搜索文件夹...",
+        "root": "根工作区",
+        "removeFromFolder": "（移出文件夹）",
+        "none": "未找到文件夹"
+      },
+      "cancel": "取消",
+      "create": {
+        "aria": "创建文件夹",
+        "titleChild": "创建子文件夹",
+        "titleNew": "创建新文件夹",
+        "placeholder": "文件夹名称...",
+        "submit": "创建"
+      },
+      "rename": {
+        "aria": "重命名学习资料",
+        "title": "重命名学习资料",
+        "placeholder": "学习资料名称...",
+        "save": "保存"
+      }
+    },
+    "payoutAccount": {
+      "bank": "银行",
+      "pickBank": "选择银行",
+      "accountNumber": "账号",
+      "keepNumberPlaceholder": "保持原账号请留空 {mask}",
+      "holderName": "账户持有人姓名",
+      "holderHint": "应与您的账户名一致（大写无声调符号也可以）。",
+      "needsEmailNote": "我们会向您的邮箱发送确认邮件，链接 30 分钟内有效。（如为修改）旧账户在您确认前仍可使用。",
+      "noEmailNote": "仅更改账户持有人姓名，将立即生效，无需邮件确认。",
+      "sending": "发送中...",
+      "sendConfirm": "发送确认邮件",
+      "save": "保存",
+      "cancel": "取消",
+      "title": "收款账户",
+      "add": "+ 添加账户",
+      "emptyConfigured": "您尚未关联任何账户。请添加银行账户以接收付款。",
+      "emptyNotConfigured": "服务器尚未启用账户关联功能。",
+      "toast": {
+        "nameUpdated": "已更新账户持有人姓名。",
+        "confirmSent": "已发送确认邮件。请在 30 分钟内打开邮件并点击链接。",
+        "editFailed": "无法修改账户。",
+        "removed": "已移除账户。",
+        "removeFailed": "无法移除账户。",
+        "defaultSet": "已设为默认收款账户。",
+        "defaultFailed": "无法更改默认账户。",
+        "linkFailed": "无法关联账户。"
+      },
+      "badge": {
+        "default": "默认",
+        "pending": "等待邮件确认"
+      },
+      "holderLabel": "账户持有人：{name}",
+      "pendingReplace": "此修改在您通过邮件确认后生效；在此之前旧账户仍可使用。",
+      "pendingNew": "请打开邮件并点击确认链接（30 分钟内有效）。",
+      "mismatch": "账户持有人姓名与您的账户名不一致；管理员将在转账前仔细核查。",
+      "removeConfirm": "移除此账户？",
+      "remove": "移除",
+      "setDefault": "设为默认",
+      "edit": "编辑",
+      "addNew": "添加新账户"
+    },
+    "onboarding": {
+      "error": "出错了，请重试。",
+      "loading": "加载中...",
+      "step": "第 {step}/{total} 步",
+      "exit": "退出",
+      "teachingOptions": {
+        "0": "线下，非正式",
+        "1": "线下，专业",
+        "2": "线上",
+        "3": "其他"
+      },
+      "videoOptions": {
+        "0": "我是新手",
+        "1": "我有一些基础",
+        "2": "我有经验",
+        "3": "我已有可上传的视频"
+      },
+      "audienceOptions": {
+        "0": "暂时没有",
+        "1": "我有少量关注者",
+        "2": "我有相当多的关注者"
+      },
+      "step1": {
+        "title": "分享您的知识",
+        "description": "LinguaLearn 上的课程都提供视频学习体验。无论您是否已有教学经验，我们都会帮助您把知识做成在线课程。",
+        "question": "您以前做过哪种形式的教学？"
+      },
+      "step2": {
+        "title": "创建课程",
+        "description": "无论您经验如何，我们都会提供资源、技巧和支持，帮助您自信地录制授课视频。",
+        "question": "您制作视频的“专业”程度如何？"
+      },
+      "step3": {
+        "title": "扩大您的影响范围",
+        "description": "发布课程后，您可以通过自己的营销活动，并结合课程在 LinguaLearn 搜索中的展示来增加学员数量。",
+        "question": "您有可以分享课程的受众吗？"
+      },
+      "verify": {
+        "title": "验证身份信息",
+        "intro": "在提交第一门课程审核之前只需完成一次，之后的课程无需重复。",
+        "idNumber": "身份证号",
+        "address": "常住地址",
+        "confirm": "我确认这是我本人的信息，并且我拥有或有权分享将要发布的课程内容。"
+      },
+      "back": "上一步",
+      "next": "继续",
+      "processing": "处理中...",
+      "finish": "完成",
+      "done": {
+        "title": "您已成为讲师！",
+        "body": "您的验证信息已记录。正在跳转到讲师频道，开始创建您的第一门课程...",
+        "go": "立即进入讲师频道"
+      }
+    },
+    "chapterEditor": {
+      "dragChapter": "拖动以调整章节顺序",
+      "sectionNo": "第 {n} 节：",
+      "sectionTitled": "第 {n} 节：{title}",
+      "objectiveQuestion": "完成本节后，学员将能够做什么？",
+      "objectivePlaceholder": "输入学习目标...",
+      "cancel": "取消",
+      "saveSection": "保存小节",
+      "collapse": "收起小节",
+      "expand": "展开小节",
+      "lessonCount": "（{count} 个课时）",
+      "renameSection": "重命名/描述小节",
+      "deleteChapter": "删除章节",
+      "dragReorder": "拖动以调整顺序",
+      "noLessons": "此章节还没有课时。",
+      "lessonNo": "课时 {n}：",
+      "lessonTitlePlaceholder": "输入课时标题",
+      "afterAddHint": "添加后，点击课时行中的“+ 内容”以上传视频或粘贴 YouTube 链接。",
+      "addLesson": "添加课时",
+      "addCurriculumItem": "+ 课程大纲项目",
+      "noChapters": "还没有章节 — 请在下方添加第一个。",
+      "newSection": "新小节：",
+      "titlePlaceholder": "输入标题",
+      "addSection": "添加小节",
+      "addSectionBtn": "+ 小节",
+      "deleteConfirm": "您即将删除 1 个小节及其中的所有课时。确定要继续吗？"
+    },
+    "payoutHistory": {
+      "loadError": "无法加载付款单。请稍后再试。",
+      "cancelled": "已取消申请，金额已退回余额。",
+      "cancelFailed": "无法取消申请。",
+      "title": "提现记录",
+      "searchAria": "搜索提现申请",
+      "searchPlaceholder": "申请编号或交易编号...",
+      "filterAria": "按状态筛选",
+      "filter": {
+        "all": "全部",
+        "pending": "处理中",
+        "paid": "已到账",
+        "closed": "已取消 / 未成功"
+      },
+      "loading": "加载中...",
+      "empty": "您还没有任何提现申请。",
+      "noMatch": "没有符合筛选条件的申请。",
+      "scheduled": " · 预计付款 {date}",
+      "transferRef": " · 交易编号 {ref}",
+      "reason": "原因：{reason}",
+      "slipTitle": "下载付款单（PDF）",
+      "slip": "付款单",
+      "changeAccount": "更换收款账户",
+      "cancel": "取消",
+      "newAccountAria": "新收款账户",
+      "pickNewAccount": "选择新收款账户",
+      "defaultSuffix": "（默认）",
+      "accountChanged": "已更改该申请的收款账户。",
+      "accountChangeFailed": "无法更改收款账户。",
+      "apply": "应用"
+    },
+    "promotions": {
+      "typePercentage": "按百分比",
+      "typeFixed": "固定金额",
+      "referralTitle": "学生推荐",
+      "referralBody": "推荐链接分享和独立销售归因功能正在规划中，当前版本暂未提供。",
+      "couponsTitle": "此课程的优惠码",
+      "couponsHint": "仅适用于此课程。“自动”优惠码会直接在课程页面显示折后价，学员无需输入代码。",
+      "create": "+ 创建优惠码",
+      "loading": "加载中...",
+      "empty": "此课程还没有优惠码。",
+      "automatic": "自动",
+      "allCourses": "您的所有课程",
+      "on": "已启用",
+      "off": "已停用",
+      "edit": "编辑",
+      "delete": "删除",
+      "createTitle": "创建优惠码",
+      "editTitle": "编辑优惠码",
+      "autoApply": "自动应用（无需输入代码）",
+      "codePlaceholder": "优惠码，例如：SALE50",
+      "valuePlaceholder": "数值",
+      "start": "开始",
+      "end": "结束",
+      "usageLimit": "使用次数上限",
+      "perLearnerLimit": "每位学员限用",
+      "cancel": "取消",
+      "saving": "保存中...",
+      "save": "保存"
+    },
+    "lessonRow": {
+      "status": {
+        "DRAFT": "暂无视频",
+        "READY": "就绪",
+        "UNAVAILABLE": "视频出错"
+      },
+      "youtubeVideo": "YouTube 视频",
+      "dragLesson": "拖动以调整课时顺序",
+      "lessonNo": "课时 {n}：",
+      "titlePlaceholder": "输入标题",
+      "descPlaceholder": "课时描述 — 明确说明学员学完本课后能做什么。",
+      "cancel": "取消",
+      "saveLesson": "保存课时",
+      "lessonTitled": "课时 {n}：{title}",
+      "rename": "重命名/描述课时",
+      "deleteLesson": "删除课时",
+      "addContent": "+ 内容",
+      "collapse": "收起",
+      "expand": "展开",
+      "dragReorder": "拖动以调整顺序",
+      "editContent": "编辑内容",
+      "preview": "预览",
+      "asInstructor": "以讲师身份",
+      "asLearner": "以学员身份",
+      "addDescription": "+ 描述",
+      "descHint": "添加描述。明确说明学员完成本课后能做到什么。",
+      "save": "保存",
+      "addResource": "+ 资源",
+      "addAssignment": "+ 作业",
+      "deleteConfirm": "您即将删除 1 个课程大纲项目。确定要继续吗？"
+    },
+    "newCourse": {
+      "step": "第 {step}/{total} 步",
+      "titleHeading": "那么，何不先选一个临时标题？",
+      "titleHint": "现在还没想到好标题也没关系，之后可以修改。",
+      "titlePlaceholder": "例如：从零开始学 Photoshop CS6",
+      "categoryHeading": "您要分享的知识最适合哪个分类？",
+      "categoryHint": "如果不确定合适的分类，之后可以修改。",
+      "pickCategory": "选择一个分类",
+      "timeHeading": "您每周可以花多少时间创建课程？",
+      "timeHint": "没有错误答案。即使时间不多，我们也能帮您实现目标。",
+      "weekly": {
+        "busy": "我很忙（0-2 小时）",
+        "offHours": "我会利用业余时间（2-4 小时）",
+        "plenty": "我有很多空闲时间（5 小时以上）",
+        "undecided": "我还没决定自己是否有时间"
+      },
+      "back": "上一步",
+      "next": "继续",
+      "creating": "创建中...",
+      "create": "创建课程",
+      "profile": {
+        "title": "完善讲师资料",
+        "body": "创建第一门课程前，您需要更新职称和个人简介。",
+        "headline": "职称",
+        "headlinePlaceholder": "例如：软件工程师 / 英语讲师",
+        "bio": "简短简介（至少 20 个字符）",
+        "cancel": "取消",
+        "saving": "保存中...",
+        "saveContinue": "保存并继续"
+      }
+    },
+    "share": {
+      "range": {
+        "all": "全部时间",
+        "30": "30 天",
+        "90": "90 天"
+      },
+      "filter": {
+        "all": "全部",
+        "published": "已发布",
+        "unpublished": "未发布"
+      },
+      "title": "分享与推广",
+      "subtitle": "每门课程都有专属推荐链接：学员通过您的链接购买时，您获得的分成比他们在平台上自行找到课程时更高。",
+      "rangeAria": "统计时间范围",
+      "searchPlaceholder": "搜索课程...",
+      "searchAria": "搜索课程",
+      "filterAria": "按状态筛选",
+      "loadError": "无法加载课程列表。",
+      "empty": "您还没有任何课程。",
+      "noMatch": "没有符合筛选条件的课程。",
+      "published": "已发布",
+      "notShareable": "未发布 — 暂无可用链接",
+      "shareTitle": "获取推荐链接并分享",
+      "publishToShare": "发布课程后即可分享",
+      "share": "分享",
+      "ordersViaLink": "通过您链接的订单",
+      "earningsViaLink": "链接带来的收入",
+      "ordersOrganic": "自然流量订单",
+      "earningsOrganic": "自然流量收入"
+    },
+    "lessonMedia": {
+      "documentTask": "文档：{name}",
+      "title": "管理视频 — {title}",
+      "status": {
+        "READY": "就绪",
+        "UNAVAILABLE": "视频出错",
+        "DRAFT": "暂无视频"
+      },
+      "source": "来源：{source}",
+      "sourceUpload": "上传",
+      "previewTitle": "预览视频 — {title}",
+      "hasVideo": "此课时已有视频（{kind}）。删除当前视频后才能更换来源或上传新视频。",
+      "kindYoutube": "YouTube 链接",
+      "kindUpload": "已上传的 MP4",
+      "deleting": "删除中...",
+      "deleteVideo": "删除视频",
+      "tabUpload": "上传 MP4",
+      "tabYoutube": "粘贴 YouTube 链接",
+      "uploadingVideo": "正在上传视频...",
+      "cancel": "取消",
+      "checking": "检查中...",
+      "saveYoutube": "保存 YouTube 链接",
+      "attachments": "附件",
+      "loading": "加载中...",
+      "delete": "删除",
+      "noDocs": "暂无文档。",
+      "uploadingDoc": "正在上传文档...",
+      "maxDocs": "已达到 {max} 个文档的上限 — 请删除部分后再添加。"
+    },
+    "debt": {
+      "level": {
+        "1": "处于欠款状态。保留期结束后，新收入将自动抵扣；您也可以在下方主动还款。",
+        "2": "欠款逾期：您暂时无法发布新课程，也无法报名推广。",
+        "3": "长期欠款逾期：您的课程暂停接受新报名（已购买的学员仍可正常学习）。"
+      },
+      "repayError": "无法生成还款码。",
+      "paidToast": "已收到还款。",
+      "title": "欠款",
+      "since": "自 {date} 起欠款（{days} 天）。",
+      "daysLeft": "距离限制发布新课程和报名推广还有 {days} 天。",
+      "suspendAfter": "欠款 {days} 天后，您的课程将暂停接受新报名。",
+      "paused": "由于您有待处理的退款申诉，相关限制已暂停。",
+      "refundFallback": "退款",
+      "cleared": "您已还清欠款。谢谢！",
+      "none": "您没有未清欠款。",
+      "amountLabel": "还款金额（可部分还款，最低 {min}）",
+      "payAll": "全部还清",
+      "exceeds": "超过欠款金额（{amount}）。",
+      "creating": "正在生成还款码...",
+      "createQr": "生成还款二维码",
+      "scan": "扫码支付 {amount}",
+      "openPayos": "打开 PayOS 支付页面",
+      "autoUpdate": "收到款项后系统会自动更新。二维码有时效，过期请重新生成。"
+    },
+    "requestPayout": {
+      "blocker": {
+        "notConfigured": "服务器尚未启用提现功能。",
+        "noAccount": "提现前请先关联并确认收款账户。",
+        "open": "您有一笔提现申请尚未完成。",
+        "min": "最低需要 {amount} 才能提现。"
+      },
+      "created": "已创建申请。请在 30 分钟内打开邮件并点击确认链接。",
+      "createFailed": "无法创建提现申请。",
+      "title": "提现申请",
+      "intro": "最低 {min}。通过邮件确认后，申请将排入最近一次付款批次（下一次：{date}）。您将收到所申请的全额。转账手续费由 LinguaLearn 承担。",
+      "toAccount": "收款账户",
+      "defaultSuffix": "（默认）",
+      "amountLabel": "提现金额（VND）",
+      "all": "全部提现",
+      "exceeds": "超过可提现金额（{amount}）。",
+      "sending": "发送中...",
+      "submit": "提交提现申请"
+    },
+    "visibility": {
+      "PUBLIC": {
+        "label": "公开",
+        "helper": "显示在搜索和目录中 — 任何人都可以报名。"
+      },
+      "PRIVATE_INVITE": {
+        "label": "私密（仅限受邀者）",
+        "helper": "不在搜索中显示 — 只有您在下方邀请的邮箱才能查看并报名。"
+      },
+      "PRIVATE_PASSWORD": {
+        "label": "私密（密码保护）",
+        "helper": "不在搜索中显示 — 任何有链接的人都能查看课程页面，但需输入正确密码才能报名。"
+      },
+      "title": "报名（隐私）",
+      "passwordKeep": "留空以保留原密码",
+      "passwordNew": "输入报名密码",
+      "saved": "已保存隐私设置。",
+      "saving": "保存中...",
+      "save": "保存",
+      "inviteList": "受邀邮箱列表",
+      "invite": "+ 邀请",
+      "loading": "加载中...",
+      "noInvites": "尚未邀请任何邮箱。",
+      "remove": "删除"
+    },
+    "proctoringList": {
+      "searchPlaceholder": "按考试名称搜索...",
+      "from": "从",
+      "to": "到",
+      "allRisk": "所有风险等级",
+      "colLearner": "学员",
+      "colExam": "考试",
+      "colSubmitted": "提交时间",
+      "colViolationsAbbr": "违规",
+      "colViolationsTitle": "记录的违规次数",
+      "colRisk": "风险",
+      "colRiskTitle": "AI 作弊风险评估",
+      "colVideoTitle": "证据视频",
+      "loading": "加载中...",
+      "empty": "启用监考的考试暂无作答记录。",
+      "noMatch": "没有符合筛选条件的作答记录。"
+    },
+    "resources": {
+      "fileZip": "压缩包",
+      "uploadPartial": "已上传 {ok} 个文件。{fail} 个文件出错（格式不正确）。",
+      "uploadOk": "已成功上传 {count} 个资源",
+      "uploadError": "上传文件时出错",
+      "deleted": "已删除静态资源",
+      "deleteError": "删除资源时出错",
+      "title": "整个课程的静态资源",
+      "subtitle": "整个课程共用的 PDF、幻灯片和文档 — 与各章节的学习资料分开。",
+      "uploading": "上传中...",
+      "dropHint": "将文件拖放到此处，或点击选择文件",
+      "supported": "支持 PDF、Word、PowerPoint、ZIP",
+      "loading": "加载中...",
+      "empty": "此课程还没有静态资源。",
+      "deleteTitle": "删除资源"
+    },
+    "lessonAssignment": {
+      "title": "作业",
+      "hint": "此课时的论述题/文件提交作业 — 您可在“沟通 > 作业”中手动评分和反馈。",
+      "loading": "加载中...",
+      "submissions": "{count} 份提交",
+      "delete": "删除",
+      "empty": "暂无作业。",
+      "add": "+ 添加作业",
+      "titlePlaceholder": "作业标题",
+      "instructionsPlaceholder": "作业说明...",
+      "maxScorePlaceholder": "最高分",
+      "cancel": "取消",
+      "saving": "保存中...",
+      "save": "保存作业"
+    },
+    "basics": {
+      "level": "难度",
+      "thumbnailTask": "封面：{title}",
+      "courseTitle": "课程标题",
+      "description": "描述",
+      "thumbnail": "封面图",
+      "thumbnailAlt": "封面预览",
+      "uploadingThumbnail": "正在上传封面...",
+      "category": "分类",
+      "pickCategory": "-- 选择分类 --",
+      "saving": "保存中...",
+      "save": "保存更改"
+    },
+    "lessonResource": {
+      "documentTask": "文档：{name}",
+      "title": "资源",
+      "hint": "为学员在本课时提供支持的参考文件或链接。请确保文件易于阅读，最大 50MB。",
+      "loading": "加载中...",
+      "delete": "删除",
+      "empty": "暂无资源。",
+      "addFile": "从设备添加文件",
+      "pasteLink": "粘贴链接",
+      "uploadingDoc": "正在上传文档...",
+      "displayName": "显示名称",
+      "adding": "添加中...",
+      "addLink": "添加链接",
+      "maxReached": "已达到 {max} 个资源的上限 — 请删除部分后再添加。"
+    },
+    "financeConfirm": {
+      "title": "通过邮件确认",
+      "subtitle": "您需要使用收到此邮件的讲师账户登录。",
+      "invalid": "链接无效：缺少确认码。",
+      "notLoggedIn": "您尚未在此浏览器上登录。请使用收到邮件的讲师账户登录，系统会将您带回确认步骤。",
+      "login": "登录以确认",
+      "payoutConfirmed": "已确认提现申请。转账完成后我们会通过邮件通知您。",
+      "accountConfirmed": "已确认收款账户。",
+      "backToEarnings": "返回收入页面",
+      "clickToFinish": "点击下方按钮完成确认。该链接只能使用一次。",
+      "failed": "无法确认。链接可能已过期。",
+      "confirming": "确认中...",
+      "confirm": "确认"
+    },
+    "proctoringAttempt": {
+      "violation": {
+        "TAB_SWITCH": "切换标签页",
+        "WINDOW_BLUR": "切换窗口/应用",
+        "FULLSCREEN_EXIT": "退出全屏",
+        "NO_FACE": "未检测到人脸",
+        "MULTIPLE_FACES": "多于 1 人",
+        "HEAD_TURNED": "头转向一侧",
+        "GAZE_AWAY": "视线离开屏幕（AI）",
+        "AUDIO_VOICE_DETECTED": "检测到说话声",
+        "DEVTOOLS_OPEN": "打开了 DevTools",
+        "COPY_PASTE_BLOCKED": "复制/粘贴/右键",
+        "IDLE_TOO_LONG": "长时间无操作"
+      },
+      "loading": "加载中...",
+      "back": "返回",
+      "aiVerdict": "AI 评估",
+      "noVideo": "暂无视频",
+      "violations": "违规（{count}）",
+      "noViolations": "无违规。"
+    },
+    "activity": {
+      "justNow": "刚刚",
+      "minutesAgo": "{count} 分钟前",
+      "hoursAgo": "{count} 小时前",
+      "daysAgo": "{count} 天前",
+      "title": "最近活动",
+      "close": "关闭",
+      "loading": "加载中...",
+      "empty": "尚无活动记录。",
+      "system": "系统"
+    },
+    "versionHistory": {
+      "restored": "已将旧版本内容恢复为最新版本",
+      "restoreError": "无法恢复版本",
+      "title": "版本历史",
+      "loading": "加载中...",
+      "empty": "暂无版本历史。",
+      "active": "使用中",
+      "untitled": "未命名学习资料",
+      "viewTitle": "查看此版本（只读）",
+      "restoreTitle": "将此内容恢复为最新版本"
+    },
+    "balance": {
+      "noCrypto": "服务器尚未启用收款账户功能，因此暂时无法关联账户或提现。您的收入仍会完整记录；管理员将启用此功能。",
+      "negative": "由于支付后发生的退款，您的余额为负 {amount}。该金额将从之后订单的收入中抵扣。",
+      "withdrawable": "可提现",
+      "nextPayout": "下次付款：{date}",
+      "holding": "保留中",
+      "holdingHint": "新收入，在退款期内保留",
+      "frozen": "冻结",
+      "frozenHint": "存在申诉的订单，等待处理",
+      "paidOut": "已到账",
+      "paidOutHint": "已转账的总金额"
+    },
+    "statement": {
+      "month": "{year} 年 {month} 月",
+      "title": "月度收入对账单",
+      "chooseMonth": "选择月份",
+      "downloadPdf": "下载 PDF",
+      "downloadHint": "当前查看月份的对账单",
+      "empty": "每月的对账单会在该月结束后立即显示在这里（如果当月有收入、退款或提现）。",
+      "debtReceipts": "还款收据",
+      "receiptError": "无法下载收据。"
+    },
+    "referral": {
+      "title": "推荐链接",
+      "body": "在您的渠道（Facebook、YouTube...）上分享此链接 — 学员通过它购买时，您可获得 <b>{referral}</b> 的收入，而学员通过平台搜索自行找到课程时仅为 {organic}。",
+      "copied": "已复制 ✓",
+      "copy": "复制",
+      "shareTitle": "分享到社交媒体或通过设备上的应用",
+      "share": "分享"
+    },
+    "studentsPage": {
+      "viewAria": "查看模式",
+      "atRisk": "需要关注",
+      "all": "全部",
+      "searchPlaceholder": "按姓名、邮箱或课程搜索...",
+      "searchAria": "搜索学员",
+      "emptyRisk": "没有需要关注的学员。选择“全部”可查看所有学员。",
+      "emptyMatch": "没有匹配的学员。"
+    },
+    "uploadTray": {
+      "uploading": "正在上传（{count}）",
+      "errors": "{count} 个任务出错",
+      "done": "上传完成",
+      "cancel": "取消",
+      "close": "关闭"
+    },
+    "submitChecklist": {
+      "title": "提交审核条件",
+      "ready": "已满足提交审核条件",
+      "fixNow": "立即处理",
+      "recommend": "建议：添加练习（测验/闪卡/思维导图）（非必填）"
+    },
+    "pricing": {
+      "title": "为您的课程定价",
+      "hint": "免费课程请填 0。保存的价格立即生效，即使课程已发布。",
+      "price": "价格（đ）",
+      "saving": "保存中...",
+      "save": "保存更改"
+    },
+    "earningsPage": {
+      "title": "收入与提现",
+      "subtitle": "课程收入在退款期内会被保留，之后才能提现。您可按需提现，并需通过邮件确认。",
+      "loadError": "无法加载收入信息。请重试。"
+    },
+    "videoPreview": {
+      "title": "预览 — {title}"
+    },
+    "sectionTabs": {
+      "unread": "{count} 条未读"
     }
   },
   "coupons": {
@@ -1597,6 +3031,15 @@
       "adminHint": "请在上方搜索课程。",
       "none": "你还没有课程。",
       "needOne": "至少选择 1 门课程。"
+    },
+    "listFilter": {
+      "searchLabel": "搜索优惠码",
+      "searchPh": "按优惠码或适用课程名称搜索...",
+      "statusAria": "按状态筛选",
+      "all": "全部状态",
+      "active": "已启用",
+      "inactive": "已停用",
+      "noMatch": "没有匹配的优惠码。"
     }
   },
   "bundles": {
@@ -1635,6 +3078,25 @@
       "update": "更新组合",
       "create": "创建组合",
       "close": "关闭"
+    },
+    "list": {
+      "delete": "删除",
+      "deleteAria": "删除课程包:{title}",
+      "searchLabel": "搜索课程包",
+      "searchPh": "按课程包名称或包内课程名称搜索...",
+      "statusFilter": "按状态筛选",
+      "statusAll": "全部状态",
+      "statusActive": "在售",
+      "statusInactive": "已停用",
+      "noMatch": "没有匹配的课程包。",
+      "deleteTitle": "删除课程包?",
+      "deleteBody": "课程包“{title}”若无人购买将被彻底删除;若已有人购买,则会归档(停售并从列表隐藏),订单历史保持不变。"
+    },
+    "upsell": {
+      "included": "套餐包含:",
+      "adding": "添加中...",
+      "buy": "购买套餐,省更多 →",
+      "title": "💡 组合套餐更划算"
     }
   },
   "admin": {
@@ -1774,7 +3236,11 @@
         "next": "下一页",
         "page": "第 {page} / {total} 页"
       },
-      "authLocal": "Email"
+      "authLocal": "Email",
+      "prompt": {
+        "title": "输入信息以查找用户",
+        "body": "账户数量很多，因此不会预先列出。请在上方搜索框输入姓名、邮箱或用户 ID；或选择“已锁定 / 被标记为垃圾信息”分组查看需要关注的账户。每个账户的角色会直接显示在结果中。"
+      }
     },
     "moderation": {
       "title": "课程审核",
@@ -1897,7 +3363,7 @@
     },
     "aiAnalytics": {
       "title": "AI 分析",
-      "subtitle": "监控学员的 API 用量，必要时锁定 AI 使用权限。",
+      "subtitle": "按功能和用户跟踪 AI API 密钥（Gemini、Groq）的预估费用。",
       "chartTitle": "每日 AI 费用（最近 30 天）",
       "cost": "费用",
       "day": "{date} 日",
@@ -1915,7 +3381,86 @@
       "unlock": "解锁",
       "empty": "暂无统计数据",
       "updated": "已更新该用户的 AI 状态",
-      "error": "出错了"
+      "error": "出错了",
+      "feature": {
+        "FLASHCARD": "抽认卡",
+        "MINDMAP": "思维导图",
+        "QUIZ": "测验",
+        "DUBBING_TRANSLATE": "配音：台词翻译",
+        "DUBBING_TRANSCRIBE": "配音：语音识别",
+        "TRANSCRIPT_EXTRACTION": "课程转录",
+        "TUTOR_CHAT": "AI 导师（问答）",
+        "TUTOR_QUIZ_EXPLAIN": "AI 导师：答案解析",
+        "TUTOR_TITLE": "AI 导师：会话标题",
+        "DISCOVERY_CHAT": "AI 找课",
+        "INSTRUCTOR_AI": "讲师 AI 助手",
+        "PROCTORING_RISK": "监考：风险评估",
+        "PROCTORING_FRAME": "监考：图像分析",
+        "EMBEDDING_TUTOR": "课程内容向量化",
+        "EMBEDDING_COURSE": "课程信息向量化",
+        "UNTAGGED": "未分类"
+      },
+      "filter": {
+        "from": "开始日期",
+        "to": "结束日期",
+        "feature": "AI 功能",
+        "allFeatures": "全部功能",
+        "badRange": "结束日期必须晚于或等于开始日期。"
+      },
+      "partial": "系统自 {date} 起完整记录所有功能的费用。在此之前，抽认卡、思维导图和测验为实际记录，而配音和 AI 导师是根据已存数据估算（仅含可见输出，不含思考 token 和测试调用），因此该区间的总额低于实际。差额请查看下方的“与账单对账”。",
+      "loadError": "无法加载 AI 费用数据，请重试。",
+      "stat": {
+        "cost": "预估费用",
+        "rate": "{usd} · 汇率 {rate} 越南盾/美元",
+        "requests": "AI 调用次数",
+        "tokens": "总 token 数",
+        "audio": "已识别音频（Groq）",
+        "hours": "{hours} 小时",
+        "audioHint": "按音频时长计费，而非 token"
+      },
+      "daily": {
+        "q": "每天的 AI 费用是多少，来自哪些功能？",
+        "insight": "花费最多：{name}（{amount}，占总费用 {pct}%）。",
+        "aria": "按日期和功能显示 AI 费用的堆叠柱状图"
+      },
+      "share": {
+        "q": "哪些功能的费用占比最高？",
+        "insight": "大部分费用集中在前几个功能 — 优先控制这些功能。",
+        "empty": "暂无数据。",
+        "aria": "按功能显示 AI 费用占比的饼图"
+      },
+      "users": {
+        "title": "谁使用 AI 最多？",
+        "search": "搜索用户",
+        "searchPh": "邮箱、姓名或用户 ID...",
+        "lockedOnly": "仅显示 AI 被锁定的用户",
+        "costCol": "预估费用",
+        "note": "此表仅包含与特定用户关联的 AI 调用；系统费用（向量化、访客搜索等）计入上方的总费用。"
+      },
+      "billing": {
+        "title": "与账单对账",
+        "intro": "将基于 token 的预估费用与 Google AI Studio 实际收费（按周期从项目的 Usage 页面录入）进行比较。仅含 Gemini；Groq 单独结算。",
+        "close": "关闭",
+        "open": "录入账单",
+        "billed": "实际账单",
+        "tracked": "已归属到功能",
+        "unexplained": "未归属",
+        "ofBill": "占账单 {pct}%",
+        "noRec": "当前日期范围内没有完整的账单周期。请选择完整覆盖某个已录入账单周期的日期范围以查看对账。",
+        "unexplainedHint": "未归属部分通常来自隐藏的思考 token、测试或失败的调用，或尚未记录的功能（直播课、Google 搜索增强）。完整记录开始后，这部分会逐渐减少。",
+        "from": "开始日期",
+        "to": "结束日期",
+        "amount": "金额（越南盾）",
+        "amountPh": "例如 220739",
+        "note": "备注（可选）",
+        "save": "保存账单",
+        "rules": "每个周期只能录入一次，且不得与已录入的周期重叠。已保存的账单无法修改或删除，以确保对账数据可信。",
+        "empty": "暂无账单。",
+        "saved": "账单已保存。",
+        "saveError": "无法保存账单，请稍后重试。"
+      },
+      "loading": "加载中...",
+      "retry": "重试"
     },
     "voices": {
       "title": "配音声音",
@@ -2004,6 +3549,55 @@
         "prev": "Previous",
         "next": "Next",
         "page": "Page {page} of {total}"
+      },
+      "view": {
+        "label": "查看",
+        "ATTENTION": "需处理（失败且无成功版本）",
+        "PROCESSING": "处理中",
+        "PENDING": "等待中",
+        "COMPLETED": "已完成",
+        "FAILED": "所有失败任务",
+        "SKIPPED": "已跳过",
+        "ALL": "全部"
+      },
+      "state": {
+        "PENDING": "等待中",
+        "PROCESSING": "处理中",
+        "COMPLETED": "已完成",
+        "FAILED": "失败",
+        "SKIPPED": "已跳过",
+        "CANCELLED": "已取消"
+      },
+      "find": {
+        "label": "搜索任务",
+        "ph": "课程、课时、语言、申请人或任务 ID..."
+      },
+      "from": "开始日期",
+      "to": "结束日期",
+      "head": {
+        "course": "课程 / 课时",
+        "language": "语言",
+        "requester": "申请人",
+        "status": "状态",
+        "progress": "进度",
+        "time": "时间",
+        "error": "错误",
+        "actions": "操作"
+      },
+      "emptyAttention": "没有需要处理的任务。",
+      "emptyFilter": "没有符合筛选条件的任务。",
+      "jobRef": "{lesson} · 任务 #{id}",
+      "superseded": "已有成功的配音版本",
+      "retries": "重试 {count}/3",
+      "created": "创建于 {at}",
+      "finished": "完成于 {at}",
+      "retryAria": "重试：{lesson}",
+      "queued": "任务已重新加入配音队列。",
+      "retryFailed": "无法重试该任务，请稍后再试。",
+      "confirm": {
+        "title": "重新配音？",
+        "body": "“{lesson}”（{language}）将从头重新翻译和朗读，这会产生 AI 费用。仅在确定该课时尚无可用配音时才重试。",
+        "cancel": "取消"
       }
     },
     "payments": {
@@ -2074,6 +3668,17 @@
         "gateway": "Gateway code",
         "notYet": "Not yet",
         "dispute": "View/handle dispute"
+      },
+      "find": {
+        "needCriteria": "请输入订单号、邮箱、买家姓名或课程（或选择状态）进行查询。",
+        "noReceipt": "该交易尚无收据。收据会在交易完成后生成，通常需要几分钟。",
+        "receiptError": "无法加载收据，请重试。",
+        "label": "搜索交易",
+        "ph": "订单号、支付网关编号、买家邮箱 / 姓名 / ID、课程...",
+        "promptTitle": "输入信息以查询交易",
+        "prompt": "交易数量很多，因此不会预先列出。请输入订单号、支付网关编号、买家的邮箱、姓名或 ID，或课程名称；点击结果可查看详情、下载收据并处理争议。",
+        "loading": "加载中...",
+        "receipt": "下载收据"
       }
     },
     "settings": {
@@ -2141,6 +3746,233 @@
       },
       "env": {
         "title": "环境"
+      },
+      "ui": {
+        "groups": "配置分组",
+        "unsaved": "有未保存的更改",
+        "saveRegion": "保存更改",
+        "pending": "有 {count} 项未保存的更改",
+        "fixInvalid": " — 请修正无效的值",
+        "decrease": "减少",
+        "increase": "增加",
+        "slider": "{label}（滑块）",
+        "daysPicked": "已选 {count}/4 天",
+        "pickHoliday": "选择节假日",
+        "addDate": "添加日期",
+        "noHolidays": "暂无节假日。",
+        "removeDate": "删除 {date}",
+        "addEmail": "添加邮箱",
+        "remove": "删除 {value}"
+      },
+      "schema": {
+        "groups": {
+          "ai": {
+            "title": "AI 额度",
+            "description": "限制每位用户使用 AI 功能的次数。"
+          },
+          "aicost": {
+            "title": "AI 成本",
+            "description": "系统已内置当前使用的 Gemini 模型价格表。以下单价仅适用于价格表中没有的模型,通常无需调整。请按服务商现行价格设置,使数据更贴近账单。"
+          },
+          "revenue": {
+            "title": "收入与分成",
+            "description": "每笔订单讲师可获得的比例。仅适用于保存后支付成功的订单;旧订单保留已应用的比例。"
+          },
+          "refund": {
+            "title": "退款与投诉",
+            "description": "学员退款政策和投诉处理期限。"
+          },
+          "payout": {
+            "title": "讲师结算",
+            "description": "讲师提现规则及通过 PayOS 的自动付款。"
+          },
+          "debt": {
+            "title": "讲师欠款",
+            "description": "讲师欠平台款项时的处理节点。"
+          },
+          "reports": {
+            "title": "报表与凭证",
+            "description": "面向管理员的自动财务报表以及凭证上显示的信息。"
+          }
+        },
+        "items": {
+          "QUOTA_DUB_STUDENT": {
+            "label": "每位学员配音次数",
+            "help": "学员每天最多可使用配音的次数。"
+          },
+          "QUOTA_DUB_INSTRUCTOR": {
+            "label": "每位讲师配音次数",
+            "help": "讲师每天最多可使用配音的次数。"
+          },
+          "QUOTA_MATERIALS": {
+            "label": "每人生成学习资料次数",
+            "help": "每天使用 AI 生成学习资料(测验、闪卡、思维导图)的次数。"
+          },
+          "QUOTA_TUTOR": {
+            "label": "AI 导师消息数",
+            "help": "每人每天最多可向 AI 导师发送的消息数。"
+          },
+          "QUOTA_GUEST_SEARCH": {
+            "label": "访客 AI 搜索",
+            "help": "未登录用户每小时的 AI 搜索次数。"
+          },
+          "AI_PRICE_INPUT_USD_PER_M": {
+            "label": "输入 token 单价(价格表中没有的模型)",
+            "help": "每 100 万输入 token 的美元价格。"
+          },
+          "AI_PRICE_OUTPUT_USD_PER_M": {
+            "label": "输出及思考 token 单价(价格表中没有的模型)",
+            "help": "每 100 万输出 token 的美元价格;隐藏的思考 token 按相同单价计算。"
+          },
+          "AI_PRICE_EMBED_USD_PER_M": {
+            "label": "向量嵌入单价"
+          },
+          "AI_PRICE_AUDIO_USD_PER_HOUR": {
+            "label": "语音识别单价(Groq)",
+            "help": "每小时音频的美元价格。"
+          },
+          "USD_VND_RATE": {
+            "label": "美元兑越南盾汇率",
+            "help": "用于以越南盾显示 AI 成本。"
+          },
+          "REVENUE_ORGANIC_INSTRUCTOR_PCT": {
+            "label": "学员自行发现课程时讲师所得",
+            "help": "其余部分归平台所有。"
+          },
+          "REVENUE_REFERRAL_INSTRUCTOR_PCT": {
+            "label": "通过讲师推荐链接购买时讲师所得",
+            "help": "适用于通过讲师专属推荐链接产生的订单。"
+          },
+          "REFUND_WINDOW_DAYS": {
+            "label": "退款申请期限",
+            "help": "自支付成功之时起计算。"
+          },
+          "REFUND_MAX_PROGRESS_PCT": {
+            "label": "可退款的最大学习进度",
+            "help": "超过此进度,“改变主意”类退款申请不在政策范围内。"
+          },
+          "REFUND_HOLIDAYS": {
+            "label": "可顺延退款期限的节假日",
+            "help": "逐个选择节假日以加入列表。"
+          },
+          "DISPUTE_INSTRUCTOR_RESPONSE_HOURS": {
+            "label": "讲师回复投诉的时限"
+          },
+          "DISPUTE_APPEAL_DAYS": {
+            "label": "讲师对退款决定提出申诉的期限"
+          },
+          "REFUND_FLAG_RATE_PCT": {
+            "label": "高退款率课程预警",
+            "help": "当某课程 30 天内的退款率超过此值时通知管理员。"
+          },
+          "REFUND_FLAG_MIN_COUNT": {
+            "label": "预警所需的最低退款笔数",
+            "help": "退款笔数低于此值的课程不会预警,避免误报新课程。"
+          },
+          "PAYOUT_MIN_AMOUNT": {
+            "label": "最低提现金额"
+          },
+          "PAYOUT_DAYS_OF_MONTH": {
+            "label": "每月结算日",
+            "help": "每月最多选择 4 天(1 至 28 日)分批结算。"
+          },
+          "PAYOUT_HOLD_EXTRA_DAYS": {
+            "label": "退款期限之后额外冻结天数",
+            "help": "收入需在退款期限再加上此天数之后才能提现。"
+          },
+          "PAYOS_PAYOUT_ENABLED": {
+            "label": "通过 PayOS 自动付款",
+            "help": "关闭后,管理员只能手动转账。"
+          },
+          "PAYOS_PAYOUT_MAX_AMOUNT": {
+            "label": "单笔自动付款最高金额",
+            "help": "超过此金额的款项必须手动转账。"
+          },
+          "PAYOS_RETRY_COOLDOWN_MINUTES": {
+            "label": "两次重新付款之间的等待时间",
+            "help": "在一次付款失败后生效。"
+          },
+          "PAYOS_MAX_ATTEMPTS": {
+            "label": "单笔款项付款失败最多次数",
+            "help": "超过此次数后只能手动转账。"
+          },
+          "DEBT_RESTRICT_DAYS": {
+            "label": "欠款逾期后限制",
+            "help": "讲师不能发布新课程,也不能报名推广。"
+          },
+          "DEBT_SUSPEND_DAYS": {
+            "label": "欠款逾期后暂停销售课程",
+            "help": "已有学员仍可正常学习;仅停止接收新订单。"
+          },
+          "DEBT_MIN_REPAY": {
+            "label": "每次最低还款金额",
+            "help": "还清剩余欠款时除外。"
+          },
+          "REPORT_DAILY_ENABLED": {
+            "label": "发送每日财务报表"
+          },
+          "REPORT_WEEKLY_ENABLED": {
+            "label": "发送每周财务报表",
+            "help": "于周一早上发送,内容为刚结束的一周。"
+          },
+          "REPORT_MONTHLY_ENABLED": {
+            "label": "发送每月财务报表",
+            "help": "于 1 日早上发送,内容为刚结束的一个月。"
+          },
+          "REPORT_RECIPIENTS": {
+            "label": "报表接收邮箱",
+            "help": "用逗号分隔。留空则发送给所有可接收邮件的管理员。"
+          },
+          "STATEMENT_EMAIL_INSTRUCTORS": {
+            "label": "通过邮件向讲师发送月度收入对账单",
+            "help": "关闭后,讲师仍可在“收入”页面查看和下载对账单。"
+          },
+          "PUBLIC_INVOICE_LINK_ENABLED": {
+            "label": "允许通过 PDF 文件上的二维码打开凭证",
+            "help": "紧急开关,关闭后停用所有凭证二维码链接;已发出的 PDF 文件仍可在登录后查看。"
+          },
+          "INVOICE_ISSUER_NAME": {
+            "label": "凭证上的开具方名称"
+          },
+          "INVOICE_ISSUER_NOTE": {
+            "label": "凭证上的开具方备注",
+            "placeholder": "例如:税号、地址"
+          }
+        },
+        "units": {
+          "turnsPerDay": "次/天",
+          "timesPerDay": "次/天",
+          "msgsPerDay": "条/天",
+          "turnsPerHour": "次/小时",
+          "usdPerMTok": "美元 / 100 万 token",
+          "usdPerAudioHour": "美元 / 音频小时",
+          "days": "天",
+          "hours": "小时",
+          "minutes": "分钟",
+          "times": "次",
+          "turns": "次"
+        },
+        "validation": {
+          "needNumber": "请输入一个数字。",
+          "integerOnly": "仅限输入非负整数,不要使用句点、逗号或字母。",
+          "minValue": "最小值为 {min}。",
+          "maxValue": "最大值为 {max}。",
+          "percentFormat": "仅限输入非负数,小数点后最多 2 位(例如 37 或 97.5)。",
+          "percentRange": "数值必须在 {min} 到 {max} 之间。",
+          "priceFormat": "仅限输入非负数,小数点后最多 4 位(例如 0.30)。",
+          "priceMax": "最大值为 {max}。",
+          "badEmail": "“{value}”不是有效的邮箱地址。",
+          "dupEmail": "有重复的邮箱。",
+          "daysMin": "至少需要选择 1 天。",
+          "daysMax": "每月最多选择 4 个结算日。",
+          "daysRange": "结算日必须在 1 到 28 之间。",
+          "dupDay": "有重复选择的日期。",
+          "datesMax": "最多 60 天。",
+          "badDate": "“{value}”不是有效日期。",
+          "issuerRequired": "开具方名称不能为空。",
+          "maxLength": "最多 {max} 个字符。",
+          "badSwitch": "开/关值无效。"
+        }
       }
     },
     "categories": {
@@ -2164,7 +3996,10 @@
         "title": "删除此分类？",
         "body": "分类“{name}”将被删除。如果仍有课程属于该分类，系统会拒绝。",
         "cancel": "取消"
-      }
+      },
+      "search": "搜索分类",
+      "searchPh": "按分类名称或路径搜索...",
+      "noMatch": "没有匹配的分类。"
     },
     "reviews": {
       "title": "评价审核",
@@ -2258,6 +4093,37 @@
         "HIGH": "高",
         "MEDIUM": "中",
         "LOW": "低"
+      },
+      "manage": {
+        "updated": "公告已更新，包括用户已收到的副本。",
+        "updateError": "无法更新公告，请重试。",
+        "restored": "公告已恢复，用户可再次看到。",
+        "restoreError": "无法恢复公告，请重试。",
+        "deleted": "公告已删除。",
+        "deleteError": "无法删除公告，请重试。",
+        "revoked": "公告已撤回，用户将不再看到。",
+        "revokeError": "无法撤回公告，请重试。",
+        "history": "公告历史",
+        "search": "搜索公告",
+        "searchPh": "按标题或内容搜索...",
+        "actions": "操作",
+        "revokedStatus": "已撤回",
+        "revokedOn": "撤回于 {date}",
+        "restore": "恢复",
+        "delete": "删除",
+        "edit": "编辑",
+        "revoke": "撤回",
+        "more": "查看更多",
+        "editTitle": "编辑公告",
+        "editHint": "修改也会应用到用户已收到的公告。发送后无法更改接收范围和级别。",
+        "cancel": "取消",
+        "saving": "保存中...",
+        "save": "保存更改",
+        "deleteTitle": "永久删除公告？",
+        "deleteBody": "公告“{title}”及用户收到的所有副本将被永久删除，无法恢复。如只想暂时隐藏，请保持已撤回状态。",
+        "deleteConfirm": "永久删除",
+        "revokeTitle": "撤回公告？",
+        "revokeBody": "公告“{title}”将对所有已收到的用户隐藏（包括顶部横幅）。记录仍保留在历史中。"
       }
     },
     "disputes": {
@@ -2364,7 +4230,92 @@
         "previousNote": "Previous resolution note",
         "noteOverwriteWarning": "The new note will be saved; the previous note is kept above."
       },
-      "fileSuccess": "Dispute filed."
+      "fileSuccess": "Dispute filed.",
+      "search": "搜索争议",
+      "searchPh": "订单号、发起人邮箱或姓名、争议编号...",
+      "needsAction": "需处理",
+      "awaitingAccount": "等待学员更新账户",
+      "more": "查看更多",
+      "refundAccount": "退款收款账户",
+      "awaitingAccountNote": "未能转入学员申报的账户{summary}。正在等待学员更新退款收款账户；更新后，该退款会自动回到“待转账”以重新付款。您仍可手动转账并在下方记录。",
+      "policy": {
+        "needReason": "请为此模式选择原因代码。",
+        "noteShort": "“讲师承担全部”模式需要清楚的说明（至少 10 个字符）。",
+        "evidenceShort": "请说明证据（至少 20 个字符：什么证据、在哪里）。",
+        "waitInstructor": "讲师尚未回复且回复期限未到 — 请等待后再判定讲师承担责任。",
+        "reasonCode": "原因代码",
+        "optional": "（可选）",
+        "none": "不选择",
+        "choose": "选择原因代码",
+        "evidence": "证据 *（讲师会看到此内容）",
+        "evidencePh": "例如：第 3 课逐字抄袭课程 X，链接为 ...，对比截图已附在争议中",
+        "evidenceHint": "仅在有证据证明违规且讲师已回复或回复期限已过时使用此模式。讲师可申诉一次。"
+      },
+      "reasonCode": {
+        "BUYER_REMORSE": "学员在期限内改变主意",
+        "OTHER": "其他原因（无人过错）",
+        "TECHNICAL_ISSUE": "系统方技术故障",
+        "DOUBLE_CHARGE": "重复付款",
+        "NOT_ENROLLED": "已扣款但未报名",
+        "PLATFORM_FAULT": "平台方过错",
+        "COPYRIGHT_VIOLATION": "侵犯版权",
+        "CONTENT_MISMATCH": "内容与描述严重不符",
+        "PROHIBITED_CONTENT": "违禁内容"
+      },
+      "account": {
+        "noStandard": "学员尚未申报标准格式的退款账户{free}；只能手动转账。",
+        "freeNote": "（自由备注：{note}）",
+        "holder": "账户持有人：{name} · {state}",
+        "confirmed": "学员已确认本人账户",
+        "unconfirmed": "未确认本人账户"
+      },
+      "payos": {
+        "succeeded": "PayOS 已转账并已记录。",
+        "rejected": "PayOS 拒绝：{reason}",
+        "unknownReason": "原因不明",
+        "sent": "付款指令已发送至 PayOS，有结果后系统会自动更新。",
+        "sendError": "无法发送付款指令。",
+        "checkAccount": "需要重新核对退款收款账户",
+        "asked": "已请学员更新退款收款账户。",
+        "askError": "无法发送请求。",
+        "blocked": "重新付款已锁定",
+        "needAccount": "需要学员申报标准账户并确认本人账户",
+        "hint": "通过 PayOS 转账退款",
+        "retryAt": "{time} 后可重新付款",
+        "locked": "PayOS 付款已锁定",
+        "retry": "通过 PayOS 重新付款",
+        "send": "通过 PayOS 付款",
+        "askHint": "将退款转为等待学员核对并更新收款账户",
+        "ask": "请学员更新账户",
+        "balance": "付款账户余额：{amount}",
+        "unknownBalance": "未知",
+        "notReady": "学员的标准账户信息不完整，无法自动付款；请在下方手动转账。",
+        "inFlight": "有 PayOS 付款尚无结果 — 此时请勿手动转账（避免重复付款）。请等待结果或点击“通过 PayOS 付款”重新发送。",
+        "accountChanged": "学员已于 {time} 更改退款收款账户；转账前请核对新账户。",
+        "order": "指令 {ref}：{state}",
+        "ok": "成功",
+        "fail": "失败",
+        "unknown": "结果未知（可重新发送，不会重复付款）",
+        "pending": "处理中 — 等待 PayOS/银行确认，页面会自动更新",
+        "nameMismatch": " — ⚠ 银行返回的户名“{name}”与填写的姓名不同",
+        "cause": {
+          "TRANSIENT": "银行/PayOS 临时故障",
+          "ACCOUNT": "收款账户有问题",
+          "UNKNOWN": "原因不明"
+        }
+      },
+      "appeal": {
+        "decided": "已对讲师的申诉作出决定。",
+        "error": "无法处理申诉。",
+        "title": "讲师申诉",
+        "reason": "决定理由 *（讲师会收到此内容）",
+        "reduceHint": "讲师只需退还已收到的部分；超额罚款将退还",
+        "reduce": "接受，降为标准模式",
+        "uphold": "维持原决定",
+        "result": "结果：{outcome}",
+        "reduced": "已降为标准模式",
+        "upheld": "维持原决定"
+      }
     },
     "userDetail": {
       "back": "Back",
@@ -3114,7 +5065,351 @@
             ]
           }
         }
+      },
+      "find": {
+        "label": "搜索支持请求",
+        "ph": "请求编号、邮箱或标题...",
+        "more": "查看更多"
       }
+    },
+    "common": {
+      "loadError": "无法加载数据，请重试。",
+      "retry": "重试"
+    },
+    "finance": {
+      "title": "财务统计",
+      "subtitle": "全平台的收入、退款、讲师结算及 PayOS 对账。",
+      "gran": {
+        "DAY": "按日",
+        "WEEK": "按周",
+        "MONTH": "按月"
+      },
+      "reportType": {
+        "DAILY": "每日",
+        "WEEKLY": "每周",
+        "MONTHLY": "每月",
+        "MANUAL": "按需"
+      },
+      "reason": {
+        "BUYER_REMORSE": "改变主意",
+        "OTHER": "其他原因",
+        "TECHNICAL_ISSUE": "技术问题",
+        "DOUBLE_CHARGE": "重复扣款",
+        "NOT_ENROLLED": "已扣款但未报名",
+        "PLATFORM_FAULT": "平台故障",
+        "COPYRIGHT_VIOLATION": "侵犯版权",
+        "CONTENT_MISMATCH": "内容与描述不符",
+        "PROHIBITED_CONTENT": "违禁内容"
+      },
+      "stage": {
+        "REQUESTED": "待审核",
+        "APPROVED": "已批准，待付款"
+      },
+      "toast": {
+        "emailed": "报告已生成并发送到您的邮箱。",
+        "noEmail": "报告已保存，但由于您的账户没有可接收邮件的地址，未能发送邮件。您仍可通过“分享”按钮下载文件。",
+        "runError": "无法生成报告，请重试。"
+      },
+      "fileName": "financial-report",
+      "export": {
+        "pdf": "下载 PDF",
+        "pdfHint": "便于打印或发送的摘要",
+        "xlsx": "下载 Excel (XLSX)",
+        "xlsxHint": "包含全部数据的多工作表文件",
+        "csv": "下载 CSV",
+        "csvHint": "可用任何软件打开的原始数据",
+        "mail": "通过邮件发给我",
+        "mailHint": "生成报告、存入历史并附上文件"
+      },
+      "filter": {
+        "from": "开始日期",
+        "to": "结束日期",
+        "group": "分组方式",
+        "last7": "7 天",
+        "last30": "30 天",
+        "thisMonth": "本月",
+        "lastMonth": "上月",
+        "autoConfig": "配置自动报告"
+      },
+      "loadError": "无法加载数据，请检查日期范围后重试。",
+      "noData": "暂无数据。",
+      "stat": {
+        "gross": "总收入",
+        "net": "净收入（扣除退款）",
+        "refunds": "退还给学员的金额",
+        "refundMeta": "{count} 笔 · 占订单 {pct}%",
+        "platform": "平台留存"
+      },
+      "split": {
+        "platform": "平台分成",
+        "instructor": "讲师分成",
+        "refunded": "已退还学员"
+      },
+      "source": {
+        "referral": "通过推荐链接",
+        "organic": "学员自行找到"
+      },
+      "trend": {
+        "q": "收入在增长还是下降？",
+        "up": "总收入较上一周期增长 {pct}%。",
+        "down": "总收入较上一周期下降 {pct}%。",
+        "empty": "本周期没有交易。",
+        "aria": "按周期显示总收入和退款的面积图",
+        "gross": "总收入",
+        "refunds": "退款"
+      },
+      "splitChart": {
+        "q": "钱最终流向了谁？",
+        "insight": "平台留存总收入的 {platform}%，退还学员 {refunds}%。",
+        "aria": "平台、讲师与退款之间收入分配的饼图"
+      },
+      "leader": "领先：{name}（{amount}，{orders} 笔订单）。",
+      "topCourses": {
+        "q": "哪些课程带来的收入最多？",
+        "aria": "按课程显示收入的柱状图"
+      },
+      "topInstructors": {
+        "q": "哪些讲师贡献的收入最多？",
+        "aria": "按讲师显示收入的柱状图"
+      },
+      "refundRate": {
+        "q": "哪些课程的退款异常多？",
+        "none": "本周期内没有订单数达 {min} 笔及以上且发生退款的课程。",
+        "review": "需检查“{name}”的质量：{refunded}/{orders} 笔订单被退款（{pct}%）。",
+        "ok": "没有课程超过警戒线。",
+        "empty": "没有需要关注的课程。",
+        "aria": "按课程显示退款率的柱状图",
+        "series": "退款率"
+      },
+      "reasons": {
+        "q": "学员为什么申请退款？",
+        "insight": "最常见：{name}（{count} 笔，{amount}）。",
+        "empty": "本周期没有退款。",
+        "aria": "按原因显示退款的饼图"
+      },
+      "sources": {
+        "q": "收入来自哪里？",
+        "insight": "{pct}% 的收入来自讲师推荐链接。",
+        "aria": "按来源显示收入的饼图"
+      },
+      "pipeline": {
+        "q": "平台还欠讲师多少？哪些申请等待已久？",
+        "insight": "尚未支付给讲师的款项：{obligations}。",
+        "receivables": " · 讲师欠平台：{amount}",
+        "paid": " 本周期已付款：{amount}（{count} 次）。",
+        "empty": "没有待处理的提现申请。",
+        "row": "{stage}：{count} 个申请 · {amount}",
+        "oldest": "最早 {days} 天",
+        "late": " — 需处理",
+        "payosFee": "本周期 PayOS 转账费用：{amount}（{orders} 笔成功付款），由平台承担。"
+      },
+      "recon": {
+        "q": "PayOS 付款与账目是否一致？",
+        "match": "本周期所有成功的 PayOS 付款都与已记录的退款和结算一致。",
+        "diff": "相差 {amount}：{direction}。请查看下方的差异列表。",
+        "payosMore": "PayOS 支付的金额多于账目记录",
+        "bookMore": "账目记录多于 PayOS 实际支付",
+        "ok": "一致",
+        "mismatch": "存在差异",
+        "summary": "PayOS 已付 {payos}（{orders} 笔）· 账目记录 {recorded}（{count} 条）",
+        "refund": "退款",
+        "payout": "讲师结算"
+      },
+      "history": {
+        "title": "已发送报告历史",
+        "empty": "暂无报告。定期报告会根据配置自动生成；您也可以在“分享”按钮中选择“通过邮件发给我”。",
+        "range": "{from} 至 {to}",
+        "sent": "已发送至 {email}",
+        "notSent": "未发送邮件"
+      }
+    },
+    "payouts": {
+      "title": "讲师结算",
+      "subtitle": "审核提现申请，手动转账后记录交易号。拒绝或失败的款项会退回讲师余额。",
+      "status": {
+        "PENDING_EMAIL": "等待邮件确认",
+        "REQUESTED": "待审核",
+        "APPROVED": "已批准，待付款",
+        "PAID": "已付款",
+        "REJECTED": "已拒绝",
+        "CANCELLED": "已取消",
+        "FAILED": "付款失败"
+      },
+      "toast": {
+        "failed": "操作未成功。",
+        "approved": "申请已批准。",
+        "paid": "已记录转账并通知讲师。",
+        "rejected": "已拒绝，金额已退回讲师。",
+        "markedFailed": "已标记为失败，金额已退回讲师。"
+      },
+      "search": "搜索提现申请",
+      "searchPh": "申请编号、邮箱或讲师姓名...",
+      "statusLabel": "状态",
+      "all": "全部",
+      "exportHint": "下载已批准申请的 CSV 以批量转账（含完整账号，会记录日志）",
+      "export": "导出已批准 CSV",
+      "loadError": "无法加载列表。",
+      "empty": "没有申请。",
+      "cols": {
+        "code": "编号",
+        "instructor": "讲师",
+        "account": "收款账户",
+        "amount": "金额",
+        "status": "状态",
+        "time": "时间",
+        "actions": "操作"
+      },
+      "nameMismatch": "账户持有人姓名与讲师不符 — 请仔细核对",
+      "transferRef": "转账号：{ref}",
+      "created": "创建：{at}",
+      "batch": "结算批次：{at}",
+      "paidAt": "付款：{at}",
+      "approve": "批准",
+      "reveal": "查看账号",
+      "manual": "手动",
+      "markPaid": "已转账",
+      "markFailed": "失败",
+      "reject": "拒绝",
+      "more": "查看更多",
+      "revealDlg": {
+        "title": "收款账号",
+        "bank": "银行",
+        "number": "账号",
+        "holder": "账户持有人",
+        "amount": "金额",
+        "memo": "建议转账备注",
+        "audit": "本次查看已记录到审计日志。请勿外传账号。"
+      },
+      "dlg": {
+        "paidTitle": "记录已转账",
+        "rejectTitle": "拒绝提现申请",
+        "failTitle": "转账失败",
+        "cancel": "取消",
+        "confirm": "确认",
+        "refLabel": "转账交易号 *",
+        "reasonLabel": "原因 *（讲师会收到此内容）",
+        "proofLabel": "凭证图片链接（可选）"
+      },
+      "debts": {
+        "title": "讲师欠款（{count}）",
+        "level1": "欠款中",
+        "level2": "限制发布/推广",
+        "level3": "停止新销售",
+        "meta": "{email} · 自 {since} 起欠款（{days} 天）· {level}",
+        "writeOff": "核销欠款",
+        "reasonPh": "核销原因（必填，讲师会收到）",
+        "reasonLabel": "核销原因",
+        "confirm": "确认核销",
+        "cancel": "取消",
+        "done": "欠款已核销，已通知讲师。",
+        "error": "无法核销欠款。"
+      },
+      "payos": {
+        "succeeded": "PayOS 已付款并已记录。",
+        "rejected": "PayOS 拒绝：{reason}",
+        "unknownReason": "原因不明",
+        "sent": "付款指令已发送至 PayOS，有结果后系统会自动更新。",
+        "sendError": "无法发送付款指令。",
+        "blocked": "重新付款已锁定",
+        "hint": "通过 PayOS 转账 {amount}。付款账户余额：{balance}",
+        "unknownBalance": "未知",
+        "sending": "发送中...",
+        "processing": "PayOS 处理中...",
+        "retryAt": "{time} 后可重新付款",
+        "locked": "PayOS 付款已锁定",
+        "retry": "通过 PayOS 重新付款",
+        "send": "通过 PayOS 付款",
+        "ok": "成功",
+        "fail": "失败",
+        "unknown": "结果未知",
+        "pending": "处理中 — 等待 PayOS/银行确认",
+        "nameMismatch": " ⚠ 银行户名与填写的姓名不同",
+        "cause": {
+          "TRANSIENT": "银行/PayOS 临时故障",
+          "ACCOUNT": "收款账户有问题",
+          "UNKNOWN": "原因不明"
+        }
+      }
+    },
+    "promotions": {
+      "title": "课程推广",
+      "subtitle": "审核讲师的推广申请。获批课程会在您选择的时间段内出现在“推荐”栏位。",
+      "status": {
+        "REQUESTED": "待审核",
+        "APPROVED": "已批准",
+        "REJECTED": "已拒绝",
+        "CANCELLED": "已取消",
+        "ENDED": "已结束"
+      },
+      "placement": {
+        "HOME_FEATURED": "首页“推荐”栏位",
+        "CATEGORY_FEATURED": "分类页顶部"
+      },
+      "toast": {
+        "failed": "操作未成功。",
+        "approved": "已批准，课程将立即上架。",
+        "rejected": "已拒绝申请。",
+        "ended": "已撤下推广，讲师将收到通知。"
+      },
+      "search": "搜索推广申请",
+      "searchPh": "课程名称、讲师姓名或邮箱...",
+      "statusLabel": "状态",
+      "all": "全部",
+      "loadError": "无法加载列表。",
+      "empty": "没有申请。",
+      "running": "进行中",
+      "requestNote": "讲师备注：{note}",
+      "adminNote": "管理员备注：{note}",
+      "estimate": "估算：推广期间 {during} 笔订单（{revDuring}），之前同等时长 {before} 笔订单（{revBefore}）。",
+      "approve": "批准",
+      "reject": "拒绝",
+      "end": "撤下推广",
+      "dlg": {
+        "approveTitle": "批准推广",
+        "endTitle": "撤下推广",
+        "rejectTitle": "拒绝申请",
+        "cancel": "取消",
+        "confirm": "确认",
+        "endAt": "结束时间 *",
+        "endHint": "批准后立即开始；最长 90 天。",
+        "note": "备注（可选）",
+        "reason": "原因 *（讲师会收到此内容）"
+      }
+    },
+    "invoices": {
+      "title": "发票与凭证",
+      "subtitle": "查询付款收据、退款单、提现付款单、还款收据和月度收入明细。凭证不可修改或删除。",
+      "type": {
+        "RECEIPT": "付款收据",
+        "REFUND": "退款单",
+        "PAYOUT": "提现付款单",
+        "DEBT_RECEIPT": "还款收据",
+        "STATEMENT": "月度收入明细"
+      },
+      "needCriteria": "请输入凭证编号、订单号、收件人邮箱或姓名、课程名称（或选择类型、日期范围）进行查询。",
+      "resent": "已通过邮件将凭证重新发送给收件人。",
+      "resendFailed": "发送失败：收件人没有可用的邮箱地址。",
+      "shareResults": "分享结果",
+      "csv": "下载列表（CSV）",
+      "csvHint": "本次搜索的全部结果",
+      "csvName": "documents.csv",
+      "search": "搜索凭证",
+      "searchPh": "凭证编号、订单号、收件人邮箱 / 姓名 / ID、课程名称...",
+      "typeLabel": "凭证类型",
+      "allTypes": "全部类型",
+      "from": "开始日期",
+      "to": "结束日期",
+      "promptTitle": "输入信息以查询凭证",
+      "prompt": "系统开具的凭证数量很多，因此不会预先列出。请输入凭证编号、订单号、收件人的邮箱、姓名或 ID，或课程名称；点击结果可查看详情、下载 PDF 或重新发送邮件给收件人。",
+      "loadError": "无法加载结果，请重试。",
+      "empty": "没有符合搜索条件的凭证。",
+      "detail": "凭证详情",
+      "pdf": "下载 PDF",
+      "pdfHint": "用于保存或打印的凭证副本",
+      "resend": "通过邮件重新发送",
+      "resendHint": "发送至 {email}",
+      "close": "关闭",
+      "immutable": "凭证永久保存；如有错误，将通过调整单作废，不会直接修改。"
     }
   },
   "supportHelp": {
@@ -3600,6 +5895,1118 @@
   "common": {
     "layout": {
       "viewAll": "查看全部"
+    },
+    "ui": {
+      "close": "关闭"
+    },
+    "notifications": {
+      "flashcardReminder": "该复习闪卡了",
+      "newNotification": "新通知"
+    },
+    "markdown": {
+      "lessonFallback": "第 {id} 课"
+    },
+    "search": {
+      "searching": "搜索中...",
+      "search": "搜索",
+      "results": "{total} 条结果",
+      "resultsPage": "{total} 条结果 · 第 {page}/{pages} 页",
+      "pagination": "分页",
+      "prev": "上一页",
+      "next": "下一页"
+    },
+    "legal": {
+      "updated": "最后更新:{date}",
+      "stub": "此内容正在建设中,将在后续版本中更新。"
+    },
+    "export": {
+      "share": "分享",
+      "failed": "操作未成功,请重试。",
+      "busy": "处理中..."
+    },
+    "confirm": {
+      "title": "确认",
+      "ok": "同意",
+      "cancel": "取消"
+    },
+    "banner": {
+      "close": "关闭公告"
+    },
+    "delta": {
+      "same": "与上期相比无变化",
+      "noPrevious": "上期暂无数据",
+      "vsPrevious": "{arrow} 较上期 {pct}%"
+    },
+    "select": {
+      "searchPlaceholder": "快速搜索...",
+      "empty": "没有结果"
+    },
+    "streak": {
+      "freezes": "🧊 本月还剩 {remaining} 次连续记录冻结"
+    },
+    "rating": {
+      "pick": "选择星级评分"
+    },
+    "pagination": {
+      "prev": "上一页",
+      "next": "下一页",
+      "page": "第 {current}/{total} 页"
+    },
+    "spinner": {
+      "loading": "加载中"
+    },
+    "typing": {
+      "replying": "正在回复"
     }
+  },
+  "finance": {
+    "invoiceType": {
+      "RECEIPT": "付款收据",
+      "REFUND": "退款单",
+      "PAYOUT": "提现付款单",
+      "DEBT_RECEIPT": "还款收据",
+      "STATEMENT": "月度收入明细"
+    },
+    "invoiceStatus": {
+      "ISSUED": "已开具",
+      "VOIDED": "已作废"
+    },
+    "invoiceField": {
+      "periodLabel": "明细周期",
+      "orders": "本期订单数",
+      "earnings": "课程收入",
+      "refundReversals": "退款扣除",
+      "adjustments": "调整",
+      "debtRepayments": "已还款",
+      "payoutsPaid": "本期已提现",
+      "platformShare": "平台在这些订单中的分成",
+      "billingName": "付款人姓名",
+      "billingPhone": "电话号码",
+      "paymentMethod": "支付方式",
+      "gatewayTxnNo": "支付网关交易号",
+      "orderRef": "订单号",
+      "originalReceipt": "原始收据",
+      "payoutCode": "提现申请编号",
+      "bankName": "银行",
+      "accountMasked": "收款账户",
+      "holderName": "账户持有人",
+      "orderCode": "支付编号",
+      "transferRef": "银行交易流水号",
+      "transferredAt": "转账时间"
+    },
+    "invoiceDetail": {
+      "recipient": "收件人",
+      "issuedAt": "开具日期",
+      "related": "相关单据",
+      "byCourse": "按课程统计的收入",
+      "byCourseChart": "本期按课程统计收入的柱状图",
+      "content": "内容",
+      "amount": "金额",
+      "discount": "优惠",
+      "total": "合计",
+      "payoutFeeNote": "转账手续费由 LinguaLearn 承担，不会从您收到的金额中扣除。"
+    },
+    "refundReason": {
+      "BUYER_REMORSE": "学员在退款期限内改变主意",
+      "OTHER": "其他原因（无责任方）",
+      "TECHNICAL_ISSUE": "系统端技术故障",
+      "DOUBLE_CHARGE": "重复付款",
+      "NOT_ENROLLED": "已扣款但未报名成功",
+      "PLATFORM_FAULT": "平台方过错",
+      "COPYRIGHT_VIOLATION": "侵犯版权",
+      "CONTENT_MISMATCH": "内容与描述严重不符",
+      "PROHIBITED_CONTENT": "违禁内容"
+    },
+    "refundResponsibility": {
+      "STANDARD": "标准 — 讲师退还其已获得的分成",
+      "PLATFORM_COMPENSATES": "平台承担全部",
+      "INSTRUCTOR_FAULT": "讲师承担全部"
+    },
+    "instructorPayoutStatus": {
+      "PENDING_EMAIL": "等待邮件确认",
+      "REQUESTED": "等待审核",
+      "APPROVED": "已批准 · 正在转账",
+      "PAID": "已到账",
+      "REJECTED": "未获批准",
+      "CANCELLED": "已取消",
+      "FAILED": "转账失败 · 余额已退回"
+    },
+    "ledgerType": {
+      "EARNING": "订单收入",
+      "REFUND_REVERSAL": "退款扣除",
+      "PAYOUT_RESERVE": "提现",
+      "PAYOUT_RELEASE": "余额退回（提现失败）",
+      "ADJUSTMENT": "调整"
+    },
+    "ledger": {
+      "title": "收入流水",
+      "group": "款项类型",
+      "groupALL": "全部",
+      "groupEARNING": "订单收入",
+      "groupREFUND": "退款扣除",
+      "groupPAYOUT": "提现",
+      "groupDEBT": "还款",
+      "groupADJUSTMENT": "调整",
+      "from": "开始日期",
+      "to": "结束日期",
+      "clear": "清除筛选",
+      "loading": "加载中...",
+      "noMatch": "没有符合筛选条件的款项。",
+      "empty": "暂无收入记录。",
+      "colTime": "时间",
+      "colType": "类型",
+      "colNote": "备注",
+      "colEffective": "生效",
+      "colAmount": "金额",
+      "matured": "已计入余额",
+      "heldUntil": "冻结至 {date}"
+    },
+    "refundDecision": {
+      "appealSent": "申诉已提交。管理员将进行审核并回复您。",
+      "appealFailed": "申诉提交失败。",
+      "title": "退款决定",
+      "mode": "模式：",
+      "charged": "从您的收入中扣除：",
+      "reason": "原因：{reason}。",
+      "adminNote": "管理员备注：{note}",
+      "evidence": "证据：{note}",
+      "appealOpen": "您的申诉正在等待管理员处理。",
+      "appealResult": "申诉结果：{result}",
+      "appealReduced": "已接受，已降为标准模式",
+      "appealUpheld": "维持原决定",
+      "appealHint": "不同意？您可以在 {deadline} 前申诉一次。等待期间，因欠款产生的限制（如有）将暂停。",
+      "deadlineFallback": "截止时间",
+      "placeholder": "请说明您的理由和证据（至少 20 个字符）",
+      "sending": "发送中...",
+      "submit": "提交申诉"
+    }
+  },
+  "pages": {
+    "notFound": {
+      "message": "找不到页面。链接可能不存在，或您没有访问权限。",
+      "home": "返回首页"
+    },
+    "messages": {
+      "title": "消息",
+      "loading": "加载中..."
+    },
+    "about": {
+      "title": "关于 LinguaLearn",
+      "intro": "LinguaLearn 是一个集成 AI 的在线学习平台（LMS），源于一项毕业论文课题，旨在帮助越南学员获取来自世界各地的优质课程，不再受视频原始语言的限制。",
+      "v1Title": "消除语言障碍",
+      "v1Desc": "AI 自动将外语课程翻译并配音为越南语（反之亦然），与原画面精确同步到毫秒——学员不必再一边看视频一边读字幕。",
+      "v2Title": "主动学习，而不只是观看",
+      "v2Desc": "苏格拉底式助教会根据当前观看的课程内容提出启发性问题，而不是直接给出答案——帮助学员真正理解而非死记硬背。",
+      "v3Title": "透明的学习进度",
+      "v3Desc": "学员和讲师都可以清晰地跟踪每节课的进度、测验结果和学习路径。",
+      "footer": "这是一个学术研究成果，其开发和运营旨在展示 AI 在在线教育中的功能。"
+    },
+    "checkout": {
+      "cancelled": "已取消支付。"
+    },
+    "materials": {
+      "notFound": "找不到课程信息。",
+      "backToCourses": "← 返回课程列表",
+      "back": "← 返回",
+      "title": "管理 AI 学习资料",
+      "subtitle": "根据课程内容自动生成思维导图、闪卡和练习。",
+      "loading": "正在加载学习资料..."
+    },
+    "verify": {
+      "checking": "正在验证证书...",
+      "notFoundTitle": "找不到证书",
+      "notFoundDesc": "系统中不存在此证书编号。请重新检查链接。",
+      "revokedTitle": "证书已被撤销",
+      "revokedDesc": "此证书已被管理员撤销，不再具有验证效力。"
+    },
+    "live": {
+      "title": "直播课",
+      "subtitle": "与讲师一起观看直播——如有需要可选择配音语言。",
+      "tabPublic": "公开",
+      "tabEnrolled": "我的课程",
+      "emptyPublic": "目前没有正在进行或即将开始的公开直播。",
+      "emptyEnrolled": "您已报名的课程目前没有正在进行或即将开始的直播。",
+      "loading": "加载中…",
+      "loadError": "无法加载直播列表。",
+      "loginTitle": "登录以查看您已报名课程的直播",
+      "loginDesc": "各课程的专属直播仅向已报名该课程的学员显示。",
+      "login": "登录",
+      "register": "注册"
+    },
+    "teaching": {
+      "r1Title": "按您的方式授课",
+      "r1Desc": "发布您想要的课程，按您想要的方式，并始终完全掌控自己的内容。",
+      "r2Title": "激励学员",
+      "r2Desc": "教授您所知道的，帮助学员发现兴趣、掌握新技能、发展职业。",
+      "r3Title": "获得应有的回报",
+      "r3Desc": "拓展专业人脉，建立个人声誉，并从每次付费报名中获得额外收入。",
+      "planLabel": "规划课程大纲",
+      "planBody": "从您的热情和知识出发，选择一个合适的主题。教学方法和知识内容由您决定。",
+      "planHelp": "“课程大纲”编辑器帮助您清晰地组织章节/课时，并在编辑时提供提交审核条件的清单。",
+      "videoLabel": "录制视频",
+      "videoBody": "您不需要昂贵的设备——只要声音清晰、画面清楚即可。可以直接上传视频，也可以使用 YouTube 链接。",
+      "videoHelp": "视频上传后，系统会自动提取原字幕并支持多语言 AI 配音，无需额外操作。",
+      "launchLabel": "发布课程",
+      "launchBody": "完善基本信息和价格，然后提交课程审核。审核通过后，您的课程将公开显示，方便学员找到。",
+      "launchHelp": "您可以随时修改内容/价格——只有第一次提交需要审核。",
+      "reasonsHeading": "开始的理由有很多。",
+      "supportHeading": "您不会孤单。",
+      "supportBody": "苏格拉底式 AI 助教、自动生成的学习资料，以及带有清单的课程大纲编辑器，从您的第一堂课起就已准备好陪伴您。您只需专注于想要分享的知识。",
+      "ctaHeading": "今天就成为讲师！",
+      "ctaSub": "加入 LinguaLearn 不断壮大的讲师社区。",
+      "ctaInstructor": "前往讲师频道",
+      "ctaStart": "开始",
+      "heroTitle": "来和我们一起授课吧！",
+      "heroSub": "成为讲师，改变他人的生活——也包括您自己的生活。",
+      "stepsHeading": "如何开始",
+      "helpHeading": "我们如何支持您"
+    },
+    "changePassword": {
+      "title": "修改密码",
+      "mismatch": "确认密码不一致",
+      "tooShort": "密码至少需要 8 个字符",
+      "success": "密码修改成功！",
+      "genericError": "发生错误",
+      "current": "当前密码",
+      "new": "新密码",
+      "confirm": "确认密码",
+      "processing": "处理中...",
+      "cancel": "取消"
+    },
+    "editProfile": {
+      "title": "编辑资料",
+      "error": "发生错误，请重试。",
+      "uploading": "上传中...",
+      "changeAvatar": "更换头像",
+      "avatarHint": "JPEG/PNG/WEBP，最大 5MB",
+      "fullName": "姓名",
+      "language": "首选语言",
+      "saving": "保存中...",
+      "save": "保存",
+      "close": "关闭"
+    },
+    "account": {
+      "loading": "加载中...",
+      "loadError": "无法加载信息。",
+      "title": "账户设置",
+      "role": "角色：{role}",
+      "preferredLanguage": "首选语言",
+      "joinedAt": "加入日期",
+      "editProfile": "编辑资料",
+      "changePassword": "修改密码",
+      "viewPublic": "查看公开资料",
+      "privacyTitle": "公开资料隐私",
+      "privacyDesc": "其他人查看您的<link>公开资料</link>页面时，将看到您在下方开启的项目。",
+      "showCourses": "显示已学课程",
+      "showWishlist": "显示心愿单",
+      "securityTitle": "安全与设备",
+      "securityDesc": "退出所有正在使用此账户的其他设备。",
+      "lastActive": "最近活动：{time}",
+      "logoutAllDone": "已退出所有其他设备。",
+      "genericError": "发生错误，请重试。",
+      "logoutAll": "退出所有其他设备"
+    },
+    "payments": {
+      "groupAll": "全部",
+      "groupSuccess": "成功",
+      "groupPending": "待处理",
+      "groupFailed": "失败",
+      "groupRefunded": "已退款",
+      "loadError": "加载交易记录失败",
+      "invoiceError": "无法下载凭证。请几分钟后重试。",
+      "statusAwaiting": "已批准退款 · 待转账",
+      "statusPaid": "成功",
+      "statusPending": "待处理",
+      "statusFailed": "失败",
+      "statusExpired": "已过期",
+      "statusRefunded": "已退款",
+      "title": "交易记录",
+      "subtitle": "每笔交易都有电子收据；如已退款，还有退款单，您可以直接在此下载。",
+      "filterByStatus": "按状态筛选",
+      "searchLabel": "搜索交易",
+      "searchPlaceholder": "订单号、支付网关编号或课程名称...",
+      "fromDate": "起始日期",
+      "toDate": "截止日期",
+      "clearFilters": "清除筛选",
+      "loading": "正在加载数据...",
+      "empty": "您还没有任何交易。",
+      "noMatch": "没有符合筛选条件的交易。",
+      "colRef": "参考编号（系统）",
+      "colGateway": "支付网关交易号",
+      "colCourse": "课程",
+      "colAmount": "金额",
+      "colMethod": "方式",
+      "colStatus": "状态",
+      "colPaidAt": "支付时间",
+      "colDocs": "凭证",
+      "none": "暂无",
+      "downloadTitle": "下载{kind} {number}（PDF）",
+      "kindRefund": "退款单",
+      "kindReceipt": "收据",
+      "downloading": "下载中...",
+      "btnRefund": "退款单",
+      "btnReceipt": "收据",
+      "creating": "生成中",
+      "creatingHint": "收据在支付完成后生成，通常需要几分钟"
+    },
+    "paymentDetail": {
+      "title": "交易详情",
+      "amount": "金额",
+      "discounted": "——已减 {amount}đ",
+      "status": "状态",
+      "couponUsed": "已使用的优惠码",
+      "course": "课程",
+      "billingName": "付款人姓名",
+      "billingPhone": "电话号码",
+      "none": "无",
+      "ref": "参考编号（系统）",
+      "gatewayNo": "交易号（支付网关）",
+      "notYet": "暂无",
+      "method": "方式",
+      "paidAt": "支付时间",
+      "report": "报告问题",
+      "reportDisabled": "只有支付成功的交易才能投诉",
+      "refundPolicy": "退款政策",
+      "close": "关闭"
+    },
+    "payosReturn": {
+      "processing": "正在处理 PayOS 支付结果...",
+      "successTitle": "支付成功",
+      "successNote": "注意：系统收到银行的成功确认后，课程将自动解锁（通常需要 1-2 分钟）。",
+      "viewHistory": "查看交易记录",
+      "backToCourses": "返回课程库",
+      "failTitle": "交易未成功",
+      "failNote": "支付已被取消或发生错误。请重试。"
+    },
+    "materialDetail": {
+      "exportPdfError": "导出 PDF 时出错，请重试。",
+      "imported": "已从文件添加 {count} 张卡片。",
+      "importErrors": "{count} 行有误：{samples}{more}",
+      "importEmpty": ".txt 文件中没有有效的数据行。",
+      "importFail": "加载 .txt 文件时出错",
+      "loading": "正在加载学习资料详情...",
+      "removed": "此练习已被讲师移除或更新。会话已结束。",
+      "notFound": "找不到此学习资料，或您没有查看权限。",
+      "unavailableTitle": "学习资料已不可用",
+      "loadErrorTitle": "无法加载数据",
+      "back": "← 返回",
+      "toHome": "返回首页",
+      "backPlain": "返回",
+      "home": "首页",
+      "typeMindmap": "思维导图",
+      "typeFlashcard": "闪卡集",
+      "heading": "{type} - 版本 {version}",
+      "statusLabel": "状态：",
+      "createdAt": "创建日期：{date}",
+      "diagram": "图表",
+      "quizStudy": "📖 答题（学习模式）",
+      "quizEdit": "📋 编辑题目（编辑模式）",
+      "exportBlankTitle": "导出空白试卷 PDF，答案在最后一页",
+      "exportCheatTitle": "导出带答案的速查表 PDF",
+      "exporting": "导出中...",
+      "blankPaper": "空白试卷",
+      "cheatsheet": "速查表",
+      "quizEmptyDone": "此测验没有任何题目。",
+      "quizProcessing": "测验正在由 AI 处理，请稍后再来...",
+      "flashStudy": "📖 复习（学习模式）",
+      "flashBrowse": "📋 浏览全部（浏览模式）",
+      "exportTxtTitle": "导出兼容 Anki/Quizlet 的 .txt 文件",
+      "export": "导出",
+      "importTxtTitle": "导入来自 Anki/Quizlet 的 .txt 文件",
+      "importing": "导入中...",
+      "import": "导入",
+      "defaultDeckName": "闪卡集",
+      "flashEmptyDone": "此闪卡集没有任何卡片。",
+      "flashProcessing": "闪卡集正在由 AI 处理，请稍后再来...",
+      "unsupported": "此类学习资料暂不支持显示，或生成时出错。"
+    },
+    "liveView": {
+      "loading": "加载中…",
+      "cannotView": "无法观看此直播",
+      "enrolledOnly": "此直播仅限已报名该课程的学员观看。",
+      "enrolledOnlyLogin": "此直播仅限已报名该课程的学员观看——如果您已报名，请登录后重试。",
+      "genericError": "发生错误，请稍后重试。",
+      "login": "登录",
+      "upcoming": "直播即将开始",
+      "scheduledAt": "预计时间：{time}",
+      "notStarted": "讲师尚未开始——请稍后再来。",
+      "ended": "直播已结束",
+      "actionOriginalSub": "查看原字幕",
+      "actionDubbing": "收听配音",
+      "actionTranslatedSub": "查看翻译字幕",
+      "listen": "收听：",
+      "translatedSub": "翻译字幕：",
+      "noTranslatedSub": "不显示翻译字幕",
+      "originalSub": "原字幕",
+      "noVideo": "讲师尚未开启摄像头或屏幕共享",
+      "delayNote": "音频/画面可能比实际延迟几秒"
+    }
+  },
+  "legal": {
+    "cookies": {
+      "title": "Cookie 政策",
+      "s1Title": "1. LinguaLearn 不使用跟踪 Cookie",
+      "s1p1": "本系统目前<b>不使用 Cookie</b> 进行行为跟踪、广告或第三方分析。",
+      "s2Title": "2. 浏览器存储（localStorage）",
+      "s2p1": "为保持登录状态，LinguaLearn 会将 JWT 格式的访问令牌（access token）和刷新令牌（refresh token）存储在您设备浏览器的本地存储（localStorage）中。这些数据仅存在于您当前使用的浏览器中，不会发送给第三方。",
+      "s2p2": "您可以随时通过清除浏览器数据或退出登录来删除这些数据——这将结束当前登录会话。"
+    },
+    "accessibility": {
+      "title": "无障碍声明"
+    },
+    "sitemap": {
+      "title": "网站地图",
+      "g1": "探索",
+      "g2": "账户",
+      "g3": "法律与政策",
+      "home": "首页",
+      "courses": "课程",
+      "about": "关于我们",
+      "teaching": "在 LinguaLearn 授课",
+      "login": "登录",
+      "register": "注册",
+      "profile": "个人资料",
+      "myCourses": "我的课程",
+      "wishlist": "心愿单",
+      "cart": "购物车",
+      "payments": "交易记录",
+      "terms": "服务条款",
+      "privacy": "隐私政策",
+      "refund": "退款政策",
+      "revenueShare": "讲师收入分成政策",
+      "moderation": "内容审核规定",
+      "cookies": "Cookie 政策",
+      "accessibility": "无障碍声明"
+    },
+    "moderation": {
+      "title": "课程内容审核规定",
+      "s1Title": "1. 课程生命周期",
+      "s1p1": "每门课程会经历以下状态：<b>草稿</b>（编写中）→ <b>待审核</b>（讲师提交审核）→ <b>已发布</b>（获批并公开显示）或 <b>已拒绝</b>（需要修改）→ <b>已归档</b>（不再接收新学员）。",
+      "s1p2": "只有处于“已发布”状态的课程才允许学员报名或购买。",
+      "s2Title": "2. 审核流程",
+      "s2p1": "管理员审查处于“待审核”状态的课程，并决定批准或拒绝。若拒绝，管理员必须说明明确的理由（至少 20 个字符），以便讲师了解重新提交前需要修改的内容。",
+      "s3Title": "3. 课程评价审核",
+      "s3p1": "违反规定（垃圾信息、不当言论等）的学员评价，管理员也可通过独立的审核机制将其隐藏或删除，与上述课程审核流程相互独立。",
+      "s4Title": "4. 内容责任",
+      "s4p1": "通过审核并不意味着 LinguaLearn 已完整核实内容的准确性或版权——最终责任仍由发布内容的讲师承担，详见<link>服务条款</link>。"
+    },
+    "terms": {
+      "title": "服务条款",
+      "intro": "LinguaLearn 是一个集成 AI 的在线学习平台（LMS），是胡志明市工业大学毕业论文课题的一部分。创建账户并使用本系统，即表示您同意以下条款。",
+      "s1Title": "1. 用户账户",
+      "s1p1": "系统有 3 种角色：学员、讲师和管理员。任何学员账户都可以随时在<link>在 LinguaLearn 授课</link>页面自行升级为讲师，且不会失去之前以学员身份购买的课程。",
+      "s1p2": "注册成为讲师时，您需要提供身份信息（身份证号码、地址），并确认对所发布内容拥有合法所有权。系统目前<b>仅收集</b>这些信息用于内部存档——<b>不会</b>调用任何政府电子身份认证（eKYC）API 进行验证。",
+      "s2Title": "2. 课程内容与版权",
+      "s2p1": "讲师对其发布内容（讲课视频、附件资料、测验题等）的合法性、版权和准确性承担全部责任。LinguaLearn 不会在发布前代替讲师核实内容版权。",
+      "s2p2": "所有课程在公开显示前都必须经过管理员审核——详情请见<link>内容审核规定</link>。",
+      "s3Title": "3. 支付与学费",
+      "s3p1": "学费通过 PayOS 一次性支付。支付成功后，学员将立即获得课程的无限期访问权限。退款政策详情请见<link>退款政策</link>。",
+      "s3p2": "收入由讲师和平台按订单来源对应的比例分成——详见<link>收入分成政策</link>。",
+      "s3aTitle": "3A. 退款、欠款与收款账户",
+      "s3ap1": "申报收款账户（学员退款、讲师提现）的用户须对信息的准确性负责，并确认该账户属于本人；我们会严格按照已确认的信息转账。当退款扣款超过余额时，讲师可能产生<b>欠款</b>；欠款将从新收入中抵扣或由讲师主动偿还，逾期可能依据<revenueLink>收入分成政策</revenueLink>被限制发布/推广或暂停接收新报名。投诉与退款流程请见<refundLink>退款政策</refundLink>。",
+      "s4Title": "4. 禁止行为",
+      "s4p1": "严禁发布违反越南法律、侵犯版权、带有侮辱性或欺诈性的内容，或故意利用系统漏洞。违规账户可能被锁定或被删除内容，恕不另行通知。",
+      "s5Title": "5. 责任限制",
+      "s5p1": "这是一个学术研究成果，其运营旨在展示 AI 在在线教育中的功能。LinguaLearn 不保证服务 100% 持续可用，也不对因使用平台而产生的间接损失负责。",
+      "s6Title": "6. 条款变更",
+      "s6p1": "本条款可能会不时更新，以反映当前已上线的功能。最新版本始终发布在本页面。"
+    },
+    "privacy": {
+      "title": "隐私政策",
+      "intro": "本政策说明 LinguaLearn 收集的个人数据及其使用方式。",
+      "s1Title": "1. 收集的信息",
+      "s1p1": "注册账户时：邮箱、姓名、密码（若使用 Google 登录，则为来自 Google 的基本信息——仅包含标准 OAuth 范围内的邮箱/姓名/头像，不会访问其他 Google 数据）。",
+      "s1p2": "使用过程中：头像、简介标题（headline）、个人简介（bio）、首选显示语言、学习进度、交易记录。",
+      "s1p3": "仅限讲师账户：身份证号码和联系地址——仅用于内部存档，详见<link>服务条款</link>。",
+      "s2Title": "2. 公开资料显示设置",
+      "s2p1": "在<link>个人资料</link>页面，您可以分别开启或关闭公开资料页上“已学课程”和“心愿单”的公开显示。创建账户时两者默认均为开启。",
+      "s3Title": "3. 登录会话存储",
+      "s3p1": "系统<b>不使用跟踪 Cookie</b>。登录会话通过存储在浏览器本地存储（localStorage）中的访问令牌（JWT）维持——详情请见 <link>Cookie 政策</link>。",
+      "s4Title": "4. 与第三方共享数据",
+      "s4p1": "除用于支付处理（PayOS 支付网关）和登录认证（Google OAuth，如果您选择使用）外，LinguaLearn 不会向第三方出售或共享个人数据。",
+      "s5Title": "5. 数据删除请求",
+      "s5p1": "目前账户删除只能由管理员执行。如需申请删除账户及相关数据，请通过页面底部的支持邮箱联系我们。",
+      "s6Title": "6. 政策变更",
+      "s6p1": "当系统新增涉及用户数据的功能时，本政策可能会更新。"
+    },
+    "refund": {
+      "title": "退款政策",
+      "intro": "适用于自 2026 年 11 月 11 日起提交的投诉（第 4 和第 6 节自 2026 年 11 月 14 日起补充）。以下数字为当前标准，管理员可能会调整，并在本页面更新。",
+      "s1Title": "1. 何时可以退款",
+      "s1p1": "如果同时满足以下两个条件，您的已付款项将被考虑<b>全额（100%）</b>退款：在支付成功之日起 <b>7 天</b>内提交申请，且已学习的课程内容<b>不超过 20%</b>。如果期限的最后一天是星期六、星期日或节假日，则顺延至下一个工作日结束。",
+      "s1p2": "这是申请被视为<em>符合条件</em>的前提；最终决定由管理员在综合您的意见和讲师的回复后作出。",
+      "s2Title": "2. 技术故障单独审理",
+      "s2p1": "以下情况不受期限和学习进度限制：同一订单被重复扣款、已扣款但未被登记到课程，或系统故障导致您无法使用已购课程。提交投诉时请选择正确的问题类型，并附上证明（图片/视频）。",
+      "s3Title": "3. 处理流程",
+      "s3i1": "进入<link>交易投诉</link>，选择交易、问题类型、填写描述并附上证明。",
+      "s3i2": "课程讲师会收到通知，并有 <b>48 小时</b>回复（同意或反对，并附证明）。",
+      "s3i3": "管理员审查双方意见并作出决定。结果及理由将通过邮件发送，并显示在投诉页面。",
+      "s3i4": "如果获批退款，我们会将已付款项的<b>全额 100%</b> 转入您提供的账户。转账手续费由 LinguaLearn 承担，因此您的退款不会被扣减。转账完成后我们会通知您。",
+      "s3p1": "每笔交易只能提交一次投诉。如果已被告知转账但仍未收到款项，您可以在 7 天内再反馈一次。",
+      "s4Title": "4. 退款收款账户与您的责任",
+      "s4p1": "提交投诉时，您需要选择银行、输入账号（两次）、账户持有人姓名，并<b>确认这是您本人的账户</b>。退款将<b>严格按照您填写的信息</b>转账，因此您须对其准确性负责。",
+      "s4i1": "如果您输入错误但该号码仍是真实账户，款项将转入该账户，追回非常困难；对于严格按您确认的信息所作的转账，我们不承担责任。",
+      "s4i2": "如果账号不存在或银行拒绝，转账将无法完成；我们会通过通知/邮件联系您更新信息后再转账。",
+      "s4i3": "如果提交投诉时未填写账户信息，您需要联系客服补充后才能收款。",
+      "s4p2": "状态<em>“已批准 · 待转账”</em>表示申请已被接受但款项<b>尚未</b>转出；只有显示<em>“已退款”</em>时才表示款项已转出，并会附上转账编号。",
+      "s5Title": "5. 退款之后",
+      "s5i1": "课程访问权限将被收回；该课程的证书（如有）将被撤销，您对该课程的评价将被隐藏。",
+      "s5i2": "如果您之后再次购买此课程，之前的学习进度将被恢复。",
+      "s5i3": "每位学员对每门课程只能退款一次。多次重复退款可能会被审查并受到限制。",
+      "s6Title": "6. 平台与讲师之间的责任",
+      "s6p1": "您始终会收回全部已付款项。讲师和平台各自承担多少，由<link>收入分成政策</link>规定，不影响您收回的金额。"
+    },
+    "revenue": {
+      "title": "讲师收入分成政策",
+      "intro": "自 2026 年 9 月 20 日起适用于新交易。分成比例在支付成功时确定。",
+      "s1Title": "1. 学员通过平台发现课程（自然流量 Organic）",
+      "s1p1": "当学员直接通过 LinguaLearn 的搜索/分类浏览找到并购买课程时：讲师获得 <b>37%</b> 的收入，平台保留 <b>63%</b> 用于系统运营。",
+      "s2Title": "2. 学员通过专属分享链接购买（推荐 Referral）",
+      "s2p1": "每门课程都有专属分享链接（referral link），讲师可以在自己的渠道（Facebook、YouTube、个人博客等）推广。学员通过该链接购买课程时：讲师获得 <b>97%</b> 的收入，平台仅保留 <b>3%</b> 作为基础设施维护费。",
+      "s3Title": "3. 比例记录",
+      "s3p1": "分成比例在订单变为已支付状态的那一刻锁定，不追溯适用于之前的交易。以上两个比例为当前标准；管理员可以调整，新比例仅适用于调整之后产生的交易。2026 年 9 月 20 日之前产生的交易保持当时的旧比例（平台 30% / 讲师 70%）。",
+      "s4Title": "4. 资金保留期",
+      "s4p1": "每笔订单的收入会在退款期限基础上再保留 3 天处理时间，之后才计入可提现余额，以确保学员有足够时间提交退款申请并完成处理。",
+      "s5Title": "5. 订单退款时",
+      "s5p1": "学员始终会全额收回已付款项。讲师需要退回的部分取决于原因：",
+      "s5i1": "<b>默认：</b>讲师仅退回该订单中已获得的收入（例如一门 1.000.000đ 的课程按 37% 自然流量比例售出：讲师退回 370.000đ）。适用于期限内改变主意、系统故障、重复付款、未被登记到课程。",
+      "s5i2": "<b>平台过错：</b>学员已能使用课程但问题出在平台一方时，不会扣除讲师的收入。",
+      "s5i3": "<b>讲师过错：</b>仅当存在有明确名称且有证据的违规行为时适用（见第 6 节）；讲师退回<b>订单金额的 100%</b>（不附加其他费用或公式），并记录理由和证据。",
+      "s5p2": "被扣除的金额记入讲师的收入。如果收入此前已支付，讲师的余额可能变为负数，并由后续收入抵扣。讲师会收到通知，并在管理员作出决定前有 48 小时附证据回复。",
+      "s6Title": "6. 追究讲师责任的标准",
+      "s6p1": "管理员选择一个<b>固定的理由代码</b>，每个代码只对应一种责任模式：",
+      "s6i1": "<b>默认模式：</b>学员在期限内改变主意，或其他无人有过错的原因。",
+      "s6i2": "<b>平台承担：</b>技术故障、重复付款、未登记、平台一方的过错。",
+      "s6i3": "<b>讲师承担全部：</b>仅限侵犯版权、内容与描述严重不符或内容被禁止的情形。必须有理由说明、明确的证据，且在作出决定前讲师已收到通知并有机会回复（已回复或回复期限已过）。",
+      "s6p2": "讲师始终会收到被扣金额以及理由、备注和证据的通知。对于“讲师承担全部”的决定，讲师可在退款获批后 <b>7 天内申诉一次</b>；管理员维持原决定或降为默认模式（此时超出部分的罚扣将退回余额）。系统仅在课程退款率较高时发出提醒供管理员审查；系统不会自动扣款或下架课程。",
+      "s7Title": "7. 欠款",
+      "s7p1": "当被扣金额超过可用余额时，讲师的余额变为负数，该负数即为<b>欠款</b>。新收入在保留期结束后会自动抵扣欠款，欠款期间讲师仍可正常销售课程。讲师也可以通过 PayOS 二维码<b>主动还款</b>，可部分或全部偿还；系统会如实记录已还金额。",
+      "s7i1": "<b>产生时：</b>讲师会收到通知，“收入”页面会显示欠款及其原因。",
+      "s7i2": "<b>超过 30 天未还清：</b>暂时无法发布新课程，也无法报名推广活动。",
+      "s7i3": "<b>超过 90 天：</b>课程暂停接收新报名；已购买的学员仍可正常学习，其权益不受影响。",
+      "s7i4": "在有待处理的申诉期间，上述限制暂停执行。还清欠款后，所有限制将解除。",
+      "s7i5": "欠款不会导致账户被锁定或被标记违规。管理员可以注销欠款，并记录理由。",
+      "s7p2": "30 天和 90 天的节点为当前标准，可能调整，并将在本页面更新。",
+      "s8Title": "8. 提现与收款账户",
+      "s8i1": "已验证的讲师最多可绑定 5 个银行账户，并选择一个默认账户收款。",
+      "s8i2": "添加账户，或更改银行/账号，需要通过邮件确认。仅更改账户持有人姓名或默认账户则立即生效。",
+      "s8i3": "最低提现金额为 100.000đ；提现申请需要通过邮件确认，并分批支付（默认每月 5 日和 20 日）。",
+      "s8i4": "每个提现申请会保存创建时的账户，因此之后更改默认账户不会影响待处理的申请。尚未批准的申请可以改为其他账户（例如银行维护时）。",
+      "s8i5": "转账严格按照已确认的账户信息进行；讲师须对其准确性负责。如果银行拒绝，款项将退回余额，讲师可选择其他账户并重新提交申请。",
+      "s9Title": "9. 转账手续费",
+      "s9p1": "讲师提现或学员退款时产生的转账手续费由 <b>LinguaLearn 承担</b>，且已包含在第 1 和第 2 节平台保留的部分中。该费用不会再从讲师收入中额外扣除：您申请提现的金额即为您实际收到的金额。"
+    }
+  },
+  "errors": {
+    "api": {
+      "requestFailed": "请求失败,状态码 {status}",
+      "networkError": "无法连接到服务器",
+      "uploadCancelled": "已取消上传",
+      "noRefreshToken": "没有刷新令牌"
+    },
+    "toast": {
+      "flashcards": {
+        "progressFailed": "更新复习进度时出错",
+        "updated": "已更新闪卡内容!",
+        "updateFailed": "更新闪卡时出错",
+        "added": "已添加新闪卡!",
+        "addFailed": "添加闪卡时出错",
+        "deleted": "已删除闪卡!",
+        "deleteFailed": "删除闪卡时出错"
+      },
+      "bundles": {
+        "created": "已成功创建课程包",
+        "createFailed": "无法创建课程包",
+        "updated": "已更新课程包",
+        "updateFailed": "无法更新课程包",
+        "deleted": "已删除课程包。",
+        "archived": "该课程包已有人购买,因此已归档:停止销售并从列表中隐藏,订单历史保持不变。",
+        "deleteFailed": "无法删除课程包,请重试。"
+      },
+      "coupons": {
+        "created": "已创建优惠码",
+        "createFailed": "无法创建优惠码,请稍后重试。",
+        "updated": "已更新优惠码",
+        "updateFailed": "无法更新优惠码,请稍后重试。",
+        "deleted": "已删除优惠码",
+        "deleteFailed": "无法删除优惠码,请稍后重试。"
+      },
+      "user": {
+        "profileUpdated": "已更新个人资料",
+        "profileUpdateFailed": "无法更新个人资料,请稍后重试。",
+        "avatarUpdated": "已更新头像",
+        "avatarUploadFailed": "无法上传图片,请稍后重试。",
+        "updateFailed": "无法更新,请稍后重试。"
+      },
+      "cart": {
+        "addFailed": "无法加入购物车,请稍后重试。",
+        "removeFailed": "无法从购物车移除,请稍后重试。"
+      },
+      "wishlist": {
+        "addFailed": "无法加入收藏列表,请稍后重试。",
+        "removeFailed": "无法从收藏列表移除,请稍后重试。"
+      },
+      "instructor": {
+        "upgradeFailed": "无法升级账号,请稍后重试。",
+        "verifyFailed": "无法提交验证信息,请稍后重试。"
+      },
+      "tutor": {
+        "readFileFailed": "无法读取文件",
+        "quotaExceeded": "您今天的提问次数已用完,请明天再来。",
+        "noResponse": "AI 导师暂时无法回复,请几分钟后重试。",
+        "pinFailed": "无法置顶此对话。"
+      },
+      "upload": {
+        "failed": "上传失败,请稍后重试。"
+      },
+      "google": {
+        "failed": "Google 登录失败",
+        "success": "登录成功!",
+        "error": "登录出错:{message}",
+        "generic": "出现错误"
+      }
+    },
+    "lib": {
+      "materialOfficialUsed": "Official — 已用于 {count} 处",
+      "materialOfficialDistributed": "Official — 已分发",
+      "materialPending": "等待处理",
+      "materialProcessing": "处理中",
+      "materialFailed": "内容生成失败",
+      "payosFailure": {
+        "TRANSIENT": "银行/PayOS 端的临时故障",
+        "ACCOUNT": "收款账户有问题",
+        "UNKNOWN": "原因不明"
+      },
+      "retryAfter": "{time} 后可重新付款",
+      "payosLocked": "PayOS 付款已锁定",
+      "fileArchive": "压缩包",
+      "growth": {
+        "start": "本期开始产生收入",
+        "none": "尚未产生收入",
+        "flat": "收入与上期持平",
+        "up": "收入较上期增长 {percent}%",
+        "down": "收入较上期下降 {percent}%"
+      }
+    }
+  },
+  "exam": {
+    "history": {
+      "invalidId": "考试编号无效",
+      "title": "考试作答记录",
+      "attemptNo": "次数",
+      "submittedAt": "提交日期",
+      "score": "分数",
+      "correctCount": "答对题数",
+      "optionLabel": "第 {n} 次 — {score}/10（{correct}/{total} 题）",
+      "back": "← 返回",
+      "loadError": "加载记录时出错",
+      "loading": "正在加载记录...",
+      "empty": "您还没有这场考试的作答记录。",
+      "loadingDetail": "正在加载作答详情...",
+      "correct": "正确",
+      "wrong": "错误",
+      "blank": "未作答",
+      "answered": "已作答",
+      "prevPage": "上一页",
+      "nextPage": "下一页",
+      "pageOf": "第 {page}/{total} 页",
+      "detailError": "无法加载详情",
+      "pickAttempt": "请选择一次作答查看详情",
+      "matrix": "结果矩阵",
+      "loadingShort": "加载中..."
+    },
+    "page": {
+      "defaultTitle": "测验",
+      "videoUploadWarn": "无法保存监考视频（不影响考试成绩）",
+      "aiError": "调用 AI 时出错。请重试。",
+      "aiExplainError": "获取 AI 解释时出错。",
+      "archivedSaved": "您的提交已保存到成绩册。此考试现已被讲师归档。",
+      "revoked": "此练习已被讲师收回。",
+      "removedEnded": "此练习已被讲师移除或更新。作答已结束。",
+      "submitError": "提交时出错。请重试。",
+      "violationExceeded": "您违规已超过 {max} 次。系统将自动交卷！",
+      "violationWarn": "违规警告（{count}/{max}）：{reason}",
+      "violationAiWarn": "AI Vision 警告（{count}/{max}）：摄像头异常",
+      "vTabSwitch": "切换标签页或最小化浏览器",
+      "vWindowBlur": "切换到其他窗口/应用",
+      "vFullscreenExit": "退出全屏模式",
+      "vCopyPaste": "尝试复制/粘贴或打开右键菜单",
+      "vDevtools": "检测到 DevTools 已打开",
+      "vIdle": "长时间无操作",
+      "vAudio": "检测到异常长时间的说话声",
+      "screenShareSkipped": "您已跳过屏幕共享——考试将继续，但之后将没有可供回看的证据视频。",
+      "permissionDenied": "您必须授予摄像头和麦克风权限才能参加此考试！",
+      "startedProctored": "开始作答。请勿切换标签页！",
+      "started": "开始作答！",
+      "removedToast": "此练习已被讲师移除或更新。",
+      "loadQuizError": "无法加载考试。",
+      "timeUp": "⏱ 时间到！考试已自动提交。",
+      "elapsedMinSec": "{m} 分 {s} 秒",
+      "elapsedSec": "{s} 秒",
+      "resultPassed": "太棒了！考试完成",
+      "resultSubmitted": "考试已提交",
+      "statCorrect": "答对",
+      "statWrong": "答错",
+      "statTotal": "总题数",
+      "statTime": "用时",
+      "submittedAt": "📅 提交时间：{time}",
+      "backToCourse": "返回课程",
+      "backToHistory": "返回考试记录",
+      "detailsTitle": "作答详情（苏格拉底式助教）",
+      "questionN": "第 {n} 题",
+      "correctMark": "正确 ✓",
+      "wrongMark": "错误 ✕",
+      "recorded": "已记录",
+      "blank": "未作答",
+      "topic": "主题：{topic}",
+      "youChose": "（您的选择）",
+      "correctAnswer": "（正确答案）",
+      "askTutor": "问问 AI 助教为什么错了？",
+      "reviewTheory": "复习相关理论 ↗",
+      "tutorExplains": "AI 助教讲解：",
+      "thinking": "思考中...",
+      "prevPage": "上一页",
+      "nextPage": "下一页",
+      "pageOf": "第 {page}/{total} 页",
+      "myCourses": "我的课程",
+      "quizType": "选择题",
+      "quizTypeProctored": "选择题 - 摄像头监考",
+      "opensAt": "开放时间：",
+      "closesAt": "关闭时间：",
+      "unlimited": "不限",
+      "questionCountLabel": "题数：",
+      "questionCountValue": "{count} 题",
+      "durationLabel": "时长：",
+      "durationValue": "{n} 分钟",
+      "attemptsLabel": "可作答次数：",
+      "attemptsValue": "{n} 次",
+      "proctoredNote": "参加此测验需要开启摄像头，由 AI 监考。不得切换标签页或离开屏幕。",
+      "officialScore": "您的正式成绩",
+      "officialNote": "系统会记录您所有考试中的最高分。",
+      "scorePoints": "{score} 分（十分制）",
+      "previousTitle": "您之前作答的概览",
+      "colAttempt": "考试次数",
+      "colStatus": "状态",
+      "colResult": "结果",
+      "colReview": "回看",
+      "noAttempts": "您还没有这场考试的作答记录。",
+      "done": "已完成",
+      "submittedOn": "已提交 {time}",
+      "questionsUnit": "题",
+      "scoreOnly": "仅查看分数",
+      "noReviewTitle": "此考试不允许回看答案",
+      "viewDetails": "查看详情",
+      "preparing": "准备中...",
+      "continueAttempt": "继续作答",
+      "notOpen": "考试尚未开放。请稍后再来。",
+      "closed": "考试已关闭。您无法再作答。",
+      "archivedQuiz": "此考试已被讲师收回或删除。",
+      "archivedHistoryOnly": "您只能查看作答记录。",
+      "noAttemptsLeft": "作答次数已用完（{done}/{max}）",
+      "startNew": "开始新的作答",
+      "startWithCamera": "开启摄像头并开始考试",
+      "loadingModel": "正在加载 AI 模型...",
+      "completeAll": "提交前请完成所有题目",
+      "submittingWait": "正在交卷，请稍候...",
+      "roomProctored": "在线考场（有监考）",
+      "roomPlain": "选择题考试",
+      "quizCode": "试卷编号：{id}",
+      "violationLabel": "违规警告",
+      "confirmTitle": "确认交卷",
+      "answered": "已作答：<b>{done}/{total}</b> 题",
+      "answeredMark": "✅ 已作答",
+      "unansweredMark": "❌ 未作答",
+      "prev": "上一页",
+      "next": "下一页",
+      "submitting": "提交中...",
+      "confirmSubmit": "确认交卷",
+      "backToExam": "返回考试",
+      "questionHeading": "第 {n} 题",
+      "flagForReview": "标记待复查",
+      "multipleHint": "（可多选）",
+      "faceDetecting": "正在扫描人脸...",
+      "faceOk": "AI 监考摄像头（正常）",
+      "faceNone": "警告：未检测到人脸",
+      "faceMultiple": "警告：检测到多张人脸",
+      "faceTurned": "警告：转头/看向屏幕之外",
+      "submitExam": "提交考试",
+      "unavailableTitle": "考试已不可用",
+      "scoreShort": "{score} 分"
+    }
+  },
+  "live": {
+    "picker": {
+      "noneLabel": "原声",
+      "chooseOther": "← 选择其他语言",
+      "chooseVoice": "为 <b>{language}</b> 选择声音——您是第一个选择该语言的人,该声音将供之后所有听众共用。",
+      "searchPlaceholder": "搜索语言…",
+      "noLanguage": "未找到任何语言",
+      "sourceTitle": "讲师正在使用该语言——无需翻译",
+      "source": "(原语言)",
+      "delayHint": "配音音频可能比画面延迟几秒。"
+    },
+    "feedCard": {
+      "upcoming": "即将开始"
+    },
+    "chat": {
+      "title": "直播聊天",
+      "empty": "暂无消息。",
+      "instructor": "讲师",
+      "anonymous": "匿名",
+      "hideTitle": "隐藏此消息",
+      "hide": "隐藏",
+      "placeholder": "输入消息…",
+      "loginPlaceholder": "登录后聊天",
+      "send": "发送",
+      "loginAction": "在直播中发送消息"
+    },
+    "requireLogin": {
+      "title": "需要登录",
+      "body": "您需要登录才能{action}。观看直播无需登录。",
+      "login": "登录",
+      "register": "注册新账号",
+      "later": "稍后"
+    },
+    "banner": {
+      "liveNow": "正在直播:",
+      "upcoming": "即将直播:",
+      "scheduled": "预计 {time}",
+      "watch": "立即观看 →"
+    }
+  },
+  "disputes": {
+    "page": {
+      "statusOpen": "未处理",
+      "statusRefunded": "已退款",
+      "statusRejected": "已拒绝",
+      "statusReopened": "等待重新处理",
+      "badgePending": "已批准 · 待转账",
+      "badgeAwaitingAccount": "需要更新账户",
+      "catChangedMind": "我改变主意了 / 课程不合适",
+      "catContentMismatch": "内容与描述不符",
+      "catTechnicalError": "技术故障（无法进入学习...）",
+      "catDoubleCharge": "被重复扣款",
+      "catNotEnrolled": "已扣款但未被登记",
+      "catOther": "其他原因",
+      "filterAll": "全部",
+      "filterProcessing": "处理中",
+      "filterAwaiting": "待转账",
+      "filterRefunded": "已退款",
+      "filterRejected": "被拒绝",
+      "loadError": "无法加载交易数据。",
+      "pickBank": "请选择接收退款的银行。",
+      "accountDigits": "账号只能包含数字（6–20 位）。",
+      "accountMismatch": "两次输入的账号不一致。",
+      "holderRequired": "请输入账户持有人姓名。",
+      "ownRequired": "您需要确认这是您本人的账户。",
+      "reopenSuccess": "已提交重新审核申请，客服团队将尽快处理。",
+      "reopenError": "无法提交申请，请重试。",
+      "maxFiles": "最多只能附加 {max} 个证明文件。",
+      "submitSuccess": "投诉已提交。处理完成后我们会通过邮件回复。",
+      "submitError": "无法提交投诉，请重试。",
+      "loading": "加载中...",
+      "title": "退款申请 / 交易投诉",
+      "intro": "请选择相关交易，描述问题并附上证明（如有）。提交前请阅读<link>退款政策</link>。",
+      "tabsLabel": "退款申请区域",
+      "tabCreate": "创建新申请",
+      "tabMine": "我的申请",
+      "needsAction": "{count} 项待处理",
+      "pickTitle": "创建新申请——选择交易",
+      "pickDesc": "仅显示已支付成功的交易。选择一笔交易以填写申请信息。",
+      "paySearchPlaceholder": "按课程名称或交易编号搜索",
+      "paySearchLabel": "搜索交易",
+      "noPayMatch": "没有与关键词匹配的交易。",
+      "noPaid": "您没有可投诉的已支付成功的交易。",
+      "txnLine": "交易编号：{ref} · {amount}đ",
+      "alreadyDisputed": "已有待处理的投诉",
+      "changeTxn": "更换交易",
+      "categoryLabel": "问题类型 *",
+      "categoryNote": "退款按政策在期限和学习进度范围内适用；技术故障单独审理。课程讲师会收到通知，并可在我们作出决定前回复。",
+      "reasonLabel": "原因 *",
+      "reasonPlaceholder": "例如：已扣款但未能登记课程",
+      "descriptionLabel": "详细描述",
+      "accountLegend": "退款收款账户（建议填写）",
+      "accountWarning": "退款将严格按照您填写的信息转账。请务必仔细输入：如果账号错误但仍是真实账户，款项将转给他人且难以追回。如果此步骤不填写，您需要联系客服补充后才能收款。",
+      "bankLabel": "银行",
+      "bankPlaceholder": "选择银行",
+      "accountNumber": "账号",
+      "accountNumberAgain": "再次输入账号",
+      "accountHolder": "账户持有人姓名",
+      "ownConfirm": "我确认这是我本人的账户，信息正确，并对其准确性负责。",
+      "evidenceLabel": "证明（图片/视频，最多 {max} 个文件）",
+      "termsText": "我确认以上申报的信息真实无误，并同意<link>退款政策</link>。",
+      "submitting": "发送中...",
+      "submit": "提交投诉",
+      "mineDesc": "跟踪您已创建的退款申请的状态。",
+      "disputeSearchPlaceholder": "按课程、交易编号或原因搜索",
+      "disputeSearchLabel": "搜索申请",
+      "filterByStatus": "按状态筛选",
+      "noneYet": "您还没有创建任何申请。<button>创建新申请</button>",
+      "noDisputeMatch": "没有符合筛选条件的申请。",
+      "disputeLine": "交易编号：{ref} — {reason}",
+      "categoryLine": "问题类型：{category}",
+      "instructorAgreed": "讲师已同意退款。",
+      "instructorObjected": "讲师已发送回复。",
+      "awaitingSupport": "等待客服团队审核并作出决定。",
+      "approvedNote": "退款申请已被接受，课程访问权限已被收回。系统将把退款支付到您申报的账户，完成后会通过邮件/通知告知您。",
+      "transferredTo": "退款已转入账户 {account}。如果尚未收到，您可以在下方反馈。",
+      "transferredToDefault": "退款已转入您登记的账户。如果尚未收到，您可以在下方反馈。",
+      "supportReply": "客服团队的回复",
+      "notReceived": "我还没收到款项",
+      "reopenPrompt": "请更详细地描述（例如：银行、查询时间）",
+      "sendReopen": "提交重新审核申请",
+      "cancel": "取消"
+    }
+  },
+  "learnPage": {
+    "lockedNotice": "{feature}仅限已拥有该课程的学员使用。",
+    "buyNow": "立即购买课程",
+    "featureTutor": "AI 助教",
+    "featurePath": "个性化学习路径",
+    "featureQna": "课程问答",
+    "featureMaterials": "学习资料",
+    "stageAsr": "正在提取语音（STT）",
+    "stageTranslate": "正在翻译内容",
+    "stageTts": "正在合成语音",
+    "stageUploading": "正在保存此片段的文件",
+    "stepPrepare": "正在下载并分析源音频",
+    "stepFinalize": "正在合并并保存完整文件",
+    "chunkWaiting": "第 {n}/{total} 段 — 等待处理",
+    "chunkStage": "第 {n}/{total} 段 — {stage}",
+    "chunkPlain": "第 {n}/{total} 段",
+    "dubCancelled": "已按要求取消配音。",
+    "dubSkipped": "此课程没有可配音的对白。",
+    "dubFailed": "配音失败，请稍后重试。",
+    "dubCancelError": "无法取消配音，请重试。",
+    "resumeError": "无法重新获得播放权限。",
+    "loadingLesson": "正在加载课程...",
+    "lessonNotFound": "找不到该课程，或需要拥有课程才能观看。",
+    "backToCourses": "← 返回课程库",
+    "selectedLanguage": "所选语言",
+    "nextLesson": "正在切换到下一课…",
+    "activateError": "无法启用配音，请重试。",
+    "switching": "正在切换课程...",
+    "studentFallback": "学员",
+    "gradebookOwner": "成绩册仅供学员使用。",
+    "viewClassGradebook": "查看班级成绩册",
+    "deviceTitle": "检测到其他设备",
+    "deviceDesc": "视频已暂停，因为您的账户正在另一台设备上播放视频。",
+    "deviceResume": "在此继续播放",
+    "loadingUi": "正在加载界面..."
+  },
+  "instructorChat": {
+    "toggleClose": "关闭 AI 讲师助手",
+    "toggleOpen": "打开 AI 讲师助手",
+    "title": "AI 讲师助手",
+    "heading": "AI 讲师助手",
+    "ready": "随时协助分析课程",
+    "close": "关闭助手",
+    "welcome": "您好!我可以帮您分析学员数据、查看评价或提出改进课程的建议。需要什么帮助?",
+    "revenue": "收入:",
+    "avgRating": "平均评分:",
+    "positive": "正面:{count}",
+    "negative": "负面:{count}",
+    "placeholder": "向助手提问(例如:本月收入?)...",
+    "maxLength": "已达到每条消息 {max} 个字符的上限。",
+    "noReply": "没有回复。",
+    "connectionError": "抱歉,我连接 AI 时遇到问题。请检查后重试。"
+  },
+  "promotionPanel": {
+    "submitted": "申请已提交。管理员将审核并回复您。",
+    "submitError": "无法提交申请。",
+    "cancelled": "申请已取消。",
+    "cancelError": "无法取消申请。",
+    "title": "平台推广",
+    "intro": "申请后,平台将在一段时间内把您的课程放在首页“推荐”栏目。免费、自愿,由管理员审核。",
+    "course": "课程",
+    "pickCourse": "选择已发布的课程",
+    "searchCourse": "搜索课程...",
+    "placement": "位置",
+    "note": "备注(选填)",
+    "sending": "发送中...",
+    "submit": "提交推广申请",
+    "loading": "加载中...",
+    "empty": "您还没有推广申请。",
+    "running": "进行中",
+    "adminNote": "管理员:{note}",
+    "effect": "效果估算:推广期间 {ordersDuring} 单({revenueDuring}),此前同等时长为 {ordersBefore} 单({revenueBefore})。",
+    "withdraw": "撤下推广",
+    "cancel": "取消申请",
+    "status": {
+      "REQUESTED": "待审核",
+      "APPROVED": "已通过",
+      "REJECTED": "已拒绝",
+      "CANCELLED": "已取消",
+      "ENDED": "已结束"
+    },
+    "placements": {
+      "HOME_FEATURED": "首页“推荐”栏目",
+      "CATEGORY_FEATURED": "分类页顶部"
+    }
+  },
+  "messaging": {
+    "inbox": {
+      "conversations": "对话",
+      "searchPlaceholder": "按姓名、内容搜索...",
+      "sort": "排序",
+      "newest": "最新",
+      "oldest": "最早",
+      "loading": "加载中...",
+      "noMatch": "未找到匹配的对话。",
+      "empty": "暂无对话。",
+      "pickOne": "选择一个对话查看消息",
+      "back": "返回对话列表",
+      "messagePlaceholder": "输入消息..."
+    }
+  },
+  "refundAccount": {
+    "pickBank": "请选择银行。",
+    "digitsOnly": "账号只能包含数字(6–20 位)。",
+    "mismatch": "两次输入的账号不一致。",
+    "needHolder": "请输入账户持有人姓名。",
+    "needOwn": "您需要确认这是您本人的账户。",
+    "updated": "退款账户已更新。",
+    "updateError": "无法更新账户。",
+    "declared": "当前登记账户:{summary}",
+    "change": "更换退款账户",
+    "bank": "银行",
+    "chooseBank": "选择银行",
+    "number": "账号",
+    "numberAgain": "再次输入账号",
+    "holder": "账户持有人姓名",
+    "own": "我确认这是我本人的账户,以上信息准确无误。",
+    "saving": "保存中...",
+    "save": "保存账户",
+    "cancel": "取消",
+    "help": "需要帮助?提交支持请求"
+  },
+  "discovery": {
+    "chat": {
+      "maxLength": "已达到每条消息 {max} 个字符的上限。",
+      "noReply": "没有回复。",
+      "connectionError": "抱歉,我连接 AI 时遇到问题。请检查后重试。",
+      "toggleClose": "关闭找课助手",
+      "toggleOpen": "打开找课助手",
+      "subtitle": "用自然语言搜索课程",
+      "welcome": "您好!我是 AI 助手。今天想找什么课程?",
+      "allLevels": "所有级别",
+      "placeholder": "例如:适合新手的 IT 课程..."
+    }
+  },
+  "shareDialog": {
+    "copyFailed": "浏览器不允许自动复制,请手动选中并复制链接。",
+    "title": "分享课程",
+    "referral": "此链接带有您的专属推荐码:学员通过它购买将计入您的推荐订单。",
+    "linkAria": "课程链接",
+    "copyTitle": "复制链接",
+    "copied": "已复制",
+    "copy": "复制",
+    "qrTitle": "显示二维码,用手机扫描",
+    "hideQr": "隐藏二维码",
+    "showQr": "二维码",
+    "qrOf": "{title} 的二维码",
+    "nativeTitle": "通过设备上的应用分享",
+    "share": "分享",
+    "via": "通过 {channel} 分享"
   }
 }

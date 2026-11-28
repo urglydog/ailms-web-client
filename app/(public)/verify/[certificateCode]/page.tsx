@@ -1,6 +1,7 @@
 'use client';
 
 import { useParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { XCircle, ShieldAlert } from 'lucide-react';
 import { useCertificateVerification } from '@/hooks/useCertificates';
 import { CertificatePreview } from '@/components/certificate/CertificatePreview';
@@ -16,6 +17,7 @@ import { CertificatePreview } from '@/components/certificate/CertificatePreview'
  * (không tìm thấy / đã thu hồi — BR-CERT-07 yêu cầu hiển thị RÕ là không hợp lệ, không được trông
  * giống chứng chỉ thật). */
 export default function VerifyCertificatePage() {
+  const t = useTranslations('pages.verify');
   const params = useParams<{ certificateCode: string }>();
   const { data, isLoading } = useCertificateVerification(params.certificateCode);
 
@@ -30,7 +32,7 @@ export default function VerifyCertificatePage() {
   if (isLoading) {
     return (
       <div className="mx-auto flex min-h-[70vh] w-full flex-col items-center justify-center px-4 py-14 text-center">
-        <p className="text-sm text-ink-muted">Đang kiểm tra chứng chỉ...</p>
+        <p className="text-sm text-ink-muted">{t('checking')}</p>
       </div>
     );
   }
@@ -64,14 +66,14 @@ export default function VerifyCertificatePage() {
       {!data || !data.found ? (
         <StatusCard
           icon={<XCircle className="h-10 w-10 text-danger" strokeWidth={1.5} />}
-          title="Không tìm thấy chứng chỉ"
-          description="Mã chứng chỉ này không tồn tại trong hệ thống. Vui lòng kiểm tra lại đường dẫn."
+          title={t('notFoundTitle')}
+          description={t('notFoundDesc')}
         />
       ) : (
         <StatusCard
           icon={<ShieldAlert className="h-10 w-10 text-danger" strokeWidth={1.5} />}
-          title="Chứng chỉ đã bị thu hồi"
-          description="Chứng chỉ này đã bị quản trị viên thu hồi và không còn giá trị xác thực."
+          title={t('revokedTitle')}
+          description={t('revokedDesc')}
         />
       )}
     </div>

@@ -1,19 +1,11 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
+import { languageDisplayName as displayName } from '@/lib/languageName';
 import { VoicePicker } from '@/components/player/VoicePicker';
 import { useVoiceOptions } from '@/hooks/useVoiceOptions';
 import type { LiveLanguageTrack, VoiceOption } from '@/types/domain';
-
-/** Tên hiển thị từ mã BCP-47 — dùng API chuẩn của trình duyệt thay vì tự tay liệt kê bảng tên
- * cho 148 ngôn ngữ (khớp tinh thần BR-DUB-07: không hardcode danh sách ngôn ngữ). */
-function languageDisplayName(code: string): string {
-  try {
-    return new Intl.DisplayNames(['vi'], { type: 'language' }).of(code) ?? code;
-  } catch {
-    return code;
-  }
-}
 
 interface LiveLanguagePickerProps {
   isAuthenticated: boolean;
@@ -52,9 +44,13 @@ export function LiveLanguagePicker({
   onClearSelection,
   onRequireLogin,
   isPending,
-  noneLabel = 'Âm thanh gốc',
+  noneLabel: noneLabelProp,
   showDelayHint = true,
 }: LiveLanguagePickerProps) {
+  const t = useTranslations('live.picker');
+  const locale = useLocale();
+  const languageDisplayName = (code: string) => displayName(code, locale);
+  const noneLabel = noneLabelProp ?? t('noneLabel');
   const { data: voiceOptions } = useVoiceOptions();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
@@ -63,8 +59,8 @@ export function LiveLanguagePicker({
 
   const languages = useMemo(() => {
     const codes = new Set((voiceOptions ?? []).map((v) => v.language));
-    return Array.from(codes).sort((a, b) => languageDisplayName(a).localeCompare(languageDisplayName(b), 'vi'));
-  }, [voiceOptions]);
+    return Array.from(codes).sort((a, b) => displayName(a, locale).localeCompare(displayName(b, locale), locale));
+  }, [voiceOptions, locale]);
 
   const normalizedQuery = query.trim().toLowerCase();
   const filteredLanguages = normalizedQuery
@@ -148,11 +144,13 @@ export function LiveLanguagePicker({
                 onClick={() => setPendingLanguage(null)}
                 className="self-start text-[12px] font-semibold text-ink-muted hover:text-ink"
               >
-                ← Chọn ngôn ngữ khác
+                {t('chooseOther')}
               </button>
               <p className="text-[13px] text-ink">
-                Chọn giọng đọc cho <strong>{languageDisplayName(pendingLanguage)}</strong> — bạn là
-                người đầu tiên chọn ngôn ngữ này, giọng sẽ dùng chung cho mọi người nghe sau.
+                {t.rich('chooseVoice', {
+                  language: languageDisplayName(pendingLanguage),
+                  b: (chunks) => <strong>{chunks}</strong>,
+                })}
               </p>
               <VoicePicker voices={voicesForPendingLanguage} selected={null} onSelect={handleConfirmVoice} />
             </div>
@@ -164,7 +162,7 @@ export function LiveLanguagePicker({
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   autoFocus
-                  placeholder="Tìm ngôn ngữ…"
+                  placeholder={t('searchPlaceholder')}
                   className="w-full rounded-full border border-line bg-surface px-3 py-1.5 text-[13px]
                              text-ink outline-none placeholder:text-ink-faint focus:border-accent"
                 />
@@ -185,7 +183,7 @@ export function LiveLanguagePicker({
                   </button>
                 </li>
                 {filteredLanguages.length === 0 && (
-                  <li className="px-4 py-3 text-center text-[13px] text-ink-faint">Không tìm thấy ngôn ngữ nào</li>
+                  <li className="px-4 py-3 text-center text-[13px] text-ink-faint">{t('noLanguage')}</li>
                 )}
                 {filteredLanguages.map((code) => {
                   const track = trackByLanguage.get(code);
@@ -196,7 +194,7 @@ export function LiveLanguagePicker({
                       <button
                         type="button"
                         disabled={isSource}
-                        title={isSource ? 'Giảng viên đang nói ngôn ngữ này — không có gì để dịch' : undefined}
+                        title={isSource ? t('sourceTitle') : undefined}
                         onClick={() => handlePickLanguage(code)}
                         className={`flex w-full items-center justify-between gap-3 px-4 py-2.5 text-left text-sm ${
                           isSource
@@ -208,7 +206,7 @@ export function LiveLanguagePicker({
                       >
                         <span>
                           {languageDisplayName(code)}
-                          {isSource && <span className="text-[11px]"> (gốc)</span>}
+                          {isSource && <span className="text-[11px]">{t('source')}</span>}
                         </span>
                         {!isSource && track && (
                           <span className="flex shrink-0 items-center gap-1 rounded-full bg-line-soft px-2 py-0.5 text-[11px] text-ink-muted">
@@ -228,7 +226,7 @@ export function LiveLanguagePicker({
 
       {selectedLanguage && showDelayHint && (
         <p className="mt-1.5 text-[11px] text-ink-faint">
-          Âm thanh lồng tiếng có thể trễ vài giây so với hình ảnh.
+          {t('delayHint')}
         </p>
       )}
     </div>

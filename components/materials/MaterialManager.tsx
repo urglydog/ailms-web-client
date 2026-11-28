@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import { useQuery } from '@tanstack/react-query';
 import { useCourseMaterials, useRequestMaterial, useAvailableLanguages, useCourseChapters, useRenameMaterial, useDeleteMaterial } from '@/hooks/useMaterials';
 import { materialsApi, type MaterialType, type ScopeType, type InstructorMaterial } from '@/lib/api/materials';
@@ -17,6 +18,8 @@ import { CautionProgressBar } from '@/components/materials/ui/CautionProgressBar
 import { BookOpen, Target, Trash2, ShieldAlert, Clock, Ban } from 'lucide-react';
 
 export function MaterialManager({ courseId, lessonId }: { courseId: number, lessonId?: number }) {
+  const t = useTranslations('learn.materialManager');
+  const locale = useLocale();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -65,7 +68,7 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
 
   const handleRequest = () => {
     if (!language) {
-      toast.error('Vui lòng chọn ngôn ngữ');
+      toast.error(t('pickLanguage'));
       return;
     }
     
@@ -80,14 +83,14 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
       },
       {
         onSuccess: () => {
-          toast.success('Đã gửi yêu cầu sinh học liệu. AI đang xử lý!');
+          toast.success(t('requestSent'));
           setCustomLessonIds([]);
         },
         onError: (err) => {
           if (err instanceof ApiError) {
             toast.error(err.message);
           } else {
-            toast.error('Có lỗi xảy ra khi tạo học liệu');
+            toast.error(t('createError'));
           }
         },
       }
@@ -104,10 +107,10 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
     if (editTitle.trim() !== '') {
       renameMutation.mutate({ id, title: editTitle.trim() }, {
         onSuccess: () => {
-          toast.success('Đã cập nhật tên học liệu');
+          toast.success(t('renamed'));
           setEditingId(null);
         },
-        onError: () => toast.error('Có lỗi xảy ra khi cập nhật tên')
+        onError: () => toast.error(t('renameError'))
       });
     } else {
       setEditingId(null);
@@ -116,8 +119,8 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
 
   const handleDelete = (id: number) => {
     deleteMutation.mutate(id, {
-      onSuccess: () => toast.success('Đã xóa học liệu'),
-      onError: () => toast.error('Có lỗi xảy ra khi xóa học liệu')
+      onSuccess: () => toast.success(t('deleted')),
+      onError: () => toast.error(t('deleteError'))
     });
   };
 
@@ -143,8 +146,8 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
       if (sortBy === 'NEWEST') return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       if (sortBy === 'OLDEST') return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
       if (sortBy === 'NAME_ASC') {
-        const titleA = a.title || 'Học liệu không tên';
-        const titleB = b.title || 'Học liệu không tên';
+        const titleA = a.title || t('untitled');
+        const titleB = b.title || t('untitled');
         return titleA.localeCompare(titleB, 'vi');
       }
       return 0;
@@ -156,22 +159,22 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
   const personalTabContent = (
     <>
       <div className="card p-6 mb-8">
-        <h2 className="font-display text-xl font-bold mb-4">Tạo học liệu AI mới</h2>
+        <h2 className="font-display text-xl font-bold mb-4">{t('createTitle')}</h2>
         <div className="grid gap-4 sm:grid-cols-3 mb-6">
           <div>
-            <label className="block text-sm font-semibold mb-1">Loại học liệu</label>
+            <label className="block text-sm font-semibold mb-1">{t('type')}</label>
             <select
               className="w-full rounded-md border border-line p-2 text-sm"
               value={materialType}
               onChange={(e) => setMaterialType(e.target.value as MaterialType)}
             >
-              <option value="MINDMAP">Sơ đồ tư duy (Mindmap)</option>
-              <option value="QUIZ">Trắc nghiệm (Quiz)</option>
+              <option value="MINDMAP">{t('typeMindmap')}</option>
+              <option value="QUIZ">{t('typeQuiz')}</option>
               <option value="FLASHCARD">Flashcard</option>
             </select>
           </div>
           <div>
-            <label className="block text-sm font-semibold mb-1">Phạm vi</label>
+            <label className="block text-sm font-semibold mb-1">{t('scope')}</label>
             <select
               className="w-full rounded-md border border-line p-2 text-sm"
               value={scopeType}
@@ -182,13 +185,13 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
                 }
               }}
             >
-              <option value="WHOLE_COURSE">Toàn bộ khóa học</option>
-              <option value="CHAPTER">Từng chương</option>
-              <option value="CUSTOM_LESSONS">Tùy chọn bài học</option>
+              <option value="WHOLE_COURSE">{t('scopeWhole')}</option>
+              <option value="CHAPTER">{t('scopeChapter')}</option>
+              <option value="CUSTOM_LESSONS">{t('scopeCustom')}</option>
             </select>
           </div>
           <div>
-            <label className="block text-sm font-semibold mb-1">Ngôn ngữ</label>
+            <label className="block text-sm font-semibold mb-1">{t('language')}</label>
             <MaterialLanguagePicker
               languages={availableLanguages ?? []}
               value={language}
@@ -200,7 +203,7 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
         {/* Render selection UI for Chapter or Custom Lessons */}
         {scopeType === 'WHOLE_COURSE' && chapters && chapters.length > 0 && (
           <div className="mb-6 p-4 bg-surface-hover rounded-md text-sm border border-line">
-            <span className="font-semibold text-ink block mb-2">Học liệu sẽ được tổng hợp từ các video đã có lồng tiếng sau:</span>
+            <span className="font-semibold text-ink block mb-2">{t('sourceNote')}</span>
             <ul className="list-disc pl-5 text-ink-muted flex flex-col gap-1">
               {chapters.map(c => (
                 <li key={c.id}>
@@ -213,7 +216,7 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
 
         {scopeType === 'CHAPTER' && chapters && chapters.length > 0 && (
           <div className="mb-6">
-            <label className="block text-sm font-semibold mb-1">Chọn chương</label>
+            <label className="block text-sm font-semibold mb-1">{t('pickChapter')}</label>
             <select
               className="w-full sm:w-1/3 rounded-md border border-line p-2 text-sm"
               value={scopeRefId || ''}
@@ -225,7 +228,7 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
             </select>
             {scopeRefId && (
               <div className="p-4 bg-surface-hover rounded-md text-sm border border-line mt-3">
-                <span className="font-semibold text-ink block mb-2">Các video khả dụng trong chương này:</span>
+                <span className="font-semibold text-ink block mb-2">{t('availableVideos')}</span>
                 <ul className="list-disc pl-5 text-ink-muted">
                   {chapters.find(c => c.id === scopeRefId)?.lessons.map(l => (
                     <li key={l.id}>{l.title}</li>
@@ -238,7 +241,7 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
         
         {scopeType === 'CUSTOM_LESSONS' && chapters && (
           <div className="mb-6 border border-line rounded-md p-4 max-h-60 overflow-y-auto bg-surface-hover">
-            <label className="block text-sm font-semibold mb-2">Tick chọn bài học</label>
+            <label className="block text-sm font-semibold mb-2">{t('tickLessons')}</label>
             {chapters.map(chapter => (
               <div key={chapter.id} className="mb-3">
                 <div className="font-medium text-ink mb-1">{chapter.title}</div>
@@ -265,20 +268,20 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
           disabled={requestMutation.isPending || (!language && availableLanguages?.length === 0) || (scopeType === 'CUSTOM_LESSONS' && customLessonIds.length === 0)}
           className="rounded-card bg-accent px-6 py-2 text-sm font-semibold text-white hover:bg-accent-dark transition-colors disabled:opacity-50"
         >
-          {requestMutation.isPending ? 'Đang gửi...' : 'Tạo học liệu'}
+          {requestMutation.isPending ? t('sending') : t('create')}
         </button>
       </div>
 
       <div className="card p-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 border-b border-line pb-4">
-          <h2 className="font-display text-xl font-bold">Lịch sử tạo cá nhân</h2>
+          <h2 className="font-display text-xl font-bold">{t('historyTitle')}</h2>
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full sm:w-auto">
             {/* Filter */}
             <div className="flex flex-wrap gap-2">
-              <button onClick={() => setFilterType('ALL')} className={`px-3 py-1 text-xs font-semibold rounded-card border transition-colors ${filterType === 'ALL' ? 'bg-ink text-white border-ink' : 'bg-surface hover:bg-surface-hover border-line text-ink-muted'}`}>Tất cả</button>
-              <button onClick={() => setFilterType('MINDMAP')} className={`px-3 py-1 text-xs font-semibold rounded-card border transition-colors ${filterType === 'MINDMAP' ? 'bg-ink text-white border-ink' : 'bg-surface hover:bg-surface-hover border-line text-ink-muted'}`}>Sơ đồ tư duy</button>
+              <button onClick={() => setFilterType('ALL')} className={`px-3 py-1 text-xs font-semibold rounded-card border transition-colors ${filterType === 'ALL' ? 'bg-ink text-white border-ink' : 'bg-surface hover:bg-surface-hover border-line text-ink-muted'}`}>{t('filterAll')}</button>
+              <button onClick={() => setFilterType('MINDMAP')} className={`px-3 py-1 text-xs font-semibold rounded-card border transition-colors ${filterType === 'MINDMAP' ? 'bg-ink text-white border-ink' : 'bg-surface hover:bg-surface-hover border-line text-ink-muted'}`}>{t('filterMindmap')}</button>
               <button onClick={() => setFilterType('FLASHCARD')} className={`px-3 py-1 text-xs font-semibold rounded-card border transition-colors ${filterType === 'FLASHCARD' ? 'bg-ink text-white border-ink' : 'bg-surface hover:bg-surface-hover border-line text-ink-muted'}`}>Flashcard</button>
-              <button onClick={() => setFilterType('QUIZ')} className={`px-3 py-1 text-xs font-semibold rounded-card border transition-colors ${filterType === 'QUIZ' ? 'bg-ink text-white border-ink' : 'bg-surface hover:bg-surface-hover border-line text-ink-muted'}`}>Trắc nghiệm</button>
+              <button onClick={() => setFilterType('QUIZ')} className={`px-3 py-1 text-xs font-semibold rounded-card border transition-colors ${filterType === 'QUIZ' ? 'bg-ink text-white border-ink' : 'bg-surface hover:bg-surface-hover border-line text-ink-muted'}`}>{t('filterQuiz')}</button>
             </div>
             
             <div className="h-4 w-px bg-line hidden sm:block"></div>
@@ -289,18 +292,18 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
               onChange={(e) => setSortBy(e.target.value as 'NEWEST' | 'OLDEST' | 'NAME_ASC')}
               className="rounded-md border border-line bg-surface px-3 py-1 text-sm text-ink outline-none focus:border-accent"
             >
-              <option value="NEWEST">Mới nhất</option>
-              <option value="OLDEST">Cũ nhất</option>
-              <option value="NAME_ASC">Tên A-Z</option>
+              <option value="NEWEST">{t('sortNewest')}</option>
+              <option value="OLDEST">{t('sortOldest')}</option>
+              <option value="NAME_ASC">{t('sortName')}</option>
             </select>
             
             <button onClick={() => refetch()} className="text-sm text-accent hover:underline whitespace-nowrap hidden sm:block ml-2">
-              Làm mới
+              {t('refresh')}
             </button>
           </div>
         </div>
         {isLoading ? (
-          <p className="text-sm text-ink-muted">Đang tải...</p>
+          <p className="text-sm text-ink-muted">{t('loading')}</p>
         ) : materials && materials.length > 0 ? (
           <div className="flex flex-col gap-3">
             {getFilteredAndSortedMaterials().map((m) => (
@@ -317,36 +320,36 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
                         onBlur={() => handleRenameSubmit(m.id)}
                         className="border border-accent rounded px-2 py-1 text-sm text-ink w-full max-w-xs outline-none"
                       />
-                      <span className="text-xs text-ink-muted hidden sm:inline">Enter để lưu</span>
+                      <span className="text-xs text-ink-muted hidden sm:inline">{t('enterToSave')}</span>
                     </div>
                   ) : (
                     <div className="flex items-center gap-2 mb-1">
                       <h3 
                         className="font-semibold text-ink cursor-pointer hover:text-accent group/title"
-                        onClick={() => { setEditingId(m.id); setEditTitle(m.title || 'Học liệu không tên'); }}
-                        title="Click để đổi tên"
+                        onClick={() => { setEditingId(m.id); setEditTitle(m.title || t('untitled')); }}
+                        title={t('clickToRename')}
                       >
-                        {m.title || 'Học liệu không tên'}
+                        {m.title || t('untitled')}
                       </h3>
-                      <span className="text-[10px] text-ink-muted bg-surface-hover px-2 py-0.5 rounded opacity-0 group-hover/title:opacity-100 transition-opacity">Đổi tên</span>
+                      <span className="text-[10px] text-ink-muted bg-surface-hover px-2 py-0.5 rounded opacity-0 group-hover/title:opacity-100 transition-opacity">{t('rename')}</span>
                     </div>
                   )}
                   
                   <div className="text-xs text-ink-muted flex items-center gap-2 flex-wrap">
                     <span className="font-medium bg-line-soft px-1.5 py-0.5 rounded text-[10px]">
-                      {m.materialType === 'MINDMAP' ? 'SƠ ĐỒ TƯ DUY' : m.materialType === 'FLASHCARD' ? 'FLASHCARD' : 'TRẮC NGHIỆM'}
+                      {m.materialType === 'MINDMAP' ? t('badgeMindmap') : m.materialType === 'FLASHCARD' ? t('badgeFlashcard') : t('badgeQuiz')}
                     </span>
                     <span>•</span>
-                    <span>Trạng thái:{' '}
+                    <span>{t('status')}{' '}
                       {m.status === 'COMPLETED' ? (
-                        <span className="text-success font-medium">Hoàn thành</span>
+                        <span className="text-success font-medium">{t('statusDone')}</span>
                       ) : m.status === 'FAILED' ? (
-                        <span className="text-danger font-medium">Lỗi</span>
+                        <span className="text-danger font-medium">{t('statusFailed')}</span>
                       ) : (
                         <span className="text-star font-medium">
                           {new Date().getTime() - new Date(m.createdAt).getTime() > 120000
-                            ? 'Đang chờ lâu'
-                            : 'Đang xử lý'}
+                            ? t('statusStale')
+                            : t('statusProcessing')}
                         </span>
                       )}
                     </span>
@@ -369,7 +372,7 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
                   <button
                     onClick={() => handleDelete(m.id)}
                     className="p-2 text-ink-muted hover:text-danger hover:bg-danger/10 rounded-card transition-colors"
-                    title="Xóa học liệu"
+                    title={t('deleteTitle')}
                   >
                     <Trash2 className="w-[15px] h-[15px]" strokeWidth={2} />
                   </button>
@@ -378,11 +381,11 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
             ))}
             
             {getFilteredAndSortedMaterials().length === 0 && (
-              <p className="text-sm text-ink-muted text-center py-6 bg-surface-hover rounded-lg">Không tìm thấy học liệu phù hợp với bộ lọc.</p>
+              <p className="text-sm text-ink-muted text-center py-6 bg-surface-hover rounded-lg">{t('noFilterMatch')}</p>
             )}
           </div>
         ) : (
-          <p className="text-sm text-ink-muted text-center py-6">Chưa có học liệu cá nhân nào được tạo.</p>
+          <p className="text-sm text-ink-muted text-center py-6">{t('noPersonal')}</p>
         )}
       </div>
     </>
@@ -446,10 +449,10 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
       >
         <div className="flex-1 w-full">
           <div className="flex items-center gap-2 mb-2 flex-wrap">
-            <h3 className="font-bold text-ink text-lg group-hover:text-accent transition-colors">{item.title || 'Học liệu khóa học'}</h3>
+            <h3 className="font-bold text-ink text-lg group-hover:text-accent transition-colors">{item.title || t('courseMaterial')}</h3>
             {item.materialType === 'QUIZ' ? (
               <MaterialBadge tone={item.quizType === 'LECTURE_QUIZ' ? 'neutral' : 'accent'}>
-                {item.quizType === 'LECTURE_QUIZ' ? 'Quick Check' : 'Thi chính thức'}
+                {item.quizType === 'LECTURE_QUIZ' ? 'Quick Check' : t('officialExam')}
               </MaterialBadge>
             ) : (
               <MaterialBadge tone="neutral">{item.materialType === 'FLASHCARD' ? 'Flashcard' : 'Mindmap'}</MaterialBadge>
@@ -460,13 +463,13 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
 
             {/* Status indicators */}
             {item.materialType === 'QUIZ' && isBeforeStart && (
-              <MaterialBadge tone="warning" icon={<Clock className="w-3 h-3" />} className="ml-auto sm:ml-2">Chưa mở</MaterialBadge>
+              <MaterialBadge tone="warning" icon={<Clock className="w-3 h-3" />} className="ml-auto sm:ml-2">{t('notOpen')}</MaterialBadge>
             )}
             {item.materialType === 'QUIZ' && isAfterEnd && (
-              <MaterialBadge tone="neutral" icon={<Ban className="w-3 h-3" />} className="ml-auto sm:ml-2">Đã đóng</MaterialBadge>
+              <MaterialBadge tone="neutral" icon={<Ban className="w-3 h-3" />} className="ml-auto sm:ml-2">{t('closed')}</MaterialBadge>
             )}
             {item.materialType === 'QUIZ' && outOfAttempts && !isAfterEnd && (
-              <MaterialBadge tone="neutral" icon={<Ban className="w-3 h-3" />} className="ml-auto sm:ml-2">Hết lượt</MaterialBadge>
+              <MaterialBadge tone="neutral" icon={<Ban className="w-3 h-3" />} className="ml-auto sm:ml-2">{t('noAttempts')}</MaterialBadge>
             )}
           </div>
           
@@ -474,15 +477,15 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
             {item.materialType === 'QUIZ' && (
               <>
                 <div className="flex items-center gap-1">
-                  <span className="text-ink-faint">Thời gian:</span>
-                  <span className="font-medium text-ink">{item.durationMinutes ? `${item.durationMinutes} phút` : 'Không giới hạn'}</span>
+                  <span className="text-ink-faint">{t('duration')}</span>
+                  <span className="font-medium text-ink">{item.durationMinutes ? t('durationValue', { minutes: item.durationMinutes }) : t('unlimited')}</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <span className="text-ink-faint">Số câu:</span>
+                  <span className="text-ink-faint">{t('questionCount')}</span>
                   <span className="font-medium text-ink">{item.randomPickCount || item.questionCount}</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <span className="text-ink-faint">Lượt thi:</span>
+                  <span className="text-ink-faint">{t('attempts')}</span>
                   <span className="font-medium text-ink">
                     {item.attemptCount !== undefined ? `${item.attemptCount} / ` : ''}
                     {item.maxAttempts || '∞'}
@@ -490,8 +493,8 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
                 </div>
                 {startTime && (
                   <div className="flex items-center gap-1 w-full sm:w-auto mt-1 sm:mt-0">
-                    <span className="text-ink-faint">Mở lúc:</span>
-                    <span className="font-medium text-ink">{startTime.toLocaleString('vi-VN')}</span>
+                    <span className="text-ink-faint">{t('opensAt')}</span>
+                    <span className="font-medium text-ink">{startTime.toLocaleString(locale)}</span>
                   </div>
                 )}
               </>
@@ -510,8 +513,8 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
           active={activeTab}
           onChange={(key) => setActiveTab(key as 'OFFICIAL' | 'PERSONAL')}
           tabs={[
-            { key: 'OFFICIAL', label: 'Kho Học Liệu Official', icon: <BookOpen className="w-3.5 h-3.5" />, count: filteredOfficialMaterials.length || undefined },
-            { key: 'PERSONAL', label: 'Kho Học Liệu Cá Nhân', icon: <Target className="w-3.5 h-3.5" /> },
+            { key: 'OFFICIAL', label: t('tabOfficial'), icon: <BookOpen className="w-3.5 h-3.5" />, count: filteredOfficialMaterials.length || undefined },
+            { key: 'PERSONAL', label: t('tabPersonal'), icon: <Target className="w-3.5 h-3.5" /> },
           ]}
         />
         {personalUnreadCount > 0 && (
@@ -525,7 +528,7 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
         <div className="space-y-6">
           <div className="flex items-center justify-between border-b border-line-soft pb-3">
             <h2 className="text-xl font-bold text-ink">
-              Danh Sách Học Liệu & Bài Thi
+              {t('listTitle')}
             </h2>
           </div>
 
@@ -542,10 +545,10 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
                   <div className="flex-1 w-full">
                     <div className="flex items-center gap-2 mb-2">
                       <h3 className="font-bold text-ink text-lg group-hover:text-accent transition-colors">{res.title}</h3>
-                      <MaterialBadge tone="warning">Tài liệu tham khảo</MaterialBadge>
+                      <MaterialBadge tone="warning">{t('reference')}</MaterialBadge>
                     </div>
                     <div className="flex items-center gap-4 text-xs text-ink-muted">
-                      <span>Tải lên lúc: {new Date(res.createdAt).toLocaleDateString('vi-VN')}</span>
+                      <span>{t('uploadedAt', { date: new Date(res.createdAt).toLocaleDateString(locale) })}</span>
                     </div>
                   </div>
                 </a>
@@ -555,9 +558,9 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
           ) : (
             <div className="text-center py-10 bg-surface rounded-card border border-line">
               <BookOpen className="w-9 h-9 mx-auto mb-3 text-ink-faint" strokeWidth={1.5} />
-              <h3 className="text-ink font-semibold mb-1">Chưa có học liệu chính thức</h3>
+              <h3 className="text-ink font-semibold mb-1">{t('noOfficial')}</h3>
               <p className="text-sm text-ink-muted max-w-sm mx-auto">
-                {lessonId ? 'Bài học này chưa có học liệu đính kèm.' : 'Giảng viên chưa công bố học liệu nào cho khóa học này.'}
+                {lessonId ? t('noOfficialLesson') : t('noOfficialCourse')}
               </p>
             </div>
           )}

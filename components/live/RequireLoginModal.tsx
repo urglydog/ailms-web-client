@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { Modal } from '@/components/ui/Modal';
 
 interface RequireLoginModalProps {
@@ -20,30 +21,31 @@ interface RequireLoginModalProps {
  * chỉ là tham số chết. Muốn có, làm ở luồng auth chung, không phải việc riêng của Live.
  */
 export function RequireLoginModal({ open, onClose, actionLabel }: RequireLoginModalProps) {
+  const t = useTranslations('live.requireLogin');
   return (
-    <Modal open={open} onClose={onClose} title="Cần đăng nhập" size="sm" hideClose>
+    <Modal open={open} onClose={onClose} title={t('title')} size="sm" hideClose>
       <div className="flex flex-col gap-4 text-center">
         <p className="m-0 text-sm text-ink-muted">
-          Bạn cần đăng nhập để {actionLabel}. Xem buổi live thì không cần đăng nhập nhé.
+          {t('body', { action: actionLabel })}
         </p>
         <div className="flex flex-col gap-2">
           <Link
             href="/login"
             className="rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-white no-underline hover:bg-accent-dark"
           >
-            Đăng nhập
+            {t('login')}
           </Link>
           <Link
             href="/register"
             className="rounded-full border border-line px-5 py-2.5 text-sm font-semibold text-ink no-underline hover:bg-surface-hover"
           >
-            Đăng ký tài khoản mới
+            {t('register')}
           </Link>
           <button
             onClick={onClose}
             className="mt-1 text-xs text-ink-faint hover:text-ink-muted"
           >
-            Để sau
+            {t('later')}
           </button>
         </div>
       </div>

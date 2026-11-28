@@ -1,19 +1,20 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { coursesApi } from '@/lib/api/courses';
 import { History, X } from 'lucide-react';
 
-function timeAgo(iso: string): string {
+function timeAgo(iso: string, t: (key: string, values?: Record<string, number>) => string): string {
   const diffMs = Date.now() - new Date(iso).getTime();
   const min = Math.floor(diffMs / 60000);
-  if (min < 1) return 'Vừa xong';
-  if (min < 60) return `${min} phút trước`;
+  if (min < 1) return t('justNow');
+  if (min < 60) return t('minutesAgo', { count: min });
   const hr = Math.floor(min / 60);
-  if (hr < 24) return `${hr} giờ trước`;
+  if (hr < 24) return t('hoursAgo', { count: hr });
   const day = Math.floor(hr / 24);
-  if (day < 30) return `${day} ngày trước`;
+  if (day < 30) return t('daysAgo', { count: day });
   return new Date(iso).toLocaleDateString('vi-VN');
 }
 
@@ -23,6 +24,7 @@ function timeAgo(iso: string): string {
  * Activity" của GakuNin RDM.
  */
 export function CourseActivityPanel({ courseId, onClose }: { courseId: number; onClose: () => void }) {
+  const t = useTranslations('instructor.activity');
   const { data: activities, isLoading } = useQuery({
     queryKey: ['course-activities', courseId],
     queryFn: () => coursesApi.getActivities(courseId, 50),
@@ -50,26 +52,26 @@ export function CourseActivityPanel({ courseId, onClose }: { courseId: number; o
       >
         <div className="p-3 border-b border-line bg-surface flex items-center gap-2">
           <History className="w-4 h-4 text-ink-muted flex-shrink-0" />
-          <h3 className="font-display font-semibold text-sm text-ink flex-1">Hoạt động gần đây</h3>
+          <h3 className="font-display font-semibold text-sm text-ink flex-1">{t('title')}</h3>
           <button
             onClick={onClose}
             className="p-1 rounded-card text-ink-muted hover:bg-surface-hover hover:text-ink transition-colors"
-            title="Đóng"
+            title={t('close')}
           >
             <X className="w-4 h-4" />
           </button>
         </div>
         <div className="overflow-y-auto flex-1 divide-y divide-line-soft">
-          {isLoading && <div className="text-xs text-ink-faint text-center py-6">Đang tải...</div>}
+          {isLoading && <div className="text-xs text-ink-faint text-center py-6">{t('loading')}</div>}
           {!isLoading && (activities?.length ?? 0) === 0 && (
-            <div className="text-xs text-ink-faint text-center py-6 px-4">Chưa có hoạt động nào được ghi lại.</div>
+            <div className="text-xs text-ink-faint text-center py-6 px-4">{t('empty')}</div>
           )}
           {activities?.map(a => (
             <div key={a.id} className="px-3 py-2.5 hover:bg-surface-hover transition-colors">
               <p className="text-xs text-ink-muted leading-snug">
-                <span className="font-semibold text-ink">{a.actorName || 'Hệ thống'}</span> {a.description.charAt(0).toLowerCase() + a.description.slice(1)}
+                <span className="font-semibold text-ink">{a.actorName || t('system')}</span> {a.description.charAt(0).toLowerCase() + a.description.slice(1)}
               </p>
-              <p className="text-[10px] text-ink-faint mt-0.5">{timeAgo(a.createdAt)}</p>
+              <p className="text-[10px] text-ink-faint mt-0.5">{timeAgo(a.createdAt, t)}</p>
             </div>
           ))}
         </div>

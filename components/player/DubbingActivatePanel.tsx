@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/Button';
 import { VoicePicker } from '@/components/player/VoicePicker';
 import type { VoiceOption } from '@/types/domain';
@@ -44,18 +45,19 @@ export function DubbingActivatePanel({
   selectedVoice = null,
   onSelectVoice,
 }: DubbingActivatePanelProps) {
+  const t = useTranslations('learn.player.activate');
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-ink">
           {quotaExceeded ? (
-            <>
-              Bạn đã đạt giới hạn yêu cầu lồng tiếng hôm nay. Vui lòng quay lại vào ngày mai hoặc chọn
-              ngôn ngữ đã có sẵn.
-            </>
+            <>{t('quotaExceeded')}</>
           ) : (
             <>
-              Ngôn ngữ <strong className="text-ink">{languageLabel}</strong> chưa có bản lồng tiếng AI.
+              {t.rich('noTrack', {
+                language: languageLabel,
+                b: (chunks) => <strong className="text-ink">{chunks}</strong>,
+              })}
             </>
           )}
         </p>
@@ -63,7 +65,7 @@ export function DubbingActivatePanel({
         <div className="flex shrink-0 items-center gap-4">
           {!quotaExceeded && (
             <Button variant="ai" size="sm" onClick={onActivate} disabled={isSubmitting}>
-              {isSubmitting ? 'Đang gửi…' : 'Kích hoạt lồng tiếng AI'}
+              {isSubmitting ? t('submitting') : t('activate')}
             </Button>
           )}
           <button
@@ -71,7 +73,7 @@ export function DubbingActivatePanel({
             onClick={onWatchOriginal}
             className="text-sm font-medium text-ink-muted underline-offset-4 hover:text-accent hover:underline"
           >
-            Để dành sau
+            {t('later')}
           </button>
         </div>
       </div>

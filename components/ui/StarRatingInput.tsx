@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 interface StarRatingInputProps {
   value: number;
@@ -9,11 +10,12 @@ interface StarRatingInputProps {
 
 /** 5 sao bấm chọn được — dùng cho form viết đánh giá (UC23). Khác `StarRating.tsx` (chỉ hiển thị). */
 export function StarRatingInput({ value, onChange }: StarRatingInputProps) {
+  const t = useTranslations('common.rating');
   const [hovered, setHovered] = useState<number | null>(null);
   const display = hovered ?? value;
 
   return (
-    <div className="flex items-center gap-1" role="radiogroup" aria-label="Chọn số sao đánh giá">
+    <div className="flex items-center gap-1" role="radiogroup" aria-label={t('pick')}>
       {[1, 2, 3, 4, 5].map((star) => (
         <button
           key={star}

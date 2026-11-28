@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { Modal } from '@/components/ui/Modal';
 
 import Link from 'next/link';
@@ -12,12 +13,7 @@ import { ApiError } from '@/lib/api/client';
 
 const TOTAL_STEPS = 3;
 
-const WEEKLY_TIME_OPTIONS = [
-  'Tôi đang rất bận (0-2 giờ)',
-  'Tôi sẽ làm việc này ngoài giờ (2-4 tiếng)',
-  'Tôi có nhiều thời gian rảnh (hơn 5 tiếng)',
-  'Tôi vẫn chưa quyết định xem mình có thời gian hay không',
-];
+const WEEKLY_TIME_OPTIONS = ['busy', 'offHours', 'plenty', 'undecided'] as const;
 
 /**
  * Wizard 3 bước tạo khóa học mới — giao diện tham khảo Udemy (19/09/2026, redesign; trước đây
@@ -30,6 +26,7 @@ const WEEKLY_TIME_OPTIONS = [
  * bản form cũ — chỉ đổi khung giao diện bao quanh, không đổi hành vi nghiệp vụ.
  */
 export default function NewCoursePage() {
+  const t = useTranslations('instructor.newCourse');
   const router = useRouter();
   const { data: categories } = useCategories();
   const createCourse = useCreateCourse();
@@ -39,7 +36,7 @@ export default function NewCoursePage() {
   const [step, setStep] = useState(0);
   const [title, setTitle] = useState('');
   const [categoryId, setCategoryId] = useState<number | ''>('');
-  const [weeklyTime, setWeeklyTime] = useState(WEEKLY_TIME_OPTIONS[0]);
+  const [weeklyTime, setWeeklyTime] = useState<(typeof WEEKLY_TIME_OPTIONS)[number]>(WEEKLY_TIME_OPTIONS[0]);
 
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [headline, setHeadline] = useState('');
@@ -99,7 +96,7 @@ export default function NewCoursePage() {
             <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-400 to-accent font-display text-[13px] font-bold text-white">
               L
             </span>
-            <span className="text-[13.5px] font-semibold text-ink-muted">Bước {step + 1}/{TOTAL_STEPS}</span>
+            <span className="text-[13.5px] font-semibold text-ink-muted">{t('step', { step: step + 1, total: TOTAL_STEPS })}</span>
           </div>
           <Link href="/instructor/courses" className="text-[13.5px] font-semibold text-accent-dark no-underline hover:underline">
             Ra
@@ -116,16 +113,16 @@ export default function NewCoursePage() {
       <main className="flex flex-1 flex-col items-center overflow-y-auto px-4 pt-20">
         {step === 0 && (
           <div className="flex w-full max-w-lg flex-col items-center gap-2 text-center">
-            <h1 className="m-0 font-display text-2xl font-bold text-ink">Vậy thì sao không chọn một tựa đề tạm thời?</h1>
+            <h1 className="m-0 font-display text-2xl font-bold text-ink">{t('titleHeading')}</h1>
             <p className="text-[13.5px] text-ink-muted">
-              Không sao nếu bạn chưa nghĩ ra được tiêu đề hay ngay bây giờ. Bạn có thể thay đổi sau.
+              {t('titleHint')}
             </p>
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && goNext()}
               autoFocus
-              placeholder="Ví dụ: Học Photoshop CS6 từ đầu"
+              placeholder={t('titlePlaceholder')}
               className="mt-4 w-full rounded-lg border border-line px-4 py-3 text-[14px] focus:border-accent focus:outline-none"
             />
           </div>
@@ -133,15 +130,15 @@ export default function NewCoursePage() {
 
         {step === 1 && (
           <div className="flex w-full max-w-lg flex-col items-center gap-2 text-center">
-            <h1 className="m-0 font-display text-2xl font-bold text-ink">Loại kiến thức bạn sẽ chia sẻ phù hợp nhất với danh mục nào?</h1>
-            <p className="text-[13.5px] text-ink-muted">Nếu bạn không chắc chắn về danh mục phù hợp, bạn có thể thay đổi sau.</p>
+            <h1 className="m-0 font-display text-2xl font-bold text-ink">{t('categoryHeading')}</h1>
+            <p className="text-[13.5px] text-ink-muted">{t('categoryHint')}</p>
             <select
               value={categoryId}
               onChange={(e) => setCategoryId(e.target.value ? Number(e.target.value) : '')}
               autoFocus
               className="mt-4 w-full rounded-lg border border-line px-4 py-3 text-[14px] focus:border-accent focus:outline-none"
             >
-              <option value="">Chọn một danh mục</option>
+              <option value="">{t('pickCategory')}</option>
               {categories?.map((c) => (
                 <option key={c.id} value={c.id}>{c.name}</option>
               ))}
@@ -151,9 +148,9 @@ export default function NewCoursePage() {
 
         {step === 2 && (
           <div className="flex w-full max-w-lg flex-col items-center gap-2 text-center">
-            <h1 className="m-0 font-display text-2xl font-bold text-ink">Mỗi tuần bạn có thể dành bao nhiêu thời gian để tạo khóa học của mình?</h1>
+            <h1 className="m-0 font-display text-2xl font-bold text-ink">{t('timeHeading')}</h1>
             <p className="text-[13.5px] text-ink-muted">
-              Không có câu trả lời sai. Chúng tôi có thể giúp bạn đạt được mục tiêu ngay cả khi bạn không có nhiều thời gian.
+              {t('timeHint')}
             </p>
             <div className="mt-4 flex w-full flex-col gap-2.5">
               {WEEKLY_TIME_OPTIONS.map((option) => (
@@ -170,7 +167,7 @@ export default function NewCoursePage() {
                     onChange={() => setWeeklyTime(option)}
                     className="accent-cyan-600"
                   />
-                  {option}
+                  {t(`weekly.${option}`)}
                 </label>
               ))}
             </div>
@@ -191,7 +188,7 @@ export default function NewCoursePage() {
             onClick={goPrev}
             className="rounded-full border border-accent px-5 py-2.5 text-[13px] font-bold text-accent-dark hover:bg-tint"
           >
-            Trước
+            {t('back')}
           </button>
         ) : (
           <span />
@@ -202,29 +199,29 @@ export default function NewCoursePage() {
           disabled={!stepValid || createCourse.isPending}
           className="rounded-full bg-accent px-5 py-2.5 text-[13px] font-bold text-white hover:bg-accent-dark disabled:cursor-not-allowed disabled:opacity-40"
         >
-          {step < TOTAL_STEPS - 1 ? 'Tiếp tục' : createCourse.isPending ? 'Đang tạo...' : 'Tạo khóa học'}
+          {step < TOTAL_STEPS - 1 ? t('next') : createCourse.isPending ? t('creating') : t('create')}
         </button>
       </footer>
 
       {showProfileModal && (
-        <Modal open onClose={() => setShowProfileModal(false)} bare ariaLabel="Hoàn thiện hồ sơ Giảng viên" closeOnBackdrop={false} className="flex w-full max-w-md flex-col gap-4 rounded-xl bg-surface-raised p-6 shadow-xl">
-            <h2 className="m-0 text-lg font-bold text-ink">Hoàn thiện hồ sơ Giảng viên</h2>
+        <Modal open onClose={() => setShowProfileModal(false)} bare ariaLabel={t('profile.title')} closeOnBackdrop={false} className="flex w-full max-w-md flex-col gap-4 rounded-xl bg-surface-raised p-6 shadow-xl">
+            <h2 className="m-0 text-lg font-bold text-ink">{t('profile.title')}</h2>
             <p className="text-sm text-ink-muted">
-              Bạn cần cập nhật chức danh nghề nghiệp và tiểu sử trước khi tạo khóa học đầu tiên.
+              {t('profile.body')}
             </p>
 
             <label className="flex flex-col gap-1.5">
-              <span className="text-[12.5px] font-semibold text-ink-muted">Chức danh nghề nghiệp</span>
+              <span className="text-[12.5px] font-semibold text-ink-muted">{t('profile.headline')}</span>
               <input
                 value={headline}
                 onChange={(e) => setHeadline(e.target.value)}
-                placeholder="VD: Kỹ sư phần mềm / Giảng viên tiếng Anh"
+                placeholder={t('profile.headlinePlaceholder')}
                 className="w-full rounded-lg border border-line px-3 py-2 text-sm focus:border-accent focus:outline-none"
               />
             </label>
 
             <label className="flex flex-col gap-1.5">
-              <span className="text-[12.5px] font-semibold text-ink-muted">Tiểu sử ngắn (tối thiểu 20 ký tự)</span>
+              <span className="text-[12.5px] font-semibold text-ink-muted">{t('profile.bio')}</span>
               <textarea
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
@@ -239,14 +236,14 @@ export default function NewCoursePage() {
                 onClick={() => setShowProfileModal(false)}
                 className="rounded-full px-4 py-2 text-[13px] font-bold text-ink-muted hover:bg-tint"
               >
-                Hủy bỏ
+                {t('profile.cancel')}
               </button>
               <button
                 onClick={handleSaveProfile}
                 disabled={!headline.trim() || bio.trim().length < 20 || updateProfile.isPending}
                 className="rounded-full bg-accent px-5 py-2 text-[13px] font-bold text-white hover:bg-accent-dark disabled:opacity-50"
               >
-                {updateProfile.isPending ? 'Đang lưu...' : 'Lưu & Tiếp tục'}
+                {updateProfile.isPending ? t('profile.saving') : t('profile.saveContinue')}
               </button>
             </div>
           </Modal>

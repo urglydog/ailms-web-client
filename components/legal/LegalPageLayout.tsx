@@ -1,4 +1,7 @@
+'use client';
+
 import type { ReactNode } from 'react';
+import { useTranslations } from 'next-intl';
 
 /** Khung dùng chung cho các trang pháp lý/chính sách (Điều khoản, Quyền riêng tư, Hoàn tiền...).
  * Cùng kiểu trình bày với `app/(public)/about/page.tsx` (max-w-3xl, rounded-card, shadow-card)
@@ -15,10 +18,11 @@ export function LegalPageLayout({
   intro?: ReactNode;
   children: ReactNode;
 }) {
+  const t = useTranslations('common.legal');
   return (
     <div className="mx-auto w-full max-w-3xl px-8 py-14">
       <h1 className="m-0 font-display text-[28px] font-bold text-ink">{title}</h1>
-      {updatedAt && <p className="mt-2 text-[12.5px] text-ink-faint">Cập nhật lần cuối: {updatedAt}</p>}
+      {updatedAt && <p className="mt-2 text-[12.5px] text-ink-faint">{t('updated', { date: updatedAt })}</p>}
       {intro && <div className="mt-4 text-[15px] leading-[1.7] text-ink-muted">{intro}</div>}
       <div className="legal-content mt-8 flex flex-col gap-8">{children}</div>
     </div>
@@ -38,9 +42,10 @@ export function LegalSection({ title, children }: { title: string; children: Rea
 /** Trang chưa có nội dung thật — chỉ hiện tiêu đề + ghi chú "đang cập nhật", KHÔNG bịa nội dung
  * chưa được triển khai thật trong hệ thống (theo yêu cầu: phần nào chưa có thì chỉ ghi tiêu đề). */
 export function LegalStubNotice() {
+  const t = useTranslations('common.legal');
   return (
     <p className="rounded-card border border-dashed border-line bg-surface-raised p-5 text-[13.5px] text-ink-faint">
-      Nội dung này đang được xây dựng và sẽ được cập nhật trong phiên bản tiếp theo.
+      {t('stub')}
     </p>
   );
 }

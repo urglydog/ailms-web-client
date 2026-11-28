@@ -2,33 +2,36 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { useLocale, useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { ApiError } from '@/lib/api/client';
 import { disputesApi } from '@/lib/api/disputes';
 import { payosPayoutApi } from '@/lib/api/payosPayout';
 import { getAccessToken } from '@/lib/auth/token';
-import { BLOCKED_REFRESH_MS, FAILURE_LABEL, clockTime, isRetryBlocked, retryButtonLabel } from '@/lib/payosRetry';
-import { REASON_CODES, REASON_LABEL } from '@/lib/refundPolicy';
+import { BLOCKED_REFRESH_MS, clockTime, isRetryBlocked } from '@/lib/payosRetry';
+import { REASON_CODES } from '@/lib/refundPolicy';
 import type { AppealDecision, DisputeAdminRes, RefundReasonCode, RefundResponsibility } from '@/types/domain';
 
-export { REASON_CODES, REASON_LABEL } from '@/lib/refundPolicy';
+export { REASON_CODES } from '@/lib/refundPolicy';
 
 const INPUT = 'w-full rounded-lg border border-line bg-surface-raised p-2.5 text-sm text-ink outline-none focus:border-accent';
 
-/** Điều kiện chính sách để bấm "Đánh dấu đã hoàn tiền" (BE kiểm lại, đây chỉ để chặn sớm và giải thích). */
+/** Vấn đề chính sách đang chặn nút "Đánh dấu đã hoàn tiền" — trả về khóa dịch trong admin.disputes.policy (BE kiểm lại, đây chỉ để chặn sớm và giải thích). */
+export type PolicyProblem = 'needReason' | 'noteShort' | 'evidenceShort' | 'waitInstructor';
+
 export function policyProblem(
   d: DisputeAdminRes,
   responsibility: RefundResponsibility,
   reasonCode: RefundReasonCode | '',
   note: string,
   evidenceNote: string,
-): string | null {
-  if (responsibility !== 'STANDARD' && reasonCode === '') return 'Hãy chọn mã lý do cho chế độ này.';
+): PolicyProblem | null {
+  if (responsibility !== 'STANDARD' && reasonCode === '') return 'needReason';
   if (responsibility === 'INSTRUCTOR_FAULT') {
-    if (note.trim().length < 10) return 'Chế độ "giảng viên chịu toàn bộ" cần ghi chú lý do rõ ràng (tối thiểu 10 ký tự).';
-    if (evidenceNote.trim().length < 20) return 'Cần nêu minh chứng (tối thiểu 20 ký tự: bằng chứng nào, ở đâu).';
+    if (note.trim().length < 10) return 'noteShort';
+    if (evidenceNote.trim().length < 20) return 'evidenceShort';
     const waiting = d.instructorDecision == null && d.instructorDeadlineAt != null && new Date(d.instructorDeadlineAt).getTime() > Date.now();
-    if (waiting) return 'Giảng viên chưa phản hồi và chưa hết hạn phản hồi — hãy chờ rồi mới quyết định giảng viên chịu trách nhiệm.';
+    if (waiting) return 'waitInstructor';
   }
   return null;
 }
@@ -47,48 +50,49 @@ export function ReasonCodeFields({
   onReasonCode: (v: RefundReasonCode | '') => void;
   evidenceNote: string;
   onEvidenceNote: (v: string) => void;
-  problem: string | null;
+  problem: PolicyProblem | null;
 }) {
+  const t = useTranslations('admin.disputes');
   const codes = REASON_CODES[responsibility];
   return (
     <div className="flex flex-col gap-3 rounded-lg border border-line bg-surface p-3">
       <label className="flex flex-col gap-1.5">
-        <span className="text-sm font-semibold text-ink">Mã lý do {responsibility === 'STANDARD' ? '(không bắt buộc)' : '*'}</span>
+        <span className="text-sm font-semibold text-ink">{t('policy.reasonCode')} {responsibility === 'STANDARD' ? t('policy.optional') : '*'}</span>
         <select value={reasonCode} onChange={(e) => onReasonCode(e.target.value as RefundReasonCode | '')} className={INPUT}>
-          <option value="">{responsibility === 'STANDARD' ? 'Không chọn' : 'Chọn mã lý do'}</option>
+          <option value="">{responsibility === 'STANDARD' ? t('policy.none') : t('policy.choose')}</option>
           {codes.map((c) => (
-            <option key={c} value={c}>{REASON_LABEL[c]}</option>
+            <option key={c} value={c}>{t(`reasonCode.${c}`)}</option>
           ))}
         </select>
       </label>
       {responsibility === 'INSTRUCTOR_FAULT' && (
         <label className="flex flex-col gap-1.5">
-          <span className="text-sm font-semibold text-ink">Minh chứng * (giảng viên sẽ thấy nội dung này)</span>
+          <span className="text-sm font-semibold text-ink">{t('policy.evidence')}</span>
           <textarea
             value={evidenceNote}
             onChange={(e) => onEvidenceNote(e.target.value)}
             rows={3}
             maxLength={2000}
-            placeholder="VD: Bài 3 sao chép nguyên văn khóa X tại đường dẫn ..., ảnh so sánh đính kèm trong khiếu nại"
+            placeholder={t('policy.evidencePh')}
             className={INPUT}
           />
           <span className="text-xs text-ink-muted">
-            Chỉ chọn chế độ này khi có vi phạm có bằng chứng và giảng viên đã được phản hồi hoặc đã hết hạn phản hồi. Giảng viên có quyền khiếu nại một lần.
+            {t('policy.evidenceHint')}
           </span>
         </label>
       )}
-      {problem && <p className="m-0 text-xs text-danger">{problem}</p>}
+      {problem && <p className="m-0 text-xs text-danger">{t(`policy.${problem}`)}</p>}
     </div>
   );
 }
 
 /** Tài khoản nhận hoàn tiền học viên khai báo + trạng thái xác nhận chính chủ. */
 export function RefundAccountInfo({ d }: { d: DisputeAdminRes }) {
+  const t = useTranslations('admin.disputes.account');
   if (!d.refundBankCode) {
     return (
       <p className="m-0 text-xs text-ink-muted">
-        Học viên chưa khai tài khoản nhận hoàn tiền dạng chuẩn
-        {d.refundBankAccount ? ` (ghi chú tự do: ${d.refundBankAccount})` : ''}; chỉ chuyển thủ công được.
+        {t('noStandard', { free: d.refundBankAccount ? t('freeNote', { note: d.refundBankAccount }) : '' })}
       </p>
     );
   }
@@ -98,7 +102,7 @@ export function RefundAccountInfo({ d }: { d: DisputeAdminRes }) {
         <span className="font-semibold">{d.refundBankCode}</span> · <span className="font-mono">{d.refundAccountNumber}</span>
       </div>
       <div className="text-xs text-ink-muted">
-        Chủ tài khoản: {d.refundAccountHolder} · {d.refundAccountConfirmed ? 'học viên đã xác nhận chính chủ' : 'chưa xác nhận chính chủ'}
+        {t('holder', { name: d.refundAccountHolder ?? '', state: d.refundAccountConfirmed ? t('confirmed') : t('unconfirmed') })}
       </div>
     </div>
   );
@@ -106,6 +110,8 @@ export function RefundAccountInfo({ d }: { d: DisputeAdminRes }) {
 
 /** Nút "Chi qua PayOS" cho khoản hoàn đang chờ chuyển + trạng thái lệnh chi gần nhất. Chỉ hiện khi công tắc chi tự động bật. */
 export function PayosRefundTransfer({ d, onChanged }: { d: DisputeAdminRes; onChanged: () => void }) {
+  const t = useTranslations('admin.disputes.payos');
+  const locale = useLocale();
   const { data: status } = useQuery({
     queryKey: ['admin', 'payos-payout', 'status'],
     queryFn: () => payosPayoutApi.status(),
@@ -139,27 +145,27 @@ export function PayosRefundTransfer({ d, onChanged }: { d: DisputeAdminRes; onCh
     onSuccess: (o) => {
       toast.success(
         o.status === 'SUCCEEDED'
-          ? 'PayOS đã chuyển tiền và đã ghi nhận.'
+          ? t('succeeded')
           : o.status === 'FAILED'
-            ? `PayOS từ chối: ${o.errorMessage ?? 'không rõ lý do'}`
-            : 'Đã gửi lệnh chi sang PayOS, hệ thống tự cập nhật khi có kết quả.',
+            ? t('rejected', { reason: o.errorMessage ?? t('unknownReason') })
+            : t('sent'),
       );
       void refetch();
       onChanged();
     },
-    onError: (err) => toast.error(err instanceof ApiError ? err.message : 'Không gửi được lệnh chi.'),
+    onError: (err) => toast.error(err instanceof ApiError ? err.message : t('sendError')),
   });
 
   const askAccount = useMutation({
     mutationFn: () =>
       disputesApi.requestAccountUpdate(d.id, {
-        reason: (orders?.[0]?.errorMessage ?? 'Cần kiểm tra lại tài khoản nhận hoàn tiền').slice(0, 280),
+        reason: (orders?.[0]?.errorMessage ?? t('checkAccount')).slice(0, 280),
       }),
     onSuccess: () => {
-      toast.success('Đã yêu cầu học viên cập nhật tài khoản nhận hoàn tiền.');
+      toast.success(t('asked'));
       onChanged();
     },
-    onError: (err) => toast.error(err instanceof ApiError ? err.message : 'Không gửi được yêu cầu.'),
+    onError: (err) => toast.error(err instanceof ApiError ? err.message : t('askError')),
   });
 
   if (!status?.enabled) return null;
@@ -168,6 +174,8 @@ export function PayosRefundTransfer({ d, onChanged }: { d: DisputeAdminRes; onCh
   const inFlight = latest && (latest.status === 'PENDING' || latest.status === 'SUBMITTED');
   const retryBlocked = isRetryBlocked(latest);
   const accountChangedAt = clockTime(d.refundAccountUpdatedAt);
+  const retryAt = retryBlocked ? clockTime(latest?.nextRetryAt) : null;
+  const blockedLabel = retryBlocked ? (retryAt ? t('retryAt', { time: retryAt }) : t('locked')) : null;
   return (
     <div className="flex flex-col gap-2 rounded-lg border border-line bg-surface-raised p-3">
       <div className="flex flex-wrap items-center gap-2">
@@ -177,47 +185,47 @@ export function PayosRefundTransfer({ d, onChanged }: { d: DisputeAdminRes; onCh
           onClick={() => transfer.mutate()}
           title={
             retryBlocked
-              ? (latest?.retryBlockedReason ?? 'Đang bị khóa chi lại')
+              ? (latest?.retryBlockedReason ?? t('blocked'))
               : blocked
-                ? 'Cần học viên khai tài khoản dạng chuẩn và xác nhận chính chủ'
-                : 'Chuyển tiền hoàn qua PayOS'
+                ? t('needAccount')
+                : t('hint')
           }
           className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-dark disabled:opacity-50"
         >
-          {retryButtonLabel(latest) ?? (latest?.status === 'FAILED' ? 'Chi lại qua PayOS' : 'Chi qua PayOS')}
+          {blockedLabel ?? (latest?.status === 'FAILED' ? t('retry') : t('send'))}
         </button>
         {latest?.status === 'FAILED' && (
           <button
             type="button"
             disabled={askAccount.isPending}
             onClick={() => askAccount.mutate()}
-            title="Chuyển khoản hoàn sang trạng thái chờ học viên kiểm tra và cập nhật tài khoản nhận"
+            title={t('askHint')}
             className="rounded-lg border border-line bg-surface px-3 py-2 text-sm font-semibold text-ink hover:bg-surface-raised disabled:opacity-50"
           >
-            Yêu cầu học viên cập nhật TK
+            {t('ask')}
           </button>
         )}
         <span className="text-xs text-ink-muted">
-          Số dư tài khoản chi: {status.balance == null ? 'không rõ' : `${status.balance.toLocaleString('vi-VN')}đ`}
+          {t('balance', { amount: status.balance == null ? t('unknownBalance') : `${status.balance.toLocaleString(locale)}đ` })}
         </span>
       </div>
-      {blocked && <p className="m-0 text-xs text-ink-muted">Chưa đủ thông tin tài khoản chuẩn của học viên nên chưa chi tự động được; chuyển thủ công bên dưới.</p>}
+      {blocked && <p className="m-0 text-xs text-ink-muted">{t('notReady')}</p>}
       {latest && (inFlight || latest.status === 'UNKNOWN') && (
         <p className="m-0 text-xs font-semibold text-danger">
-          Đang có lệnh chi PayOS chưa có kết quả — KHÔNG chuyển tay lúc này (tránh chuyển tiền hai lần). Chờ kết quả hoặc bấm &quot;Chi qua PayOS&quot; để gửi lại.
+          {t('inFlight')}
         </p>
       )}
       {accountChangedAt && (
         <p className="m-0 text-xs font-semibold text-warning">
-          Học viên đã đổi tài khoản nhận hoàn tiền lúc {accountChangedAt}; hãy kiểm tra tài khoản mới trước khi chuyển.
+          {t('accountChanged', { time: accountChangedAt })}
         </p>
       )}
       {latest && (
         <p className="m-0 text-xs text-ink">
-          Lệnh {latest.referenceId}: {latest.status === 'SUCCEEDED' ? 'thành công' : latest.status === 'FAILED' ? `thất bại${latest.failureCategory ? ` (${FAILURE_LABEL[latest.failureCategory]})` : ''}` : latest.status === 'UNKNOWN' ? 'chưa rõ kết quả (có thể bấm gửi lại, không chi trùng)' : 'đang xử lý — chờ PayOS/ngân hàng xác nhận, trang tự cập nhật khi có kết quả'}
+          {t('order', { ref: latest.referenceId, state: latest.status === 'SUCCEEDED' ? t('ok') : latest.status === 'FAILED' ? `${t('fail')}${latest.failureCategory ? ` (${t(`cause.${latest.failureCategory}`)})` : ''}` : latest.status === 'UNKNOWN' ? t('unknown') : t('pending') })}
           {latest.errorMessage ? ` — ${latest.errorMessage}` : ''}
           {retryBlocked && latest.retryBlockedReason ? `. ${latest.retryBlockedReason}` : ''}
-          {latest.nameMismatch ? ` — ⚠ tên ngân hàng trả về "${latest.resolvedAccountName}" khác tên đã nhập` : ''}
+          {latest.nameMismatch ? t('nameMismatch', { name: latest.resolvedAccountName ?? '' }) : ''}
         </p>
       )}
     </div>
@@ -226,26 +234,27 @@ export function PayosRefundTransfer({ d, onChanged }: { d: DisputeAdminRes; onCh
 
 /** Khiếu nại của giảng viên với quyết định "giảng viên chịu toàn bộ": admin giữ nguyên hoặc giảm về chế độ Chuẩn. */
 export function AppealPanel({ d, onChanged }: { d: DisputeAdminRes; onChanged: () => void }) {
+  const t = useTranslations('admin.disputes.appeal');
   const [note, setNote] = useState('');
   const decide = useMutation({
     mutationFn: (decision: AppealDecision) => disputesApi.decideAppeal(d.id, { decision, note: note.trim() }),
     onSuccess: () => {
-      toast.success('Đã quyết định khiếu nại của giảng viên.');
+      toast.success(t('decided'));
       setNote('');
       onChanged();
     },
-    onError: (err) => toast.error(err instanceof ApiError ? err.message : 'Không xử lý được khiếu nại.'),
+    onError: (err) => toast.error(err instanceof ApiError ? err.message : t('error')),
   });
 
   if (!d.appealStatus || d.appealStatus === 'NONE') return null;
   return (
     <div className="mt-4 flex flex-col gap-2 rounded-lg border border-warning bg-surface p-4">
-      <h3 className="m-0 text-sm font-semibold text-ink">Khiếu nại của giảng viên</h3>
+      <h3 className="m-0 text-sm font-semibold text-ink">{t('title')}</h3>
       {d.appealReason && <p className="m-0 whitespace-pre-wrap text-sm text-ink">{d.appealReason}</p>}
       {d.appealStatus === 'OPEN' ? (
         <>
           <label className="flex flex-col gap-1.5">
-            <span className="text-xs font-semibold text-ink-muted">Lý do quyết định * (giảng viên sẽ nhận được nội dung này)</span>
+            <span className="text-xs font-semibold text-ink-muted">{t('reason')}</span>
             <textarea value={note} onChange={(e) => setNote(e.target.value)} rows={2} maxLength={1000} className={INPUT} />
           </label>
           <div className="flex flex-wrap gap-2">
@@ -253,10 +262,10 @@ export function AppealPanel({ d, onChanged }: { d: DisputeAdminRes; onChanged: (
               type="button"
               disabled={decide.isPending || !note.trim()}
               onClick={() => decide.mutate('REDUCE_TO_STANDARD')}
-              title="Giảng viên chỉ phải trả phần đã nhận; hoàn lại phần phạt vượt mức"
+              title={t('reduceHint')}
               className="rounded-lg bg-success px-4 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
             >
-              Chấp nhận, giảm về chế độ Chuẩn
+              {t('reduce')}
             </button>
             <button
               type="button"
@@ -264,13 +273,13 @@ export function AppealPanel({ d, onChanged }: { d: DisputeAdminRes; onChanged: (
               onClick={() => decide.mutate('UPHOLD')}
               className="rounded-lg bg-surface-raised px-4 py-2 text-sm font-semibold text-danger ring-1 ring-inset ring-danger/40 hover:bg-danger/5 disabled:opacity-50"
             >
-              Giữ nguyên quyết định
+              {t('uphold')}
             </button>
           </div>
         </>
       ) : (
         <p className="m-0 text-xs text-ink-muted">
-          Kết quả: {d.appealStatus === 'REDUCED' ? 'đã giảm về chế độ Chuẩn' : 'giữ nguyên quyết định'}
+          {t('result', { outcome: d.appealStatus === 'REDUCED' ? t('reduced') : t('upheld') })}
           {d.appealDecisionNote ? ` — ${d.appealDecisionNote}` : ''}
         </p>
       )}

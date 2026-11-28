@@ -1,4 +1,5 @@
 import type { InstructorMaterial } from '@/lib/api/materials';
+import { tr } from '@/lib/i18n/translate';
 
 export type MaterialStatusTone = 'success' | 'neutral' | 'warning' | 'danger';
 
@@ -11,7 +12,7 @@ export function getMaterialDistributionBadge(mat: Pick<InstructorMaterial, 'isOf
   const assignedCount = mat.assignments?.length ?? 0;
   if (assignedCount > 0) {
     return {
-      label: assignedCount > 1 ? `Official — Đang dùng ở ${assignedCount} vị trí` : 'Official — Đã phân phối',
+      label: assignedCount > 1 ? tr('errors.lib.materialOfficialUsed', { count: assignedCount }) : tr('errors.lib.materialOfficialDistributed'),
       tone: 'success',
     };
   }
@@ -23,11 +24,11 @@ export function getMaterialProcessingBadge(status: string | undefined): { label:
   switch (status) {
     case 'PENDING_TRANSCRIPT':
     case 'PENDING':
-      return { label: 'Đang chờ xử lý', tone: 'warning' };
+      return { label: tr('errors.lib.materialPending'), tone: 'warning' };
     case 'PROCESSING':
-      return { label: 'Đang xử lý', tone: 'warning' };
+      return { label: tr('errors.lib.materialProcessing'), tone: 'warning' };
     case 'FAILED':
-      return { label: 'Lỗi sinh nội dung', tone: 'danger' };
+      return { label: tr('errors.lib.materialFailed'), tone: 'danger' };
     default:
       return null;
   }

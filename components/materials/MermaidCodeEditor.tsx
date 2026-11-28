@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Save, Sparkles } from 'lucide-react';
 import { MermaidViewer } from './MermaidViewer';
 
@@ -28,6 +29,7 @@ interface MermaidCodeEditorProps {
  * thay vì kéo thả (`MindmapEditor`/DRAG_DROP vẫn giữ nguyên, không đổi gì ở đó).
  */
 export function MermaidCodeEditor({ initialCode, onSave, isSaving = false }: MermaidCodeEditorProps) {
+  const t = useTranslations('learn.mermaidEditor');
   const [code, setCode] = useState(initialCode);
   const [debouncedCode, setDebouncedCode] = useState(initialCode);
 
@@ -43,13 +45,13 @@ export function MermaidCodeEditor({ initialCode, onSave, isSaving = false }: Mer
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1 min-h-0">
         <div className="flex flex-col gap-1.5 min-h-0">
           <div className="flex items-center justify-between">
-            <label className="text-xs font-bold text-ink-muted uppercase tracking-wider">Mã Mermaid</label>
+            <label className="text-xs font-bold text-ink-muted uppercase tracking-wider">{t('label')}</label>
             <button
               type="button"
               onClick={() => setCode(TREE_CARD_TEMPLATE)}
               className="flex items-center gap-1 text-[11px] font-semibold text-accent hover:underline"
             >
-              <Sparkles className="w-3 h-3" /> Chèn khung Tree-card mẫu
+              <Sparkles className="w-3 h-3" /> {t('insertTemplate')}
             </button>
           </div>
           <textarea
@@ -61,7 +63,7 @@ export function MermaidCodeEditor({ initialCode, onSave, isSaving = false }: Mer
           />
         </div>
         <div className="flex flex-col gap-1.5 min-h-0">
-          <label className="text-xs font-bold text-ink-muted uppercase tracking-wider">Xem trước trực tiếp</label>
+          <label className="text-xs font-bold text-ink-muted uppercase tracking-wider">{t('preview')}</label>
           <div className="flex-1 min-h-0 overflow-y-auto rounded-card border border-line bg-surface-raised">
             <MermaidViewer chart={debouncedCode} readOnly />
           </div>
@@ -73,7 +75,7 @@ export function MermaidCodeEditor({ initialCode, onSave, isSaving = false }: Mer
           disabled={!isDirty || isSaving || !code.trim()}
           className="flex items-center gap-1.5 px-4 py-2 bg-accent hover:bg-accent-dark text-white text-sm font-bold rounded-card transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <Save className="w-4 h-4" /> {isSaving ? 'Đang lưu...' : 'Lưu'}
+          <Save className="w-4 h-4" /> {isSaving ? t('saving') : t('save')}
         </button>
       </div>
     </div>

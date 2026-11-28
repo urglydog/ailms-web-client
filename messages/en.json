@@ -88,7 +88,16 @@
       "light": "Light"
     },
     "skipToContent": "Skip to content",
-    "help": "Help & Support"
+    "help": "Help & Support",
+    "streak": {
+      "congrats": "🔥 Congratulations! Your learning streak is now {days} days!",
+      "frozen": "🧊 You missed a day — the system automatically \"froze\" your streak to keep your {days}-day streak! {remaining} freezes left this month.",
+      "title": "{days}-day streak",
+      "record": "Record: {days} days",
+      "doneToday": "You have reached today's goal!",
+      "keepGoing": "Study 1 lesson or take 1 quiz to keep your streak!",
+      "freezes": "🧊 {remaining} streak freezes left this month (applied automatically if you miss a day)"
+    }
   },
   "footer": {
     "tagline": "An academic-grade online learning and examination management system.",
@@ -431,6 +440,450 @@
         "chapter": "What is the main idea of the chapter {chapter}?"
       },
       "aiGenerated": "AI-generated from the lesson content"
+    },
+    "player": {
+      "posterLabel": "lesson video frame",
+      "playVideo": "Play video",
+      "dubPending": "This segment is being dubbed — playing original audio for now",
+      "dubRemaining": "Processing the rest",
+      "youtubeSubHint": "YouTube captions (the course has no transcript yet)",
+      "noOriginalSub": "(no original subtitles yet)",
+      "noTranslatedSub": "(no translated subtitles yet)",
+      "controls": {
+        "auto": "Auto",
+        "pause": "Pause",
+        "play": "Play",
+        "back5": "Back 5 seconds",
+        "forward5": "Forward 5 seconds",
+        "unmute": "Unmute",
+        "mute": "Mute",
+        "volume": "Volume",
+        "originalSub": "Original subtitles",
+        "noOriginalSub": "This lesson has no original subtitles",
+        "original": "Original",
+        "translatedSub": "Translated subtitles",
+        "noTranslatedSub": "The selected language has no translated subtitles",
+        "translated": "Translated",
+        "transcript": "Transcript",
+        "settings": "Settings",
+        "videoQuality": "Video quality",
+        "autoNext": "Autoplay next lesson",
+        "subtitleStyle": "Subtitle style",
+        "shortcuts": "Keyboard shortcuts",
+        "exitFullscreen": "Exit full screen",
+        "fullscreen": "Full screen"
+      },
+      "subtitle": {
+        "pickColor": "Pick a custom color",
+        "close": "Close",
+        "title": "Subtitle style",
+        "tabOriginal": "Original subtitles",
+        "tabTranslated": "Translated subtitles",
+        "fontSize": "Font size",
+        "textColor": "Text color",
+        "bgColor": "Background color",
+        "bgOpacity": "Background opacity",
+        "transparent": "Transparent",
+        "outline": "Text outline (easier to read on bright backgrounds)",
+        "presets": "Presets (you can apply several in a row)",
+        "preview": "Preview",
+        "sampleOriginal": "This is the original subtitle",
+        "sampleTranslated": "This is the translated subtitle",
+        "editPosition": "Adjust subtitle position on the video",
+        "presetDefault": "Default",
+        "presetBlackBg": "Black background",
+        "presetYellow": "Yellow text",
+        "presetOutline": "Text outline",
+        "presetMinimal": "Minimal (no background)"
+      },
+      "shortcuts": {
+        "playPause": "Play / Pause",
+        "slower": "Decrease playback speed",
+        "faster": "Increase playback speed",
+        "fullscreen": "Full screen",
+        "exitFullscreen": "Exit full screen",
+        "back5": "Back 5 seconds",
+        "forward5": "Forward 5 seconds",
+        "volumeUp": "Volume up",
+        "volumeDown": "Volume down",
+        "mute": "Mute / Unmute",
+        "close": "Close",
+        "title": "Keyboard shortcuts"
+      },
+      "activate": {
+        "quotaExceeded": "You have reached today's dubbing request limit. Please come back tomorrow or choose a language that is already available.",
+        "noTrack": "The language <b>{language}</b> does not have an AI dub yet.",
+        "submitting": "Sending…",
+        "activate": "Enable AI dubbing",
+        "later": "Maybe later"
+      },
+      "pipeline": {
+        "heading": "PROCESSING AI DUBBING",
+        "aria": "Dubbing progress",
+        "failedNote": " — keeping the original audio for this segment",
+        "hide": "Hide progress, watch video",
+        "cancelling": "Cancelling...",
+        "cancel": "Cancel dubbing"
+      },
+      "transcript": {
+        "autoScroll": "Auto-scroll with the dialogue",
+        "empty": "This lesson has no transcript yet."
+      },
+      "positionEditor": {
+        "hint": "Drag the subtitles to where you want them",
+        "reset": "Reset to default",
+        "done": "Done"
+      },
+      "voice": {
+        "default": "default",
+        "choose": "Choose a voice",
+        "female": "Female",
+        "male": "Male"
+      }
+    },
+    "tutor": {
+      "pinned": "Pinned",
+      "options": "Options",
+      "optionsAria": "Conversation options",
+      "unpin": "Unpin",
+      "pin": "Pin",
+      "rename": "Rename",
+      "delete": "Delete",
+      "maxAttachments": "You can attach at most {max} files per question.",
+      "oversized": "The file \"{name}\" exceeds {max}MB.",
+      "deleteFailed": "Could not delete this conversation.",
+      "title": "Socratic AI Tutor",
+      "subtitle": "Ask about the lesson content — no direct answers",
+      "newChat": "New conversation",
+      "newChatAria": "Start a new conversation",
+      "history": "Conversation history",
+      "historyAria": "View conversation history",
+      "searchPlaceholder": "Search conversations…",
+      "searchAria": "Search conversations",
+      "noHistory": "No previous conversations yet",
+      "noMatch": "No matching conversations found",
+      "dropFiles": "Drop files here to attach",
+      "restoring": "Reloading the conversation…",
+      "greeting": "Hi there! Ask me anything about this lesson (or other lessons in the course) — I'll give you hints so you can find the answer yourself rather than handing it over directly.",
+      "removeAttachment": "Remove attachment {name}",
+      "attach": "Attach a file",
+      "inputPlaceholder": "Ask about the lesson content..."
+    },
+    "studyPlan": {
+      "createdToast": "Study plan created successfully!",
+      "createError": "Something went wrong while creating the plan.",
+      "deletedToast": "Study plan deleted successfully!",
+      "deleteError": "Something went wrong while deleting the plan.",
+      "updatedToast": "Progress updated successfully!",
+      "genericError": "Something went wrong.",
+      "icsObjective": "Goal: {objective}",
+      "icsLessons": "Lessons:",
+      "icsLessonLine": "- {title} ({minutes} min)",
+      "icsSummary": "LMS study - {title}...",
+      "icsDefaultLesson": "Lesson",
+      "exportError": "Failed to export the calendar file",
+      "loading": "Loading...",
+      "title": "AI study plan (personalized)",
+      "subtitle": "Automatically scheduled by AI based on your progress and goals.",
+      "exportIcs": "Export calendar (.ics)",
+      "updateProgress": "Update progress",
+      "adjust": "Adjust plan",
+      "createNow": "Create a plan now",
+      "deleteTitle": "Delete plan",
+      "behindTitle": "You are behind schedule!",
+      "behindBody": "You have some past lessons that are not completed. Click <b>Update progress</b> so the system automatically moves the unfinished lessons into the remaining schedule.",
+      "emptyTitle": "No study plan yet",
+      "emptyBody": "Set a target completion date so AI can build a detailed daily schedule to help you track your progress.",
+      "startConfig": "Start setup",
+      "targetLabel": "Target completion:",
+      "commitLabel": "Study commitment:",
+      "hoursPerWeek": "{hours} hours / week",
+      "minutes": "{minutes} min",
+      "noVideo": "No video",
+      "configTitle": "Configure AI study plan",
+      "expectedDate": "Expected completion date",
+      "expectedDateHint": "The schedule will be spread evenly from today to this date.",
+      "weeklyHours": "Study time (hours / week)",
+      "weeklyHoursHint": "AI will schedule so that this limit is not exceeded.",
+      "catchUpTitle": "Tips to catch up:",
+      "catchUpBody": "Because more lessons have piled up, you may need to <b>increase your weekly study hours</b> or <b>push back the completion date</b> to make the plan feasible.",
+      "cancel": "Cancel",
+      "analyzing": "Analyzing...",
+      "createPlan": "Create plan",
+      "deleteConfirmTitle": "Delete the current plan?",
+      "deleteConfirmBody": "Are you sure you want to delete this plan? You will have to set it up again from scratch.",
+      "cancelShort": "Cancel",
+      "deleting": "Deleting...",
+      "deletePlan": "Delete plan",
+      "remaining": "Remaining:",
+      "remainingValue": "{lessons} lessons ({minutes} min)",
+      "dueLabel": "Due:",
+      "dueValue": "{date} ({days} days)",
+      "requiredPace": "Required pace:",
+      "paceValue": "~{minutes} min / day",
+      "pickNewDate": "Choose a new completion date",
+      "tooHeavy": "The workload is too heavy. Please move the deadline to reduce it.",
+      "deadlinePassed": "The deadline has passed or is invalid. You must choose a new date.",
+      "updating": "Updating...",
+      "confirmUpdate": "Confirm update"
+    },
+    "materialManager": {
+      "pickLanguage": "Please choose a language",
+      "requestSent": "Material generation request sent. AI is working on it!",
+      "createError": "Something went wrong while creating the material",
+      "renamed": "Material name updated",
+      "renameError": "Something went wrong while renaming",
+      "deleted": "Material deleted",
+      "deleteError": "Something went wrong while deleting the material",
+      "untitled": "Untitled material",
+      "createTitle": "Create new AI material",
+      "type": "Material type",
+      "typeMindmap": "Mind map",
+      "typeQuiz": "Quiz",
+      "scope": "Scope",
+      "scopeWhole": "Entire course",
+      "scopeChapter": "By chapter",
+      "scopeCustom": "Choose lessons",
+      "language": "Language",
+      "sourceNote": "The material will be compiled from these dubbed videos:",
+      "pickChapter": "Choose chapter",
+      "availableVideos": "Videos available in this chapter:",
+      "tickLessons": "Select lessons",
+      "sending": "Sending...",
+      "create": "Create material",
+      "historyTitle": "Your creation history",
+      "filterAll": "All",
+      "filterMindmap": "Mind map",
+      "filterQuiz": "Quiz",
+      "sortNewest": "Newest",
+      "sortOldest": "Oldest",
+      "sortName": "Name A-Z",
+      "refresh": "Refresh",
+      "loading": "Loading...",
+      "enterToSave": "Press Enter to save",
+      "clickToRename": "Click to rename",
+      "rename": "Rename",
+      "badgeMindmap": "MIND MAP",
+      "badgeFlashcard": "FLASHCARD",
+      "badgeQuiz": "QUIZ",
+      "status": "Status:",
+      "statusDone": "Completed",
+      "statusFailed": "Failed",
+      "statusStale": "Waiting for a long time",
+      "statusProcessing": "Processing",
+      "deleteTitle": "Delete material",
+      "noFilterMatch": "No materials match the filter.",
+      "noPersonal": "No personal materials have been created yet.",
+      "courseMaterial": "Course material",
+      "officialExam": "Official exam",
+      "notOpen": "Not open yet",
+      "closed": "Closed",
+      "noAttempts": "No attempts left",
+      "duration": "Duration:",
+      "durationValue": "{minutes} min",
+      "unlimited": "Unlimited",
+      "questionCount": "Questions:",
+      "attempts": "Attempts:",
+      "opensAt": "Opens at:",
+      "tabOfficial": "Official Materials",
+      "tabPersonal": "Personal Materials",
+      "listTitle": "Materials & Exams",
+      "reference": "Reference material",
+      "uploadedAt": "Uploaded: {date}",
+      "noOfficial": "No official materials yet",
+      "noOfficialLesson": "This lesson has no attached materials.",
+      "noOfficialCourse": "The instructor has not published any materials for this course yet."
+    },
+    "messageInstructor": {
+      "title": "Message the instructor",
+      "close": "Close",
+      "loading": "Loading...",
+      "empty": "No messages yet — send your first question!",
+      "scrollDown": "Scroll to the latest message",
+      "placeholder": "Type a message...",
+      "send": "Send"
+    },
+    "mindmapEditor": {
+      "newBranch": "New branch",
+      "addChild": "Add child branch (Tab)",
+      "addSibling": "Add sibling branch (Enter)",
+      "undo": "Undo (Ctrl+Z)",
+      "redo": "Redo (Ctrl+Y)",
+      "enterContent": "Enter content",
+      "cancel": "Cancel",
+      "update": "Update",
+      "hidePanel": "Hide control panel",
+      "showPanel": "Show control panel",
+      "shapeRect": "Square",
+      "shapeRounded": "Rounded",
+      "shapeCircle": "Circle",
+      "fillColor": "Fill color",
+      "resetDefault": "Reset to default",
+      "textLabel": "Text",
+      "bold": "Bold",
+      "italic": "Italic",
+      "syncNote": "Customizations will be synced when you press \"Save & Apply\"",
+      "pickNodeHint": "Click a specific node on the map to customize its shape, font, background color and text color."
+    },
+    "mermaid": {
+      "renderError": "Could not render the mind map. The data may be malformed.",
+      "copied": "Mermaid code copied!",
+      "copyError": "Failed to copy the code.",
+      "rotate": "Rotate diagram: {direction}",
+      "copyCode": "Copy Mermaid code",
+      "downloadTitle": "Download the diagram as an SVG image",
+      "download": "Download image (SVG)",
+      "loading": "Loading..."
+    },
+    "flashcard": {
+      "empty": "No flashcards yet.",
+      "addNew": "Add new card",
+      "loading": "Loading cards...",
+      "noSpeech": "Your browser does not support audio playback.",
+      "langUnsupported": "The deck language is not supported for pronunciation yet.",
+      "addTitle": "Add new flashcard",
+      "cancel": "Cancel",
+      "front": "Front",
+      "back": "Back",
+      "addSubmit": "Add card",
+      "editTitle": "Edit flashcard",
+      "saveChanges": "Save changes",
+      "editThis": "Edit this card",
+      "deleteThis": "Delete this card",
+      "flipHint": "Click the card to flip it",
+      "listen": "Listen to pronunciation ({lang})",
+      "due": "Due for review",
+      "reviewOn": "Review: {date}",
+      "flip": "Flip card"
+    },
+    "flashcardStudy": {
+      "noSpeech": "Your browser does not support speech playback.",
+      "doneBody": "All cards have been reviewed. Come back when new cards need review.",
+      "doneTitle": "Congratulations! You have finished this deck for now.",
+      "back": "Back",
+      "smaller": "Decrease font size",
+      "larger": "Increase font size",
+      "listen": "Listen to pronunciation",
+      "showAnswer": "Click to see the answer",
+      "minutes": "{n} min",
+      "hours": "{n} h",
+      "days": "{n} d"
+    },
+    "materialPicker": {
+      "group": "Choose material language",
+      "notTranslated": "No translation available yet",
+      "translated": "Translation available",
+      "noTranscript": "No transcript yet",
+      "choose": "Choose a language",
+      "search": "Search languages",
+      "list": "Language list",
+      "noLanguage": "No languages found"
+    },
+    "quiz": {
+      "aiError": "Error connecting to the AI.",
+      "explainError": "Error getting the explanation.",
+      "empty": "No quiz questions yet.",
+      "title": "Quick Check: quick review",
+      "intro": "This exercise has {count} questions to reinforce what you just learned.",
+      "continue": "Continue",
+      "start": "Start",
+      "doneTitle": "Quiz completed!",
+      "doneBody": "Great job! You completed {count} questions.",
+      "finish": "Finish & go back",
+      "displayError": "Error displaying the question.",
+      "questionOf": "Question {current} of {total}",
+      "askTutor": "Ask the AI tutor why it is wrong",
+      "tutorExplains": "The AI tutor explains:",
+      "thinking": "Thinking...",
+      "finishQuiz": "Finish",
+      "next": "Next question"
+    },
+    "quizEditor": {
+      "updated": "Question updated successfully",
+      "updateFailed": "Update failed",
+      "added": "Question added successfully",
+      "addFailed": "Add failed",
+      "deleted": "Question deleted",
+      "addNew": "Add new question",
+      "addAria": "Add question",
+      "editAria": "Edit question",
+      "addTitle": "Add question",
+      "editTitle": "Edit question",
+      "questionNo": "Question {n}:",
+      "edit": "Edit",
+      "delete": "Delete",
+      "correct": "Correct answer",
+      "content": "Question text",
+      "multi": "Question has multiple correct answers (multi-answer)",
+      "answers": "Answers (tick the green box to mark the correct answer)",
+      "answerPh": "Answer {n}",
+      "addOption": "+ Add option",
+      "cancel": "Cancel",
+      "save": "Save question"
+    },
+    "overview": {
+      "loading": "Loading...",
+      "loadError": "Could not load course information.",
+      "counts": "{chapters} chapters · {lessons} lessons",
+      "dubbable": "Can be dubbed into {count} languages",
+      "instructor": "Instructor",
+      "messageInstructor": "Message the instructor",
+      "announcements": "Announcements from the instructor"
+    },
+    "mermaidEditor": {
+      "label": "Mermaid code",
+      "insertTemplate": "Insert sample Tree-card template",
+      "preview": "Live preview",
+      "saving": "Saving...",
+      "save": "Save"
+    },
+    "gradebook": {
+      "error": "Failed to load the gradebook.",
+      "emptyTitle": "No gradebook data yet",
+      "emptyBody": "You have not completed any exercises in this course yet. Study and take the exercises to see your results here!",
+      "title": "Exam & exercise history",
+      "colName": "Test name",
+      "colLocation": "Location (Chapter/Lesson)",
+      "colType": "Type",
+      "colBest": "Highest score",
+      "colAttempts": "Attempts",
+      "colLatest": "Last submitted",
+      "colAction": "Action",
+      "defaultTitle": "Test",
+      "archived": "This exercise/exam has been archived by the instructor.",
+      "official": "Official exam",
+      "practice": "Practice (AI)",
+      "inProgress": "In progress",
+      "viewHistory": "View history ({count} attempts)"
+    },
+    "assignments": {
+      "title": "Assignments",
+      "due": "Due: {date}",
+      "maxScore": "Max {score} points",
+      "submitted": "Submitted · {time}",
+      "submittedFile": "Submitted file",
+      "score": "Score: {score}",
+      "waiting": "Waiting for the instructor to grade it.",
+      "placeholder": "Enter your answer...",
+      "submitting": "Submitting...",
+      "submit": "Submit"
+    },
+    "knowledgeGaps": {
+      "greatTitle": "Great job!",
+      "greatBody": "You have no notable knowledge gaps. Keep up the excellent work!",
+      "title": "Knowledge gap analysis",
+      "intro": "The system found topics you often answered incorrectly in your last 5 attempts. Prioritize reviewing them to improve your score:",
+      "wrongCount": "Wrong {wrong}/{total} times",
+      "errorRate": "Error rate: {percent}%",
+      "review": "Review the theory",
+      "generalTitle": "This topic belongs to a comprehensive assessment. Please review all the materials.",
+      "general": "General knowledge"
+    },
+    "resources": {
+      "error": "Failed to load course resources.",
+      "emptyTitle": "No static resources yet",
+      "emptyBody": "The instructor has not uploaded any attachments (PDF, ZIP, ...) for this course yet.",
+      "title": "Attached resources"
     }
   },
   "profile": {
@@ -492,7 +945,15 @@
     "linkedinHint": "Paste this link into Licenses & Certifications on LinkedIn or the Certifications section of your CV.",
     "loading": "Loading...",
     "notFound": "Certificate not found.",
-    "loadError": "Could not load the certificate, try again later."
+    "loadError": "Could not load the certificate, try again later.",
+    "preview": {
+      "title": "Certificate of Course Completion",
+      "awardedTo": "This certificate is awarded to",
+      "completed": "has successfully completed the course",
+      "duration": "Duration: {hours} study hours",
+      "instructorLabel": "Course instructor",
+      "platformLabel": "Platform representative"
+    }
   },
   "courseDetail": {
     "breadcrumbAria": "Breadcrumb",
@@ -579,8 +1040,6 @@
     },
     "shareGift": {
       "share": "Share",
-      "gift": "Gift this course",
-      "soon": "Coming soon",
       "copied": "Course link copied",
       "copyFailed": "Couldn't copy the link"
     },
@@ -588,7 +1047,22 @@
       "note": "This is your course.",
       "edit": "Edit course",
       "learn": "Open as a learner"
-    }
+    },
+    "reviewsList": {
+      "writeTitle": "Write your review",
+      "placeholder": "Share your thoughts about the course (optional)...",
+      "sending": "Sending...",
+      "submit": "Submit review",
+      "thanks": "Thank you for reviewing the course!",
+      "loading": "Loading reviews...",
+      "empty": "There are no reviews for this course yet.",
+      "starsAria": "{rating} out of 5 stars"
+    },
+    "preview": {
+      "label": "Course preview",
+      "loading": "Loading video…"
+    },
+    "loadingCourse": "Loading course..."
   },
   "courseList": {
     "loadMore": {
@@ -697,7 +1171,11 @@
       "subtotalOne": "Subtotal",
       "discount": "Discount",
       "total": "Total",
-      "terms": "By paying, you agree to LinguaLearn's <link>Terms of Service</link>."
+      "terms": "By paying, you agree to LinguaLearn's <link>Terms of Service</link>.",
+      "promotionDiscount": "Course promotion",
+      "couponDiscount": "Code {code}",
+      "bundleDiscount": "Bundle discount",
+      "couponNotApplied": "Code {code} does not stack with the promotion and does not give a lower price, so it was not applied. Each course gets only its single best offer."
     },
     "billing": {
       "title": "Additional information",
@@ -877,7 +1355,25 @@
     "viewAll": "View all",
     "rank": "Rank {rank}",
     "podiumAria": "Top 3 on the leaderboard",
-    "listAria": "Leaderboard"
+    "listAria": "Leaderboard",
+    "chat": {
+      "ownReply": "You cannot reply to your own message!",
+      "bestError": "Could not update the best answer, please try again later.",
+      "instructor": "Instructor",
+      "bestAnswer": "✓ Best answer",
+      "reply": "Reply",
+      "unmarkBest": "Unmark as best",
+      "markBest": "Mark as best answer",
+      "title": "Comments",
+      "replyingTo": "Replying to <b>{name}</b>",
+      "cancel": "Cancel",
+      "replyPlaceholder": "Write a reply...",
+      "placeholder": "Share your thoughts ...",
+      "send": "Send",
+      "empty": "No comments yet.",
+      "emptyHint": "Be the first to share your thoughts!",
+      "showMore": "View {count} more replies"
+    }
   },
   "instructor": {
     "nav": {
@@ -908,7 +1404,8 @@
       "logoutTitle": "Confirm sign out",
       "logoutBody": "Are you sure you want to sign out?",
       "cancel": "Cancel",
-      "confirm": "Sign out"
+      "confirm": "Sign out",
+      "unreadNotifications": "{count} unread notifications"
     },
     "courses": {
       "title": "My courses",
@@ -1001,7 +1498,8 @@
         "label": "{percent}% complete",
         "ready": "Ready to submit",
         "missingTitle": "Still missing to submit",
-        "aria": "Course completion progress: {percent}%"
+        "aria": "Course completion progress: {percent}%",
+        "fixNow": "Do it now"
       },
       "submit": {
         "send": "Submit for review",
@@ -1199,7 +1697,9 @@
         "error": "Could not send the response.",
         "noResponse": "This dispute has been resolved; responding is no longer possible."
       },
-      "note": "An administrator reviews your response and decides. You can respond only once."
+      "note": "An administrator reviews your response and decides. You can respond only once.",
+      "searchLabel": "Search refund requests",
+      "searchPlaceholder": "Course name, order code or learner name..."
     },
     "communication": {
       "tabsAria": "Communication sections",
@@ -1295,7 +1795,8 @@
       }
     },
     "common": {
-      "close": "Close"
+      "close": "Close",
+      "redirecting": "Redirecting..."
     },
     "perf": {
       "common": {
@@ -1447,7 +1948,9 @@
         "hasBest": "Has top answer",
         "markBest": "Mark as top answer",
         "unmarkBest": "Unmark top answer",
-        "markUnread": "Mark as unread"
+        "markUnread": "Mark as unread",
+        "searchLabel": "Search questions",
+        "searchPlaceholder": "Search questions: learner, lesson, course, content..."
       },
       "assignments": {
         "title": "Assignments",
@@ -1460,7 +1963,10 @@
         "feedback": "Feedback",
         "save": "Save",
         "gradedLine": "Graded: {score} points",
-        "close": "Close"
+        "close": "Close",
+        "searchLabel": "Search assignments",
+        "searchPlaceholder": "Assignment, course or lesson name...",
+        "noMatch": "No assignments match."
       },
       "announcements": {
         "title": "Announcements",
@@ -1473,7 +1979,10 @@
         "pickCourse": "Choose a course...",
         "titlePh": "Announcement title",
         "contentPh": "Announcement content sent to every learner signed up for this course...",
-        "send": "Send announcement"
+        "send": "Send announcement",
+        "searchLabel": "Search announcements",
+        "searchPlaceholder": "Title, content or course name...",
+        "noMatch": "No announcements match."
       },
       "messages": {
         "title": "Messages"
@@ -1531,6 +2040,931 @@
       "privacy": "Topics only appear when 2 or more learners asked; labels are shared keywords, never verbatim questions.",
       "retry": "Retry",
       "retryAfter": "You can retry at {time} (at most once every 10 minutes)."
+    },
+    "materials": {
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "edit": "Edit",
+      "close": "Close",
+      "loading": "Loading...",
+      "saving": "Saving...",
+      "deleting": "Deleting...",
+      "processingBtn": "Processing...",
+      "confirmBtn": "Confirm",
+      "saveChanges": "Save changes",
+      "exporting": "Exporting...",
+      "questionsCount": "{count} questions",
+      "cardsCount": "{count} cards",
+      "dragToDistribute": "Drag to distribute into a lesson",
+      "viewEdit": "View / edit",
+      "untitled": "Untitled material",
+      "materialFallback": "Material",
+      "chapterPrefix": "Chapter: {title}",
+      "toast": {
+        "versionUpdated": "New version updated",
+        "versionUpdateError": "Error updating version",
+        "distributed": "Material distributed successfully",
+        "distributeError": "Error while distributing",
+        "moved": "Material moved",
+        "moveError": "Could not move the material",
+        "duplicated": "Material duplicated",
+        "duplicateError": "Could not duplicate the material",
+        "deleted": "Material set deleted successfully",
+        "deleteError": "Error deleting material",
+        "pdfError": "Failed to export the PDF, please try again.",
+        "mindmapSaved": "Mindmap saved successfully!",
+        "mindmapSaveError": "An error occurred while saving the diagram!",
+        "questionDeleted": "Question deleted",
+        "flashcardDeleted": "Flashcard deleted",
+        "csvImported": "Added {count} rows from CSV.",
+        "csvErrors": "{count} rows with errors: {details}",
+        "csvEmpty": "The CSV file has no valid data rows.",
+        "csvError": "Error uploading the CSV file",
+        "quizSettingsSaved": "Quiz settings saved successfully!",
+        "quizSettingsError": "Error saving quiz settings",
+        "openTimeRequired": "Please set the exam open time for Official Exam mode!",
+        "closeAfterOpen": "The close time must be later than the open time!",
+        "generateSent": "AI material generation request sent successfully!",
+        "generateError": "Could not generate the material",
+        "pickType": "Please choose the type of material to create",
+        "enterTitle": "Please enter a title",
+        "pickChapter": "Please select a chapter",
+        "pickLesson": "Please select a lesson",
+        "questionSaved": "Question changes saved",
+        "questionSaveError": "Could not save the question",
+        "questionAdded": "New question added",
+        "questionAddError": "Could not add the question",
+        "questionContentRequired": "Please enter the question content",
+        "flashcardUpdated": "Flashcard updated",
+        "flashcardAdded": "New flashcard added",
+        "manualCreated": "Empty material created successfully!",
+        "manualError": "Could not create the material",
+        "pickMaterialType": "Please choose a material type",
+        "enterMaterialName": "Please enter a material name"
+      },
+      "versionConfirm": {
+        "title": "Update version",
+        "message": "Do you want to update this material to the new version? Learners' previous scores will be kept."
+      },
+      "deleteModal": {
+        "aria": "Delete material",
+        "title": "Delete material",
+        "body": "Are you sure you want to delete this? This action cannot be undone.",
+        "wait": "Deleting, please wait...",
+        "confirm": "Confirm delete"
+      },
+      "distribution": {
+        "title": "Distribution (Shortcuts)",
+        "unassignTitle": "Remove distribution",
+        "unassignChapter": "Are you sure you want to remove this material from the chapter?",
+        "unassignLesson": "Are you sure you want to remove this material from the lesson?",
+        "remove": "Remove"
+      },
+      "activityTitle": "View recent activity",
+      "activity": "Activity",
+      "manualBtn": "Manual",
+      "searchPlaceholder": "Search materials...",
+      "filterAll": "All",
+      "filterAllStatus": "All statuses",
+      "filterByType": "Filter by type: {label}",
+      "filterByStatus": "Filter by status: {label}",
+      "confirmWait": "Processing, please wait...",
+      "viewer": {
+        "previewOnly": "Preview mode — content cannot be edited here.",
+        "aiMaterial": "AI material",
+        "type": "Type",
+        "language": "Language",
+        "version": "Version",
+        "vietnamese": "Vietnamese",
+        "deleteAllTitle": "Delete this entire material",
+        "closeWorkspace": "Close workspace",
+        "loadingAll": "Loading all material data into the workspace...",
+        "questionBank": "Question bank ({count})",
+        "examSettings": "Exam settings",
+        "exportBlankTitle": "Export blank-exam PDF, answers on the last page",
+        "exportBlank": "Blank exam",
+        "exportCheatTitle": "Export cheatsheet PDF with answers included",
+        "addQuestion": "Add new question",
+        "questionNo": "Question {n}:",
+        "correctAnswer": "Correct answer",
+        "mindmapBoard": "Mind map board (Mindmap)",
+        "mindmapHint": "Use the mouse to drag nodes; double-click text to rename a branch.",
+        "modeView": "Static view",
+        "modeEdit": "Edit",
+        "modeCode": "Code editor",
+        "flashcardTitle": "Visual two-sided flashcard set",
+        "flashcardHint": "Click a card to flip it, or use Edit/Delete below the card.",
+        "reviewCards": "{count} review cards",
+        "addCard": "Add new card",
+        "cardNo": "Card #{n}",
+        "back": "Back (concept)",
+        "front": "Front (term)",
+        "flipBack": "Click to flip back",
+        "flipToSee": "Click to see the definition"
+      },
+      "csv": {
+        "uploading": "Uploading...",
+        "upload": "Upload CSV"
+      },
+      "dt": {
+        "now": "Now"
+      },
+      "quiz": {
+        "title": "Exam settings",
+        "subtitle": "Manage timing, attempts, random exam generation and proctoring",
+        "typeAria": "Quiz type",
+        "officialExam": "Official exam",
+        "lectureNote": "Quick Check ignores time limits, attempts and proctoring; learners see answers right after each question. Choose Official exam for the settings below to take effect.",
+        "officialNote": "The type cannot be changed once learners have taken the quiz. Click Save settings to apply.",
+        "save": "Save settings",
+        "modeLabel": "Exam mode",
+        "practice": "Practice (unlimited)",
+        "practiceDesc": "Students can attempt as many times as they like. The highest score is saved automatically.",
+        "limited": "Limited review",
+        "limitedDesc": "Limit the number of attempts. The highest score is saved automatically.",
+        "attemptsPlaceholder": "Attempts",
+        "once": "Official exam (1 attempt)",
+        "onceDesc": "Each student may attempt only once. An open time is required.",
+        "openLabel": "Open time",
+        "closeLabel": "Close time",
+        "closeHint": "Stays open forever if not set",
+        "allowReview": "Let learners review answers after submitting",
+        "duration": "Duration (minutes)",
+        "pickCount": "Questions per attempt",
+        "pickDefault": "Default: {count} questions",
+        "proctoring": "AI exam proctoring (Anti-Cheat)",
+        "proctoringDesc": "Requires the camera. The AI system monitors faces automatically and warns when a learner leaves the screen or switches tabs.",
+        "maxViolations": "Maximum violations before the exam is auto-submitted"
+      },
+      "gen": {
+        "summaryExam": "Final exam",
+        "reviewTitle": "{type} Review - {chapter}",
+        "wholeCourseTitle": "{type} - Course",
+        "title": "Auto-generate AI material",
+        "subtitle": "Choose the type of material you want the AI to compile from the lesson content.",
+        "quizName": "Multiple-choice quiz",
+        "quizDesc": "Generate multiple-choice questions with explanations",
+        "flashcardName": "Flashcards",
+        "flashcardDesc": "Extract two-sided terms & concepts",
+        "mindmapName": "Mind map",
+        "mindmapDesc": "Draw a visual map of the knowledge flow",
+        "detail": "Detailed settings",
+        "quizKind": "Quiz category",
+        "quickCheck": "Quick Check",
+        "quickCheckDesc": "Attached to one lesson. Always shows explanations, unlimited attempts, no timer.",
+        "officialExam": "Official Exam",
+        "officialExamDesc": "Per chapter/course. Timed, recorded in the gradebook, configurable attempts.",
+        "materialTitle": "Material title",
+        "scope": "Generation scope",
+        "scopeWhole": "Entire course",
+        "scopeChapter": "By specific chapter",
+        "scopeLesson": "Specific lesson",
+        "pickChapter": "Select chapter",
+        "pickChapterOpt": "-- Select chapter --",
+        "pickLesson": "Select lesson",
+        "pickLessonOpt": "-- Select lesson --",
+        "difficulty": "Question difficulty",
+        "easy": "Basic (Easy)",
+        "medium": "Medium",
+        "hard": "Advanced (Hard)",
+        "questionCount": "Number of questions",
+        "qFew": "Few (~10 questions)",
+        "qStd": "Medium (~20 questions)",
+        "qMore": "Many (~30 questions)",
+        "cardCount": "Number of flashcards",
+        "cFew": "Few (~10 cards)",
+        "cStd": "Medium (~20 cards)",
+        "cMore": "Many (~30 cards)",
+        "template": "Diagram template",
+        "detailLevel": "Branch detail level",
+        "dBasic": "Basic, main branches",
+        "dStd": "Standard, moderate",
+        "dDetail": "Detailed, many sub-branches",
+        "language": "Material language",
+        "calling": "Calling AI...",
+        "start": "Start generating"
+      },
+      "qe": {
+        "editAria": "Edit question content",
+        "editTitle": "Edit question content",
+        "warnAttempted": "Note: this material already has attempts. Changing an answer will affect the grading of previously submitted exams.",
+        "content": "Question content",
+        "type": "Question type",
+        "single": "Single choice (1 correct answer)",
+        "multiple": "Multiple choice (multiple correct answers)",
+        "topicTag": "Topic tag",
+        "topicPlaceholder": "e.g. Logical operators",
+        "videoTime": "Video timestamp (seconds)",
+        "sourceLesson": "Source lesson",
+        "leaveEmpty": "-- None --",
+        "options": "Answers",
+        "deleteOption": "Delete answer",
+        "optionPlaceholder": "Type a new answer and press Enter...",
+        "newOption": "New answer",
+        "optionA": "Answer A",
+        "optionB": "Answer B",
+        "optionC": "Answer C",
+        "optionD": "Answer D",
+        "addAria": "Add new question",
+        "addTitle": "Add new question",
+        "contentPlaceholder": "Enter the question content...",
+        "adding": "Adding...",
+        "addBtn": "Add question"
+      },
+      "fc": {
+        "editAria": "Edit flashcard",
+        "editTitle": "Edit flashcard",
+        "addAria": "Add new flashcard",
+        "addTitle": "Add new flashcard"
+      },
+      "manual": {
+        "title": "Create material manually",
+        "subtitle": "Create an empty record so you can enter 100% of the content yourself.",
+        "quizName": "Quiz",
+        "emptyBadge": "Create empty",
+        "name": "Material name",
+        "namePlaceholder": "e.g. Midterm exam, Basic concepts...",
+        "creating": "Creating...",
+        "createEmpty": "Create empty record"
+      },
+      "dblClickPreview": "Double-click to preview",
+      "addCardBtn": "Add card"
+    },
+    "gradebook": {
+      "loading": "Loading class gradebook...",
+      "loadError": "Could not load the gradebook",
+      "loadErrorHint": "You may not have access, or this course has no data yet.",
+      "back": "Back",
+      "crumbInstructor": "Instructor",
+      "crumbMaterials": "Materials & exams library",
+      "crumbGradebook": "Gradebook",
+      "title": "Class gradebook:",
+      "totalStudents": "Total enrolled learners",
+      "students": "learners",
+      "avgScore": "Class average score",
+      "passRate": "Pass rate",
+      "totalAttempts": "Total attempts",
+      "attemptsUnit": "attempts",
+      "detailList": "Detailed gradebook list",
+      "noOfficialQuiz": "This course has no published official quiz",
+      "colStudent": "Learner",
+      "colAttempts": "Attempts",
+      "colBest": "Highest score",
+      "colLatest": "Latest score",
+      "colSubmitted": "Submitted at",
+      "colStatus": "Status",
+      "colActions": "Actions",
+      "attemptCount": "{count} attempts",
+      "notTaken": "Not taken",
+      "notJoined": "Not participated",
+      "passed": "Passed ✓",
+      "failed": "Not passed ✕",
+      "viewAttempt": "Attempt details",
+      "noSubmission": "No submission",
+      "noStudents": "No learners have enrolled in this course yet.",
+      "modalAria": "Learner attempt details",
+      "modalTitle": "Learner attempt details:",
+      "submittedAt": "Submitted at:",
+      "loadingAttempt": "Loading submission details...",
+      "score": "Score",
+      "correctCount": "Correct answers",
+      "perQuestion": "Choices per question",
+      "questionNo": "Question {n}:",
+      "correct": "Correct ✓",
+      "learnerChoice": "Learner's choice",
+      "correctAnswer": "Correct answer ✓",
+      "close": "Close"
+    },
+    "folderTree": {
+      "createError": "Could not create the folder",
+      "deleteFolderError": "Could not delete the folder",
+      "renamed": "Material renamed",
+      "renameError": "Could not rename the material",
+      "deleted": "Material deleted",
+      "deleteError": "Could not delete the material",
+      "deleteMatTitle": "Delete material",
+      "thisMaterial": "this material",
+      "material": "material",
+      "deleteMatMsg": "Are you sure you want to delete \"{title}\"? This action cannot be undone.",
+      "copied": "Copied \"{title}\" — choose a target folder and press Ctrl+V to paste the copy",
+      "cut": "Cut \"{title}\" — choose a target folder and press Ctrl+V to paste",
+      "folderHasMaterialsTitle": "The folder contains materials",
+      "deleteFolderTitle": "Delete folder",
+      "folderHasMaterialsMsg": "This folder contains materials. If you continue, the materials inside will be moved out to the root workspace. Are you sure?",
+      "deleteFolderMsg": "Are you sure you want to delete this folder?",
+      "emptyFolder": "Empty folder",
+      "rootHint": "Root folder (right-click to add · drag a material here to move it to the root)",
+      "selectedHint": "✓ Selected — Del: delete · Ctrl+C: copy · Ctrl+X: cut · Ctrl+V: paste",
+      "workspaceEmpty": "The workspace is empty",
+      "workspaceEmptyHint": "Right-click to create a new folder.",
+      "ctx": {
+        "newFolder": "Create new folder",
+        "newSubfolder": "Create subfolder",
+        "deleteFolder": "Delete folder",
+        "viewEdit": "View / edit",
+        "rename": "Rename",
+        "history": "Version history",
+        "moveTo": "Move to folder...",
+        "deleteMaterial": "Delete material"
+      },
+      "picker": {
+        "aria": "Choose a folder",
+        "titleCopy": "Choose a target folder for the copy",
+        "title": "Choose a target folder",
+        "search": "Search folders...",
+        "root": "Root workspace",
+        "removeFromFolder": "(remove from folder)",
+        "none": "No folders found"
+      },
+      "cancel": "Cancel",
+      "create": {
+        "aria": "Create folder",
+        "titleChild": "Create subfolder",
+        "titleNew": "Create new folder",
+        "placeholder": "Folder name...",
+        "submit": "Create"
+      },
+      "rename": {
+        "aria": "Rename material",
+        "title": "Rename material",
+        "placeholder": "Material name...",
+        "save": "Save"
+      }
+    },
+    "payoutAccount": {
+      "bank": "Bank",
+      "pickBank": "Select a bank",
+      "accountNumber": "Account number",
+      "keepNumberPlaceholder": "Leave empty to keep the number {mask}",
+      "holderName": "Account holder name",
+      "holderHint": "Should match your account name (uppercase without diacritics is fine).",
+      "needsEmailNote": "We send a confirmation email to your address; the link is valid for 30 minutes. The old account (if you are editing) stays usable until you confirm.",
+      "noEmailNote": "Only the holder name is changing, so it applies immediately without email confirmation.",
+      "sending": "Sending...",
+      "sendConfirm": "Send confirmation email",
+      "save": "Save",
+      "cancel": "Cancel",
+      "title": "Payout accounts",
+      "add": "+ Add account",
+      "emptyConfigured": "You have not linked any account. Add a bank account to receive payouts.",
+      "emptyNotConfigured": "Account linking is not enabled on the server.",
+      "toast": {
+        "nameUpdated": "Account holder name updated.",
+        "confirmSent": "Confirmation email sent. Open it and click the link within 30 minutes.",
+        "editFailed": "Could not edit the account.",
+        "removed": "Account removed.",
+        "removeFailed": "Could not remove the account.",
+        "defaultSet": "Set as the default payout account.",
+        "defaultFailed": "Could not change the default account.",
+        "linkFailed": "Could not link the account."
+      },
+      "badge": {
+        "default": "Default",
+        "pending": "Awaiting email confirmation"
+      },
+      "holderLabel": "Account holder: {name}",
+      "pendingReplace": "This edit takes effect after you confirm by email; the old account stays usable until then.",
+      "pendingNew": "Open the email and click the confirmation link (valid for 30 minutes).",
+      "mismatch": "The account holder name does not match your account name; an admin will review carefully before transferring money.",
+      "removeConfirm": "Remove this account?",
+      "remove": "Remove",
+      "setDefault": "Set as default",
+      "edit": "Edit",
+      "addNew": "Add a new account"
+    },
+    "onboarding": {
+      "error": "Something went wrong, please try again.",
+      "loading": "Loading...",
+      "step": "Step {step}/{total}",
+      "exit": "Exit",
+      "teachingOptions": {
+        "0": "In person, informal",
+        "1": "In person, professional",
+        "2": "Online",
+        "3": "Other"
+      },
+      "videoOptions": {
+        "0": "I am a beginner",
+        "1": "I have some knowledge",
+        "2": "I have experience",
+        "3": "I have videos ready to upload"
+      },
+      "audienceOptions": {
+        "0": "Not right now",
+        "1": "I have a small following",
+        "2": "I have a fairly large following"
+      },
+      "step1": {
+        "title": "Share your knowledge",
+        "description": "Courses on LinguaLearn deliver a video-based learning experience. Whether you already have teaching experience or this is your first time, we will help you bring your knowledge into an online course.",
+        "question": "What kind of teaching have you done before?"
+      },
+      "step2": {
+        "title": "Create a course",
+        "description": "We will give you the resources, tips and support to film your lectures with confidence, whatever your level of experience.",
+        "question": "How \"professional\" are your video productions?"
+      },
+      "step3": {
+        "title": "Expand your reach",
+        "description": "After publishing your course, you can grow your learner base with your own marketing, combined with your course appearing in LinguaLearn search.",
+        "question": "Do you have an audience to share your course with?"
+      },
+      "verify": {
+        "title": "Verify your identity information",
+        "intro": "This only needs to be completed once, before you submit your first course for review — not repeated for later courses.",
+        "idNumber": "ID card number",
+        "address": "Permanent address",
+        "confirm": "I confirm this is my own information and that I own or have the right to share the course content I will publish."
+      },
+      "back": "Back",
+      "next": "Continue",
+      "processing": "Processing...",
+      "finish": "Finish",
+      "done": {
+        "title": "You are now an Instructor!",
+        "body": "Your verification details have been recorded. Taking you to the Instructor channel so you can start creating your first course...",
+        "go": "Go to the Instructor channel now"
+      }
+    },
+    "chapterEditor": {
+      "dragChapter": "Drag to reorder chapters",
+      "sectionNo": "Section {n}:",
+      "sectionTitled": "Section {n}: {title}",
+      "objectiveQuestion": "What will learners be able to do after completing this section?",
+      "objectivePlaceholder": "Enter a learning objective...",
+      "cancel": "Cancel",
+      "saveSection": "Save section",
+      "collapse": "Collapse section",
+      "expand": "Expand section",
+      "lessonCount": "({count} lectures)",
+      "renameSection": "Rename / describe section",
+      "deleteChapter": "Delete chapter",
+      "dragReorder": "Drag to reorder",
+      "noLessons": "This chapter has no lessons yet.",
+      "lessonNo": "Lecture {n}:",
+      "lessonTitlePlaceholder": "Enter the lecture title",
+      "afterAddHint": "After adding, click \"+ Content\" on the lecture row to upload a video or paste a YouTube link.",
+      "addLesson": "Add lecture",
+      "addCurriculumItem": "+ Curriculum item",
+      "noChapters": "No chapters yet — add the first one below.",
+      "newSection": "New section:",
+      "titlePlaceholder": "Enter a title",
+      "addSection": "Add section",
+      "addSectionBtn": "+ Section",
+      "deleteConfirm": "You are about to delete 1 section and all lectures inside it. Are you sure you want to continue?"
+    },
+    "payoutHistory": {
+      "loadError": "Could not load the payout slip. Please try again in a few minutes.",
+      "cancelled": "Request cancelled; the amount has been returned to your balance.",
+      "cancelFailed": "Could not cancel the request.",
+      "title": "Withdrawal history",
+      "searchAria": "Search withdrawal requests",
+      "searchPlaceholder": "Request code or transaction code...",
+      "filterAria": "Filter by status",
+      "filter": {
+        "all": "All",
+        "pending": "Processing",
+        "paid": "Paid",
+        "closed": "Cancelled / unsuccessful"
+      },
+      "loading": "Loading...",
+      "empty": "You have no withdrawal requests yet.",
+      "noMatch": "No requests match the filter.",
+      "scheduled": " · scheduled payout {date}",
+      "transferRef": " · transaction code {ref}",
+      "reason": "Reason: {reason}",
+      "slipTitle": "Download payout slip (PDF)",
+      "slip": "Payout slip",
+      "changeAccount": "Change receiving account",
+      "cancel": "Cancel",
+      "newAccountAria": "New receiving account",
+      "pickNewAccount": "Select a new receiving account",
+      "defaultSuffix": " (default)",
+      "accountChanged": "The receiving account of the request has been changed.",
+      "accountChangeFailed": "Could not change the receiving account.",
+      "apply": "Apply"
+    },
+    "promotions": {
+      "typePercentage": "By %",
+      "typeFixed": "Fixed amount",
+      "referralTitle": "Student referrals",
+      "referralBody": "Referral link sharing and separate sales attribution are planned but not available in this version.",
+      "couponsTitle": "Coupons for this course",
+      "couponsHint": "Applies only to this course. \"Automatic\" coupons show the discounted price right on the course page, no code entry required.",
+      "create": "+ Create coupon",
+      "loading": "Loading...",
+      "empty": "This course has no coupons yet.",
+      "automatic": "Automatic",
+      "allCourses": "All your courses",
+      "on": "Enabled",
+      "off": "Disabled",
+      "edit": "Edit",
+      "delete": "Delete",
+      "createTitle": "Create coupon",
+      "editTitle": "Edit coupon",
+      "autoApply": "Apply automatically (no code needed)",
+      "codePlaceholder": "Coupon code, e.g. SALE50",
+      "valuePlaceholder": "Value",
+      "start": "Start",
+      "end": "End",
+      "usageLimit": "Usage limit",
+      "perLearnerLimit": "Limit per learner",
+      "cancel": "Cancel",
+      "saving": "Saving...",
+      "save": "Save"
+    },
+    "lessonRow": {
+      "status": {
+        "DRAFT": "No video yet",
+        "READY": "Ready",
+        "UNAVAILABLE": "Video error"
+      },
+      "youtubeVideo": "YouTube video",
+      "dragLesson": "Drag to reorder lessons",
+      "lessonNo": "Lecture {n}:",
+      "titlePlaceholder": "Enter a title",
+      "descPlaceholder": "Lecture description — state clearly what learners will be able to do after this lecture.",
+      "cancel": "Cancel",
+      "saveLesson": "Save lecture",
+      "lessonTitled": "Lecture {n}: {title}",
+      "rename": "Rename / describe lecture",
+      "deleteLesson": "Delete lecture",
+      "addContent": "+ Content",
+      "collapse": "Collapse",
+      "expand": "Expand",
+      "dragReorder": "Drag to reorder",
+      "editContent": "Edit content",
+      "preview": "Preview",
+      "asInstructor": "As an instructor",
+      "asLearner": "As a learner",
+      "addDescription": "+ Description",
+      "descHint": "Add a description. State clearly what learners will be able to do after completing the lecture.",
+      "save": "Save",
+      "addResource": "+ Resources",
+      "addAssignment": "+ Assignment",
+      "deleteConfirm": "You are about to delete 1 curriculum item. Are you sure you want to continue?"
+    },
+    "newCourse": {
+      "step": "Step {step}/{total}",
+      "titleHeading": "So why not pick a working title?",
+      "titleHint": "It is fine if you have not come up with a great title yet. You can change it later.",
+      "titlePlaceholder": "e.g. Learn Photoshop CS6 from scratch",
+      "categoryHeading": "Which category best fits the knowledge you will share?",
+      "categoryHint": "If you are unsure about the right category, you can change it later.",
+      "pickCategory": "Select a category",
+      "timeHeading": "How much time can you spend each week creating your course?",
+      "timeHint": "There is no wrong answer. We can help you reach your goal even if you do not have much time.",
+      "weekly": {
+        "busy": "I am very busy (0-2 hours)",
+        "offHours": "I will do this outside work hours (2-4 hours)",
+        "plenty": "I have plenty of free time (5+ hours)",
+        "undecided": "I have not decided yet whether I have the time"
+      },
+      "back": "Back",
+      "next": "Continue",
+      "creating": "Creating...",
+      "create": "Create course",
+      "profile": {
+        "title": "Complete your instructor profile",
+        "body": "You need to update your professional title and bio before creating your first course.",
+        "headline": "Professional title",
+        "headlinePlaceholder": "e.g. Software engineer / English teacher",
+        "bio": "Short bio (at least 20 characters)",
+        "cancel": "Cancel",
+        "saving": "Saving...",
+        "saveContinue": "Save & continue"
+      }
+    },
+    "share": {
+      "range": {
+        "all": "All time",
+        "30": "30 days",
+        "90": "90 days"
+      },
+      "filter": {
+        "all": "All",
+        "published": "Published",
+        "unpublished": "Unpublished"
+      },
+      "title": "Share & promote",
+      "subtitle": "Each course has its own referral link: when learners buy through your link, you earn a higher share than when they find the course on the platform themselves.",
+      "rangeAria": "Statistics time range",
+      "searchPlaceholder": "Search courses...",
+      "searchAria": "Search courses",
+      "filterAria": "Filter by status",
+      "loadError": "Could not load the course list.",
+      "empty": "You have no courses yet.",
+      "noMatch": "No courses match the filter.",
+      "published": "Published",
+      "notShareable": "Unpublished — no usable link yet",
+      "shareTitle": "Get the referral link and share",
+      "publishToShare": "Publish the course to share it",
+      "share": "Share",
+      "ordersViaLink": "Orders via your link",
+      "earningsViaLink": "Earnings via link",
+      "ordersOrganic": "Organic orders",
+      "earningsOrganic": "Organic earnings"
+    },
+    "lessonMedia": {
+      "documentTask": "Document: {name}",
+      "title": "Manage video — {title}",
+      "status": {
+        "READY": "Ready",
+        "UNAVAILABLE": "Video error",
+        "DRAFT": "No video yet"
+      },
+      "source": "Source: {source}",
+      "sourceUpload": "Upload",
+      "previewTitle": "Preview video — {title}",
+      "hasVideo": "This lesson already has a video ({kind}). Delete the current video to switch source or upload a new one.",
+      "kindYoutube": "YouTube link",
+      "kindUpload": "uploaded MP4",
+      "deleting": "Deleting...",
+      "deleteVideo": "Delete video",
+      "tabUpload": "Upload MP4",
+      "tabYoutube": "Paste YouTube link",
+      "uploadingVideo": "Uploading video...",
+      "cancel": "Cancel",
+      "checking": "Checking...",
+      "saveYoutube": "Save YouTube link",
+      "attachments": "Attachments",
+      "loading": "Loading...",
+      "delete": "Delete",
+      "noDocs": "No documents yet.",
+      "uploadingDoc": "Uploading document...",
+      "maxDocs": "Maximum of {max} documents reached — delete some to add new ones."
+    },
+    "debt": {
+      "level": {
+        "1": "In debt. New revenue will be offset automatically once the holding period ends; you can also repay proactively below.",
+        "2": "Overdue debt: you temporarily cannot publish new courses or register for promotions.",
+        "3": "Long overdue debt: your courses have temporarily stopped accepting new enrollments (existing learners can still study normally)."
+      },
+      "repayError": "Could not create the repayment code.",
+      "paidToast": "Debt repayment received.",
+      "title": "Debt",
+      "since": "In debt since {date} ({days} days). ",
+      "daysLeft": "{days} days left before restrictions on publishing new courses and registering for promotions.",
+      "suspendAfter": "After {days} days in debt, your courses will temporarily stop accepting new enrollments.",
+      "paused": " Restrictions are paused because you have a pending refund dispute.",
+      "refundFallback": "Refund",
+      "cleared": "Your debt is cleared. Thank you!",
+      "none": "You have no outstanding debt.",
+      "amountLabel": "Amount to repay (partial payment allowed, minimum {min})",
+      "payAll": "Pay in full",
+      "exceeds": "Exceeds the outstanding debt ({amount}).",
+      "creating": "Creating code...",
+      "createQr": "Create repayment QR code",
+      "scan": "Scan the code to pay {amount}",
+      "openPayos": "Open the PayOS payment page",
+      "autoUpdate": "The system updates automatically as soon as payment is received. The code expires; create a new one if it does."
+    },
+    "requestPayout": {
+      "blocker": {
+        "notConfigured": "Withdrawals are not enabled on the server.",
+        "noAccount": "Link and confirm a receiving account before withdrawing.",
+        "open": "You have a withdrawal request that is not yet completed.",
+        "min": "A minimum of {amount} is required to withdraw."
+      },
+      "created": "Request created. Open your email and click the confirmation link within 30 minutes.",
+      "createFailed": "Could not create the withdrawal request.",
+      "title": "Request a withdrawal",
+      "intro": "Minimum {min}. After email confirmation, the request is queued for the nearest payout run (next: {date}). You will receive the full requested amount. Transfer fees are covered by LinguaLearn.",
+      "toAccount": "Receive to account",
+      "defaultSuffix": " (default)",
+      "amountLabel": "Amount to withdraw (VND)",
+      "all": "Withdraw all",
+      "exceeds": "Exceeds the withdrawable amount ({amount}).",
+      "sending": "Sending...",
+      "submit": "Submit withdrawal request"
+    },
+    "visibility": {
+      "PUBLIC": {
+        "label": "Public",
+        "helper": "Shown in search and the catalog — anyone can enroll."
+      },
+      "PRIVATE_INVITE": {
+        "label": "Private (invited people only)",
+        "helper": "Hidden from search — only the emails you invite below can view and enroll."
+      },
+      "PRIVATE_PASSWORD": {
+        "label": "Private (password protected)",
+        "helper": "Hidden from search — anyone with the link can view the course page, but the correct password is needed to enroll."
+      },
+      "title": "Enrollment (Privacy)",
+      "passwordKeep": "Leave empty to keep the current password",
+      "passwordNew": "Enter an enrollment password",
+      "saved": "Privacy settings saved.",
+      "saving": "Saving...",
+      "save": "Save",
+      "inviteList": "Invited email list",
+      "invite": "+ Invite",
+      "loading": "Loading...",
+      "noInvites": "No emails invited yet.",
+      "remove": "Remove"
+    },
+    "proctoringList": {
+      "searchPlaceholder": "Search by exam name...",
+      "from": "From",
+      "to": "To",
+      "allRisk": "All risk levels",
+      "colLearner": "Learner",
+      "colExam": "Exam",
+      "colSubmitted": "Submitted at",
+      "colViolationsAbbr": "Viol.",
+      "colViolationsTitle": "Recorded violations",
+      "colRisk": "Risk",
+      "colRiskTitle": "AI cheating risk assessment",
+      "colVideoTitle": "Evidence video",
+      "loading": "Loading...",
+      "empty": "No attempts yet on proctored exams.",
+      "noMatch": "No attempts match the filter."
+    },
+    "resources": {
+      "fileZip": "Archive",
+      "uploadPartial": "Uploaded {ok} files. {fail} files failed (wrong format).",
+      "uploadOk": "Uploaded {count} resources successfully",
+      "uploadError": "Error uploading the file",
+      "deleted": "Static resource deleted",
+      "deleteError": "Error deleting the resource",
+      "title": "Course-wide static resources",
+      "subtitle": "PDFs, slides and documents shared across the whole course — separate from per-chapter materials.",
+      "uploading": "Uploading...",
+      "dropHint": "Drag and drop files here, or click to choose files",
+      "supported": "Supports PDF, Word, PowerPoint, ZIP",
+      "loading": "Loading...",
+      "empty": "This course has no static resources yet.",
+      "deleteTitle": "Delete resource"
+    },
+    "lessonAssignment": {
+      "title": "Assignments",
+      "hint": "Essay / file-submission assignments for this lecture — you grade and reply manually under \"Communication > Assignments\".",
+      "loading": "Loading...",
+      "submissions": "{count} submissions",
+      "delete": "Delete",
+      "empty": "No assignments yet.",
+      "add": "+ Add assignment",
+      "titlePlaceholder": "Assignment title",
+      "instructionsPlaceholder": "Instructions...",
+      "maxScorePlaceholder": "Maximum score",
+      "cancel": "Cancel",
+      "saving": "Saving...",
+      "save": "Save assignment"
+    },
+    "basics": {
+      "level": "Level",
+      "thumbnailTask": "Thumbnail: {title}",
+      "courseTitle": "Course title",
+      "description": "Description",
+      "thumbnail": "Thumbnail",
+      "thumbnailAlt": "Thumbnail preview",
+      "uploadingThumbnail": "Uploading thumbnail...",
+      "category": "Category",
+      "pickCategory": "-- Select category --",
+      "saving": "Saving...",
+      "save": "Save changes"
+    },
+    "lessonResource": {
+      "documentTask": "Document: {name}",
+      "title": "Resources",
+      "hint": "Reference files or links that support learners in this lecture. Make sure files are easy to read, up to 50MB.",
+      "loading": "Loading...",
+      "delete": "Delete",
+      "empty": "No resources yet.",
+      "addFile": "Add file from device",
+      "pasteLink": "Paste link",
+      "uploadingDoc": "Uploading document...",
+      "displayName": "Display name",
+      "adding": "Adding...",
+      "addLink": "Add link",
+      "maxReached": "Maximum of {max} resources reached — delete some to add new ones."
+    },
+    "financeConfirm": {
+      "title": "Confirm via email",
+      "subtitle": "You need to sign in with the instructor account that received this email.",
+      "invalid": "Invalid link: the confirmation code is missing.",
+      "notLoggedIn": "You are not signed in on this browser. Sign in with the instructor account that received the email and we will bring you back to the confirmation step.",
+      "login": "Sign in to confirm",
+      "payoutConfirmed": "Withdrawal request confirmed. We will notify you by email once the transfer is made.",
+      "accountConfirmed": "Receiving account confirmed.",
+      "backToEarnings": "Back to Earnings",
+      "clickToFinish": "Click the button below to finish confirming. The link can only be used once.",
+      "failed": "Could not confirm. The link may have expired.",
+      "confirming": "Confirming...",
+      "confirm": "Confirm"
+    },
+    "proctoringAttempt": {
+      "violation": {
+        "TAB_SWITCH": "Tab switch",
+        "WINDOW_BLUR": "Window/app switch",
+        "FULLSCREEN_EXIT": "Exited full screen",
+        "NO_FACE": "No face detected",
+        "MULTIPLE_FACES": "More than one person",
+        "HEAD_TURNED": "Head turned to one side",
+        "GAZE_AWAY": "Gaze away from screen (AI)",
+        "AUDIO_VOICE_DETECTED": "Voice detected",
+        "DEVTOOLS_OPEN": "DevTools opened",
+        "COPY_PASTE_BLOCKED": "Copy/paste/right-click",
+        "IDLE_TOO_LONG": "Idle for too long"
+      },
+      "loading": "Loading...",
+      "back": "Back",
+      "aiVerdict": "AI assessment",
+      "noVideo": "No video yet",
+      "violations": "Violations ({count})",
+      "noViolations": "No violations."
+    },
+    "activity": {
+      "justNow": "Just now",
+      "minutesAgo": "{count, plural, one {# minute ago} other {# minutes ago}}",
+      "hoursAgo": "{count, plural, one {# hour ago} other {# hours ago}}",
+      "daysAgo": "{count, plural, one {# day ago} other {# days ago}}",
+      "title": "Recent activity",
+      "close": "Close",
+      "loading": "Loading...",
+      "empty": "No activity has been recorded yet.",
+      "system": "System"
+    },
+    "versionHistory": {
+      "restored": "The old version content has been restored as the latest version",
+      "restoreError": "Could not restore the version",
+      "title": "Version history",
+      "loading": "Loading...",
+      "empty": "No version history yet.",
+      "active": "In use",
+      "untitled": "Untitled material",
+      "viewTitle": "View this version (read-only)",
+      "restoreTitle": "Restore this content as the latest version"
+    },
+    "balance": {
+      "noCrypto": "The server has not enabled the payout account feature, so you cannot link accounts or withdraw yet. Your earnings are still fully recorded; an admin will enable this feature.",
+      "negative": "Your balance is negative by {amount} because of refunds that occurred after payout. This will be offset against the earnings of later orders.",
+      "withdrawable": "Withdrawable",
+      "nextPayout": "Next payout: {date}",
+      "holding": "On hold",
+      "holdingHint": "New earnings, held during the refund period",
+      "frozen": "Frozen",
+      "frozenHint": "Orders with a dispute, awaiting resolution",
+      "paidOut": "Received",
+      "paidOutHint": "Total amount transferred"
+    },
+    "statement": {
+      "month": "Month {month}/{year}",
+      "title": "Monthly earnings statement",
+      "chooseMonth": "Choose month",
+      "downloadPdf": "Download PDF",
+      "downloadHint": "Statement of the month being viewed",
+      "empty": "Each month's statement appears here right after the month ends, if you had earnings, refunds or withdrawals that month.",
+      "debtReceipts": "Debt repayment receipts",
+      "receiptError": "Could not download the receipt."
+    },
+    "referral": {
+      "title": "Referral link",
+      "body": "Share exactly this link on your channels (Facebook, YouTube...) — when learners buy through it, you earn <b>{referral}</b> of revenue instead of {organic} when learners find the course through search on the platform.",
+      "copied": "Copied ✓",
+      "copy": "Copy",
+      "shareTitle": "Share on social media or via an app on your device",
+      "share": "Share"
+    },
+    "studentsPage": {
+      "viewAria": "View mode",
+      "atRisk": "Needs attention",
+      "all": "All",
+      "searchPlaceholder": "Search by name, email or course...",
+      "searchAria": "Search learners",
+      "emptyRisk": "No learners need attention. Choose \"All\" to see every learner.",
+      "emptyMatch": "No learners match."
+    },
+    "uploadTray": {
+      "uploading": "Uploading ({count})",
+      "errors": "{count} tasks failed",
+      "done": "Upload complete",
+      "cancel": "Cancel",
+      "close": "Close"
+    },
+    "submitChecklist": {
+      "title": "Submission requirements",
+      "ready": "All submission requirements are met",
+      "fixNow": "Do it now",
+      "recommend": "Recommended: add exercises (Quiz/Flashcard/Mindmap) (optional)"
+    },
+    "pricing": {
+      "title": "Set the price of your course",
+      "hint": "Enter 0 for a free course. The saved price applies immediately, even if the course is already published.",
+      "price": "Price (đ)",
+      "saving": "Saving...",
+      "save": "Save changes"
+    },
+    "earningsPage": {
+      "title": "Earnings & Withdrawals",
+      "subtitle": "Course earnings are held during the refund period before they can be withdrawn. You withdraw on request, with email confirmation.",
+      "loadError": "Could not load earnings information. Please try again."
+    },
+    "videoPreview": {
+      "title": "Preview — {title}"
+    },
+    "sectionTabs": {
+      "unread": "{count} unread"
     }
   },
   "coupons": {
@@ -1597,6 +3031,15 @@
       "adminHint": "Search for courses above.",
       "none": "You have no courses yet.",
       "needOne": "Choose at least 1 course."
+    },
+    "listFilter": {
+      "searchLabel": "Search coupons",
+      "searchPh": "Search by code or applicable course name...",
+      "statusAria": "Filter by status",
+      "all": "All statuses",
+      "active": "Enabled",
+      "inactive": "Disabled",
+      "noMatch": "No coupons match."
     }
   },
   "bundles": {
@@ -1635,6 +3078,25 @@
       "update": "Update bundle",
       "create": "Create bundle",
       "close": "Close"
+    },
+    "list": {
+      "delete": "Delete",
+      "deleteAria": "Delete bundle: {title}",
+      "searchLabel": "Search bundles",
+      "searchPh": "Search by bundle name or course name in the bundle...",
+      "statusFilter": "Filter by status",
+      "statusAll": "All statuses",
+      "statusActive": "On sale",
+      "statusInactive": "Disabled",
+      "noMatch": "No bundles match.",
+      "deleteTitle": "Delete this bundle?",
+      "deleteBody": "The bundle \"{title}\" will be deleted permanently if nobody has bought it; if it has buyers, it will be archived (stopped from sale, hidden from the list) and the order history is kept."
+    },
+    "upsell": {
+      "included": "Included in the bundle:",
+      "adding": "Adding...",
+      "buy": "Buy the bundle to save more →",
+      "title": "💡 Save more with a combo bundle"
     }
   },
   "admin": {
@@ -1774,7 +3236,11 @@
         "next": "Next",
         "page": "Page {page} of {total}"
       },
-      "authLocal": "Email"
+      "authLocal": "Email",
+      "prompt": {
+        "title": "Enter details to find users",
+        "body": "There are too many accounts to list by default. Enter a name, email or user ID in the search box above, or pick the Locked / Flagged as spam group to see accounts that need watching. Each account's role is shown in the results."
+      }
     },
     "userDetail": {
       "back": "Back",
@@ -1963,7 +3429,7 @@
     },
     "aiAnalytics": {
       "title": "AI Analytics",
-      "subtitle": "Monitor learners’ API usage and lock AI access when needed.",
+      "subtitle": "Track the estimated cost of AI API keys (Gemini, Groq) by feature and by user.",
       "chartTitle": "AI cost per day (last 30 days)",
       "cost": "Cost",
       "day": "Day {date}",
@@ -1981,7 +3447,86 @@
       "unlock": "Unlock",
       "empty": "No usage data yet",
       "updated": "Updated the user’s AI status",
-      "error": "Something went wrong"
+      "error": "Something went wrong",
+      "feature": {
+        "FLASHCARD": "Flashcards",
+        "MINDMAP": "Mind maps",
+        "QUIZ": "Quiz",
+        "DUBBING_TRANSLATE": "Dubbing: dialogue translation",
+        "DUBBING_TRANSCRIBE": "Dubbing: speech recognition",
+        "TRANSCRIPT_EXTRACTION": "Lecture transcription",
+        "TUTOR_CHAT": "AI tutor (Q&A)",
+        "TUTOR_QUIZ_EXPLAIN": "AI tutor: answer explanations",
+        "TUTOR_TITLE": "AI tutor: conversation titles",
+        "DISCOVERY_CHAT": "AI course search",
+        "INSTRUCTOR_AI": "Instructor AI assistant",
+        "PROCTORING_RISK": "Proctoring: risk assessment",
+        "PROCTORING_FRAME": "Proctoring: image analysis",
+        "EMBEDDING_TUTOR": "Lecture embeddings",
+        "EMBEDDING_COURSE": "Course embeddings",
+        "UNTAGGED": "Uncategorised"
+      },
+      "filter": {
+        "from": "From",
+        "to": "To",
+        "feature": "AI feature",
+        "allFeatures": "All features",
+        "badRange": "The end date must be on or after the start date."
+      },
+      "partial": "Full cost tracking for every feature started on {date}. Before that, Flashcards, Mind maps and Quiz are recorded figures, while Dubbing and the AI tutor are estimates from stored data (visible output only, excluding thinking tokens and test calls), so totals for this range are lower than actual. See “Invoice reconciliation” below for the gap.",
+      "loadError": "Could not load AI cost figures. Please try again.",
+      "stat": {
+        "cost": "Estimated cost",
+        "rate": "{usd} · rate {rate} VND/USD",
+        "requests": "AI calls",
+        "tokens": "Total tokens",
+        "audio": "Audio transcribed (Groq)",
+        "hours": "{hours} h",
+        "audioHint": "Billed per audio hour, not per token"
+      },
+      "daily": {
+        "q": "How much does AI cost each day, and which features drive it?",
+        "insight": "Most expensive: {name} ({amount}, {pct}% of total cost).",
+        "aria": "Stacked bar chart of AI cost by day and feature"
+      },
+      "share": {
+        "q": "Which features account for the most cost?",
+        "insight": "Most of the cost sits in the top few features — control those first.",
+        "empty": "No data yet.",
+        "aria": "Pie chart of AI cost share by feature"
+      },
+      "users": {
+        "title": "Who uses AI the most?",
+        "search": "Search users",
+        "searchPh": "Email, name or user ID...",
+        "lockedOnly": "Only users with AI locked",
+        "costCol": "Estimated cost",
+        "note": "This table only includes AI calls tied to a specific user; system costs (embeddings, guest searches…) are part of the total above."
+      },
+      "billing": {
+        "title": "Invoice reconciliation",
+        "intro": "Compare the token-based estimate with what Google AI Studio actually charged (entered per period from the project's Usage page). Gemini only; Groq is billed separately.",
+        "close": "Close",
+        "open": "Enter invoice",
+        "billed": "Actual invoice",
+        "tracked": "Attributed to features",
+        "unexplained": "Unattributed",
+        "ofBill": "{pct}% of invoice",
+        "noRec": "No invoice falls entirely within the selected range. Choose a range that covers a whole entered billing period to see the reconciliation.",
+        "unexplainedHint": "The unattributed part usually comes from hidden thinking tokens, test or failed runs, or features not yet tracked (live sessions, Google Search grounding). It shrinks once full tracking is in place.",
+        "from": "From",
+        "to": "To",
+        "amount": "Amount (VND)",
+        "amountPh": "e.g. 220739",
+        "note": "Note (optional)",
+        "save": "Save invoice",
+        "rules": "Each period can be entered once and must not overlap an existing one. Saved invoices cannot be edited or deleted, so the reconciliation stays trustworthy.",
+        "empty": "No invoices yet.",
+        "saved": "Invoice saved.",
+        "saveError": "Could not save the invoice. Please try again later."
+      },
+      "loading": "Loading...",
+      "retry": "Retry"
     },
     "voices": {
       "title": "Dubbing voices",
@@ -2070,6 +3615,55 @@
         "prev": "Previous",
         "next": "Next",
         "page": "Page {page} of {total}"
+      },
+      "view": {
+        "label": "View",
+        "ATTENTION": "Needs attention (failed, no successful version)",
+        "PROCESSING": "Processing",
+        "PENDING": "Pending",
+        "COMPLETED": "Completed",
+        "FAILED": "All failed jobs",
+        "SKIPPED": "Skipped",
+        "ALL": "All"
+      },
+      "state": {
+        "PENDING": "Pending",
+        "PROCESSING": "Processing",
+        "COMPLETED": "Completed",
+        "FAILED": "Failed",
+        "SKIPPED": "Skipped",
+        "CANCELLED": "Cancelled"
+      },
+      "find": {
+        "label": "Search jobs",
+        "ph": "Course, lesson, language, requester or job ID..."
+      },
+      "from": "From",
+      "to": "To",
+      "head": {
+        "course": "Course / Lesson",
+        "language": "Language",
+        "requester": "Requested by",
+        "status": "Status",
+        "progress": "Progress",
+        "time": "Time",
+        "error": "Error",
+        "actions": "Actions"
+      },
+      "emptyAttention": "No jobs need attention.",
+      "emptyFilter": "No jobs match the filters.",
+      "jobRef": "{lesson} · job #{id}",
+      "superseded": "A successful dub already exists",
+      "retries": "Retries {count}/3",
+      "created": "Created {at}",
+      "finished": "Finished {at}",
+      "retryAria": "Retry: {lesson}",
+      "queued": "The job was queued to be dubbed again.",
+      "retryFailed": "Could not retry the job. Please try again later.",
+      "confirm": {
+        "title": "Retry dubbing?",
+        "body": "\"{lesson}\" ({language}) will be translated and voiced again from scratch, which costs AI credits. Only retry if you are sure this lesson has no usable dub yet.",
+        "cancel": "Cancel"
       }
     },
     "payments": {
@@ -2140,6 +3734,17 @@
         "gateway": "Gateway code",
         "notYet": "Not yet",
         "dispute": "View/handle dispute"
+      },
+      "find": {
+        "needCriteria": "Enter an order code, email, buyer name or course (or pick a status) to search.",
+        "noReceipt": "This transaction has no receipt yet. Receipts are created after the transaction completes, usually within a few minutes.",
+        "receiptError": "Could not load the receipt. Please try again.",
+        "label": "Search transactions",
+        "ph": "Order code, gateway reference, buyer email / name / ID, course...",
+        "promptTitle": "Enter details to look up transactions",
+        "prompt": "There are too many transactions to list by default. Enter an order code, gateway reference, buyer email, name or ID, or a course title; click a result to see details, download the receipt and handle disputes.",
+        "loading": "Loading...",
+        "receipt": "Download receipt"
       }
     },
     "disputes": {
@@ -2246,7 +3851,92 @@
         "previousNote": "Previous resolution note",
         "noteOverwriteWarning": "The new note will be saved; the previous note is kept above."
       },
-      "fileSuccess": "Dispute filed."
+      "fileSuccess": "Dispute filed.",
+      "search": "Search disputes",
+      "searchPh": "Order code, sender email or name, dispute code...",
+      "needsAction": "Needs action",
+      "awaitingAccount": "Awaiting student account update",
+      "more": "Show more",
+      "refundAccount": "Refund receiving account",
+      "awaitingAccountNote": "The transfer to the student's declared account did not go through{summary}. Waiting for the student to update their refund account; once they do, the refund returns to \"awaiting transfer\" to be paid again. You can still transfer manually and record it below.",
+      "policy": {
+        "needReason": "Choose a reason code for this mode.",
+        "noteShort": "\"Instructor bears all\" requires a clear note (at least 10 characters).",
+        "evidenceShort": "Describe the evidence (at least 20 characters: what evidence, and where).",
+        "waitInstructor": "The instructor has not responded and the response deadline has not passed — wait before holding the instructor responsible.",
+        "reasonCode": "Reason code",
+        "optional": "(optional)",
+        "none": "None",
+        "choose": "Choose a reason code",
+        "evidence": "Evidence * (the instructor will see this)",
+        "evidencePh": "e.g. Lesson 3 copies course X verbatim at link ..., comparison screenshots attached to the dispute",
+        "evidenceHint": "Only use this mode when there is a documented violation and the instructor has responded or the deadline has passed. The instructor may appeal once."
+      },
+      "reasonCode": {
+        "BUYER_REMORSE": "Student changed mind within the window",
+        "OTHER": "Other reason (no one at fault)",
+        "TECHNICAL_ISSUE": "Technical issue on our side",
+        "DOUBLE_CHARGE": "Duplicate payment",
+        "NOT_ENROLLED": "Charged but not enrolled",
+        "PLATFORM_FAULT": "Platform fault",
+        "COPYRIGHT_VIOLATION": "Copyright violation",
+        "CONTENT_MISMATCH": "Content seriously differs from the description",
+        "PROHIBITED_CONTENT": "Prohibited content"
+      },
+      "account": {
+        "noStandard": "The student has not declared a standard refund account{free}; manual transfer only.",
+        "freeNote": " (free-text note: {note})",
+        "holder": "Account holder: {name} · {state}",
+        "confirmed": "ownership confirmed by the student",
+        "unconfirmed": "ownership not confirmed"
+      },
+      "payos": {
+        "succeeded": "PayOS transferred the money and it was recorded.",
+        "rejected": "PayOS declined: {reason}",
+        "unknownReason": "no reason given",
+        "sent": "Payout order sent to PayOS; it updates automatically when there is a result.",
+        "sendError": "Could not send the payout order.",
+        "checkAccount": "The refund receiving account needs to be checked",
+        "asked": "Asked the student to update their refund account.",
+        "askError": "Could not send the request.",
+        "blocked": "Retry is locked",
+        "needAccount": "The student must declare a standard account and confirm ownership",
+        "hint": "Transfer the refund via PayOS",
+        "retryAt": "Retry after {time}",
+        "locked": "PayOS payout locked",
+        "retry": "Retry via PayOS",
+        "send": "Pay via PayOS",
+        "askHint": "Move the refund to waiting for the student to check and update the receiving account",
+        "ask": "Ask student to update account",
+        "balance": "Payout account balance: {amount}",
+        "unknownBalance": "unknown",
+        "notReady": "The student's standard account details are incomplete, so automatic payout is not possible; transfer manually below.",
+        "inFlight": "A PayOS payout has no result yet — DO NOT transfer manually now (to avoid paying twice). Wait for the result or press \"Pay via PayOS\" to resend.",
+        "accountChanged": "The student changed their refund account at {time}; check the new account before transferring.",
+        "order": "Order {ref}: {state}",
+        "ok": "succeeded",
+        "fail": "failed",
+        "unknown": "result unknown (you can resend; it will not pay twice)",
+        "pending": "processing — waiting for PayOS/bank confirmation; the page updates automatically",
+        "nameMismatch": " — ⚠ bank returned name \"{name}\", which differs from the entered name",
+        "cause": {
+          "TRANSIENT": "temporary bank/PayOS issue",
+          "ACCOUNT": "problem with the receiving account",
+          "UNKNOWN": "unknown cause"
+        }
+      },
+      "appeal": {
+        "decided": "The instructor's appeal has been decided.",
+        "error": "Could not process the appeal.",
+        "title": "Instructor appeal",
+        "reason": "Reason for the decision * (the instructor will receive this)",
+        "reduceHint": "The instructor only repays what they received; the excess penalty is refunded",
+        "reduce": "Accept, reduce to Standard",
+        "uphold": "Uphold the decision",
+        "result": "Outcome: {outcome}",
+        "reduced": "reduced to Standard",
+        "upheld": "decision upheld"
+      }
     },
     "settings": {
       "title": "System settings",
@@ -2313,6 +4003,233 @@
       },
       "env": {
         "title": "Environment"
+      },
+      "ui": {
+        "groups": "Settings groups",
+        "unsaved": "Unsaved changes",
+        "saveRegion": "Save changes",
+        "pending": "{count} unsaved changes",
+        "fixInvalid": " — please fix the invalid values",
+        "decrease": "Decrease",
+        "increase": "Increase",
+        "slider": "{label} (slider)",
+        "daysPicked": "{count}/4 days selected",
+        "pickHoliday": "Pick a holiday",
+        "addDate": "Add date",
+        "noHolidays": "No holidays yet.",
+        "removeDate": "Remove {date}",
+        "addEmail": "Add email",
+        "remove": "Remove {value}"
+      },
+      "schema": {
+        "groups": {
+          "ai": {
+            "title": "AI quota",
+            "description": "Usage limits for AI features per user."
+          },
+          "aicost": {
+            "title": "AI cost",
+            "description": "The system already has a price table for the Gemini models in use. The unit prices below only apply to models missing from that table, so they usually need no changes. Set them to the provider's current pricing so figures stay close to the invoice."
+          },
+          "revenue": {
+            "title": "Revenue & sharing",
+            "description": "The share instructors receive on each order. Only applies to orders paid successfully after saving; older orders keep the rate that was applied."
+          },
+          "refund": {
+            "title": "Refunds & disputes",
+            "description": "Refund policy for students and the deadline for handling disputes."
+          },
+          "payout": {
+            "title": "Instructor payouts",
+            "description": "Instructor withdrawal rules and automatic payouts via PayOS."
+          },
+          "debt": {
+            "title": "Instructor debt",
+            "description": "Actions taken when an instructor owes the platform money."
+          },
+          "reports": {
+            "title": "Reports & documents",
+            "description": "Automated financial reports for admins and the information shown on documents."
+          }
+        },
+        "items": {
+          "QUOTA_DUB_STUDENT": {
+            "label": "Dubbing per student",
+            "help": "Maximum dubbing requests a student can make per day."
+          },
+          "QUOTA_DUB_INSTRUCTOR": {
+            "label": "Dubbing per instructor",
+            "help": "Maximum dubbing requests an instructor can make per day."
+          },
+          "QUOTA_MATERIALS": {
+            "label": "Material generation per person",
+            "help": "Number of AI-generated materials (quiz, flashcards, mind map) per day."
+          },
+          "QUOTA_TUTOR": {
+            "label": "AI Tutor messages",
+            "help": "Maximum messages one person can send to the AI Tutor per day."
+          },
+          "QUOTA_GUEST_SEARCH": {
+            "label": "Guest AI search",
+            "help": "AI searches per hour for signed-out visitors."
+          },
+          "AI_PRICE_INPUT_USD_PER_M": {
+            "label": "Input token price (models not in the price table)",
+            "help": "USD per 1 million input tokens."
+          },
+          "AI_PRICE_OUTPUT_USD_PER_M": {
+            "label": "Output and thinking token price (models not in the price table)",
+            "help": "USD per 1 million output tokens; hidden thinking tokens are billed at the same rate."
+          },
+          "AI_PRICE_EMBED_USD_PER_M": {
+            "label": "Embedding price"
+          },
+          "AI_PRICE_AUDIO_USD_PER_HOUR": {
+            "label": "Speech recognition price (Groq)",
+            "help": "USD per hour of audio."
+          },
+          "USD_VND_RATE": {
+            "label": "USD to VND exchange rate",
+            "help": "Used to display AI costs in VND."
+          },
+          "REVENUE_ORGANIC_INSTRUCTOR_PCT": {
+            "label": "Instructor share when the student finds the course on their own",
+            "help": "The remainder goes to the platform."
+          },
+          "REVENUE_REFERRAL_INSTRUCTOR_PCT": {
+            "label": "Instructor share when purchased via their referral link",
+            "help": "Applies to orders from the instructor's own referral link."
+          },
+          "REFUND_WINDOW_DAYS": {
+            "label": "Refund request window",
+            "help": "Counted from the successful payment."
+          },
+          "REFUND_MAX_PROGRESS_PCT": {
+            "label": "Maximum learning progress to qualify for a refund",
+            "help": "Beyond this, a \"change of mind\" refund request is outside the policy."
+          },
+          "REFUND_HOLIDAYS": {
+            "label": "Holidays that extend the refund window",
+            "help": "Pick each holiday to add it to the list."
+          },
+          "DISPUTE_INSTRUCTOR_RESPONSE_HOURS": {
+            "label": "Instructor response time for disputes"
+          },
+          "DISPUTE_APPEAL_DAYS": {
+            "label": "Instructor appeal period for refund decisions"
+          },
+          "REFUND_FLAG_RATE_PCT": {
+            "label": "Flag courses with a high refund rate",
+            "help": "Alert admins when a course's 30-day refund rate exceeds this level."
+          },
+          "REFUND_FLAG_MIN_COUNT": {
+            "label": "Minimum refunds before flagging",
+            "help": "Courses with fewer refunds than this are not flagged, to avoid false alarms on new courses."
+          },
+          "PAYOUT_MIN_AMOUNT": {
+            "label": "Minimum withdrawal amount"
+          },
+          "PAYOUT_DAYS_OF_MONTH": {
+            "label": "Payout days in the month",
+            "help": "Choose up to 4 days in the month (1 to 28) for batch payouts."
+          },
+          "PAYOUT_HOLD_EXTRA_DAYS": {
+            "label": "Extra holding period after the refund window",
+            "help": "Earnings can only be withdrawn after the refund window plus this many days."
+          },
+          "PAYOS_PAYOUT_ENABLED": {
+            "label": "Automatic payouts via PayOS",
+            "help": "When off, admins can only pay by manual bank transfer."
+          },
+          "PAYOS_PAYOUT_MAX_AMOUNT": {
+            "label": "Maximum amount per automatic payout",
+            "help": "Larger amounts must be transferred manually."
+          },
+          "PAYOS_RETRY_COOLDOWN_MINUTES": {
+            "label": "Wait time between payout retries",
+            "help": "Applies after a payout fails."
+          },
+          "PAYOS_MAX_ATTEMPTS": {
+            "label": "Maximum failed payout attempts per request",
+            "help": "Beyond this, only a manual transfer is possible."
+          },
+          "DEBT_RESTRICT_DAYS": {
+            "label": "Restrict after debt overdue by",
+            "help": "The instructor cannot publish new courses or sign up for promotions."
+          },
+          "DEBT_SUSPEND_DAYS": {
+            "label": "Suspend course sales after debt overdue by",
+            "help": "Existing students keep learning normally; only new orders stop."
+          },
+          "DEBT_MIN_REPAY": {
+            "label": "Minimum repayment per payment",
+            "help": "Unless paying off the remaining balance."
+          },
+          "REPORT_DAILY_ENABLED": {
+            "label": "Send daily financial report"
+          },
+          "REPORT_WEEKLY_ENABLED": {
+            "label": "Send weekly financial report",
+            "help": "Sent on Monday morning, for the week that just ended."
+          },
+          "REPORT_MONTHLY_ENABLED": {
+            "label": "Send monthly financial report",
+            "help": "Sent on the morning of the 1st, for the month that just ended."
+          },
+          "REPORT_RECIPIENTS": {
+            "label": "Report recipient emails",
+            "help": "Separate with commas. Leave blank to send to all admins who can receive email."
+          },
+          "STATEMENT_EMAIL_INSTRUCTORS": {
+            "label": "Email monthly earnings statements to instructors",
+            "help": "When off, instructors can still view and download statements on the Earnings page."
+          },
+          "PUBLIC_INVOICE_LINK_ENABLED": {
+            "label": "Allow opening documents via the QR code on PDF files",
+            "help": "Emergency off-switch to disable all document QR links; issued PDF files can still be viewed after signing in."
+          },
+          "INVOICE_ISSUER_NAME": {
+            "label": "Issuer name on documents"
+          },
+          "INVOICE_ISSUER_NOTE": {
+            "label": "Issuer note on documents",
+            "placeholder": "e.g. tax ID, address"
+          }
+        },
+        "units": {
+          "turnsPerDay": "times/day",
+          "timesPerDay": "times/day",
+          "msgsPerDay": "messages/day",
+          "turnsPerHour": "times/hour",
+          "usdPerMTok": "USD / 1M tokens",
+          "usdPerAudioHour": "USD / audio hour",
+          "days": "days",
+          "hours": "hours",
+          "minutes": "minutes",
+          "times": "times",
+          "turns": "times"
+        },
+        "validation": {
+          "needNumber": "Please enter a number.",
+          "integerOnly": "Enter a non-negative whole number only, with no dots, commas or letters.",
+          "minValue": "The minimum value is {min}.",
+          "maxValue": "The maximum value is {max}.",
+          "percentFormat": "Enter a non-negative number with at most 2 digits after the dot (e.g. 37 or 97.5).",
+          "percentRange": "The value must be between {min} and {max}.",
+          "priceFormat": "Enter a non-negative number with at most 4 digits after the dot (e.g. 0.30).",
+          "priceMax": "The maximum value is {max}.",
+          "badEmail": "\"{value}\" is not a valid email address.",
+          "dupEmail": "Some emails are duplicated.",
+          "daysMin": "Select at least 1 day.",
+          "daysMax": "Select at most 4 payout days per month.",
+          "daysRange": "Payout days must be between 1 and 28.",
+          "dupDay": "Some days are selected more than once.",
+          "datesMax": "At most 60 days.",
+          "badDate": "\"{value}\" is not a valid date.",
+          "issuerRequired": "The issuer name cannot be empty.",
+          "maxLength": "At most {max} characters.",
+          "badSwitch": "Invalid on/off value."
+        }
       }
     },
     "categories": {
@@ -2336,7 +4253,10 @@
         "title": "Delete this category?",
         "body": "The category \"{name}\" will be deleted. The system will refuse if courses still belong to it.",
         "cancel": "Cancel"
-      }
+      },
+      "search": "Search categories",
+      "searchPh": "Search by category name or slug...",
+      "noMatch": "No categories match."
     },
     "reviews": {
       "title": "Review moderation",
@@ -2430,6 +4350,37 @@
         "HIGH": "High",
         "MEDIUM": "Medium",
         "LOW": "Low"
+      },
+      "manage": {
+        "updated": "Announcement updated, including copies users already received.",
+        "updateError": "Could not update the announcement. Please try again.",
+        "restored": "Announcement restored. Users can see it again.",
+        "restoreError": "Could not restore the announcement. Please try again.",
+        "deleted": "Announcement deleted.",
+        "deleteError": "Could not delete the announcement. Please try again.",
+        "revoked": "Announcement revoked. Users no longer see it.",
+        "revokeError": "Could not revoke the announcement. Please try again.",
+        "history": "Announcement history",
+        "search": "Search announcements",
+        "searchPh": "Search by title or content...",
+        "actions": "Actions",
+        "revokedStatus": "Revoked",
+        "revokedOn": "Revoked {date}",
+        "restore": "Restore",
+        "delete": "Delete",
+        "edit": "Edit",
+        "revoke": "Revoke",
+        "more": "Show more",
+        "editTitle": "Edit announcement",
+        "editHint": "Changes also apply to copies users already received. Audience and severity cannot change after sending.",
+        "cancel": "Cancel",
+        "saving": "Saving...",
+        "save": "Save changes",
+        "deleteTitle": "Delete announcement permanently?",
+        "deleteBody": "\"{title}\" and every copy users received will be permanently deleted and cannot be restored. To hide it temporarily, keep it revoked instead.",
+        "deleteConfirm": "Delete permanently",
+        "revokeTitle": "Revoke announcement?",
+        "revokeBody": "\"{title}\" will be hidden from every user who received it (including the top banner). The record stays in the history."
       }
     },
     "support": {
@@ -3114,7 +5065,351 @@
             ]
           }
         }
+      },
+      "find": {
+        "label": "Search support requests",
+        "ph": "Request code, email or subject...",
+        "more": "Show more"
       }
+    },
+    "common": {
+      "loadError": "Could not load data. Please try again.",
+      "retry": "Retry"
+    },
+    "finance": {
+      "title": "Financial statistics",
+      "subtitle": "Platform-wide revenue, refunds, instructor payouts and PayOS reconciliation.",
+      "gran": {
+        "DAY": "By day",
+        "WEEK": "By week",
+        "MONTH": "By month"
+      },
+      "reportType": {
+        "DAILY": "Daily",
+        "WEEKLY": "Weekly",
+        "MONTHLY": "Monthly",
+        "MANUAL": "On demand"
+      },
+      "reason": {
+        "BUYER_REMORSE": "Changed mind",
+        "OTHER": "Other reason",
+        "TECHNICAL_ISSUE": "Technical issue",
+        "DOUBLE_CHARGE": "Charged twice",
+        "NOT_ENROLLED": "Charged but not enrolled",
+        "PLATFORM_FAULT": "Platform fault",
+        "COPYRIGHT_VIOLATION": "Copyright violation",
+        "CONTENT_MISMATCH": "Content not as described",
+        "PROHIBITED_CONTENT": "Prohibited content"
+      },
+      "stage": {
+        "REQUESTED": "Awaiting approval",
+        "APPROVED": "Approved, awaiting payment"
+      },
+      "toast": {
+        "emailed": "The report was created and sent to your email.",
+        "noEmail": "The report was saved but could not be emailed because your account has no deliverable email address. You can still download the file from the Share button.",
+        "runError": "Could not create the report. Please try again."
+      },
+      "fileName": "financial-report",
+      "export": {
+        "pdf": "Download PDF",
+        "pdfHint": "Summary for printing or sending",
+        "xlsx": "Download Excel (XLSX)",
+        "xlsxHint": "Multi-sheet workbook with all the data",
+        "csv": "Download CSV",
+        "csvHint": "Raw data that opens in any software",
+        "mail": "Email it to me",
+        "mailHint": "Create the report, save it to history and attach the file"
+      },
+      "filter": {
+        "from": "From",
+        "to": "To",
+        "group": "Group by",
+        "last7": "7 days",
+        "last30": "30 days",
+        "thisMonth": "This month",
+        "lastMonth": "Last month",
+        "autoConfig": "Configure automatic reports"
+      },
+      "loadError": "Could not load the figures. Please check the date range and try again.",
+      "noData": "No data yet.",
+      "stat": {
+        "gross": "Gross revenue",
+        "net": "Net revenue (after refunds)",
+        "refunds": "Refunded to students",
+        "refundMeta": "{count} refunds · {pct}% of orders",
+        "platform": "Platform share kept"
+      },
+      "split": {
+        "platform": "Platform share",
+        "instructor": "Instructor share",
+        "refunded": "Refunded to students"
+      },
+      "source": {
+        "referral": "Via referral link",
+        "organic": "Found by students"
+      },
+      "trend": {
+        "q": "Is revenue going up or down?",
+        "up": "Gross revenue is up {pct}% on the previous period.",
+        "down": "Gross revenue is down {pct}% on the previous period.",
+        "empty": "No transactions in this period.",
+        "aria": "Area chart of gross revenue and refunds by period",
+        "gross": "Gross revenue",
+        "refunds": "Refunds"
+      },
+      "splitChart": {
+        "q": "Where does the money actually go?",
+        "insight": "The platform keeps {platform}% of gross revenue; {refunds}% is refunded to students.",
+        "aria": "Pie chart of revenue split between platform, instructors and refunds"
+      },
+      "leader": "Top: {name} ({amount}, {orders} orders).",
+      "topCourses": {
+        "q": "Which courses bring in the most revenue?",
+        "aria": "Bar chart of revenue by course"
+      },
+      "topInstructors": {
+        "q": "Which instructors contribute the most revenue?",
+        "aria": "Bar chart of revenue by instructor"
+      },
+      "refundRate": {
+        "q": "Which courses have unusually many refunds?",
+        "none": "No course with {min} or more orders had refunds in this period.",
+        "review": "Review the quality of \"{name}\": {refunded}/{orders} orders refunded ({pct}%).",
+        "ok": "No course is above the warning threshold.",
+        "empty": "No courses of concern.",
+        "aria": "Bar chart of refund rate by course",
+        "series": "Refund rate"
+      },
+      "reasons": {
+        "q": "Why do students ask for refunds?",
+        "insight": "Most common: {name} ({count} refunds, {amount}).",
+        "empty": "No refunds in this period.",
+        "aria": "Pie chart of refunds by reason"
+      },
+      "sources": {
+        "q": "Where does revenue come from?",
+        "insight": "{pct}% of revenue comes from instructor referral links.",
+        "aria": "Pie chart of revenue by source"
+      },
+      "pipeline": {
+        "q": "How much is owed to instructors, and which requests are waiting long?",
+        "insight": "Unpaid instructor obligations: {obligations}.",
+        "receivables": " · instructors owe the platform: {amount}",
+        "paid": " Paid out this period: {amount} ({count} payouts).",
+        "empty": "No withdrawal requests are waiting.",
+        "row": "{stage}: {count} requests · {amount}",
+        "oldest": "Oldest {days} days",
+        "late": " — needs action",
+        "payosFee": "PayOS transfer fees this period: {amount} ({orders} successful payouts), borne by the platform."
+      },
+      "recon": {
+        "q": "Do PayOS payouts match the books?",
+        "match": "Every successful PayOS payout this period matches a recorded refund or payout.",
+        "diff": "Off by {amount}: {direction}. See the mismatches below.",
+        "payosMore": "PayOS paid out more than was recorded",
+        "bookMore": "the books record more than PayOS paid out",
+        "ok": "Matched",
+        "mismatch": "Mismatch",
+        "summary": "PayOS paid {payos} ({orders} orders) · books recorded {recorded} ({count} entries)",
+        "refund": "Refund",
+        "payout": "Instructor payout"
+      },
+      "history": {
+        "title": "Sent report history",
+        "empty": "No reports yet. Scheduled reports are created automatically from the settings; you can also choose \"Email it to me\" in the Share button.",
+        "range": "{from} to {to}",
+        "sent": "sent to {email}",
+        "notSent": "not emailed"
+      }
+    },
+    "payouts": {
+      "title": "Instructor payouts",
+      "subtitle": "Approve withdrawal requests, transfer manually, then record the transaction ID. Rejected or failed payouts return the money to the instructor's balance.",
+      "status": {
+        "PENDING_EMAIL": "Awaiting email confirmation",
+        "REQUESTED": "Awaiting approval",
+        "APPROVED": "Approved, awaiting payment",
+        "PAID": "Paid",
+        "REJECTED": "Rejected",
+        "CANCELLED": "Cancelled",
+        "FAILED": "Payment failed"
+      },
+      "toast": {
+        "failed": "The action did not succeed.",
+        "approved": "Request approved.",
+        "paid": "Transfer recorded and the instructor notified.",
+        "rejected": "Rejected; the amount was returned to the instructor.",
+        "markedFailed": "Marked as failed; the amount was returned to the instructor."
+      },
+      "search": "Search withdrawal requests",
+      "searchPh": "Request code, email or instructor name...",
+      "statusLabel": "Status",
+      "all": "All",
+      "exportHint": "Download a CSV of approved requests for bulk transfer (full account numbers, logged)",
+      "export": "Export approved CSV",
+      "loadError": "Could not load the list.",
+      "empty": "No requests.",
+      "cols": {
+        "code": "Code",
+        "instructor": "Instructor",
+        "account": "Receiving account",
+        "amount": "Amount",
+        "status": "Status",
+        "time": "Time",
+        "actions": "Actions"
+      },
+      "nameMismatch": "Account holder name does not match the instructor — check carefully",
+      "transferRef": "Transfer ID: {ref}",
+      "created": "Created: {at}",
+      "batch": "Payout run: {at}",
+      "paidAt": "Paid: {at}",
+      "approve": "Approve",
+      "reveal": "Show account no.",
+      "manual": "Manual",
+      "markPaid": "Transferred",
+      "markFailed": "Failed",
+      "reject": "Reject",
+      "more": "Show more",
+      "revealDlg": {
+        "title": "Receiving account number",
+        "bank": "Bank",
+        "number": "Account number",
+        "holder": "Account holder",
+        "amount": "Amount",
+        "memo": "Suggested transfer note",
+        "audit": "This view has been written to the audit log. Do not share the account number."
+      },
+      "dlg": {
+        "paidTitle": "Record transfer",
+        "rejectTitle": "Reject withdrawal request",
+        "failTitle": "Transfer failed",
+        "cancel": "Cancel",
+        "confirm": "Confirm",
+        "refLabel": "Transfer transaction ID *",
+        "reasonLabel": "Reason * (the instructor will receive this)",
+        "proofLabel": "Receipt image link (optional)"
+      },
+      "debts": {
+        "title": "Instructor debts ({count})",
+        "level1": "In debt",
+        "level2": "Publishing/promotion restricted",
+        "level3": "New sales stopped",
+        "meta": "{email} · in debt since {since} ({days} days) · {level}",
+        "writeOff": "Write off",
+        "reasonPh": "Reason for write-off (required, sent to the instructor)",
+        "reasonLabel": "Reason for write-off",
+        "confirm": "Confirm write-off",
+        "cancel": "Cancel",
+        "done": "Debt written off; the instructor was notified.",
+        "error": "Could not write off the debt."
+      },
+      "payos": {
+        "succeeded": "PayOS paid out and it was recorded.",
+        "rejected": "PayOS declined: {reason}",
+        "unknownReason": "no reason given",
+        "sent": "Payout order sent to PayOS; it will update automatically when there is a result.",
+        "sendError": "Could not send the payout order.",
+        "blocked": "Retry is locked",
+        "hint": "Send a {amount} transfer via PayOS. Payout account balance: {balance}",
+        "unknownBalance": "unknown",
+        "sending": "Sending...",
+        "processing": "PayOS processing...",
+        "retryAt": "Retry after {time}",
+        "locked": "PayOS payout locked",
+        "retry": "Retry via PayOS",
+        "send": "Pay via PayOS",
+        "ok": "succeeded",
+        "fail": "failed",
+        "unknown": "result unknown",
+        "pending": "processing — waiting for PayOS/bank confirmation",
+        "nameMismatch": " ⚠ bank name differs from the entered name",
+        "cause": {
+          "TRANSIENT": "temporary bank/PayOS issue",
+          "ACCOUNT": "problem with the receiving account",
+          "UNKNOWN": "unknown cause"
+        }
+      }
+    },
+    "promotions": {
+      "title": "Course promotions",
+      "subtitle": "Review instructors' promotion requests. Approved courses appear on the \"Featured\" shelf during the window you choose.",
+      "status": {
+        "REQUESTED": "Awaiting approval",
+        "APPROVED": "Approved",
+        "REJECTED": "Rejected",
+        "CANCELLED": "Cancelled",
+        "ENDED": "Ended"
+      },
+      "placement": {
+        "HOME_FEATURED": "Home page \"Featured\" shelf",
+        "CATEGORY_FEATURED": "Top of category page"
+      },
+      "toast": {
+        "failed": "The action did not succeed.",
+        "approved": "Approved; the course goes on the shelf right away.",
+        "rejected": "Request rejected.",
+        "ended": "Promotion removed; the instructor will be notified."
+      },
+      "search": "Search promotion requests",
+      "searchPh": "Course title, instructor name or email...",
+      "statusLabel": "Status",
+      "all": "All",
+      "loadError": "Could not load the list.",
+      "empty": "No requests.",
+      "running": "Running",
+      "requestNote": "Instructor note: {note}",
+      "adminNote": "Admin note: {note}",
+      "estimate": "Estimate: {during} orders ({revDuring}) while running vs {before} orders ({revBefore}) in the equal period before.",
+      "approve": "Approve",
+      "reject": "Reject",
+      "end": "Remove promotion",
+      "dlg": {
+        "approveTitle": "Approve promotion",
+        "endTitle": "Remove promotion",
+        "rejectTitle": "Reject request",
+        "cancel": "Cancel",
+        "confirm": "Confirm",
+        "endAt": "Ends at *",
+        "endHint": "Starts as soon as it is approved; up to 90 days.",
+        "note": "Note (optional)",
+        "reason": "Reason * (the instructor will receive this)"
+      }
+    },
+    "invoices": {
+      "title": "Invoices & documents",
+      "subtitle": "Look up payment receipts, refund notes, payout vouchers, debt receipts and monthly earnings statements. Documents cannot be edited or deleted.",
+      "type": {
+        "RECEIPT": "Payment receipt",
+        "REFUND": "Refund note",
+        "PAYOUT": "Payout voucher",
+        "DEBT_RECEIPT": "Debt repayment receipt",
+        "STATEMENT": "Monthly earnings statement"
+      },
+      "needCriteria": "Enter a document number, order code, recipient email or name, or course title (or pick a type or date range) to search.",
+      "resent": "The document was emailed to the recipient again.",
+      "resendFailed": "Could not send: the recipient has no valid email address.",
+      "shareResults": "Share results",
+      "csv": "Download list (CSV)",
+      "csvHint": "All results of this search",
+      "csvName": "documents.csv",
+      "search": "Search documents",
+      "searchPh": "Document number, order code, recipient email / name / ID, course title...",
+      "typeLabel": "Document type",
+      "allTypes": "All types",
+      "from": "From",
+      "to": "To",
+      "promptTitle": "Enter details to look up documents",
+      "prompt": "The system issues a large number of documents, so none are listed by default. Enter a document number, order code, recipient email, name or ID, or a course title; click a result to see details, download the PDF or email it to the recipient again.",
+      "loadError": "Could not load results. Please try again.",
+      "empty": "No documents match the search.",
+      "detail": "Document details",
+      "pdf": "Download PDF",
+      "pdfHint": "Copy of the document to keep or print",
+      "resend": "Resend by email",
+      "resendHint": "Send to {email}",
+      "close": "Close",
+      "immutable": "Documents are stored permanently; mistakes are cancelled with an adjustment note, never edited directly."
     }
   },
   "supportHelp": {
@@ -3600,6 +5895,1118 @@
   "common": {
     "layout": {
       "viewAll": "View all"
+    },
+    "ui": {
+      "close": "Close"
+    },
+    "notifications": {
+      "flashcardReminder": "Time to review your flashcards",
+      "newNotification": "New notification"
+    },
+    "markdown": {
+      "lessonFallback": "lesson #{id}"
+    },
+    "search": {
+      "searching": "Searching...",
+      "search": "Search",
+      "results": "{total} results",
+      "resultsPage": "{total} results · page {page}/{pages}",
+      "pagination": "Pagination",
+      "prev": "Previous",
+      "next": "Next"
+    },
+    "legal": {
+      "updated": "Last updated: {date}",
+      "stub": "This content is under construction and will be added in a future version."
+    },
+    "export": {
+      "share": "Share",
+      "failed": "The action was not successful. Please try again.",
+      "busy": "Processing..."
+    },
+    "confirm": {
+      "title": "Confirm",
+      "ok": "OK",
+      "cancel": "Cancel"
+    },
+    "banner": {
+      "close": "Dismiss announcement"
+    },
+    "delta": {
+      "same": "No change from the previous period",
+      "noPrevious": "No data for the previous period",
+      "vsPrevious": "{arrow} {pct}% vs. the previous period"
+    },
+    "select": {
+      "searchPlaceholder": "Quick search...",
+      "empty": "No results"
+    },
+    "streak": {
+      "freezes": "🧊 {remaining} streak freezes left this month"
+    },
+    "rating": {
+      "pick": "Choose a star rating"
+    },
+    "pagination": {
+      "prev": "Previous page",
+      "next": "Next page",
+      "page": "Page {current}/{total}"
+    },
+    "spinner": {
+      "loading": "Loading"
+    },
+    "typing": {
+      "replying": "Replying"
     }
+  },
+  "finance": {
+    "invoiceType": {
+      "RECEIPT": "Payment receipt",
+      "REFUND": "Refund note",
+      "PAYOUT": "Payout voucher",
+      "DEBT_RECEIPT": "Debt repayment receipt",
+      "STATEMENT": "Monthly earnings statement"
+    },
+    "invoiceStatus": {
+      "ISSUED": "Issued",
+      "VOIDED": "Voided"
+    },
+    "invoiceField": {
+      "periodLabel": "Statement period",
+      "orders": "Orders in period",
+      "earnings": "Course earnings",
+      "refundReversals": "Refund deductions",
+      "adjustments": "Adjustments",
+      "debtRepayments": "Debt repaid",
+      "payoutsPaid": "Paid out in period",
+      "platformShare": "Platform share of these orders",
+      "billingName": "Billing name",
+      "billingPhone": "Phone number",
+      "paymentMethod": "Payment method",
+      "gatewayTxnNo": "Gateway transaction ID",
+      "orderRef": "Order reference",
+      "originalReceipt": "Original receipt",
+      "payoutCode": "Payout request code",
+      "bankName": "Bank",
+      "accountMasked": "Receiving account",
+      "holderName": "Account holder",
+      "orderCode": "Payment code",
+      "transferRef": "Bank transaction reference",
+      "transferredAt": "Transferred at"
+    },
+    "invoiceDetail": {
+      "recipient": "Recipient",
+      "issuedAt": "Issue date",
+      "related": "Related document",
+      "byCourse": "Earnings by course",
+      "byCourseChart": "Bar chart of earnings by course in this period",
+      "content": "Description",
+      "amount": "Amount",
+      "discount": "Discount",
+      "total": "Total",
+      "payoutFeeNote": "Transfer fees are paid by LinguaLearn and are not deducted from the amount you receive."
+    },
+    "refundReason": {
+      "BUYER_REMORSE": "Student changed their mind within the refund window",
+      "OTHER": "Other reason (no one at fault)",
+      "TECHNICAL_ISSUE": "Technical issue on the system side",
+      "DOUBLE_CHARGE": "Duplicate payment",
+      "NOT_ENROLLED": "Charged but not enrolled",
+      "PLATFORM_FAULT": "Platform fault",
+      "COPYRIGHT_VIOLATION": "Copyright violation",
+      "CONTENT_MISMATCH": "Content differs seriously from the description",
+      "PROHIBITED_CONTENT": "Prohibited content"
+    },
+    "refundResponsibility": {
+      "STANDARD": "Standard — the instructor returns exactly the share they received",
+      "PLATFORM_COMPENSATES": "Platform covers the full amount",
+      "INSTRUCTOR_FAULT": "Instructor covers the full amount"
+    },
+    "instructorPayoutStatus": {
+      "PENDING_EMAIL": "Awaiting email confirmation",
+      "REQUESTED": "Awaiting approval",
+      "APPROVED": "Approved · transfer in progress",
+      "PAID": "Received",
+      "REJECTED": "Not accepted",
+      "CANCELLED": "Cancelled",
+      "FAILED": "Transfer failed · balance restored"
+    },
+    "ledgerType": {
+      "EARNING": "Order earnings",
+      "REFUND_REVERSAL": "Refund deduction",
+      "PAYOUT_RESERVE": "Payout",
+      "PAYOUT_RELEASE": "Balance restored (payout failed)",
+      "ADJUSTMENT": "Adjustment"
+    },
+    "ledger": {
+      "title": "Earnings statement",
+      "group": "Entry type",
+      "groupALL": "All",
+      "groupEARNING": "Order earnings",
+      "groupREFUND": "Refund deductions",
+      "groupPAYOUT": "Payouts",
+      "groupDEBT": "Debt repayments",
+      "groupADJUSTMENT": "Adjustments",
+      "from": "From",
+      "to": "To",
+      "clear": "Clear filters",
+      "loading": "Loading...",
+      "noMatch": "No entries match the filters.",
+      "empty": "No earnings entries yet.",
+      "colTime": "Time",
+      "colType": "Type",
+      "colNote": "Note",
+      "colEffective": "Availability",
+      "colAmount": "Amount",
+      "matured": "Added to balance",
+      "heldUntil": "Held until {date}"
+    },
+    "refundDecision": {
+      "appealSent": "Appeal sent. An administrator will review it and get back to you.",
+      "appealFailed": "Could not send the appeal.",
+      "title": "Refund decision",
+      "mode": "Mode:",
+      "charged": "Deducted from your earnings:",
+      "reason": "Reason: {reason}.",
+      "adminNote": "Administrator note: {note}",
+      "evidence": "Evidence: {note}",
+      "appealOpen": "Your appeal is waiting for an administrator.",
+      "appealResult": "Appeal result: {result}",
+      "appealReduced": "accepted, reduced to Standard mode",
+      "appealUpheld": "decision upheld",
+      "appealHint": "Disagree? You can appeal once before {deadline}. While it is pending, any debt-related restrictions are paused.",
+      "deadlineFallback": "the deadline",
+      "placeholder": "Explain your reasons and evidence (at least 20 characters)",
+      "sending": "Sending...",
+      "submit": "Submit appeal"
+    }
+  },
+  "pages": {
+    "notFound": {
+      "message": "Page not found. The link may not exist or you may not have access.",
+      "home": "Back to Home"
+    },
+    "messages": {
+      "title": "Messages",
+      "loading": "Loading..."
+    },
+    "about": {
+      "title": "About LinguaLearn",
+      "intro": "LinguaLearn is an AI-integrated online learning platform (LMS) born from a graduation thesis project, aiming to help Vietnamese learners access high-quality lectures from around the world without being limited by the original language of the video.",
+      "v1Title": "Break the language barrier",
+      "v1Desc": "AI automatically translates and dubs foreign lectures into Vietnamese (and vice versa), synchronized to the millisecond with the original video — learners no longer have to watch and read subtitles at the same time.",
+      "v2Title": "Learn actively, not just watch",
+      "v2Desc": "The Socratic Tutor assistant poses guiding questions in the context of the lesson being watched instead of just giving answers — helping learners truly understand rather than memorize.",
+      "v3Title": "Transparent learning progress",
+      "v3Desc": "Track progress for each lesson, quiz results, and a clear learning path for both learners and instructors.",
+      "footer": "This is an academic research product, developed and operated to demonstrate AI features in online education."
+    },
+    "checkout": {
+      "cancelled": "Payment cancelled."
+    },
+    "materials": {
+      "notFound": "Course information not found.",
+      "backToCourses": "← Back to course list",
+      "back": "← Back",
+      "title": "Manage AI materials",
+      "subtitle": "Automatically create mind maps, flashcards and exercises from lectures.",
+      "loading": "Loading materials..."
+    },
+    "verify": {
+      "checking": "Verifying certificate...",
+      "notFoundTitle": "Certificate not found",
+      "notFoundDesc": "This certificate code does not exist in the system. Please check the link again.",
+      "revokedTitle": "Certificate revoked",
+      "revokedDesc": "This certificate has been revoked by an administrator and is no longer valid."
+    },
+    "live": {
+      "title": "Live sessions",
+      "subtitle": "Watch live with the instructor — choose a dubbing language if needed.",
+      "tabPublic": "Public",
+      "tabEnrolled": "My courses",
+      "emptyPublic": "There are no public live sessions happening or coming up right now.",
+      "emptyEnrolled": "The courses you are enrolled in have no live sessions happening or coming up right now.",
+      "loading": "Loading…",
+      "loadError": "Could not load the list of live sessions.",
+      "loginTitle": "Sign in to see live sessions of the courses you are enrolled in",
+      "loginDesc": "Each course's private live sessions are only shown to learners enrolled in that course.",
+      "login": "Sign in",
+      "register": "Sign up"
+    },
+    "teaching": {
+      "r1Title": "Teach your way",
+      "r1Desc": "Publish the courses you want, the way you want, and you always keep full control of your content.",
+      "r2Title": "Inspire learners",
+      "r2Desc": "Teach what you know and help learners discover interests, pick up new skills and grow their careers.",
+      "r3Title": "Earn well-deserved rewards",
+      "r3Desc": "Expand your professional network, build your reputation and earn extra income from every paid enrollment.",
+      "planLabel": "Plan your curriculum",
+      "planBody": "Start from your passion and knowledge, then choose a suitable topic. You decide the teaching method and the content.",
+      "planHelp": "The \"Curriculum\" editor helps you organize Sections/Lectures clearly, with a checklist of submission requirements right while you write.",
+      "videoLabel": "Record your video",
+      "videoBody": "You don't need expensive equipment — just clear audio and a clear picture. You can upload videos directly or use a YouTube link.",
+      "videoHelp": "The system automatically extracts the original subtitles and supports multilingual AI dubbing right after you upload the video, with no extra steps.",
+      "launchLabel": "Launch your course",
+      "launchBody": "Complete the basic information and pricing, then submit the course for review. Once approved, your course will be publicly visible so learners can find it.",
+      "launchHelp": "You can edit the content/price at any time — only the FIRST submission needs to be reviewed.",
+      "reasonsHeading": "There are plenty of reasons to get started.",
+      "supportHeading": "You won't be alone.",
+      "supportBody": "The Socratic AI Tutor assistant, auto-generated materials and a curriculum editor with a built-in checklist are all ready to accompany you from your very first lecture. You only need to focus on the knowledge you want to share.",
+      "ctaHeading": "Become an instructor today!",
+      "ctaSub": "Join LinguaLearn's growing community of instructors.",
+      "ctaInstructor": "Go to instructor channel",
+      "ctaStart": "Get started",
+      "heroTitle": "Come teach with us!",
+      "heroSub": "Become an instructor and change other people's lives — including your own.",
+      "stepsHeading": "How to get started",
+      "helpHeading": "How we support you"
+    },
+    "changePassword": {
+      "title": "Change password",
+      "mismatch": "The confirmation password does not match",
+      "tooShort": "Password must be at least 8 characters",
+      "success": "Password changed successfully!",
+      "genericError": "Something went wrong",
+      "current": "Current password",
+      "new": "New password",
+      "confirm": "Confirm password",
+      "processing": "Processing...",
+      "cancel": "Cancel"
+    },
+    "editProfile": {
+      "title": "Edit profile",
+      "error": "Something went wrong, please try again.",
+      "uploading": "Uploading...",
+      "changeAvatar": "Change avatar",
+      "avatarHint": "JPEG/PNG/WEBP, up to 5MB",
+      "fullName": "Full name",
+      "language": "Preferred language",
+      "saving": "Saving...",
+      "save": "Save",
+      "close": "Close"
+    },
+    "account": {
+      "loading": "Loading...",
+      "loadError": "Unable to load information.",
+      "title": "Account settings",
+      "role": "Role: {role}",
+      "preferredLanguage": "Preferred language",
+      "joinedAt": "Joined on",
+      "editProfile": "Edit profile",
+      "changePassword": "Change password",
+      "viewPublic": "View public profile",
+      "privacyTitle": "Public profile privacy",
+      "privacyDesc": "Others viewing your <link>public profile</link> page will see the items you turn on below.",
+      "showCourses": "Show learned courses",
+      "showWishlist": "Show wishlist",
+      "securityTitle": "Security & Devices",
+      "securityDesc": "Sign out of all other devices using this account.",
+      "lastActive": "Last active: {time}",
+      "logoutAllDone": "Signed out of all other devices.",
+      "genericError": "Something went wrong, please try again.",
+      "logoutAll": "Sign out of all other devices"
+    },
+    "payments": {
+      "groupAll": "All",
+      "groupSuccess": "Successful",
+      "groupPending": "Pending",
+      "groupFailed": "Failed",
+      "groupRefunded": "Refunded",
+      "loadError": "Failed to load transaction history",
+      "invoiceError": "Could not download the document. Please try again in a few minutes.",
+      "statusAwaiting": "Refund approved · awaiting transfer",
+      "statusPaid": "Successful",
+      "statusPending": "Pending",
+      "statusFailed": "Failed",
+      "statusExpired": "Expired",
+      "statusRefunded": "Refunded",
+      "title": "Transaction history",
+      "subtitle": "Each transaction has an electronic receipt and, if refunded, a refund note you can download right here.",
+      "filterByStatus": "Filter by status",
+      "searchLabel": "Search transactions",
+      "searchPlaceholder": "Order code, gateway code or course name...",
+      "fromDate": "From date",
+      "toDate": "To date",
+      "clearFilters": "Clear filters",
+      "loading": "Loading data...",
+      "empty": "You have no transactions yet.",
+      "noMatch": "No transactions match the filters.",
+      "colRef": "Reference code (System)",
+      "colGateway": "Gateway transaction no.",
+      "colCourse": "Course",
+      "colAmount": "Amount",
+      "colMethod": "Method",
+      "colStatus": "Status",
+      "colPaidAt": "Payment time",
+      "colDocs": "Documents",
+      "none": "None yet",
+      "downloadTitle": "Download {kind} {number} (PDF)",
+      "kindRefund": "refund note",
+      "kindReceipt": "receipt",
+      "downloading": "Downloading...",
+      "btnRefund": "Refund note",
+      "btnReceipt": "Receipt",
+      "creating": "Generating",
+      "creatingHint": "The receipt is generated after payment completes, usually within a few minutes"
+    },
+    "paymentDetail": {
+      "title": "Transaction details",
+      "amount": "Amount",
+      "discounted": "— discounted {amount}đ",
+      "status": "Status",
+      "couponUsed": "Coupon used",
+      "course": "Course",
+      "billingName": "Billing name",
+      "billingPhone": "Phone number",
+      "none": "None",
+      "ref": "Reference code (System)",
+      "gatewayNo": "Transaction no. (Gateway)",
+      "notYet": "None yet",
+      "method": "Method",
+      "paidAt": "Payment time",
+      "report": "Report an issue",
+      "reportDisabled": "Only successfully paid transactions can be disputed",
+      "refundPolicy": "Refund policy",
+      "close": "Close"
+    },
+    "payosReturn": {
+      "processing": "Processing PayOS payment result...",
+      "successTitle": "Payment successful",
+      "successNote": "Note: The course will be unlocked automatically once the system receives confirmation from the bank (usually 1-2 minutes).",
+      "viewHistory": "View transaction history",
+      "backToCourses": "Back to course catalog",
+      "failTitle": "Transaction failed",
+      "failNote": "The payment was cancelled or an error occurred. Please try again."
+    },
+    "materialDetail": {
+      "exportPdfError": "Error exporting PDF, please try again.",
+      "imported": "Added {count} cards from the file.",
+      "importErrors": "{count} invalid lines: {samples}{more}",
+      "importEmpty": "The .txt file has no valid data lines.",
+      "importFail": "Error loading .txt file",
+      "loading": "Loading material details...",
+      "removed": "This exercise was removed or updated by the instructor. The session has ended.",
+      "notFound": "This material was not found or you do not have permission to view it.",
+      "unavailableTitle": "Material no longer available",
+      "loadErrorTitle": "Unable to load data",
+      "back": "← Back",
+      "toHome": "Go to home",
+      "backPlain": "Back",
+      "home": "Home",
+      "typeMindmap": "Mind map",
+      "typeFlashcard": "Flashcard deck",
+      "heading": "{type} - Version {version}",
+      "statusLabel": "Status:",
+      "createdAt": "Created: {date}",
+      "diagram": "Diagram",
+      "quizStudy": "📖 Take quiz (Study Mode)",
+      "quizEdit": "📋 Edit questions (Edit Mode)",
+      "exportBlankTitle": "Export a blank-paper PDF with answers on the last page",
+      "exportCheatTitle": "Export a cheatsheet PDF with answers included",
+      "exporting": "Exporting...",
+      "blankPaper": "Blank paper",
+      "cheatsheet": "Cheatsheet",
+      "quizEmptyDone": "This quiz has no questions.",
+      "quizProcessing": "The quiz is being processed by AI, please come back later...",
+      "flashStudy": "📖 Review (Study Mode)",
+      "flashBrowse": "📋 Browse all (Browse)",
+      "exportTxtTitle": "Export a .txt file compatible with Anki/Quizlet",
+      "export": "Export",
+      "importTxtTitle": "Import a .txt file from Anki/Quizlet",
+      "importing": "Importing...",
+      "import": "Import",
+      "defaultDeckName": "Flashcard deck",
+      "flashEmptyDone": "This flashcard deck has no cards.",
+      "flashProcessing": "The flashcard deck is being processed by AI, please come back later...",
+      "unsupported": "This material type is not supported for display yet, or it failed during generation."
+    },
+    "liveView": {
+      "loading": "Loading…",
+      "cannotView": "Cannot view this live session",
+      "enrolledOnly": "This live session is only for learners enrolled in the course.",
+      "enrolledOnlyLogin": "This live session is only for learners enrolled in the course — sign in and try again if you are enrolled.",
+      "genericError": "Something went wrong, please try again later.",
+      "login": "Sign in",
+      "upcoming": "The live session is about to start",
+      "scheduledAt": "Scheduled for {time}",
+      "notStarted": "The instructor has not started yet — please come back later.",
+      "ended": "The live session has ended",
+      "actionOriginalSub": "view the original subtitles",
+      "actionDubbing": "listen to dubbing",
+      "actionTranslatedSub": "view translated subtitles",
+      "listen": "Listen:",
+      "translatedSub": "Translated subtitles:",
+      "noTranslatedSub": "Hide translated subtitles",
+      "originalSub": "Original subtitles",
+      "noVideo": "The instructor has not turned on the camera or screen sharing",
+      "delayNote": "Audio/video may lag a few seconds behind real time"
+    }
+  },
+  "legal": {
+    "cookies": {
+      "title": "Cookie Policy",
+      "s1Title": "1. LinguaLearn does not use tracking cookies",
+      "s1p1": "The system currently <b>does not use cookies</b> for behavior tracking, advertising, or third-party analytics.",
+      "s2Title": "2. Browser storage (localStorage)",
+      "s2p1": "To keep you signed in, LinguaLearn stores an access token and a refresh token (JWT) in your browser's local storage (localStorage) on your device. This data exists only in the browser you are using and is not sent to third parties.",
+      "s2p2": "You can delete this data at any time by clearing your browser data or signing out — doing so ends your current session."
+    },
+    "accessibility": {
+      "title": "Accessibility Statement"
+    },
+    "sitemap": {
+      "title": "Sitemap",
+      "g1": "Explore",
+      "g2": "Account",
+      "g3": "Legal & Policies",
+      "home": "Home",
+      "courses": "Courses",
+      "about": "About us",
+      "teaching": "Teach on LinguaLearn",
+      "login": "Sign in",
+      "register": "Sign up",
+      "profile": "Profile",
+      "myCourses": "My courses",
+      "wishlist": "Wishlist",
+      "cart": "Cart",
+      "payments": "Transaction history",
+      "terms": "Terms of Service",
+      "privacy": "Privacy Policy",
+      "refund": "Refund Policy",
+      "revenueShare": "Instructor Revenue Share Policy",
+      "moderation": "Content Moderation Policy",
+      "cookies": "Cookie Policy",
+      "accessibility": "Accessibility Statement"
+    },
+    "moderation": {
+      "title": "Course Content Moderation Policy",
+      "s1Title": "1. Course lifecycle",
+      "s1p1": "Each course goes through these states: <b>Draft</b> (being written) → <b>Pending review</b> (the Instructor submits it for review) → <b>Published</b> (approved and publicly visible) or <b>Rejected</b> (needs revision) → <b>Archived</b> (no longer accepting new learners).",
+      "s1p2": "Only courses in the Published state allow learners to enroll or purchase.",
+      "s2Title": "2. Review process",
+      "s2p1": "Administrators review courses in the Pending review state and decide to approve or reject. If rejecting, the Administrator must state a clear reason (at least 20 characters) so the Instructor knows what to fix before resubmitting.",
+      "s3Title": "3. Course review moderation",
+      "s3p1": "Learner reviews that violate the rules (spam, inappropriate language, etc.) may also be hidden or removed by Administrators through a separate moderation mechanism, independent of the course review process above.",
+      "s4Title": "4. Content responsibility",
+      "s4p1": "Being approved does not mean LinguaLearn has fully verified the accuracy or copyright of the content — ultimate responsibility remains with the publishing Instructor, per the <link>Terms of Service</link>."
+    },
+    "terms": {
+      "title": "Terms of Service",
+      "intro": "LinguaLearn is an AI-integrated online learning platform (LMS) developed as part of a graduation thesis project at Ho Chi Minh City University of Industry. By creating an account and using the system, you agree to the terms below.",
+      "s1Title": "1. User accounts",
+      "s1p1": "The system has 3 roles: Learner, Instructor and Administrator. Any Learner account can upgrade itself to Instructor at any time on the <link>Teach on LinguaLearn</link> page without losing ownership of courses previously purchased as a Learner.",
+      "s1p2": "When registering as an Instructor, you must provide identification information (national ID number, address) and confirm lawful ownership of the content you publish. The system currently <b>only collects</b> this information for internal records — it does <b>not</b> call any government eKYC/electronic identification API to verify it.",
+      "s2Title": "2. Course content & copyright",
+      "s2p1": "Instructors are fully responsible for the legality, copyright and accuracy of the content they publish (lecture videos, attached materials, quiz questions, etc.). LinguaLearn does not verify content copyright on behalf of Instructors before publication.",
+      "s2p2": "Every course must be reviewed by an Administrator before being publicly displayed — see details in the <link>Content Moderation Policy</link>.",
+      "s3Title": "3. Payment & tuition",
+      "s3p1": "Tuition is paid in a single payment via PayOS. After successful payment, learners get immediate, unlimited-time access to the course. See the refund policy details in the <link>Refund Policy</link>.",
+      "s3p2": "Revenue is shared between the Instructor and the platform at a rate depending on the order source — see the <link>Revenue Share Policy</link>.",
+      "s3aTitle": "3A. Refunds, debts and payout accounts",
+      "s3ap1": "Users who declare a payout account (refunds for learners, withdrawals for instructors) are responsible for the accuracy of the information and for confirming it is their own account; we transfer money exactly as per the confirmed information. Instructors may incur <b>debt</b> when deductions for refunds exceed their balance; debt is offset against new revenue or repaid voluntarily, and if overdue they may be restricted from publishing/promoting or have new enrollments suspended under the <revenueLink>Revenue Share Policy</revenueLink>. For the dispute and refund process, see the <refundLink>Refund Policy</refundLink>.",
+      "s4Title": "4. Prohibited conduct",
+      "s4p1": "It is strictly prohibited to publish content that violates Vietnamese law, infringes copyright, is offensive or fraudulent, or deliberately exploits system bugs. Violating accounts may be locked or have content removed without prior notice.",
+      "s5Title": "5. Limitation of liability",
+      "s5p1": "This is an academic research product, operated to demonstrate AI features in online education. LinguaLearn does not guarantee 100% continuous availability of the service and is not liable for indirect damages arising from use of the platform.",
+      "s6Title": "6. Changes to the terms",
+      "s6p1": "These terms may be updated from time to time to reflect the features currently deployed. The latest version is always posted on this page."
+    },
+    "privacy": {
+      "title": "Privacy Policy",
+      "intro": "This policy describes the personal data LinguaLearn collects and how it is used.",
+      "s1Title": "1. Information we collect",
+      "s1p1": "When registering an account: email, full name, password (or basic information from Google if signing in with Google — only email/name/avatar under the standard OAuth scope, with no access to other Google data).",
+      "s1p2": "During use: avatar, headline, bio, preferred display language, learning progress, transaction history.",
+      "s1p3": "Instructor accounts only: national ID number and contact address — kept solely for internal records; see more in the <link>Terms of Service</link>.",
+      "s2Title": "2. Public profile visibility settings",
+      "s2p1": "On the <link>Profile</link> page, you can separately turn public display of \"Learned courses\" and \"Wishlist\" on or off on your public profile page. Both are on by default when an account is created.",
+      "s3Title": "3. Session storage",
+      "s3p1": "The system <b>does not use tracking cookies</b>. The login session is maintained by an access token (JWT) stored in the browser's local storage (localStorage) — details in the <link>Cookie Policy</link>.",
+      "s4Title": "4. Sharing data with third parties",
+      "s4p1": "LinguaLearn does not sell or share personal data with third parties except for payment processing (PayOS payment gateway) and sign-in authentication (Google OAuth, if you choose to use it).",
+      "s5Title": "5. Data deletion requests",
+      "s5p1": "Currently, account deletion can only be performed by an Administrator. If you want to request deletion of your account and related data, please contact us via the support email at the bottom of the page.",
+      "s6Title": "6. Policy changes",
+      "s6p1": "This policy may be updated when the system adds new features that involve user data."
+    },
+    "refund": {
+      "title": "Refund Policy",
+      "intro": "Applies to disputes submitted from 11/11/2026 (sections 4 and 6 added from 14/11/2026). The figures below are the current levels; administrators may adjust them and updates will be posted on this page.",
+      "s1Title": "1. When you can get a refund",
+      "s1p1": "You are eligible to be considered for a <b>100%</b> refund of the amount paid if you meet both conditions: the request is submitted within <b>7 days</b> of the successful payment date, and you have completed <b>no more than 20%</b> of the course content. If the last day of the period falls on a Saturday, Sunday or public holiday, the deadline is extended to the end of the next working day.",
+      "s1p2": "These are the conditions for a request to be considered <em>eligible</em>; the final decision is made by an administrator after reviewing both your input and the instructor's response.",
+      "s2Title": "2. Technical errors are reviewed separately",
+      "s2p1": "The following cases are not limited by the deadline or learning progress: being charged twice for the same order, being charged but not enrolled in the course, or a system error that prevents you from using the purchased course. Please choose the correct issue type when submitting a dispute and attach evidence (photos/videos).",
+      "s3Title": "3. Process",
+      "s3i1": "Go to <link>Transaction dispute</link>, choose the transaction, issue type, description and attach evidence.",
+      "s3i2": "The course's instructor is notified and has <b>48 hours</b> to respond (agree or object, with evidence).",
+      "s3i3": "An administrator reviews both sides and decides. The result, with reasons, is sent by email and shown on the dispute page.",
+      "s3i4": "If a refund is approved, we transfer <b>the full 100%</b> of the amount paid to the account you provided. LinguaLearn pays the transfer fee, so your refund is not reduced. We will notify you once it has been transferred.",
+      "s3p1": "Each transaction can only have one dispute. If you were told the money was transferred but have not received it, you can report it once within 7 days.",
+      "s4Title": "4. Refund account and your responsibility",
+      "s4p1": "When submitting a dispute, you choose the bank, enter the account number (twice), the account holder name and <b>confirm this is your own account</b>. The refund is transferred <b>exactly as per the information you provide</b>, so you are responsible for its accuracy.",
+      "s4i1": "If you enter the wrong number but it is still a real account, the money will go to that account and recovery is very difficult; we are not responsible for transfers made exactly per the information you confirmed.",
+      "s4i2": "If the account number does not exist or the bank rejects it, the transfer cannot be completed; we will contact you via notification/email to update the information before transferring.",
+      "s4i3": "If you do not fill in account information when submitting a dispute, you need to contact support to add it before receiving the money.",
+      "s4p2": "The status <em>\"Approved · awaiting transfer\"</em> means the request was accepted but the money has <b>not</b> been transferred yet; only when <em>\"Refunded\"</em> is shown has the money been sent, and you receive a transfer reference.",
+      "s5Title": "5. After a refund",
+      "s5i1": "Access to the course is revoked; the course certificate (if any) is revoked and your review of the course is hidden.",
+      "s5i2": "If you purchase this course again later, your previous learning progress is restored.",
+      "s5i3": "Each course can only be refunded once per learner. Repeated refunds may be reviewed and restricted.",
+      "s6Title": "6. Responsibility between the platform and instructors",
+      "s6p1": "You always receive back the full amount paid. How much the instructor and the platform each bear is set out in the <link>Revenue Share Policy</link> and does not affect the amount you get back."
+    },
+    "revenue": {
+      "title": "Instructor Revenue Share Policy",
+      "intro": "Applies from 20/09/2026 to new transactions. The rate is determined at the time of successful payment.",
+      "s1Title": "1. Learners discover courses via the platform (Organic)",
+      "s1p1": "When a learner finds and buys a course directly through LinguaLearn's search/category browsing: the Instructor receives <b>37%</b> of the revenue and the platform keeps <b>63%</b> to operate the system.",
+      "s2Title": "2. Learners buy via a personal share link (Referral)",
+      "s2p1": "Each course has its own share link (referral link) that the Instructor can promote on their own channels (Facebook, YouTube, personal blog, etc.). When a learner buys the course through this link: the Instructor receives <b>97%</b> of the revenue and the platform keeps only <b>3%</b> as an infrastructure maintenance fee.",
+      "s3Title": "3. Rate recording",
+      "s3p1": "The share rate is locked at the moment the order becomes paid and is not applied retroactively to earlier transactions. The two rates above are current levels; administrators may adjust them and the new levels apply only to transactions made after the adjustment. Transactions made before 20/09/2026 keep the old rate (30% platform / 70% Instructor) as at the time they occurred.",
+      "s4Title": "4. Holding period",
+      "s4p1": "Earnings from each order are held for the refund period plus 3 processing days before being counted into the withdrawable balance, to ensure learners have enough time to submit refund requests and for those requests to be processed.",
+      "s5Title": "5. When an order is refunded",
+      "s5p1": "The learner always receives the full amount paid. The portion the Instructor must repay depends on the cause:",
+      "s5i1": "<b>Default:</b> the Instructor repays exactly the earnings received from that order (e.g. a 1.000.000đ course sold at the 37% organic rate: the Instructor repays 370.000đ). Applies to change of mind within the deadline, system errors, duplicate payments, and failure to enroll.",
+      "s5i2": "<b>Platform fault:</b> when the learner was able to use the course but the issue lies with the platform, the Instructor's earnings are not deducted.",
+      "s5i3": "<b>Instructor fault:</b> applies only when there is a named violation with evidence (see section 6); the Instructor repays <b>100% of the order value</b> (with no extra fees or other formula), with the reason and evidence recorded.",
+      "s5p2": "The deducted amount is recorded against the Instructor's earnings. If the earnings were already paid out, the Instructor's balance may go negative and is offset against later earnings. The Instructor is notified and has 48 hours to respond with evidence before an administrator decides.",
+      "s6Title": "6. Standards for holding Instructors responsible",
+      "s6p1": "The administrator selects a <b>fixed reason code</b>, each code paired with only one responsibility mode:",
+      "s6i1": "<b>Default mode:</b> the learner changed their mind within the deadline, or another reason where no one is at fault.",
+      "s6i2": "<b>Platform bears it:</b> technical errors, duplicate payments, non-enrollment, faults on the platform side.",
+      "s6i3": "<b>Instructor bears it all:</b> only for copyright infringement, content that differs seriously from the description, or prohibited content. A reason note, clear evidence, and the Instructor having been notified and given the chance to respond (responded or the response period expired) before the decision are mandatory.",
+      "s6p2": "The Instructor is always notified of the deducted amount along with the reason, notes and evidence. For an \"Instructor bears it all\" decision, the Instructor may <b>appeal once within 7 days</b> of the refund approval; the administrator either upholds the decision or reduces it to the default mode (in which case the excess penalty is returned to the balance). The system only sends an alert when a course has a high refund rate for an administrator to review; the system never automatically deducts money or removes a course.",
+      "s7Title": "7. Debt",
+      "s7p1": "When the deducted amount exceeds the available balance, the Instructor's balance goes negative and that negative amount is a <b>debt</b>. New revenue is automatically offset against the debt once its holding period ends, and during the debt the Instructor can still sell courses normally. The Instructor can also <b>repay voluntarily</b> via a PayOS QR code, partially or in full; the system records the exact amount paid.",
+      "s7i1": "<b>As soon as it arises:</b> the Instructor is notified and the Earnings page shows the debt with its reason.",
+      "s7i2": "<b>More than 30 days unpaid:</b> new courses cannot be published and promotions cannot be registered for the time being.",
+      "s7i3": "<b>More than 90 days:</b> courses temporarily stop accepting new enrollments; learners who have already purchased continue to learn normally and their rights are not affected.",
+      "s7i4": "While a dispute is pending, the above restrictions are suspended. Once the debt is cleared, all restrictions are lifted.",
+      "s7i5": "Debt does not lead to account locking or a violation flag. An administrator may write off the debt with a recorded reason.",
+      "s7p2": "The 30-day and 90-day thresholds are current levels, may be adjusted and will be updated on this page.",
+      "s8Title": "8. Withdrawals and payout accounts",
+      "s8i1": "Verified Instructors can link up to 5 bank accounts and choose one default account to receive money.",
+      "s8i2": "Adding an account, or changing the bank/account number, requires email confirmation. Changing only the account holder name or the default account takes effect immediately.",
+      "s8i3": "The minimum withdrawal is 100.000đ; withdrawal requests require email confirmation and are paid out in batches (by default on the 5th and 20th of each month).",
+      "s8i4": "Each withdrawal request stores the account at the time it is created, so changing the default account later does not affect pending requests. A request not yet approved can be switched to another account (for example when a bank is under maintenance).",
+      "s8i5": "Transfers are made exactly per the confirmed account information; the Instructor is responsible for its accuracy. If the bank rejects it, the amount is returned to the balance so the Instructor can choose another account and resubmit the request.",
+      "s9Title": "9. Transfer fees",
+      "s9p1": "Transfer fees incurred when Instructors withdraw money or learners are refunded are <b>borne by LinguaLearn</b> and are already included in the platform's share in sections 1 and 2. This fee is not deducted further from the Instructor's earnings: the amount you request to withdraw is exactly the amount you receive."
+    }
+  },
+  "errors": {
+    "api": {
+      "requestFailed": "Request failed with status {status}",
+      "networkError": "Could not connect to the server",
+      "uploadCancelled": "Upload cancelled",
+      "noRefreshToken": "No refresh token available"
+    },
+    "toast": {
+      "flashcards": {
+        "progressFailed": "Failed to update review progress",
+        "updated": "Flashcard updated!",
+        "updateFailed": "Failed to update flashcard",
+        "added": "New flashcard added!",
+        "addFailed": "Failed to add flashcard",
+        "deleted": "Flashcard deleted!",
+        "deleteFailed": "Failed to delete flashcard"
+      },
+      "bundles": {
+        "created": "Course bundle created successfully",
+        "createFailed": "Could not create the course bundle",
+        "updated": "Course bundle updated",
+        "updateFailed": "Could not update the course bundle",
+        "deleted": "Course bundle deleted.",
+        "archived": "This bundle already has buyers, so it was archived: it is no longer for sale and is hidden from the list, while order history is kept.",
+        "deleteFailed": "Could not delete the course bundle. Please try again."
+      },
+      "coupons": {
+        "created": "Coupon created",
+        "createFailed": "Could not create the coupon, please try again later.",
+        "updated": "Coupon updated",
+        "updateFailed": "Could not update the coupon, please try again later.",
+        "deleted": "Coupon deleted",
+        "deleteFailed": "Could not delete the coupon, please try again later."
+      },
+      "user": {
+        "profileUpdated": "Profile updated",
+        "profileUpdateFailed": "Could not update your profile, please try again later.",
+        "avatarUpdated": "Profile photo updated",
+        "avatarUploadFailed": "Could not upload the photo, please try again later.",
+        "updateFailed": "Could not update, please try again later."
+      },
+      "cart": {
+        "addFailed": "Could not add to cart, please try again later.",
+        "removeFailed": "Could not remove from cart, please try again later."
+      },
+      "wishlist": {
+        "addFailed": "Could not add to your wishlist, please try again later.",
+        "removeFailed": "Could not remove from your wishlist, please try again later."
+      },
+      "instructor": {
+        "upgradeFailed": "Could not upgrade your account, please try again later.",
+        "verifyFailed": "Could not submit your verification details, please try again later."
+      },
+      "tutor": {
+        "readFileFailed": "Could not read the file",
+        "quotaExceeded": "You've used all your questions for today, come back tomorrow.",
+        "noResponse": "The AI tutor is not responding right now, please try again in a few minutes.",
+        "pinFailed": "Could not pin this conversation."
+      },
+      "upload": {
+        "failed": "Upload failed, please try again later."
+      },
+      "google": {
+        "failed": "Google sign-in failed",
+        "success": "Signed in successfully!",
+        "error": "Sign-in error: {message}",
+        "generic": "Something went wrong"
+      }
+    },
+    "lib": {
+      "materialOfficialUsed": "Official — In use in {count} places",
+      "materialOfficialDistributed": "Official — Distributed",
+      "materialPending": "Waiting to be processed",
+      "materialProcessing": "Processing",
+      "materialFailed": "Content generation failed",
+      "payosFailure": {
+        "TRANSIENT": "temporary issue on the bank/PayOS side",
+        "ACCOUNT": "problem with the receiving account",
+        "UNKNOWN": "cause unknown"
+      },
+      "retryAfter": "Retry payout after {time}",
+      "payosLocked": "PayOS payout locked",
+      "fileArchive": "Archive",
+      "growth": {
+        "start": "Revenue started this period",
+        "none": "No revenue yet",
+        "flat": "Revenue unchanged from the previous period",
+        "up": "Revenue up {percent}% from the previous period",
+        "down": "Revenue down {percent}% from the previous period"
+      }
+    }
+  },
+  "exam": {
+    "history": {
+      "invalidId": "Invalid exam ID",
+      "title": "Exam attempt history",
+      "attemptNo": "Attempt",
+      "submittedAt": "Submitted on",
+      "score": "Score",
+      "correctCount": "Correct answers",
+      "optionLabel": "Attempt {n} — {score}/10 ({correct}/{total} questions)",
+      "back": "← Back",
+      "loadError": "An error occurred while loading history",
+      "loading": "Loading history...",
+      "empty": "You have no attempts for this exam yet.",
+      "loadingDetail": "Loading attempt details...",
+      "correct": "Correct",
+      "wrong": "Wrong",
+      "blank": "Unanswered",
+      "answered": "Answered",
+      "prevPage": "Previous page",
+      "nextPage": "Next page",
+      "pageOf": "Page {page}/{total}",
+      "detailError": "Could not load details",
+      "pickAttempt": "Select an attempt to view details",
+      "matrix": "Result matrix",
+      "loadingShort": "Loading..."
+    },
+    "page": {
+      "defaultTitle": "Quiz",
+      "videoUploadWarn": "Could not save the proctoring video (does not affect your exam score)",
+      "aiError": "Error calling AI. Please try again.",
+      "aiExplainError": "Error getting the explanation from AI.",
+      "archivedSaved": "Your submission was saved to the Gradebook. This exam has now been archived by the instructor.",
+      "revoked": "This exercise was revoked by the instructor.",
+      "removedEnded": "This exercise was removed or updated by the instructor. The session has ended.",
+      "submitError": "Error submitting. Please try again.",
+      "violationExceeded": "You have violated the rules more than {max} times. The system is submitting automatically!",
+      "violationWarn": "Violation warning ({count}/{max}): {reason}",
+      "violationAiWarn": "AI Vision warning ({count}/{max}): camera anomaly",
+      "vTabSwitch": "Switched tab or minimized the browser",
+      "vWindowBlur": "Switched to another window/app",
+      "vFullscreenExit": "Exited fullscreen mode",
+      "vCopyPaste": "Tried to copy/paste or open the right-click menu",
+      "vDevtools": "DevTools detected as open",
+      "vIdle": "No interaction for too long",
+      "vAudio": "Abnormally long speech detected",
+      "screenShareSkipped": "You skipped screen sharing — the exam continues, but there will be no evidence video to review later.",
+      "permissionDenied": "You must grant Camera & Microphone access to take this exam!",
+      "startedProctored": "Exam started. Please do not switch tabs!",
+      "started": "Exam started!",
+      "removedToast": "This exercise was removed or updated by the instructor.",
+      "loadQuizError": "Could not load the exam.",
+      "timeUp": "⏱ Time is up! The exam was submitted automatically.",
+      "elapsedMinSec": "{m} min {s} sec",
+      "elapsedSec": "{s} sec",
+      "resultPassed": "Excellent! Exam completed",
+      "resultSubmitted": "Exam submitted",
+      "statCorrect": "Correct",
+      "statWrong": "Wrong",
+      "statTotal": "Total questions",
+      "statTime": "Time",
+      "submittedAt": "📅 Submitted at: {time}",
+      "backToCourse": "Back to course",
+      "backToHistory": "Back to exam history",
+      "detailsTitle": "Attempt details (Socratic Tutor)",
+      "questionN": "Question {n}",
+      "correctMark": "Correct ✓",
+      "wrongMark": "Wrong ✕",
+      "recorded": "Recorded",
+      "blank": "Unanswered",
+      "topic": "Topic: {topic}",
+      "youChose": "(Your choice)",
+      "correctAnswer": "(Correct answer)",
+      "askTutor": "Ask the AI Tutor why it is wrong?",
+      "reviewTheory": "Review the theory ↗",
+      "tutorExplains": "AI Tutor explains:",
+      "thinking": "Thinking...",
+      "prevPage": "Previous page",
+      "nextPage": "Next page",
+      "pageOf": "Page {page}/{total}",
+      "myCourses": "My courses",
+      "quizType": "Multiple choice",
+      "quizTypeProctored": "Multiple choice - Camera proctored",
+      "opensAt": "Opens:",
+      "closesAt": "Closes:",
+      "unlimited": "Unlimited",
+      "questionCountLabel": "Questions:",
+      "questionCountValue": "{count} questions",
+      "durationLabel": "Duration:",
+      "durationValue": "{n} min",
+      "attemptsLabel": "Attempts:",
+      "attemptsValue": "{n} times",
+      "proctoredNote": "To take this quiz you must turn on the Camera so AI can proctor. You may not switch tabs or leave the screen.",
+      "officialScore": "Your official score",
+      "officialNote": "The system records the highest score among your attempts.",
+      "scorePoints": "{score} points (out of 10)",
+      "previousTitle": "Overview of your previous attempts",
+      "colAttempt": "Attempt",
+      "colStatus": "Status",
+      "colResult": "Result",
+      "colReview": "Review",
+      "noAttempts": "You have no attempts for this exam yet.",
+      "done": "Done",
+      "submittedOn": "Submitted {time}",
+      "questionsUnit": "questions",
+      "scoreOnly": "Score only",
+      "noReviewTitle": "This exam does not allow reviewing answers",
+      "viewDetails": "View details",
+      "preparing": "Preparing...",
+      "continueAttempt": "Continue the exam",
+      "notOpen": "The exam is not open yet. Please come back later.",
+      "closed": "The exam is closed. You can no longer take it.",
+      "archivedQuiz": "This exam was revoked or deleted by the instructor.",
+      "archivedHistoryOnly": "You can only view your attempt history.",
+      "noAttemptsLeft": "No attempts left ({done}/{max})",
+      "startNew": "Start a new attempt",
+      "startWithCamera": "Turn on Camera & start exam",
+      "loadingModel": "Loading AI model...",
+      "completeAll": "Please complete all questions before submitting",
+      "submittingWait": "Submitting, please wait...",
+      "roomProctored": "Online Exam Room (Proctored)",
+      "roomPlain": "Multiple-Choice Exam",
+      "quizCode": "Exam code: {id}",
+      "violationLabel": "Violation warnings",
+      "confirmTitle": "Confirm submission",
+      "answered": "Answered: <b>{done}/{total}</b> questions",
+      "answeredMark": "✅ Answered",
+      "unansweredMark": "❌ Not answered",
+      "prev": "Previous",
+      "next": "Next",
+      "submitting": "Submitting...",
+      "confirmSubmit": "Confirm and submit",
+      "backToExam": "Back to the exam",
+      "questionHeading": "Question {n}",
+      "flagForReview": "Flag for review",
+      "multipleHint": "(Select multiple answers)",
+      "faceDetecting": "Scanning face...",
+      "faceOk": "AI Proctoring Camera (Normal)",
+      "faceNone": "WARNING: NO FACE DETECTED",
+      "faceMultiple": "WARNING: MULTIPLE FACES DETECTED",
+      "faceTurned": "WARNING: HEAD TURNED / LOOKING AWAY FROM SCREEN",
+      "submitExam": "Submit exam",
+      "unavailableTitle": "The exam is no longer available",
+      "scoreShort": "{score} points"
+    }
+  },
+  "live": {
+    "picker": {
+      "noneLabel": "Original audio",
+      "chooseOther": "← Choose another language",
+      "chooseVoice": "Choose a voice for <b>{language}</b> — you are the first to pick this language, and the voice will be shared with everyone who listens afterwards.",
+      "searchPlaceholder": "Search languages…",
+      "noLanguage": "No languages found",
+      "sourceTitle": "The instructor is speaking this language — nothing to translate",
+      "source": " (original)",
+      "delayHint": "Dubbed audio may lag the video by a few seconds."
+    },
+    "feedCard": {
+      "upcoming": "Upcoming"
+    },
+    "chat": {
+      "title": "Live chat",
+      "empty": "No messages yet.",
+      "instructor": "Instructor",
+      "anonymous": "Anonymous",
+      "hideTitle": "Hide this message",
+      "hide": "Hide",
+      "placeholder": "Type a message…",
+      "loginPlaceholder": "Log in to chat",
+      "send": "Send",
+      "loginAction": "send messages during the live session"
+    },
+    "requireLogin": {
+      "title": "Login required",
+      "body": "You need to log in to {action}. You can watch the live session without logging in.",
+      "login": "Log in",
+      "register": "Create a new account",
+      "later": "Maybe later"
+    },
+    "banner": {
+      "liveNow": "Live now: ",
+      "upcoming": "Going live soon: ",
+      "scheduled": "Scheduled {time}",
+      "watch": "Watch now →"
+    }
+  },
+  "disputes": {
+    "page": {
+      "statusOpen": "Not yet processed",
+      "statusRefunded": "Refunded",
+      "statusRejected": "Rejected",
+      "statusReopened": "Awaiting re-processing",
+      "badgePending": "Approved · awaiting transfer",
+      "badgeAwaitingAccount": "Account update needed",
+      "catChangedMind": "I changed my mind / the course is not suitable",
+      "catContentMismatch": "Content differs from the description",
+      "catTechnicalError": "Technical error (cannot access the course...)",
+      "catDoubleCharge": "Charged twice",
+      "catNotEnrolled": "Charged but not enrolled",
+      "catOther": "Other reason",
+      "filterAll": "All",
+      "filterProcessing": "Processing",
+      "filterAwaiting": "Awaiting transfer",
+      "filterRefunded": "Refunded",
+      "filterRejected": "Rejected",
+      "loadError": "Could not load transaction data.",
+      "pickBank": "Please choose the bank to receive the refund.",
+      "accountDigits": "The account number must contain digits only (6–20 digits).",
+      "accountMismatch": "The two account number entries do not match.",
+      "holderRequired": "Please enter the account holder name.",
+      "ownRequired": "You need to confirm this is your own account.",
+      "reopenSuccess": "Your review request has been sent; the support team will handle it as soon as possible.",
+      "reopenError": "Could not send the request, please try again.",
+      "maxFiles": "You can attach at most {max} evidence files.",
+      "submitSuccess": "Dispute submitted. We will reply by email once it has been processed.",
+      "submitError": "Could not submit the dispute, please try again.",
+      "loading": "Loading...",
+      "title": "Refund request / Transaction dispute",
+      "intro": "Choose the right transaction, describe the issue and attach evidence if any. Please read the <link>refund policy</link> before submitting.",
+      "tabsLabel": "Refund request area",
+      "tabCreate": "Create new request",
+      "tabMine": "My requests",
+      "needsAction": "{count} need action",
+      "pickTitle": "Create new request — choose a transaction",
+      "pickDesc": "Only successfully paid transactions are shown. Choose one to fill in the request details.",
+      "paySearchPlaceholder": "Search by course name or transaction code",
+      "paySearchLabel": "Search transactions",
+      "noPayMatch": "No transactions match the keyword.",
+      "noPaid": "You have no successfully paid transactions to dispute.",
+      "txnLine": "Txn code: {ref} · {amount}đ",
+      "alreadyDisputed": "A dispute is already pending",
+      "changeTxn": "Change transaction",
+      "categoryLabel": "Issue type *",
+      "categoryNote": "Refunds apply within the deadline and learning-progress limits per the policy; technical errors are reviewed separately. The course's instructor will be notified and may respond before we decide.",
+      "reasonLabel": "Reason *",
+      "reasonPlaceholder": "e.g. Charged but could not enroll in the course",
+      "descriptionLabel": "Detailed description",
+      "accountLegend": "Refund receiving account (recommended)",
+      "accountWarning": "The refund is transferred exactly per the information you provide. Please enter it very carefully: if the account number is wrong but still a real account, the money will go to someone else and be hard to recover. If you skip this step, you will need to contact support to add it before receiving the money.",
+      "bankLabel": "Bank",
+      "bankPlaceholder": "Choose a bank",
+      "accountNumber": "Account number",
+      "accountNumberAgain": "Re-enter account number",
+      "accountHolder": "Account holder name",
+      "ownConfirm": "I confirm this is my own account, the information is correct and I am responsible for its accuracy.",
+      "evidenceLabel": "Evidence (photos/videos, up to {max} files)",
+      "termsText": "I confirm the information declared above is true and agree to the <link>refund policy</link>.",
+      "submitting": "Sending...",
+      "submit": "Submit dispute",
+      "mineDesc": "Track the status of the refund requests you have created.",
+      "disputeSearchPlaceholder": "Search by course, transaction code or reason",
+      "disputeSearchLabel": "Search requests",
+      "filterByStatus": "Filter by status",
+      "noneYet": "You have not created any requests yet. <button>Create new request</button>",
+      "noDisputeMatch": "No requests match the filter.",
+      "disputeLine": "Txn code: {ref} — {reason}",
+      "categoryLine": "Issue type: {category}",
+      "instructorAgreed": "The instructor has agreed to the refund.",
+      "instructorObjected": "The instructor has sent a response.",
+      "awaitingSupport": "Waiting for the support team to review and decide.",
+      "approvedNote": "The refund request has been accepted and access to the course has been revoked. The system will pay the refund to the account you declared and notify you by email/notification when done.",
+      "transferredTo": "The refund has been transferred to account {account}. If you have not received it, you can report it below.",
+      "transferredToDefault": "The refund has been transferred to the account you registered. If you have not received it, you can report it below.",
+      "supportReply": "Response from the support team",
+      "notReceived": "I have not received the money",
+      "reopenPrompt": "Please describe in more detail (e.g. bank, time you checked)",
+      "sendReopen": "Send review request",
+      "cancel": "Cancel"
+    }
+  },
+  "learnPage": {
+    "lockedNotice": "{feature} is only for learners who own the course.",
+    "buyNow": "Buy the course now",
+    "featureTutor": "AI Tutor",
+    "featurePath": "Personalized learning path",
+    "featureQna": "Lesson Q&A",
+    "featureMaterials": "Materials",
+    "stageAsr": "Extracting speech (STT)",
+    "stageTranslate": "Translating content",
+    "stageTts": "Synthesizing voice",
+    "stageUploading": "Saving this segment's file",
+    "stepPrepare": "Downloading & analyzing source audio",
+    "stepFinalize": "Merging & saving the final file",
+    "chunkWaiting": "Segment {n}/{total} — waiting to be processed",
+    "chunkStage": "Segment {n}/{total} — {stage}",
+    "chunkPlain": "Segment {n}/{total}",
+    "dubCancelled": "Dubbing cancelled as requested.",
+    "dubSkipped": "This lesson has no speech to dub.",
+    "dubFailed": "Dubbing failed, please try again later.",
+    "dubCancelError": "Could not cancel dubbing, please try again.",
+    "resumeError": "Could not take back playback.",
+    "loadingLesson": "Loading lesson...",
+    "lessonNotFound": "Lesson not found, or this lesson requires owning the course to view.",
+    "backToCourses": "← Back to course catalog",
+    "selectedLanguage": "the selected language",
+    "nextLesson": "Moving on to the next lesson…",
+    "activateError": "Could not activate dubbing, please try again.",
+    "switching": "Switching lesson...",
+    "studentFallback": "Learner",
+    "gradebookOwner": "The gradebook is for learners only.",
+    "viewClassGradebook": "View the class gradebook",
+    "deviceTitle": "Another device detected",
+    "deviceDesc": "The video was paused because your account is playing video on another device.",
+    "deviceResume": "Continue playing here",
+    "loadingUi": "Loading interface..."
+  },
+  "instructorChat": {
+    "toggleClose": "Close the AI instructor assistant",
+    "toggleOpen": "Open the AI instructor assistant",
+    "title": "AI Instructor Assistant",
+    "heading": "AI Instructor Assistant",
+    "ready": "Ready to help analyze your courses",
+    "close": "Close assistant",
+    "welcome": "Hello! I can help you analyze learner data, review ratings, or suggest ways to improve your courses. What do you need help with?",
+    "revenue": "Revenue:",
+    "avgRating": "Average rating:",
+    "positive": "Positive: {count}",
+    "negative": "Negative: {count}",
+    "placeholder": "Ask the assistant (e.g. This month's revenue?)...",
+    "maxLength": "You have reached the limit of {max} characters per message.",
+    "noReply": "No response.",
+    "connectionError": "Sorry, I am having trouble connecting to the AI. Please check and try again."
+  },
+  "promotionPanel": {
+    "submitted": "Registration sent. An administrator will review it and get back to you.",
+    "submitError": "Could not send the registration.",
+    "cancelled": "Registration cancelled.",
+    "cancelError": "Could not cancel the registration.",
+    "title": "Platform promotion",
+    "intro": "Sign up to have the platform feature your course on the \"Recommended\" shelf on the home page for a period of time. Free, voluntary, and approved by an administrator.",
+    "course": "Course",
+    "pickCourse": "Choose a published course",
+    "searchCourse": "Search courses...",
+    "placement": "Placement",
+    "note": "Note (optional)",
+    "sending": "Sending...",
+    "submit": "Submit promotion request",
+    "loading": "Loading...",
+    "empty": "You have no promotion requests yet.",
+    "running": "Running",
+    "adminNote": "Administrator: {note}",
+    "effect": "Estimated impact: {ordersDuring} orders ({revenueDuring}) during the run versus {ordersBefore} orders ({revenueBefore}) in an equal period right before.",
+    "withdraw": "Withdraw promotion",
+    "cancel": "Cancel request",
+    "status": {
+      "REQUESTED": "Pending review",
+      "APPROVED": "Approved",
+      "REJECTED": "Rejected",
+      "CANCELLED": "Cancelled",
+      "ENDED": "Ended"
+    },
+    "placements": {
+      "HOME_FEATURED": "Home page \"Recommended\" shelf",
+      "CATEGORY_FEATURED": "Top of category page"
+    }
+  },
+  "messaging": {
+    "inbox": {
+      "conversations": "Conversations",
+      "searchPlaceholder": "Search by name, content...",
+      "sort": "Sort",
+      "newest": "Newest",
+      "oldest": "Oldest",
+      "loading": "Loading...",
+      "noMatch": "No matching conversations found.",
+      "empty": "No conversations yet.",
+      "pickOne": "Select a conversation to view messages",
+      "back": "Back to the conversation list",
+      "messagePlaceholder": "Type a message..."
+    }
+  },
+  "refundAccount": {
+    "pickBank": "Please choose a bank.",
+    "digitsOnly": "The account number must contain digits only (6–20 digits).",
+    "mismatch": "The two account numbers do not match.",
+    "needHolder": "Please enter the account holder name.",
+    "needOwn": "You must confirm this is your own account.",
+    "updated": "Refund account updated.",
+    "updateError": "Could not update the account.",
+    "declared": "Declared account: {summary}",
+    "change": "Change refund account",
+    "bank": "Bank",
+    "chooseBank": "Choose a bank",
+    "number": "Account number",
+    "numberAgain": "Re-enter account number",
+    "holder": "Account holder name",
+    "own": "I confirm this is my own account and the information above is correct.",
+    "saving": "Saving...",
+    "save": "Save account",
+    "cancel": "Cancel",
+    "help": "Need help? Send a support request"
+  },
+  "discovery": {
+    "chat": {
+      "maxLength": "You have reached the limit of {max} characters per message.",
+      "noReply": "No response.",
+      "connectionError": "Sorry, I am having trouble connecting to the AI. Please check and try again.",
+      "toggleClose": "Close the course finder assistant",
+      "toggleOpen": "Open the course finder assistant",
+      "subtitle": "Search for courses in natural language",
+      "welcome": "Hello! I am an AI assistant. What course would you like to find today?",
+      "allLevels": "All levels",
+      "placeholder": "e.g. IT courses for beginners..."
+    }
+  },
+  "shareDialog": {
+    "copyFailed": "Your browser does not allow automatic copying — please select and copy the link manually.",
+    "title": "Share course",
+    "referral": "This link carries your personal referral code: purchases made through it are counted as your referrals.",
+    "linkAria": "Course link",
+    "copyTitle": "Copy link",
+    "copied": "Copied",
+    "copy": "Copy",
+    "qrTitle": "Show a QR code to scan with your phone",
+    "hideQr": "Hide QR code",
+    "showQr": "QR code",
+    "qrOf": "QR code for {title}",
+    "nativeTitle": "Share via an app on your device",
+    "share": "Share",
+    "via": "Share via {channel}"
   }
 }

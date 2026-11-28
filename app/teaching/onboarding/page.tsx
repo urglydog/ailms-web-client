@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -8,6 +9,7 @@ import { useBecomeInstructor, useInstructorVerificationStatus, useSubmitInstruct
 import { getCurrentRole } from '@/lib/auth/token';
 import { ApiError } from '@/lib/api/client';
 
+// Giá trị đáp án được lưu/gửi lên API nguyên văn; chỉ nhãn hiển thị được dịch (xem optionLabel).
 const TEACHING_EXPERIENCE_OPTIONS = ['Trực tiếp, không chính thức', 'Trực tiếp, chuyên nghiệp', 'Online', 'Ý khác'];
 const VIDEO_EXPERIENCE_OPTIONS = ['Tôi là người mới', 'Tôi có một chút kiến thức', 'Tôi có kinh nghiệm', 'Tôi có video sẵn sàng để tải lên'];
 const AUDIENCE_OPTIONS = ['Không phải lúc này', 'Tôi có một lượng người theo dõi nhỏ', 'Tôi có lượng người theo dõi khá lớn'];
@@ -27,10 +29,11 @@ const TOTAL_STEPS = 4;
  * Bước 4 (form xác minh định danh) tái dùng NGUYÊN các hook/API đã có
  * (`useBecomeInstructor`/`useSubmitInstructorVerification`) — trước đây form này nằm trong
  * `/profile`, giờ dời hẳn vào đây (xem yêu cầu "xóa chức năng trở thành giảng viên ở hồ sơ").
- * Bấm "Hoàn tất" gọi TUẦN TỰ: nâng role (nếu đang là Học viên) → làm mới JWT → gửi xác minh —
+ * Bấm t('finish') gọi TUẦN TỰ: nâng role (nếu đang là Học viên) → làm mới JWT → gửi xác minh —
  * đúng thứ tự bắt buộc vì endpoint xác minh yêu cầu role Giảng viên.
  */
 export default function BecomeInstructorWizard() {
+  const t = useTranslations('instructor.onboarding');
   const router = useRouter();
   const { data: currentUser, isLoading: userLoading } = useCurrentUser();
   const isAlreadyInstructor = currentUser?.role === 'INSTRUCTOR';
@@ -79,12 +82,12 @@ export default function BecomeInstructorWizard() {
       });
       setStep(4);
     } catch (err) {
-      setSubmitError(err instanceof ApiError ? err.message : 'Có lỗi xảy ra, vui lòng thử lại.');
+      setSubmitError(err instanceof ApiError ? err.message : t('error'));
     }
   };
 
   if (userLoading) {
-    return <div className="flex min-h-dvh items-center justify-center text-sm text-ink-muted">Đang tải...</div>;
+    return <div className="flex min-h-dvh items-center justify-center text-sm text-ink-muted">{t('loading')}</div>;
   }
 
   if (step === 4) {
@@ -99,10 +102,10 @@ export default function BecomeInstructorWizard() {
             <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-accent to-accent-dark font-display text-[13px] font-bold text-white">
               L
             </span>
-            <span className="text-[13.5px] font-semibold text-ink-muted">Bước {step + 1}/{TOTAL_STEPS}</span>
+            <span className="text-[13.5px] font-semibold text-ink-muted">{t('step', { step: step + 1, total: TOTAL_STEPS })}</span>
           </div>
           <Link href="/teaching" className="text-[13.5px] font-semibold text-accent no-underline hover:underline">
-            Thoát
+            {t('exit')}
           </Link>
         </div>
         <div className="h-[3px] w-full bg-line-soft">
@@ -116,30 +119,33 @@ export default function BecomeInstructorWizard() {
       <main className="flex flex-1 flex-col items-center px-4 pt-16 pb-10">
         {step === 0 && (
           <SurveyStep
-            title="Chia sẻ kiến thức của bạn"
-            description="Các khóa học trên LinguaLearn đều mang lại trải nghiệm học tập bằng video. Dù bạn đã có kinh nghiệm giảng dạy hay đây là lần đầu tiên, chúng tôi sẽ giúp bạn đưa kiến thức của mình vào khóa học online."
-            question="Bạn đã từng thực hiện hình thức giảng dạy nào trước đây?"
+            title={t('step1.title')}
+            description={t('step1.description')}
+            question={t('step1.question')}
             options={TEACHING_EXPERIENCE_OPTIONS}
+            optionLabel={(o) => t(`teachingOptions.${TEACHING_EXPERIENCE_OPTIONS.indexOf(o)}`)}
             value={teachingExperience}
             onChange={setTeachingExperience}
           />
         )}
         {step === 1 && (
           <SurveyStep
-            title="Tạo một khóa học"
-            description="Chúng tôi sẽ trang bị cho bạn tài nguyên, bí quyết và sự hỗ trợ để bạn tự tin quay video bài giảng, dù bạn ở mức độ kinh nghiệm nào."
-            question='Bạn sản xuất video "chuyên nghiệp" ở mức độ nào?'
+            title={t('step2.title')}
+            description={t('step2.description')}
+            question={t('step2.question')}
             options={VIDEO_EXPERIENCE_OPTIONS}
+            optionLabel={(o) => t(`videoOptions.${VIDEO_EXPERIENCE_OPTIONS.indexOf(o)}`)}
             value={videoExperience}
             onChange={setVideoExperience}
           />
         )}
         {step === 2 && (
           <SurveyStep
-            title="Mở rộng phạm vi tiếp cận của bạn"
-            description="Sau khi xuất bản khóa học, bạn có thể tăng lượng học viên bằng hoạt động marketing của riêng bạn, kết hợp với việc khóa học hiển thị trong tìm kiếm trên LinguaLearn."
-            question="Bạn có đối tượng để chia sẻ khóa học của mình không?"
+            title={t('step3.title')}
+            description={t('step3.description')}
+            question={t('step3.question')}
             options={AUDIENCE_OPTIONS}
+            optionLabel={(o) => t(`audienceOptions.${AUDIENCE_OPTIONS.indexOf(o)}`)}
             value={audience}
             onChange={setAudience}
           />
@@ -147,16 +153,15 @@ export default function BecomeInstructorWizard() {
         {step === 3 && (
           <div className="flex w-full max-w-lg flex-col gap-4">
             <div className="text-center">
-              <h1 className="m-0 font-display text-2xl font-bold text-ink">Xác minh thông tin định danh</h1>
+              <h1 className="m-0 font-display text-2xl font-bold text-ink">{t('verify.title')}</h1>
               <p className="mt-2 text-[13.5px] text-ink-muted">
-                Cần hoàn tất 1 lần duy nhất trước khi gửi khóa học đầu tiên đi duyệt — không lặp
-                lại cho các khóa sau.
+                {t('verify.intro')}
               </p>
             </div>
 
             <div>
               <label className="mb-1.5 block text-sm font-semibold text-ink">
-                Số CCCD/CMND <span className="text-danger">*</span>
+                {t('verify.idNumber')} <span className="text-danger">*</span>
               </label>
               <input
                 type="text"
@@ -167,7 +172,7 @@ export default function BecomeInstructorWizard() {
             </div>
             <div>
               <label className="mb-1.5 block text-sm font-semibold text-ink">
-                Địa chỉ thường trú <span className="text-danger">*</span>
+                {t('verify.address')} <span className="text-danger">*</span>
               </label>
               <input
                 type="text"
@@ -183,7 +188,7 @@ export default function BecomeInstructorWizard() {
                 checked={confirmed}
                 onChange={(e) => setConfirmed(e.target.checked)}
               />
-              <span>Tôi xác nhận đây là thông tin của chính mình và tôi sở hữu/có quyền chia sẻ nội dung khóa học sẽ đăng tải.</span>
+              <span>{t('verify.confirm')}</span>
             </label>
 
             {submitError && <p className="text-[13px] text-danger">{submitError}</p>}
@@ -198,7 +203,7 @@ export default function BecomeInstructorWizard() {
             onClick={() => setStep((s) => s - 1)}
             className="rounded-full border border-accent px-5 py-2.5 text-[13px] font-bold text-accent hover:bg-accent/5"
           >
-            Trước
+            {t('back')}
           </button>
         ) : (
           <span />
@@ -210,7 +215,7 @@ export default function BecomeInstructorWizard() {
             onClick={() => setStep((s) => s + 1)}
             className="rounded-full bg-accent px-5 py-2.5 text-[13px] font-bold text-white hover:bg-accent-dark"
           >
-            Tiếp tục
+            {t('next')}
           </button>
         ) : (
           <button
@@ -219,7 +224,7 @@ export default function BecomeInstructorWizard() {
             disabled={!isFormValid || isSubmitting}
             className="rounded-full bg-accent px-5 py-2.5 text-[13px] font-bold text-white hover:bg-accent-dark disabled:cursor-not-allowed disabled:opacity-40"
           >
-            {isSubmitting ? 'Đang xử lý...' : 'Hoàn tất'}
+            {isSubmitting ? t('processing') : t('finish')}
           </button>
         )}
       </footer>
@@ -228,12 +233,13 @@ export default function BecomeInstructorWizard() {
 }
 
 function SurveyStep({
-  title, description, question, options, value, onChange,
+  title, description, question, options, optionLabel, value, onChange,
 }: {
   title: string;
   description: string;
   question: string;
   options: string[];
+  optionLabel: (option: string) => string;
   value: string | undefined;
   onChange: (value: string) => void;
 }) {
@@ -256,7 +262,7 @@ function SurveyStep({
               onChange={() => onChange(option)}
               className="accent-accent"
             />
-            {option}
+            {optionLabel(option)}
           </label>
         ))}
       </div>
@@ -267,6 +273,7 @@ function SurveyStep({
 /** Trang chúc mừng cuối wizard — hiện THẲNG trên trang (không alert/modal) rồi tự chuyển sang
  * Kênh Giảng viên sau vài giây, kèm nút bấm ngay cho ai không muốn chờ. */
 function SuccessScreen() {
+  const t = useTranslations('instructor.onboarding');
   const router = useRouter();
 
   useEffect(() => {
@@ -288,17 +295,16 @@ function SuccessScreen() {
           />
         </svg>
       </div>
-      <h1 className="font-display text-2xl font-bold text-ink">Bạn đã trở thành Giảng viên!</h1>
+      <h1 className="font-display text-2xl font-bold text-ink">{t('done.title')}</h1>
       <p className="max-w-sm text-[13.5px] text-ink-muted">
-        Thông tin xác minh của bạn đã được ghi nhận. Đang chuyển đến Kênh Giảng viên để bạn bắt
-        đầu tạo khóa học đầu tiên...
+        {t('done.body')}
       </p>
       <button
         type="button"
         onClick={() => router.push('/instructor/courses')}
         className="rounded-full bg-accent px-6 py-2.5 text-[13px] font-bold text-white hover:bg-accent-dark"
       >
-        Vào Kênh Giảng viên ngay
+        {t('done.go')}
       </button>
     </div>
   );

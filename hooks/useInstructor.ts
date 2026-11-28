@@ -4,6 +4,7 @@ import { ApiError } from '@/lib/api/client';
 import { authApi } from '@/lib/api/auth';
 import { instructorApi, type SubmitVerificationReq } from '@/lib/api/instructor';
 import { getAccessToken, getCurrentRole } from '@/lib/auth/token';
+import { tr } from '@/lib/i18n/translate';
 
 const CURRENT_USER_QUERY_KEY = ['users', 'me'] as const;
 const VERIFICATION_STATUS_QUERY_KEY = ['instructor', 'verification', 'status'] as const;
@@ -38,7 +39,7 @@ export function useBecomeInstructor() {
       void queryClient.invalidateQueries({ queryKey: CURRENT_USER_QUERY_KEY });
     },
     onError: (err) => {
-      toast.error(err instanceof ApiError ? err.message : 'Không thể nâng cấp tài khoản, thử lại sau.');
+      toast.error(err instanceof ApiError ? err.message : tr('errors.toast.instructor.upgradeFailed'));
     },
   });
 }
@@ -60,7 +61,7 @@ export function useSubmitInstructorVerification() {
       void queryClient.invalidateQueries({ queryKey: VERIFICATION_STATUS_QUERY_KEY });
     },
     onError: (err) => {
-      toast.error(err instanceof ApiError ? err.message : 'Không gửi được thông tin xác minh, thử lại sau.');
+      toast.error(err instanceof ApiError ? err.message : tr('errors.toast.instructor.verifyFailed'));
     },
   });
 }

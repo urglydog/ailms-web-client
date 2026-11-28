@@ -42,6 +42,8 @@ export function CouponPicker({ coupons, loading, selectedId, onSelect }: CouponP
             <input
               type="radio"
               name="checkout-coupon"
+              value={c.id}
+              aria-label={`${label}, ${t('pickerSave', { amount: formatMoney(c.savings) })}`}
               checked={selectedId === c.id}
               onChange={() => onSelect(c.id)}
               className="mt-1 accent-[var(--accent,#1A6FE0)]"
@@ -60,6 +62,8 @@ export function CouponPicker({ coupons, loading, selectedId, onSelect }: CouponP
         <input
           type="radio"
           name="checkout-coupon"
+          value="none"
+          aria-label={t('pickerNone')}
           checked={selectedId === null}
           onChange={() => onSelect(null)}
           className="mt-1 accent-[var(--accent,#1A6FE0)]"

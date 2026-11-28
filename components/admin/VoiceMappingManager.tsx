@@ -10,6 +10,7 @@ import {
   useVoiceMappings,
 } from '@/hooks/useVoiceMappings';
 import { ApiError } from '@/lib/api/client';
+import { TableErrorRow } from '@/components/admin/ui/TableErrorRow';
 import type { VoiceMapping } from '@/types/domain';
 
 /**
@@ -21,7 +22,7 @@ import type { VoiceMapping } from '@/types/domain';
 export function VoiceMappingManager() {
   const t = useTranslations('admin.voices');
   const [pendingDelete, setPendingDelete] = useState<VoiceMapping | null>(null);
-  const { data: voices, isLoading } = useVoiceMappings();
+  const { data: voices, isLoading, isError, refetch } = useVoiceMappings();
   const createVoice = useCreateVoiceMapping();
   const updateVoice = useUpdateVoiceMapping();
   const deleteVoice = useDeleteVoiceMapping();
@@ -119,9 +120,9 @@ export function VoiceMappingManager() {
         <div role="alert" className="rounded-xl border border-danger/40 bg-surface-raised p-4 text-[13px] text-danger">{errorMessage}</div>
       )}
 
-      <div className="overflow-x-auto rounded-xl border border-line bg-surface-raised shadow-sm">
+      <div className="max-h-[70vh] overflow-auto rounded-xl border border-line bg-surface-raised shadow-sm">
         <table className="w-full min-w-[700px] text-left text-sm">
-          <thead className="bg-surface text-xs font-bold text-ink-muted uppercase">
+          <thead className="sticky top-0 z-10 bg-surface text-xs font-bold text-ink-muted uppercase">
             <tr>
               <th className="px-6 py-4">{t('cols.language')}</th>
               <th className="px-6 py-4">{t('cols.voice')}</th>
@@ -146,7 +147,8 @@ export function VoiceMappingManager() {
                 </td>
               </tr>
             )}
-            {!isLoading && voices?.length === 0 && (
+            {isError && <TableErrorRow colSpan={6} onRetry={() => void refetch()} />}
+            {!isError && !isLoading && voices?.length === 0 && (
               <tr>
                 <td colSpan={6} className="px-6 py-6 text-center text-ink-muted">
                   {t('empty')}

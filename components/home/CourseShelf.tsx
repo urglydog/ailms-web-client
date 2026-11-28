@@ -72,7 +72,7 @@ export function CourseShelf({ title, subtitle, href, courses, tone = 'plain' }: 
         </div>
         <ul
           ref={trackRef}
-          className="-mx-4 m-0 flex list-none snap-x snap-mandatory gap-5 overflow-x-auto scroll-px-4 px-4 pb-2 [scrollbar-width:none] md:mx-0 md:px-0 md:scroll-px-0"
+          className="relative -mx-4 m-0 flex list-none snap-x snap-mandatory gap-5 overflow-x-auto scroll-px-4 px-4 pb-2 [scrollbar-width:none] md:mx-0 md:px-0 md:scroll-px-0"
         >
           {visible.map((course) => (
             <li

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslations } from 'next-intl';
 import { Pager } from '@/components/ui/SearchPanel';
 import { ListSearch } from '@/components/ui/ListSearch';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -19,14 +20,15 @@ import type { Invoice } from '@/types/invoice';
 import PaymentDetailModal from './PaymentDetailModal';
 
 const GROUPS = [
-  { id: 'ALL', label: 'Tất cả' },
-  { id: 'SUCCESS', label: 'Thành công' },
-  { id: 'PENDING', label: 'Đang chờ' },
-  { id: 'FAILED', label: 'Thất bại' },
-  { id: 'REFUNDED', label: 'Hoàn tiền' },
+  { id: 'ALL', labelKey: 'groupAll' },
+  { id: 'SUCCESS', labelKey: 'groupSuccess' },
+  { id: 'PENDING', labelKey: 'groupPending' },
+  { id: 'FAILED', labelKey: 'groupFailed' },
+  { id: 'REFUNDED', labelKey: 'groupRefunded' },
 ] as const;
 
 export default function PaymentsHistoryPage() {
+  const t = useTranslations('pages.payments');
   const [group, setGroup] = useState<string>('ALL');
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebounce(search, 350);
@@ -45,8 +47,8 @@ export default function PaymentsHistoryPage() {
   const payments = data?.items ?? [];
   const totalPages = data ? Math.max(1, Math.ceil(data.total / data.size)) : 1;
   useEffect(() => {
-    if (isError) toast.error('Lỗi khi tải lịch sử giao dịch');
-  }, [isError]);
+    if (isError) toast.error(t('loadError'));
+  }, [isError, t]);
 
   // Giao dịch đã DUYỆT hoàn tiền nhưng tiền CHƯA chuyển: hiện "chờ chuyển" thay vì "Đã hoàn tiền" cho khớp trang Khiếu nại.
   const [awaitingTransfer, setAwaitingTransfer] = useState<Set<string>>(new Set());
@@ -72,7 +74,7 @@ export default function PaymentsHistoryPage() {
     try {
       saveBlob(await invoicesApi.pdf(inv.id), `${inv.number}.pdf`);
     } catch (err) {
-      toast.error(err instanceof ApiError ? err.message : 'Không tải được chứng từ. Vui lòng thử lại sau ít phút.');
+      toast.error(err instanceof ApiError ? err.message : t('invoiceError'));
     } finally {
       setDownloadingId(null);
     }
@@ -103,23 +105,23 @@ export default function PaymentsHistoryPage() {
   };
 
   const getStatusLabel = (status: string, txnRef?: string) => {
-    if (status === 'REFUNDED' && txnRef && awaitingTransfer.has(txnRef)) return 'Đã duyệt hoàn · chờ chuyển';
+    if (status === 'REFUNDED' && txnRef && awaitingTransfer.has(txnRef)) return t('statusAwaiting');
     switch (status) {
-      case 'PAID': return 'Thành công';
-      case 'PENDING': return 'Đang chờ xử lý';
-      case 'FAILED': return 'Thất bại';
-      case 'EXPIRED': return 'Hết hạn';
-      case 'REFUNDED': return 'Đã hoàn tiền';
+      case 'PAID': return t('statusPaid');
+      case 'PENDING': return t('statusPending');
+      case 'FAILED': return t('statusFailed');
+      case 'EXPIRED': return t('statusExpired');
+      case 'REFUNDED': return t('statusRefunded');
       default: return status;
     }
   };
 
   return (
     <div className="shell py-10">
-      <h1 className="font-display text-2xl font-bold text-ink mb-1">Lịch sử giao dịch</h1>
-      <p className="mb-5 text-sm text-ink-muted">Mỗi giao dịch có biên lai điện tử và, nếu được hoàn tiền, phiếu hoàn tiền để bạn tải về ngay tại đây.</p>
+      <h1 className="font-display text-2xl font-bold text-ink mb-1">{t('title')}</h1>
+      <p className="mb-5 text-sm text-ink-muted">{t('subtitle')}</p>
 
-      <div className="mb-4 flex flex-wrap items-center gap-2" role="group" aria-label="Lọc theo trạng thái">
+      <div className="mb-4 flex flex-wrap items-center gap-2" role="group" aria-label={t('filterByStatus')}>
         {GROUPS.map((g) => (
           <button
             key={g.id}
@@ -133,24 +135,24 @@ export default function PaymentsHistoryPage() {
               group === g.id ? 'bg-accent text-white' : 'border border-line bg-surface-raised text-ink-muted hover:border-accent hover:text-ink'
             }`}
           >
-            {g.label} <span className={group === g.id ? 'text-white/85' : 'text-ink-muted'}>({(data?.counts[g.id] ?? 0).toLocaleString('vi-VN')})</span>
+            {t(g.labelKey)} <span className={group === g.id ? 'text-white/85' : 'text-ink-muted'}>({(data?.counts[g.id] ?? 0).toLocaleString('vi-VN')})</span>
           </button>
         ))}
       </div>
 
       <div className="mb-5 flex flex-wrap items-end gap-3 rounded-xl border border-line bg-surface-raised p-3">
         <ListSearch
-          label="Tìm giao dịch"
+          label={t('searchLabel')}
           value={search}
           onChange={(v) => {
             setSearch(v);
             setPage(0);
           }}
-          placeholder="Mã đơn, mã cổng thanh toán hoặc tên khóa học..."
+          placeholder={t('searchPlaceholder')}
           className="sm:w-80"
         />
         <label className="flex flex-col gap-1">
-          <span className="text-xs font-semibold text-ink-muted">Từ ngày</span>
+          <span className="text-xs font-semibold text-ink-muted">{t('fromDate')}</span>
           <input
             type="date"
             value={from}
@@ -163,7 +165,7 @@ export default function PaymentsHistoryPage() {
           />
         </label>
         <label className="flex flex-col gap-1">
-          <span className="text-xs font-semibold text-ink-muted">Đến ngày</span>
+          <span className="text-xs font-semibold text-ink-muted">{t('toDate')}</span>
           <input
             type="date"
             value={to}
@@ -187,30 +189,30 @@ export default function PaymentsHistoryPage() {
             }}
             className="rounded-lg px-3 py-2 text-sm font-semibold text-accent-dark hover:bg-tint"
           >
-            Xóa bộ lọc
+            {t('clearFilters')}
           </button>
         )}
       </div>
 
       {loading ? (
-        <div className="text-ink-muted">Đang tải dữ liệu...</div>
+        <div className="text-ink-muted">{t('loading')}</div>
       ) : payments.length === 0 ? (
         <div className="card p-8 text-center text-ink-muted">
-          {group === 'ALL' && !search && !from && !to ? 'Bạn chưa có giao dịch nào.' : 'Không có giao dịch nào khớp bộ lọc.'}
+          {group === 'ALL' && !search && !from && !to ? t('empty') : t('noMatch')}
         </div>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm text-ink-muted">
             <thead className="bg-surface-raised text-xs uppercase text-ink">
               <tr>
-                <th className="px-6 py-4">Mã tham chiếu (Hệ thống)</th>
-                <th className="px-6 py-4">Mã GD Cổng thanh toán</th>
-                <th className="px-6 py-4">Khóa học</th>
-                <th className="px-6 py-4">Số tiền</th>
-                <th className="px-6 py-4">Phương thức</th>
-                <th className="px-6 py-4">Trạng thái</th>
-                <th className="px-6 py-4">Thời gian thanh toán</th>
-                <th className="px-6 py-4">Chứng từ</th>
+                <th className="px-6 py-4">{t('colRef')}</th>
+                <th className="px-6 py-4">{t('colGateway')}</th>
+                <th className="px-6 py-4">{t('colCourse')}</th>
+                <th className="px-6 py-4">{t('colAmount')}</th>
+                <th className="px-6 py-4">{t('colMethod')}</th>
+                <th className="px-6 py-4">{t('colStatus')}</th>
+                <th className="px-6 py-4">{t('colPaidAt')}</th>
+                <th className="px-6 py-4">{t('colDocs')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-line">
@@ -221,7 +223,7 @@ export default function PaymentsHistoryPage() {
                   onClick={() => setSelectedPayment(p)}
                 >
                   <td className="px-6 py-4 font-mono font-medium text-ink">{p.txnRef}</td>
-                  <td className="px-6 py-4 font-mono text-ink-muted text-sm">{p.gatewayTxnNo || 'Chưa có'}</td>
+                  <td className="px-6 py-4 font-mono text-ink-muted text-sm">{p.gatewayTxnNo || t('none')}</td>
                   <td className="px-6 py-4 font-medium text-ink max-w-[200px] truncate" title={p.courseTitle}>
                     {p.courseTitle}
                   </td>
@@ -246,15 +248,15 @@ export default function PaymentsHistoryPage() {
                             type="button"
                             disabled={downloadingId === inv.id}
                             onClick={() => downloadInvoice(inv)}
-                            title={`Tải ${inv.type === 'REFUND' ? 'phiếu hoàn tiền' : 'biên lai'} ${inv.number} (PDF)`}
+                            title={t('downloadTitle', { kind: inv.type === 'REFUND' ? t('kindRefund') : t('kindReceipt'), number: inv.number })}
                             className="rounded-lg border border-line px-2.5 py-1 text-xs font-semibold text-accent-dark hover:bg-tint disabled:opacity-50"
                           >
-                            {downloadingId === inv.id ? 'Đang tải...' : inv.type === 'REFUND' ? 'Phiếu hoàn' : 'Biên lai'}
+                            {downloadingId === inv.id ? t('downloading') : inv.type === 'REFUND' ? t('btnRefund') : t('btnReceipt')}
                           </button>
                         ) : null,
                       )}
                       {!byOrder.get(p.txnRef) && (p.status === 'PAID' || p.status === 'REFUNDED') && (
-                        <span className="text-xs text-ink-muted" title="Biên lai được tạo sau khi thanh toán hoàn tất, thường trong vài phút">Đang tạo</span>
+                        <span className="text-xs text-ink-muted" title={t('creatingHint')}>{t('creating')}</span>
                       )}
                     </div>
                   </td>

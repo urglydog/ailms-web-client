@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useQueryClient } from '@tanstack/react-query';
 import { useConversationMessages, useConversations, useSendMessage, useStartConversationAsStudent } from '@/hooks/useCommunication';
 import { Avatar } from '@/components/ui/Avatar';
@@ -26,6 +27,7 @@ const PREVIEW_AUTO_HIDE_MS = 6000;
  */
 /** {@code leftOnDesktop} (27/11/2026): trang học có cột Gia sư AI bên phải — nút nổi góc phải che nút gửi của khung chat Gia sư, nên từ `lg` chuyển sang góc trái. */
 export function MessageInstructorFloatingButton({ courseId, leftOnDesktop = false }: { courseId: number; leftOnDesktop?: boolean }) {
+  const t = useTranslations('learn.messageInstructor');
   const side = leftOnDesktop ? 'right-6 lg:left-6 lg:right-auto' : 'right-6';
   const [open, setOpen] = useState(false);
   const [conversationId, setConversationId] = useState<number | null>(null);
@@ -82,12 +84,12 @@ export function MessageInstructorFloatingButton({ courseId, leftOnDesktop = fals
           <div className="flex items-center gap-2.5 border-b border-line px-4 py-3">
             {conversation && <Avatar name={conversation.otherUserName} avatarUrl={conversation.otherUserAvatarUrl} size={28} />}
             <span className="flex-1 truncate font-display text-[14px] font-bold text-ink">
-              {conversation?.otherUserName ?? 'Nhắn tin giảng viên'}
+              {conversation?.otherUserName ?? t('title')}
             </span>
             <button
               type="button"
               onClick={() => setOpen(false)}
-              aria-label="Đóng"
+              aria-label={t('close')}
               className="text-lg text-ink-muted hover:text-ink"
             >
               ×
@@ -118,8 +120,8 @@ export function MessageInstructorFloatingButton({ courseId, leftOnDesktop = fals
 
         <button
           type="button"
-          title="Nhắn tin giảng viên"
-          aria-label="Nhắn tin giảng viên"
+          title={t('title')}
+          aria-label={t('title')}
           disabled={startConversation.isPending}
           onClick={handleToggle}
           className="relative flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-accent text-white shadow-lg transition-colors hover:bg-accent-dark disabled:cursor-not-allowed disabled:opacity-60"
@@ -149,6 +151,7 @@ export function MessageInstructorFloatingButton({ courseId, leftOnDesktop = fals
 const BOTTOM_THRESHOLD_PX = 24;
 
 function FloatingConversationThread({ conversationId }: { conversationId: number }) {
+  const t = useTranslations('learn.messageInstructor');
   const { data: messages, isLoading } = useConversationMessages(conversationId);
   const sendMessage = useSendMessage();
   const queryClient = useQueryClient();
@@ -245,9 +248,9 @@ function FloatingConversationThread({ conversationId }: { conversationId: number
           onScroll={() => updateAtBottom(isScrollAtBottom())}
           className="h-full overflow-y-auto p-3"
         >
-          {isLoading && <p className="text-center text-[12.5px] text-ink-muted">Đang tải...</p>}
+          {isLoading && <p className="text-center text-[12.5px] text-ink-muted">{t('loading')}</p>}
           {!isLoading && messages?.length === 0 && (
-            <p className="text-center text-[12.5px] text-ink-muted">Chưa có tin nhắn nào — gửi câu hỏi đầu tiên nhé!</p>
+            <p className="text-center text-[12.5px] text-ink-muted">{t('empty')}</p>
           )}
           <div className="flex flex-col gap-2">
             {messages?.map((m) => (
@@ -272,7 +275,7 @@ function FloatingConversationThread({ conversationId }: { conversationId: number
           <button
             type="button"
             onClick={handleScrollToBottomClick}
-            aria-label="Cuộn xuống tin nhắn mới nhất"
+            aria-label={t('scrollDown')}
             className="absolute bottom-2 right-2 flex h-9 w-9 items-center justify-center rounded-full border border-line bg-surface-raised text-ink shadow-md hover:bg-surface-hover"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -295,7 +298,7 @@ function FloatingConversationThread({ conversationId }: { conversationId: number
           onKeyDown={(e) => {
             if (e.key === 'Enter') handleSend();
           }}
-          placeholder="Nhập tin nhắn..."
+          placeholder={t('placeholder')}
           className="flex-1 rounded-lg border border-line px-3 py-2 text-[12.5px] focus:border-accent focus:outline-none"
         />
         <button
@@ -304,7 +307,7 @@ function FloatingConversationThread({ conversationId }: { conversationId: number
           disabled={!content.trim() || sendMessage.isPending}
           className="shrink-0 rounded-lg bg-accent px-3.5 py-2 text-[12.5px] font-bold text-white hover:bg-accent-dark disabled:cursor-not-allowed disabled:opacity-50"
         >
-          Gửi
+          {t('send')}
         </button>
       </div>
     </>

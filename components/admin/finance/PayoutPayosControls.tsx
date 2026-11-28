@@ -1,13 +1,14 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { ApiError } from '@/lib/api/client';
 import { payosPayoutApi, type PayosStatus } from '@/lib/api/payosPayout';
 import { getAccessToken } from '@/lib/auth/token';
 import { money } from '@/lib/finance';
-import { BLOCKED_REFRESH_MS, FAILURE_LABEL, isRetryBlocked, retryButtonLabel } from '@/lib/payosRetry';
+import { BLOCKED_REFRESH_MS, clockTime, isRetryBlocked } from '@/lib/payosRetry';
 
 interface Props {
   payoutId: number;
@@ -25,6 +26,7 @@ interface Props {
  * tự tải lại khi thành công. Khóa cả chuyển tay/từ chối/thất bại trong lúc lệnh còn chạy để không chi hai lần hoặc trả tiền về số dư khi PayOS vẫn đang chuyển.
  */
 export function PayoutPayosControls({ payoutId, amount, status, onInFlightChange, onChanged, disabled }: Props) {
+  const t = useTranslations('admin.payouts.payos');
   const { data: orders, refetch } = useQuery({
     queryKey: ['admin', 'payos-payout', 'orders', 'INSTRUCTOR_PAYOUT', payoutId],
     queryFn: () => payosPayoutApi.orders('INSTRUCTOR_PAYOUT', payoutId),
@@ -40,21 +42,23 @@ export function PayoutPayosControls({ payoutId, amount, status, onInFlightChange
   const latest = orders?.[0];
   const retryBlocked = isRetryBlocked(latest);
   const inFlight = !!latest && (latest.status === 'PENDING' || latest.status === 'SUBMITTED' || latest.status === 'UNKNOWN');
+  const retryAt = retryBlocked ? clockTime(latest?.nextRetryAt) : null;
+  const blockedLabel = retryBlocked ? (retryAt ? t('retryAt', { time: retryAt }) : t('locked')) : null;
 
   const transfer = useMutation({
     mutationFn: () => payosPayoutApi.transferPayout(payoutId),
     onSuccess: (o) => {
       toast.success(
         o.status === 'SUCCEEDED'
-          ? 'PayOS đã chi và đã ghi nhận.'
+          ? t('succeeded')
           : o.status === 'FAILED'
-            ? `PayOS từ chối: ${o.errorMessage ?? 'không rõ lý do'}`
-            : 'Đã gửi lệnh chi sang PayOS, hệ thống sẽ tự cập nhật khi có kết quả.',
+            ? t('rejected', { reason: o.errorMessage ?? t('unknownReason') })
+            : t('sent'),
       );
       void refetch();
       onChanged();
     },
-    onError: (err) => toast.error(err instanceof ApiError ? err.message : 'Không gửi được lệnh chi.'),
+    onError: (err) => toast.error(err instanceof ApiError ? err.message : t('sendError')),
   });
 
   useEffect(() => {
@@ -75,23 +79,23 @@ export function PayoutPayosControls({ payoutId, amount, status, onInFlightChange
       <button
         type="button"
         disabled={disabled || transfer.isPending || inFlight || retryBlocked}
-        title={retryBlocked ? (latest?.retryBlockedReason ?? 'Đang bị khóa chi lại') : `Gửi lệnh chuyển ${money(amount)} qua PayOS. Số dư tài khoản chi: ${status.balance === null ? 'không rõ' : money(status.balance)}`}
+        title={retryBlocked ? (latest?.retryBlockedReason ?? t('blocked')) : t('hint', { amount: money(amount), balance: status.balance === null ? t('unknownBalance') : money(status.balance) })}
         onClick={() => transfer.mutate()}
         className="whitespace-nowrap rounded-lg bg-accent px-3 py-1.5 text-xs font-semibold text-white hover:bg-accent-dark disabled:opacity-50"
       >
-        {transfer.isPending ? 'Đang gửi...' : inFlight ? 'PayOS đang xử lý...' : retryButtonLabel(latest) ?? (latest?.status === 'FAILED' || latest?.status === 'UNKNOWN' ? 'Chi lại qua PayOS' : 'Chi qua PayOS')}
+        {transfer.isPending ? t('sending') : inFlight ? t('processing') : blockedLabel ?? (latest?.status === 'FAILED' || latest?.status === 'UNKNOWN' ? t('retry') : t('send'))}
       </button>
       {latest && (
         <span className={`basis-full text-right text-[11px] ${latest.status === 'FAILED' ? 'text-danger' : 'text-ink-muted'}`}>
           {latest.referenceId}:{' '}
           {latest.status === 'SUCCEEDED'
-            ? 'thành công'
+            ? t('ok')
             : latest.status === 'FAILED'
-              ? `thất bại${latest.failureCategory ? ` (${FAILURE_LABEL[latest.failureCategory]})` : ''}${latest.errorMessage ? ` — ${latest.errorMessage}` : ''}${retryBlocked && latest.retryBlockedReason ? `. ${latest.retryBlockedReason}` : ''}`
+              ? `${t('fail')}${latest.failureCategory ? ` (${t(`cause.${latest.failureCategory}`)})` : ''}${latest.errorMessage ? ` — ${latest.errorMessage}` : ''}${retryBlocked && latest.retryBlockedReason ? `. ${latest.retryBlockedReason}` : ''}`
               : latest.status === 'UNKNOWN'
-                ? 'chưa rõ kết quả'
-                : 'đang xử lý — chờ PayOS/ngân hàng xác nhận'}
-          {latest.nameMismatch ? ' ⚠ tên ngân hàng khác tên đã nhập' : ''}
+                ? t('unknown')
+                : t('pending')}
+          {latest.nameMismatch ? t('nameMismatch') : ''}
         </span>
       )}
     </>

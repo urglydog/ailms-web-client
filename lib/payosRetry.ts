@@ -1,11 +1,8 @@
 import type { PayosFailureCategory, PayosOrder } from '@/lib/api/payosPayout';
+import { tr } from '@/lib/i18n/translate';
 
 /** Nhãn nguyên nhân thất bại hiển thị cho admin. */
-export const FAILURE_LABEL: Record<PayosFailureCategory, string> = {
-  TRANSIENT: 'sự cố tạm thời phía ngân hàng/PayOS',
-  ACCOUNT: 'tài khoản nhận có vấn đề',
-  UNKNOWN: 'chưa rõ nguyên nhân',
-};
+export const failureLabel = (category: PayosFailureCategory): string => tr(`errors.lib.payosFailure.${category}`);
 
 /** Lệnh gần nhất đã thất bại và BE đang từ chối chi lại (chờ, hết lượt hoặc lỗi tài khoản). Nút chỉ phản ánh quyết định của BE. */
 export function isRetryBlocked(o: PayosOrder | undefined): boolean {
@@ -26,6 +23,6 @@ export function clockTime(iso: string | null | undefined): string | null {
 export function retryButtonLabel(o: PayosOrder | undefined): string | null {
   if (!isRetryBlocked(o) || !o) return null;
   const at = clockTime(o.nextRetryAt);
-  if (at) return `Chi lại sau ${at}`;
-  return 'Đã khóa chi PayOS';
+  if (at) return tr('errors.lib.retryAfter', { time: at });
+  return tr('errors.lib.payosLocked');
 }

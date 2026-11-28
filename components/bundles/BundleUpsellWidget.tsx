@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useBundlesForCourse } from '@/hooks/useBundles';
@@ -12,6 +13,7 @@ function fmt(amount: number) {
 }
 
 function BundleUpsellCard({ bundle, currentCourseId }: { bundle: CourseBundle; currentCourseId: number }) {
+  const t = useTranslations('bundles.upsell');
   const otherCourses = bundle.courses.filter((c) => c.id !== currentCourseId);
   const router = useRouter();
   const { data: cartItems } = useCart();
@@ -59,7 +61,7 @@ function BundleUpsellCard({ bundle, currentCourseId }: { bundle: CourseBundle; c
         {otherCourses.length > 0 && (
           <div className="mb-3">
             <p className="text-[11px] font-semibold text-ink-muted uppercase tracking-wider mb-1.5">
-              Đi kèm trong gói:
+              {t('included')}
             </p>
             <ul className="space-y-1">
               {otherCourses.map((c) => (
@@ -89,7 +91,7 @@ function BundleUpsellCard({ bundle, currentCourseId }: { bundle: CourseBundle; c
           disabled={addingBundle}
           className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-accent to-accent py-2.5 text-sm font-bold text-white shadow hover:from-accent-dark hover:to-accent-dark transition active:scale-95 disabled:opacity-60"
         >
-          {addingBundle ? 'Đang thêm...' : 'Mua gói để tiết kiệm thêm →'}
+          {addingBundle ? t('adding') : t('buy')}
         </button>
       </div>
     </div>
@@ -105,6 +107,7 @@ interface BundleUpsellWidgetProps {
  * khóa học. Fetch theo courseId, không render gì cả nếu không có gói nào.
  */
 export function BundleUpsellWidget({ courseId }: BundleUpsellWidgetProps) {
+  const t = useTranslations('bundles.upsell');
   const { data: bundles, isLoading } = useBundlesForCourse(courseId);
 
   if (isLoading || !bundles || bundles.length === 0) return null;
@@ -112,7 +115,7 @@ export function BundleUpsellWidget({ courseId }: BundleUpsellWidgetProps) {
   return (
     <div className="flex flex-col gap-3 border-t border-dashed border-line pt-4 mt-1">
       <p className="text-xs font-semibold text-ink-muted uppercase tracking-wider">
-        💡 Tiết kiệm hơn với gói combo
+        {t('title')}
       </p>
       {bundles.map((bundle) => (
         <BundleUpsellCard key={bundle.id} bundle={bundle} currentCourseId={courseId} />

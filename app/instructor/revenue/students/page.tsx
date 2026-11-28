@@ -17,6 +17,7 @@ const AT_RISK_WARNING_RATIO = 0.3;
 
 export default function InstructorStudentsPage() {
   const t = useTranslations('instructor.perf');
+  const ts = useTranslations('instructor.studentsPage');
   const locale = useLocale();
   const [courseId, setCourseId] = useState<number | ''>('');
   const { data: courses } = useInstructorCourseOptions();
@@ -94,7 +95,7 @@ export default function InstructorStudentsPage() {
       )}
 
       <div className="flex flex-wrap items-center gap-3">
-        <div role="group" aria-label="Chế độ xem" className="flex gap-2">
+        <div role="group" aria-label={ts('viewAria')} className="flex gap-2">
           <button
             type="button"
             aria-pressed={view === 'risk'}
@@ -104,7 +105,7 @@ export default function InstructorStudentsPage() {
             }}
             className={`rounded-full px-3.5 py-1.5 text-[13px] font-semibold ${view === 'risk' ? 'bg-accent text-white' : 'border border-line bg-surface-raised text-ink-muted hover:text-ink'}`}
           >
-            Cần chú ý{stats ? ` (${stats.atRiskCount})` : ''}
+            {ts('atRisk')}{stats ? ` (${stats.atRiskCount})` : ''}
           </button>
           <button
             type="button"
@@ -115,7 +116,7 @@ export default function InstructorStudentsPage() {
             }}
             className={`rounded-full px-3.5 py-1.5 text-[13px] font-semibold ${view === 'all' ? 'bg-accent text-white' : 'border border-line bg-surface-raised text-ink-muted hover:text-ink'}`}
           >
-            Tất cả{stats ? ` (${stats.total})` : ''}
+            {ts('all')}{stats ? ` (${stats.total})` : ''}
           </button>
         </div>
         <input
@@ -125,8 +126,8 @@ export default function InstructorStudentsPage() {
             setQuery(e.target.value);
             setPage(0);
           }}
-          placeholder="Tìm theo tên, email hoặc khóa học..."
-          aria-label="Tìm học viên"
+          placeholder={ts('searchPlaceholder')}
+          aria-label={ts('searchAria')}
           className="ml-auto w-full rounded-lg border border-line bg-surface-raised px-3 py-2 text-sm text-ink outline-none focus:border-accent sm:w-72"
         />
       </div>
@@ -146,7 +147,7 @@ export default function InstructorStudentsPage() {
         {!isLoading && stats && stats.total === 0 && <div className="p-10 text-center text-sm text-ink-muted">{t('students.empty')}</div>}
         {!isLoading && stats && stats.total > 0 && visible.length === 0 && (
           <div className="p-10 text-center text-sm text-ink-muted">
-            {view === 'risk' && !query.trim() ? 'Không có học viên nào cần chú ý. Chọn "Tất cả" để xem toàn bộ học viên.' : 'Không có học viên nào khớp.'}
+            {view === 'risk' && !query.trim() ? ts('emptyRisk') : ts('emptyMatch')}
           </div>
         )}
 

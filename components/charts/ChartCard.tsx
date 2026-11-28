@@ -1,4 +1,7 @@
+'use client';
+
 import type { ReactNode } from 'react';
+import { useTranslations } from 'next-intl';
 
 interface Props {
   /** Câu hỏi mà biểu đồ trả lời, vd "Doanh thu đang tăng hay giảm?". */
@@ -22,15 +25,16 @@ export function ChartCard({ question, insight, children, className = '' }: Props
 
 /** Mũi tên và % thay đổi so với kỳ trước; {@code upIsGood=false} cho chỉ số mà tăng là xấu (vd tiền hoàn). */
 export function Delta({ current, previous, upIsGood = true }: { current: number; previous: number; upIsGood?: boolean }) {
-  if (previous === 0 && current === 0) return <span className="text-xs text-ink-muted">Không đổi so với kỳ trước</span>;
-  if (previous === 0) return <span className="text-xs text-ink-muted">Kỳ trước chưa có số liệu</span>;
+  const t = useTranslations('common.delta');
+  if (previous === 0 && current === 0) return <span className="text-xs text-ink-muted">{t('same')}</span>;
+  if (previous === 0) return <span className="text-xs text-ink-muted">{t('noPrevious')}</span>;
   const pct = Math.round(((current - previous) / previous) * 1000) / 10;
-  if (pct === 0) return <span className="text-xs text-ink-muted">Không đổi so với kỳ trước</span>;
+  if (pct === 0) return <span className="text-xs text-ink-muted">{t('same')}</span>;
   const up = pct > 0;
   const good = up === upIsGood;
   return (
     <span className={`text-xs font-semibold ${good ? 'text-success-ink' : 'text-danger'}`}>
-      {up ? '▲' : '▼'} {Math.abs(pct)}% so với kỳ trước
+      {t('vsPrevious', { arrow: up ? '▲' : '▼', pct: Math.abs(pct) })}
     </span>
   );
 }

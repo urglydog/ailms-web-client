@@ -4,6 +4,7 @@ import { TypingDots } from '@/components/ui/TypingDots';
 
 import React, { useState, useRef, useEffect } from 'react';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 import { api } from '@/lib/api/client';
 import { getAccessToken } from '@/lib/auth/token';
 
@@ -67,6 +68,7 @@ function renderFormattedMessage(text: string) {
 }
 
 export function InstructorChat() {
+  const t = useTranslations('instructorChat');
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
@@ -80,7 +82,7 @@ export function InstructorChat() {
     setInput(value);
     if (value.length >= MAX_MESSAGE_LENGTH) {
       if (!maxLengthToastShownRef.current) {
-        toast.warning(`Đã đạt giới hạn ${MAX_MESSAGE_LENGTH} ký tự cho 1 tin nhắn.`);
+        toast.warning(t('maxLength', { max: MAX_MESSAGE_LENGTH }));
         maxLengthToastShownRef.current = true;
       }
     } else {
@@ -110,11 +112,11 @@ export function InstructorChat() {
       
       setMessages(prev => [...prev, { 
         role: 'assistant', 
-        text: data.reply || 'Không có phản hồi.', 
+        text: data.reply || t('noReply'), 
         data: data.data 
       }]);
     } catch {
-      setMessages(prev => [...prev, { role: 'assistant', text: 'Xin lỗi, tôi đang gặp sự cố kết nối tới AI. Vui lòng kiểm tra lại.' }]);
+      setMessages(prev => [...prev, { role: 'assistant', text: t('connectionError') }]);
     } finally {
       setLoading(false);
     }
@@ -126,10 +128,10 @@ export function InstructorChat() {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        aria-label={isOpen ? "Đóng trợ lý giảng viên AI" : "Mở trợ lý giảng viên AI"}
+        aria-label={isOpen ? t('toggleClose') : t('toggleOpen')}
         aria-expanded={isOpen}
         className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-xl bg-accent text-white shadow-md btn-tactile"
-        title="Trợ lý Giảng viên AI"
+        title={t('title')}
       >
         {isOpen ? (
           <span className="text-xl font-bold">✕</span>
@@ -159,14 +161,14 @@ export function InstructorChat() {
               🤖
             </div>
             <div>
-              <h3 className="font-bold text-sm leading-none">Trợ Lý Giảng Viên AI</h3>
-              <span className="text-[10px] text-blue-100">Sẵn sàng hỗ trợ phân tích khóa học</span>
+              <h3 className="font-bold text-sm leading-none">{t('heading')}</h3>
+              <span className="text-[10px] text-blue-100">{t('ready')}</span>
             </div>
           </div>
           <button
             type="button"
             onClick={() => setIsOpen(false)}
-            aria-label="Đóng trợ lý"
+            aria-label={t('close')}
             className="flex h-9 w-9 items-center justify-center rounded-md text-sm text-white/80 transition-colors duration-150 hover:bg-white/10 hover:text-white"
           >
             ✕
@@ -177,7 +179,7 @@ export function InstructorChat() {
         <div className="flex-1 overflow-y-auto p-4 space-y-3.5 bg-surface/50">
           {messages.length === 0 && (
             <div className="text-center text-sm text-ink-muted mt-4">
-              Xin chào! Tôi có thể giúp bạn phân tích số liệu học viên, xem đánh giá, hoặc gợi ý cải thiện khóa học. Bạn cần hỗ trợ gì?
+              {t('welcome')}
             </div>
           )}
           
@@ -205,20 +207,20 @@ export function InstructorChat() {
                 <div className="mt-2 w-full rounded-xl bg-surface-raised p-3 border border-line text-xs shadow-sm space-y-1.5">
                   {msg.data.data && (
                     <div className="flex justify-between items-center border-b border-line-soft pb-1.5">
-                      <span className="text-ink-muted font-medium">Doanh thu:</span>
+                      <span className="text-ink-muted font-medium">{t('revenue')}</span>
                       <span className="font-bold text-success">{msg.data.data.totalRevenue?.toLocaleString('vi-VN')} đ</span>
                     </div>
                   )}
                   {msg.data.average_rating !== undefined && (
                     <div className="flex justify-between items-center">
-                      <span className="text-ink-muted font-medium">Đánh giá trung bình:</span>
+                      <span className="text-ink-muted font-medium">{t('avgRating')}</span>
                       <span className="font-bold text-warning">⭐ {msg.data.average_rating}</span>
                     </div>
                   )}
                   {msg.data.positive_count !== undefined && (
                     <div className="flex justify-between items-center text-[11px]">
-                      <span className="text-success font-medium">Tích cực: {msg.data.positive_count}</span>
-                      <span className="text-danger font-medium">Tiêu cực: {msg.data.negative_count}</span>
+                      <span className="text-success font-medium">{t('positive', { count: msg.data.positive_count })}</span>
+                      <span className="text-danger font-medium">{t('negative', { count: msg.data.negative_count ?? 0 })}</span>
                     </div>
                   )}
                 </div>
@@ -244,7 +246,7 @@ export function InstructorChat() {
               type="text"
               value={input}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange(e.target.value)}
-              placeholder="Hỏi trợ lý (VD: Doanh thu tháng này?)..."
+              placeholder={t('placeholder')}
               maxLength={MAX_MESSAGE_LENGTH}
               className="flex-1 bg-surface border border-line rounded-full px-4 py-2 text-sm focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-colors text-ink"
               disabled={loading}

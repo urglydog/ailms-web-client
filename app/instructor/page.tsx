@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -8,11 +9,12 @@ import { useRouter } from 'next/navigation';
  * `/instructor` để không hỏng đường link cũ (đăng nhập, bookmark) — chuyển hướng sang trang
  * "Khóa học của tôi", mục đầu tiên của sidebar mới. */
 export default function InstructorRootRedirectPage() {
+  const t = useTranslations('instructor.common');
   const router = useRouter();
 
   useEffect(() => {
     router.replace('/instructor/courses');
   }, [router]);
 
-  return <div className="p-10 text-center text-sm text-ink-muted">Đang chuyển hướng...</div>;
+  return <div className="p-10 text-center text-sm text-ink-muted">{t('redirecting')}</div>;
 }

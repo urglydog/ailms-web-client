@@ -1,10 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { AlarmClock, Gift, Share2 } from 'lucide-react';
+import { AlarmClock, Share2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
-import { Tooltip } from '@/components/ui/Tooltip';
 
 const SHOW_WITHIN_MS = 30 * 24 * 3600 * 1000;
 
@@ -42,8 +41,8 @@ export function PromoCountdown({ endsAt }: { endsAt: string | null | undefined }
   );
 }
 
-/** Nút Chia sẻ (chia sẻ gốc của thiết bị nếu có, không thì chép link) + Tặng (chưa hỗ trợ, "Sắp ra mắt"). */
-export function ShareGiftButtons({ title, slug }: { title: string; slug: string }) {
+/** Nút Chia sẻ: chia sẻ gốc của thiết bị nếu có, không thì chép link. (Bỏ nút "Tặng khoá học" 28/11/2026 — chưa hỗ trợ tặng.) */
+export function ShareButton({ title, slug }: { title: string; slug: string }) {
   const t = useTranslations('courseDetail.shareGift');
   const share = async () => {
     const url = `${window.location.origin}/courses/${slug}`;
@@ -62,21 +61,14 @@ export function ShareGiftButtons({ title, slug }: { title: string; slug: string 
       toast.error(t('copyFailed'));
     }
   };
-  const base =
-    'flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-control border border-line bg-surface-raised px-3 text-sm font-semibold text-ink transition-colors motion-reduce:transition-none';
   return (
-    <div className="flex gap-2">
-      <button type="button" onClick={share} className={`${base} hover:border-accent hover:text-accent-dark`}>
-        <Share2 size={16} aria-hidden />
-        {t('share')}
-      </button>
-      <Tooltip label={t('soon')} className="flex flex-1">
-        <button type="button" aria-disabled="true" onClick={(e) => e.preventDefault()} className={`${base} w-full cursor-not-allowed opacity-60`}>
-          <Gift size={16} aria-hidden />
-          {t('gift')}
-          <span className="sr-only">({t('soon')})</span>
-        </button>
-      </Tooltip>
-    </div>
+    <button
+      type="button"
+      onClick={share}
+      className="flex min-h-11 w-full items-center justify-center gap-1.5 rounded-control border border-line bg-surface-raised px-3 text-sm font-semibold text-ink transition-colors hover:border-accent hover:text-accent-dark motion-reduce:transition-none"
+    >
+      <Share2 size={16} aria-hidden />
+      {t('share')}
+    </button>
   );
 }

@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { Modal } from '@/components/ui/Modal';
 
 import Image from 'next/image';
@@ -35,6 +36,7 @@ export function CoursePreview({
   courseTitle: string;
   previewLessons: LessonSummary[];
 }) {
+  const t = useTranslations('courseDetail.preview');
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const hasPreview = previewLessons.length > 0;
@@ -77,7 +79,7 @@ export function CoursePreview({
               <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
             </span>
             <span className="absolute bottom-2 left-2 rounded bg-ink/70 px-2 py-1 text-[11px] font-semibold text-white">
-              Xem trước khóa học
+              {t('label')}
             </span>
           </>
         )}
@@ -89,7 +91,7 @@ export function CoursePreview({
         size="lg"
         title={
           <span className="block min-w-0">
-            <span className="block text-[11px] font-semibold uppercase tracking-wide text-ink-faint">Xem trước khóa học</span>
+            <span className="block text-[11px] font-semibold uppercase tracking-wide text-ink-faint">{t('label')}</span>
             <span className="block truncate text-sm">{courseTitle}</span>
           </span>
         }
@@ -97,7 +99,7 @@ export function CoursePreview({
           <div className="-mx-6 flex flex-col">
             <div className="aspect-video w-full shrink-0 bg-black">
               {isLoading || !player ? (
-                <div className="flex h-full items-center justify-center text-sm text-white/70">Đang tải video…</div>
+                <div className="flex h-full items-center justify-center text-sm text-white/70">{t('loading')}</div>
               ) : player.videoSource === 'YOUTUBE' && player.youtubeId ? (
                 <iframe
                   key={player.lessonId}

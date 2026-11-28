@@ -79,7 +79,7 @@ export function CompletionMeter({ percent, missing }: CompletionMeterProps) {
                     <>
                       {' '}
                       <Link href={href} className="font-semibold text-accent hover:underline">
-                        Làm ngay
+                        {t('fixNow')}
                       </Link>
                     </>
                   )}

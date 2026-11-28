@@ -83,7 +83,7 @@ export default function AdminPaymentsPage() {
 
   const search = () => {
     if (!input.trim() && !statusInput) {
-      toast.error('Hãy nhập mã đơn, email, tên người mua hoặc khóa học (hoặc chọn trạng thái) để tra cứu.');
+      toast.error(t('find.needCriteria'));
       return;
     }
     setPage(0);
@@ -115,12 +115,12 @@ export default function AdminPaymentsPage() {
       const res = await adminInvoicesApi.list({ q: p.txnRef, type: 'RECEIPT', size: 1 });
       const inv = res.items[0];
       if (!inv) {
-        toast.error('Giao dịch này chưa có biên lai. Biên lai được tạo sau khi giao dịch hoàn tất, thường trong vài phút.');
+        toast.error(t('find.noReceipt'));
         return;
       }
       saveBlob(await adminInvoicesApi.pdf(inv.id), `${inv.number}.pdf`);
     } catch (err) {
-      toast.error(err instanceof ApiError ? err.message : 'Không tải được biên lai. Vui lòng thử lại.');
+      toast.error(err instanceof ApiError ? err.message : t('find.receiptError'));
     } finally {
       setReceiptBusy(false);
     }
@@ -134,8 +134,8 @@ export default function AdminPaymentsPage() {
       <PageHeader title={t('title')} subtitle={t('subtitle')} />
 
       <SearchPanel
-        label="Tìm giao dịch"
-        placeholder="Mã đơn, mã cổng thanh toán, email / tên / ID người mua, khóa học..."
+        label={t('find.label')}
+        placeholder={t('find.ph')}
         value={input}
         onChange={setInput}
         onSubmit={search}
@@ -156,9 +156,8 @@ export default function AdminPaymentsPage() {
       />
 
       {!criteria ? (
-        <SearchPrompt title="Nhập thông tin để tra cứu giao dịch">
-          Hệ thống có rất nhiều giao dịch nên không hiển thị sẵn. Hãy nhập mã đơn, mã cổng thanh toán, email, tên hoặc ID người mua, hoặc tên khóa học;
-          bấm vào một kết quả để xem chi tiết, tải biên lai và xử lý khiếu nại.
+        <SearchPrompt title={t('find.promptTitle')}>
+          {t('find.prompt')}
         </SearchPrompt>
       ) : isFetching && !data ? (
         <div className="flex flex-col gap-2 rounded-xl border border-line bg-surface-raised p-4">
@@ -172,9 +171,9 @@ export default function AdminPaymentsPage() {
         <div className="rounded-xl border border-line bg-surface-raised p-8 text-center text-ink-muted">{t('noMatch')}</div>
       ) : (
         <div className="flex flex-col gap-4">
-          <div className="overflow-x-auto rounded-xl border border-line bg-surface-raised shadow-sm">
+          <div className="max-h-[70vh] overflow-auto rounded-xl border border-line bg-surface-raised shadow-sm">
             <table className="w-full min-w-[900px] text-left text-sm">
-              <thead className="border-b border-line bg-surface text-xs text-ink-muted">
+              <thead className="sticky top-0 z-10 border-b border-line bg-surface text-xs text-ink-muted">
                 <tr>
                   <th scope="col" className="px-4 py-3 font-semibold">{t('cols.ref')}</th>
                   <th scope="col" className="px-4 py-3 font-semibold">{t('cols.user')}</th>
@@ -290,7 +289,7 @@ export default function AdminPaymentsPage() {
                   className="inline-flex items-center gap-1.5 rounded-lg border border-line bg-surface-raised px-3 py-1.5 text-sm font-semibold text-ink hover:bg-tint disabled:opacity-50"
                 >
                   <FileText size={14} aria-hidden />
-                  {receiptBusy ? 'Đang tải...' : 'Tải biên lai'}
+                  {receiptBusy ? t('find.loading') : t('find.receipt')}
                 </button>
                 <Link
                   href={`/admin/transactions/disputes?ref=${selectedPayment.txnRef}`}

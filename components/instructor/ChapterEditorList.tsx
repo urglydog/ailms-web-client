@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useState, type DragEvent } from 'react';
 import { ChevronDownIcon, PencilIcon, TrashIcon, DragHandleIcon } from '@/components/instructor/CurriculumIcons';
 import { LessonEditorRow } from '@/components/instructor/LessonEditorRow';
@@ -33,6 +34,7 @@ interface ChapterEditorListProps {
  * dùng số cứng nào lưu sẵn — nên tự động đổi số ngay khi kéo-thả xong, không cần chờ tải lại.
  */
 export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEditorListProps) {
+  const t = useTranslations('instructor.chapterEditor');
   const [newChapterTitle, setNewChapterTitle] = useState('');
   const [newChapterDescription, setNewChapterDescription] = useState('');
   const [showAddChapterForm, setShowAddChapterForm] = useState(false);
@@ -161,7 +163,7 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
               e.preventDefault();
               handleChapterDrop(chapter.id);
             }}
-            title="Kéo để đổi thứ tự chương"
+            title={t('dragChapter')}
             className={`rounded-xl border bg-surface-raised p-4 shadow-sm transition-colors ${
               isEditing ? '' : 'cursor-move'
             } ${
@@ -173,7 +175,7 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
             {isEditing ? (
               <div className="mb-3 flex flex-col gap-2" draggable={false} onDragStart={(e) => e.preventDefault()}>
                 <label className="flex flex-col gap-1">
-                  <span className="text-[11.5px] font-bold text-ink-muted">Phần {chapterIndex + 1}:</span>
+                  <span className="text-[11.5px] font-bold text-ink-muted">{t('sectionNo', { n: chapterIndex + 1 })}</span>
                   <input
                     value={editChapterTitle}
                     onChange={(e) => setEditChapterTitle(e.target.value)}
@@ -183,13 +185,13 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
                 </label>
                 <label className="flex flex-col gap-1">
                   <span className="text-[11.5px] text-ink-muted">
-                    Sau khi hoàn thành phần này, học viên sẽ có thể làm được những gì?
+                    {t('objectiveQuestion')}
                   </span>
                   <textarea
                     value={editChapterDescription}
                     onChange={(e) => setEditChapterDescription(e.target.value)}
                     rows={2}
-                    placeholder="Nhập mục tiêu học tập..."
+                    placeholder={t('objectivePlaceholder')}
                     draggable={false}
                     className="rounded-lg border border-line px-3 py-1.5 text-[12.5px] focus:border-accent focus:outline-none"
                   />
@@ -201,7 +203,7 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
                     onClick={() => setEditingChapterId(null)}
                     className="rounded-lg px-3 py-1.5 text-[12px] font-semibold text-ink-muted hover:bg-tint"
                   >
-                    Hủy bỏ
+                    {t('cancel')}
                   </button>
                   <button
                     type="button"
@@ -209,7 +211,7 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
                     onClick={handleSaveChapterEdit}
                     className="rounded-lg bg-accent px-3 py-1.5 text-[12px] font-bold text-white hover:bg-accent-dark"
                   >
-                    Lưu phần
+                    {t('saveSection')}
                   </button>
                 </div>
               </div>
@@ -226,23 +228,23 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
                   onClick={() =>
                     setExpandedChapters((prev) => ({ ...prev, [chapter.id]: !prev[chapter.id] }))
                   }
-                  title={isExpanded ? 'Thu gọn phần' : 'Mở rộng phần'}
+                  title={isExpanded ? t('collapse') : t('expand')}
                   className="shrink-0 text-ink-faint hover:text-ink"
                 >
                   <ChevronDownIcon expanded={isExpanded} />
                 </button>
                 <div className="flex min-w-0 flex-1 items-center gap-1.5">
                   <span className="truncate font-display text-[14.5px] font-bold text-ink">
-                    Phần {chapterIndex + 1}: {chapter.title}
+                    {t('sectionTitled', { n: chapterIndex + 1, title: chapter.title })}
                   </span>
                   <span className="shrink-0 text-[11px] font-semibold text-ink-faint">
-                    ({lessons.length} bài giảng)
+                    {t('lessonCount', { count: lessons.length })}
                   </span>
                   <button
                     type="button"
                     draggable={false}
                     onClick={() => openChapterEdit(chapter)}
-                    title="Đổi tên/mô tả phần"
+                    title={t('renameSection')}
                     className="shrink-0 text-ink-faint opacity-0 hover:text-ink group-hover:opacity-100"
                   >
                     <PencilIcon />
@@ -251,7 +253,7 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
                     type="button"
                     draggable={false}
                     onClick={() => setConfirmDeleteChapterId(chapter.id)}
-                    title="Xóa chương"
+                    title={t('deleteChapter')}
                     className="shrink-0 text-ink-faint opacity-0 hover:text-danger group-hover:opacity-100"
                   >
                     <TrashIcon />
@@ -259,7 +261,7 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
                 </div>
                 <span
                   aria-hidden
-                  title="Kéo để đổi thứ tự"
+                  title={t('dragReorder')}
                   className="shrink-0 select-none text-ink-faint opacity-0 group-hover:opacity-100"
                 >
                   <DragHandleIcon />
@@ -326,7 +328,7 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
                     </div>
                   ))}
                   {lessons.length === 0 && (
-                    <p className="px-1 text-[12.5px] text-ink-faint">Chương này chưa có bài học nào.</p>
+                    <p className="px-1 text-[12.5px] text-ink-faint">{t('noLessons')}</p>
                   )}
                 </div>
 
@@ -344,19 +346,19 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
                       setAddLessonFormOpenFor(null);
                     }}
                   >
-                    <span className="text-[11.5px] font-bold text-ink-muted">Bài giảng {lessons.length + 1}:</span>
+                    <span className="text-[11.5px] font-bold text-ink-muted">{t('lessonNo', { n: lessons.length + 1 })}</span>
                     <input
                       autoFocus
                       value={newLessonTitleByChapter[chapter.id] ?? ''}
                       onChange={(e) =>
                         setNewLessonTitleByChapter((prev) => ({ ...prev, [chapter.id]: e.target.value }))
                       }
-                      placeholder="Nhập tiêu đề bài giảng"
+                      placeholder={t('lessonTitlePlaceholder')}
                       draggable={false}
                       className="rounded-lg border border-line px-3 py-1.5 text-[13px] focus:border-accent focus:outline-none"
                     />
                     <p className="text-[11px] text-ink-faint">
-                      Sau khi thêm, bấm &quot;+ Nội dung&quot; ở hàng bài giảng để tải video hoặc dán link YouTube.
+                      {t('afterAddHint')}
                     </p>
                     <div className="flex justify-end gap-2">
                       <button
@@ -365,14 +367,14 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
                         onClick={() => setAddLessonFormOpenFor(null)}
                         className="rounded-lg px-3 py-1.5 text-[12px] font-semibold text-ink-muted hover:bg-tint"
                       >
-                        Hủy bỏ
+                        {t('cancel')}
                       </button>
                       <button
                         type="submit"
                         draggable={false}
                         className="rounded-lg bg-accent px-3 py-1.5 text-[12px] font-bold text-white hover:bg-accent-dark"
                       >
-                        Thêm bài giảng
+                        {t('addLesson')}
                       </button>
                     </div>
                   </form>
@@ -383,7 +385,7 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
                     onClick={() => setAddLessonFormOpenFor(chapter.id)}
                     className="ml-1 mt-3 flex w-[calc(100%-0.25rem)] items-center justify-center gap-1.5 rounded-lg border border-dashed border-line py-2 text-[12.5px] font-bold text-ink-muted hover:border-accent/40 hover:text-accent-dark"
                   >
-                    + Mục trong chương trình giảng dạy
+                    {t('addCurriculumItem')}
                   </button>
                 )}
               </div>
@@ -394,7 +396,7 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
 
       {sortedChapters.length === 0 && (
         <p className="rounded-xl border border-dashed border-line p-6 text-center text-[13px] text-ink-faint">
-          Chưa có chương nào — thêm chương đầu tiên bên dưới.
+          {t('noChapters')}
         </p>
       )}
 
@@ -406,22 +408,22 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
             handleCreateChapter();
           }}
         >
-          <span className="text-[11.5px] font-bold text-ink-muted">Phần mới:</span>
+          <span className="text-[11.5px] font-bold text-ink-muted">{t('newSection')}</span>
           <input
             autoFocus
             value={newChapterTitle}
             onChange={(e) => setNewChapterTitle(e.target.value)}
-            placeholder="Nhập tiêu đề"
+            placeholder={t('titlePlaceholder')}
             className="rounded-lg border border-line px-3 py-2 text-[13px] focus:border-accent focus:outline-none"
           />
           <span className="text-[11.5px] text-ink-muted">
-            Sau khi hoàn thành phần này, học viên sẽ có thể làm được những gì?
+            {t('objectiveQuestion')}
           </span>
           <textarea
             value={newChapterDescription}
             onChange={(e) => setNewChapterDescription(e.target.value)}
             rows={2}
-            placeholder="Nhập mục tiêu học tập..."
+            placeholder={t('objectivePlaceholder')}
             className="rounded-lg border border-line px-3 py-1.5 text-[12.5px] focus:border-accent focus:outline-none"
           />
           <div className="flex justify-end gap-2">
@@ -434,13 +436,13 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
               }}
               className="rounded-lg px-3 py-1.5 text-[12px] font-semibold text-ink-muted hover:bg-tint"
             >
-              Hủy bỏ
+              {t('cancel')}
             </button>
             <button
               type="submit"
               className="rounded-lg bg-accent px-4 py-1.5 text-[12.5px] font-bold text-white hover:bg-accent-dark"
             >
-              Thêm phần
+              {t('addSection')}
             </button>
           </div>
         </form>
@@ -450,7 +452,7 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
           onClick={() => setShowAddChapterForm(true)}
           className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-line py-3 text-[13px] font-bold text-ink-muted hover:border-accent/40 hover:text-accent-dark"
         >
-          + Phần
+          {t('addSectionBtn')}
         </button>
       )}
 
@@ -464,7 +466,7 @@ export function ChapterEditorList({ courseId, courseSlug, chapters }: ChapterEdi
 
       {confirmDeleteChapterId !== null && (
         <ConfirmModal
-          message="Bạn sắp xóa 1 Phần và toàn bộ bài giảng bên trong. Bạn có chắc chắn muốn tiếp tục không?"
+          message={t('deleteConfirm')}
           onCancel={() => setConfirmDeleteChapterId(null)}
           onConfirm={() => {
             deleteChapter.mutate(confirmDeleteChapterId);

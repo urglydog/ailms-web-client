@@ -1,7 +1,8 @@
 'use client';
 
 import { formatDistanceToNow } from 'date-fns';
-import { vi } from 'date-fns/locale';
+import { useLocale, useTranslations } from 'next-intl';
+import { getDateFnsLocale } from '@/lib/dateFnsLocale';
 import { useEffect, useRef, useState, type DragEvent } from 'react';
 import { toast } from 'sonner';
 import { useTutorChat } from '@/hooks/useTutorChat';
@@ -51,6 +52,8 @@ function SessionRow({
   session, isActive, menuOpen, isEditing, onOpen, onToggleMenu,
   onStartRename, onSubmitRename, onCancelRename, onTogglePin, onDelete,
 }: SessionRowProps) {
+  const t = useTranslations('learn.tutor');
+  const locale = useLocale();
   const [draftTitle, setDraftTitle] = useState(session.title);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -90,11 +93,11 @@ function SessionRow({
         }`}
       >
         <span className="flex w-full items-center gap-1.5 truncate text-sm text-ink">
-          {session.isPinned && <span aria-hidden title="Đã ghim" className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />}
+          {session.isPinned && <span aria-hidden title={t('pinned')} className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />}
           <span className="truncate">{session.title}</span>
         </span>
         <span className="text-xs text-ink-faint">
-          {formatDistanceToNow(new Date(session.lastActivityAt), { addSuffix: true, locale: vi })}
+          {formatDistanceToNow(new Date(session.lastActivityAt), { addSuffix: true, locale: getDateFnsLocale(locale) })}
         </span>
       </button>
 
@@ -104,8 +107,8 @@ function SessionRow({
           e.stopPropagation();
           onToggleMenu();
         }}
-        title="Tuỳ chọn"
-        aria-label="Tuỳ chọn cuộc trò chuyện"
+        title={t('options')}
+        aria-label={t('optionsAria')}
         className="absolute right-1.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-ink-faint opacity-0 transition-opacity hover:bg-line-soft group-hover:opacity-100 data-[open=true]:opacity-100"
         data-open={menuOpen}
       >
@@ -119,21 +122,21 @@ function SessionRow({
             onClick={onTogglePin}
             className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-ink hover:bg-surface"
           >
-            {session.isPinned ? 'Bỏ ghim' : 'Ghim'}
+            {session.isPinned ? t('unpin') : t('pin')}
           </button>
           <button
             type="button"
             onClick={onStartRename}
             className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-ink hover:bg-surface"
           >
-            Đổi tên
+            {t('rename')}
           </button>
           <button
             type="button"
             onClick={onDelete}
             className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-danger hover:bg-danger/5"
           >
-            Xoá
+            {t('delete')}
           </button>
         </div>
       )}
@@ -174,6 +177,7 @@ export function TutorEmbedded({ courseId, lessonId, onSeek, lessonTitleById }: T
     sessions, activeSessionId, switchSession, startNewChat,
     renameSession, togglePin, removeSession,
   } = useTutorChat(courseId, lessonId);
+  const t = useTranslations('learn.tutor');
   const [input, setInput] = useState('');
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const [isDraggingFile, setIsDraggingFile] = useState(false);
@@ -212,12 +216,12 @@ export function TutorEmbedded({ courseId, lessonId, onSeek, lessonTitleById }: T
     if (incoming.length === 0) return;
     const combined = [...pendingFiles, ...incoming];
     if (combined.length > MAX_ATTACHMENTS) {
-      toast.error(`Chỉ đính kèm tối đa ${MAX_ATTACHMENTS} tệp mỗi lượt hỏi.`);
+      toast.error(t('maxAttachments', { max: MAX_ATTACHMENTS }));
       return;
     }
     const oversized = incoming.find((f) => f.size > MAX_ATTACHMENT_SIZE_MB * 1024 * 1024);
     if (oversized) {
-      toast.error(`Tệp "${oversized.name}" vượt quá ${MAX_ATTACHMENT_SIZE_MB}MB.`);
+      toast.error(t('oversized', { name: oversized.name, max: MAX_ATTACHMENT_SIZE_MB }));
       return;
     }
     setPendingFiles(combined);
@@ -243,7 +247,7 @@ export function TutorEmbedded({ courseId, lessonId, onSeek, lessonTitleById }: T
     try {
       await removeSession(session.id);
     } catch (err) {
-      toast.error(err instanceof ApiError ? err.message : 'Không xoá được cuộc trò chuyện này.');
+      toast.error(err instanceof ApiError ? err.message : t('deleteFailed'));
     }
   };
 
@@ -251,8 +255,8 @@ export function TutorEmbedded({ courseId, lessonId, onSeek, lessonTitleById }: T
     <div className="flex h-full flex-col">
       <div className="flex items-center justify-between border-b border-line bg-accent px-4 py-3 text-white">
         <div>
-          <h3 className="font-display text-sm font-semibold">Gia sư AI Socratic</h3>
-          <p className="text-[11px] opacity-90">Hỏi về nội dung bài học, không cho đáp án trực tiếp</p>
+          <h3 className="font-display text-sm font-semibold">{t('title')}</h3>
+          <p className="text-[11px] opacity-90">{t('subtitle')}</p>
         </div>
         <div className="flex items-center gap-1">
           <button
@@ -261,8 +265,8 @@ export function TutorEmbedded({ courseId, lessonId, onSeek, lessonTitleById }: T
               setShowHistory(false);
               void startNewChat();
             }}
-            title="Cuộc trò chuyện mới"
-            aria-label="Bắt đầu cuộc trò chuyện mới"
+            title={t('newChat')}
+            aria-label={t('newChatAria')}
             className="flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-white/20"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
@@ -273,8 +277,8 @@ export function TutorEmbedded({ courseId, lessonId, onSeek, lessonTitleById }: T
               setShowHistory((v) => !v);
               setOpenMenuId(null);
             }}
-            title="Lịch sử trò chuyện"
-            aria-label="Xem lịch sử trò chuyện"
+            title={t('history')}
+            aria-label={t('historyAria')}
             aria-expanded={showHistory}
             className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-white/20 ${showHistory ? 'bg-white/20' : ''}`}
           >
@@ -289,15 +293,15 @@ export function TutorEmbedded({ courseId, lessonId, onSeek, lessonTitleById }: T
             <input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Tìm cuộc trò chuyện…"
-              aria-label="Tìm cuộc trò chuyện"
+              placeholder={t('searchPlaceholder')}
+              aria-label={t('searchAria')}
               className="w-full rounded-full border border-line bg-surface px-4 py-2 text-sm text-ink outline-none placeholder:text-ink-faint focus:border-accent"
             />
           </div>
           <div className="flex-1 overflow-y-auto">
             {filteredSessions.length === 0 ? (
               <p className="px-4 py-6 text-center text-sm text-ink-faint">
-                {sessions.length === 0 ? 'Chưa có cuộc trò chuyện nào trước đây' : 'Không tìm thấy cuộc trò chuyện nào khớp'}
+                {sessions.length === 0 ? t('noHistory') : t('noMatch')}
               </p>
             ) : (
               <ul>
@@ -348,17 +352,16 @@ export function TutorEmbedded({ courseId, lessonId, onSeek, lessonTitleById }: T
           >
             {isDraggingFile && (
               <div className="pointer-events-none absolute inset-2 z-10 flex items-center justify-center rounded-xl border-2 border-dashed border-accent bg-accent/5 text-sm font-medium text-accent">
-                Thả tệp vào đây để đính kèm
+                {t('dropFiles')}
               </div>
             )}
             {isRestoring && (
-              <p className="mt-4 text-center text-sm text-ink-faint">Đang tải lại cuộc trò chuyện…</p>
+              <p className="mt-4 text-center text-sm text-ink-faint">{t('restoring')}</p>
             )}
             {!isRestoring && messages.length === 0 && (
               <>
                 <p className="mt-4 text-center text-sm text-ink-muted">
-                  Chào bạn! Hỏi mình bất cứ điều gì về bài học này (hoặc bài học khác trong khóa) nhé
-                  — mình sẽ gợi ý để bạn tự tìm ra câu trả lời, chứ không đưa đáp án trực tiếp đâu
+                  {t('greeting')}
                 </p>
                 <TutorSuggestions
                   lessonId={lessonId}
@@ -437,7 +440,7 @@ export function TutorEmbedded({ courseId, lessonId, onSeek, lessonTitleById }: T
                     <button
                       type="button"
                       onClick={() => removePendingFile(i)}
-                      aria-label={`Bỏ đính kèm ${file.name}`}
+                      aria-label={t('removeAttachment', { name: file.name })}
                       className="text-ink-faint hover:text-danger"
                     >
                       ✕
@@ -462,8 +465,8 @@ export function TutorEmbedded({ courseId, lessonId, onSeek, lessonTitleById }: T
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={pendingFiles.length >= MAX_ATTACHMENTS}
-                title="Đính kèm tệp"
-                aria-label="Đính kèm tệp"
+                title={t('attach')}
+                aria-label={t('attach')}
                 className="mb-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-ink-muted transition-colors hover:bg-surface disabled:opacity-40"
               >
                 ＋
@@ -478,7 +481,7 @@ export function TutorEmbedded({ courseId, lessonId, onSeek, lessonTitleById }: T
                     addFiles(files);
                   }
                 }}
-                placeholder="Hỏi về nội dung bài học..."
+                placeholder={t('inputPlaceholder')}
                 rows={1}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {

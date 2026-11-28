@@ -1,4 +1,5 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { renderWithIntl } from '@/test/renderWithIntl';
 import { describe, expect, it, vi } from 'vitest';
 import { useState } from 'react';
 import { Modal } from './Modal';
@@ -27,7 +28,7 @@ function Harness({ onClose = () => {} }: { onClose?: () => void }) {
 
 describe('Modal', () => {
   it('là hộp thoại có tên lấy từ tiêu đề', () => {
-    render(<Harness />);
+    renderWithIntl(<Harness />);
     expect(screen.queryByRole('dialog')).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: 'Mở' }));
     const dialog = screen.getByRole('dialog', { name: 'Xóa bài học' });
@@ -35,7 +36,7 @@ describe('Modal', () => {
   });
 
   it('focus vào trong khi mở và giữ focus vòng lại khi Tab', () => {
-    render(<Harness />);
+    renderWithIntl(<Harness />);
     fireEvent.click(screen.getByRole('button', { name: 'Mở' }));
     const close = screen.getByRole('button', { name: 'Đóng' });
     const ok = screen.getByRole('button', { name: 'Đồng ý' });
@@ -49,7 +50,7 @@ describe('Modal', () => {
 
   it('Esc đóng và trả focus về nút đã mở', async () => {
     const onClose = vi.fn();
-    render(<Harness onClose={onClose} />);
+    renderWithIntl(<Harness onClose={onClose} />);
     const trigger = screen.getByRole('button', { name: 'Mở' });
     trigger.focus();
     fireEvent.click(trigger);
@@ -59,8 +60,20 @@ describe('Modal', () => {
   });
 
   it('khóa cuộn trang nền khi mở', () => {
-    render(<Harness />);
+    renderWithIntl(<Harness />);
     fireEvent.click(screen.getByRole('button', { name: 'Mở' }));
     expect(document.body.style.overflow).toBe('hidden');
+  });
+
+  it('đang chạy hiệu ứng thoát thì lớp phủ không nhận chuột (không nuốt cú bấm kế tiếp)', async () => {
+    renderWithIntl(<Harness />);
+    fireEvent.click(screen.getByRole('button', { name: 'Mở' }));
+    const layer = screen.getByRole('dialog').closest('.fixed');
+    expect(layer).not.toHaveClass('pointer-events-none');
+    fireEvent.keyDown(document, { key: 'Escape' });
+    // Lớp phủ vẫn còn trong DOM suốt hiệu ứng thoát nhưng phải xuyên chuột.
+    expect(document.body.contains(layer)).toBe(true);
+    expect(layer).toHaveClass('pointer-events-none');
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
   });
 });

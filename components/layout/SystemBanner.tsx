@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { AlertTriangle, X } from 'lucide-react';
 import { useActiveBanner } from '@/hooks/useSystemAnnouncements';
 
@@ -15,6 +16,7 @@ const DISMISS_KEY_PREFIX = 'dismissed-system-banner-';
  * layout con (public/authenticated/student/learn/admin/instructor), không riêng 1 nhóm route nào.
  */
 export function SystemBanner() {
+  const t = useTranslations('common.banner');
   const { data: banner } = useActiveBanner();
   const [dismissed, setDismissed] = useState(true);
 
@@ -52,7 +54,7 @@ export function SystemBanner() {
       <button
         type="button"
         onClick={handleDismiss}
-        aria-label="Đóng thông báo"
+        aria-label={t('close')}
         className="shrink-0 rounded-full p-1 hover:bg-white/20"
       >
         <X className="h-4 w-4" strokeWidth={2} />

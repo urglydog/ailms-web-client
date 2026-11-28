@@ -2,8 +2,9 @@
 
 import { useEffect, useId, useRef, useState, type ReactNode, type RefObject } from 'react';
 import { createPortal } from 'react-dom';
-import { AnimatePresence, motion } from 'motion/react';
+import { AnimatePresence, motion, useIsPresent } from 'motion/react';
 import { X } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { duration, ease, scale } from '@/lib/motion/tokens';
 
 /**
@@ -64,7 +65,7 @@ export function Modal({
   size = 'md',
   closeOnBackdrop = true,
   hideClose = false,
-  closeLabel = 'Đóng',
+  closeLabel,
   className = '',
   role = 'dialog',
   initialFocusRef,
@@ -72,6 +73,7 @@ export function Modal({
   zClass = 'z-[300]',
   bare = false,
 }: ModalProps) {
+  const tUi = useTranslations('common.ui');
   // Render qua portal vào <body>: `fixed` bên trong phần tử có transform/overflow sẽ bị cắt hoặc lệch.
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
@@ -128,7 +130,7 @@ export function Modal({
   return createPortal(
     <AnimatePresence>
       {open && (
-        <div className={`fixed inset-0 ${zClass} flex items-center justify-center p-4`}>
+        <ModalLayer zClass={zClass}>
           <motion.div
             aria-hidden
             className="absolute inset-0 bg-night/50"
@@ -179,7 +181,7 @@ export function Modal({
                   <button
                     type="button"
                     onClick={onClose}
-                    aria-label={closeLabel}
+                    aria-label={closeLabel ?? tUi('close')}
                     className="-mr-2 -mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-ink-muted transition-colors duration-150 hover:bg-tint hover:text-ink"
                   >
                     <X size={18} aria-hidden />
@@ -194,9 +196,23 @@ export function Modal({
               </>
             )}
           </motion.div>
-        </div>
+        </ModalLayer>
       )}
     </AnimatePresence>,
     document.body,
+  );
+}
+
+/**
+ * Lớp phủ toàn màn hình. Khi đóng, AnimatePresence giữ lớp này trên màn hình thêm ~160ms cho hiệu
+ * ứng thoát; trong lúc đó nó vẫn nhận chuột nên nuốt mất cú bấm đầu tiên vào nút bên dưới (vd "Thêm vào
+ * giỏ" ngay sau khi đóng modal xem trước). Đang thoát thì tắt pointer-events để cú bấm đi xuyên qua.
+ */
+function ModalLayer({ zClass, children }: { zClass: string; children: ReactNode }) {
+  const isPresent = useIsPresent();
+  return (
+    <div className={`fixed inset-0 ${zClass} flex items-center justify-center p-4${isPresent ? '' : ' pointer-events-none'}`}>
+      {children}
+    </div>
   );
 }

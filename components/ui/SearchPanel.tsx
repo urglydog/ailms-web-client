@@ -2,6 +2,7 @@
 
 import type { FormEvent, ReactNode } from 'react';
 import { Search } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 interface Props {
   label: string;
@@ -16,6 +17,7 @@ interface Props {
 
 /** Khung tra cứu dùng chung cho các màn quản lý dữ liệu lớn: chỉ có ô nhập (+ bộ lọc phụ); kết quả chỉ hiện sau khi bấm Tìm. */
 export function SearchPanel({ label, placeholder, value, onChange, onSubmit, filters, busy = false }: Props) {
+  const t = useTranslations('common.search');
   const submit = (e: FormEvent) => {
     e.preventDefault();
     onSubmit();
@@ -39,7 +41,7 @@ export function SearchPanel({ label, placeholder, value, onChange, onSubmit, fil
         className="inline-flex items-center gap-1.5 rounded-lg bg-accent px-4 py-2.5 text-sm font-semibold text-white hover:bg-accent-dark disabled:opacity-50"
       >
         <Search size={15} aria-hidden />
-        {busy ? 'Đang tìm...' : 'Tìm kiếm'}
+        {busy ? t('searching') : t('search')}
       </button>
     </form>
   );
@@ -65,17 +67,18 @@ interface PagerProps {
 
 /** Phân trang đơn giản: trang hiện tại bắt đầu từ 0. */
 export function Pager({ page, totalPages, total, onPage }: PagerProps) {
+  const t = useTranslations('common.search');
   if (totalPages <= 1) {
-    return <p className="m-0 px-1 text-sm text-ink-muted">{total} kết quả</p>;
+    return <p className="m-0 px-1 text-sm text-ink-muted">{t('results', { total })}</p>;
   }
   return (
-    <nav aria-label="Phân trang" className="flex flex-wrap items-center justify-between gap-3 px-1">
-      <span className="text-sm text-ink-muted">{total} kết quả · trang {page + 1}/{totalPages}</span>
+    <nav aria-label={t('pagination')} className="flex flex-wrap items-center justify-between gap-3 px-1">
+      <span className="text-sm text-ink-muted">{t('resultsPage', { total, page: page + 1, pages: totalPages })}</span>
       <div className="flex items-center gap-2">
         <button type="button" disabled={page === 0} onClick={() => onPage(page - 1)}
-          className="rounded-lg border border-line bg-surface-raised px-3 py-1.5 text-sm font-semibold text-ink hover:bg-tint disabled:opacity-50">Trước</button>
+          className="rounded-lg border border-line bg-surface-raised px-3 py-1.5 text-sm font-semibold text-ink hover:bg-tint disabled:opacity-50">{t('prev')}</button>
         <button type="button" disabled={page + 1 >= totalPages} onClick={() => onPage(page + 1)}
-          className="rounded-lg border border-line bg-surface-raised px-3 py-1.5 text-sm font-semibold text-ink hover:bg-tint disabled:opacity-50">Sau</button>
+          className="rounded-lg border border-line bg-surface-raised px-3 py-1.5 text-sm font-semibold text-ink hover:bg-tint disabled:opacity-50">{t('next')}</button>
       </div>
     </nav>
   );

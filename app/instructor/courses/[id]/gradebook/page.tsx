@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { Modal } from '@/components/ui/Modal';
 
 import { useState } from 'react';
@@ -9,6 +10,7 @@ import { gradebookApi, GradebookRes, AttemptInspectionRes } from '@/lib/api/grad
 
 
 export default function InstructorGradebookPage() {
+  const t = useTranslations('instructor.gradebook');
   const params = useParams();
   const router = useRouter();
   const courseId = Number(params.id);
@@ -30,7 +32,7 @@ export default function InstructorGradebookPage() {
   if (isLoading) {
     return (
       <div className="min-h-dvh bg-surface p-8 flex items-center justify-center">
-        <div className="text-ink-muted animate-pulse font-medium">Đang tải Bảng điểm lớp học...</div>
+        <div className="text-ink-muted animate-pulse font-medium">{t('loading')}</div>
       </div>
     );
   }
@@ -39,13 +41,13 @@ export default function InstructorGradebookPage() {
     return (
       <div className="min-h-dvh bg-surface p-8">
         <div className="card p-8 text-center max-w-md mx-auto">
-          <h2 className="text-lg font-bold text-danger mb-2">Không thể tải Bảng điểm</h2>
-          <p className="text-sm text-ink-muted mb-4">Bạn có thể không có quyền truy cập hoặc khóa học này chưa có dữ liệu.</p>
+          <h2 className="text-lg font-bold text-danger mb-2">{t('loadError')}</h2>
+          <p className="text-sm text-ink-muted mb-4">{t('loadErrorHint')}</p>
           <button 
             onClick={() => router.back()}
             className="bg-ink text-white px-4 py-2 rounded-lg text-sm font-semibold"
           >
-            Quay lại
+            {t('back')}
           </button>
         </div>
       </div>
@@ -59,51 +61,51 @@ export default function InstructorGradebookPage() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-line pb-6">
           <div>
             <div className="flex items-center gap-2 text-sm text-ink-muted mb-1">
-              <button onClick={() => router.push('/instructor')} className="hover:underline">Giảng viên</button>
+              <button onClick={() => router.push('/instructor')} className="hover:underline">{t('crumbInstructor')}</button>
               <span>/</span>
-              <button onClick={() => router.push(`/instructor/courses/${courseId}/edit/materials`)} className="hover:underline text-accent">Kho Học Liệu & Đề Thi</button>
+              <button onClick={() => router.push(`/instructor/courses/${courseId}/edit/materials`)} className="hover:underline text-accent">{t('crumbMaterials')}</button>
               <span>/</span>
-              <span>Bảng điểm</span>
+              <span>{t('crumbGradebook')}</span>
             </div>
             <h1 className="font-display text-2xl font-bold text-ink">
-              Bảng Điểm Lớp Học: <span className="text-accent">{gradebook.courseTitle}</span>
+              {t('title')} <span className="text-accent">{gradebook.courseTitle}</span>
             </h1>
           </div>
           <button
             onClick={() => router.push(`/instructor/courses/${courseId}/edit/materials`)}
             className="bg-ink text-white px-4 py-2 rounded-xl text-sm font-bold shadow hover:bg-ink/90 transition"
           >
-            Kho Học Liệu & Đề Thi
+            {t('crumbMaterials')}
           </button>
         </div>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="card p-6 border-l-4 border-accent">
-            <div className="text-xs font-bold uppercase tracking-wider text-ink-muted">Tổng học viên ghi danh</div>
-            <div className="text-3xl font-extrabold text-ink mt-2">{gradebook.totalStudents} <span className="text-sm font-normal text-ink-muted">học viên</span></div>
+            <div className="text-xs font-bold uppercase tracking-wider text-ink-muted">{t('totalStudents')}</div>
+            <div className="text-3xl font-extrabold text-ink mt-2">{gradebook.totalStudents} <span className="text-sm font-normal text-ink-muted">{t('students')}</span></div>
           </div>
           <div className="card p-6 border-l-4 border-success">
-            <div className="text-xs font-bold uppercase tracking-wider text-ink-muted">Điểm trung bình lớp</div>
+            <div className="text-xs font-bold uppercase tracking-wider text-ink-muted">{t('avgScore')}</div>
             <div className="text-3xl font-extrabold text-success mt-2">{gradebook.averageScore} <span className="text-sm font-normal text-ink-muted">/10</span></div>
           </div>
           <div className="card p-6 border-l-4 border-warning">
-            <div className="text-xs font-bold uppercase tracking-wider text-ink-muted">Tỷ lệ Đạt (Pass Rate)</div>
+            <div className="text-xs font-bold uppercase tracking-wider text-ink-muted">{t('passRate')}</div>
             <div className="text-3xl font-extrabold text-warning mt-2">{gradebook.passRatePercentage}%</div>
           </div>
           <div className="card p-6 border-l-4 border-accent">
-            <div className="text-xs font-bold uppercase tracking-wider text-ink-muted">Tổng số lượt làm bài</div>
-            <div className="text-3xl font-extrabold text-accent-dark mt-2">{gradebook.totalAttempts} <span className="text-sm font-normal text-ink-muted">lượt</span></div>
+            <div className="text-xs font-bold uppercase tracking-wider text-ink-muted">{t('totalAttempts')}</div>
+            <div className="text-3xl font-extrabold text-accent-dark mt-2">{gradebook.totalAttempts} <span className="text-sm font-normal text-ink-muted">{t('attemptsUnit')}</span></div>
           </div>
         </div>
 
         {/* Gradebook Table */}
         <div className="card overflow-hidden">
           <div className="p-6 border-b border-line flex justify-between items-center bg-surface-hover">
-            <h2 className="font-display font-bold text-lg text-ink">Danh Sách Bảng Điểm Chi Tiết</h2>
+            <h2 className="font-display font-bold text-lg text-ink">{t('detailList')}</h2>
             {!gradebook.hasOfficialQuiz && (
               <span className="text-xs font-semibold text-warning bg-streak-bg px-3 py-1 rounded-full border border-warning/30">
-                Khóa học chưa xuất bản Quiz chính thức
+                {t('noOfficialQuiz')}
               </span>
             )}
           </div>
@@ -112,13 +114,13 @@ export default function InstructorGradebookPage() {
             <table className="w-full text-left text-sm">
               <thead className="bg-surface text-ink-muted text-xs uppercase font-bold border-b border-line">
                 <tr>
-                  <th className="px-6 py-4">Học Viên</th>
-                  <th className="px-6 py-4 text-center">Số Lượt Làm</th>
-                  <th className="px-6 py-4 text-center">Điểm Cao Nhất</th>
-                  <th className="px-6 py-4 text-center">Điểm Gần Nhất</th>
-                  <th className="px-6 py-4">Thời Gian Nộp</th>
-                  <th className="px-6 py-4 text-center">Trạng Thái</th>
-                  <th className="px-6 py-4 text-right">Thao Tác</th>
+                  <th className="px-6 py-4">{t('colStudent')}</th>
+                  <th className="px-6 py-4 text-center">{t('colAttempts')}</th>
+                  <th className="px-6 py-4 text-center">{t('colBest')}</th>
+                  <th className="px-6 py-4 text-center">{t('colLatest')}</th>
+                  <th className="px-6 py-4">{t('colSubmitted')}</th>
+                  <th className="px-6 py-4 text-center">{t('colStatus')}</th>
+                  <th className="px-6 py-4 text-right">{t('colActions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-line">
@@ -131,10 +133,10 @@ export default function InstructorGradebookPage() {
                     <td className="px-6 py-4 text-center font-semibold">
                       {student.attemptCount > 0 ? (
                         <span className="bg-tint text-accent-dark px-2.5 py-1 rounded-full text-xs font-bold">
-                          {student.attemptCount} lượt
+                          {t('attemptCount', { count: student.attemptCount })}
                         </span>
                       ) : (
-                        <span className="text-ink-muted">Chưa làm</span>
+                        <span className="text-ink-muted">{t('notTaken')}</span>
                       )}
                     </td>
                     <td className="px-6 py-4 text-center font-bold text-base">
@@ -154,11 +156,11 @@ export default function InstructorGradebookPage() {
                     </td>
                     <td className="px-6 py-4 text-center">
                       {student.attemptCount === 0 ? (
-                        <span className="bg-tint text-ink-muted px-2.5 py-1 rounded-full text-xs font-semibold">Chưa tham gia</span>
+                        <span className="bg-tint text-ink-muted px-2.5 py-1 rounded-full text-xs font-semibold">{t('notJoined')}</span>
                       ) : student.passed ? (
-                        <span className="bg-success-tint text-success-ink px-2.5 py-1 rounded-full text-xs font-bold border border-success/30">Đạt (Passed) ✓</span>
+                        <span className="bg-success-tint text-success-ink px-2.5 py-1 rounded-full text-xs font-bold border border-success/30">{t('passed')}</span>
                       ) : (
-                        <span className="bg-danger/5 text-danger px-2.5 py-1 rounded-full text-xs font-bold border border-danger/30">Chưa đạt ✕</span>
+                        <span className="bg-danger/5 text-danger px-2.5 py-1 rounded-full text-xs font-bold border border-danger/30">{t('failed')}</span>
                       )}
                     </td>
                     <td className="px-6 py-4 text-right">
@@ -167,10 +169,10 @@ export default function InstructorGradebookPage() {
                           onClick={() => setSelectedAttemptId(student.latestAttemptId)}
                           className="bg-accent text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-accent-dark transition flex items-center gap-1 ml-auto"
                         >
-                          Chi Tiết Bài Làm
+                          {t('viewAttempt')}
                         </button>
                       ) : (
-                        <span className="text-xs text-ink-muted italic">Không có bài nộp</span>
+                        <span className="text-xs text-ink-muted italic">{t('noSubmission')}</span>
                       )}
                     </td>
                   </tr>
@@ -178,7 +180,7 @@ export default function InstructorGradebookPage() {
                 {gradebook.students.length === 0 && (
                   <tr>
                     <td colSpan={7} className="px-6 py-12 text-center text-ink-muted">
-                      Chưa có học viên nào ghi danh khóa học này.
+                      {t('noStudents')}
                     </td>
                   </tr>
                 )}
@@ -190,14 +192,14 @@ export default function InstructorGradebookPage() {
 
       {/* Attempt Inspection Modal */}
       {selectedAttemptId && (
-        <Modal open onClose={() => setSelectedAttemptId(null)} bare ariaLabel="Chi tiết bài làm học viên" closeOnBackdrop={false} className="card w-full max-w-3xl max-h-[90vh] flex flex-col p-6 shadow-2xl bg-surface-raised rounded-2xl my-8">
+        <Modal open onClose={() => setSelectedAttemptId(null)} bare ariaLabel={t('modalAria')} closeOnBackdrop={false} className="card w-full max-w-3xl max-h-[90vh] flex flex-col p-6 shadow-2xl bg-surface-raised rounded-2xl my-8">
             <div className="flex justify-between items-center border-b border-line pb-4 mb-4">
               <div>
                 <h3 className="text-lg font-bold text-ink flex items-center gap-2">
-                  <span>Chi Tiết Bài Làm Học Viên:</span>
+                  <span>{t('modalTitle')}</span>
                   <span className="text-accent">{attemptDetail?.studentName}</span>
                 </h3>
-                <p className="text-xs text-ink-muted">{attemptDetail?.studentEmail} • Nộp lúc: {attemptDetail?.submittedAt ? new Date(attemptDetail.submittedAt).toLocaleString('vi-VN') : ''}</p>
+                <p className="text-xs text-ink-muted">{attemptDetail?.studentEmail} • {t('submittedAt')} {attemptDetail?.submittedAt ? new Date(attemptDetail.submittedAt).toLocaleString('vi-VN') : ''}</p>
               </div>
               <button 
                 onClick={() => setSelectedAttemptId(null)}
@@ -208,31 +210,31 @@ export default function InstructorGradebookPage() {
             </div>
 
             {isLoadingAttempt ? (
-              <div className="py-12 text-center text-ink-muted animate-pulse font-medium">Đang nạp chi tiết bài nộp...</div>
+              <div className="py-12 text-center text-ink-muted animate-pulse font-medium">{t('loadingAttempt')}</div>
             ) : attemptDetail ? (
               <div className="overflow-y-auto pr-2 space-y-6 flex-1">
                 {/* Result Overview */}
                 <div className="bg-surface p-4 rounded-xl flex items-center justify-around border border-line">
                   <div className="text-center">
-                    <div className="text-xs font-semibold text-ink-muted uppercase">Điểm số</div>
+                    <div className="text-xs font-semibold text-ink-muted uppercase">{t('score')}</div>
                     <div className="text-2xl font-extrabold text-accent">{attemptDetail.score}/10</div>
                   </div>
                   <div className="h-8 w-px bg-line"></div>
                   <div className="text-center">
-                    <div className="text-xs font-semibold text-ink-muted uppercase">Số câu đúng</div>
+                    <div className="text-xs font-semibold text-ink-muted uppercase">{t('correctCount')}</div>
                     <div className="text-2xl font-extrabold text-success">{attemptDetail.correctCount}/{attemptDetail.totalQuestions}</div>
                   </div>
                 </div>
 
                 {/* Answers Inspection List */}
                 <div className="space-y-4">
-                  <h4 className="font-bold text-sm text-ink uppercase tracking-wider">Chi Tiết Lựa Chọn Từng Câu Hỏi</h4>
+                  <h4 className="font-bold text-sm text-ink uppercase tracking-wider">{t('perQuestion')}</h4>
                   {attemptDetail.answers.map((q, idx) => (
                     <div key={q.questionId} className={`p-4 rounded-xl border-l-4 ${q.isCorrect ? 'border-success bg-success-tint/20' : 'border-danger bg-danger/5'} border border-line`}>
                       <div className="flex justify-between items-start mb-2">
-                        <div className="font-bold text-sm text-ink">Câu {idx + 1}: {q.questionContent}</div>
+                        <div className="font-bold text-sm text-ink">{t('questionNo', { n: idx + 1 })} {q.questionContent}</div>
                         {q.isCorrect ? (
-                          <span className="text-success-ink bg-success-tint px-2.5 py-0.5 rounded-full text-xs font-bold">Đúng ✓</span>
+                          <span className="text-success-ink bg-success-tint px-2.5 py-0.5 rounded-full text-xs font-bold">{t('correct')}</span>
                         ) : (
                           <span className="text-danger bg-danger/10 px-2.5 py-0.5 rounded-full text-xs font-bold">Sai ✕</span>
                         )}
@@ -258,8 +260,8 @@ export default function InstructorGradebookPage() {
                             <div key={opt.id} className={style}>
                               <span>{opt.content}</span>
                               <div className="flex items-center gap-1 text-[11px]">
-                                {isSelected && <span className="bg-ink text-white px-2 py-0.5 rounded font-bold">Lựa chọn của học viên</span>}
-                                {isCorrect && <span className="bg-success text-white px-2 py-0.5 rounded font-bold">Đáp án đúng ✓</span>}
+                                {isSelected && <span className="bg-ink text-white px-2 py-0.5 rounded font-bold">{t('learnerChoice')}</span>}
+                                {isCorrect && <span className="bg-success text-white px-2 py-0.5 rounded font-bold">{t('correctAnswer')}</span>}
                               </div>
                             </div>
                           );
@@ -276,7 +278,7 @@ export default function InstructorGradebookPage() {
                 onClick={() => setSelectedAttemptId(null)}
                 className="bg-ink text-white font-bold px-6 py-2 rounded-xl text-sm hover:bg-ink/90"
               >
-                Đóng
+                {t('close')}
               </button>
             </div>
           </Modal>

@@ -14,6 +14,7 @@
  */
 
 import type { ProblemDetail } from '@/types/domain';
+import { tr } from '@/lib/i18n/translate';
 
 /** Lỗi API đã được chuẩn hoá — component bắt lỗi này thay vì đọc Response thô. */
 export class ApiError extends Error {
@@ -265,7 +266,7 @@ async function parseProblem(response: Response): Promise<ProblemDetail> {
       type: 'about:blank',
       title: response.statusText,
       status: response.status,
-      detail: `Yêu cầu thất bại với mã ${response.status}`,
+      detail: tr('errors.api.requestFailed', { status: response.status }),
       instance: response.url,
       code: 'NON_JSON_RESPONSE',
       timestamp: new Date().toISOString(),
@@ -276,7 +277,7 @@ async function parseProblem(response: Response): Promise<ProblemDetail> {
 /** Người dùng chủ động bấm "Hủy" giữa lúc upload — phân biệt với lỗi mạng/máy chủ thật. */
 export class UploadCancelledError extends Error {
   constructor() {
-    super('Đã hủy tải lên');
+    super(tr('errors.api.uploadCancelled'));
     this.name = 'UploadCancelledError';
   }
 }
@@ -319,7 +320,7 @@ export function uploadFileCancelable<T>(
           type: 'about:blank',
           title: 'Network Error',
           status: 0,
-          detail: 'Không kết nối được máy chủ',
+          detail: tr('errors.api.networkError'),
           instance: path,
           code: 'NETWORK_ERROR',
           timestamp: new Date().toISOString(),
@@ -387,7 +388,7 @@ export function uploadFilesCancelable<T>(
           type: 'about:blank',
           title: 'Network Error',
           status: 0,
-          detail: 'Không kết nối được máy chủ',
+          detail: tr('errors.api.networkError'),
           instance: path,
           code: 'NETWORK_ERROR',
           timestamp: new Date().toISOString(),
@@ -430,7 +431,7 @@ function parseProblemFromXhr(xhr: XMLHttpRequest): ProblemDetail {
       type: 'about:blank',
       title: xhr.statusText,
       status: xhr.status,
-      detail: `Yêu cầu thất bại với mã ${xhr.status}`,
+      detail: tr('errors.api.requestFailed', { status: xhr.status }),
       instance: xhr.responseURL,
       code: 'NON_JSON_RESPONSE',
       timestamp: new Date().toISOString(),

@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import ReactMarkdown, { defaultUrlTransform } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -15,7 +16,8 @@ const TIMESTAMP_RE = /\[(?:(\d+)\|)?(\d{1,3}):([0-5]?\d)\]/g;
 /** Nhãn nút bấm hiện thêm "· Tên bài" khi mốc thời gian thuộc 1 bài KHÁC bài đang mở, để học
  * viên biết TRƯỚC khi bấm là sẽ nhảy sang bài nào, không chỉ thấy mỗi giờ:phút:giây. */
 function injectTimestampLinks(
-  content: string, currentLessonId?: number, lessonTitleById?: Record<number, string>,
+  content: string, currentLessonId: number | undefined, lessonTitleById: Record<number, string> | undefined,
+  lessonFallback: (id: number) => string,
 ): string {
   return content.replace(TIMESTAMP_RE, (_match, lessonIdStr: string | undefined, m: string, s: string) => {
     const sec = Number(m) * 60 + Number(s);
@@ -23,7 +25,7 @@ function injectTimestampLinks(
     const target = lessonId !== undefined ? `${sec}@${lessonId}` : `${sec}`;
     const timeLabel = `${m.padStart(2, '0')}:${s.padStart(2, '0')}`;
     const isOtherLesson = lessonId !== undefined && currentLessonId !== undefined && lessonId !== currentLessonId;
-    const lessonLabel = isOtherLesson ? lessonTitleById?.[lessonId] ?? `bài #${lessonId}` : null;
+    const lessonLabel = isOtherLesson ? lessonTitleById?.[lessonId] ?? lessonFallback(lessonId) : null;
     const linkText = lessonLabel ? `▶ ${timeLabel} · ${lessonLabel}` : `▶ ${timeLabel}`;
     return `[${linkText}](tutor-seek:${target})`;
   });
@@ -58,7 +60,10 @@ export function MarkdownRenderer({
   currentLessonId?: number;
   lessonTitleById?: Record<number, string>;
 }) {
-  const processedContent = onSeek ? injectTimestampLinks(content, currentLessonId, lessonTitleById) : content;
+  const t = useTranslations('common.markdown');
+  const processedContent = onSeek
+    ? injectTimestampLinks(content, currentLessonId, lessonTitleById, (id) => t('lessonFallback', { id }))
+    : content;
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
   const components: Components = {

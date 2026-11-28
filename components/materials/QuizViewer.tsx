@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useExplainWrongAnswer } from '@/hooks/useQuizzes';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 import { MarkdownRenderer } from '@/components/ui/MarkdownRenderer';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useParams, useRouter } from 'next/navigation';
@@ -21,6 +22,7 @@ interface QuizQuestion {
 }
 
 export function QuizViewer({ questions, quizId }: { questions: QuizQuestion[], quizId?: number }) {
+  const t = useTranslations('learn.quiz');
   const router = useRouter();
   const { data: user } = useCurrentUser();
   const userId = user?.id;
@@ -96,29 +98,29 @@ export function QuizViewer({ questions, quizId }: { questions: QuizQuestion[], q
         setExplanations(prev => ({ ...prev, [qId]: { loading: false, text: data.explanation } }));
       },
       onError: () => {
-        setExplanations(prev => ({ ...prev, [qId]: { loading: false, text: 'Có lỗi khi kết nối AI.' } }));
-        toast.error('Có lỗi khi lấy giải thích.');
+        setExplanations(prev => ({ ...prev, [qId]: { loading: false, text: t('aiError') } }));
+        toast.error(t('explainError'));
       }
     });
   };
 
   if (!questions || questions.length === 0) {
-    return <div className="text-center text-ink-muted">Chưa có câu hỏi trắc nghiệm nào.</div>;
+    return <div className="text-center text-ink-muted">{t('empty')}</div>;
   }
 
   if (!isDoing) {
     return (
       <div className="card p-10 text-center bg-surface-hover border border-line-soft">
         <div className="text-4xl mb-4">🧩</div>
-        <h2 className="text-2xl font-bold font-display text-ink mb-4">Quick Check: Ôn tập nhanh</h2>
+        <h2 className="text-2xl font-bold font-display text-ink mb-4">{t('title')}</h2>
         <p className="text-ink-muted mb-8">
-          Bài tập này có {questions.length} câu hỏi giúp bạn củng cố kiến thức vừa học.
+          {t('intro', { count: questions.length })}
         </p>
         <button
           onClick={() => setIsDoing(true)}
           className="btn-primary"
         >
-          {currentIdx > 0 || selectedOption !== null ? 'Tiếp tục làm bài' : 'Bắt đầu làm bài'}
+          {currentIdx > 0 || selectedOption !== null ? t('continue') : t('start')}
         </button>
       </div>
     );
@@ -127,12 +129,12 @@ export function QuizViewer({ questions, quizId }: { questions: QuizQuestion[], q
   if (showResult) {
     return (
       <div className="card p-10 text-center bg-surface-hover border border-line-soft">
-        <h2 className="text-2xl font-bold font-display text-ink mb-4">Hoàn thành bài trắc nghiệm!</h2>
+        <h2 className="text-2xl font-bold font-display text-ink mb-4">{t('doneTitle')}</h2>
         <div className="text-5xl font-display font-black text-accent mb-6">
           {score} / {questions.length}
         </div>
         <p className="text-ink-muted mb-8">
-          Tuyệt vời! Bạn đã hoàn thành {questions.length} câu hỏi.
+          {t('doneBody', { count: questions.length })}
         </p>
         <button
           onClick={() => {
@@ -140,7 +142,7 @@ export function QuizViewer({ questions, quizId }: { questions: QuizQuestion[], q
           }}
           className="btn-primary"
         >
-          Hoàn tất & Quay lại
+          {t('finish')}
         </button>
       </div>
     );
@@ -148,7 +150,7 @@ export function QuizViewer({ questions, quizId }: { questions: QuizQuestion[], q
 
   const question = questions[currentIdx];
   if (!question) {
-    return <div className="text-center text-ink-muted">Lỗi hiển thị câu hỏi.</div>;
+    return <div className="text-center text-ink-muted">{t('displayError')}</div>;
   }
   
   const isAnswered = selectedOption !== null;
@@ -175,7 +177,7 @@ export function QuizViewer({ questions, quizId }: { questions: QuizQuestion[], q
   return (
     <div className="card border-line-soft shadow-sm overflow-hidden bg-surface-raised/70 backdrop-blur-md">
       <div className="bg-surface-hover px-6 py-4 border-b border-line flex justify-between items-center">
-        <span className="font-semibold text-ink">Câu hỏi {currentIdx + 1} của {questions.length}</span>
+        <span className="font-semibold text-ink">{t('questionOf', { current: currentIdx + 1, total: questions.length })}</span>
         <div className="w-1/3 bg-line-soft h-2 rounded-full overflow-hidden">
           <div 
             className="bg-accent h-full transition duration-300" 
@@ -231,13 +233,13 @@ export function QuizViewer({ questions, quizId }: { questions: QuizQuestion[], q
                 onClick={() => handleExplain(question.id, selectedOption)}
                 className="text-accent text-sm font-semibold hover:underline flex items-center gap-1"
               >
-                Hỏi Gia sư AI tại sao sai?
+                {t('askTutor')}
               </button>
             ) : (
               <div className="bg-accent/5 p-4 rounded-lg border border-accent/15">
                 <div className="flex items-center gap-2 font-bold text-accent-dark mb-2">
-                  <span>Gia sư AI giải thích:</span>
-                  {explanations[question.id]?.loading && <span className="animate-pulse text-accent">Đang suy nghĩ...</span>}
+                  <span>{t('tutorExplains')}</span>
+                  {explanations[question.id]?.loading && <span className="animate-pulse text-accent">{t('thinking')}</span>}
                 </div>
                 {explanations[question.id]?.text && (
                   <div className="text-sm text-ink leading-relaxed">
@@ -255,7 +257,7 @@ export function QuizViewer({ questions, quizId }: { questions: QuizQuestion[], q
             onClick={handleNext}
             className={`px-6 py-3 rounded-xl font-bold transition ${isAnswered ? 'bg-accent text-white hover:bg-accent-hover transform hover:scale-105 active:scale-95' : 'bg-surface-hover text-ink-muted cursor-not-allowed'}`}
           >
-            {currentIdx === questions.length - 1 ? 'Hoàn thành' : 'Câu tiếp theo'}
+            {currentIdx === questions.length - 1 ? t('finishQuiz') : t('next')}
           </button>
         </div>
       </div>

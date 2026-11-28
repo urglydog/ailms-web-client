@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import type { PipelineStep } from '@/types/domain';
 
 /**
@@ -26,13 +27,14 @@ interface PipelineProgressProps {
 }
 
 export function PipelineProgress({ steps, percent, onWatchOriginal, onCancel, isCancelling }: PipelineProgressProps) {
+  const t = useTranslations('learn.player.pipeline');
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="h-2 w-2 animate-ai-pulse rounded-full bg-accent" aria-hidden />
           <span className="font-mono text-[11px] font-semibold tracking-widest text-accent">
-            ĐANG XỬ LÝ LỒNG TIẾNG AI
+            {t('heading')}
           </span>
         </div>
         {percent !== undefined && (
@@ -46,7 +48,7 @@ export function PipelineProgress({ steps, percent, onWatchOriginal, onCancel, is
           aria-valuenow={percent}
           aria-valuemin={0}
           aria-valuemax={100}
-          aria-label="Tiến độ lồng tiếng"
+          aria-label={t('aria')}
           className="h-1.5 w-full overflow-hidden rounded-full bg-line-soft"
         >
           <div
@@ -89,7 +91,7 @@ export function PipelineProgress({ steps, percent, onWatchOriginal, onCancel, is
               }`}
             >
               {step.label}
-              {step.failed && ' — giữ âm thanh gốc cho đoạn này'}
+              {step.failed && t('failedNote')}
             </span>
           </li>
         ))}
@@ -101,7 +103,7 @@ export function PipelineProgress({ steps, percent, onWatchOriginal, onCancel, is
           onClick={onWatchOriginal}
           className="text-[13px] font-medium text-ink-muted underline-offset-4 hover:text-accent hover:underline"
         >
-          Ẩn tiến độ, xem video
+          {t('hide')}
         </button>
         <button
           type="button"
@@ -109,7 +111,7 @@ export function PipelineProgress({ steps, percent, onWatchOriginal, onCancel, is
           disabled={isCancelling}
           className="text-[13px] font-medium text-danger underline-offset-4 hover:underline disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {isCancelling ? 'Đang huỷ...' : 'Huỷ lồng tiếng'}
+          {isCancelling ? t('cancelling') : t('cancel')}
         </button>
       </div>
     </div>

@@ -145,9 +145,9 @@ export function CouponManager({ role }: CouponManagerProps) {
 
       {coupons && coupons.length > 0 && (
         <div className="flex flex-wrap items-center gap-3">
-          <ListSearch label="Tìm mã giảm giá" value={list.query} onChange={list.setQuery} placeholder="Tìm theo mã hoặc tên khóa học áp dụng..." />
+          <ListSearch label={t('listFilter.searchLabel')} value={list.query} onChange={list.setQuery} placeholder={t('listFilter.searchPh')} />
           <select
-            aria-label="Lọc theo trạng thái"
+            aria-label={t('listFilter.statusAria')}
             value={statusFilter}
             onChange={(e) => {
               setStatusFilter(e.target.value as 'ALL' | 'ACTIVE' | 'INACTIVE');
@@ -155,9 +155,9 @@ export function CouponManager({ role }: CouponManagerProps) {
             }}
             className="rounded-lg border border-line bg-surface-raised px-3 py-2.5 text-sm text-ink outline-none focus:border-accent"
           >
-            <option value="ALL">Tất cả trạng thái</option>
-            <option value="ACTIVE">Đang bật</option>
-            <option value="INACTIVE">Đã tắt</option>
+            <option value="ALL">{t('listFilter.all')}</option>
+            <option value="ACTIVE">{t('listFilter.active')}</option>
+            <option value="INACTIVE">{t('listFilter.inactive')}</option>
           </select>
         </div>
       )}
@@ -259,7 +259,7 @@ export function CouponManager({ role }: CouponManagerProps) {
 
       {coupons && coupons.length > 0 &&
         (list.total === 0 ? (
-          <div className="card border border-line rounded-xl p-6 text-center text-sm text-ink-muted">Không có mã giảm giá nào khớp.</div>
+          <div className="card border border-line rounded-xl p-6 text-center text-sm text-ink-muted">{t('listFilter.noMatch')}</div>
         ) : (
           <Pager page={list.page} totalPages={list.totalPages} total={list.total} onPage={list.setPage} />
         ))}

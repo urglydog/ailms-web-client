@@ -62,7 +62,7 @@ export function InstructorSidebar({ pathname, collapsed, onToggleCollapsed, badg
               {!collapsed && <span className="flex-1">{label}</span>}
               {!collapsed && (badges?.[item.id] ?? 0) > 0 && (
                 <span
-                  aria-label={`${badges?.[item.id]} thông báo chưa đọc`}
+                  aria-label={t('shell.unreadNotifications', { count: badges?.[item.id] ?? 0 })}
                   className="flex h-5 min-w-5 items-center justify-center rounded-full bg-danger px-1.5 text-[11px] font-bold leading-none text-white"
                 >
                   {(badges?.[item.id] ?? 0) > 99 ? '99+' : badges?.[item.id]}

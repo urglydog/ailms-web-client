@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { Modal } from '@/components/ui/Modal';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -35,6 +36,7 @@ interface CourseMaterialsManagerProps {
 
 
 function DraggableMaterialCard({ mat, onClick, isLoading: isPending }: { mat: InstructorMaterial; onClick: () => void; isLoading?: boolean }) {
+  const t = useTranslations('instructor.materials');
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: `material-${mat.id}`,
     data: { material: mat },
@@ -50,8 +52,8 @@ function DraggableMaterialCard({ mat, onClick, isLoading: isPending }: { mat: In
   };
   const cfg = typeConfig[mat.materialType] ?? { Icon: File, label: mat.materialType, band: 'bg-line-soft', iconTone: 'text-ink-faint' };
   const statLabel =
-    mat.materialType === 'QUIZ' && mat.questionCount != null ? `${mat.questionCount} câu hỏi` :
-    mat.materialType === 'FLASHCARD' && mat.cardCount != null ? `${mat.cardCount} thẻ` :
+    mat.materialType === 'QUIZ' && mat.questionCount != null ? t('questionsCount', { count: mat.questionCount }) :
+    mat.materialType === 'FLASHCARD' && mat.cardCount != null ? t('cardsCount', { count: mat.cardCount }) :
     null;
 
   return (
@@ -77,7 +79,7 @@ function DraggableMaterialCard({ mat, onClick, isLoading: isPending }: { mat: In
       <div
         {...listeners}
         className="absolute top-2 left-2 text-ink-faint p-1 bg-surface-raised/80 rounded-card z-10 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing"
-        title="Kéo để phân phối vào bài học"
+        title={t('dragToDistribute')}
         onClick={(e) => e.stopPropagation()}
       >
         <GripVertical className="w-4 h-4" />
@@ -88,7 +90,7 @@ function DraggableMaterialCard({ mat, onClick, isLoading: isPending }: { mat: In
         <button
           onClick={(e) => { e.stopPropagation(); onClick(); }}
           className="p-1 rounded-card bg-surface-raised/90 hover:bg-accent/10 text-ink-muted hover:text-accent transition-colors shadow-card border border-line"
-          title="Xem / chỉnh sửa"
+          title={t('viewEdit')}
         >
           <FileText className="w-3.5 h-3.5" />
         </button>
@@ -105,7 +107,7 @@ function DraggableMaterialCard({ mat, onClick, isLoading: isPending }: { mat: In
 
       <div className="p-3 pb-2 flex-1">
         <h4 className="text-sm font-bold text-ink line-clamp-2 leading-tight">
-          {mat.title || 'Học liệu không tên'}
+          {mat.title || t('untitled')}
         </h4>
       </div>
 
@@ -123,6 +125,7 @@ function DraggableMaterialCard({ mat, onClick, isLoading: isPending }: { mat: In
 }
 
 function DraggableMaterialRow({ mat, onDoubleClick }: { mat: InstructorMaterial; onDoubleClick: () => void }) {
+  const t = useTranslations('instructor.materials');
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: `material-${mat.id}`,
     data: { material: mat },
@@ -148,7 +151,7 @@ function DraggableMaterialRow({ mat, onDoubleClick }: { mat: InstructorMaterial;
         {...listeners}
         onClick={(e) => e.stopPropagation()}
         className="cursor-grab active:cursor-grabbing text-ink-faint hover:text-ink-muted flex-shrink-0"
-        title="Kéo để phân phối vào bài học"
+        title={t('dragToDistribute')}
       >
         <GripVertical className="w-3.5 h-3.5" />
       </span>
@@ -156,7 +159,7 @@ function DraggableMaterialRow({ mat, onDoubleClick }: { mat: InstructorMaterial;
         <rowCfg.Icon className={`w-4 h-4 ${rowCfg.iconTone}`} strokeWidth={1.75} />
       </span>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold text-ink truncate">{mat.title || 'Học liệu không tên'}</p>
+        <p className="text-sm font-semibold text-ink truncate">{mat.title || t('untitled')}</p>
         <p className="text-[10px] text-ink-faint">{new Date(mat.createdAt).toLocaleDateString('vi-VN')}</p>
       </div>
       {processingBadge ? (
@@ -169,6 +172,7 @@ function DraggableMaterialRow({ mat, onDoubleClick }: { mat: InstructorMaterial;
 }
 
 function DroppableNode({ id, title, type, children }: { id: string, title: string, type: string, children: React.ReactNode }) {
+  const t = useTranslations('instructor.materials');
   const { isOver, setNodeRef } = useDroppable({
     id: id,
     data: { type }
@@ -178,7 +182,7 @@ function DroppableNode({ id, title, type, children }: { id: string, title: strin
     <div ref={setNodeRef} className={`rounded-card transition-colors ${isOver ? 'bg-accent/5 border border-accent/30 border-dashed' : ''}`}>
       <div className={`flex items-center gap-2 px-2 py-1.5 text-xs border rounded-card ${type === 'CHAPTER' ? 'font-bold text-ink bg-surface-hover border-line' : 'font-semibold text-ink border-line/60 bg-surface-hover/50 mt-1'}`}>
         {type === 'CHAPTER' ? <Folder className="w-3.5 h-3.5 flex-shrink-0" strokeWidth={1.75} /> : <File className="w-3.5 h-3.5 flex-shrink-0" strokeWidth={1.75} />}
-        {type === 'CHAPTER' ? `Chương: ${title}` : title}
+        {type === 'CHAPTER' ? t('chapterPrefix', { title }) : title}
       </div>
       {children}
     </div>
@@ -186,6 +190,7 @@ function DroppableNode({ id, title, type, children }: { id: string, title: strin
 }
 
 export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps) {
+  const t = useTranslations('instructor.materials');
   const router = useRouter();
   const pathname = usePathname();
   const queryClient = useQueryClient();
@@ -221,11 +226,11 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
     mutationFn: (variables: { id: number, targetLessonId?: number, targetChapterId?: number }) =>
       materialsApi.overwriteMaterialVersion(variables.id, variables),
     onSuccess: () => {
-      toast.success('Đã cập nhật phiên bản mới');
+      toast.success(t('toast.versionUpdated'));
       queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] });
       setConfirmAction(null);
     },
-    onError: (err: Error) => toast.error(err.message || 'Lỗi khi cập nhật phiên bản'),
+    onError: (err: Error) => toast.error(err.message || t('toast.versionUpdateError')),
   });
 
 
@@ -233,10 +238,10 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
     mutationFn: (variables: { id: number; target: { lessonId?: number | null; chapterId?: number | null } }) =>
       materialsApi.attachMaterial(variables.id, variables.target),
     onSuccess: () => {
-      toast.success('Đã phân phối học liệu thành công');
+      toast.success(t('toast.distributed'));
       queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] });
     },
-    onError: (err: Error) => toast.error(err.message || 'Lỗi khi phân phối'),
+    onError: (err: Error) => toast.error(err.message || t('toast.distributeError')),
   });
 
   // Dùng chung cho cả 2 lối "di chuyển vào thư mục": kéo-thả thẻ học liệu thả vào dòng thư mục
@@ -247,9 +252,9 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
       materialsApi.moveToFolder(vars.id, vars.folderId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] });
-      toast.success('Đã di chuyển học liệu');
+      toast.success(t('toast.moved'));
     },
-    onError: (err: Error) => toast.error(err.message || 'Không thể di chuyển học liệu'),
+    onError: (err: Error) => toast.error(err.message || t('toast.moveError')),
   });
 
   const duplicateMaterialMutation = useMutation({
@@ -257,9 +262,9 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
       materialsApi.duplicateMaterial(vars.id, vars.targetFolderId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] });
-      toast.success('Đã nhân bản học liệu');
+      toast.success(t('toast.duplicated'));
     },
-    onError: (err: Error) => toast.error(err.message || 'Không thể nhân bản học liệu'),
+    onError: (err: Error) => toast.error(err.message || t('toast.duplicateError')),
   });
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -303,8 +308,8 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
     if (alreadyAssignedInLineage) {
       const latestInLineage = lineage.reduce((a, b) => (b.versionNo ?? 1) > (a.versionNo ?? 1) ? b : a);
       setConfirmAction({
-        title: "Cập nhật Phiên bản",
-        message: "Bạn có muốn cập nhật phiên bản mới cho học liệu này? Điểm số cũ của học viên sẽ được bảo lưu.",
+        title: t('versionConfirm.title'),
+        message: t('versionConfirm.message'),
         onConfirm: () => overwriteMaterialVersionMutation.mutateAsync({
           id: latestInLineage.id,
           targetLessonId: isChapter ? undefined : parsedTargetId,
@@ -364,12 +369,12 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
   const deleteMaterialMutation = useMutation({
     mutationFn: (id: number) => materialsApi.deleteMaterial(id),
     onSuccess: () => {
-      toast.success('Đã xóa bộ học liệu thành công');
+      toast.success(t('toast.deleted'));
       queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] });
       setInspectGenerationId(null);
       setConfirmDeleteId(null);
     },
-    onError: (err: Error) => toast.error(err.message || 'Lỗi khi xóa học liệu'),
+    onError: (err: Error) => toast.error(err.message || t('toast.deleteError')),
   });
 
   const renderDeleteModal = () => {
@@ -377,19 +382,19 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
     
     
     return (
-      <Modal open onClose={() => setConfirmDeleteId(null)} bare ariaLabel="Xóa học liệu" role="alertdialog" zClass="z-[100]" closeOnBackdrop={false} className="bg-surface-raised rounded-card max-w-sm w-full shadow-card-hover overflow-hidden border border-line">
+      <Modal open onClose={() => setConfirmDeleteId(null)} bare ariaLabel={t('deleteModal.aria')} role="alertdialog" zClass="z-[100]" closeOnBackdrop={false} className="bg-surface-raised rounded-card max-w-sm w-full shadow-card-hover overflow-hidden border border-line">
           <div className="bg-danger/5 p-4 border-b border-danger/10 flex items-center gap-3">
             <Trash2 className="w-5 h-5 text-danger" />
-            <h3 className="text-base font-bold text-ink">Xóa Học Liệu</h3>
+            <h3 className="text-base font-bold text-ink">{t('deleteModal.title')}</h3>
           </div>
           <div className="p-4">
             <p className="text-ink-muted text-sm mb-4">
-              Bạn có chắc chắn muốn xóa không? Hành động này không thể hoàn tác.
+              {t('deleteModal.body')}
             </p>
             {deleteMaterialMutation.isPending && (
               <div className="mb-4">
                 <CautionProgressBar tone="warning" />
-                <p className="text-[11px] text-ink-faint mt-1.5">Đang xóa, vui lòng đợi...</p>
+                <p className="text-[11px] text-ink-faint mt-1.5">{t('deleteModal.wait')}</p>
               </div>
             )}
             <div className="flex items-center justify-end gap-2">
@@ -397,14 +402,14 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                 onClick={() => setConfirmDeleteId(null)}
                 className="px-3 py-1.5 text-xs font-bold text-ink-muted bg-surface-hover hover:bg-line-soft rounded-card transition-colors"
               >
-                Hủy
+                {t('cancel')}
               </button>
               <button
                 onClick={() => deleteMaterialMutation.mutate(confirmDeleteId)}
                 disabled={deleteMaterialMutation.isPending}
                 className="px-3 py-1.5 text-xs font-bold text-white bg-danger hover:bg-danger/90 rounded-card shadow-card transition disabled:opacity-50"
               >
-                {deleteMaterialMutation.isPending ? 'Đang xóa...' : 'Xác nhận xóa'}
+                {deleteMaterialMutation.isPending ? t('deleting') : t('deleteModal.confirm')}
               </button>
             </div>
           </div>
@@ -412,7 +417,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
     );
   };
 
-  if (isLoading) return <div className="p-6 text-center text-sm text-ink-muted animate-pulse">Đang tải...</div>;
+  if (isLoading) return <div className="p-6 text-center text-sm text-ink-muted animate-pulse">{t('loading')}</div>;
 
   if (inspectGenerationId) {
     const activeMat = materials?.find(m => m.id === inspectGenerationId);
@@ -463,7 +468,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
         <div className="w-1/3 bg-surface-raised border border-line rounded-card overflow-hidden flex flex-col shadow-sm">
           <div className="p-3 border-b border-line bg-surface-hover flex items-center gap-2">
             <Layers className="w-4 h-4 text-ink-muted" />
-            <h3 className="font-bold text-sm text-ink">Phân Phối (Shortcuts)</h3>
+            <h3 className="font-bold text-sm text-ink">{t('distribution.title')}</h3>
           </div>
           <div className="overflow-y-auto p-2 flex flex-col gap-1 flex-1">
             {chapters?.map(chapter => {
@@ -476,20 +481,20 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                     {chapterMaterials.map(mat => {
                       const assignment = mat.assignments?.find(a => a.chapterId === chapter.id);
                       return (
-                        <div key={`mat-${mat.id}`} onDoubleClick={() => setInspectGenerationId(mat.id, true)} onMouseDown={(e) => { if (e.detail > 1) e.preventDefault(); }} className="flex items-center justify-between ml-6 mt-1 px-2 py-1.5 text-xs text-ink border border-line bg-surface-raised rounded-card hover:border-accent hover:bg-accent/5 cursor-pointer transition-colors group select-none" title="Nháy đúp để xem trước">
+                        <div key={`mat-${mat.id}`} onDoubleClick={() => setInspectGenerationId(mat.id, true)} onMouseDown={(e) => { if (e.detail > 1) e.preventDefault(); }} className="flex items-center justify-between ml-6 mt-1 px-2 py-1.5 text-xs text-ink border border-line bg-surface-raised rounded-card hover:border-accent hover:bg-accent/5 cursor-pointer transition-colors group select-none" title={t('dblClickPreview')}>
                           <div className="flex items-center gap-2 min-w-0">
-                            <LinkIcon className="w-3 h-3 text-ink-faint flex-shrink-0" /> <span className="truncate">{mat.title || 'Học liệu'}</span>
+                            <LinkIcon className="w-3 h-3 text-ink-faint flex-shrink-0" /> <span className="truncate">{mat.title || t('materialFallback')}</span>
                           </div>
                           <button onClick={(e) => {
                             e.stopPropagation();
                             if (assignment) {
                               setConfirmAction({
-                                title: "Gỡ phân phối",
-                                message: "Bạn có chắc chắn muốn gỡ học liệu này khỏi chương?",
+                                title: t('distribution.unassignTitle'),
+                                message: t('distribution.unassignChapter'),
                                 onConfirm: () => assignment?.id ? materialsApi.deleteAssignment(assignment.id).then(() => queryClient.invalidateQueries({ queryKey: ["instructor-materials", courseId] })) : undefined
                               });
                             }
-                          }} title="Gỡ" className="opacity-0 group-hover:opacity-100 p-0.5 text-ink-faint hover:text-danger transition-opacity shrink-0">
+                          }} title={t('distribution.remove')} className="opacity-0 group-hover:opacity-100 p-0.5 text-ink-faint hover:text-danger transition-opacity shrink-0">
                             <Trash2 className="w-3 h-3" />
                           </button>
                         </div>
@@ -507,20 +512,20 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                             {lessonMaterials.map(mat => {
                               const assignment = mat.assignments?.find(a => a.lessonId === lesson.id);
                               return (
-                                <div key={`mat-${mat.id}`} onDoubleClick={() => setInspectGenerationId(mat.id, true)} onMouseDown={(e) => { if (e.detail > 1) e.preventDefault(); }} className="flex items-center justify-between ml-6 mt-1 px-2 py-1.5 text-[11px] text-ink border border-line bg-surface-raised rounded-card hover:border-accent hover:bg-accent/5 cursor-pointer transition-colors group select-none" title="Nháy đúp để xem trước">
+                                <div key={`mat-${mat.id}`} onDoubleClick={() => setInspectGenerationId(mat.id, true)} onMouseDown={(e) => { if (e.detail > 1) e.preventDefault(); }} className="flex items-center justify-between ml-6 mt-1 px-2 py-1.5 text-[11px] text-ink border border-line bg-surface-raised rounded-card hover:border-accent hover:bg-accent/5 cursor-pointer transition-colors group select-none" title={t('dblClickPreview')}>
                                   <div className="flex items-center gap-2 min-w-0">
-                                    <LinkIcon className="w-3 h-3 text-ink-faint flex-shrink-0" /> <span className="truncate">{mat.title || 'Học liệu'}</span>
+                                    <LinkIcon className="w-3 h-3 text-ink-faint flex-shrink-0" /> <span className="truncate">{mat.title || t('materialFallback')}</span>
                                   </div>
                                   <button onClick={(e) => {
                                     e.stopPropagation();
                                     if (assignment) {
                                       setConfirmAction({
-                                        title: "Gỡ phân phối",
-                                         message: "Bạn có chắc chắn muốn gỡ học liệu này khỏi bài học?",
+                                        title: t('distribution.unassignTitle'),
+                                         message: t('distribution.unassignLesson'),
                                         onConfirm: () => assignment?.id ? materialsApi.deleteAssignment(assignment.id).then(() => queryClient.invalidateQueries({ queryKey: ["instructor-materials", courseId] })) : undefined
                                       });
                                     }
-                                  }} title="Gỡ" className="opacity-0 group-hover:opacity-100 p-0.5 text-ink-faint hover:text-danger transition-opacity shrink-0">
+                                  }} title={t('distribution.remove')} className="opacity-0 group-hover:opacity-100 p-0.5 text-ink-faint hover:text-danger transition-opacity shrink-0">
                                     <Trash2 className="w-3 h-3" />
                                   </button>
                                 </div>
@@ -556,9 +561,9 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                 className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-card transition-colors border ${
                   showActivityPanel ? 'bg-ink text-white border-ink' : 'bg-surface-raised text-ink-muted border-line hover:bg-surface-hover'
                 }`}
-                title="Xem hoạt động gần đây"
+                title={t('activityTitle')}
               >
-                <History className="w-3.5 h-3.5" /> Hoạt động
+                <History className="w-3.5 h-3.5" /> {t('activity')}
               </button>
               {/* Tạo Mới — trước đây là dropdown 6 dòng (3 loại × Thủ công/AI), nhưng cả 2 màn
                   đích (`GenerateManualOfficialView`/`GenerateAiOfficialView`) đều tự hiện lại đủ
@@ -568,7 +573,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                 onClick={() => setManualMaterialType('QUIZ')}
                 className="flex items-center gap-1.5 px-3 py-1.5 bg-surface-raised hover:bg-surface-hover text-ink text-xs font-bold rounded-card border border-line transition-colors"
               >
-                <PencilLine className="w-3.5 h-3.5" /> Thủ Công
+                <PencilLine className="w-3.5 h-3.5" /> {t('manualBtn')}
               </button>
               <button
                 onClick={() => setGenMaterialType('QUIZ')}
@@ -585,7 +590,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-ink-faint" />
               <input
                 type="text"
-                placeholder="Tìm kiếm học liệu..."
+                placeholder={t('searchPlaceholder')}
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 className="w-full pl-8 pr-8 py-1.5 text-sm border border-line rounded-card focus:outline-none focus:border-accent transition-colors bg-surface"
@@ -612,7 +617,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
               màu theo token có sẵn, không emoji/phối màu — đúng quy tắc Materials Workspace. */}
           <div className="px-3 py-2.5 border-b border-line flex items-center gap-1.5 bg-surface-raised overflow-x-auto flex-shrink-0">
             {([
-              { key: 'ALL', label: 'Tất cả', Icon: null },
+              { key: 'ALL', label: t('filterAll'), Icon: null },
               { key: 'QUIZ', label: 'Quiz', Icon: FileQuestion },
               { key: 'FLASHCARD', label: 'Flashcard', Icon: Layers },
               { key: 'MINDMAP', label: 'Mindmap', Icon: Workflow },
@@ -620,7 +625,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
               <button
                 key={key}
                 onClick={() => setTypeFilter(key)}
-                title={`Lọc theo loại: ${label}`}
+                title={t('filterByType', { label })}
                 className={`flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-card border transition-colors shrink-0 ${
                   typeFilter === key ? 'bg-ink text-white border-ink' : 'bg-surface text-ink-muted border-line hover:bg-surface-hover'
                 }`}
@@ -630,14 +635,14 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
             ))}
             <span className="w-px h-5 bg-line mx-1 shrink-0" />
             {([
-              { key: 'ALL', label: 'Mọi trạng thái' },
+              { key: 'ALL', label: t('filterAllStatus') },
               { key: 'DRAFT', label: 'Draft' },
               { key: 'OFFICIAL', label: 'Official' },
             ] as const).map(({ key, label }) => (
               <button
                 key={key}
                 onClick={() => setStatusFilter(key)}
-                title={`Lọc theo trạng thái: ${label}`}
+                title={t('filterByStatus', { label })}
                 className={`px-3 py-1.5 text-xs font-semibold rounded-card border transition-colors shrink-0 ${
                   statusFilter === key ? 'bg-ink text-white border-ink' : 'bg-surface text-ink-muted border-line hover:bg-surface-hover'
                 }`}
@@ -668,7 +673,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
         {activeDragMaterial ? (
           <div className="bg-surface-raised opacity-90 shadow-card-hover scale-105 border-accent border rounded-card px-3 py-2 text-xs flex items-center gap-2">
             <FileText className="w-4 h-4 text-accent" />
-            <span className="font-bold text-ink line-clamp-1">{activeDragMaterial.title || 'Học liệu'}</span>
+            <span className="font-bold text-ink line-clamp-1">{activeDragMaterial.title || t('materialFallback')}</span>
           </div>
         ) : null}
       </DragOverlay>
@@ -681,7 +686,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
             {isConfirmProcessing && (
               <div className="mb-4">
                 <CautionProgressBar />
-                <p className="text-[11px] text-ink-faint mt-1.5">Đang xử lý, vui lòng đợi...</p>
+                <p className="text-[11px] text-ink-faint mt-1.5">{t('confirmWait')}</p>
               </div>
             )}
             <div className="flex gap-2 justify-end">
@@ -690,7 +695,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                 disabled={isConfirmProcessing}
                 className="px-3 py-1.5 text-xs font-bold text-ink-muted bg-surface-hover rounded-card hover:bg-line-soft transition-colors disabled:opacity-50"
               >
-                Hủy
+                {t('cancel')}
               </button>
               <button
                 onClick={() => {
@@ -703,7 +708,7 @@ export function CourseMaterialsManager({ courseId }: CourseMaterialsManagerProps
                 disabled={isConfirmProcessing}
                 className="px-3 py-1.5 text-xs font-bold text-white bg-accent rounded-card hover:bg-accent-dark transition-colors disabled:opacity-50"
               >
-                {isConfirmProcessing ? 'Đang xử lý...' : 'Xác nhận'}
+                {isConfirmProcessing ? t('processingBtn') : t('confirmBtn')}
               </button>
             </div>
           </Modal>}
@@ -729,6 +734,7 @@ function MaterialWorkspaceViewer({
   onDelete?: () => void;
   readOnly?: boolean;
 }) {
+  const t = useTranslations('instructor.materials');
   const { data: detail, isLoading } = useQuery<MaterialDetailRes>({
     queryKey: ['material-detail', generationId],
     queryFn: () => materialsApi.getDetail(generationId),
@@ -752,7 +758,7 @@ function MaterialWorkspaceViewer({
       a.click();
       URL.revokeObjectURL(url);
     } catch {
-      toast.error('Có lỗi khi xuất PDF, vui lòng thử lại.');
+      toast.error(t('toast.pdfError'));
     } finally {
       setIsExportingPdf(null);
     }
@@ -761,11 +767,11 @@ function MaterialWorkspaceViewer({
   const updateMermaidMutation = useMutation({
     mutationFn: (variables: { id: number; mermaidCode: string }) => materialsApi.updateMaterial(variables.id, { mermaidCode: variables.mermaidCode }),
     onSuccess: () => {
-      toast.success('Đã lưu sơ đồ Mindmap thành công!');
+      toast.success(t('toast.mindmapSaved'));
       queryClient.invalidateQueries({ queryKey: ['instructor-materials'] });
       queryClient.invalidateQueries({ queryKey: ['material-detail'] });
     },
-    onError: () => toast.error('Có lỗi xảy ra khi lưu sơ đồ!'),
+    onError: () => toast.error(t('toast.mindmapSaveError')),
   });
 
   // Cập nhật tab mặc định dựa trên loại học liệu
@@ -793,7 +799,7 @@ function MaterialWorkspaceViewer({
   const deleteQuestionMutation = useMutation({
     mutationFn: (id: number) => materialsApi.deleteQuizQuestion(id),
     onSuccess: () => {
-      toast.success('Đã xóa câu hỏi');
+      toast.success(t('toast.questionDeleted'));
       queryClient.invalidateQueries({ queryKey: ['material-detail', generationId] });
     }
   });
@@ -801,7 +807,7 @@ function MaterialWorkspaceViewer({
   const deleteFlashcardMutation = useMutation({
     mutationFn: (id: number) => materialsApi.deleteFlashcard(id),
     onSuccess: () => {
-      toast.success('Đã xóa Flashcard');
+      toast.success(t('toast.flashcardDeleted'));
       queryClient.invalidateQueries({ queryKey: ['material-detail', generationId] });
     }
   });
@@ -814,7 +820,7 @@ function MaterialWorkspaceViewer({
     <div className="flex flex-col gap-6 rounded-card bg-surface-raised p-6 shadow-sm border border-line min-h-[750px]">
       {readOnly && (
         <div className="flex items-center gap-2 bg-star/10 border border-star/20 text-star text-xs font-bold px-4 py-2 rounded-card">
-          <Lock className="w-3.5 h-3.5" /> Chế độ xem trước — không thể chỉnh sửa nội dung ở đây.
+          <Lock className="w-3.5 h-3.5" /> {t('viewer.previewOnly')}
         </div>
       )}
       {/* Top Workspace Bar */}
@@ -823,7 +829,7 @@ function MaterialWorkspaceViewer({
           {/* Removed Back to list button */}
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-lg font-bold text-ink">{detail?.title || material?.title || 'Học liệu AI'}</h2>
+              <h2 className="text-lg font-bold text-ink">{detail?.title || material?.title || t('viewer.aiMaterial')}</h2>
               {material && (
                 <MaterialBadge tone={getMaterialDistributionBadge(material).tone}>
                   {getMaterialDistributionBadge(material).label}
@@ -834,9 +840,9 @@ function MaterialWorkspaceViewer({
               )}
             </div>
             <p className="text-xs text-ink-muted mt-0.5">
-              Loại: <strong className="text-accent">{detail?.materialType || material?.materialType}</strong> •
-              Ngôn ngữ: <strong className="text-ink">{detail?.language || material?.language || 'Tiếng Việt'}</strong> •
-              Phiên bản: #{detail?.versionNo || material?.versionNo || 1}
+              {t('viewer.type')}: <strong className="text-accent">{detail?.materialType || material?.materialType}</strong> •
+              {t('viewer.language')}: <strong className="text-ink">{detail?.language || material?.language || t('viewer.vietnamese')}</strong> •
+              {t('viewer.version')}: #{detail?.versionNo || material?.versionNo || 1}
             </p>
           </div>
         </div>
@@ -848,15 +854,15 @@ function MaterialWorkspaceViewer({
             <button
               onClick={onDelete}
               className="inline-flex items-center rounded-card px-3 py-1.5 text-xs font-bold bg-danger/10 text-danger border border-danger/20 hover:bg-danger/5 transition"
-              title="Xóa toàn bộ học liệu này"
+              title={t('viewer.deleteAllTitle')}
             >
-              Xóa
+              {t('delete')}
             </button>
           )}
           <button
             onClick={onBack}
             className="flex items-center justify-center w-8 h-8 rounded-card bg-surface-hover hover:bg-line-soft text-ink-muted transition-colors"
-            title="Đóng Workspace"
+            title={t('viewer.closeWorkspace')}
           >
             <X className="w-4 h-4" />
           </button>
@@ -864,7 +870,7 @@ function MaterialWorkspaceViewer({
       </div>
 
       {isLoading ? (
-        <div className="py-20 text-center text-ink-muted animate-pulse font-medium">Đang tải toàn bộ dữ liệu học liệu vào Workspace...</div>
+        <div className="py-20 text-center text-ink-muted animate-pulse font-medium">{t('viewer.loadingAll')}</div>
       ) : detail ? (
         <div className="flex flex-col gap-6">
 
@@ -876,8 +882,8 @@ function MaterialWorkspaceViewer({
                   active={activeTab}
                   onChange={(key) => setActiveTab(key as 'QUESTIONS' | 'SETTINGS')}
                   tabs={[
-                    { key: 'QUESTIONS', label: `Ngân Hàng Câu Hỏi (${detail.quizQuestions.length})` },
-                    ...(!readOnly ? [{ key: 'SETTINGS', label: 'Cấu Hình Bài Thi' }] : []),
+                    { key: 'QUESTIONS', label: t('viewer.questionBank', { count: detail.quizQuestions.length }) },
+                    ...(!readOnly ? [{ key: 'SETTINGS', label: t('viewer.examSettings') }] : []),
                   ]}
                 />
               </div>
@@ -894,20 +900,20 @@ function MaterialWorkspaceViewer({
                       <button
                         onClick={() => handleExportQuizPdf(material.materialId!, 'blank')}
                         disabled={isExportingPdf !== null}
-                        title="Xuất PDF đề trắng, đáp án ở trang cuối"
+                        title={t('viewer.exportBlankTitle')}
                         className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-card border bg-surface-raised text-ink-muted border-line hover:bg-surface-hover transition-colors disabled:opacity-50"
                       >
                         <FileText className="w-3.5 h-3.5" strokeWidth={1.75} />
-                        {isExportingPdf === 'blank' ? 'Đang xuất...' : 'Đề trắng'}
+                        {isExportingPdf === 'blank' ? t('exporting') : t('viewer.exportBlank')}
                       </button>
                       <button
                         onClick={() => handleExportQuizPdf(material.materialId!, 'cheatsheet')}
                         disabled={isExportingPdf !== null}
-                        title="Xuất PDF cheatsheet, đáp án in kèm"
+                        title={t('viewer.exportCheatTitle')}
                         className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-card border bg-surface-raised text-ink-muted border-line hover:bg-surface-hover transition-colors disabled:opacity-50"
                       >
                         <FileText className="w-3.5 h-3.5" strokeWidth={1.75} />
-                        {isExportingPdf === 'cheatsheet' ? 'Đang xuất...' : 'Cheatsheet'}
+                        {isExportingPdf === 'cheatsheet' ? t('exporting') : 'Cheatsheet'}
                       </button>
                     </div>
                   )}
@@ -919,7 +925,7 @@ function MaterialWorkspaceViewer({
                         onDone={() => queryClient.invalidateQueries({ queryKey: ['material-detail', generationId] })}
                       />
                       <button onClick={() => setIsAddingQuestion(true)} className="flex items-center gap-1.5 px-4 py-2 bg-accent/10 text-accent hover:bg-accent/20 rounded-card font-bold text-sm border border-accent/20 transition-colors">
-                        <Plus className="w-4 h-4" /> Thêm Câu Hỏi Mới
+                        <Plus className="w-4 h-4" /> {t('viewer.addQuestion')}
                       </button>
                     </div>
                   )}
@@ -927,12 +933,12 @@ function MaterialWorkspaceViewer({
                     <div key={q.id} className="p-5 rounded-card border border-line bg-surface-hover/70 space-y-3 shadow-card hover:border-accent/40 transition">
                       <div className="flex items-start justify-between gap-3">
                         <div className="font-bold text-base text-ink">
-                          <span className="text-accent mr-2">Câu {idx + 1}:</span> {q.content}
+                          <span className="text-accent mr-2">{t('viewer.questionNo', { n: idx + 1 })}</span> {q.content}
                         </div>
                         {!readOnly && (
                           <div className="flex gap-2 shrink-0">
-                            <button onClick={() => setEditingQuestion(q)} className="text-xs font-semibold bg-surface-hover text-ink px-3 py-1.5 rounded-card hover:bg-line-soft border border-line transition-colors">Sửa</button>
-                            <button onClick={() => deleteQuestionMutation.mutate(q.id)} className="text-xs font-semibold bg-danger/10 text-danger px-3 py-1.5 rounded-card hover:bg-danger/5 border border-danger/20 transition-colors">Xóa</button>
+                            <button onClick={() => setEditingQuestion(q)} className="text-xs font-semibold bg-surface-hover text-ink px-3 py-1.5 rounded-card hover:bg-line-soft border border-line transition-colors">{t('edit')}</button>
+                            <button onClick={() => deleteQuestionMutation.mutate(q.id)} className="text-xs font-semibold bg-danger/10 text-danger px-3 py-1.5 rounded-card hover:bg-danger/5 border border-danger/20 transition-colors">{t('delete')}</button>
                           </div>
                         )}
                       </div>
@@ -948,7 +954,7 @@ function MaterialWorkspaceViewer({
                           >
                             <span>{opt.content}</span>
                             {opt.isCorrect && (
-                              <MaterialBadge tone="success" icon={<Check className="w-3 h-3" />}>Đáp án đúng</MaterialBadge>
+                              <MaterialBadge tone="success" icon={<Check className="w-3 h-3" />}>{t('viewer.correctAnswer')}</MaterialBadge>
                             )}
                           </div>
                         ))}
@@ -969,16 +975,16 @@ function MaterialWorkspaceViewer({
             <div className="space-y-4">
               <div className="bg-accent/5 border border-accent/15 rounded-card p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                  <h3 className="font-bold text-sm text-ink">Bảng Vẽ Sơ Đồ Tư Duy (Mindmap)</h3>
-                  <p className="text-xs text-accent-dark/80 mt-0.5">Sử dụng chuột để kéo thả vị trí, click đúp vào chữ để sửa tên nhánh.</p>
+                  <h3 className="font-bold text-sm text-ink">{t('viewer.mindmapBoard')}</h3>
+                  <p className="text-xs text-accent-dark/80 mt-0.5">{t('viewer.mindmapHint')}</p>
                 </div>
                 <MaterialTabs
                   active={activeTab}
                   onChange={(key) => setActiveTab(key as 'VIEW' | 'DRAG_DROP' | 'CODE_EDITOR')}
                   tabs={[
-                    { key: 'VIEW', label: 'Xem Tĩnh' },
-                    ...(!readOnly ? [{ key: 'DRAG_DROP', label: 'Chỉnh Sửa', icon: <FileEdit className="w-3.5 h-3.5" /> }] : []),
-                    ...(!readOnly ? [{ key: 'CODE_EDITOR', label: 'Soạn Code', icon: <PencilLine className="w-3.5 h-3.5" /> }] : []),
+                    { key: 'VIEW', label: t('viewer.modeView') },
+                    ...(!readOnly ? [{ key: 'DRAG_DROP', label: t('viewer.modeEdit'), icon: <FileEdit className="w-3.5 h-3.5" /> }] : []),
+                    ...(!readOnly ? [{ key: 'CODE_EDITOR', label: t('viewer.modeCode'), icon: <PencilLine className="w-3.5 h-3.5" /> }] : []),
                   ]}
                 />
               </div>
@@ -1021,12 +1027,12 @@ function MaterialWorkspaceViewer({
             <div className="space-y-6">
               <div className="bg-accent/5 border border-accent/15 rounded-card p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                  <h3 className="font-bold text-sm text-ink">Bộ Thẻ Học Flashcards 2 Mặt Trực Quan</h3>
-                  <p className="text-xs text-accent-dark/80 mt-0.5">Bấm vào thẻ để lật, hoặc Sửa/Xóa bên dưới thẻ.</p>
+                  <h3 className="font-bold text-sm text-ink">{t('viewer.flashcardTitle')}</h3>
+                  <p className="text-xs text-accent-dark/80 mt-0.5">{t('viewer.flashcardHint')}</p>
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="bg-accent text-white font-extrabold text-xs px-3 py-1 rounded-card">
-                    {detail.flashcards.length} Thẻ ôn tập
+                    {t('viewer.reviewCards', { count: detail.flashcards.length })}
                   </span>
                   {!readOnly && (
                     <>
@@ -1036,7 +1042,7 @@ function MaterialWorkspaceViewer({
                         onDone={() => queryClient.invalidateQueries({ queryKey: ['material-detail', generationId] })}
                       />
                       <button onClick={() => setIsAddingFlashcard(true)} className="flex items-center gap-1.5 px-3 py-1.5 bg-accent/10 hover:bg-accent/20 text-accent rounded-card text-xs font-bold border border-accent/20 transition-colors">
-                        <Plus className="w-3.5 h-3.5" /> Thêm Thẻ Mới
+                        <Plus className="w-3.5 h-3.5" /> {t('viewer.addCard')}
                       </button>
                     </>
                   )}
@@ -1056,8 +1062,8 @@ function MaterialWorkspaceViewer({
                         }`}
                     >
                       <div className="flex justify-between items-center text-xs font-extrabold opacity-80 mb-2">
-                        <span>Thẻ #{idx + 1}</span>
-                        <span className="underline">{isFlipped ? 'Mặt Sau (Khái niệm)' : 'Mặt Trước (Thuật ngữ)'}</span>
+                        <span>{t('viewer.cardNo', { n: idx + 1 })}</span>
+                        <span className="underline">{isFlipped ? t('viewer.back') : t('viewer.front')}</span>
                       </div>
 
                       <div className="text-base font-bold my-auto leading-relaxed">
@@ -1066,12 +1072,12 @@ function MaterialWorkspaceViewer({
 
                       <div className={`flex items-center justify-between mt-3 border-t pt-3 ${isFlipped ? 'border-white/20' : 'border-line'}`}>
                         <div className="text-[11px] opacity-70">
-                          {isFlipped ? 'Nhấn để lật lại' : 'Nhấn để xem giải nghĩa'}
+                          {isFlipped ? t('viewer.flipBack') : t('viewer.flipToSee')}
                         </div>
                         {!readOnly && (
                           <div className="flex gap-2">
-                            <button onClick={(e) => { e.stopPropagation(); setEditingFlashcard(card); }} className={`text-[11px] font-bold px-2.5 py-1 rounded-card border transition-colors ${isFlipped ? 'bg-white/10 hover:bg-white/20 text-white border-white/20' : 'bg-surface-hover hover:bg-line-soft text-ink border-line'}`}>Sửa</button>
-                            <button onClick={(e) => { e.stopPropagation(); deleteFlashcardMutation.mutate(card.id); }} className={`text-[11px] font-bold px-2.5 py-1 rounded-card border transition-colors ${isFlipped ? 'bg-white/10 hover:bg-white/20 text-white border-white/20' : 'bg-danger/10 hover:bg-danger/5 text-danger border-danger/20'}`}>Xóa</button>
+                            <button onClick={(e) => { e.stopPropagation(); setEditingFlashcard(card); }} className={`text-[11px] font-bold px-2.5 py-1 rounded-card border transition-colors ${isFlipped ? 'bg-white/10 hover:bg-white/20 text-white border-white/20' : 'bg-surface-hover hover:bg-line-soft text-ink border-line'}`}>{t('edit')}</button>
+                            <button onClick={(e) => { e.stopPropagation(); deleteFlashcardMutation.mutate(card.id); }} className={`text-[11px] font-bold px-2.5 py-1 rounded-card border transition-colors ${isFlipped ? 'bg-white/10 hover:bg-white/20 text-white border-white/20' : 'bg-danger/10 hover:bg-danger/5 text-danger border-danger/20'}`}>{t('delete')}</button>
                           </div>
                         )}
                       </div>
@@ -1131,13 +1137,14 @@ function MaterialWorkspaceViewer({
   );
 }
 
-/** Task 4 — nút "Tải CSV" dùng chung cho import hàng loạt Quiz/Flashcard. Input file ẩn, bấm
+/** Task 4 — nút 'Tải CSV' dùng chung cho import hàng loạt Quiz/Flashcard. Input file ẩn, bấm
  * label để mở hộp thoại chọn file; kết quả (số dòng thêm + lỗi từng dòng) hiện qua toast. */
 function CsvImportButton({ inputId, onUpload, onDone }: {
   inputId: string;
   onUpload: (file: File) => Promise<{ importedCount: number; errors: string[] }>;
   onDone: () => void;
 }) {
+  const t = useTranslations('instructor.materials');
   const [isUploading, setIsUploading] = useState(false);
 
   const handleFile = async (file: File) => {
@@ -1145,17 +1152,17 @@ function CsvImportButton({ inputId, onUpload, onDone }: {
     try {
       const result = await onUpload(file);
       if (result.importedCount > 0) {
-        toast.success(`Đã thêm ${result.importedCount} dòng từ CSV.`);
+        toast.success(t('toast.csvImported', { count: result.importedCount }));
         onDone();
       }
       if (result.errors.length > 0) {
-        toast.error(`${result.errors.length} dòng lỗi: ${result.errors.slice(0, 3).join('; ')}${result.errors.length > 3 ? '...' : ''}`);
+        toast.error(t('toast.csvErrors', { count: result.errors.length, details: `${result.errors.slice(0, 3).join('; ')}${result.errors.length > 3 ? '...' : ''}` }));
       }
       if (result.importedCount === 0 && result.errors.length === 0) {
-        toast.error('File CSV không có dòng dữ liệu hợp lệ.');
+        toast.error(t('toast.csvEmpty'));
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Lỗi khi tải file CSV');
+      toast.error(err instanceof Error ? err.message : t('toast.csvError'));
     } finally {
       setIsUploading(false);
     }
@@ -1178,13 +1185,14 @@ function CsvImportButton({ inputId, onUpload, onDone }: {
         htmlFor={inputId}
         className="flex items-center gap-1.5 px-3 py-1.5 bg-surface-hover hover:bg-line-soft text-ink rounded-card text-xs font-bold border border-line transition-colors cursor-pointer"
       >
-        <Upload className="w-3.5 h-3.5" /> {isUploading ? 'Đang tải lên...' : 'Tải CSV'}
+        <Upload className="w-3.5 h-3.5" /> {isUploading ? t('csv.uploading') : t('csv.upload')}
       </label>
     </>
   );
 }
 
 function CustomDateTimePicker({ value, onChange, label, onClear, hint }: { value: string; onChange: (v: string) => void; label: string; onClear?: () => void; hint?: string }) {
+  const t = useTranslations('instructor.materials');
   const handleSetNow = () => {
     const now = new Date();
     const pad = (n: number) => n.toString().padStart(2, '0');
@@ -1199,7 +1207,7 @@ function CustomDateTimePicker({ value, onChange, label, onClear, hint }: { value
           {hint && <span className="font-normal text-[11px] text-ink-muted mt-0.5 block">{hint}</span>}
         </div>
         {onClear && value && (
-          <button type="button" onClick={onClear} className="text-[11px] text-danger hover:text-danger/80 font-semibold bg-danger/10 hover:bg-danger/5 px-2 py-0.5 rounded-card transition-colors">Xóa</button>
+          <button type="button" onClick={onClear} className="text-[11px] text-danger hover:text-danger/80 font-semibold bg-danger/10 hover:bg-danger/5 px-2 py-0.5 rounded-card transition-colors">{t('delete')}</button>
         )}
       </div>
       <div className="flex items-stretch rounded-card border border-line focus-within:border-accent focus-within:ring-1 focus-within:ring-accent overflow-hidden bg-surface-raised shadow-card transition">
@@ -1209,8 +1217,8 @@ function CustomDateTimePicker({ value, onChange, label, onClear, hint }: { value
           onChange={e => onChange(e.target.value)}
           className="px-3 py-2 text-sm outline-none hover:bg-surface-hover flex-1 min-w-[150px] bg-transparent text-ink"
         />
-        <button type="button" onClick={handleSetNow} title="Hiện tại" className="px-3 py-2 text-xs font-semibold text-ink-muted bg-surface-hover hover:bg-line-soft hover:text-accent border-l border-line transition-colors flex items-center justify-center">
-          Hiện tại
+        <button type="button" onClick={handleSetNow} title={t('dt.now')} className="px-3 py-2 text-xs font-semibold text-ink-muted bg-surface-hover hover:bg-line-soft hover:text-accent border-l border-line transition-colors flex items-center justify-center">
+          {t('dt.now')}
         </button>
       </div>
     </div>
@@ -1219,6 +1227,7 @@ function CustomDateTimePicker({ value, onChange, label, onClear, hint }: { value
 
 /** Tab Cấu hình Quiz Thi Cử & Proctoring (Mới) */
 function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
+  const t = useTranslations('instructor.materials');
   const queryClient = useQueryClient();
 
   type ExamPolicy = 'PRACTICE_UNLIMITED' | 'PRACTICE_LIMITED' | 'EXAM_STRICT';
@@ -1251,11 +1260,11 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
     mutationFn: (data: Record<string, unknown>) =>
       materialsApi.updateQuizSettings(quiz.materialId as number, data),
     onSuccess: () => {
-      toast.success('Đã lưu cấu hình Quiz thành công!');
+      toast.success(t('toast.quizSettingsSaved'));
       queryClient.invalidateQueries({ queryKey: ['instructor-materials'] });
     },
     onError: (err: Error) => {
-      toast.error(err.message || 'Lỗi khi lưu cấu hình Quiz');
+      toast.error(err.message || t('toast.quizSettingsError'));
     }
   });
 
@@ -1285,13 +1294,13 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
 
     if (examPolicy === 'EXAM_STRICT') {
       if (!startTime) {
-        toast.error('Vui lòng thiết lập thời gian Mở bài thi cho chế độ Thi chính thức!');
+        toast.error(t('toast.openTimeRequired'));
         return;
       }
     }
 
     if (startTime && endTime && new Date(startTime) >= new Date(endTime)) {
-      toast.error('Thời gian đóng bài phải lớn hơn thời gian mở bài!');
+      toast.error(t('toast.closeAfterOpen'));
       return;
     }
 
@@ -1313,16 +1322,16 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
       <div className="flex justify-between items-center pb-4 mb-6 border-b">
         <div>
           <div className="flex items-center gap-3">
-            <h3 className="text-xl font-bold text-ink">Cấu Hình Bài Thi</h3>
+            <h3 className="text-xl font-bold text-ink">{t('quiz.title')}</h3>
             {quiz.quizType === 'LECTURE_QUIZ' ? (
               <MaterialBadge tone="neutral">Quick Check</MaterialBadge>
             ) : (
               <MaterialBadge tone="accent">Official Exam</MaterialBadge>
             )}
           </div>
-          <p className="text-sm text-ink-muted mt-1">Quản lý thời gian, số lượt làm bài, sinh đề ngẫu nhiên và tính năng giám sát</p>
-          <div role="group" aria-label="Loại bài" className="mt-3 flex flex-wrap items-center gap-2">
-            {([['LECTURE_QUIZ', 'Quick Check'], ['OFFICIAL_EXAM', 'Thi chính thức']] as const).map(([value, label]) => (
+          <p className="text-sm text-ink-muted mt-1">{t('quiz.subtitle')}</p>
+          <div role="group" aria-label={t('quiz.typeAria')} className="mt-3 flex flex-wrap items-center gap-2">
+            {([['LECTURE_QUIZ', 'Quick Check'], ['OFFICIAL_EXAM', t('quiz.officialExam')]] as const).map(([value, label]) => (
               <button
                 key={value}
                 type="button"
@@ -1336,10 +1345,10 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
           </div>
           {quizTypeChoice === 'LECTURE_QUIZ' ? (
             <p className="mt-2 max-w-xl text-xs text-ink-muted">
-              Quick Check không áp dụng giờ làm bài, số lượt và giám sát; học viên xem đáp án ngay sau mỗi câu. Chọn Thi chính thức để các cấu hình bên dưới có hiệu lực.
+              {t('quiz.lectureNote')}
             </p>
           ) : (
-            <p className="mt-2 max-w-xl text-xs text-ink-muted">Bài đã có học viên làm sẽ không đổi được loại. Nhấn Lưu Cấu Hình để áp dụng.</p>
+            <p className="mt-2 max-w-xl text-xs text-ink-muted">{t('quiz.officialNote')}</p>
           )}
         </div>
         <button
@@ -1347,7 +1356,7 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
           disabled={updateQuizSettingsMutation.isPending}
           className="flex items-center gap-2 rounded-card bg-accent px-6 py-2.5 text-sm font-bold text-white hover:bg-accent-dark disabled:opacity-50 shadow-card transition"
         >
-          <Save className="w-4 h-4" /> {updateQuizSettingsMutation.isPending ? 'Đang lưu...' : 'Lưu Cấu Hình'}
+          <Save className="w-4 h-4" /> {updateQuizSettingsMutation.isPending ? t('saving') : t('quiz.save')}
         </button>
       </div>
 
@@ -1356,7 +1365,7 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
 
           {/* Policy Selector */}
           <div className="flex flex-col gap-3">
-            <label className="text-sm font-bold text-ink">Chế độ bài thi</label>
+            <label className="text-sm font-bold text-ink">{t('quiz.modeLabel')}</label>
             <div className="grid grid-cols-1 gap-3">
               <label className={`cursor-pointer flex items-start gap-3 p-4 rounded-card border-2 transition ${examPolicy === 'PRACTICE_UNLIMITED' ? 'border-accent bg-accent/5' : 'border-line hover:border-accent/50'}`}>
                 <input
@@ -1367,8 +1376,8 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
                   className="mt-1 w-4 h-4 text-accent focus:ring-accent"
                 />
                 <div>
-                  <div className="font-bold text-ink text-sm">Luyện tập (Vô hạn)</div>
-                  <div className="text-xs text-ink-muted mt-0.5">Sinh viên làm bao nhiêu lần tùy ý. Tự động lưu điểm cao nhất.</div>
+                  <div className="font-bold text-ink text-sm">{t('quiz.practice')}</div>
+                  <div className="text-xs text-ink-muted mt-0.5">{t('quiz.practiceDesc')}</div>
                 </div>
               </label>
 
@@ -1381,15 +1390,15 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
                   className="mt-1 w-4 h-4 text-accent focus:ring-accent"
                 />
                 <div className="w-full">
-                  <div className="font-bold text-ink text-sm">Ôn tập có giới hạn</div>
-                  <div className="text-xs text-ink-muted mt-0.5 mb-2">Giới hạn số lần làm. Tự động lưu điểm cao nhất.</div>
+                  <div className="font-bold text-ink text-sm">{t('quiz.limited')}</div>
+                  <div className="text-xs text-ink-muted mt-0.5 mb-2">{t('quiz.limitedDesc')}</div>
                   {examPolicy === 'PRACTICE_LIMITED' && (
                     <input
                       type="number"
                       min="2"
                       value={customAttempts}
                       onChange={(e) => setCustomAttempts(e.target.value)}
-                      placeholder="Số lần"
+                      placeholder={t('quiz.attemptsPlaceholder')}
                       className="rounded-lg border border-line px-3 py-1.5 text-sm focus:border-accent focus:ring-1 focus:ring-accent outline-none w-24"
                     />
                   )}
@@ -1405,8 +1414,8 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
                   className="mt-1 w-4 h-4 text-accent focus:ring-accent"
                 />
                 <div>
-                  <div className="font-bold text-ink text-sm">Thi chính thức (1 Lần)</div>
-                  <div className="text-xs text-ink-muted mt-0.5">Mỗi sinh viên chỉ được làm 1 lần duy nhất. Bắt buộc nhập thời gian Mở bài.</div>
+                  <div className="font-bold text-ink text-sm">{t('quiz.once')}</div>
+                  <div className="text-xs text-ink-muted mt-0.5">{t('quiz.onceDesc')}</div>
                 </div>
               </label>
             </div>
@@ -1414,15 +1423,15 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-line">
             <CustomDateTimePicker
-              label="Khung giờ mở bài"
+              label={t('quiz.openLabel')}
               value={startTime}
               onChange={handleStartTimeChange}
               onClear={examPolicy !== 'EXAM_STRICT' ? () => handleStartTimeChange('') : undefined}
             />
 
             <CustomDateTimePicker
-              label="Khung giờ đóng bài"
-              hint="Mở mãi mãi nếu không thiết lập"
+              label={t('quiz.closeLabel')}
+              hint={t('quiz.closeHint')}
               value={endTime}
               onChange={setEndTime}
               onClear={() => setEndTime('')}
@@ -1436,12 +1445,12 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
               onChange={(e) => setAllowReview(e.target.checked)}
               className="h-5 w-5 rounded border-line text-accent focus:ring-accent"
             />
-            Cho phép học viên xem lại đáp án sau khi nộp bài
+            {t('quiz.allowReview')}
           </label>
 
           <div className="grid grid-cols-2 gap-4 border-t border-line pt-4">
             <label className="flex flex-col gap-2 text-sm font-bold text-ink">
-              Thời gian làm bài (Phút)
+              {t('quiz.duration')}
               <input
                 type="number"
                 min="1"
@@ -1451,14 +1460,14 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
               />
             </label>
             <label className="flex flex-col gap-2 text-sm font-bold text-ink">
-              Số câu hỏi mỗi lượt
+              {t('quiz.pickCount')}
               <input
                 type="number"
                 min="1"
                 max={quiz.questionCount ?? 100}
                 value={randomPickCount}
                 onChange={(e) => setRandomPickCount(e.target.value)}
-                placeholder={`Mặc định: ${quiz.questionCount ?? '0'} câu`}
+                placeholder={t('quiz.pickDefault', { count: quiz.questionCount ?? '0' })}
                 className="rounded-card border border-line px-4 py-2.5 text-sm focus:border-accent focus:ring-1 focus:ring-accent outline-none"
               />
             </label>
@@ -1469,7 +1478,7 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
           <div className="rounded-card border border-danger/20 bg-danger/5 p-6 space-y-4 shadow-card">
             <div className="flex items-center justify-between">
               <span className="text-base font-black text-ink flex items-center gap-2">
-                <ShieldAlert className="w-4 h-4 text-danger" /> Giám Sát Thi Cử AI (Anti-Cheat)
+                <ShieldAlert className="w-4 h-4 text-danger" /> {t('quiz.proctoring')}
               </span>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input
@@ -1482,13 +1491,13 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
               </label>
             </div>
             <p className="text-sm text-ink-muted leading-relaxed border-l-2 border-danger/30 pl-3">
-              Yêu cầu bật Camera. Hệ thống AI sẽ tự động giám sát khuôn mặt, cảnh báo khi học viên rời khỏi màn hình hoặc chuyển sang tab khác.
+              {t('quiz.proctoringDesc')}
             </p>
 
             {isProctored && (
               <div className="pt-4 border-t border-danger/20">
                 <label className="flex flex-col gap-2 text-sm font-bold text-ink">
-                  Số lần vi phạm tối đa trước khi tự động thu bài
+                  {t('quiz.maxViolations')}
                   <input
                     type="number"
                     min="1"
@@ -1509,6 +1518,7 @@ function QuizSettingsTab({ quiz }: { quiz: InstructorMaterial }) {
 
 /** Giao diện Sinh AI Official Mới Cho Giảng Viên */
 function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: { courseId: number; initialType: 'QUIZ' | 'FLASHCARD' | 'MINDMAP'; onClose: () => void; onSuccess: () => void }) {
+  const t = useTranslations('instructor.materials');
   const [materialType, setMaterialType] = useState<'QUIZ' | 'FLASHCARD' | 'MINDMAP'>(initialType);
   const [quizType, setQuizType] = useState<'LECTURE_QUIZ' | 'OFFICIAL_EXAM'>('OFFICIAL_EXAM');
   const [scopeType, setScopeType] = useState<'WHOLE_COURSE' | 'CHAPTER' | 'LESSON'>('WHOLE_COURSE');
@@ -1539,7 +1549,7 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
   useEffect(() => {
     if (isTitleEdited) return;
     let typeName = materialType === 'QUIZ' ? 'Quick Check' : materialType === 'MINDMAP' ? 'Mindmap' : 'Flashcard';
-    if (materialType === 'QUIZ' && scopeType === 'WHOLE_COURSE') typeName = 'Đề thi Tổng kết';
+    if (materialType === 'QUIZ' && scopeType === 'WHOLE_COURSE') typeName = t('gen.summaryExam');
 
     let newTitle = '';
     if (scopeType === 'LESSON' && lessonId && chapters) {
@@ -1547,43 +1557,43 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
       if (lesson) newTitle = `${typeName} - ${lesson.title}`;
     } else if (scopeType === 'CHAPTER' && scopeRefId && chapters) {
       const chapter = chapters.find(c => c.id === scopeRefId);
-      if (chapter) newTitle = `${typeName} Ôn tập - ${chapter.title}`;
+      if (chapter) newTitle = t('gen.reviewTitle', { type: typeName, chapter: chapter.title });
     } else if (scopeType === 'WHOLE_COURSE') {
-      newTitle = `${typeName} - Khóa học`;
+      newTitle = t('gen.wholeCourseTitle', { type: typeName });
     }
 
     if (newTitle && newTitle !== title) {
       setTitle(newTitle);
     }
-  }, [materialType, scopeType, scopeRefId, lessonId, chapters, isTitleEdited, title]);
+  }, [materialType, scopeType, scopeRefId, lessonId, chapters, isTitleEdited, title, t]);
 
   const generateMutation = useMutation({
     mutationFn: materialsApi.requestGeneration,
     onSuccess: () => {
-      toast.success('Đã gửi yêu cầu sinh học liệu AI thành công!');
+      toast.success(t('toast.generateSent'));
       onSuccess();
     },
     onError: (err: Error) => {
-      toast.error(err.message || 'Không thể sinh học liệu');
+      toast.error(err.message || t('toast.generateError'));
     }
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!materialType) {
-      toast.error("Vui lòng chọn loại học liệu bạn muốn tạo");
+      toast.error(t('toast.pickType'));
       return;
     }
     if (!title.trim()) {
-      toast.error("Vui lòng nhập tiêu đề");
+      toast.error(t('toast.enterTitle'));
       return;
     }
     if (scopeType === 'CHAPTER' && !scopeRefId) {
-      toast.error("Vui lòng chọn một chương");
+      toast.error(t('toast.pickChapter'));
       return;
     }
     if (scopeType === 'LESSON' && !lessonId) {
-      toast.error("Vui lòng chọn một bài học");
+      toast.error(t('toast.pickLesson'));
       return;
     }
     generateMutation.mutate({
@@ -1606,10 +1616,10 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
     <div className="w-full rounded-3xl bg-surface-raised p-8 shadow-sm border border-line relative">
       <div className="border-b pb-4 mb-6 flex justify-between items-start">
         <div>
-          <h3 className="text-2xl font-black text-ink">Tạo Học Liệu AI Tự Động</h3>
-          <p className="text-sm text-ink-muted mt-1">Lựa chọn loại học liệu bạn muốn AI tự động tổng hợp từ nội dung bài giảng.</p>
+          <h3 className="text-2xl font-black text-ink">{t('gen.title')}</h3>
+          <p className="text-sm text-ink-muted mt-1">{t('gen.subtitle')}</p>
         </div>
-        <button type="button" onClick={onClose} className="flex items-center justify-center w-8 h-8 rounded-card bg-surface-hover hover:bg-line-soft text-ink-muted transition-colors" title="Đóng"><X className="w-4 h-4" /></button>
+        <button type="button" onClick={onClose} className="flex items-center justify-center w-8 h-8 rounded-card bg-surface-hover hover:bg-line-soft text-ink-muted transition-colors" title={t('close')}><X className="w-4 h-4" /></button>
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-6">
@@ -1625,8 +1635,8 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
               }`}
           >
             <div className="flex justify-center"><FileQuestion className="w-9 h-9 text-accent" strokeWidth={1.5} /></div>
-            <div className="font-bold text-ink">Bài Thi Trắc Nghiệm</div>
-            <div className="text-xs text-ink-muted">Sinh câu hỏi trắc nghiệm kèm giải thích</div>
+            <div className="font-bold text-ink">{t('gen.quizName')}</div>
+            <div className="text-xs text-ink-muted">{t('gen.quizDesc')}</div>
           </div>
 
           <div
@@ -1638,8 +1648,8 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
               }`}
           >
             <div className="flex justify-center"><Layers className="w-9 h-9 text-accent" strokeWidth={1.5} /></div>
-            <div className="font-bold text-ink">Thẻ Flashcard</div>
-            <div className="text-xs text-ink-muted">Trích xuất thuật ngữ & khái niệm 2 mặt</div>
+            <div className="font-bold text-ink">{t('gen.flashcardName')}</div>
+            <div className="text-xs text-ink-muted">{t('gen.flashcardDesc')}</div>
           </div>
 
           <div
@@ -1651,19 +1661,19 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
               }`}
           >
             <div className="flex justify-center"><Workflow className="w-9 h-9 text-accent" strokeWidth={1.5} /></div>
-            <div className="font-bold text-ink">Sơ Đồ Tư Duy</div>
-            <div className="text-xs text-ink-muted">Vẽ sơ đồ luồng kiến thức trực quan</div>
+            <div className="font-bold text-ink">{t('gen.mindmapName')}</div>
+            <div className="text-xs text-ink-muted">{t('gen.mindmapDesc')}</div>
           </div>
         </div>
 
         {/* Bước 2: Hiển thị các Option nếu đã chọn loại */}
         {materialType && (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-300 flex flex-col gap-4 bg-surface-hover p-5 rounded-card border border-line">
-            <h4 className="font-bold text-ink border-b pb-2">Cấu Hình Chi Tiết</h4>
+            <h4 className="font-bold text-ink border-b pb-2">{t('gen.detail')}</h4>
 
             {materialType === 'QUIZ' && (
               <div className="flex flex-col gap-2 pt-2 pb-2">
-                <span className="text-sm font-semibold text-ink">Phân loại Trắc nghiệm</span>
+                <span className="text-sm font-semibold text-ink">{t('gen.quizKind')}</span>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <label className={`cursor-pointer flex items-start gap-3 p-3 rounded-card border-2 transition ${quizType === 'LECTURE_QUIZ' ? 'border-accent bg-accent/5' : 'border-line bg-surface-raised hover:border-accent/30'}`}>
                     <input type="radio" name="aiQuizType" value="LECTURE_QUIZ" checked={quizType === 'LECTURE_QUIZ'} onChange={() => {
@@ -1673,8 +1683,8 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
                       setLessonId(undefined);
                     }} className="mt-1" />
                     <div className="flex flex-col">
-                      <span className="font-bold text-ink text-sm">Kiểm tra nhanh (Quick Check)</span>
-                      <span className="text-xs text-ink-muted">Gắn vào 1 Bài học. Luôn hiện giải thích, làm vô hạn lần, không tính giờ.</span>
+                      <span className="font-bold text-ink text-sm">{t('gen.quickCheck')}</span>
+                      <span className="text-xs text-ink-muted">{t('gen.quickCheckDesc')}</span>
                     </div>
                   </label>
                   <label className={`cursor-pointer flex items-start gap-3 p-3 rounded-card border-2 transition ${quizType === 'OFFICIAL_EXAM' ? 'border-accent bg-accent/5' : 'border-line bg-surface-raised hover:border-accent/30'}`}>
@@ -1685,8 +1695,8 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
                       setLessonId(undefined);
                     }} className="mt-1" />
                     <div className="flex flex-col">
-                      <span className="font-bold text-ink text-sm">Thi chính thức (Official Exam)</span>
-                      <span className="text-xs text-ink-muted">Thi theo Chương/Khóa học. Có tính giờ, ghi Bảng điểm, tùy chỉnh lượt làm.</span>
+                      <span className="font-bold text-ink text-sm">{t('gen.officialExam')}</span>
+                      <span className="text-xs text-ink-muted">{t('gen.officialExamDesc')}</span>
                     </div>
                   </label>
                 </div>
@@ -1694,7 +1704,7 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
             )}
 
             <label className="flex flex-col gap-1 text-sm font-semibold text-ink">
-              Tiêu đề học liệu
+              {t('gen.materialTitle')}
               <input
                 type="text"
                 key={`ai-title-${materialType}-${scopeType}-${scopeRefId || ''}-${lessonId || ''}`}
@@ -1709,7 +1719,7 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
             </label>
 
             <label className="flex flex-col gap-1 text-sm font-semibold text-ink">
-              Phạm vi tạo học liệu
+              {t('gen.scope')}
               <select
                 value={scopeType}
                 onChange={(e) => {
@@ -1718,21 +1728,21 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
                 }}
                 className="rounded-card border border-line px-4 py-2.5 text-sm focus:border-accent outline-none bg-surface-raised"
               >
-                {materialType === 'QUIZ' && quizType === 'OFFICIAL_EXAM' && <option value="WHOLE_COURSE">Toàn bộ khóa học</option>}
-                {materialType === 'QUIZ' && quizType === 'OFFICIAL_EXAM' && <option value="CHAPTER">Theo chương cụ thể</option>}
-                {materialType === 'QUIZ' && quizType === 'LECTURE_QUIZ' && <option value="LESSON">Bài học cụ thể</option>}
+                {materialType === 'QUIZ' && quizType === 'OFFICIAL_EXAM' && <option value="WHOLE_COURSE">{t('gen.scopeWhole')}</option>}
+                {materialType === 'QUIZ' && quizType === 'OFFICIAL_EXAM' && <option value="CHAPTER">{t('gen.scopeChapter')}</option>}
+                {materialType === 'QUIZ' && quizType === 'LECTURE_QUIZ' && <option value="LESSON">{t('gen.scopeLesson')}</option>}
                 
-                {materialType === 'FLASHCARD' && <option value="CHAPTER">Theo chương cụ thể</option>}
-                {materialType === 'FLASHCARD' && <option value="LESSON">Bài học cụ thể</option>}
+                {materialType === 'FLASHCARD' && <option value="CHAPTER">{t('gen.scopeChapter')}</option>}
+                {materialType === 'FLASHCARD' && <option value="LESSON">{t('gen.scopeLesson')}</option>}
                 
-                {materialType === 'MINDMAP' && <option value="CHAPTER">Theo chương cụ thể</option>}
-                {materialType === 'MINDMAP' && <option value="LESSON">Bài học cụ thể</option>}
+                {materialType === 'MINDMAP' && <option value="CHAPTER">{t('gen.scopeChapter')}</option>}
+                {materialType === 'MINDMAP' && <option value="LESSON">{t('gen.scopeLesson')}</option>}
               </select>
             </label>
 
             {scopeType === 'CHAPTER' && (
               <label className="flex flex-col gap-1 text-sm font-semibold text-ink">
-                Chọn chương
+                {t('gen.pickChapter')}
                 <select
                   value={scopeRefId ?? ''}
                   onChange={(e) => {
@@ -1742,7 +1752,7 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
                   required
                   className="rounded-lg border border-line px-3 py-2 text-sm focus:border-accent focus:outline-none"
                 >
-                  <option value="">-- Chọn chương --</option>
+                  <option value="">{t('gen.pickChapterOpt')}</option>
                   {chapters?.map((ch) => (
                     <option key={ch.id} value={ch.id}>{ch.title}</option>
                   ))}
@@ -1752,7 +1762,7 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
 
             {scopeType === 'LESSON' && (
               <label className="flex flex-col gap-1 text-sm font-semibold text-ink">
-                Chọn bài học
+                {t('gen.pickLesson')}
                 <select
                   value={lessonId ?? ''}
                   onChange={(e) => {
@@ -1762,7 +1772,7 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
                   required
                   className="rounded-lg border border-line px-3 py-2 text-sm focus:border-accent focus:outline-none"
                 >
-                  <option value="">-- Chọn bài học --</option>
+                  <option value="">{t('gen.pickLessonOpt')}</option>
                   {chapters?.flatMap(ch => ch.lessons).map((lesson) => (
                     <option key={lesson.id} value={lesson.id}>{lesson.title}</option>
                   ))}
@@ -1774,27 +1784,27 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
             {materialType === 'QUIZ' && (
               <div className="grid grid-cols-2 gap-3">
                 <label className="flex flex-col gap-1 text-sm font-semibold text-ink">
-                  Độ khó câu hỏi
+                  {t('gen.difficulty')}
                   <select
                     value={difficultyLevel}
                     onChange={(e) => setDifficultyLevel(e.target.value as 'EASY' | 'MEDIUM' | 'HARD')}
                     className="rounded-lg border border-line px-3 py-2 text-sm focus:border-accent focus:outline-none"
                   >
-                    <option value="EASY">Cơ bản (Easy)</option>
-                    <option value="MEDIUM">Vừa (Medium)</option>
-                    <option value="HARD">Nâng cao (Hard)</option>
+                    <option value="EASY">{t('gen.easy')}</option>
+                    <option value="MEDIUM">{t('gen.medium')}</option>
+                    <option value="HARD">{t('gen.hard')}</option>
                   </select>
                 </label>
                 <label className="flex flex-col gap-1 text-sm font-semibold text-ink">
-                  Số lượng câu hỏi
+                  {t('gen.questionCount')}
                   <select
                     value={quantityLevel}
                     onChange={(e) => setQuantityLevel(e.target.value as 'FEWER' | 'STANDARD' | 'MORE')}
                     className="rounded-lg border border-line px-3 py-2 text-sm focus:border-accent focus:outline-none"
                   >
-                    <option value="FEWER">Ít (~10 câu)</option>
-                    <option value="STANDARD">Vừa (~20 câu)</option>
-                    <option value="MORE">Nhiều (~30 câu)</option>
+                    <option value="FEWER">{t('gen.qFew')}</option>
+                    <option value="STANDARD">{t('gen.qStd')}</option>
+                    <option value="MORE">{t('gen.qMore')}</option>
                   </select>
                 </label>
               </div>
@@ -1802,15 +1812,15 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
 
             {materialType === 'FLASHCARD' && (
               <label className="flex flex-col gap-1 text-sm font-semibold text-ink">
-                Số lượng thẻ Flashcard
+                {t('gen.cardCount')}
                 <select
                   value={quantityLevel}
                   onChange={(e) => setQuantityLevel(e.target.value as 'FEWER' | 'STANDARD' | 'MORE')}
                   className="rounded-lg border border-line px-3 py-2 text-sm focus:border-accent focus:outline-none"
                 >
-                  <option value="FEWER">Ít (~10 thẻ)</option>
-                  <option value="STANDARD">Vừa (~20 thẻ)</option>
-                  <option value="MORE">Nhiều (~30 thẻ)</option>
+                  <option value="FEWER">{t('gen.cFew')}</option>
+                  <option value="STANDARD">{t('gen.cStd')}</option>
+                  <option value="MORE">{t('gen.cMore')}</option>
                 </select>
               </label>
             )}
@@ -1818,7 +1828,7 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
             {materialType === 'MINDMAP' && (
               <div className="flex flex-col gap-4">
                 <div>
-                  <label className="text-sm font-bold text-ink block mb-3">Mẫu sơ đồ (Template)</label>
+                  <label className="text-sm font-bold text-ink block mb-3">{t('gen.template')}</label>
                   <div className="grid grid-cols-4 gap-2">
                     {[
                       { id: 'LOGIC_CHART', name: 'Logic Chart', Icon: GitBranch },
@@ -1837,22 +1847,22 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
                 </div>
 
                 <label className="flex flex-col gap-1 text-sm font-semibold text-ink">
-                  Mức độ chi tiết nhánh
+                  {t('gen.detailLevel')}
                   <select
                     value={quantityLevel}
                     onChange={(e) => setQuantityLevel(e.target.value as 'FEWER' | 'STANDARD' | 'MORE')}
                     className="rounded-lg border border-line px-3 py-2.5 text-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
                   >
-                    <option value="FEWER">Cơ bản, nhánh chính</option>
-                    <option value="STANDARD">Tiêu chuẩn, vừa phải</option>
-                    <option value="MORE">Chi tiết, chia nhiều nhánh nhỏ</option>
+                    <option value="FEWER">{t('gen.dBasic')}</option>
+                    <option value="STANDARD">{t('gen.dStd')}</option>
+                    <option value="MORE">{t('gen.dDetail')}</option>
                   </select>
                 </label>
               </div>
             )}
 
             <label className="flex flex-col gap-1 text-sm font-semibold text-ink">
-              Ngôn ngữ học liệu
+              {t('gen.language')}
               <MaterialLanguagePicker
                 languages={languages ?? []}
                 value={language}
@@ -1862,14 +1872,14 @@ function GenerateAiOfficialView({ courseId, initialType, onClose, onSuccess }: {
 
             <div className="mt-6 flex justify-end gap-3 border-t pt-5">
               <button type="button" onClick={onClose} className="rounded-card px-5 py-2.5 text-sm font-bold text-ink-muted hover:bg-line-soft transition-colors">
-                Hủy
+                {t('cancel')}
               </button>
               <button
                 type="submit"
                 disabled={generateMutation.isPending || !materialType}
                 className="flex items-center gap-2 rounded-card bg-accent px-6 py-2.5 text-sm font-bold text-white hover:bg-accent-dark disabled:opacity-50 shadow-card"
               >
-                <Sparkles className="w-4 h-4" /> {generateMutation.isPending ? 'Đang gọi AI...' : 'Bắt Đầu Sinh'}
+                <Sparkles className="w-4 h-4" /> {generateMutation.isPending ? t('gen.calling') : t('gen.start')}
               </button>
             </div>
           </div>
@@ -1898,6 +1908,7 @@ interface QuizQuestionEditorProps {
 }
 
 function QuizQuestionEditorModal({ question, chapters, onClose, onSuccess }: QuizQuestionEditorProps) {
+  const t = useTranslations('instructor.materials');
   const [content, setContent] = useState(question.content);
   const [isMultipleChoice, setIsMultipleChoice] = useState(question.isMultipleChoice || false);
   const [topicTag, setTopicTag] = useState(question.topicTag || '');
@@ -1920,11 +1931,11 @@ function QuizQuestionEditorModal({ question, chapters, onClose, onSuccess }: Qui
       });
     },
     onSuccess: () => {
-      toast.success('Đã lưu thay đổi câu hỏi');
+      toast.success(t('toast.questionSaved'));
       onSuccess();
     },
     onError: (err: Error) => {
-      toast.error(err.message || 'Không thể lưu câu hỏi');
+      toast.error(err.message || t('toast.questionSaveError'));
     }
   });
 
@@ -1937,17 +1948,17 @@ function QuizQuestionEditorModal({ question, chapters, onClose, onSuccess }: Qui
   };
 
   return (
-    <Modal open onClose={onClose} bare ariaLabel="Chỉnh sửa nội dung câu hỏi" closeOnBackdrop={false} className="bg-surface-raised p-6 rounded-card w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-card-hover border border-line">
-        <h3 className="font-bold text-lg mb-4 text-ink">Chỉnh sửa Nội Dung Câu Hỏi</h3>
+    <Modal open onClose={onClose} bare ariaLabel={t('qe.editAria')} closeOnBackdrop={false} className="bg-surface-raised p-6 rounded-card w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-card-hover border border-line">
+        <h3 className="font-bold text-lg mb-4 text-ink">{t('qe.editTitle')}</h3>
 
         {question.usageCount && question.usageCount > 0 ? (
           <div className="mb-4 p-3 bg-star/10 border border-star/20 rounded-card text-star text-sm font-medium flex items-start gap-2">
             <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
-            Lưu ý: Học liệu này đã có lượt làm bài. Sửa đáp án câu hỏi sẽ ảnh hưởng đến kết quả chấm điểm của các bài thi đã nộp trước đó.
+            {t('qe.warnAttempted')}
           </div>
         ) : null}
 
-        <label className="block text-sm font-semibold text-ink mb-1">Nội dung câu hỏi</label>
+        <label className="block text-sm font-semibold text-ink mb-1">{t('qe.content')}</label>
         <textarea
           value={content}
           onChange={e => setContent(e.target.value)}
@@ -1955,31 +1966,31 @@ function QuizQuestionEditorModal({ question, chapters, onClose, onSuccess }: Qui
           rows={3}
         />
 
-        <label className="block text-sm font-semibold text-ink mb-1">Loại câu hỏi</label>
+        <label className="block text-sm font-semibold text-ink mb-1">{t('qe.type')}</label>
         <div className="flex gap-4 mb-4">
           <label className="flex items-center gap-2 text-sm cursor-pointer">
             <input type="radio" checked={!isMultipleChoice} onChange={() => setIsMultipleChoice(false)} className="w-4 h-4 text-accent focus:ring-accent" />
-            Single Choice (1 đáp án đúng)
+            {t('qe.single')}
           </label>
           <label className="flex items-center gap-2 text-sm cursor-pointer">
             <input type="radio" checked={isMultipleChoice} onChange={() => setIsMultipleChoice(true)} className="w-4 h-4 text-accent focus:ring-accent" />
-            Multiple Choice (Nhiều đáp án đúng)
+            {t('qe.multiple')}
           </label>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5 p-4 bg-surface-hover rounded-card border border-line">
           <label className="block text-sm font-semibold text-ink">
-            Topic Tag (Chủ đề)
-            <input type="text" value={topicTag} onChange={e => setTopicTag(e.target.value)} placeholder="VD: Toán tử Logic" className="w-full border border-line p-2 mt-1 rounded-md focus:border-accent focus:outline-none bg-surface-raised" />
+            {t('qe.topicTag')}
+            <input type="text" value={topicTag} onChange={e => setTopicTag(e.target.value)} placeholder={t('qe.topicPlaceholder')} className="w-full border border-line p-2 mt-1 rounded-md focus:border-accent focus:outline-none bg-surface-raised" />
           </label>
           <label className="block text-sm font-semibold text-ink">
-            Mốc TG Video (giây)
+            {t('qe.videoTime')}
             <input type="number" value={videoTimestamp} onChange={e => setVideoTimestamp(e.target.value ? Number(e.target.value) : '')} placeholder="VD: 120" className="w-full border border-line p-2 mt-1 rounded-md focus:border-accent focus:outline-none bg-surface-raised" />
           </label>
           <label className="block text-sm font-semibold text-ink">
-            Bài giảng gốc
+            {t('qe.sourceLesson')}
             <select value={referenceLessonId} onChange={e => setReferenceLessonId(e.target.value ? Number(e.target.value) : '')} className="w-full border border-line p-2 mt-1 rounded-md focus:border-accent focus:outline-none bg-surface-raised">
-              <option value="">-- Bỏ trống --</option>
+              <option value="">{t('qe.leaveEmpty')}</option>
               {chapters?.flatMap(ch => ch.lessons).map(l => (
                 <option key={l.id} value={l.id}>{l.title}</option>
               ))}
@@ -1987,7 +1998,7 @@ function QuizQuestionEditorModal({ question, chapters, onClose, onSuccess }: Qui
           </label>
         </div>
 
-        <label className="block text-sm font-semibold text-ink mb-2">Các đáp án</label>
+        <label className="block text-sm font-semibold text-ink mb-2">{t('qe.options')}</label>
         <div className="space-y-3">
           {options.map((opt, idx) => (
             <div key={idx} className={`flex gap-3 items-center p-3 rounded-card border ${opt.isCorrect ? 'bg-success/10 border-success/30' : 'bg-surface-hover border-line'}`}>
@@ -2022,7 +2033,7 @@ function QuizQuestionEditorModal({ question, chapters, onClose, onSuccess }: Qui
                   type="button"
                   onClick={() => setOptions(options.filter((_, i) => i !== idx))}
                   className="p-1 text-ink-faint hover:text-danger transition-colors"
-                  title="Xóa đáp án"
+                  title={t('qe.deleteOption')}
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -2034,13 +2045,13 @@ function QuizQuestionEditorModal({ question, chapters, onClose, onSuccess }: Qui
               <input type="checkbox" disabled className="w-5 h-5 cursor-not-allowed" />
               <input
                 type="text"
-                placeholder="Nhập đáp án mới và nhấn Enter..."
+                placeholder={t('qe.optionPlaceholder')}
                 value=""
                 onChange={() => {}}
                 onKeyDown={e => {
                   if (e.key === 'Enter') {
                     e.preventDefault();
-                    const newOptions = [...options, { id: -Date.now(), content: (e.target as HTMLInputElement).value || 'Đáp án mới', isCorrect: false }];
+                    const newOptions = [...options, { id: -Date.now(), content: (e.target as HTMLInputElement).value || t('qe.newOption'), isCorrect: false }];
                     setOptions(newOptions);
                     setTimeout(() => {
                       const inputs = document.querySelectorAll('.option-input');
@@ -2055,13 +2066,13 @@ function QuizQuestionEditorModal({ question, chapters, onClose, onSuccess }: Qui
         </div>
 
         <div className="mt-6 flex justify-end gap-3 border-t pt-4">
-          <button onClick={onClose} className="px-5 py-2 bg-surface-hover font-semibold text-ink rounded-lg hover:bg-line-soft">Hủy</button>
+          <button onClick={onClose} className="px-5 py-2 bg-surface-hover font-semibold text-ink rounded-lg hover:bg-line-soft">{t('cancel')}</button>
           <button
             onClick={() => updateMutation.mutate()}
             disabled={updateMutation.isPending}
             className="px-5 py-2 bg-accent text-white font-bold rounded-lg hover:bg-accent-dark shadow disabled:opacity-50"
           >
-            {updateMutation.isPending ? 'Đang lưu...' : 'Lưu Thay Đổi'}
+            {updateMutation.isPending ? t('saving') : t('saveChanges')}
           </button>
         </div>
       </Modal>
@@ -2070,16 +2081,17 @@ function QuizQuestionEditorModal({ question, chapters, onClose, onSuccess }: Qui
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function NewQuizQuestionEditorModal({ quizId, chapters, onClose, onSuccess }: { quizId: number; chapters?: any[]; onClose: () => void; onSuccess: () => void; }) {
+  const t = useTranslations('instructor.materials');
   const [content, setContent] = useState('');
   const [isMultipleChoice, setIsMultipleChoice] = useState(false);
   const [topicTag, setTopicTag] = useState('');
   const [videoTimestamp, setVideoTimestamp] = useState<number | ''>('');
   const [referenceLessonId, setReferenceLessonId] = useState<number | ''>('');
   const [options, setOptions] = useState<{ id: number; content: string; isCorrect: boolean }[]>([
-    { id: -1, content: 'Đáp án A', isCorrect: true },
-    { id: -2, content: 'Đáp án B', isCorrect: false },
-    { id: -3, content: 'Đáp án C', isCorrect: false },
-    { id: -4, content: 'Đáp án D', isCorrect: false },
+    { id: -1, content: t('qe.optionA'), isCorrect: true },
+    { id: -2, content: t('qe.optionB'), isCorrect: false },
+    { id: -3, content: t('qe.optionC'), isCorrect: false },
+    { id: -4, content: t('qe.optionD'), isCorrect: false },
   ]);
 
   const addMutation = useMutation({
@@ -2095,11 +2107,11 @@ function NewQuizQuestionEditorModal({ quizId, chapters, onClose, onSuccess }: { 
       });
     },
     onSuccess: () => {
-      toast.success('Đã thêm câu hỏi mới');
+      toast.success(t('toast.questionAdded'));
       onSuccess();
     },
     onError: (err: Error) => {
-      toast.error(err.message || 'Không thể thêm câu hỏi');
+      toast.error(err.message || t('toast.questionAddError'));
     }
   });
 
@@ -2112,43 +2124,43 @@ function NewQuizQuestionEditorModal({ quizId, chapters, onClose, onSuccess }: { 
   };
 
   return (
-    <Modal open onClose={onClose} bare ariaLabel="Thêm câu hỏi mới" closeOnBackdrop={false} className="bg-surface-raised p-6 rounded-card w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-card-hover border border-line">
-        <h3 className="font-bold text-lg mb-4 text-ink">Thêm Câu Hỏi Mới</h3>
+    <Modal open onClose={onClose} bare ariaLabel={t('qe.addAria')} closeOnBackdrop={false} className="bg-surface-raised p-6 rounded-card w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-card-hover border border-line">
+        <h3 className="font-bold text-lg mb-4 text-ink">{t('qe.addTitle')}</h3>
 
-        <label className="block text-sm font-semibold text-ink mb-1">Nội dung câu hỏi</label>
+        <label className="block text-sm font-semibold text-ink mb-1">{t('qe.content')}</label>
         <textarea
           value={content}
           onChange={e => setContent(e.target.value)}
-          placeholder="Nhập nội dung câu hỏi..."
+          placeholder={t('qe.contentPlaceholder')}
           className="w-full border border-line p-3 rounded-card mb-5 focus:border-accent focus:outline-none"
           rows={3}
         />
 
-        <label className="block text-sm font-semibold text-ink mb-1">Loại câu hỏi</label>
+        <label className="block text-sm font-semibold text-ink mb-1">{t('qe.type')}</label>
         <div className="flex gap-4 mb-4">
           <label className="flex items-center gap-2 text-sm cursor-pointer">
             <input type="radio" checked={!isMultipleChoice} onChange={() => setIsMultipleChoice(false)} className="w-4 h-4 text-accent focus:ring-accent" />
-            Single Choice (1 đáp án đúng)
+            {t('qe.single')}
           </label>
           <label className="flex items-center gap-2 text-sm cursor-pointer">
             <input type="radio" checked={isMultipleChoice} onChange={() => setIsMultipleChoice(true)} className="w-4 h-4 text-accent focus:ring-accent" />
-            Multiple Choice (Nhiều đáp án đúng)
+            {t('qe.multiple')}
           </label>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5 p-4 bg-surface-hover rounded-card border border-line">
           <label className="block text-sm font-semibold text-ink">
-            Topic Tag (Chủ đề)
-            <input type="text" value={topicTag} onChange={e => setTopicTag(e.target.value)} placeholder="VD: Toán tử Logic" className="w-full border border-line p-2 mt-1 rounded-md focus:border-accent focus:outline-none bg-surface-raised" />
+            {t('qe.topicTag')}
+            <input type="text" value={topicTag} onChange={e => setTopicTag(e.target.value)} placeholder={t('qe.topicPlaceholder')} className="w-full border border-line p-2 mt-1 rounded-md focus:border-accent focus:outline-none bg-surface-raised" />
           </label>
           <label className="block text-sm font-semibold text-ink">
-            Mốc TG Video (giây)
+            {t('qe.videoTime')}
             <input type="number" value={videoTimestamp} onChange={e => setVideoTimestamp(e.target.value ? Number(e.target.value) : '')} placeholder="VD: 120" className="w-full border border-line p-2 mt-1 rounded-md focus:border-accent focus:outline-none bg-surface-raised" />
           </label>
           <label className="block text-sm font-semibold text-ink">
-            Bài giảng gốc
+            {t('qe.sourceLesson')}
             <select value={referenceLessonId} onChange={e => setReferenceLessonId(e.target.value ? Number(e.target.value) : '')} className="w-full border border-line p-2 mt-1 rounded-md focus:border-accent focus:outline-none bg-surface-raised">
-              <option value="">-- Bỏ trống --</option>
+              <option value="">{t('qe.leaveEmpty')}</option>
               {chapters?.flatMap(ch => ch.lessons).map(l => (
                 <option key={l.id} value={l.id}>{l.title}</option>
               ))}
@@ -2156,7 +2168,7 @@ function NewQuizQuestionEditorModal({ quizId, chapters, onClose, onSuccess }: { 
           </label>
         </div>
 
-        <label className="block text-sm font-semibold text-ink mb-2">Các đáp án</label>
+        <label className="block text-sm font-semibold text-ink mb-2">{t('qe.options')}</label>
         <div className="space-y-3">
           {options.map((opt, idx) => (
             <div key={idx} className={`flex gap-3 items-center p-3 rounded-card border ${opt.isCorrect ? 'bg-success/10 border-success/30' : 'bg-surface-hover border-line'}`}>
@@ -2191,7 +2203,7 @@ function NewQuizQuestionEditorModal({ quizId, chapters, onClose, onSuccess }: { 
                   type="button"
                   onClick={() => setOptions(options.filter((_, i) => i !== idx))}
                   className="p-1 text-ink-faint hover:text-danger transition-colors"
-                  title="Xóa đáp án"
+                  title={t('qe.deleteOption')}
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -2203,13 +2215,13 @@ function NewQuizQuestionEditorModal({ quizId, chapters, onClose, onSuccess }: { 
               <input type="checkbox" disabled className="w-5 h-5 cursor-not-allowed" />
               <input
                 type="text"
-                placeholder="Nhập đáp án mới và nhấn Enter..."
+                placeholder={t('qe.optionPlaceholder')}
                 value=""
                 onChange={() => {}}
                 onKeyDown={e => {
                   if (e.key === 'Enter') {
                     e.preventDefault();
-                    const newOptions = [...options, { id: -Date.now(), content: (e.target as HTMLInputElement).value || 'Đáp án mới', isCorrect: false }];
+                    const newOptions = [...options, { id: -Date.now(), content: (e.target as HTMLInputElement).value || t('qe.newOption'), isCorrect: false }];
                     setOptions(newOptions);
                     setTimeout(() => {
                       const inputs = document.querySelectorAll('.option-input');
@@ -2224,16 +2236,16 @@ function NewQuizQuestionEditorModal({ quizId, chapters, onClose, onSuccess }: { 
         </div>
 
         <div className="mt-6 flex justify-end gap-3 border-t pt-4">
-          <button onClick={onClose} className="px-5 py-2 bg-surface-hover font-semibold text-ink rounded-lg hover:bg-line-soft">Hủy</button>
+          <button onClick={onClose} className="px-5 py-2 bg-surface-hover font-semibold text-ink rounded-lg hover:bg-line-soft">{t('cancel')}</button>
           <button
             onClick={() => {
-              if (!content.trim()) return toast.error('Vui lòng nhập nội dung câu hỏi');
+              if (!content.trim()) return toast.error(t('toast.questionContentRequired'));
               addMutation.mutate();
             }}
             disabled={addMutation.isPending}
             className="px-5 py-2 bg-accent text-white font-bold rounded-lg hover:bg-accent-dark shadow disabled:opacity-50"
           >
-            {addMutation.isPending ? 'Đang thêm...' : 'Thêm Câu Hỏi'}
+            {addMutation.isPending ? t('qe.adding') : t('qe.addBtn')}
           </button>
         </div>
       </Modal>
@@ -2241,56 +2253,58 @@ function NewQuizQuestionEditorModal({ quizId, chapters, onClose, onSuccess }: { 
 }
 
 function FlashcardEditorModal({ flashcard, onClose, onSuccess }: { flashcard: { id: number, frontText: string, backText: string, usageCount?: number }, onClose: () => void, onSuccess: () => void }) {
+  const t = useTranslations('instructor.materials');
   const [frontText, setFrontText] = useState(flashcard.frontText);
   const [backText, setBackText] = useState(flashcard.backText);
 
   const updateMutation = useMutation({
     mutationFn: () => materialsApi.updateFlashcard(flashcard.id, { frontText, backText }),
     onSuccess: () => {
-      toast.success('Đã cập nhật Flashcard');
+      toast.success(t('toast.flashcardUpdated'));
       onSuccess();
     }
   });
 
   return (
-    <Modal open onClose={onClose} bare ariaLabel="Chỉnh sửa flashcard" closeOnBackdrop={false} className="bg-surface-raised p-6 rounded-card w-full max-w-lg shadow-card-hover border border-line">
-        <h3 className="font-bold text-lg mb-4 text-ink">Chỉnh sửa Flashcard</h3>
-        <label className="block text-sm font-semibold text-ink mb-1">Mặt Trước (Thuật ngữ)</label>
+    <Modal open onClose={onClose} bare ariaLabel={t('fc.editAria')} closeOnBackdrop={false} className="bg-surface-raised p-6 rounded-card w-full max-w-lg shadow-card-hover border border-line">
+        <h3 className="font-bold text-lg mb-4 text-ink">{t('fc.editTitle')}</h3>
+        <label className="block text-sm font-semibold text-ink mb-1">{t('viewer.front')}</label>
         <textarea value={frontText} onChange={e => setFrontText(e.target.value)} className="w-full border border-line p-3 rounded-card mb-4 focus:border-accent focus:outline-none" rows={3} />
-        <label className="block text-sm font-semibold text-ink mb-1">Mặt Sau (Khái niệm)</label>
+        <label className="block text-sm font-semibold text-ink mb-1">{t('viewer.back')}</label>
         <textarea value={backText} onChange={e => setBackText(e.target.value)} className="w-full border border-line p-3 rounded-card mb-5 focus:border-accent focus:outline-none" rows={3} />
         
         <div className="flex justify-end gap-3 border-t pt-4">
-          <button onClick={onClose} className="px-5 py-2 bg-surface-hover font-semibold text-ink rounded-lg hover:bg-line-soft">Hủy</button>
-          <button onClick={() => updateMutation.mutate()} disabled={updateMutation.isPending} className="px-5 py-2 bg-accent text-white font-bold rounded-lg hover:bg-accent-dark shadow disabled:opacity-50">Lưu Thay Đổi</button>
+          <button onClick={onClose} className="px-5 py-2 bg-surface-hover font-semibold text-ink rounded-lg hover:bg-line-soft">{t('cancel')}</button>
+          <button onClick={() => updateMutation.mutate()} disabled={updateMutation.isPending} className="px-5 py-2 bg-accent text-white font-bold rounded-lg hover:bg-accent-dark shadow disabled:opacity-50">{t('saveChanges')}</button>
         </div>
       </Modal>
   );
 }
 
 function NewFlashcardEditorModal({ generationId, onClose, onSuccess }: { generationId: number, onClose: () => void, onSuccess: () => void }) {
+  const t = useTranslations('instructor.materials');
   const [frontText, setFrontText] = useState('');
   const [backText, setBackText] = useState('');
 
   const addMutation = useMutation({
     mutationFn: () => materialsApi.addFlashcard(generationId, { frontText, backText }),
     onSuccess: () => {
-      toast.success('Đã thêm Flashcard mới');
+      toast.success(t('toast.flashcardAdded'));
       onSuccess();
     }
   });
 
   return (
-    <Modal open onClose={onClose} bare ariaLabel="Thêm flashcard mới" closeOnBackdrop={false} className="bg-surface-raised p-6 rounded-card w-full max-w-lg shadow-card-hover border border-line">
-        <h3 className="font-bold text-lg mb-4 text-ink">Thêm Flashcard Mới</h3>
-        <label className="block text-sm font-semibold text-ink mb-1">Mặt Trước (Thuật ngữ)</label>
+    <Modal open onClose={onClose} bare ariaLabel={t('fc.addAria')} closeOnBackdrop={false} className="bg-surface-raised p-6 rounded-card w-full max-w-lg shadow-card-hover border border-line">
+        <h3 className="font-bold text-lg mb-4 text-ink">{t('fc.addTitle')}</h3>
+        <label className="block text-sm font-semibold text-ink mb-1">{t('viewer.front')}</label>
         <textarea value={frontText} onChange={e => setFrontText(e.target.value)} className="w-full border border-line p-3 rounded-card mb-4 focus:border-accent focus:outline-none" rows={3} />
-        <label className="block text-sm font-semibold text-ink mb-1">Mặt Sau (Khái niệm)</label>
+        <label className="block text-sm font-semibold text-ink mb-1">{t('viewer.back')}</label>
         <textarea value={backText} onChange={e => setBackText(e.target.value)} className="w-full border border-line p-3 rounded-card mb-5 focus:border-accent focus:outline-none" rows={3} />
         
         <div className="flex justify-end gap-3 border-t pt-4">
-          <button onClick={onClose} className="px-5 py-2 bg-surface-hover font-semibold text-ink rounded-lg hover:bg-line-soft">Hủy</button>
-          <button onClick={() => addMutation.mutate()} disabled={addMutation.isPending || !frontText.trim() || !backText.trim()} className="px-5 py-2 bg-accent text-white font-bold rounded-lg hover:bg-accent-dark shadow disabled:opacity-50">Thêm Thẻ</button>
+          <button onClick={onClose} className="px-5 py-2 bg-surface-hover font-semibold text-ink rounded-lg hover:bg-line-soft">{t('cancel')}</button>
+          <button onClick={() => addMutation.mutate()} disabled={addMutation.isPending || !frontText.trim() || !backText.trim()} className="px-5 py-2 bg-accent text-white font-bold rounded-lg hover:bg-accent-dark shadow disabled:opacity-50">{t('addCardBtn')}</button>
         </div>
       </Modal>
   );
@@ -2298,6 +2312,7 @@ function NewFlashcardEditorModal({ generationId, onClose, onSuccess }: { generat
 
 /** Giao diện Sinh Thủ Công Cho Giảng Viên */
 function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess }: { courseId: number; initialType: 'QUIZ' | 'FLASHCARD' | 'MINDMAP'; onClose: () => void; onSuccess: (id: number) => void }) {
+  const t = useTranslations('instructor.materials');
   const [materialType, setMaterialType] = useState<'QUIZ' | 'FLASHCARD' | 'MINDMAP'>(initialType);
   const [title, setTitle] = useState('');
   const [isTitleEdited, setIsTitleEdited] = useState(false);
@@ -2320,34 +2335,34 @@ function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess 
   // Auto-generate title for manual
   useEffect(() => {
     if (isTitleEdited) return;
-    const typeName = materialType === 'QUIZ' ? (quizType === 'LECTURE_QUIZ' ? 'Quick Check' : 'Đề thi Tổng kết') : (materialType === 'MINDMAP' ? 'Mindmap' : 'Flashcard');
+    const typeName = materialType === 'QUIZ' ? (quizType === 'LECTURE_QUIZ' ? 'Quick Check' : t('gen.summaryExam')) : (materialType === 'MINDMAP' ? 'Mindmap' : 'Flashcard');
 
-    const newTitle = `${typeName} - Khóa học`;
+    const newTitle = t('gen.wholeCourseTitle', { type: typeName });
 
     if (newTitle && newTitle !== title) {
       setTitle(newTitle);
     }
-  }, [materialType, quizType, isTitleEdited, title]);
+  }, [materialType, quizType, isTitleEdited, title, t]);
 
   const generateManualMutation = useMutation({
     mutationFn: (input: { materialType: string; language: string; title: string; quizType?: string; scope: string; scopeRefId?: string; customLessonIds?: string }) => materialsApi.createManualMaterial(courseId, input),
     onSuccess: (data) => {
-      toast.success('Đã khởi tạo học liệu trống thành công!');
+      toast.success(t('toast.manualCreated'));
       onSuccess(data.id);
     },
     onError: (err: Error) => {
-      toast.error(err.message || 'Không thể khởi tạo học liệu');
+      toast.error(err.message || t('toast.manualError'));
     }
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!materialType) {
-      toast.error("Vui lòng chọn loại học liệu");
+      toast.error(t('toast.pickMaterialType'));
       return;
     }
     if (!title.trim()) {
-      toast.error("Vui lòng nhập tên học liệu");
+      toast.error(t('toast.enterMaterialName'));
       return;
     }
     generateManualMutation.mutate({
@@ -2364,11 +2379,11 @@ function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess 
       <div className="border-b border-line pb-4 mb-6 flex justify-between items-start">
         <div>
           <h3 className="text-2xl font-black text-ink flex items-center gap-2">
-            <PencilLine className="w-5 h-5 text-accent" /> Tạo Học Liệu Thủ Công
+            <PencilLine className="w-5 h-5 text-accent" /> {t('manual.title')}
           </h3>
-          <p className="text-sm text-ink-muted mt-1">Khởi tạo một bản ghi rỗng để bạn tự tay nhập nội dung 100%.</p>
+          <p className="text-sm text-ink-muted mt-1">{t('manual.subtitle')}</p>
         </div>
-        <button type="button" onClick={onClose} className="flex items-center justify-center w-8 h-8 rounded-card bg-surface-hover hover:bg-line-soft text-ink-muted transition-colors" title="Đóng"><X className="w-4 h-4" /></button>
+        <button type="button" onClick={onClose} className="flex items-center justify-center w-8 h-8 rounded-card bg-surface-hover hover:bg-line-soft text-ink-muted transition-colors" title={t('close')}><X className="w-4 h-4" /></button>
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-6">
@@ -2380,8 +2395,8 @@ function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess 
             className={`cursor-pointer rounded-card p-4 border-2 transition flex flex-col items-center text-center gap-2 ${materialType === 'QUIZ' ? 'border-accent bg-accent/5 shadow-md scale-[1.02]' : 'border-line hover:border-accent/40 bg-surface-raised'}`}
           >
             <div className="flex justify-center"><FileQuestion className="w-9 h-9 text-accent" strokeWidth={1.5} /></div>
-            <div className="font-bold text-ink">Bài Thi (Quiz)</div>
-            <div className="text-[10px] font-bold text-accent uppercase bg-accent/10 px-2 py-0.5 rounded">Khởi tạo trống</div>
+            <div className="font-bold text-ink">{t('manual.quizName')}</div>
+            <div className="text-[10px] font-bold text-accent uppercase bg-accent/10 px-2 py-0.5 rounded">{t('manual.emptyBadge')}</div>
           </div>
           <div
             onClick={() => {
@@ -2391,7 +2406,7 @@ function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess 
           >
             <div className="flex justify-center"><Layers className="w-9 h-9 text-accent" strokeWidth={1.5} /></div>
             <div className="font-bold text-ink">Flashcard</div>
-            <div className="text-[10px] font-bold text-accent uppercase bg-accent/10 px-2 py-0.5 rounded">Khởi tạo trống</div>
+            <div className="text-[10px] font-bold text-accent uppercase bg-accent/10 px-2 py-0.5 rounded">{t('manual.emptyBadge')}</div>
           </div>
           <div
             onClick={() => {
@@ -2401,13 +2416,13 @@ function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess 
           >
             <div className="flex justify-center"><Workflow className="w-9 h-9 text-accent" strokeWidth={1.5} /></div>
             <div className="font-bold text-ink">Mindmap</div>
-            <div className="text-[10px] font-bold text-accent uppercase bg-accent/10 px-2 py-0.5 rounded">Khởi tạo trống</div>
+            <div className="text-[10px] font-bold text-accent uppercase bg-accent/10 px-2 py-0.5 rounded">{t('manual.emptyBadge')}</div>
           </div>
         </div>
 
         <div className="flex flex-col gap-4 bg-surface-hover p-5 rounded-card border border-line">
           <label className="flex flex-col gap-1 text-sm font-semibold text-ink">
-            Tên học liệu
+            {t('manual.name')}
             <input
               type="text"
               key={`manual-title-${materialType}-${quizType}`}
@@ -2416,13 +2431,13 @@ function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess 
                 setTitle(e.target.value);
                 setIsTitleEdited(true);
               }}
-              placeholder="VD: Bài thi giữa kỳ, Khái niệm cơ bản..."
+              placeholder={t('manual.namePlaceholder')}
               className="rounded-card border border-line px-4 py-2.5 text-sm focus:border-accent outline-none bg-surface-raised"
               required
             />
           </label>
           <label className="flex flex-col gap-1 text-sm font-semibold text-ink">
-            Ngôn ngữ học liệu
+            {t('gen.language')}
             <MaterialLanguagePicker
               languages={languages ?? []}
               value={language}
@@ -2432,15 +2447,15 @@ function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess 
 
           {materialType === 'QUIZ' && (
             <div className="flex flex-col gap-2 pt-2">
-              <span className="text-sm font-semibold text-ink">Phân loại Trắc nghiệm</span>
+              <span className="text-sm font-semibold text-ink">{t('gen.quizKind')}</span>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <label className={`cursor-pointer flex items-start gap-3 p-3 rounded-card border-2 transition ${quizType === 'LECTURE_QUIZ' ? 'border-accent bg-accent/5' : 'border-line bg-surface-raised hover:border-accent/20'}`}>
                   <input type="radio" name="quizTypeTop" value="LECTURE_QUIZ" checked={quizType === 'LECTURE_QUIZ'} onChange={() => {
                     setQuizType('LECTURE_QUIZ');
                   }} className="mt-1" />
                   <div className="flex flex-col">
-                    <span className="font-bold text-ink text-sm">Kiểm tra nhanh (Quick Check)</span>
-                    <span className="text-xs text-ink-muted">Gắn vào 1 Bài học. Luôn hiện giải thích, làm vô hạn lần, không tính giờ.</span>
+                    <span className="font-bold text-ink text-sm">{t('gen.quickCheck')}</span>
+                    <span className="text-xs text-ink-muted">{t('gen.quickCheckDesc')}</span>
                   </div>
                 </label>
                 <label className={`cursor-pointer flex items-start gap-3 p-3 rounded-card border-2 transition ${quizType === 'OFFICIAL_EXAM' ? 'border-accent bg-accent/5' : 'border-line bg-surface-raised hover:border-accent/20'}`}>
@@ -2448,8 +2463,8 @@ function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess 
                     setQuizType('OFFICIAL_EXAM');
                   }} className="mt-1" />
                   <div className="flex flex-col">
-                    <span className="font-bold text-ink text-sm">Thi chính thức (Official Exam)</span>
-                    <span className="text-xs text-ink-muted">Thi theo Chương/Khóa học. Có tính giờ, ghi Bảng điểm, tùy chỉnh lượt làm.</span>
+                    <span className="font-bold text-ink text-sm">{t('gen.officialExam')}</span>
+                    <span className="text-xs text-ink-muted">{t('gen.officialExamDesc')}</span>
                   </div>
                 </label>
               </div>
@@ -2463,14 +2478,14 @@ function GenerateManualOfficialView({ courseId, initialType, onClose, onSuccess 
           
           <div className="mt-4 flex justify-end gap-3 border-t pt-5">
             <button type="button" onClick={onClose} className="rounded-card px-5 py-2.5 text-sm font-bold text-ink-muted hover:bg-line-soft transition-colors">
-              Hủy
+              {t('cancel')}
             </button>
             <button
               type="submit"
               disabled={generateManualMutation.isPending || !materialType || !title.trim()}
               className="flex items-center gap-2 rounded-card bg-accent px-6 py-2.5 text-sm font-bold text-white hover:bg-accent-dark disabled:opacity-50 shadow-card"
             >
-              <Plus className="w-4 h-4" /> {generateManualMutation.isPending ? 'Đang tạo...' : 'Tạo Bản Ghi Trống'}
+              <Plus className="w-4 h-4" /> {generateManualMutation.isPending ? t('manual.creating') : t('manual.createEmpty')}
             </button>
           </div>
         </div>

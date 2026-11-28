@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { notFound } from 'next/navigation';
 import { CourseDetailView } from '@/components/course/CourseDetailView';
 import { ApiError } from '@/lib/api/client';
@@ -18,6 +19,7 @@ import type { CourseDetail } from '@/types/domain';
  * điều kiện xem) — chỉ khóa "Riêng tư mời" mới có thể 404 ở server rồi thành công ở đây.
  */
 export function CourseDetailClientRetry({ slug }: { slug: string }) {
+  const t = useTranslations('courseDetail');
   const [state, setState] = useState<{ status: 'loading' } | { status: 'ok'; course: CourseDetail } | { status: 'denied' }>(
     { status: 'loading' },
   );
@@ -43,7 +45,7 @@ export function CourseDetailClientRetry({ slug }: { slug: string }) {
   }, [slug]);
 
   if (state.status === 'loading') {
-    return <div className="p-16 text-center text-sm text-ink-muted">Đang tải khóa học...</div>;
+    return <div className="p-16 text-center text-sm text-ink-muted">{t('loadingCourse')}</div>;
   }
   if (state.status === 'denied') {
     notFound();

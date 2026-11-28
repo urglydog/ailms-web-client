@@ -154,12 +154,12 @@ function AdminDisputesContent() {
 
       <div className="flex flex-wrap items-end gap-4 rounded-xl border border-line bg-surface-raised p-4">
         <label className="flex min-w-0 flex-1 flex-col gap-1.5 sm:min-w-64">
-          <span className="text-xs font-semibold text-ink-muted">Tìm khiếu nại</span>
+          <span className="text-xs font-semibold text-ink-muted">{t('search')}</span>
           <input
             type="search"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Mã đơn, email hoặc tên người gửi, mã khiếu nại..."
+            placeholder={t('searchPh')}
             className="w-full rounded-lg border border-line bg-surface-raised p-2.5 text-sm text-ink outline-none focus:border-accent"
           />
         </label>
@@ -170,7 +170,7 @@ function AdminDisputesContent() {
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as DisputeStatus | 'ALL' | 'NEEDS_ACTION')}
           >
-            <option value="NEEDS_ACTION">Cần xử lý</option>
+            <option value="NEEDS_ACTION">{t('needsAction')}</option>
             <option value="ALL">{t('filters.all')}</option>
             {STATUSES.map((s) => (
               <option key={s} value={s}>
@@ -190,9 +190,9 @@ function AdminDisputesContent() {
       ) : filtered.length === 0 ? (
         <div className="rounded-xl border border-line bg-surface-raised p-8 text-center text-ink-muted">{t('empty')}</div>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-line bg-surface-raised shadow-sm">
+        <div className="max-h-[70vh] overflow-auto rounded-xl border border-line bg-surface-raised shadow-sm">
           <table className="w-full min-w-[820px] text-left text-sm">
-            <thead className="border-b border-line bg-surface text-xs text-ink-muted">
+            <thead className="sticky top-0 z-10 border-b border-line bg-surface text-xs text-ink-muted">
               <tr>
                 <th className="px-4 py-3 font-semibold">{t('cols.ref')}</th>
                 <th className="px-4 py-3 font-semibold">{t('cols.user')}</th>
@@ -214,7 +214,7 @@ function AdminDisputesContent() {
                   <td className="max-w-[220px] truncate px-4 py-3 text-ink-muted" title={d.reason}>{d.reason}</td>
                   <td className="px-4 py-3 font-semibold text-ink">{d.amount.toLocaleString('vi-VN')}đ</td>
                   <td className="px-4 py-3">
-                    <span className={`inline-block rounded-full border px-2.5 py-1 text-xs font-medium ${STATUS_CLASS[d.status]}`}>{d.status === 'RESOLVED_REFUNDED' && d.refundTransferStatus === 'AWAITING_ACCOUNT' ? 'Chờ học viên cập nhật TK' : d.status === 'RESOLVED_REFUNDED' && d.refundTransferStatus === 'PENDING_TRANSFER' ? t('status.RESOLVED_REFUNDED_PENDING') : t(`status.${d.status}`)}</span>
+                    <span className={`inline-block rounded-full border px-2.5 py-1 text-xs font-medium ${STATUS_CLASS[d.status]}`}>{d.status === 'RESOLVED_REFUNDED' && d.refundTransferStatus === 'AWAITING_ACCOUNT' ? t('awaitingAccount') : d.status === 'RESOLVED_REFUNDED' && d.refundTransferStatus === 'PENDING_TRANSFER' ? t('status.RESOLVED_REFUNDED_PENDING') : t(`status.${d.status}`)}</span>
                   </td>
                   <td className="whitespace-nowrap px-4 py-3 text-ink-muted">{dateTime(d.createdAt)}</td>
                   <td className="px-4 py-3 text-right">
@@ -235,7 +235,7 @@ function AdminDisputesContent() {
           {hasMore && (
             <div className="flex justify-center border-t border-line p-3">
               <button type="button" onClick={() => fetchDisputes(page + 1)} className="rounded-lg border border-line bg-surface-raised px-4 py-2 text-sm font-semibold text-ink hover:bg-tint">
-                Xem thêm
+                {t('more')}
               </button>
             </div>
           )}
@@ -298,7 +298,7 @@ function AdminDisputesContent() {
               <DisputeV2Details d={selected} />
 
               <div className="mt-4 flex flex-col gap-2">
-                <h3 className="m-0 text-sm font-semibold text-ink">Tài khoản nhận hoàn tiền</h3>
+                <h3 className="m-0 text-sm font-semibold text-ink">{t('refundAccount')}</h3>
                 <RefundAccountInfo d={selected} />
               </div>
 
@@ -382,7 +382,7 @@ function AdminDisputesContent() {
 
               {selected.refundTransferStatus === 'AWAITING_ACCOUNT' && (
                 <div className="mt-4 rounded-lg border border-warning bg-surface p-3 text-xs text-ink">
-                  Chưa chuyển được vào tài khoản học viên đã khai{selected.refundAccountSummary ? ` (${selected.refundAccountSummary})` : ''}. Đang chờ học viên cập nhật tài khoản nhận hoàn tiền; khi họ cập nhật, khoản hoàn tự quay về &quot;chờ chuyển&quot; để chi lại. Bạn vẫn có thể chuyển thủ công và ghi nhận bên dưới.
+                  {t('awaitingAccountNote', { summary: selected.refundAccountSummary ? ` (${selected.refundAccountSummary})` : '' })}
                 </div>
               )}
 

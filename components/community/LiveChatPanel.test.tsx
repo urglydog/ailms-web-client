@@ -1,4 +1,7 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, screen } from '@testing-library/react';
+import { NextIntlClientProvider } from 'next-intl';
+import viMessages from '@/messages/vi.json';
+import { renderWithIntl } from '@/test/renderWithIntl';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ChatMessage } from '@/hooks/useCommunitySocket';
 import { applyBestAnswer } from '@/hooks/useCommunitySocket';
@@ -38,7 +41,7 @@ describe('LiveChatPanel — câu trả lời hay nhất', () => {
       msg('a1', '3', { parentId: 'q1', timestamp: '2026-11-27T01:00:00Z' }),
       msg('a2', '4', { parentId: 'q1', timestamp: '2026-11-27T02:00:00Z' }),
     ];
-    render(<LiveChatPanel lessonId={1} userName="Khách" currentUserId="9" />);
+    renderWithIntl(<LiveChatPanel lessonId={1} userName="Khách" currentUserId="9" />);
     expect(screen.getByText(/Câu trả lời hay nhất/)).toBeInTheDocument();
     const contents = screen.getAllByText(/nội dung a/).map((n) => n.textContent);
     expect(contents).toEqual(['nội dung a2', 'nội dung a1']);
@@ -48,19 +51,19 @@ describe('LiveChatPanel — câu trả lời hay nhất', () => {
 
   it('người hỏi đánh dấu / bỏ đánh dấu được', () => {
     messages = [msg('q1', '2', { bestAnswerId: null }), msg('a1', '3', { parentId: 'q1' })];
-    const { rerender } = render(<LiveChatPanel lessonId={1} userName="U2" currentUserId="2" />);
+    const { rerender } = renderWithIntl(<LiveChatPanel lessonId={1} userName="U2" currentUserId="2" />);
     fireEvent.click(screen.getByRole('button', { name: 'Đánh dấu là câu trả lời hay nhất' }));
     expect(setBestAnswer).toHaveBeenCalledWith('q1', 'a1');
 
     messages = [msg('q1', '2', { bestAnswerId: 'a1' }), msg('a1', '3', { parentId: 'q1' })];
-    rerender(<LiveChatPanel lessonId={1} userName="U2" currentUserId="2" />);
+    rerender(<NextIntlClientProvider locale="vi" messages={viMessages}><LiveChatPanel lessonId={1} userName="U2" currentUserId="2" /></NextIntlClientProvider>);
     fireEvent.click(screen.getByRole('button', { name: 'Bỏ đánh dấu hay nhất' }));
     expect(setBestAnswer).toHaveBeenLastCalledWith('q1', null);
   });
 
   it('giảng viên khoá (đã từng trả lời với nhãn Giảng viên) cũng đánh dấu được', () => {
     messages = [msg('q1', '2'), msg('a1', '3', { parentId: 'q1' }), msg('a2', '1', { parentId: 'q1', isInstructor: true })];
-    render(<LiveChatPanel lessonId={1} userName="GV" currentUserId="1" />);
+    renderWithIntl(<LiveChatPanel lessonId={1} userName="GV" currentUserId="1" />);
     expect(screen.getAllByRole('button', { name: 'Đánh dấu là câu trả lời hay nhất' })).toHaveLength(2);
   });
 });

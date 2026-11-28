@@ -1,52 +1,56 @@
-import Link from 'next/link';
+'use client';
 
-const GROUPS: Array<{ title: string; links: Array<{ label: string; href: string }> }> = [
+import Link from 'next/link';
+import { useTranslations } from 'next-intl';
+
+const GROUPS: Array<{ titleKey: string; links: Array<{ key: string; href: string }> }> = [
   {
-    title: 'Khám phá',
+    titleKey: 'g1',
     links: [
-      { label: 'Trang chủ', href: '/' },
-      { label: 'Khóa học', href: '/courses' },
-      { label: 'Về chúng tôi', href: '/about' },
-      { label: 'Giảng dạy trên LinguaLearn', href: '/teaching' },
+      { key: 'home', href: '/' },
+      { key: 'courses', href: '/courses' },
+      { key: 'about', href: '/about' },
+      { key: 'teaching', href: '/teaching' },
     ],
   },
   {
-    title: 'Tài khoản',
+    titleKey: 'g2',
     links: [
-      { label: 'Đăng nhập', href: '/login' },
-      { label: 'Đăng ký', href: '/register' },
-      { label: 'Hồ sơ cá nhân', href: '/profile' },
-      { label: 'Khóa học của tôi', href: '/my-courses' },
-      { label: 'Danh sách yêu thích', href: '/wishlist' },
-      { label: 'Giỏ hàng', href: '/cart' },
-      { label: 'Lịch sử giao dịch', href: '/payments' },
+      { key: 'login', href: '/login' },
+      { key: 'register', href: '/register' },
+      { key: 'profile', href: '/profile' },
+      { key: 'myCourses', href: '/my-courses' },
+      { key: 'wishlist', href: '/wishlist' },
+      { key: 'cart', href: '/cart' },
+      { key: 'payments', href: '/payments' },
     ],
   },
   {
-    title: 'Pháp lý & Chính sách',
+    titleKey: 'g3',
     links: [
-      { label: 'Điều khoản dịch vụ', href: '/legal/terms' },
-      { label: 'Chính sách quyền riêng tư', href: '/legal/privacy' },
-      { label: 'Chính sách hoàn tiền', href: '/legal/refund' },
-      { label: 'Chính sách chia sẻ doanh thu Giảng viên', href: '/legal/revenue-share' },
-      { label: 'Quy định kiểm duyệt nội dung', href: '/legal/content-moderation' },
-      { label: 'Chính sách Cookie', href: '/legal/cookies' },
-      { label: 'Tuyên bố khả năng tiếp cận', href: '/legal/accessibility' },
+      { key: 'terms', href: '/legal/terms' },
+      { key: 'privacy', href: '/legal/privacy' },
+      { key: 'refund', href: '/legal/refund' },
+      { key: 'revenueShare', href: '/legal/revenue-share' },
+      { key: 'moderation', href: '/legal/content-moderation' },
+      { key: 'cookies', href: '/legal/cookies' },
+      { key: 'accessibility', href: '/legal/accessibility' },
     ],
   },
 ];
 
 export default function SitemapPage() {
+  const t = useTranslations('legal.sitemap');
   return (
     <div className="mx-auto w-full max-w-3xl px-8 py-14">
-      <h1 className="m-0 font-display text-[28px] font-bold text-ink">Sơ đồ trang</h1>
+      <h1 className="m-0 font-display text-[28px] font-bold text-ink">{t('title')}</h1>
       <div className="mt-8 grid grid-cols-1 gap-8 sm:grid-cols-2">
         {GROUPS.map((group) => (
-          <div key={group.title} className="flex flex-col gap-2">
-            <h2 className="m-0 font-display text-[15px] font-semibold text-ink">{group.title}</h2>
+          <div key={group.titleKey} className="flex flex-col gap-2">
+            <h2 className="m-0 font-display text-[15px] font-semibold text-ink">{t(group.titleKey)}</h2>
             {group.links.map((link) => (
               <Link key={link.href} href={link.href} className="text-[13.5px] text-ink-muted hover:text-accent">
-                {link.label}
+                {t(link.key)}
               </Link>
             ))}
           </div>

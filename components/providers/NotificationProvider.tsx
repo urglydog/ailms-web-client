@@ -7,6 +7,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { getAccessToken, decodeAccessToken } from '@/lib/auth/token';
 import { notificationApi } from '@/lib/api/notifications';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 
 type Notification = {
   id: number;
@@ -41,6 +42,9 @@ const NotificationContext = createContext<NotificationContextType | undefined>(u
 export function NotificationProvider({ children }: { children: React.ReactNode }) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const queryClient = useQueryClient();
+  const t = useTranslations('common.notifications');
+  const tRef = useRef(t);
+  tRef.current = t;
 
   useEffect(() => {
     if (!getAccessToken()) return;
@@ -91,7 +95,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
             const content = data.content ?? data.message ?? '';
             setNotifications(prev => [{
               id: data.id ?? Date.now(),
-              title: data.title ?? 'Đến giờ ôn flashcard',
+              title: data.title ?? tRef.current('flashcardReminder'),
               content,
               linkUrl: data.linkUrl ?? null,
               isRead: false,
@@ -112,7 +116,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
           // Payload thật từ NotificationService.notify() — NotificationRes đầy đủ.
           setNotifications(prev => [{
             id: data.id ?? Date.now(),
-            title: data.title ?? 'Thông báo mới',
+            title: data.title ?? tRef.current('newNotification'),
             content: data.content ?? '',
             linkUrl: data.linkUrl ?? null,
             isRead: false,

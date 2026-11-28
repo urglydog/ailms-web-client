@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useEffect, useRef, useState } from 'react';
 
 /**
@@ -34,7 +35,6 @@ const QUALITY_LABELS: Record<string, string> = {
   medium: '360p',
   small: '240p',
   tiny: '144p',
-  auto: 'Tự động',
 };
 
 export interface PlayerControlsProps {
@@ -135,6 +135,7 @@ export function PlayerControls({
   onOpenShortcuts,
   onOpenSubtitleSettings,
 }: PlayerControlsProps) {
+  const t = useTranslations('learn.player.controls');
   const [speedOpen, setSpeedOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [scrubbing, setScrubbing] = useState(false);
@@ -202,14 +203,14 @@ export function PlayerControls({
       <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1.5 px-2 sm:px-3">
         {/* ── Cụm trái: play/pause · lùi 5s · tốc độ · tua 5s · thời lượng ── */}
         <div className="flex items-center gap-0.5 sm:gap-3">
-          <button type="button" onClick={onTogglePlay} aria-label={isPlaying ? 'Tạm dừng' : 'Phát'} className={`${CTRL} hover:text-accent`}>
+          <button type="button" onClick={onTogglePlay} aria-label={isPlaying ? t('pause') : t('play')} className={`${CTRL} hover:text-accent`}>
             {isPlaying ? <PauseIcon /> : <PlayIcon />}
           </button>
           <button
             type="button"
             onClick={() => onSeek(Math.max(0, currentSec - 5))}
-            aria-label="Lùi 5 giây"
-            title="Lùi 5 giây"
+            aria-label={t('back5')}
+            title={t('back5')}
             className={`${CTRL} hover:text-accent`}
           >
             <Skip5Icon direction="back" />
@@ -249,8 +250,8 @@ export function PlayerControls({
           <button
             type="button"
             onClick={() => onSeek(Math.min(duration, currentSec + 5))}
-            aria-label="Tua tới 5 giây"
-            title="Tua tới 5 giây"
+            aria-label={t('forward5')}
+            title={t('forward5')}
             className={`${CTRL} hover:text-accent`}
           >
             <Skip5Icon direction="forward" />
@@ -271,7 +272,7 @@ export function PlayerControls({
             <button
               type="button"
               onClick={onToggleMute}
-              aria-label={muted || volume === 0 ? 'Bật tiếng' : 'Tắt tiếng'}
+              aria-label={muted || volume === 0 ? t('unmute') : t('mute')}
               className={`${CTRL} hover:text-accent`}
             >
               {muted || volume === 0 ? <VolumeMuteIcon /> : <VolumeIcon />}
@@ -283,7 +284,7 @@ export function PlayerControls({
                 max={100}
                 value={muted ? 0 : volume}
                 onChange={(e) => onSetVolume(Number(e.target.value))}
-                aria-label="Âm lượng"
+                aria-label={t('volume')}
                 className="h-1 w-16 accent-accent"
               />
             </div>
@@ -297,24 +298,24 @@ export function PlayerControls({
               onClick={onToggleShowOriginalSub}
               disabled={!originalSubtitleAvailable}
               aria-pressed={showOriginalSub}
-              title={originalSubtitleAvailable ? (originalSubtitleHint ?? 'Phụ đề gốc') : 'Bài học chưa có phụ đề gốc'}
+              title={originalSubtitleAvailable ? (originalSubtitleHint ?? t('originalSub')) : t('noOriginalSub')}
               className={`min-h-10 rounded border px-2 py-0.5 text-[11px] font-semibold transition-colors sm:min-h-0 sm:px-1.5 disabled:cursor-not-allowed disabled:opacity-30 ${
                 showOriginalSub ? 'border-accent bg-accent text-white' : 'border-white/30 text-white/85 hover:border-white'
               }`}
             >
-              Gốc
+              {t('original')}
             </button>
             <button
               type="button"
               onClick={onToggleShowTranslatedSub}
               disabled={!translatedSubtitleAvailable}
               aria-pressed={showTranslatedSub}
-              title={translatedSubtitleAvailable ? 'Phụ đề đã dịch' : 'Ngôn ngữ đang chọn chưa có phụ đề dịch'}
+              title={translatedSubtitleAvailable ? t('translatedSub') : t('noTranslatedSub')}
               className={`min-h-10 rounded border px-2 py-0.5 text-[11px] font-semibold transition-colors sm:min-h-0 sm:px-1.5 disabled:cursor-not-allowed disabled:opacity-30 ${
                 showTranslatedSub ? 'border-accent bg-accent text-white' : 'border-white/30 text-white/85 hover:border-white'
               }`}
             >
-              Dịch
+              {t('translated')}
             </button>
           </div>
 
@@ -322,14 +323,14 @@ export function PlayerControls({
             type="button"
             onClick={onToggleTranscript}
             aria-pressed={showTranscript}
-            title="Bản ghi lời thoại (Transcript)"
+            title={t('transcript')}
             className={`${CTRL} ${showTranscript ? 'text-accent' : 'hover:text-accent'}`}
           >
             <TranscriptIcon />
           </button>
 
           <div ref={settingsRef} className="relative">
-            <button type="button" onClick={() => setSettingsOpen((v) => !v)} aria-label="Cài đặt" title="Cài đặt" className={`${CTRL} hover:text-accent`}>
+            <button type="button" onClick={() => setSettingsOpen((v) => !v)} aria-label={t('settings')} title={t('settings')} className={`${CTRL} hover:text-accent`}>
               <GearIcon />
             </button>
             {settingsOpen && (
@@ -337,7 +338,7 @@ export function PlayerControls({
                 {qualityOptions.length > 0 && (
                   <div className="border-b border-white/10 p-2">
                     <p className="px-1.5 pb-1 text-[11px] font-semibold uppercase tracking-wide text-white/50">
-                      Chất lượng video
+                      {t('videoQuality')}
                     </p>
                     {qualityOptions.map((q) => (
                       <button
@@ -348,14 +349,14 @@ export function PlayerControls({
                           q === quality ? 'text-accent' : 'text-white'
                         }`}
                       >
-                        {QUALITY_LABELS[q] ?? q}
+                        {q === 'auto' ? t('auto') : (QUALITY_LABELS[q] ?? q)}
                         {q === quality && <span aria-hidden>✓</span>}
                       </button>
                     ))}
                   </div>
                 )}
                 <label className="flex cursor-pointer items-center justify-between gap-3 border-b border-white/10 p-3">
-                  <span>Tự động phát bài tiếp theo</span>
+                  <span>{t('autoNext')}</span>
                   <input type="checkbox" checked={autoNextEnabled} onChange={onToggleAutoNext} className="h-4 w-4 rounded accent-accent" />
                 </label>
                 <button
@@ -367,7 +368,7 @@ export function PlayerControls({
                   className="flex w-full items-center gap-2.5 border-b border-white/10 p-3 text-left hover:bg-white/10"
                 >
                   <SubtitleStyleIcon />
-                  Kiểu hiển thị phụ đề
+                  {t('subtitleStyle')}
                 </button>
                 <button
                   type="button"
@@ -378,7 +379,7 @@ export function PlayerControls({
                   className="flex w-full items-center gap-2.5 p-3 text-left hover:bg-white/10"
                 >
                   <KeyboardIcon />
-                  Phím tắt bàn phím
+                  {t('shortcuts')}
                 </button>
               </div>
             )}
@@ -387,8 +388,8 @@ export function PlayerControls({
           <button
             type="button"
             onClick={onToggleFullscreen}
-            aria-label={isFullscreen ? 'Thoát toàn màn hình' : 'Toàn màn hình'}
-            title={isFullscreen ? 'Thoát toàn màn hình' : 'Toàn màn hình'}
+            aria-label={isFullscreen ? t('exitFullscreen') : t('fullscreen')}
+            title={isFullscreen ? t('exitFullscreen') : t('fullscreen')}
             className={`${CTRL} hover:text-accent`}
           >
             {isFullscreen ? <CollapseIcon /> : <ExpandIcon />}

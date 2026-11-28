@@ -30,9 +30,9 @@ export function UsersTable({ users, sortField, sortOrder, onSort, onToggleBlock 
   const ariaSort = (field: UserSortField) => (sortField !== field ? 'none' : sortOrder === 'asc' ? 'ascending' : 'descending');
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-line bg-surface-raised shadow-sm">
+    <div className="max-h-[70vh] overflow-auto rounded-xl border border-line bg-surface-raised shadow-sm">
       <table className="w-full min-w-[760px] text-left text-sm">
-        <thead className="border-b border-line bg-surface text-xs text-ink-muted">
+        <thead className="sticky top-0 z-10 border-b border-line bg-surface text-xs text-ink-muted">
           <tr>
             {COLUMNS.map((field) => {
               const Icon = sortField !== field ? ArrowUpDown : sortOrder === 'asc' ? ArrowUp : ArrowDown;

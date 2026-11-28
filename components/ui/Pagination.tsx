@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 interface PaginationProps {
   currentPage: number;
   totalPages: number;
@@ -10,6 +11,7 @@ interface PaginationProps {
 /** Component phân trang dùng chung — trước đây `admin/users` và `admin/transactions/payments`
  * tự viết cùng 1 pattern Trước/Sau riêng lẻ, trích xuất ra đây để tái dùng thay vì copy-paste lần 3. */
 export function Pagination({ currentPage, totalPages, onPageChange, className = '' }: PaginationProps) {
+  const t = useTranslations('common.pagination');
   if (totalPages <= 1) return null;
 
   return (
@@ -20,16 +22,16 @@ export function Pagination({ currentPage, totalPages, onPageChange, className = 
         onClick={() => onPageChange(currentPage - 1)}
         className="px-3 py-1.5 border border-line rounded-card text-xs font-semibold text-ink-muted hover:bg-surface-hover disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
       >
-        Trang trước
+        {t('prev')}
       </button>
-      <span className="text-xs text-ink-muted">Trang {currentPage}/{totalPages}</span>
+      <span className="text-xs text-ink-muted">{t('page', { current: currentPage, total: totalPages })}</span>
       <button
         type="button"
         disabled={currentPage === totalPages}
         onClick={() => onPageChange(currentPage + 1)}
         className="px-3 py-1.5 border border-line rounded-card text-xs font-semibold text-ink-muted hover:bg-surface-hover disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
       >
-        Trang sau
+        {t('next')}
       </button>
     </div>
   );

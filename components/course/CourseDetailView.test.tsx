@@ -10,7 +10,7 @@ const getViewerFlags = vi.fn();
 vi.mock('@/lib/auth/token', () => ({ getAccessToken: () => token }));
 vi.mock('@/lib/api/publicCourses', () => ({ publicCoursesApi: { getViewerFlags: (...a: unknown[]) => getViewerFlags(...a) } }));
 vi.mock('@/components/course/EnrollButton', () => ({ EnrollButton: () => <button type="button">Thêm vào giỏ hàng</button> }));
-vi.mock('@/components/course/detail/PurchaseExtras', () => ({ PromoCountdown: () => null, ShareGiftButtons: () => <button type="button">Tặng khóa học</button> }));
+vi.mock('@/components/course/detail/PurchaseExtras', () => ({ PromoCountdown: () => null, ShareButton: () => <button type="button">Chia sẻ</button> }));
 vi.mock('@/components/course/CoursePreview', () => ({ CoursePreview: () => null }));
 vi.mock('@/components/course/ReviewsSection', () => ({ ReviewsSection: () => null }));
 vi.mock('@/components/course/ReferralCapture', () => ({ ReferralCapture: () => null }));

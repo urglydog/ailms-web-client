@@ -8,12 +8,13 @@ import { Pager } from '@/components/ui/SearchPanel';
 import { useListControls } from '@/hooks/useListControls';
 import { useCategories, useCreateCategory, useDeleteCategory, useUpdateCategory } from '@/hooks/useCategories';
 import { ApiError } from '@/lib/api/client';
+import { TableErrorRow } from '@/components/admin/ui/TableErrorRow';
 import type { Category } from '@/types/domain';
 
 export function CategoryManager() {
   const t = useTranslations('admin.categories');
   const [pendingDelete, setPendingDelete] = useState<Category | null>(null);
-  const { data: categories, isLoading } = useCategories();
+  const { data: categories, isLoading, isError, refetch } = useCategories();
   const list = useListControls(categories, { pageSize: 10, match: (c, q) => c.name.toLowerCase().includes(q) || c.slug.toLowerCase().includes(q) });
   const createCategory = useCreateCategory();
   const updateCategory = useUpdateCategory();
@@ -68,11 +69,11 @@ export function CategoryManager() {
         <div role="alert" className="rounded-xl border border-danger/40 bg-surface-raised p-4 text-[13px] text-danger">{errorMessage}</div>
       )}
 
-      <ListSearch label="Tìm danh mục" value={list.query} onChange={list.setQuery} placeholder="Tìm theo tên hoặc đường dẫn danh mục..." />
+      <ListSearch label={t('search')} value={list.query} onChange={list.setQuery} placeholder={t('searchPh')} />
 
-      <div className="overflow-x-auto rounded-xl border border-line bg-surface-raised shadow-sm">
+      <div className="max-h-[70vh] overflow-auto rounded-xl border border-line bg-surface-raised shadow-sm">
         <table className="w-full min-w-[520px] text-left text-sm">
-          <thead className="bg-surface text-xs font-bold text-ink-muted uppercase">
+          <thead className="sticky top-0 z-10 bg-surface text-xs font-bold text-ink-muted uppercase">
             <tr>
               <th className="px-6 py-4">{t('cols.name')}</th>
               <th className="px-6 py-4">{t('cols.slug')}</th>
@@ -87,7 +88,8 @@ export function CategoryManager() {
                 </td>
               </tr>
             )}
-            {!isLoading && categories?.length === 0 && (
+            {isError && <TableErrorRow colSpan={3} onRetry={() => void refetch()} />}
+            {!isError && !isLoading && categories?.length === 0 && (
               <tr>
                 <td colSpan={3} className="px-6 py-6 text-center text-ink-muted">
                   {t('empty')}
@@ -96,7 +98,7 @@ export function CategoryManager() {
             )}
             {!isLoading && categories && categories.length > 0 && list.total === 0 && (
               <tr>
-                <td colSpan={3} className="px-6 py-6 text-center text-ink-muted">Không có danh mục nào khớp.</td>
+                <td colSpan={3} className="px-6 py-6 text-center text-ink-muted">{t('noMatch')}</td>
               </tr>
             )}
             {list.pageItems.map((category) => (

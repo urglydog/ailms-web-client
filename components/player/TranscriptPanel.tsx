@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useEffect, useRef, useState } from 'react';
 import type { SubtitleSegment } from '@/types/domain';
 
@@ -42,6 +43,7 @@ function findOverlapping(segments: SubtitleSegment[], startSec: number, endSec: 
 }
 
 export function TranscriptPanel({ originalSubtitles, translatedSubtitles, currentSec, onSeek }: TranscriptPanelProps) {
+  const t = useTranslations('learn.player.transcript');
   const [autoScroll, setAutoScroll] = useState(true);
   const activeRowRef = useRef<HTMLButtonElement>(null);
   const activeSeq = originalSubtitles.find((s) => currentSec >= s.startSec && currentSec < s.endSec)?.seq ?? null;
@@ -61,12 +63,12 @@ export function TranscriptPanel({ originalSubtitles, translatedSubtitles, curren
           onChange={(e) => setAutoScroll(e.target.checked)}
           className="h-3.5 w-3.5 rounded accent-accent"
         />
-        Tự động cuộn theo lời thoại
+        {t('autoScroll')}
       </label>
 
       <div className="flex-1 overflow-y-auto p-2">
         {originalSubtitles.length === 0 ? (
-          <p className="p-4 text-sm text-ink-muted">Bài học này chưa có bản ghi lời thoại.</p>
+          <p className="p-4 text-sm text-ink-muted">{t('empty')}</p>
         ) : (
           originalSubtitles.map((seg) => {
             const translated = translatedSubtitles.length > 0 ? findOverlapping(translatedSubtitles, seg.startSec, seg.endSec) : null;

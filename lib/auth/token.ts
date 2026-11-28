@@ -41,3 +41,13 @@ export function getCurrentRole(): Role | null {
   const role = decoded.roles.split(',')[0]?.replace('ROLE_', '');
   return (role as Role) || null;
 }
+
+/**
+ * Giỏ hàng, yêu thích, "khóa học của tôi" chỉ có cho STUDENT và INSTRUCTOR (BE: `@PreAuthorize
+ * hasAnyRole('STUDENT','INSTRUCTOR')`). ADMIN gọi các API này sẽ nhận 403 — dùng làm điều kiện `enabled`
+ * của các hook đó thay vì chỉ kiểm tra "có token".
+ */
+export function canUseLearnerFeatures(): boolean {
+  const role = getCurrentRole();
+  return role === 'STUDENT' || role === 'INSTRUCTOR';
+}

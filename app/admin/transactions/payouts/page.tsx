@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { DebtsPanel } from '@/components/admin/finance/DebtsPanel';
@@ -12,7 +13,7 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { ApiError } from '@/lib/api/client';
 import { payosPayoutApi } from '@/lib/api/payosPayout';
 import { adminPayoutsApi } from '@/lib/api/finance';
-import { PAYOUT_STATUS_CLASS, PAYOUT_STATUS_LABEL, dateOnly, dateTime, money } from '@/lib/finance';
+import { PAYOUT_STATUS_CLASS, dateOnly, dateTime, money } from '@/lib/finance';
 import { getAccessToken } from '@/lib/auth/token';
 import type { AccountReveal, AdminPayout, PayoutStatus } from '@/types/finance';
 
@@ -30,6 +31,7 @@ type Dialog =
  * lần xem/xuất CSV đều được BE ghi nhật ký kiểm toán.
  */
 export default function AdminPayoutsPage() {
+  const t = useTranslations('admin.payouts');
   const queryClient = useQueryClient();
   // Hàng chờ duyệt hiện sẵn (ít, cần xử lý ngay); các yêu cầu đã xử lý chỉ hiện khi chọn trạng thái hoặc tìm kiếm.
   const [statusFilter, setStatusFilter] = useState<PayoutStatus | 'ALL'>('REQUESTED');
@@ -47,7 +49,7 @@ export default function AdminPayoutsPage() {
   });
 
   const refresh = () => queryClient.invalidateQueries({ queryKey: ['admin', 'payouts'] });
-  const onError = (err: unknown) => toast.error(err instanceof ApiError ? err.message : 'Thao tác không thành công.');
+  const onError = (err: unknown) => toast.error(err instanceof ApiError ? err.message : t('toast.failed'));
   const closeDialog = () => {
     setDialog(null);
     setText('');
@@ -82,22 +84,22 @@ export default function AdminPayoutsPage() {
 
   const approve = useMutation({
     mutationFn: (id: number) => adminPayoutsApi.approve(id),
-    onSuccess: () => { toast.success('Đã duyệt yêu cầu.'); refresh(); },
+    onSuccess: () => { toast.success(t('toast.approved')); refresh(); },
     onError,
   });
   const markPaid = useMutation({
     mutationFn: (v: { id: number; ref: string; proof: string }) => adminPayoutsApi.markPaid(v.id, v.ref, v.proof),
-    onSuccess: () => { toast.success('Đã ghi nhận chuyển khoản và báo cho giảng viên.'); closeDialog(); refresh(); },
+    onSuccess: () => { toast.success(t('toast.paid')); closeDialog(); refresh(); },
     onError,
   });
   const reject = useMutation({
     mutationFn: (v: { id: number; reason: string }) => adminPayoutsApi.reject(v.id, v.reason),
-    onSuccess: () => { toast.success('Đã từ chối, số tiền được trả lại cho giảng viên.'); closeDialog(); refresh(); },
+    onSuccess: () => { toast.success(t('toast.rejected')); closeDialog(); refresh(); },
     onError,
   });
   const fail = useMutation({
     mutationFn: (v: { id: number; reason: string }) => adminPayoutsApi.markFailed(v.id, v.reason),
-    onSuccess: () => { toast.success('Đã đánh dấu thất bại, số tiền được trả lại cho giảng viên.'); closeDialog(); refresh(); },
+    onSuccess: () => { toast.success(t('toast.markedFailed')); closeDialog(); refresh(); },
     onError,
   });
   const reveal = useMutation({
@@ -134,15 +136,15 @@ export default function AdminPayoutsPage() {
   return (
     <>
       <PageHeader
-        title="Chi trả giảng viên"
-        subtitle="Duyệt yêu cầu rút tiền, chuyển khoản tay rồi ghi mã giao dịch. Từ chối hoặc thất bại sẽ trả tiền về số dư của giảng viên."
+        title={t('title')}
+        subtitle={t('subtitle')}
       />
 
       <DebtsPanel />
 
       <div className="flex flex-wrap items-end justify-between gap-4 rounded-xl border border-line bg-surface-raised p-4">
         <label className="flex min-w-0 flex-1 flex-col gap-1.5 sm:min-w-64">
-          <span className="text-xs font-semibold text-ink-muted">Tìm yêu cầu rút</span>
+          <span className="text-xs font-semibold text-ink-muted">{t('search')}</span>
           <input
             type="search"
             value={search}
@@ -150,12 +152,12 @@ export default function AdminPayoutsPage() {
               setSearch(e.target.value);
               setLimit(PAYOUT_PAGE);
             }}
-            placeholder="Mã yêu cầu, email hoặc tên giảng viên..."
+            placeholder={t('searchPh')}
             className="w-full rounded-lg border border-line bg-surface-raised p-2.5 text-sm text-ink outline-none focus:border-accent"
           />
         </label>
         <label className="flex w-full flex-col gap-1.5 sm:w-64">
-          <span className="text-xs font-semibold text-ink-muted">Trạng thái</span>
+          <span className="text-xs font-semibold text-ink-muted">{t('statusLabel')}</span>
           <select
             value={statusFilter}
             onChange={(e) => {
@@ -164,9 +166,9 @@ export default function AdminPayoutsPage() {
             }}
             className="w-full rounded-lg border border-line bg-surface-raised p-2.5 text-sm text-ink outline-none focus:border-accent"
           >
-            <option value="ALL">Tất cả</option>
+            <option value="ALL">{t('all')}</option>
             {STATUSES.map((s) => (
-              <option key={s} value={s}>{PAYOUT_STATUS_LABEL[s]}</option>
+              <option key={s} value={s}>{t(`status.${s}`)}</option>
             ))}
           </select>
         </label>
@@ -174,10 +176,10 @@ export default function AdminPayoutsPage() {
           type="button"
           disabled={exportCsv.isPending}
           onClick={() => exportCsv.mutate()}
-          title="Tải CSV các yêu cầu đã duyệt để chuyển khoản hàng loạt (có số tài khoản đầy đủ, được ghi nhật ký)"
+          title={t('exportHint')}
           className="rounded-lg border border-line px-4 py-2 text-sm font-semibold text-accent-dark hover:bg-tint disabled:opacity-50"
         >
-          Xuất CSV đã duyệt
+          {t('export')}
         </button>
       </div>
 
@@ -188,21 +190,21 @@ export default function AdminPayoutsPage() {
           ))}
         </div>
       ) : isError ? (
-        <div role="alert" className="rounded-xl border border-danger/40 bg-danger/5 p-6 text-center text-danger">Không tải được danh sách.</div>
+        <div role="alert" className="rounded-xl border border-danger/40 bg-danger/5 p-6 text-center text-danger">{t('loadError')}</div>
       ) : rows.length === 0 ? (
-        <div className="rounded-xl border border-line bg-surface-raised p-8 text-center text-ink-muted">Không có yêu cầu nào.</div>
+        <div className="rounded-xl border border-line bg-surface-raised p-8 text-center text-ink-muted">{t('empty')}</div>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-line bg-surface-raised shadow-sm">
+        <div className="max-h-[70vh] overflow-auto rounded-xl border border-line bg-surface-raised shadow-sm">
           <table className="w-full min-w-[900px] text-left text-sm">
-            <thead className="border-b border-line bg-surface text-xs text-ink-muted">
+            <thead className="sticky top-0 z-10 border-b border-line bg-surface text-xs text-ink-muted">
               <tr>
-                <th className="px-4 py-3 font-semibold">Mã</th>
-                <th className="px-4 py-3 font-semibold">Giảng viên</th>
-                <th className="px-4 py-3 font-semibold">Tài khoản nhận</th>
-                <th className="px-4 py-3 text-right font-semibold">Số tiền</th>
-                <th className="px-4 py-3 font-semibold">Trạng thái</th>
-                <th className="px-4 py-3 font-semibold">Thời gian</th>
-                <th className="px-4 py-3 text-right font-semibold">Thao tác</th>
+                <th className="px-4 py-3 font-semibold">{t('cols.code')}</th>
+                <th className="px-4 py-3 font-semibold">{t('cols.instructor')}</th>
+                <th className="px-4 py-3 font-semibold">{t('cols.account')}</th>
+                <th className="px-4 py-3 text-right font-semibold">{t('cols.amount')}</th>
+                <th className="px-4 py-3 font-semibold">{t('cols.status')}</th>
+                <th className="px-4 py-3 font-semibold">{t('cols.time')}</th>
+                <th className="px-4 py-3 text-right font-semibold">{t('cols.actions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-line-soft">
@@ -217,33 +219,33 @@ export default function AdminPayoutsPage() {
                     <div>{p.bankName} {p.accountMask}</div>
                     <div className="text-xs text-ink-muted">{p.holderName}</div>
                     {!p.nameMatches && (
-                      <div className="mt-1 text-xs font-semibold text-danger">Tên chủ TK không khớp tên giảng viên — kiểm tra kỹ</div>
+                      <div className="mt-1 text-xs font-semibold text-danger">{t('nameMismatch')}</div>
                     )}
                   </td>
                   <td className="px-4 py-3 text-right font-semibold text-ink">{money(p.amount)}</td>
                   <td className="px-4 py-3">
                     <span className={`inline-block rounded-full border px-2.5 py-1 text-xs font-medium ${PAYOUT_STATUS_CLASS[p.status]}`}>
-                      {PAYOUT_STATUS_LABEL[p.status]}
+                      {t(`status.${p.status}`)}
                     </span>
-                    {p.transferRef && <div className="mt-1 text-xs text-ink-muted">Mã CK: {p.transferRef}</div>}
+                    {p.transferRef && <div className="mt-1 text-xs text-ink-muted">{t('transferRef', { ref: p.transferRef })}</div>}
                     {p.rejectReason && <div className="mt-1 text-xs text-danger">{p.rejectReason}</div>}
                   </td>
                   <td className="whitespace-nowrap px-4 py-3 text-xs text-ink-muted">
-                    <div>Tạo: {dateTime(p.createdAt)}</div>
-                    {p.scheduledFor && <div>Đợt chi: {dateOnly(p.scheduledFor)}</div>}
-                    {p.paidAt && <div>Chi: {dateTime(p.paidAt)}</div>}
+                    <div>{t('created', { at: dateTime(p.createdAt) })}</div>
+                    {p.scheduledFor && <div>{t('batch', { at: dateOnly(p.scheduledFor) })}</div>}
+                    {p.paidAt && <div>{t('paidAt', { at: dateTime(p.paidAt) })}</div>}
                   </td>
                   <td className="w-72 px-4 py-3">
                     <div className="flex flex-wrap items-start justify-end gap-1.5">
                       {p.status === 'REQUESTED' && (
                         <button type="button" disabled={busy} onClick={() => approve.mutate(p.id)} className="rounded-lg bg-accent px-3 py-1.5 text-xs font-semibold text-white hover:bg-accent-dark disabled:opacity-50">
-                          Duyệt
+                          {t('approve')}
                         </button>
                       )}
                       {p.status === 'APPROVED' && (
                         <>
                           <button type="button" disabled={busy} onClick={() => reveal.mutate(p)} className="whitespace-nowrap rounded-lg border border-line px-3 py-1.5 text-xs font-semibold text-accent-dark hover:bg-tint disabled:opacity-50">
-                            Xem số TK
+                            {t('reveal')}
                           </button>
                           {payosStatus?.enabled && (
                             <PayoutPayosControls
@@ -263,16 +265,16 @@ export default function AdminPayoutsPage() {
                               onClick={() => toggleManual(p.id)}
                               className="whitespace-nowrap rounded-lg border border-line px-3 py-1.5 text-xs font-semibold text-ink-muted hover:text-ink"
                             >
-                              Thủ công {manualOpen.has(p.id) ? '▴' : '▾'}
+                              {t('manual')} <span aria-hidden>{manualOpen.has(p.id) ? '▴' : '▾'}</span>
                             </button>
                           )}
                           {(!payosStatus?.enabled || manualOpen.has(p.id)) && (
                             <>
                               <button type="button" disabled={busy || inFlightIds.has(p.id)} onClick={() => setDialog({ kind: 'paid', payout: p })} className="whitespace-nowrap rounded-lg bg-success px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90 disabled:opacity-50">
-                                Đã chuyển
+                                {t('markPaid')}
                               </button>
                               <button type="button" disabled={busy || inFlightIds.has(p.id)} onClick={() => setDialog({ kind: 'fail', payout: p })} className="whitespace-nowrap rounded-lg border border-line px-3 py-1.5 text-xs font-semibold text-ink-muted hover:text-ink disabled:opacity-50">
-                                Thất bại
+                                {t('markFailed')}
                               </button>
                             </>
                           )}
@@ -280,7 +282,7 @@ export default function AdminPayoutsPage() {
                       )}
                       {(p.status === 'REQUESTED' || p.status === 'APPROVED') && (
                         <button type="button" disabled={busy || inFlightIds.has(p.id)} onClick={() => setDialog({ kind: 'reject', payout: p })} className="whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-semibold text-danger ring-1 ring-inset ring-danger/40 hover:bg-danger/5 disabled:opacity-50">
-                          Từ chối
+                          {t('reject')}
                         </button>
                       )}
                     </div>
@@ -292,7 +294,7 @@ export default function AdminPayoutsPage() {
           {rows.length >= limit && (
             <div className="flex justify-center border-t border-line p-3">
               <button type="button" onClick={() => setLimit((n) => n + PAYOUT_PAGE)} className="rounded-lg border border-line bg-surface-raised px-4 py-2 text-sm font-semibold text-ink hover:bg-tint">
-                Xem thêm
+                {t('more')}
               </button>
             </div>
           )}
@@ -300,16 +302,16 @@ export default function AdminPayoutsPage() {
       )}
 
       {dialog && dialog.kind === 'reveal' && (
-        <Modal open onClose={closeDialog} title="Số tài khoản nhận tiền" size="sm" closeOnBackdrop={false}>
+        <Modal open onClose={closeDialog} title={t('revealDlg.title')} size="sm" closeOnBackdrop={false}>
           <div className="flex flex-col gap-3 text-sm">
             <dl className="m-0 flex flex-col gap-2">
-              <div><dt className="text-ink-muted">Ngân hàng</dt><dd className="m-0 font-semibold text-ink">{dialog.data.bankName}</dd></div>
-              <div><dt className="text-ink-muted">Số tài khoản</dt><dd className="m-0 font-mono text-lg font-bold text-ink">{dialog.data.accountNumber}</dd></div>
-              <div><dt className="text-ink-muted">Chủ tài khoản</dt><dd className="m-0 font-semibold text-ink">{dialog.data.holderName}</dd></div>
-              <div><dt className="text-ink-muted">Số tiền</dt><dd className="m-0 font-semibold text-ink">{money(dialog.payout.amount)}</dd></div>
-              <div><dt className="text-ink-muted">Nội dung chuyển khoản gợi ý</dt><dd className="m-0 font-mono text-ink">LINGUALEARN {dialog.payout.code}</dd></div>
+              <div><dt className="text-ink-muted">{t('revealDlg.bank')}</dt><dd className="m-0 font-semibold text-ink">{dialog.data.bankName}</dd></div>
+              <div><dt className="text-ink-muted">{t('revealDlg.number')}</dt><dd className="m-0 font-mono text-lg font-bold text-ink">{dialog.data.accountNumber}</dd></div>
+              <div><dt className="text-ink-muted">{t('revealDlg.holder')}</dt><dd className="m-0 font-semibold text-ink">{dialog.data.holderName}</dd></div>
+              <div><dt className="text-ink-muted">{t('revealDlg.amount')}</dt><dd className="m-0 font-semibold text-ink">{money(dialog.payout.amount)}</dd></div>
+              <div><dt className="text-ink-muted">{t('revealDlg.memo')}</dt><dd className="m-0 font-mono text-ink">LINGUALEARN {dialog.payout.code}</dd></div>
             </dl>
-            <p className="m-0 text-xs text-ink-muted">Lượt xem này đã được ghi vào nhật ký kiểm toán. Không chia sẻ số tài khoản ra ngoài.</p>
+            <p className="m-0 text-xs text-ink-muted">{t('revealDlg.audit')}</p>
           </div>
         </Modal>
       )}
@@ -320,17 +322,17 @@ export default function AdminPayoutsPage() {
           onClose={closeDialog}
           size="sm"
           closeOnBackdrop={false}
-          title={dialog.kind === 'paid' ? 'Ghi nhận đã chuyển khoản' : dialog.kind === 'reject' ? 'Từ chối yêu cầu rút' : 'Chuyển khoản thất bại'}
+          title={dialog.kind === 'paid' ? t('dlg.paidTitle') : dialog.kind === 'reject' ? t('dlg.rejectTitle') : t('dlg.failTitle')}
           footer={
             <div className="flex justify-end gap-2">
-              <button type="button" onClick={closeDialog} className="rounded-lg border border-line px-4 py-2 text-sm font-semibold text-ink-muted hover:text-ink">Hủy</button>
+              <button type="button" onClick={closeDialog} className="rounded-lg border border-line px-4 py-2 text-sm font-semibold text-ink-muted hover:text-ink">{t('dlg.cancel')}</button>
               <button
                 type="button"
                 disabled={busy || !text.trim()}
                 onClick={submitDialog}
                 className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-dark disabled:opacity-50"
               >
-                Xác nhận
+                {t('dlg.confirm')}
               </button>
             </div>
           }
@@ -340,7 +342,7 @@ export default function AdminPayoutsPage() {
               {dialog.payout.code} · {dialog.payout.instructorName} · {money(dialog.payout.amount)}
             </p>
             <label className="flex flex-col gap-1.5">
-              <span className="font-semibold text-ink">{dialog.kind === 'paid' ? 'Mã giao dịch chuyển khoản *' : 'Lý do * (giảng viên sẽ nhận được nội dung này)'}</span>
+              <span className="font-semibold text-ink">{dialog.kind === 'paid' ? t('dlg.refLabel') : t('dlg.reasonLabel')}</span>
               {dialog.kind === 'paid' ? (
                 <input type="text" value={text} maxLength={100} onChange={(e) => setText(e.target.value)} className="w-full rounded-lg border border-line bg-surface-raised p-2.5 text-ink outline-none focus:border-accent" />
               ) : (
@@ -349,7 +351,7 @@ export default function AdminPayoutsPage() {
             </label>
             {dialog.kind === 'paid' && (
               <label className="flex flex-col gap-1.5">
-                <span className="font-semibold text-ink">Liên kết ảnh chứng từ (không bắt buộc)</span>
+                <span className="font-semibold text-ink">{t('dlg.proofLabel')}</span>
                 <input type="text" value={proofUrl} maxLength={500} onChange={(e) => setProofUrl(e.target.value)} className="w-full rounded-lg border border-line bg-surface-raised p-2.5 text-ink outline-none focus:border-accent" />
               </label>
             )}

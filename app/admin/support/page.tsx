@@ -197,7 +197,7 @@ export default function AdminSupportPage() {
 
       <div className="flex flex-wrap items-end gap-4 rounded-xl border border-line bg-surface-raised p-4">
         <label className="flex min-w-0 flex-1 flex-col gap-1.5 sm:min-w-64">
-          <span className="text-xs font-semibold text-ink-muted">Tìm yêu cầu hỗ trợ</span>
+          <span className="text-xs font-semibold text-ink-muted">{t('find.label')}</span>
           <input
             type="search"
             value={search}
@@ -205,7 +205,7 @@ export default function AdminSupportPage() {
               setSearch(e.target.value);
               setLimit(TICKET_PAGE);
             }}
-            placeholder="Mã yêu cầu, email hoặc tiêu đề..."
+            placeholder={t('find.ph')}
             className="w-full rounded-lg border border-line bg-surface-raised p-2.5 text-sm text-ink outline-none focus:border-accent"
           />
         </label>
@@ -238,9 +238,9 @@ export default function AdminSupportPage() {
       ) : tickets.length === 0 ? (
         <div className="rounded-xl border border-line bg-surface-raised p-8 text-center text-ink-muted">{t('empty')}</div>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-line bg-surface-raised shadow-sm">
+        <div className="max-h-[70vh] overflow-auto rounded-xl border border-line bg-surface-raised shadow-sm">
           <table className="w-full min-w-[820px] text-left text-sm">
-            <thead className="border-b border-line bg-surface text-xs text-ink-muted">
+            <thead className="sticky top-0 z-10 border-b border-line bg-surface text-xs text-ink-muted">
               <tr>
                 <th className="px-4 py-3 font-semibold">{t('cols.code')}</th>
                 <th className="px-4 py-3 font-semibold">{t('cols.sender')}</th>
@@ -274,7 +274,7 @@ export default function AdminSupportPage() {
           {tickets.length >= limit && (
             <div className="flex justify-center border-t border-line p-3">
               <button type="button" onClick={() => setLimit((n) => n + TICKET_PAGE)} className="rounded-lg border border-line bg-surface-raised px-4 py-2 text-sm font-semibold text-ink hover:bg-tint">
-                Xem thêm
+                {t('find.more')}
               </button>
             </div>
           )}

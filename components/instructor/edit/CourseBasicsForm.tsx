@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useEffect, useRef, useState, type ChangeEvent, type FormEvent, type ReactNode } from 'react';
 import { SubmitChecklist } from '@/components/instructor/SubmitChecklist';
 import { UploadProgressBar } from '@/components/ui/UploadProgressBar';
@@ -10,15 +11,16 @@ import { ApiError } from '@/lib/api/client';
 import { useUploadTrayStore } from '@/lib/stores/uploadTrayStore';
 import type { CourseLevel } from '@/types/domain';
 
-const LEVEL_OPTIONS: Array<{ value: CourseLevel; label: string }> = [
-  { value: 'BEGINNER', label: 'Cơ bản' },
-  { value: 'INTERMEDIATE', label: 'Trung cấp' },
-  { value: 'ADVANCED', label: 'Nâng cao' },
+const LEVEL_OPTIONS: Array<{ value: CourseLevel }> = [
+  { value: 'BEGINNER' },
+  { value: 'INTERMEDIATE' },
+  { value: 'ADVANCED' },
 ];
 
 /** "Thông tin cơ bản" — giao diện tham khảo Udemy "Trang đích của khóa học" (19/09/2026, tách
  * khỏi `CourseBuilderForm` cũ, KHÔNG còn trường Giá — xem `CoursePricingForm.tsx`). */
 export function CourseBasicsForm({ courseId }: { courseId: number }) {
+  const t = useTranslations('instructor.basics');
   const { data: categories } = useCategories();
   const { data: course } = useMyCourseDetail(courseId);
   const updateCourse = useUpdateCourse(courseId);
@@ -49,7 +51,7 @@ export function CourseBasicsForm({ courseId }: { courseId: number }) {
     const file = e.target.files?.[0];
     e.target.value = '';
     if (!file) return;
-    startThumbnailUpload(file, `Ảnh bìa: ${title || course?.title || ''}`, (updated) =>
+    startThumbnailUpload(file, t('thumbnailTask', { title: title || course?.title || '' }), (updated) =>
       setThumbnailUrl(updated.thumbnailUrl ?? ''),
     );
   };
@@ -79,7 +81,7 @@ export function CourseBasicsForm({ courseId }: { courseId: number }) {
             {updateCourse.error.message}
           </div>
         )}
-        <Field label="Tiêu đề khóa học">
+        <Field label={t('courseTitle')}>
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
@@ -87,7 +89,7 @@ export function CourseBasicsForm({ courseId }: { courseId: number }) {
             className="w-full rounded-lg border border-line px-3 py-2 text-sm focus:border-accent focus:outline-none"
           />
         </Field>
-        <Field label="Mô tả">
+        <Field label={t('description')}>
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
@@ -95,10 +97,10 @@ export function CourseBasicsForm({ courseId }: { courseId: number }) {
             className="w-full rounded-lg border border-line px-3 py-2 text-sm focus:border-accent focus:outline-none"
           />
         </Field>
-        <Field label="Ảnh bìa">
+        <Field label={t('thumbnail')}>
           {thumbnailUrl && (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={thumbnailUrl} alt="Xem trước ảnh bìa" className="h-28 w-full rounded-lg object-cover" />
+            <img src={thumbnailUrl} alt={t('thumbnailAlt')} className="h-28 w-full rounded-lg object-cover" />
           )}
           <input
             type="file"
@@ -108,19 +110,19 @@ export function CourseBasicsForm({ courseId }: { courseId: number }) {
             className="text-[12.5px] file:mr-3 file:rounded-md file:border-0 file:bg-tint file:px-3 file:py-1.5 file:text-[12px] file:font-semibold"
           />
           {thumbnailTask?.status === 'uploading' && (
-            <UploadProgressBar percent={thumbnailTask.percent} label="Đang tải ảnh bìa lên..." />
+            <UploadProgressBar percent={thumbnailTask.percent} label={t('uploadingThumbnail')} />
           )}
           {thumbnailTask?.status === 'error' && <p className="text-[11.5px] text-danger">{thumbnailTask.errorMessage}</p>}
         </Field>
         <div className="grid grid-cols-2 gap-3">
-          <Field label="Danh mục">
+          <Field label={t('category')}>
             <select
               value={categoryId}
               onChange={(e) => setCategoryId(e.target.value ? Number(e.target.value) : '')}
               required
               className="w-full rounded-lg border border-line px-3 py-2 text-sm focus:border-accent focus:outline-none"
             >
-              <option value="">-- Chọn danh mục --</option>
+              <option value="">{t('pickCategory')}</option>
               {categories?.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name}
@@ -128,7 +130,7 @@ export function CourseBasicsForm({ courseId }: { courseId: number }) {
               ))}
             </select>
           </Field>
-          <Field label="Trình độ">
+          <Field label={t('level')}>
             <select
               value={level}
               onChange={(e) => setLevel(e.target.value as CourseLevel)}
@@ -136,7 +138,7 @@ export function CourseBasicsForm({ courseId }: { courseId: number }) {
             >
               {LEVEL_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>
-                  {opt.label}
+                  {t(`level.${opt.value}`)}
                 </option>
               ))}
             </select>
@@ -147,7 +149,7 @@ export function CourseBasicsForm({ courseId }: { courseId: number }) {
           disabled={updateCourse.isPending}
           className="self-start rounded-full bg-ink px-6 py-3 text-[13.5px] font-bold text-white hover:bg-ink/90 disabled:opacity-50"
         >
-          {updateCourse.isPending ? 'Đang lưu...' : 'Lưu thay đổi'}
+          {updateCourse.isPending ? t('saving') : t('save')}
         </button>
       </form>
 

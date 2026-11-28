@@ -57,7 +57,7 @@ export default function InstructorRefundsPage() {
       <PageHeader title={t('title')} subtitle={t('subtitle')} />
 
       <div className="flex flex-wrap items-end justify-between gap-4 rounded-xl border border-line bg-surface-raised p-4">
-        <ListSearch label="Tìm yêu cầu hoàn tiền" value={list.query} onChange={list.setQuery} placeholder="Tên khóa học, mã đơn hoặc tên học viên..." />
+        <ListSearch label={t('searchLabel')} value={list.query} onChange={list.setQuery} placeholder={t('searchPlaceholder')} />
         <label className="flex w-full flex-col gap-1.5 sm:w-56">
           <span className="text-xs font-semibold text-ink-muted">{t('filters.status')}</span>
           <select

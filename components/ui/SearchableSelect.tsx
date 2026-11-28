@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Check, ChevronDown, Search } from 'lucide-react';
 
 export interface SearchableOption {
@@ -35,9 +36,12 @@ export function SearchableSelect({
   value,
   onChange,
   placeholder,
-  searchPlaceholder = 'Tìm nhanh...',
-  emptyText = 'Không có kết quả',
+  searchPlaceholder: searchPlaceholderProp,
+  emptyText: emptyTextProp,
 }: SearchableSelectProps) {
+  const t = useTranslations('common.select');
+  const searchPlaceholder = searchPlaceholderProp ?? t('searchPlaceholder');
+  const emptyText = emptyTextProp ?? t('empty');
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const rootRef = useRef<HTMLDivElement>(null);

@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { Modal } from '@/components/ui/Modal';
 
 import { useState, type ChangeEvent, type FormEvent } from 'react';
@@ -26,6 +27,7 @@ const MAX_DOCUMENTS = 5;
 
 /** F4.1/F4.2 (UC34, UC35) — mở từ nút "Quản lý video" ở mỗi hàng bài học. */
 export function LessonMediaModal({ courseId, lesson, onClose }: LessonMediaModalProps) {
+  const t = useTranslations('instructor.lessonMedia');
   const [tab, setTab] = useState<'upload' | 'youtube'>(lesson.videoSource === 'YOUTUBE' ? 'youtube' : 'upload');
   const [youtubeUrl, setYoutubeUrl] = useState(lesson.videoSource === 'YOUTUBE' ? (lesson.videoUrl ?? '') : '');
 
@@ -64,7 +66,7 @@ export function LessonMediaModal({ courseId, lesson, onClose }: LessonMediaModal
     const file = e.target.files?.[0];
     e.target.value = '';
     if (!file) return;
-    startDocumentUpload(lesson.id, file, `Tài liệu: ${file.name}`);
+    startDocumentUpload(lesson.id, file, t('documentTask', { name: file.name }));
   };
 
   const handleDeleteVideo = () => {
@@ -72,7 +74,7 @@ export function LessonMediaModal({ courseId, lesson, onClose }: LessonMediaModal
   };
 
   return (
-    <Modal open onClose={onClose} title={<>Quản lý video — {lesson.title}</>} closeOnBackdrop={false}>
+    <Modal open onClose={onClose} title={t('title', { title: lesson.title })} closeOnBackdrop={false}>
 
         <div className="mb-5 flex flex-wrap items-center gap-2 rounded-lg bg-surface px-3 py-2 text-[12.5px] text-ink-muted">
           <span
@@ -84,11 +86,11 @@ export function LessonMediaModal({ courseId, lesson, onClose }: LessonMediaModal
                   : 'bg-tint text-ink-muted'
             }`}
           >
-            {lesson.status === 'READY' ? 'Sẵn sàng' : lesson.status === 'UNAVAILABLE' ? 'Video lỗi' : 'Chưa có video'}
+            {t(`status.${lesson.status === 'READY' || lesson.status === 'UNAVAILABLE' ? lesson.status : 'DRAFT'}`)}
           </span>
           {lesson.videoSource && (
             <span>
-              Nguồn: {lesson.videoSource === 'YOUTUBE' ? 'YouTube' : 'Tải lên'} · {formatDuration(lesson.durationSec)}
+              {t('source', { source: lesson.videoSource === 'YOUTUBE' ? 'YouTube' : t('sourceUpload') })} · {formatDuration(lesson.durationSec)}
             </span>
           )}
         </div>
@@ -99,7 +101,7 @@ export function LessonMediaModal({ courseId, lesson, onClose }: LessonMediaModal
               <iframe
                 key={lesson.youtubeId}
                 src={`https://www.youtube.com/embed/${lesson.youtubeId}`}
-                title={`Xem trước video — ${lesson.title}`}
+                title={t('previewTitle', { title: lesson.title })}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
                 className="h-full w-full"
@@ -113,8 +115,7 @@ export function LessonMediaModal({ courseId, lesson, onClose }: LessonMediaModal
         {lesson.videoSource ? (
           <div className="mb-5 flex flex-col gap-2 rounded-lg border border-warning/30 bg-streak-bg p-3 text-[12.5px] text-streak-ink">
             <span>
-              Bài học đã có video ({lesson.videoSource === 'YOUTUBE' ? 'link YouTube' : 'MP4 tải lên'}). Xóa video
-              hiện tại để đổi sang nguồn khác hoặc tải video mới.
+              {t('hasVideo', { kind: lesson.videoSource === 'YOUTUBE' ? t('kindYoutube') : t('kindUpload') })}
             </span>
             <button
               type="button"
@@ -122,7 +123,7 @@ export function LessonMediaModal({ courseId, lesson, onClose }: LessonMediaModal
               disabled={deleteVideo.isPending}
               className="self-start rounded-lg border border-danger/40 bg-surface-raised px-3 py-1.5 text-[12px] font-bold text-danger hover:bg-danger/5 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {deleteVideo.isPending ? 'Đang xóa...' : 'Xóa video'}
+              {deleteVideo.isPending ? t('deleting') : t('deleteVideo')}
             </button>
             {deleteVideo.error instanceof ApiError && (
               <p className="text-[12px] text-danger">{deleteVideo.error.message}</p>
@@ -137,7 +138,7 @@ export function LessonMediaModal({ courseId, lesson, onClose }: LessonMediaModal
                 disabled={videoTask?.status === 'uploading'}
                 className={`flex-1 rounded-md py-1.5 disabled:cursor-not-allowed ${tab === 'upload' ? 'bg-surface-raised text-accent-dark shadow-sm' : 'text-ink-muted'}`}
               >
-                Tải MP4 lên
+                {t('tabUpload')}
               </button>
               <button
                 type="button"
@@ -145,7 +146,7 @@ export function LessonMediaModal({ courseId, lesson, onClose }: LessonMediaModal
                 disabled={videoTask?.status === 'uploading'}
                 className={`flex-1 rounded-md py-1.5 disabled:cursor-not-allowed ${tab === 'youtube' ? 'bg-surface-raised text-accent-dark shadow-sm' : 'text-ink-muted'}`}
               >
-                Dán link YouTube
+                {t('tabYoutube')}
               </button>
             </div>
 
@@ -161,14 +162,14 @@ export function LessonMediaModal({ courseId, lesson, onClose }: LessonMediaModal
                 {videoTask?.status === 'uploading' && (
                   <div className="flex items-end gap-2">
                     <div className="flex-1">
-                      <UploadProgressBar percent={videoTask.percent} label="Đang tải video lên..." />
+                      <UploadProgressBar percent={videoTask.percent} label={t('uploadingVideo')} />
                     </div>
                     <button
                       type="button"
                       onClick={() => useUploadTrayStore.getState().cancelTask(videoTask.id)}
                       className="shrink-0 pb-0.5 text-[11.5px] font-bold text-danger hover:text-danger"
                     >
-                      Hủy
+                      {t('cancel')}
                     </button>
                   </div>
                 )}
@@ -192,7 +193,7 @@ export function LessonMediaModal({ courseId, lesson, onClose }: LessonMediaModal
                   disabled={setYoutube.isPending}
                   className="self-start rounded-lg bg-accent px-4 py-1.5 text-[12.5px] font-bold text-white hover:bg-accent-dark disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  {setYoutube.isPending ? 'Đang kiểm tra...' : 'Lưu link YouTube'}
+                  {setYoutube.isPending ? t('checking') : t('saveYoutube')}
                 </button>
                 {setYoutube.error instanceof ApiError && (
                   <p className="text-[12px] text-danger">{setYoutube.error.message}</p>
@@ -205,13 +206,13 @@ export function LessonMediaModal({ courseId, lesson, onClose }: LessonMediaModal
         <hr className="my-4 border-line-soft" />
 
         <div className="mb-2 flex items-center justify-between">
-          <h3 className="text-[13px] font-bold text-ink">Tài liệu đính kèm</h3>
+          <h3 className="text-[13px] font-bold text-ink">{t('attachments')}</h3>
           <span className="text-[11.5px] text-ink-faint">
             {docs.length}/{MAX_DOCUMENTS}
           </span>
         </div>
 
-        {documentsLoading && <p className="text-[12.5px] text-ink-faint">Đang tải...</p>}
+        {documentsLoading && <p className="text-[12.5px] text-ink-faint">{t('loading')}</p>}
 
         <div className="mb-3 flex flex-col gap-1.5">
           {docs.map((doc) => (
@@ -223,12 +224,12 @@ export function LessonMediaModal({ courseId, lesson, onClose }: LessonMediaModal
                 onClick={() => deleteDocument.mutate(doc.id)}
                 className="shrink-0 text-[11.5px] font-bold text-danger hover:text-danger"
               >
-                Xóa
+                {t('delete')}
               </button>
             </div>
           ))}
           {docs.length === 0 && !documentsLoading && (
-            <p className="text-[12px] text-ink-faint">Chưa có tài liệu nào.</p>
+            <p className="text-[12px] text-ink-faint">{t('noDocs')}</p>
           )}
         </div>
 
@@ -242,12 +243,12 @@ export function LessonMediaModal({ courseId, lesson, onClose }: LessonMediaModal
               className="text-[12.5px] file:mr-3 file:rounded-md file:border-0 file:bg-tint file:px-3 file:py-1.5 file:text-[12px] file:font-semibold"
             />
             {docTask?.status === 'uploading' && (
-              <UploadProgressBar percent={docTask.percent} label="Đang tải tài liệu lên..." />
+              <UploadProgressBar percent={docTask.percent} label={t('uploadingDoc')} />
             )}
             {docTask?.status === 'error' && <p className="text-[12px] text-danger">{docTask.errorMessage}</p>}
           </div>
         ) : (
-          <p className="text-[12px] text-warning">Đã đạt tối đa {MAX_DOCUMENTS} tài liệu — xóa bớt để thêm mới.</p>
+          <p className="text-[12px] text-warning">{t('maxDocs', { max: MAX_DOCUMENTS })}</p>
         )}
     </Modal>
   );

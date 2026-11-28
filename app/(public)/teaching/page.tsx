@@ -3,49 +3,20 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 
 const REASONS = [
-  {
-    title: 'Dạy theo cách của bạn',
-    description: 'Đăng khóa học bạn muốn, theo cách bạn muốn, và bạn luôn giữ toàn quyền kiểm soát nội dung của mình.',
-    image: '/teaching/6.webp',
-  },
-  {
-    title: 'Truyền cảm hứng cho học viên',
-    description: 'Dạy những gì bạn biết và giúp học viên khám phá sở thích, tiếp thu kỹ năng mới, phát triển sự nghiệp.',
-    image: '/teaching/5.webp',
-  },
-  {
-    title: 'Nhận phần thưởng xứng đáng',
-    description: 'Mở rộng mạng lưới chuyên môn, xây dựng uy tín cá nhân, và có thêm thu nhập từ mỗi lượt đăng ký trả phí.',
-    image: '/teaching/4.webp',
-  },
-];
+  { key: 'r1', image: '/teaching/6.webp' },
+  { key: 'r2', image: '/teaching/5.webp' },
+  { key: 'r3', image: '/teaching/4.webp' },
+] as const;
 
 const STEPS = [
-  {
-    key: 'plan',
-    label: 'Lên kế hoạch chương trình',
-    body: 'Bắt đầu từ đam mê và kiến thức của bạn, sau đó chọn 1 chủ đề phù hợp. Bạn là người quyết định phương pháp giảng dạy và nội dung kiến thức.',
-    help: 'Trình soạn "Chương trình giảng dạy" giúp bạn sắp xếp Phần/Bài giảng rõ ràng, có checklist điều kiện gửi duyệt ngay trong lúc soạn.',
-    image: '/teaching/1.webp',
-  },
-  {
-    key: 'video',
-    label: 'Quay video',
-    body: 'Bạn không cần thiết bị đắt tiền — chỉ cần âm thanh rõ ràng và hình ảnh dễ nhìn. Có thể tải video lên trực tiếp hoặc dùng đường dẫn YouTube.',
-    help: 'Hệ thống tự tách phụ đề gốc và hỗ trợ lồng tiếng AI đa ngôn ngữ ngay sau khi bạn tải video lên, không cần thao tác thêm.',
-    image: '/teaching/2.webp',
-  },
-  {
-    key: 'launch',
-    label: 'Ra mắt khóa học',
-    body: 'Hoàn thiện thông tin cơ bản, giá cả, rồi gửi khóa học đi duyệt. Sau khi được duyệt, khóa học của bạn sẽ hiển thị công khai để học viên tìm thấy.',
-    help: 'Bạn có thể chỉnh sửa nội dung/giá bất cứ lúc nào — chỉ lần gửi duyệt ĐẦU TIÊN cần được kiểm duyệt.',
-    image: '/teaching/3.webp',
-  },
-];
+  { key: 'plan', image: '/teaching/1.webp' },
+  { key: 'video', image: '/teaching/2.webp' },
+  { key: 'launch', image: '/teaching/3.webp' },
+] as const;
 
 /**
  * "Đến và giảng dạy cùng chúng tôi!" — trang giới thiệu trước khi vào wizard "Trở thành Giảng
@@ -59,10 +30,11 @@ const STEPS = [
  * với font chữ tự lưu trữ trong `app/fonts/`.
  */
 export default function TeachingIntroPage() {
+  const t = useTranslations('pages.teaching');
   const { data: currentUser } = useCurrentUser();
   const isInstructor = currentUser?.role === 'INSTRUCTOR';
   const ctaHref = isInstructor ? '/instructor/courses' : '/teaching/onboarding';
-  const ctaLabel = isInstructor ? 'Đến kênh giảng viên' : 'Bắt đầu';
+  const ctaLabel = isInstructor ? t('ctaInstructor') : t('ctaStart');
 
   return (
     <div className="flex flex-col">
@@ -78,7 +50,7 @@ export default function TeachingIntroPage() {
           <div className="absolute inset-0 flex items-center">
             <div className="shell w-full">
               <div className="max-w-sm">
-                <HeroText ctaHref={ctaHref} ctaLabel={ctaLabel} />
+                <HeroText ctaHref={ctaHref} ctaLabel={ctaLabel} onImage />
               </div>
             </div>
           </div>
@@ -89,14 +61,14 @@ export default function TeachingIntroPage() {
       <section className="bg-surface-raised py-14">
         <div className="shell flex flex-col gap-10">
           <h2 className="text-center font-display text-3xl font-bold text-ink md:text-4xl">
-            Có rất nhiều lý do để bắt đầu.
+            {t('reasonsHeading')}
           </h2>
           <div className="grid gap-8 md:grid-cols-3">
             {REASONS.map((reason) => (
-              <div key={reason.title} className="flex flex-col items-center gap-3 text-center">
+              <div key={reason.key} className="flex flex-col items-center gap-3 text-center">
                 <Image src={reason.image} alt="" width={80} height={80} className="mb-1" />
-                <h3 className="font-display text-xl font-bold text-ink">{reason.title}</h3>
-                <p className="text-lg leading-relaxed text-ink">{reason.description}</p>
+                <h3 className="font-display text-xl font-bold text-ink">{t(`${reason.key}Title`)}</h3>
+                <p className="text-lg leading-relaxed text-ink">{t(`${reason.key}Desc`)}</p>
               </div>
             ))}
           </div>
@@ -117,11 +89,9 @@ export default function TeachingIntroPage() {
       <section className="bg-surface-hover py-14">
         <div className="shell grid items-center gap-8 md:grid-cols-2">
           <div>
-            <h2 className="mb-3 font-display text-3xl font-bold text-ink">Bạn sẽ không đơn độc.</h2>
+            <h2 className="mb-3 font-display text-3xl font-bold text-ink">{t('supportHeading')}</h2>
             <p className="text-lg leading-relaxed text-ink">
-              Trợ lý Socratic AI Tutor, học liệu tự sinh và trình soạn Chương trình giảng dạy có
-              checklist ngay trong lúc soạn — tất cả đã sẵn sàng đồng hành cùng bạn từ bài giảng
-              đầu tiên. Bạn chỉ cần tập trung vào kiến thức muốn chia sẻ.
+              {t('supportBody')}
             </p>
           </div>
           {/* (19/09/2026, theo phản hồi) — bỏ khung thẻ trắng bọc ảnh, để ảnh liền khối với nền
@@ -134,8 +104,8 @@ export default function TeachingIntroPage() {
 
       {/* CTA cuối trang */}
       <section className="py-16 text-center">
-        <h2 className="mb-3 font-display text-3xl font-bold text-ink">Trở thành giảng viên ngay hôm nay!</h2>
-        <p className="mb-6 text-lg text-ink">Tham gia cộng đồng giảng viên đang phát triển của LinguaLearn.</p>
+        <h2 className="mb-3 font-display text-3xl font-bold text-ink">{t('ctaHeading')}</h2>
+        <p className="mb-6 text-lg text-ink">{t('ctaSub')}</p>
         <Link
           href={ctaHref}
           className="rounded-full bg-accent px-9 py-3.5 font-display text-lg font-bold text-white no-underline hover:bg-accent-dark hover:text-white"
@@ -147,14 +117,21 @@ export default function TeachingIntroPage() {
   );
 }
 
-function HeroText({ ctaHref, ctaLabel }: { ctaHref: string; ctaLabel: string }) {
+/**
+ * `onImage`: chữ đè lên ảnh nền 0.webp — ảnh là bitmap có vùng xám sáng bên trái ở CẢ 2 chế độ, nên
+ * không được dùng `text-ink` (đảo sang màu sáng ở dark mode → chữ sáng trên nền sáng). Dùng `night`
+ * (tối cố định ở mọi chế độ). Bản mobile nằm trên `bg-tint` đổi theo chế độ nên vẫn dùng `ink`.
+ */
+function HeroText({ ctaHref, ctaLabel, onImage = false }: { ctaHref: string; ctaLabel: string; onImage?: boolean }) {
+  const t = useTranslations('pages.teaching');
+  const textColor = onImage ? 'text-night' : 'text-ink';
   return (
     <div className="flex flex-col gap-5">
-      <h1 className="font-display text-5xl font-extrabold leading-tight text-ink md:text-6xl">
-        Đến và giảng dạy cùng chúng tôi!
+      <h1 className={`font-display text-5xl font-extrabold leading-tight ${textColor} md:text-6xl`}>
+        {t('heroTitle')}
       </h1>
-      <p className="max-w-md text-lg leading-relaxed text-ink">
-        Trở thành giảng viên và thay đổi cuộc sống của người khác — kể cả chính bạn.
+      <p className={`max-w-md text-lg leading-relaxed ${textColor}`}>
+        {t('heroSub')}
       </p>
       <Link
         href={ctaHref}
@@ -167,12 +144,13 @@ function HeroText({ ctaHref, ctaLabel }: { ctaHref: string; ctaLabel: string }) 
 }
 
 function StepsTabs() {
-  const [active, setActive] = useState(STEPS[0]!.key);
+  const t = useTranslations('pages.teaching');
+  const [active, setActive] = useState<string>(STEPS[0]!.key);
   const step = STEPS.find((s) => s.key === active) ?? STEPS[0]!;
 
   return (
     <div className="flex flex-col gap-8">
-      <h2 className="text-center font-display text-2xl font-bold text-ink md:text-3xl">Cách bắt đầu</h2>
+      <h2 className="text-center font-display text-2xl font-bold text-ink md:text-3xl">{t('stepsHeading')}</h2>
       <div className="flex justify-center gap-6 border-b border-line">
         {STEPS.map((s) => (
           <button
@@ -183,15 +161,15 @@ function StepsTabs() {
               active === s.key ? 'border-accent text-accent' : 'border-transparent text-ink-muted hover:text-ink'
             }`}
           >
-            {s.label}
+            {t(`${s.key}Label`)}
           </button>
         ))}
       </div>
       <div className="grid items-center gap-8 md:grid-cols-2">
         <div className="flex flex-col gap-4">
-          <p className="text-lg leading-relaxed text-ink">{step.body}</p>
-          <p className="text-base font-bold text-ink">Chúng tôi hỗ trợ bạn thế nào</p>
-          <p className="text-lg leading-relaxed text-ink">{step.help}</p>
+          <p className="text-lg leading-relaxed text-ink">{t(`${step.key}Body`)}</p>
+          <p className="text-base font-bold text-ink">{t('helpHeading')}</p>
+          <p className="text-lg leading-relaxed text-ink">{t(`${step.key}Help`)}</p>
         </div>
         {/* (19/09/2026, theo phản hồi) — nền trắng trùng màu nền của chính ảnh minh họa (thay
             `bg-accent/5` trước đây tạo viền lệch màu rõ), ảnh phóng to hơn (bỏ padding, tăng

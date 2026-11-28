@@ -82,7 +82,7 @@ export function CourseCard({ course }: { course: CourseSummary }) {
   return (
     <Link
       href={targetHref}
-      className="card-interactive group flex h-full flex-col overflow-hidden no-underline hover:no-underline"
+      className="card-interactive group relative flex h-full flex-col overflow-hidden no-underline hover:no-underline"
     >
       {/* 1. Ảnh bìa 16:9 */}
       <div

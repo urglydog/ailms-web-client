@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useAllReviews, useHideReview, useUnhideReview } from '@/hooks/useReviews';
 import { useDebounce } from '@/hooks/useDebounce';
+import { TableErrorRow } from '@/components/admin/ui/TableErrorRow';
 import { ApiError } from '@/lib/api/client';
 
 /** UC44 — bám khung `CategoryManager.tsx`: bảng + lỗi cục bộ + confirm trước khi hành động. */
@@ -29,7 +30,7 @@ export function ReviewManager() {
     setPage(0);
   }, [debouncedCourseTitle, debouncedInstructorEmail, status]);
 
-  const { data, isLoading } = useAllReviews(
+  const { data, isLoading, isError, refetch } = useAllReviews(
     page,
     20,
     debouncedCourseTitle,
@@ -95,9 +96,9 @@ export function ReviewManager() {
         </select>
       </div>
 
-      <div className="overflow-x-auto rounded-xl border border-line bg-surface-raised shadow-sm">
+      <div className="max-h-[70vh] overflow-auto rounded-xl border border-line bg-surface-raised shadow-sm">
         <table className="w-full min-w-[900px] text-left text-sm">
-          <thead className="bg-surface text-xs font-bold text-ink-muted uppercase">
+          <thead className="sticky top-0 z-10 bg-surface text-xs font-bold text-ink-muted uppercase">
             <tr>
               <th className="px-6 py-4">{t('cols.course')}</th>
               <th className="px-6 py-4">{t('cols.student')}</th>
@@ -116,7 +117,8 @@ export function ReviewManager() {
                 </td>
               </tr>
             )}
-            {mounted && !isLoading && reviews.length === 0 && (
+            {isError && <TableErrorRow colSpan={7} onRetry={() => void refetch()} />}
+            {!isError && mounted && !isLoading && reviews.length === 0 && (
               <tr>
                 <td colSpan={7} className="px-6 py-6 text-center text-ink-muted">
                   {t('empty')}

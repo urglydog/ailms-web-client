@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useReviewFlashcard } from '@/hooks/useFlashcards';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 import type { FlashcardCardWithReview } from '@/lib/api/flashcards';
 import { CheckCircle2, ArrowLeft, Volume2, CalendarClock } from 'lucide-react';
 
@@ -30,6 +31,7 @@ interface StudyModeProps {
  * - Font size +/- controls
  */
 export function FlashcardStudyMode({ deckName: _deckName, cards, language, onFinish }: StudyModeProps) {
+  const t = useTranslations('learn.flashcardStudy');
   const { mutate: reviewCard } = useReviewFlashcard();
 
   // Filter due cards: isDue=true (includes new cards with no review)
@@ -69,7 +71,7 @@ export function FlashcardStudyMode({ deckName: _deckName, cards, language, onFin
 
   const handleSpeak = useCallback((text: string) => {
     if (!('speechSynthesis' in window)) {
-      toast.error('Trình duyệt không hỗ trợ phát âm.');
+      toast.error(t('noSpeech'));
       return;
     }
     const langCode = language?.toLowerCase().split('-')[0] ?? '';
@@ -79,7 +81,7 @@ export function FlashcardStudyMode({ deckName: _deckName, cards, language, onFin
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = bcp47;
     window.speechSynthesis.speak(utterance);
-  }, [language]);
+  }, [language, t]);
 
   const langCode = language?.toLowerCase().split('-')[0] ?? '';
   const isSpeakSupported = !!LANGUAGE_MAP[langCode] && typeof window !== 'undefined' && 'speechSynthesis' in window;
@@ -99,17 +101,17 @@ export function FlashcardStudyMode({ deckName: _deckName, cards, language, onFin
           <CheckCircle2 className="w-8 h-8" strokeWidth={1.75} />
         </div>
         <h2 className="font-display text-2xl font-bold text-ink mb-3">
-          Congratulations! You have finished this deck for now.
+          {t('doneTitle')}
         </h2>
         <p className="text-ink-muted text-sm mb-8 max-w-md">
-          Tất cả thẻ đã được ôn tập xong. Hãy quay lại sau khi có thẻ mới cần ôn.
+          {t('doneBody')}
         </p>
         {onFinish && (
           <button
             onClick={onFinish}
             className="flex items-center gap-2 bg-accent hover:bg-accent-dark text-white font-semibold px-8 py-3 rounded-card shadow-card transition"
           >
-            <ArrowLeft className="w-4 h-4" /> Quay lại
+            <ArrowLeft className="w-4 h-4" /> {t('back')}
           </button>
         )}
       </div>
@@ -127,14 +129,14 @@ export function FlashcardStudyMode({ deckName: _deckName, cards, language, onFin
           <button
             onClick={() => setFontSize(s => Math.max(16, s - 4))}
             className="w-8 h-8 flex items-center justify-center bg-surface-hover border border-line rounded-lg text-ink-muted hover:text-ink hover:bg-line transition-colors font-bold text-lg"
-            title="Giảm cỡ chữ"
+            title={t('smaller')}
           >
             −
           </button>
           <button
             onClick={() => setFontSize(s => Math.min(48, s + 4))}
             className="w-8 h-8 flex items-center justify-center bg-surface-hover border border-line rounded-lg text-ink-muted hover:text-ink hover:bg-line transition-colors font-bold text-lg"
-            title="Tăng cỡ chữ"
+            title={t('larger')}
           >
             +
           </button>
@@ -167,7 +169,7 @@ export function FlashcardStudyMode({ deckName: _deckName, cards, language, onFin
                   <button
                     onClick={(e) => { e.stopPropagation(); handleSpeak(currentCard.frontText); }}
                     className="absolute top-4 right-4 p-2 text-ink-muted hover:text-accent bg-surface hover:bg-surface-hover rounded-card transition-colors"
-                    title="Nghe phát âm"
+                    title={t('listen')}
                   >
                     <Volume2 className="h-5 w-5" strokeWidth={1.75} />
                   </button>
@@ -179,7 +181,7 @@ export function FlashcardStudyMode({ deckName: _deckName, cards, language, onFin
                   {currentCard.frontText}
                 </h3>
                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-xs text-ink-muted opacity-0 group-hover:opacity-100 transition-opacity">
-                  Click để xem đáp án
+                  {t('showAnswer')}
                 </div>
               </div>
 
@@ -192,7 +194,7 @@ export function FlashcardStudyMode({ deckName: _deckName, cards, language, onFin
                   <button
                     onClick={(e) => { e.stopPropagation(); handleSpeak(currentCard.backText); }}
                     className="absolute top-4 right-4 p-2 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 rounded-card transition-colors"
-                    title="Nghe phát âm"
+                    title={t('listen')}
                   >
                     <Volume2 className="h-5 w-5" strokeWidth={1.75} />
                   </button>
@@ -225,9 +227,9 @@ export function FlashcardStudyMode({ deckName: _deckName, cards, language, onFin
                 const now = new Date();
                 const fmt = (d: Date) => {
                   const diff = d.getTime() - now.getTime();
-                  if (diff < 3600000) return `${Math.round(diff / 60000)} phút`;
-                  if (diff < 86400000) return `${Math.round(diff / 3600000)} giờ`;
-                  return `${Math.round(diff / 86400000)} ngày`;
+                  if (diff < 3600000) return t('minutes', { n: Math.round(diff / 60000) });
+                  if (diff < 86400000) return t('hours', { n: Math.round(diff / 3600000) });
+                  return t('days', { n: Math.round(diff / 86400000) });
                 };
                 const nextAgain  = new Date(now.getTime() + 1   * 60000);
                 const nextHard   = new Date(now.getTime() + 6   * 60000);

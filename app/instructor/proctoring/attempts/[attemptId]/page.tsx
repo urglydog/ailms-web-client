@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { ShieldAlert, ChevronDown } from 'lucide-react';
@@ -14,19 +15,8 @@ const parseDate = (d: string | number[]) => {
   return new Date(d);
 };
 
-const VIOLATION_LABEL: Record<string, string> = {
-  TAB_SWITCH: 'Chuyển tab',
-  WINDOW_BLUR: 'Chuyển cửa sổ/ứng dụng',
-  FULLSCREEN_EXIT: 'Thoát toàn màn hình',
-  NO_FACE: 'Không thấy khuôn mặt',
-  MULTIPLE_FACES: 'Nhiều hơn 1 người',
-  HEAD_TURNED: 'Quay đầu sang 1 bên',
-  GAZE_AWAY: 'Ánh mắt rời màn hình (AI)',
-  AUDIO_VOICE_DETECTED: 'Phát hiện giọng nói',
-  DEVTOOLS_OPEN: 'Mở DevTools',
-  COPY_PASTE_BLOCKED: 'Copy/paste/chuột phải',
-  IDLE_TOO_LONG: 'Không tương tác quá lâu',
-};
+
+const VIOLATION_TYPES = new Set(['TAB_SWITCH', 'WINDOW_BLUR', 'FULLSCREEN_EXIT', 'NO_FACE', 'MULTIPLE_FACES', 'HEAD_TURNED', 'GAZE_AWAY', 'AUDIO_VOICE_DETECTED', 'DEVTOOLS_OPEN', 'COPY_PASTE_BLOCKED', 'IDLE_TOO_LONG']);
 
 const AI_ANALYZED_TYPES = new Set(['NO_FACE', 'MULTIPLE_FACES', 'HEAD_TURNED', 'GAZE_AWAY']);
 
@@ -48,6 +38,7 @@ const formatOffset = (sec: number) => {
  * AI cho đúng vi phạm đó (nếu có, vd Gemini Vision giải thích vì sao gắn cờ "ánh mắt rời màn
  * hình"), giống hệt cách trích dẫn `[MM:SS]` của Gia sư AI tua video bài giảng. */
 export default function ProctoringAttemptDetailPage() {
+  const t = useTranslations('instructor.proctoringAttempt');
   const params = useParams();
   const router = useRouter();
   const attemptId = Number(params.attemptId);
@@ -113,17 +104,17 @@ export default function ProctoringAttemptDetailPage() {
   };
 
   if (isLoading || !attempt) {
-    return <div className="card p-8 text-center text-sm text-ink-muted">Đang tải...</div>;
+    return <div className="card p-8 text-center text-sm text-ink-muted">{t('loading')}</div>;
   }
 
   return (
     <>
       <button
         onClick={() => router.back()}
-        title="Quay lại"
+        title={t('back')}
         className="flex items-center gap-1.5 text-sm font-semibold text-accent hover:underline mb-4"
       >
-        <ArrowLeftIcon /> Quay lại
+        <ArrowLeftIcon /> {t('back')}
       </button>
 
       <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
@@ -140,7 +131,7 @@ export default function ProctoringAttemptDetailPage() {
 
       {attempt.aiRiskExplanation && (
         <div className="card p-4 mb-6 border-l-4 border-l-accent">
-          <div className="text-xs font-semibold uppercase text-ink-muted mb-1">Nhận định của AI</div>
+          <div className="text-xs font-semibold uppercase text-ink-muted mb-1">{t('aiVerdict')}</div>
           <div className="text-sm text-ink leading-relaxed">
             <MarkdownRenderer content={attempt.aiRiskExplanation} />
           </div>
@@ -156,7 +147,7 @@ export default function ProctoringAttemptDetailPage() {
               <video ref={videoRef} src={attempt.videoUrl} controls preload="metadata" className="w-full aspect-video bg-black" />
             ) : (
               <div className="aspect-video flex items-center justify-center text-sm text-ink-faint bg-surface-raised">
-                Chưa có video
+                {t('noVideo')}
               </div>
             )}
           </div>
@@ -164,10 +155,10 @@ export default function ProctoringAttemptDetailPage() {
 
         <div className="card p-4 flex flex-col gap-2 max-h-[calc(100vh-160px)] overflow-y-auto">
           <div className="text-xs font-semibold uppercase text-ink-muted mb-1">
-            Vi phạm ({attempt.violationCount})
+            {t('violations', { count: attempt.violationCount })}
           </div>
           {attempt.violations.length === 0 ? (
-            <p className="text-sm text-ink-faint">Không có vi phạm.</p>
+            <p className="text-sm text-ink-faint">{t('noViolations')}</p>
           ) : (
               attempt.violations.map((v, idx) => {
               const isExpanded = expandedIdx === idx;
@@ -178,7 +169,7 @@ export default function ProctoringAttemptDetailPage() {
                     onClick={() => handleViolationClick(idx, v.offsetSec)}
                     className="w-full flex items-center justify-between gap-2 px-3 py-2 text-left text-xs hover:bg-surface-raised transition-colors"
                   >
-                    <span className="font-medium text-ink">{VIOLATION_LABEL[v.type] || v.type}</span>
+                    <span className="font-medium text-ink">{VIOLATION_TYPES.has(v.type) ? t(`violation.${v.type}`) : v.type}</span>
                     <span className="flex items-center gap-1.5 shrink-0">
                       {attempt.videoUrl && <span className="text-accent font-mono">{formatOffset(v.offsetSec)}</span>}
                       {hasAiDetail && <ChevronDown className={`w-3.5 h-3.5 text-ink-faint transition-transform ${isExpanded ? 'rotate-180' : ''}`} />}

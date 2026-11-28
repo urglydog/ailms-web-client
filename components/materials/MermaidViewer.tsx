@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 import { ArrowDown, ArrowRight, ArrowUp, ArrowLeft } from 'lucide-react';
 
 const DIRECTIONS = [
@@ -17,6 +18,7 @@ interface MermaidViewerProps {
 }
 
 export function MermaidViewer({ chart, readOnly = false }: MermaidViewerProps) {
+  const t = useTranslations('learn.mermaid');
   const containerRef = useRef<HTMLDivElement>(null);
   const [svgContent, setSvgContent] = useState<string>('');
   const [loading, setLoading] = useState(true);
@@ -82,7 +84,7 @@ export function MermaidViewer({ chart, readOnly = false }: MermaidViewerProps) {
         setSvgContent(containedSvg);
       } catch (err: unknown) {
         console.error("Mermaid Render Error:", err);
-        setError("Không thể vẽ Sơ đồ tư duy. Dữ liệu có thể bị lỗi định dạng.");
+        setError('renderError');
       } finally {
         setLoading(false);
       }
@@ -142,9 +144,9 @@ export function MermaidViewer({ chart, readOnly = false }: MermaidViewerProps) {
   const handleCopyCode = async () => {
     try {
       await navigator.clipboard.writeText(styledChart || chart);
-      toast.success('Đã sao chép mã Mermaid!');
+      toast.success(t('copied'));
     } catch {
-      toast.error('Lỗi khi sao chép mã.');
+      toast.error(t('copyError'));
     }
   };
 
@@ -161,7 +163,7 @@ export function MermaidViewer({ chart, readOnly = false }: MermaidViewerProps) {
                 className={`p-2 rounded-md transition-colors ${
                   layoutDirection === dir.id ? 'bg-accent text-white shadow-sm' : 'text-ink-muted hover:bg-surface-hover hover:text-ink'
                 }`}
-                title={`Xoay sơ đồ hướng ${dir.name}`}
+                title={t('rotate', { direction: dir.name })}
               >
                 <dir.Icon className="w-4 h-4" strokeWidth={1.75} />
               </button>
@@ -174,16 +176,16 @@ export function MermaidViewer({ chart, readOnly = false }: MermaidViewerProps) {
             <button 
               onClick={handleCopyCode}
               className="flex items-center gap-2 px-4 py-2 bg-tint hover:bg-accent text-ink hover:text-white rounded-lg text-sm font-medium transition border border-line"
-              title="Sao chép mã Mermaid"
+              title={t('copyCode')}
             >
               Copy Code
             </button>
             <button 
               onClick={handleDownloadSVG}
               className="flex items-center gap-2 px-4 py-2 bg-tint hover:bg-accent text-ink hover:text-white rounded-lg text-sm font-medium transition border border-line"
-              title="Tải sơ đồ dưới dạng ảnh SVG"
+              title={t('downloadTitle')}
             >
-              Tải ảnh (SVG)
+              {t('download')}
             </button>
           </div>
         )}
@@ -193,12 +195,12 @@ export function MermaidViewer({ chart, readOnly = false }: MermaidViewerProps) {
       <div className="relative w-full min-h-[400px] h-[600px] bg-surface-raised rounded-2xl border border-line p-4 overflow-auto">
         {loading && (
           <div className="absolute inset-0 bg-surface-raised/50 flex items-center justify-center z-10 backdrop-blur-sm">
-            <span className="text-accent text-sm">Đang tải...</span>
+            <span className="text-accent text-sm">{t('loading')}</span>
           </div>
         )}
         {error ? (
           <div className="flex flex-col items-center justify-center w-full h-full bg-danger/5 rounded-2xl border border-danger/30 text-danger p-8 text-center">
-            <p className="mb-4 text-sm font-medium">{error}</p>
+            <p className="mb-4 text-sm font-medium">{t(error)}</p>
             <pre className="text-xs text-left w-full overflow-auto p-4 bg-surface rounded-xl border border-line">{chart}</pre>
           </div>
         ) : (

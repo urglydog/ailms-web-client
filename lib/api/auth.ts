@@ -1,5 +1,6 @@
 import { ApiError } from './client';
 import type { ProblemDetail } from '@/types/domain';
+import { tr } from '@/lib/i18n/translate';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
@@ -64,7 +65,7 @@ export const authApi = {
    */
   refresh: async (): Promise<{ accessToken: string; refreshToken: string }> => {
     const refreshToken = localStorage.getItem('refreshToken');
-    if (!refreshToken) throw new Error('Không có refresh token');
+    if (!refreshToken) throw new Error(tr('errors.api.noRefreshToken'));
     const data = await fetchApi('/api/v1/auth/refresh', { refreshToken });
     localStorage.setItem('accessToken', data.accessToken as string);
     localStorage.setItem('refreshToken', data.refreshToken as string);

@@ -1,6 +1,7 @@
 import { toast } from 'sonner';
 import { ApiError } from '@/lib/api/client';
 import type { ProblemDetail } from '@/types/domain';
+import { tr } from '@/lib/i18n/translate';
 
 interface GoogleCredentialResponse {
   credential?: string;
@@ -26,7 +27,7 @@ export async function handleGoogleSuccess(credentialResponse: GoogleCredentialRe
         type: err.type ?? 'about:blank',
         title: err.title ?? '',
         status: err.status ?? res.status,
-        detail: err.detail || 'Đăng nhập Google thất bại',
+        detail: err.detail || tr('errors.toast.google.failed'),
         instance: err.instance ?? '',
         code: err.code ?? 'UNKNOWN',
         timestamp: err.timestamp ?? '',
@@ -69,11 +70,11 @@ export async function handleGoogleSuccess(credentialResponse: GoogleCredentialRe
     const next = new URLSearchParams(window.location.search).get('next');
     if (next && /^\/(?![/\\])/.test(next)) targetUrl = next;
 
-    toast.success('Đăng nhập thành công!');
+    toast.success(tr('errors.toast.google.success'));
     setTimeout(() => {
       window.location.href = targetUrl;
     }, 1000);
   } catch (error: unknown) {
-    toast.error('Lỗi đăng nhập: ' + (error instanceof Error ? error.message : 'Có lỗi xảy ra'));
+    toast.error(tr('errors.toast.google.error', { message: error instanceof Error ? error.message : tr('errors.toast.google.generic') }));
   }
 }

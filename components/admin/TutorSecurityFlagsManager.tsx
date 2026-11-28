@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
+import { TableErrorRow } from '@/components/admin/ui/TableErrorRow';
 import { useTutorSecurityFlags } from '@/hooks/useTutorSecurity';
 
 const PAGE_SIZE = 20;
@@ -14,14 +15,14 @@ export function TutorSecurityFlagsManager() {
   const t = useTranslations('admin.tutorSec');
   const locale = useLocale();
   const [page, setPage] = useState(0);
-  const { data, isLoading } = useTutorSecurityFlags({ page, size: PAGE_SIZE });
+  const { data, isLoading, isError, refetch } = useTutorSecurityFlags({ page, size: PAGE_SIZE });
   const flags = data?.content ?? [];
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="overflow-x-auto rounded-xl border border-line bg-surface-raised shadow-sm">
+      <div className="max-h-[70vh] overflow-auto rounded-xl border border-line bg-surface-raised shadow-sm">
         <table className="w-full min-w-[760px] text-left text-sm">
-          <thead className="bg-surface text-xs font-bold text-ink-muted uppercase">
+          <thead className="sticky top-0 z-10 bg-surface text-xs font-bold text-ink-muted uppercase">
             <tr>
               <th className="px-6 py-4">{t('cols.student')}</th>
               <th className="px-6 py-4">{t('cols.course')}</th>
@@ -36,7 +37,8 @@ export function TutorSecurityFlagsManager() {
                 <td colSpan={5} className="px-6 py-6 text-center text-ink-muted">{t('loading')}</td>
               </tr>
             )}
-            {!isLoading && flags.length === 0 && (
+            {isError && <TableErrorRow colSpan={5} onRetry={() => void refetch()} />}
+            {!isError && !isLoading && flags.length === 0 && (
               <tr>
                 <td colSpan={5} className="px-6 py-6 text-center text-ink-muted">
                   {t('empty')}

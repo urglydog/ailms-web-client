@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { enrollmentsApi } from '@/lib/api/enrollments';
 import { ApiError } from '@/lib/api/client';
+import { canUseLearnerFeatures } from '@/lib/auth/token';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
 import { useAddToCart, useCart } from '@/hooks/useCart';
@@ -56,7 +57,9 @@ export function EnrollButton({
   };
 
   useEffect(() => {
-    // Check if user is actually enrolled (since public API always returns false)
+    // Check if user is actually enrolled (since public API always returns false). Khách và ADMIN
+    // không có "khóa học của tôi" — gọi sẽ ra 401/403.
+    if (!canUseLearnerFeatures()) return;
     enrollmentsApi.listMine()
       .then((data) => {
         setEnrolled(data.some(e => e.courseId === courseId));

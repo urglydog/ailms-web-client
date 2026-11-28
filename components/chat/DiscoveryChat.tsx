@@ -6,6 +6,7 @@ import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 import { api, ApiError } from '@/lib/api/client';
 import { getAccessToken } from '@/lib/auth/token';
 import { MarkdownRenderer } from '@/components/ui/MarkdownRenderer';
@@ -34,6 +35,7 @@ interface DiscoveryChatResponse {
 }
 
 export function DiscoveryChat() {
+  const t = useTranslations('discovery.chat');
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<{role: 'user' | 'assistant', text: string, courses?: DiscoveryCourseCard[]}[]>([]);
@@ -48,7 +50,7 @@ export function DiscoveryChat() {
     setInput(value);
     if (value.length >= MAX_MESSAGE_LENGTH) {
       if (!maxLengthToastShownRef.current) {
-        toast.warning(`Đã đạt giới hạn ${MAX_MESSAGE_LENGTH} ký tự cho 1 tin nhắn.`);
+        toast.warning(t('maxLength', { max: MAX_MESSAGE_LENGTH }));
         maxLengthToastShownRef.current = true;
       }
     } else {
@@ -80,7 +82,7 @@ export function DiscoveryChat() {
       
       setMessages(prev => [...prev, { 
         role: 'assistant', 
-        text: data.reply || 'Không có phản hồi.', 
+        text: data.reply || t('noReply'), 
         courses: data.courses 
       }]);
     } catch (err) {
@@ -89,7 +91,7 @@ export function DiscoveryChat() {
       // không biết mình bị hạn chế. Giờ hiện đúng lý do thật khi là lỗi nghiệp vụ từ BE.
       const text = err instanceof ApiError
         ? err.message
-        : 'Xin lỗi, tôi đang gặp sự cố kết nối tới AI. Vui lòng kiểm tra lại.';
+        : t('connectionError');
       setMessages(prev => [...prev, { role: 'assistant', text }]);
     } finally {
       setLoading(false);
@@ -102,7 +104,7 @@ export function DiscoveryChat() {
       <button 
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        aria-label={isOpen ? "Đóng trợ lý tìm khóa học" : "Mở trợ lý tìm khóa học"}
+        aria-label={isOpen ? t('toggleClose') : t('toggleOpen')}
         aria-expanded={isOpen}
         className="fixed bottom-6 right-6 flex h-14 w-14 items-center justify-center rounded-xl border border-accent-dark bg-accent text-white shadow-md z-50 btn-tactile"
       >
@@ -126,7 +128,7 @@ export function DiscoveryChat() {
         <div className="bg-accent px-4 py-3 text-white flex justify-between items-center">
           <div>
             <h3 className="font-display font-semibold">AI Course Discovery</h3>
-            <p className="text-xs opacity-90">Tìm kiếm khóa học bằng ngôn ngữ tự nhiên</p>
+            <p className="text-xs opacity-90">{t('subtitle')}</p>
           </div>
           <button 
             onClick={() => setIsOpen(false)} 
@@ -139,7 +141,7 @@ export function DiscoveryChat() {
           <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4 bg-surface">
             {messages.length === 0 && (
               <div className="text-center text-sm text-ink-muted mt-4">
-                Xin chào! Tôi là trợ lý AI. Bạn muốn tìm khóa học gì hôm nay?
+                {t('welcome')}
               </div>
             )}
             
@@ -159,7 +161,7 @@ export function DiscoveryChat() {
                         <span className="text-xs text-ink-muted">GV. {c.instructor_name}</span>
                         <div className="flex items-center justify-between mt-auto pt-2 border-t border-line-soft">
                           <span className={`text-sm font-bold ${c.is_free ? 'text-success' : 'text-ink'}`}>{c.price_label}</span>
-                          <span className="text-[10px] bg-surface-raised font-semibold px-2 py-1 rounded-full text-ink-muted">{c.level_label === 'ALL' ? 'Mọi cấp độ' : c.level_label}</span>
+                          <span className="text-[10px] bg-surface-raised font-semibold px-2 py-1 rounded-full text-ink-muted">{c.level_label === 'ALL' ? t('allLevels') : c.level_label}</span>
                         </div>
                       </Link>
                     ))}
@@ -186,7 +188,7 @@ export function DiscoveryChat() {
                 <textarea
                   value={input}
                   onChange={e => handleInputChange(e.target.value)}
-                  placeholder="Ví dụ: Khoá học IT cho người mới..."
+                  placeholder={t('placeholder')}
                   maxLength={MAX_MESSAGE_LENGTH}
                   rows={1}
                   onKeyDown={(e) => {

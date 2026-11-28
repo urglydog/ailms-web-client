@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import type { VoiceOption } from '@/types/domain';
 
 /**
@@ -27,6 +28,7 @@ export function prettyVoiceName(voiceName: string): string {
 }
 
 export function VoicePicker({ voices, selected, onSelect }: VoicePickerProps) {
+  const t = useTranslations('learn.player.voice');
   if (voices.length === 0) return null;
 
   const female = voices.filter((v) => v.gender === 'FEMALE');
@@ -57,7 +59,7 @@ export function VoicePicker({ voices, selected, onSelect }: VoicePickerProps) {
                 {prettyVoiceName(voice.voiceName)}
                 {voice.isDefault && (
                   <span className="rounded-full bg-line-soft px-1.5 py-0.5 text-[10px] font-normal text-ink-faint">
-                    mặc định
+                    {t('default')}
                   </span>
                 )}
               </button>
@@ -70,10 +72,10 @@ export function VoicePicker({ voices, selected, onSelect }: VoicePickerProps) {
 
   return (
     <div className="flex flex-col gap-3">
-      <span className="text-[13px] font-medium text-ink">Chọn giọng đọc</span>
+      <span className="text-[13px] font-medium text-ink">{t('choose')}</span>
       <div className="flex flex-col gap-3 sm:flex-row sm:gap-6">
-        {renderGroup('Nữ', female)}
-        {renderGroup('Nam', male)}
+        {renderGroup(t('female'), female)}
+        {renderGroup(t('male'), male)}
       </div>
     </div>
   );
