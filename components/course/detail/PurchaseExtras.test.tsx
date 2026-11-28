@@ -1,7 +1,7 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { renderWithIntl } from '@/test/renderWithIntl';
-import { PromoCountdown, ShareGiftButtons, remaining } from './PurchaseExtras';
+import { PromoCountdown, ShareButton, remaining } from './PurchaseExtras';
 
 vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
 
@@ -19,12 +19,12 @@ describe('PurchaseExtras', () => {
     expect(screen.getByText(/Ưu đãi kết thúc sau/)).toBeInTheDocument();
   });
 
-  it('chia sẻ chép link khi không có chia sẻ gốc; Tặng là "Sắp ra mắt"', async () => {
+  it('chia sẻ chép link khi không có chia sẻ gốc; không còn nút Tặng', async () => {
     const writeText = vi.fn().mockResolvedValue(undefined);
     Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
-    renderWithIntl(<ShareGiftButtons title="Java" slug="java" />);
+    renderWithIntl(<ShareButton title="Java" slug="java" />);
     fireEvent.click(screen.getByRole('button', { name: 'Chia sẻ' }));
     await waitFor(() => expect(writeText).toHaveBeenCalledWith(expect.stringContaining('/courses/java')));
-    expect(screen.getByRole('button', { name: /Tặng khóa học/ })).toHaveAttribute('aria-disabled', 'true');
+    expect(screen.queryByRole('button', { name: /Tặng khóa học/ })).toBeNull();
   });
 });

@@ -579,8 +579,6 @@
     },
     "shareGift": {
       "share": "Share",
-      "gift": "Gift this course",
-      "soon": "Coming soon",
       "copied": "Course link copied",
       "copyFailed": "Couldn't copy the link"
     },

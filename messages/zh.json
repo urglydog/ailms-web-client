@@ -579,8 +579,6 @@
     },
     "shareGift": {
       "share": "分享",
-      "gift": "赠送课程",
-      "soon": "即将推出",
       "copied": "已复制课程链接",
       "copyFailed": "无法复制链接"
     },
