@@ -174,16 +174,21 @@ export function useLessonProgressFromState(
   const lastPositionRef = useRef(initialPositionSec);
   const currentSecRef = useRef(currentSec);
   const isPlayingRef = useRef(isPlaying);
+  // Chưa từng phát thì chưa có gì để ghi — tránh gửi lastPositionSec=0 (player YouTube chưa kịp tua tới
+  // vị trí cũ) đè mất vị trí học dở khi học viên chỉ mở bài rồi rời đi.
+  const hasStartedRef = useRef(false);
   const queryClient = useQueryClient();
 
   // Gán tham chiếu ngay lúc render — an toàn vì chỉ interval bên dưới đọc lại, không dùng để
   // quyết định JSX render ra gì (xem docblock ở trên).
   currentSecRef.current = currentSec;
-  lastPositionRef.current = currentSec;
+  if (isPlaying) hasStartedRef.current = true;
+  if (hasStartedRef.current) lastPositionRef.current = currentSec;
   isPlayingRef.current = isPlaying;
 
   useEffect(() => {
     watchedSecRef.current = 0;
+    hasStartedRef.current = false;
     lastPositionRef.current = initialPositionSec;
   }, [lessonId, initialPositionSec]);
 
@@ -193,6 +198,7 @@ export function useLessonProgressFromState(
     }
 
     const send = () => {
+      if (!hasStartedRef.current) return;
       lessonProgressApi
         .record(lessonId, {
           watchedSec: Math.round(watchedSecRef.current),
@@ -224,6 +230,7 @@ export function useLessonProgressFromState(
     const sendIntervalId = setInterval(send, SEND_INTERVAL_MS);
 
     const handlePageHide = () => {
+      if (!hasStartedRef.current) return;
       lessonProgressApi.recordOnUnload(lessonId, {
         watchedSec: Math.round(watchedSecRef.current),
         lastPositionSec: Math.round(lastPositionRef.current),

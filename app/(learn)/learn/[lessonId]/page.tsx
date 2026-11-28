@@ -525,6 +525,16 @@ function LearnPageContent() {
     enabled: hasToken && lesson?.videoSource === 'YOUTUBE',
   });
 
+  // BR-PROGRESS-03 — YouTube không có <video> để tua lúc loadedmetadata như UPLOAD, nên tua tới vị
+  // trí học dở ở lần phát ĐẦU TIÊN của bài (lúc này IFrame chắc chắn đã sẵn sàng nhận seekTo).
+  const resumedLessonRef = useRef<number | null>(null);
+  useEffect(() => {
+    if (!playerIsPlaying || lesson?.videoSource !== 'YOUTUBE' || resumedLessonRef.current === lessonId) return;
+    resumedLessonRef.current = lessonId;
+    const resumeAt = lesson.lastPositionSec ?? 0;
+    if (resumeAt > 3 && playerCurrentSec < resumeAt - 3) dualPlayerRef.current?.seekTo(resumeAt);
+  }, [playerIsPlaying, lesson, lessonId, playerCurrentSec]);
+
   // Gửi heartbeat kiểm tra conflict (Task 10)
   useEffect(() => {
     if (!hasToken || !lessonId || streamConflict) return;
