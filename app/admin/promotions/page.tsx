@@ -35,6 +35,9 @@ export default function AdminPromotionsPage() {
   const [statusFilter, setStatusFilter] = useState<PromotionStatus | 'ALL'>('REQUESTED');
   const [dialog, setDialog] = useState<Dialog | null>(null);
   const [endAt, setEndAt] = useState('');
+  // Mốc "bây giờ" cố định lúc mở trang, để nhận ra đợt đã duyệt nhưng quá hạn (backend vẫn ghi APPROVED sau khi hết `endAt`).
+  const [nowMs] = useState(() => Date.now());
+  const isExpired = (p: PromotionRes) => p.status === 'APPROVED' && !!p.endAt && new Date(p.endAt).getTime() <= nowMs;
   const [note, setNote] = useState('');
 
   const { data, isLoading, isError } = useQuery({
@@ -140,30 +143,42 @@ export default function AdminPromotionsPage() {
         <ul className="m-0 flex list-none flex-col gap-3 p-0">
           {rows.map((p) => (
             <li key={p.id} className="flex flex-col gap-2 rounded-xl border border-line bg-surface-raised p-4 shadow-sm">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <div className="min-w-0">
-                  <div className="truncate font-semibold text-ink">{p.courseTitle}</div>
-                  <div className="text-xs text-ink-muted">
-                    {p.instructorName} · {p.instructorEmail} · {t(`placement.${p.placement}`)}
-                  </div>
-                </div>
+              <div className="flex flex-wrap items-start justify-between gap-2">
+                <div className="min-w-0 text-base font-bold text-ink">{p.courseTitle}</div>
                 <span className="flex items-center gap-2">
                   {p.active && <span className="rounded-full bg-tint px-2.5 py-1 text-xs font-bold text-accent-dark">{t('running')}</span>}
-                  <span className="rounded-full border border-line px-2.5 py-1 text-xs font-medium text-ink">{t(`status.${p.status}`)}</span>
+                  <span className="rounded-full border border-line px-2.5 py-1 text-xs font-medium text-ink">{t(`status.${isExpired(p) ? 'ENDED' : p.status}`)}</span>
                 </span>
               </div>
               {p.requestNote && <div className="text-sm text-ink">{t('requestNote', { note: p.requestNote })}</div>}
-              {p.startAt && p.endAt && (
-                <div className="text-xs text-ink-muted">
-                  {dateTime(p.startAt)} → {dateTime(p.endAt)}
+              <dl className="m-0 grid gap-3 rounded-lg bg-surface p-3 sm:grid-cols-2 lg:grid-cols-4">
+                <div>
+                  <dt className="text-xs font-semibold uppercase tracking-wide text-ink-muted">{t('fieldInstructor')}</dt>
+                  <dd className="m-0 mt-0.5 text-sm font-semibold text-ink">{p.instructorName}</dd>
+                  <dd className="m-0 break-all text-xs text-ink-muted">{p.instructorEmail}</dd>
                 </div>
-              )}
-              {(p.status === 'APPROVED' || p.status === 'ENDED') && (
-                <div className="text-xs text-ink-muted">
-                  {t('estimate', { during: p.ordersDuring, revDuring: money(p.revenueDuring), before: p.ordersBefore, revBefore: money(p.revenueBefore) })}
+                <div>
+                  <dt className="text-xs font-semibold uppercase tracking-wide text-ink-muted">{t('fieldPlacement')}</dt>
+                  <dd className="m-0 mt-1">
+                    <span className="inline-block rounded-full bg-tint px-3 py-1 text-sm font-semibold text-accent-dark">{t(`placement.${p.placement}`)}</span>
+                  </dd>
                 </div>
-              )}
-              {p.adminNote && <div className="text-xs text-ink">{t('adminNote', { note: p.adminNote })}</div>}
+                {p.startAt && p.endAt && (
+                  <div>
+                    <dt className="text-xs font-semibold uppercase tracking-wide text-ink-muted">{t('fieldPeriod')}</dt>
+                    <dd className="m-0 mt-0.5 text-sm font-semibold text-ink">{dateTime(p.startAt)} → {dateTime(p.endAt)}</dd>
+                  </div>
+                )}
+                {(p.status === 'APPROVED' || p.status === 'ENDED') && (
+                  <div>
+                    <dt className="text-xs font-semibold uppercase tracking-wide text-ink-muted">{t('fieldDuring')}</dt>
+                    <dd className="m-0 mt-0.5 text-lg font-bold text-ink">{t('ordersCount', { count: p.ordersDuring })}</dd>
+                    <dd className="m-0 text-sm font-semibold text-ink">{money(p.revenueDuring)}</dd>
+                    <dd className="m-0 mt-1 text-xs text-ink-muted">{t('fieldBefore')}: {t('ordersCount', { count: p.ordersBefore })} · {money(p.revenueBefore)}</dd>
+                  </div>
+                )}
+              </dl>
+              {p.adminNote && <div className="text-sm text-ink">{t('adminNote', { note: p.adminNote })}</div>}
               <div className="flex flex-wrap gap-2">
                 {p.status === 'REQUESTED' && (
                   <>
@@ -175,7 +190,7 @@ export default function AdminPromotionsPage() {
                     </button>
                   </>
                 )}
-                {p.status === 'APPROVED' && (
+                {p.status === 'APPROVED' && !isExpired(p) && (
                   <button type="button" disabled={busy} onClick={() => setDialog({ kind: 'end', promotion: p })} className="rounded-lg border border-line px-3 py-1.5 text-xs font-semibold text-ink-muted hover:text-ink disabled:opacity-50">
                     {t('end')}
                   </button>
