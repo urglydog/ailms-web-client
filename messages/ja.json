@@ -3117,6 +3117,153 @@
     "common": {
       "loadError": "データを読み込めませんでした。もう一度お試しください。",
       "retry": "再試行"
+    },
+    "finance": {
+      "title": "財務統計",
+      "subtitle": "プラットフォーム全体の売上、返金、講師への支払い、PayOS の照合。",
+      "gran": {
+        "DAY": "日別",
+        "WEEK": "週別",
+        "MONTH": "月別"
+      },
+      "reportType": {
+        "DAILY": "毎日",
+        "WEEKLY": "毎週",
+        "MONTHLY": "毎月",
+        "MANUAL": "手動"
+      },
+      "reason": {
+        "BUYER_REMORSE": "気が変わった",
+        "OTHER": "その他の理由",
+        "TECHNICAL_ISSUE": "技術的な問題",
+        "DOUBLE_CHARGE": "二重請求",
+        "NOT_ENROLLED": "請求されたが未登録",
+        "PLATFORM_FAULT": "プラットフォームの不具合",
+        "COPYRIGHT_VIOLATION": "著作権侵害",
+        "CONTENT_MISMATCH": "説明と異なる内容",
+        "PROHIBITED_CONTENT": "禁止コンテンツ"
+      },
+      "stage": {
+        "REQUESTED": "承認待ち",
+        "APPROVED": "承認済み・支払い待ち"
+      },
+      "toast": {
+        "emailed": "レポートを作成し、メールで送信しました。",
+        "noEmail": "レポートは保存されましたが、アカウントに受信可能なメールアドレスがないため送信できませんでした。共有ボタンからファイルをダウンロードできます。",
+        "runError": "レポートを作成できませんでした。もう一度お試しください。"
+      },
+      "fileName": "financial-report",
+      "export": {
+        "pdf": "PDF をダウンロード",
+        "pdfHint": "印刷・送付用の概要",
+        "xlsx": "Excel (XLSX) をダウンロード",
+        "xlsxHint": "全データを含む複数シートのブック",
+        "csv": "CSV をダウンロード",
+        "csvHint": "どのソフトでも開ける生データ",
+        "mail": "メールで自分に送る",
+        "mailHint": "レポートを作成して履歴に保存し、ファイルを添付"
+      },
+      "filter": {
+        "from": "開始日",
+        "to": "終了日",
+        "group": "集計単位",
+        "last7": "7 日間",
+        "last30": "30 日間",
+        "thisMonth": "今月",
+        "lastMonth": "先月",
+        "autoConfig": "自動レポートの設定"
+      },
+      "loadError": "数値を読み込めませんでした。期間を確認してもう一度お試しください。",
+      "noData": "データがまだありません。",
+      "stat": {
+        "gross": "総売上",
+        "net": "純売上（返金後）",
+        "refunds": "受講者への返金額",
+        "refundMeta": "{count} 件 · 注文の {pct}%",
+        "platform": "プラットフォームの取り分"
+      },
+      "split": {
+        "platform": "プラットフォームの取り分",
+        "instructor": "講師の取り分",
+        "refunded": "受講者に返金済み"
+      },
+      "source": {
+        "referral": "紹介リンク経由",
+        "organic": "受講者が自分で発見"
+      },
+      "trend": {
+        "q": "売上は増えている？減っている？",
+        "up": "総売上は前期比 {pct}% 増加しました。",
+        "down": "総売上は前期比 {pct}% 減少しました。",
+        "empty": "この期間の取引はありません。",
+        "aria": "期間別の総売上と返金の面グラフ",
+        "gross": "総売上",
+        "refunds": "返金"
+      },
+      "splitChart": {
+        "q": "お金は実際にどこへ？",
+        "insight": "プラットフォームが総売上の {platform}% を保持し、{refunds}% を受講者に返金しました。",
+        "aria": "プラットフォーム・講師・返金の売上配分を示す円グラフ"
+      },
+      "leader": "トップ：{name}（{amount}、{orders} 件）。",
+      "topCourses": {
+        "q": "最も売上の多いコースは？",
+        "aria": "コース別売上の棒グラフ"
+      },
+      "topInstructors": {
+        "q": "最も売上に貢献している講師は？",
+        "aria": "講師別売上の棒グラフ"
+      },
+      "refundRate": {
+        "q": "返金が異常に多いコースは？",
+        "none": "この期間、注文 {min} 件以上で返金のあったコースはありません。",
+        "review": "「{name}」の品質を確認してください：{refunded}/{orders} 件が返金（{pct}%）。",
+        "ok": "警告しきい値を超えるコースはありません。",
+        "empty": "懸念のあるコースはありません。",
+        "aria": "コース別返金率の棒グラフ",
+        "series": "返金率"
+      },
+      "reasons": {
+        "q": "受講者が返金を求める理由は？",
+        "insight": "最も多い理由：{name}（{count} 件、{amount}）。",
+        "empty": "この期間の返金はありません。",
+        "aria": "理由別返金の円グラフ"
+      },
+      "sources": {
+        "q": "売上はどこから？",
+        "insight": "売上の {pct}% は講師の紹介リンク経由です。",
+        "aria": "流入元別売上の円グラフ"
+      },
+      "pipeline": {
+        "q": "講師への未払いはいくら？長く待っている申請は？",
+        "insight": "講師への未払い額：{obligations}。",
+        "receivables": " · 講師からプラットフォームへの未収金：{amount}",
+        "paid": " 期間内の支払い済み：{amount}（{count} 回）。",
+        "empty": "処理待ちの出金申請はありません。",
+        "row": "{stage}：{count} 件 · {amount}",
+        "oldest": "最古 {days} 日",
+        "late": " — 対応が必要",
+        "payosFee": "期間内の PayOS 送金手数料：{amount}（成功した支払い {orders} 件）、プラットフォーム負担。"
+      },
+      "recon": {
+        "q": "PayOS の支払いは帳簿と一致している？",
+        "match": "期間内に成功した PayOS の支払いはすべて、記録済みの返金・支払いと一致しています。",
+        "diff": "{amount} の差異：{direction}。下の差異一覧を確認してください。",
+        "payosMore": "PayOS の支払いが記録より多い",
+        "bookMore": "帳簿の記録が PayOS の支払いより多い",
+        "ok": "一致",
+        "mismatch": "差異あり",
+        "summary": "PayOS 支払い {payos}（{orders} 件）· 帳簿記録 {recorded}（{count} 件）",
+        "refund": "返金",
+        "payout": "講師への支払い"
+      },
+      "history": {
+        "title": "送信済みレポートの履歴",
+        "empty": "レポートはまだありません。定期レポートは設定に従って自動作成されます。共有ボタンの「メールで自分に送る」も使えます。",
+        "range": "{from} ～ {to}",
+        "sent": "{email} に送信済み",
+        "notSent": "メール未送信"
+      }
     }
   },
   "supportHelp": {

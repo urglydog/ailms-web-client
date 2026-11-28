@@ -3117,6 +3117,153 @@
     "common": {
       "loadError": "无法加载数据，请重试。",
       "retry": "重试"
+    },
+    "finance": {
+      "title": "财务统计",
+      "subtitle": "全平台的收入、退款、讲师结算及 PayOS 对账。",
+      "gran": {
+        "DAY": "按日",
+        "WEEK": "按周",
+        "MONTH": "按月"
+      },
+      "reportType": {
+        "DAILY": "每日",
+        "WEEKLY": "每周",
+        "MONTHLY": "每月",
+        "MANUAL": "按需"
+      },
+      "reason": {
+        "BUYER_REMORSE": "改变主意",
+        "OTHER": "其他原因",
+        "TECHNICAL_ISSUE": "技术问题",
+        "DOUBLE_CHARGE": "重复扣款",
+        "NOT_ENROLLED": "已扣款但未报名",
+        "PLATFORM_FAULT": "平台故障",
+        "COPYRIGHT_VIOLATION": "侵犯版权",
+        "CONTENT_MISMATCH": "内容与描述不符",
+        "PROHIBITED_CONTENT": "违禁内容"
+      },
+      "stage": {
+        "REQUESTED": "待审核",
+        "APPROVED": "已批准，待付款"
+      },
+      "toast": {
+        "emailed": "报告已生成并发送到您的邮箱。",
+        "noEmail": "报告已保存，但由于您的账户没有可接收邮件的地址，未能发送邮件。您仍可通过“分享”按钮下载文件。",
+        "runError": "无法生成报告，请重试。"
+      },
+      "fileName": "financial-report",
+      "export": {
+        "pdf": "下载 PDF",
+        "pdfHint": "便于打印或发送的摘要",
+        "xlsx": "下载 Excel (XLSX)",
+        "xlsxHint": "包含全部数据的多工作表文件",
+        "csv": "下载 CSV",
+        "csvHint": "可用任何软件打开的原始数据",
+        "mail": "通过邮件发给我",
+        "mailHint": "生成报告、存入历史并附上文件"
+      },
+      "filter": {
+        "from": "开始日期",
+        "to": "结束日期",
+        "group": "分组方式",
+        "last7": "7 天",
+        "last30": "30 天",
+        "thisMonth": "本月",
+        "lastMonth": "上月",
+        "autoConfig": "配置自动报告"
+      },
+      "loadError": "无法加载数据，请检查日期范围后重试。",
+      "noData": "暂无数据。",
+      "stat": {
+        "gross": "总收入",
+        "net": "净收入（扣除退款）",
+        "refunds": "退还给学员的金额",
+        "refundMeta": "{count} 笔 · 占订单 {pct}%",
+        "platform": "平台留存"
+      },
+      "split": {
+        "platform": "平台分成",
+        "instructor": "讲师分成",
+        "refunded": "已退还学员"
+      },
+      "source": {
+        "referral": "通过推荐链接",
+        "organic": "学员自行找到"
+      },
+      "trend": {
+        "q": "收入在增长还是下降？",
+        "up": "总收入较上一周期增长 {pct}%。",
+        "down": "总收入较上一周期下降 {pct}%。",
+        "empty": "本周期没有交易。",
+        "aria": "按周期显示总收入和退款的面积图",
+        "gross": "总收入",
+        "refunds": "退款"
+      },
+      "splitChart": {
+        "q": "钱最终流向了谁？",
+        "insight": "平台留存总收入的 {platform}%，退还学员 {refunds}%。",
+        "aria": "平台、讲师与退款之间收入分配的饼图"
+      },
+      "leader": "领先：{name}（{amount}，{orders} 笔订单）。",
+      "topCourses": {
+        "q": "哪些课程带来的收入最多？",
+        "aria": "按课程显示收入的柱状图"
+      },
+      "topInstructors": {
+        "q": "哪些讲师贡献的收入最多？",
+        "aria": "按讲师显示收入的柱状图"
+      },
+      "refundRate": {
+        "q": "哪些课程的退款异常多？",
+        "none": "本周期内没有订单数达 {min} 笔及以上且发生退款的课程。",
+        "review": "需检查“{name}”的质量：{refunded}/{orders} 笔订单被退款（{pct}%）。",
+        "ok": "没有课程超过警戒线。",
+        "empty": "没有需要关注的课程。",
+        "aria": "按课程显示退款率的柱状图",
+        "series": "退款率"
+      },
+      "reasons": {
+        "q": "学员为什么申请退款？",
+        "insight": "最常见：{name}（{count} 笔，{amount}）。",
+        "empty": "本周期没有退款。",
+        "aria": "按原因显示退款的饼图"
+      },
+      "sources": {
+        "q": "收入来自哪里？",
+        "insight": "{pct}% 的收入来自讲师推荐链接。",
+        "aria": "按来源显示收入的饼图"
+      },
+      "pipeline": {
+        "q": "平台还欠讲师多少？哪些申请等待已久？",
+        "insight": "尚未支付给讲师的款项：{obligations}。",
+        "receivables": " · 讲师欠平台：{amount}",
+        "paid": " 本周期已付款：{amount}（{count} 次）。",
+        "empty": "没有待处理的提现申请。",
+        "row": "{stage}：{count} 个申请 · {amount}",
+        "oldest": "最早 {days} 天",
+        "late": " — 需处理",
+        "payosFee": "本周期 PayOS 转账费用：{amount}（{orders} 笔成功付款），由平台承担。"
+      },
+      "recon": {
+        "q": "PayOS 付款与账目是否一致？",
+        "match": "本周期所有成功的 PayOS 付款都与已记录的退款和结算一致。",
+        "diff": "相差 {amount}：{direction}。请查看下方的差异列表。",
+        "payosMore": "PayOS 支付的金额多于账目记录",
+        "bookMore": "账目记录多于 PayOS 实际支付",
+        "ok": "一致",
+        "mismatch": "存在差异",
+        "summary": "PayOS 已付 {payos}（{orders} 笔）· 账目记录 {recorded}（{count} 条）",
+        "refund": "退款",
+        "payout": "讲师结算"
+      },
+      "history": {
+        "title": "已发送报告历史",
+        "empty": "暂无报告。定期报告会根据配置自动生成；您也可以在“分享”按钮中选择“通过邮件发给我”。",
+        "range": "{from} 至 {to}",
+        "sent": "已发送至 {email}",
+        "notSent": "未发送邮件"
+      }
     }
   },
   "supportHelp": {

@@ -3117,6 +3117,153 @@
     "common": {
       "loadError": "Không tải được dữ liệu. Vui lòng thử lại.",
       "retry": "Thử lại"
+    },
+    "finance": {
+      "title": "Thống kê tài chính",
+      "subtitle": "Doanh thu, hoàn tiền, chi trả giảng viên và đối soát PayOS của toàn nền tảng.",
+      "gran": {
+        "DAY": "Theo ngày",
+        "WEEK": "Theo tuần",
+        "MONTH": "Theo tháng"
+      },
+      "reportType": {
+        "DAILY": "Hằng ngày",
+        "WEEKLY": "Hằng tuần",
+        "MONTHLY": "Hằng tháng",
+        "MANUAL": "Theo yêu cầu"
+      },
+      "reason": {
+        "BUYER_REMORSE": "Đổi ý",
+        "OTHER": "Lý do khác",
+        "TECHNICAL_ISSUE": "Lỗi kỹ thuật",
+        "DOUBLE_CHARGE": "Trừ tiền hai lần",
+        "NOT_ENROLLED": "Trừ tiền nhưng chưa ghi danh",
+        "PLATFORM_FAULT": "Lỗi từ nền tảng",
+        "COPYRIGHT_VIOLATION": "Vi phạm bản quyền",
+        "CONTENT_MISMATCH": "Nội dung khác mô tả",
+        "PROHIBITED_CONTENT": "Nội dung cấm"
+      },
+      "stage": {
+        "REQUESTED": "Chờ duyệt",
+        "APPROVED": "Đã duyệt, chờ chi"
+      },
+      "toast": {
+        "emailed": "Đã tạo báo cáo và gửi đến email của bạn.",
+        "noEmail": "Đã lưu báo cáo nhưng chưa gửi được email vì tài khoản của bạn chưa có địa chỉ email nhận thư được. Bạn vẫn có thể tải file bằng nút Chia sẻ.",
+        "runError": "Không tạo được báo cáo. Vui lòng thử lại."
+      },
+      "fileName": "bao-cao-tai-chinh",
+      "export": {
+        "pdf": "Tải PDF",
+        "pdfHint": "Bản tóm tắt để in hoặc gửi",
+        "xlsx": "Tải Excel (XLSX)",
+        "xlsxHint": "Bảng tính nhiều trang, đầy đủ dữ liệu",
+        "csv": "Tải CSV",
+        "csvHint": "Dữ liệu thô, mở được bằng mọi phần mềm",
+        "mail": "Gửi cho tôi qua email",
+        "mailHint": "Tạo báo cáo, lưu vào lịch sử và gửi kèm file"
+      },
+      "filter": {
+        "from": "Từ ngày",
+        "to": "Đến ngày",
+        "group": "Gom nhóm",
+        "last7": "7 ngày",
+        "last30": "30 ngày",
+        "thisMonth": "Tháng này",
+        "lastMonth": "Tháng trước",
+        "autoConfig": "Cấu hình báo cáo tự động"
+      },
+      "loadError": "Không tải được số liệu. Vui lòng kiểm tra khoảng ngày và thử lại.",
+      "noData": "Chưa có dữ liệu.",
+      "stat": {
+        "gross": "Doanh thu gộp",
+        "net": "Doanh thu ròng (sau hoàn tiền)",
+        "refunds": "Tiền hoàn lại học viên",
+        "refundMeta": "{count} khoản · {pct}% số đơn",
+        "platform": "Phần nền tảng giữ lại"
+      },
+      "split": {
+        "platform": "Phần nền tảng",
+        "instructor": "Phần giảng viên",
+        "refunded": "Đã hoàn lại học viên"
+      },
+      "source": {
+        "referral": "Qua liên kết giới thiệu",
+        "organic": "Học viên tự tìm thấy"
+      },
+      "trend": {
+        "q": "Doanh thu đang tăng hay giảm?",
+        "up": "Doanh thu gộp tăng {pct}% so với kỳ liền trước.",
+        "down": "Doanh thu gộp giảm {pct}% so với kỳ liền trước.",
+        "empty": "Không có giao dịch trong kỳ này.",
+        "aria": "Biểu đồ vùng doanh thu gộp và tiền hoàn theo kỳ",
+        "gross": "Doanh thu gộp",
+        "refunds": "Tiền hoàn"
+      },
+      "splitChart": {
+        "q": "Tiền thực sự về ai?",
+        "insight": "Nền tảng giữ lại {platform}% doanh thu gộp, hoàn lại học viên {refunds}%.",
+        "aria": "Biểu đồ tròn phân bổ doanh thu giữa nền tảng, giảng viên và tiền hoàn"
+      },
+      "leader": "Dẫn đầu: {name} ({amount}, {orders} đơn).",
+      "topCourses": {
+        "q": "Khóa học nào mang lại nhiều doanh thu nhất?",
+        "aria": "Biểu đồ cột doanh thu theo khóa học"
+      },
+      "topInstructors": {
+        "q": "Giảng viên nào đóng góp nhiều doanh thu nhất?",
+        "aria": "Biểu đồ cột doanh thu theo giảng viên"
+      },
+      "refundRate": {
+        "q": "Khóa học nào đang bị hoàn tiền nhiều bất thường?",
+        "none": "Không có khóa nào có từ {min} đơn trở lên bị hoàn tiền trong kỳ này.",
+        "review": "Cần xem lại chất lượng \"{name}\": {refunded}/{orders} đơn bị hoàn ({pct}%).",
+        "ok": "Không khóa nào vượt ngưỡng cảnh báo.",
+        "empty": "Không có khóa học nào đáng lo ngại.",
+        "aria": "Biểu đồ cột tỷ lệ hoàn tiền theo khóa học",
+        "series": "Tỷ lệ hoàn"
+      },
+      "reasons": {
+        "q": "Học viên xin hoàn tiền vì lý do gì?",
+        "insight": "Nhiều nhất: {name} ({count} khoản, {amount}).",
+        "empty": "Không có khoản hoàn nào trong kỳ.",
+        "aria": "Biểu đồ tròn hoàn tiền theo lý do"
+      },
+      "sources": {
+        "q": "Doanh thu đến từ đâu?",
+        "insight": "{pct}% doanh thu đến từ liên kết giới thiệu của giảng viên.",
+        "aria": "Biểu đồ tròn doanh thu theo nguồn"
+      },
+      "pipeline": {
+        "q": "Nền tảng còn nợ giảng viên bao nhiêu, yêu cầu nào đang chờ lâu?",
+        "insight": "Nghĩa vụ chưa trả giảng viên: {obligations}.",
+        "receivables": " · giảng viên đang nợ nền tảng: {amount}",
+        "paid": " Đã chi trả trong kỳ: {amount} ({count} lần).",
+        "empty": "Không có yêu cầu rút tiền nào đang chờ xử lý.",
+        "row": "{stage}: {count} yêu cầu · {amount}",
+        "oldest": "Cũ nhất {days} ngày",
+        "late": " — cần xử lý",
+        "payosFee": "Chi phí chuyển tiền PayOS trong kỳ: {amount} ({orders} lệnh chi thành công), do nền tảng chịu."
+      },
+      "recon": {
+        "q": "Tiền chi qua PayOS có khớp với sổ sách không?",
+        "match": "Mọi lệnh chi PayOS thành công trong kỳ đều khớp với khoản hoàn tiền và chi trả đã ghi nhận.",
+        "diff": "Lệch {amount}: {direction}. Xem danh sách khoản lệch bên dưới.",
+        "payosMore": "PayOS đã chi nhiều hơn số đã ghi nhận",
+        "bookMore": "sổ sách ghi nhiều hơn số PayOS đã chi",
+        "ok": "Khớp",
+        "mismatch": "Có chênh lệch",
+        "summary": "PayOS đã chi {payos} ({orders} lệnh) · sổ sách ghi nhận {recorded} ({count} khoản)",
+        "refund": "Hoàn tiền",
+        "payout": "Chi trả giảng viên"
+      },
+      "history": {
+        "title": "Lịch sử báo cáo đã gửi",
+        "empty": "Chưa có báo cáo nào. Báo cáo định kỳ được tạo tự động theo cấu hình; bạn cũng có thể chọn \"Gửi cho tôi qua email\" trong nút Chia sẻ.",
+        "range": "{from} đến {to}",
+        "sent": "đã gửi {email}",
+        "notSent": "chưa gửi email"
+      }
     }
   },
   "supportHelp": {

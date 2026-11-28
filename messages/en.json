@@ -3117,6 +3117,153 @@
     "common": {
       "loadError": "Could not load data. Please try again.",
       "retry": "Retry"
+    },
+    "finance": {
+      "title": "Financial statistics",
+      "subtitle": "Platform-wide revenue, refunds, instructor payouts and PayOS reconciliation.",
+      "gran": {
+        "DAY": "By day",
+        "WEEK": "By week",
+        "MONTH": "By month"
+      },
+      "reportType": {
+        "DAILY": "Daily",
+        "WEEKLY": "Weekly",
+        "MONTHLY": "Monthly",
+        "MANUAL": "On demand"
+      },
+      "reason": {
+        "BUYER_REMORSE": "Changed mind",
+        "OTHER": "Other reason",
+        "TECHNICAL_ISSUE": "Technical issue",
+        "DOUBLE_CHARGE": "Charged twice",
+        "NOT_ENROLLED": "Charged but not enrolled",
+        "PLATFORM_FAULT": "Platform fault",
+        "COPYRIGHT_VIOLATION": "Copyright violation",
+        "CONTENT_MISMATCH": "Content not as described",
+        "PROHIBITED_CONTENT": "Prohibited content"
+      },
+      "stage": {
+        "REQUESTED": "Awaiting approval",
+        "APPROVED": "Approved, awaiting payment"
+      },
+      "toast": {
+        "emailed": "The report was created and sent to your email.",
+        "noEmail": "The report was saved but could not be emailed because your account has no deliverable email address. You can still download the file from the Share button.",
+        "runError": "Could not create the report. Please try again."
+      },
+      "fileName": "financial-report",
+      "export": {
+        "pdf": "Download PDF",
+        "pdfHint": "Summary for printing or sending",
+        "xlsx": "Download Excel (XLSX)",
+        "xlsxHint": "Multi-sheet workbook with all the data",
+        "csv": "Download CSV",
+        "csvHint": "Raw data that opens in any software",
+        "mail": "Email it to me",
+        "mailHint": "Create the report, save it to history and attach the file"
+      },
+      "filter": {
+        "from": "From",
+        "to": "To",
+        "group": "Group by",
+        "last7": "7 days",
+        "last30": "30 days",
+        "thisMonth": "This month",
+        "lastMonth": "Last month",
+        "autoConfig": "Configure automatic reports"
+      },
+      "loadError": "Could not load the figures. Please check the date range and try again.",
+      "noData": "No data yet.",
+      "stat": {
+        "gross": "Gross revenue",
+        "net": "Net revenue (after refunds)",
+        "refunds": "Refunded to students",
+        "refundMeta": "{count} refunds · {pct}% of orders",
+        "platform": "Platform share kept"
+      },
+      "split": {
+        "platform": "Platform share",
+        "instructor": "Instructor share",
+        "refunded": "Refunded to students"
+      },
+      "source": {
+        "referral": "Via referral link",
+        "organic": "Found by students"
+      },
+      "trend": {
+        "q": "Is revenue going up or down?",
+        "up": "Gross revenue is up {pct}% on the previous period.",
+        "down": "Gross revenue is down {pct}% on the previous period.",
+        "empty": "No transactions in this period.",
+        "aria": "Area chart of gross revenue and refunds by period",
+        "gross": "Gross revenue",
+        "refunds": "Refunds"
+      },
+      "splitChart": {
+        "q": "Where does the money actually go?",
+        "insight": "The platform keeps {platform}% of gross revenue; {refunds}% is refunded to students.",
+        "aria": "Pie chart of revenue split between platform, instructors and refunds"
+      },
+      "leader": "Top: {name} ({amount}, {orders} orders).",
+      "topCourses": {
+        "q": "Which courses bring in the most revenue?",
+        "aria": "Bar chart of revenue by course"
+      },
+      "topInstructors": {
+        "q": "Which instructors contribute the most revenue?",
+        "aria": "Bar chart of revenue by instructor"
+      },
+      "refundRate": {
+        "q": "Which courses have unusually many refunds?",
+        "none": "No course with {min} or more orders had refunds in this period.",
+        "review": "Review the quality of \"{name}\": {refunded}/{orders} orders refunded ({pct}%).",
+        "ok": "No course is above the warning threshold.",
+        "empty": "No courses of concern.",
+        "aria": "Bar chart of refund rate by course",
+        "series": "Refund rate"
+      },
+      "reasons": {
+        "q": "Why do students ask for refunds?",
+        "insight": "Most common: {name} ({count} refunds, {amount}).",
+        "empty": "No refunds in this period.",
+        "aria": "Pie chart of refunds by reason"
+      },
+      "sources": {
+        "q": "Where does revenue come from?",
+        "insight": "{pct}% of revenue comes from instructor referral links.",
+        "aria": "Pie chart of revenue by source"
+      },
+      "pipeline": {
+        "q": "How much is owed to instructors, and which requests are waiting long?",
+        "insight": "Unpaid instructor obligations: {obligations}.",
+        "receivables": " · instructors owe the platform: {amount}",
+        "paid": " Paid out this period: {amount} ({count} payouts).",
+        "empty": "No withdrawal requests are waiting.",
+        "row": "{stage}: {count} requests · {amount}",
+        "oldest": "Oldest {days} days",
+        "late": " — needs action",
+        "payosFee": "PayOS transfer fees this period: {amount} ({orders} successful payouts), borne by the platform."
+      },
+      "recon": {
+        "q": "Do PayOS payouts match the books?",
+        "match": "Every successful PayOS payout this period matches a recorded refund or payout.",
+        "diff": "Off by {amount}: {direction}. See the mismatches below.",
+        "payosMore": "PayOS paid out more than was recorded",
+        "bookMore": "the books record more than PayOS paid out",
+        "ok": "Matched",
+        "mismatch": "Mismatch",
+        "summary": "PayOS paid {payos} ({orders} orders) · books recorded {recorded} ({count} entries)",
+        "refund": "Refund",
+        "payout": "Instructor payout"
+      },
+      "history": {
+        "title": "Sent report history",
+        "empty": "No reports yet. Scheduled reports are created automatically from the settings; you can also choose \"Email it to me\" in the Share button.",
+        "range": "{from} to {to}",
+        "sent": "sent to {email}",
+        "notSent": "not emailed"
+      }
     }
   },
   "supportHelp": {
