@@ -4,9 +4,10 @@ import { renderWithIntl } from '@/test/renderWithIntl';
 import { MyLearningTabs } from './MyLearningTabs';
 
 describe('MyLearningTabs', () => {
-  it('có tiêu đề Khóa học của tôi và hai tab dẫn đúng trang', () => {
+  it('có tiêu đề Học tập và ba tab dẫn đúng trang', () => {
     renderWithIntl(<MyLearningTabs active="courses" />);
-    expect(screen.getByRole('heading', { level: 1, name: 'Khóa học của tôi' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: 'Học tập' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Chứng chỉ' })).toHaveAttribute('href', '/certificates');
     expect(screen.getByRole('link', { name: 'Tất cả khóa học' })).toHaveAttribute('href', '/my-courses');
     expect(screen.getByRole('link', { name: 'Yêu thích' })).toHaveAttribute('href', '/wishlist');
   });

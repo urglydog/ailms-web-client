@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Gift, Lightbulb, Trash2 } from 'lucide-react';
+import { Gift, Heart, Lightbulb, Trash2 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { CheckoutSteps } from '@/components/checkout/CheckoutSteps';
@@ -14,6 +14,7 @@ import { ShopEmptyState } from '@/components/checkout/ShopEmptyState';
 import { StarRating } from '@/components/ui/StarRating';
 import { useAddToCart, useCart, useRemoveFromCart } from '@/hooks/useCart';
 import { useCartBundleMatches } from '@/hooks/useCartBundleMatches';
+import { useAddToWishlist } from '@/hooks/useWishlist';
 import { couponsApi } from '@/lib/api/coupons';
 import { ApiError } from '@/lib/api/client';
 import { formatMoney } from '@/lib/shop/money';
@@ -44,6 +45,7 @@ export default function CartPage() {
   const { data: cartItems, isLoading } = useCart();
   const removeFromCart = useRemoveFromCart();
   const addToCart = useAddToCart();
+  const addToWishlist = useAddToWishlist();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   const [uncheckedIds, setUncheckedIds] = useState<Set<number>>(new Set());
@@ -95,6 +97,16 @@ export default function CartPage() {
   // dòng bấm "Xoá" lần lượt. Gọi song song vì mỗi khóa là 1 bản ghi độc lập trong `cart_items`.
   const handleRemoveSelected = () => {
     selectedItems.forEach((item) => removeFromCart.mutate(item.courseId));
+  };
+
+  // "Chuyển vào yêu thích" (26/11/2026): thêm vào wishlist xong mới bỏ khỏi giỏ — lỗi thì giữ nguyên giỏ.
+  const moveToWishlist = (courseId: number) => {
+    addToWishlist.mutate(courseId, {
+      onSuccess: () => {
+        removeFromCart.mutate(courseId);
+        toast.success(t('cart.movedToWishlist'));
+      },
+    });
   };
 
   const handleApplyCoupon = async () => {
@@ -216,14 +228,27 @@ export default function CartPage() {
                     ) : (
                       <span className="font-display text-[15px] font-bold text-ink">{formatMoney(item.price, locale)}</span>
                     )}
-                    <button
-                      type="button"
-                      onClick={() => removeFromCart.mutate(item.courseId)}
-                      className="inline-flex items-center gap-1 min-h-8 rounded-full border border-danger/30 bg-surface-raised px-3 py-1 text-xs font-semibold text-danger hover:bg-danger/5"
-                    >
-                      <Trash2 size={12} aria-hidden />
-                      {t('cart.remove')}
-                    </button>
+                    {/* Hành động dạng liên kết chữ (UDEMY_LAYOUT_ANALYSIS mục 10): Xoá · Chuyển vào yêu thích. */}
+                    <div className="flex items-center gap-1.5 text-xs">
+                      <button
+                        type="button"
+                        onClick={() => removeFromCart.mutate(item.courseId)}
+                        className="inline-flex min-h-8 items-center gap-1 font-semibold text-danger hover:underline"
+                      >
+                        <Trash2 size={12} aria-hidden />
+                        {t('cart.remove')}
+                      </button>
+                      <span aria-hidden className="text-ink-faint">·</span>
+                      <button
+                        type="button"
+                        onClick={() => moveToWishlist(item.courseId)}
+                        disabled={addToWishlist.isPending}
+                        className="inline-flex min-h-8 items-center gap-1 font-semibold text-accent-dark hover:underline disabled:opacity-50"
+                      >
+                        <Heart size={12} aria-hidden />
+                        {t('cart.moveToWishlist')}
+                      </button>
+                    </div>
                   </div>
                 </div>
               );
@@ -260,7 +285,7 @@ export default function CartPage() {
             ))}
           </div>
 
-          <div className="card sticky top-24 h-fit p-5">
+          <div className="card h-fit p-5 lg:sticky lg:top-24">
             <h2 className="mb-4 font-display text-base font-bold text-ink">{t('summary.title')}</h2>
             <OrderTotals
               count={selectedItems.length}
@@ -268,6 +293,17 @@ export default function CartPage() {
               original={totalOriginal}
               total={total}
             />
+            {totalOriginal > total && totalOriginal > 0 && (
+              <p className="m-0 mt-2 flex items-baseline justify-end gap-2 text-sm">
+                <span className="text-ink-faint line-through">
+                  <span className="sr-only">{t('cart.originalPrice')} </span>
+                  {formatMoney(totalOriginal, locale)}
+                </span>
+                <span className="font-semibold text-danger">
+                  {t('cart.percentOff', { percent: Math.round(((totalOriginal - total) / totalOriginal) * 100) })}
+                </span>
+              </p>
+            )}
             <button
               type="button"
               onClick={handleCheckout}

@@ -70,9 +70,20 @@ export function EditCourseLayout({ courseId, children }: { courseId: number; chi
         onPreviewInstructor={() => firstLessonId && window.open(`/learn/${firstLessonId}`, '_blank', 'noopener,noreferrer')}
         onPreviewLearner={() => window.open(`/courses/${course.slug}`, '_blank', 'noopener,noreferrer')}
       />
-      <EditTabs courseId={courseId} pathname={pathname} settingsOpen={showSettings} />
+      <div className="flex flex-1 flex-col lg:flex-row">
+      <EditTabs
+        courseId={courseId}
+        pathname={pathname}
+        settingsOpen={showSettings}
+        course={course}
+        submit={
+          course.status === 'DRAFT' || course.status === 'REJECTED'
+            ? { onSubmit: () => submitCourse.mutate(), canSubmit: course.canSubmit, submitting: submitCourse.isPending }
+            : undefined
+        }
+      />
 
-      <main id="main-content" tabIndex={-1} className="mx-auto flex w-full max-w-[1400px] flex-1 flex-col gap-5 px-4 py-6 sm:px-8 sm:py-7">
+      <main id="main-content" tabIndex={-1} className="mx-auto flex w-full min-w-0 max-w-[1400px] flex-1 flex-col gap-5 px-4 py-6 sm:px-8 sm:py-7">
         {!showSettings && course.status === 'REJECTED' && course.rejectReason && (
           <div role="alert" className="rounded-xl border border-danger/40 bg-surface-raised p-4 text-[13px] text-danger">
             <span className="font-bold">{t('banners.rejected')} </span>
@@ -142,6 +153,7 @@ export function EditCourseLayout({ courseId, children }: { courseId: number; chi
           <div className={isLocked ? 'pointer-events-none opacity-70' : ''}>{children}</div>
         )}
       </main>
+      </div>
 
       {confirmArchive && (
         <ConfirmModal

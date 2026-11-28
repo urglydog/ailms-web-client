@@ -30,7 +30,7 @@ export default function InstructorAnnouncementsPage() {
         <h1 className="m-0 font-display text-[20px] font-bold text-ink">{t('announcements.title')}</h1>
         <div className="flex flex-wrap items-center gap-2">
           <ListSearch label="Tìm thông báo" value={list.query} onChange={list.setQuery} placeholder="Tiêu đề, nội dung hoặc tên khóa học..." />
-          <CourseFilterDropdown courses={courses ?? []} value={filterCourseId} onChange={setFilterCourseId} />
+          <CourseFilterDropdown align="right" courses={courses ?? []} value={filterCourseId} onChange={setFilterCourseId} />
         </div>
       </div>
 

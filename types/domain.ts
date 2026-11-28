@@ -153,6 +153,12 @@ export interface CourseDetail extends CourseSummary {
   /** "Đăng ký (Quyền riêng tư)" kiểu Udemy (19/09/2026) — true khi cần nhập đúng mật khẩu mới
    * ghi danh được (chế độ PRIVATE_PASSWORD). Không ảnh hưởng việc XEM trang chi tiết. */
   requiresPassword: boolean;
+  /** "Bạn sẽ học được gì" / "Yêu cầu" / "Đối tượng" (26/11/2026) — có thể thiếu ở BE bản cũ. */
+  learningOutcomes?: string[];
+  requirements?: string[];
+  targetAudience?: string[];
+  /** Hết hạn ưu đãi tự động đang áp (26/11/2026) — null khi không có, FE hiện đếm ngược. */
+  discountEndsAt?: string | null;
 }
 
 export interface Chapter {
@@ -252,6 +258,8 @@ export interface PlayerLesson {
   chapters: ChapterNav[];
   /** Phụ đề ngôn ngữ GỐC — rỗng nếu bài học chưa từng lồng tiếng lần nào. */
   originalSubtitles: SubtitleSegment[];
+  /** (27/11/2026) Giảng viên sở hữu khoá đang xem như học viên — bỏ qua API chỉ dành cho học viên (bảng điểm). */
+  viewerIsOwner?: boolean;
 }
 
 export interface ChapterNav {
@@ -464,11 +472,24 @@ export interface CourseEditDetail {
   chapters: ChapterEditItem[];
   missingConditions: string[];
   canSubmit: boolean;
+  /** % hoàn thiện nội dung do máy chủ tính — CÙNG nguồn với `completionPercent` ở danh sách khoá (27/11/2026). */
+  completionPercent?: number;
   visibility: CourseVisibility;
   hasEnrollPassword: boolean;
   /** Chia doanh thu 2 mức (20/09/2026) — dựng liên kết giới thiệu `/courses/{slug}?ref=
    * {referralCode}`. Chỉ trả về ở đây (CHÍNH chủ khóa học), không lộ qua API công khai. */
   referralCode: string;
+  /** Mục tiêu khoá học (26/11/2026) — rỗng khi chưa điền (BE bản cũ có thể không trả). */
+  learningOutcomes?: string[];
+  requirements?: string[];
+  targetAudience?: string[];
+}
+
+/** Mục tiêu khoá học (26/11/2026) — mỗi danh sách ≤ 10 mục, mỗi mục ≤ 160 ký tự. */
+export interface CourseGoalsInput {
+  learningOutcomes: string[];
+  requirements: string[];
+  targetAudience: string[];
 }
 
 export interface CreateChapterInput {
@@ -608,6 +629,9 @@ export interface EnrolledCourse {
   resumeLessonId?: number | null;
   /** Vị trí (giây) mở `resumeLessonId`; trình phát tự khôi phục từ tiến độ đã lưu nên FE chỉ cần id bài. */
   resumePositionSec?: number | null;
+  /** Tên + thời lượng (giây) bài `resumeLessonId` — hàng thẻ "Tiếp tục học" trang chủ (26/11/2026). */
+  resumeLessonTitle?: string | null;
+  resumeLessonDurationSec?: number | null;
 }
 
 // ── F6.2: Tiến độ học tập (UC21, UC22) ───────────────────────────

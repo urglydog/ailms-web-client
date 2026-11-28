@@ -74,9 +74,19 @@
       "categories": "カテゴリ",
       "more": "その他",
       "liveNow": "配信中",
-      "groups": { "it": "情報技術", "soft": "ソフトスキル", "other": "その他の分野" }
+      "groups": {
+        "it": "情報技術",
+        "soft": "ソフトスキル",
+        "other": "その他の分野"
+      }
     },
-    "theme": { "toDark": "ダークモードに切り替え", "toLight": "ライトモードに切り替え", "label": "表示", "dark": "ダーク", "light": "ライト" },
+    "theme": {
+      "toDark": "ダークモードに切り替え",
+      "toLight": "ライトモードに切り替え",
+      "label": "表示",
+      "dark": "ダーク",
+      "light": "ライト"
+    },
     "skipToContent": "本文へスキップ",
     "help": "Help & Support"
   },
@@ -112,7 +122,7 @@
   "home": {
     "hero": {
       "tag": "新機能 · AI吹き替え",
-      "titleBefore": "すべての講座を",
+      "titleBefore": "どんな講座も",
       "titleHighlight": "あなたの言語で",
       "description": "AIが海外の講座を選んだ言語に吹き替え、元の映像と同期。字幕は不要です。",
       "cta": "講座を探す",
@@ -186,7 +196,10 @@
       "empty": "このカテゴリにはまだ講座がありません。"
     },
     "shelves": {
-      "featured": { "title": "Recommended", "subtitle": "Courses recommended for you by LinguaLearn." },
+      "featured": {
+        "title": "Recommended",
+        "subtitle": "Courses recommended for you by LinguaLearn."
+      },
       "newest": {
         "title": "新着講座",
         "subtitle": "LinguaLearn に追加されたばかりの講座"
@@ -201,18 +214,54 @@
       },
       "byCategory": {
         "subtitle": "{name}の人気コース"
-      }
+      },
+      "prev": "前へ",
+      "next": "次へ"
     },
     "topics": {
       "title": "テーマから探す",
       "subtitle": "学びたい分野を選びましょう"
+    },
+    "continue": {
+      "title": "学習を続ける",
+      "all": "マイラーニング",
+      "streak": "{count}日連続",
+      "studiedToday": "今日も学習済み — その調子！",
+      "notStudiedToday": "今日1レッスン学んで連続記録を維持",
+      "becauseViewed": "「{title}」を見たあなたへ",
+      "resumeFallback": "途中のレッスンを再開",
+      "lessonMeta": "レクチャー · {minutes}分",
+      "lessonLabel": "レクチャー",
+      "progress": "コース {pct}%"
+    },
+    "ai": {
+      "title": "AIと一緒に、自分のペースで",
+      "subtitle": "LinguaLearnのすべてのコースに3つのAIツールが付いています。",
+      "dubbing": {
+        "title": "AI吹き替え",
+        "body": "選んだ言語で講義を聞けます。元の動画と同期します。"
+      },
+      "tutor": {
+        "title": "AIチューター",
+        "body": "分からない時にすぐ質問。チューターが考え方を導き、該当箇所へ移動します。"
+      },
+      "plan": {
+        "title": "AI学習プラン",
+        "body": "あなたの時間と進捗に合わせた個別プラン。"
+      },
+      "cta": "コースを探す"
+    },
+    "categoryBar": {
+      "label": "コースカテゴリ"
     }
   },
   "myCourses": {
     "title": "マイコース",
     "tabs": {
       "all": "すべての講座",
-      "wishlist": "お気に入り"
+      "wishlist": "お気に入り",
+      "certificates": "修了証",
+      "ariaLabel": "学習セクション"
     },
     "count": "{count} 講座",
     "loading": "読み込み中…",
@@ -278,11 +327,22 @@
     "suggestions": {
       "title": "次のおすすめ",
       "trending": "人気の講座"
+    },
+    "hubTitle": "マイラーニング",
+    "certificates": {
+      "subtitle": "コースを 100% 修了すると修了証が自動で発行されます。",
+      "loading": "読み込み中...",
+      "empty": "まだ修了証はありません。コースを 100% 修了して最初の修了証を手に入れましょう！",
+      "issuedOn": "{date} 発行"
     }
   },
   "learn": {
     "header": {
-      "back": "マイコース"
+      "back": "マイコース",
+      "browse": "コース一覧",
+      "help": "ヘルプ",
+      "menu": "レッスンメニューを開く",
+      "progress": "あなたの進捗"
     },
     "dubbing": {
       "groupAria": "AI吹き替えの音声を選ぶ",
@@ -297,7 +357,8 @@
       "processing": "作成中 {percent}%",
       "create": "音声を作成",
       "sourceTag": "原語",
-      "sourceTitle": "この講義はすでに選んだ言語です"
+      "sourceTitle": "この講義はすでに選んだ言語です",
+      "voice": "音声"
     },
     "tabs": {
       "overview": "概要",
@@ -305,7 +366,12 @@
       "qna": "質問",
       "materials": "教材",
       "gradebook": "成績表",
-      "reviews": "レビュー"
+      "reviews": "レビュー",
+      "transcript": "文字起こし",
+      "lessons": "レクチャー",
+      "tutor": "AIチューター",
+      "ariaLabel": "レッスン内容",
+      "notes": "メモ"
     },
     "materials": {
       "courseResources": "講座リソース"
@@ -320,7 +386,51 @@
       "current": "学習中",
       "notStarted": "未学習",
       "hasAttachments": "添付資料あり",
-      "signInPrompt": "ログインすると全カリキュラムと学習の進捗を確認できます。"
+      "signInPrompt": "ログインすると全カリキュラムと学習の進捗を確認できます。",
+      "lectures": "レクチャー",
+      "chapterStats": "{done}/{total} · {duration}",
+      "locked": "ロック中 — 受講登録で解除",
+      "expandChapter": "セクションの開閉"
+    },
+    "theatre": {
+      "on": "シアターモード",
+      "off": "シアターモードを終了"
+    },
+    "qnaBanner": {
+      "text": "まず AI チューターに聞けばすぐに答えが得られます",
+      "cta": "AI チューターに聞く"
+    },
+    "notes": {
+      "createAt": "{time} にメモを作成",
+      "newAt": "{time} の新しいメモ",
+      "save": "メモを保存",
+      "cancel": "キャンセル",
+      "filter": "表示",
+      "scopeLesson": "現在のレッスン",
+      "scopeCourse": "コース内のすべてのレッスン",
+      "loading": "メモを読み込み中…",
+      "errorLoad": "メモを読み込めませんでした。",
+      "errorSave": "メモを保存できませんでした。もう一度お試しください。",
+      "errorDelete": "メモを削除できませんでした。もう一度お試しください。",
+      "empty": "まだメモはありません。上の欄から、今見ている時点の要点を記録しましょう。",
+      "seekTo": "{time} に移動",
+      "edit": "メモを編集",
+      "editLabel": "メモの内容",
+      "delete": "メモを削除",
+      "confirmDelete": "このメモを削除しますか？"
+    },
+    "tutorSuggest": {
+      "title": "おすすめの質問",
+      "popular": "他の受講者も質問しています",
+      "disclaimer": "AI は間違えることがあります。レッスン内容で確認してください。",
+      "templates": {
+        "summary": "レッスン {lesson} を要約して",
+        "quiz": "{lesson} について 3 問クイズを出して",
+        "hardest": "{lesson} で一番難しい概念を説明して",
+        "relation": "このレッスンは {previous} とどう関係しますか？",
+        "chapter": "章 {chapter} の要点は何ですか？"
+      },
+      "aiGenerated": "レッスン内容からAIが生成"
     }
   },
   "profile": {
@@ -404,7 +514,11 @@
       "title": "講座の内容",
       "summary": "{chapters} 章 · {lessons} レッスン",
       "lessons": "{count} レッスン",
-      "preview": "試聴"
+      "preview": "試聴",
+      "expandAll": "すべて展開",
+      "collapseAll": "すべて折りたたむ",
+      "previewLink": "プレビュー",
+      "totalSummary": "{chapters} セクション · {lessons} レクチャー · 合計 {duration}"
     },
     "reviews": "受講生のレビュー",
     "price": {
@@ -435,11 +549,59 @@
       "wishlistRemove": "お気に入りから削除",
       "toastSuccess": "登録しました！",
       "toastError": "エラーが発生しました"
+    },
+    "time": {
+      "hour": "時間",
+      "minute": "分"
+    },
+    "includesTitle": "このコースに含まれるもの",
+    "description": {
+      "title": "説明",
+      "showMore": "もっと見る",
+      "showLess": "閉じる"
+    },
+    "instructorBlock": {
+      "title": "講師",
+      "stats": "★ {rating} · 受講者 {learners} 人"
+    },
+    "coupon": {
+      "note": "クーポンをお持ちですか？",
+      "link": "お支払い時に適用"
+    },
+    "goals": {
+      "outcomesTitle": "学習内容",
+      "requirementsTitle": "前提条件",
+      "audienceTitle": "このコースの対象者"
+    },
+    "promo": {
+      "endsIn": "セール終了まで",
+      "days": "{d}日{h}時間"
+    },
+    "shareGift": {
+      "share": "共有",
+      "gift": "コースをギフト",
+      "soon": "近日公開",
+      "copied": "コースのリンクをコピーしました",
+      "copyFailed": "リンクをコピーできませんでした"
+    },
+    "owner": {
+      "note": "これはあなたのコースです。",
+      "edit": "コースを編集",
+      "learn": "受講者として開く"
     }
   },
   "courseList": {
-    "loadMore": { "button": "もっと見る", "loading": "講座を読み込み中…", "end": "該当する講座はすべて表示しました。" },
-    "pagination": { "nav": "ページ送り", "prev": "前のページ", "next": "次のページ", "page": "{page} ページ" },
+    "loadMore": {
+      "button": "もっと見る",
+      "loading": "講座を読み込み中…",
+      "end": "該当する講座はすべて表示しました。"
+    },
+    "pagination": {
+      "nav": "ページ送り",
+      "prev": "前のページ",
+      "next": "次のページ",
+      "page": "{page} ページ"
+    },
     "title": "講座一覧",
     "subtitle": "すべての講座を、選んだ言語に吹き替えできます。",
     "all": "すべて",
@@ -495,8 +657,12 @@
       "free": "無料",
       "paid": "有料",
       "showMore": "もっと見る（{count}）",
-      "showLess": "閉じる"
-    }
+      "showLess": "閉じる",
+      "all": "すべてのフィルター",
+      "done": "結果を表示"
+    },
+    "resultsFor": "「{q}」の検索結果 {count} 件",
+    "resultsCount": "{count} コース"
   },
   "shop": {
     "steps": {
@@ -559,7 +725,11 @@
       "bundleSuggest": "<b>{title}</b>（+{price}）を追加すると、「{bundle}」セットで <b>{percent}%</b> 割引になります",
       "addToCart": "カートに追加",
       "emptyTitle": "カートは空です。",
-      "emptyCta": "講座を探す"
+      "emptyCta": "講座を探す",
+      "moveToWishlist": "ウィッシュリストに移動",
+      "movedToWishlist": "ウィッシュリストに移動しました",
+      "originalPrice": "元の価格",
+      "percentOff": "{percent}% オフ"
     },
     "checkout": {
       "titleOne": "講座のお支払い",
@@ -813,8 +983,9 @@
       "back": "講座一覧に戻る",
       "tabsAria": "講座編集のセクション",
       "groups": {
-        "content": "講座の内容",
-        "publish": "公開"
+        "content": "コンテンツを作成",
+        "publish": "コースを公開",
+        "plan": "コースを計画"
       },
       "tabs": {
         "curriculum": "カリキュラム",
@@ -823,7 +994,8 @@
         "proctoring": "試験の監督",
         "basics": "基本情報",
         "pricing": "価格",
-        "promotions": "プロモーション"
+        "promotions": "プロモーション",
+        "goals": "対象受講者"
       },
       "completion": {
         "label": "{percent}% 完了",
@@ -865,6 +1037,37 @@
         "archiveConfirm": "削除",
         "cancel": "キャンセル",
         "coInstructor": "共同講師の管理は開発中で、今後のアップデートで追加されます。"
+      },
+      "stepDone": "完了",
+      "checklist": {
+        "submitting": "送信中..."
+      },
+      "goals": {
+        "title": "対象受講者",
+        "intro": "これらの説明はコース紹介ページに表示され、受講者が自分に合うか判断する助けになります。",
+        "learningOutcomes": {
+          "label": "受講者は何を学べますか？",
+          "hint": "{min} 項目以上、各 {max} 文字以内をおすすめします。",
+          "placeholder": "例：日常の基本的な会話ができる"
+        },
+        "requirements": {
+          "label": "受講の前提条件",
+          "hint": "必要なスキル・ツール・知識。不要な場合もその旨を書くと初心者が安心します。",
+          "placeholder": "例：予備知識は不要"
+        },
+        "targetAudience": {
+          "label": "このコースの対象者",
+          "hint": "最も役立つ受講者像を説明してください。",
+          "placeholder": "例：旅行の準備をする初心者"
+        },
+        "itemLabel": "{section} — {n} 項目目",
+        "remove": "{n} 項目目を削除",
+        "add": "項目を追加",
+        "recommendMin": "現在 {count}/{min} 項目 — {min} 項目まで追加しましょう。",
+        "save": "保存",
+        "saving": "保存中...",
+        "saved": "コース目標を保存しました",
+        "saveFailed": "保存できませんでした。もう一度お試しください。"
       }
     },
     "performance": {
@@ -894,12 +1097,22 @@
           "revenue": "実収益（30 日間）",
           "enrollments": "新規登録",
           "rating": "平均評価",
-          "hardQuestions": "難問"
+          "hardQuestions": "難問",
+          "revenueRange": "純収益（{range}）",
+          "sales": "購入数（選択したコース）"
         },
         "chart": {
           "title": "日別の実収益（過去 30 日間）",
           "aria": "日別収益の棒グラフ。30 日間の合計 {total}、最も多い日 {peak}",
-          "empty": "過去 30 日間の収益はありません。"
+          "empty": "過去 30 日間の収益はありません。",
+          "titleRange": "純収益 — {range}",
+          "ariaRange": "収益の棒グラフ（{range}）。合計 {total}、最も高い棒 {peak}",
+          "emptyRange": {
+            "7d": "過去 7 日間の収益はありません。",
+            "30d": "過去 30 日間の収益はありません。",
+            "12m": "過去 12 か月の収益はありません。",
+            "all": "まだ収益はありません。"
+          }
         },
         "growth": {
           "start": "今期から収益が発生しました",
@@ -909,7 +1122,15 @@
           "down": "収益は前期より {percent}% 減少"
         },
         "hard": "{count} 問が受講生の 60% 超に間違えられています。関連する内容を見直しましょう。",
-        "lowRating": "{student} さんから「{course}」に新しい {rating}★ のレビューがあります。早めに返信しましょう。"
+        "lowRating": "{student} さんから「{course}」に新しい {rating}★ のレビューがあります。早めに返信しましょう。",
+        "exportCsv": "CSV をエクスポート",
+        "csv": {
+          "date": "日付",
+          "course": "コース",
+          "amount": "金額",
+          "earning": "純収益",
+          "coupon": "クーポン"
+        }
       }
     },
     "refunds": {
@@ -987,7 +1208,8 @@
         "qa": "Q&A",
         "messages": "メッセージ",
         "assignments": "課題",
-        "announcements": "お知らせ"
+        "announcements": "お知らせ",
+        "insights": "AIインサイト"
       }
     },
     "tools": {
@@ -1007,7 +1229,10 @@
           "title": "講座セット",
           "description": "複数の講座をお得な割引つきのセットにして、まとめて購入してもらえます。"
         },
-        "share": { "title": "Share & Promote", "description": "Get your own referral link for each course, share it on social media and see the orders that came through your links." }
+        "share": {
+          "title": "Share & Promote",
+          "description": "Get your own referral link for each course, share it on social media and see the orders that came through your links."
+        }
       }
     },
     "live": {
@@ -1207,7 +1432,22 @@
         "youAnswered": "回答済み",
         "instructorTag": "（講師）",
         "placeholder": "受講生に返信...",
-        "send": "送信"
+        "send": "送信",
+        "filtersAria": "質問を絞り込む",
+        "filter": {
+          "all": "すべて",
+          "unanswered": "未回答",
+          "noInstructor": "講師が未回答",
+          "unread": "未読",
+          "noBest": "ベストアンサーなし"
+        },
+        "mostReplies": "回答が多い順",
+        "unreadDot": "未読",
+        "best": "ベストアンサー",
+        "hasBest": "ベストアンサーあり",
+        "markBest": "ベストアンサーに選ぶ",
+        "unmarkBest": "ベストアンサーを解除",
+        "markUnread": "未読にする"
       },
       "assignments": {
         "title": "課題",
@@ -1254,6 +1494,43 @@
         "search": "講座を検索...",
         "notFound": "講座が見つかりません。"
       }
+    },
+    "insights": {
+      "title": "AIチューターのインサイト",
+      "subtitle": "受講者がAIチューターに何を質問しているか（集計データのみ。氏名や個別の質問は表示しません）。",
+      "noCourses": "公開済みのコースはまだありません。受講者が学習してAIチューターに質問するとインサイトが表示されます。",
+      "loadError": "インサイトを読み込めませんでした。もう一度お試しください。",
+      "lessonFilter": "レッスンで絞り込み",
+      "allLessons": "すべてのレッスン",
+      "noQuestions": "過去{days}日間、AIチューターへの質問はありません。",
+      "lessonsTitle": "レッスン別のよくある話題",
+      "noLessonQuestions": "このレッスンにはまだ質問がありません。",
+      "unusual": "質問が異常に多い",
+      "lessonCounts": "質問{questions}件 · 受講者{learners}人",
+      "topicsAria": "{lesson}のよくある話題",
+      "learners": "受講者{count}人",
+      "noTopics": "2人以上が質問した話題はまだありません。",
+      "poorCount": "十分に回答できなかった質問 {count}件",
+      "poorTitle": "チューターの回答が不十分",
+      "poorHint": "受講者が何度も質問した、またはチューターがレッスンに含まれないと回答した話題です。",
+      "noPoor": "該当する話題はまだありません。",
+      "reasonRepeat": "繰り返し質問",
+      "reasonNotCovered": "レッスン外の内容",
+      "statQuestions": "質問数（{days}日）",
+      "statLearners": "質問した受講者",
+      "statUnusual": "要確認のレッスン",
+      "summaryTitle": "AIによる要約と提案",
+      "generate": "要約を作成",
+      "refresh": "更新",
+      "summaryPending": "AIが要約を作成しています。少々お待ちください…",
+      "summaryFailed": "要約を作成できませんでした。数分後にもう一度お試しください。",
+      "summaryNone": "まだ要約がありません。毎日自動で作成されます。「要約を作成」を押すこともできます。",
+      "summaryNoData": "受講者がAIチューターに質問し始めると要約が表示されます。",
+      "actionsTitle": "おすすめのアクション",
+      "generatedAt": "{time} 更新",
+      "privacy": "話題は2人以上が質問した場合のみ表示され、ラベルは共通キーワードで質問の原文ではありません。",
+      "retry": "再試行",
+      "retryAfter": "{time} に再試行できます（10分に1回まで）。"
     }
   },
   "coupons": {
@@ -3300,5 +3577,29 @@
     "requestThis": "Didn't solve it? Send a request",
     "otherInGroup": "Something else in this topic",
     "otherLabel": "Other issue"
+  },
+  "courseCard": {
+    "aiDub": "AI吹き替え",
+    "instructor": "講師 {name}",
+    "free": "無料",
+    "owned": "購入済み",
+    "viewCertificate": "修了証を見る",
+    "addToCart": "カートに追加",
+    "adding": "追加中...",
+    "goToCart": "カートへ進む",
+    "wishlistAdd": "お気に入りに追加",
+    "wishlistRemove": "お気に入りから削除",
+    "coverPlaceholder": "コース画像",
+    "originalPrice": "通常価格",
+    "level": {
+      "BEGINNER": "初級",
+      "INTERMEDIATE": "中級",
+      "ADVANCED": "上級"
+    }
+  },
+  "common": {
+    "layout": {
+      "viewAll": "すべて表示"
+    }
   }
 }

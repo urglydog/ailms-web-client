@@ -14,23 +14,41 @@ vi.mock('@/components/course/CourseCard', () => ({
 const COURSES = [1, 2, 3, 4, 5, 6].map((id) => makeCourse(id));
 
 describe('CourseShelf', () => {
-  it('hiện tiêu đề, mô tả ngắn và liên kết Xem tất cả', () => {
+  it('kệ ngắn (không cần cuộn) hiện tiêu đề, mô tả ngắn và liên kết Xem tất cả', () => {
     renderWithIntl(
-      <CourseShelf title="Mới ra mắt" subtitle="Khóa vừa lên kệ" href="/courses?sort=newest" courses={COURSES} />,
+      <CourseShelf title="Mới ra mắt" subtitle="Khóa vừa lên kệ" href="/courses?sort=newest" courses={COURSES.slice(0, 3)} />,
     );
     expect(screen.getByRole('heading', { name: 'Mới ra mắt' })).toBeInTheDocument();
     expect(screen.getByText('Khóa vừa lên kệ')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Xem tất cả/ })).toHaveAttribute('href', '/courses?sort=newest');
   });
 
-  it('bỏ khóa đã sở hữu và hiện tối đa 4 thẻ', () => {
+  it('kệ có mũi tên cuộn thì không hiện thêm Xem tất cả', () => {
+    renderWithIntl(<CourseShelf title="T" href="/courses" courses={COURSES} />);
+    expect(screen.queryByRole('link', { name: /Xem tất cả/ })).not.toBeInTheDocument();
+  });
+
+  it('bỏ khóa đã sở hữu, giữ thứ tự', () => {
     renderWithIntl(<CourseShelf title="T" href="/courses" courses={COURSES} />);
     expect(screen.getAllByTestId('card').map((c) => c.textContent)).toEqual([
       'Khóa học 1',
       'Khóa học 3',
       'Khóa học 4',
       'Khóa học 5',
+      'Khóa học 6',
     ]);
+  });
+
+  it('kệ nhiều hơn 4 thẻ có mũi tên trái/phải', () => {
+    renderWithIntl(<CourseShelf title="T" href="/courses" courses={COURSES} />);
+    expect(screen.getByRole('button', { name: 'Trước' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Tiếp' })).toBeInTheDocument();
+  });
+
+  it('tối đa 12 thẻ', () => {
+    const many = Array.from({ length: 20 }, (_, i) => makeCourse(100 + i));
+    renderWithIntl(<CourseShelf title="T" href="/courses" courses={many} />);
+    expect(screen.getAllByTestId('card')).toHaveLength(12);
   });
 
   it('không có khóa nào để hiện thì không vẽ gì', () => {

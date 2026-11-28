@@ -9,7 +9,7 @@ describe('HomeHero', () => {
     const marks = container.querySelectorAll('mark');
     expect(marks).toHaveLength(1);
     expect(marks[0]).toHaveTextContent('ngôn ngữ của bạn');
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Mọi khóa học bằng ngôn ngữ của bạn');
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Học mọi khóa học bằng ngôn ngữ của bạn');
   });
 
   it('nút chính dẫn tới /courses và giữ chữ trắng khi hover', () => {

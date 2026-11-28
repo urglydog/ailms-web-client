@@ -27,3 +27,17 @@ describe('themeMode', () => {
     localStorage.clear();
   });
 });
+
+describe('applyStoredTheme (gắn lại lớp dark sau hydrate)', () => {
+  it('gắn / bỏ lớp dark theo lựa chọn đã lưu', async () => {
+    const { applyStoredTheme, THEME_STORAGE_KEY } = await import('./themeMode');
+    const root = document.createElement('html');
+    localStorage.setItem(THEME_STORAGE_KEY, 'dark');
+    expect(applyStoredTheme(root)).toBe('dark');
+    expect(root.classList.contains('dark')).toBe(true);
+    localStorage.setItem(THEME_STORAGE_KEY, 'light');
+    expect(applyStoredTheme(root)).toBe('light');
+    expect(root.classList.contains('dark')).toBe(false);
+    localStorage.removeItem(THEME_STORAGE_KEY);
+  });
+});

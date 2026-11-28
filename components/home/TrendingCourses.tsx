@@ -26,9 +26,9 @@ export function TrendingCourses({ initialCourses }: { initialCourses: CourseSumm
 
   return (
     <section className="bg-surface-raised">
-      <div className="shell py-10">
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-          <h2 className="m-0 font-display text-lg font-semibold text-ink">{t('title')}</h2>
+      <div className="shell section-block">
+        <div className="section-head items-center">
+          <h2 className="section-title">{t('title')}</h2>
           <Link href="/courses" className="text-sm font-semibold text-accent-dark no-underline hover:underline">
             {t('viewAll')} →
           </Link>

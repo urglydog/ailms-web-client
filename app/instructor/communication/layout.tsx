@@ -11,12 +11,12 @@ export default function CommunicationLayout({ children }: { children: React.Reac
   const pathname = usePathname();
   const { notifications } = useNotification();
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:gap-8">
       <CommunicationTabs
         pathname={pathname}
         badges={sectionBadgeCounts(notifications, '/instructor/communication/', ['qa', 'messages', 'assignments', 'announcements', 'refunds'])}
       />
-      <div className="flex flex-col gap-5">{children}</div>
+      <div className="flex min-w-0 flex-1 flex-col gap-5">{children}</div>
     </div>
   );
 }

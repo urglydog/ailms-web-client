@@ -28,7 +28,7 @@ export function CategoryFeaturedShelf({ categorySlug }: { categorySlug: string }
 
   return (
     <section className="mb-6 rounded-xl border border-line bg-tint p-4">
-      <h2 className="m-0 font-display text-lg font-semibold text-ink">{t('title')}</h2>
+      <h2 className="section-title">{t('title')}</h2>
       <p className="m-0 mb-3 mt-0.5 text-sm text-ink-muted">{t('subtitle')}</p>
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {visible.map((course) => (

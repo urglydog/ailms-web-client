@@ -1,7 +1,8 @@
 'use client';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { applyStoredTheme } from '@/lib/theme/themeMode';
 import { NotificationProvider } from '@/components/providers/NotificationProvider';
 import { LocaleProvider } from '@/components/providers/LocaleProvider';
 import { SystemBanner } from '@/components/layout/SystemBanner';
@@ -21,6 +22,10 @@ import { MotionConfig } from 'motion/react';
  *  - Không bao giờ copy dữ liệu server vào Zustand
  */
 export function Providers({ children }: { children: React.ReactNode }) {
+  // Đồng bộ lại lớp `dark` sau hydrate — xem applyStoredTheme.
+  useEffect(() => {
+    applyStoredTheme();
+  }, []);
   const [queryClient] = useState(
     () =>
       new QueryClient({

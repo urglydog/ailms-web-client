@@ -1,4 +1,5 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { renderWithIntl as render } from '@/test/renderWithIntl';
 import { describe, expect, it, vi } from 'vitest';
 import { makeCourse } from '@/test/fixtures';
 import type { DubLanguage } from '@/types/domain';
@@ -49,5 +50,23 @@ describe('CourseCard', () => {
   it('khóa miễn phí hiện nhãn Miễn phí', () => {
     render(<CourseCard course={makeCourse(5, { isFree: true, finalPrice: 0, price: 0 })} />);
     expect(screen.getAllByText('Miễn phí').length).toBeGreaterThan(0);
+  });
+});
+
+describe('CourseCard — thứ tự thông tin', () => {
+  it('tên → giảng viên → nhãn lồng tiếng → giá gốc gạch ngang', () => {
+    const { container } = render(
+      <CourseCard course={makeCourse(7, { price: 500000, finalPrice: 400000, discountPercent: 20, isFree: false })} />,
+    );
+    const text = container.textContent ?? '';
+    const iTitle = text.indexOf('Khóa học 7');
+    const iInstr = text.indexOf('GV.');
+    const iDub = text.indexOf('AI lồng tiếng');
+    const iPrice = text.indexOf('400.000đ');
+    expect(iTitle).toBeGreaterThan(-1);
+    expect(iTitle).toBeLessThan(iInstr);
+    expect(iInstr).toBeLessThan(iDub);
+    expect(iDub).toBeLessThan(iPrice);
+    expect(screen.getByText('Giá gốc', { exact: false }).parentElement).toHaveClass('line-through');
   });
 });

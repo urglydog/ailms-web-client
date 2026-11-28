@@ -1,0 +1,93 @@
+import { fireEvent, screen } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { renderWithIntl } from '@/test/renderWithIntl';
+import type { CourseInsight } from '@/lib/api/tutorInsights';
+import { TutorInsightsView } from './TutorInsightsView';
+
+const mutate = vi.fn();
+let insight: CourseInsight | undefined;
+let courseOptions: { id: number; title: string }[] | undefined = [{ id: 5, title: 'Java' }];
+
+vi.mock('@/hooks/useDashboard', () => ({
+  useInstructorCourseOptions: () => ({ data: courseOptions, isLoading: false }),
+}));
+vi.mock('@/hooks/useTutorInsights', () => ({
+  useTutorInsights: () => ({ data: insight, isLoading: false, isError: false }),
+  useRefreshInsightSummary: () => ({ mutate, isPending: false }),
+}));
+
+const base: CourseInsight = {
+  courseId: 5,
+  windowDays: 90,
+  totalQuestions: 0,
+  learnerCount: 0,
+  lessons: [],
+  poorTopics: [],
+  summary: { status: 'NONE', text: null, actions: [], generatedAt: null },
+};
+
+describe('TutorInsightsView', () => {
+  beforeEach(() => {
+    mutate.mockReset();
+    courseOptions = [{ id: 5, title: 'Java' }];
+  });
+
+  it('chưa có dữ liệu khoá (SSR, query tắt) thì KHÔNG hiện thẻ "chưa có khoá" — tránh lệch hydrate', () => {
+    courseOptions = undefined;
+    insight = undefined;
+    renderWithIntl(<TutorInsightsView />);
+    expect(screen.queryByText(/Chưa có khóa học đã xuất bản/)).toBeNull();
+  });
+
+  it('danh sách khoá rỗng thì hiện thẻ "chưa có khoá"', () => {
+    courseOptions = [];
+    renderWithIntl(<TutorInsightsView />);
+    expect(screen.getByText(/Chưa có khóa học đã xuất bản/)).toBeInTheDocument();
+  });
+
+  it('trạng thái rỗng khi chưa có câu hỏi', () => {
+    insight = base;
+    renderWithIntl(<TutorInsightsView />);
+    expect(screen.getByText('Chưa có học viên nào hỏi Gia sư AI trong 90 ngày qua.')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Tạo tóm tắt/ })).not.toBeInTheDocument();
+  });
+
+  it('hiện chủ đề, bài bất thường, câu trả lời chưa tốt và tóm tắt AI', () => {
+    insight = {
+      ...base,
+      totalQuestions: 9,
+      learnerCount: 6,
+      lessons: [
+        { lessonId: 1, lessonTitle: 'Vòng lặp', questionCount: 7, learnerCount: 5, unusual: true, poorCount: 2,
+          topics: [{ label: 'vòng lặp', learnerCount: 3, questionCount: 4 }] },
+      ],
+      poorTopics: [{ lessonId: 1, lessonTitle: 'Vòng lặp', label: 'con trỏ', reason: 'NOT_COVERED', learnerCount: 2 }],
+      summary: { status: 'READY', text: 'Học viên vướng ở vòng lặp.', actions: ['Thêm ví dụ while'], generatedAt: '2026-11-26T02:30:00' },
+    };
+    renderWithIntl(<TutorInsightsView />);
+    expect(screen.getByText('Nhiều câu hỏi bất thường')).toBeInTheDocument();
+    expect(screen.getByText('vòng lặp')).toBeInTheDocument();
+    expect(screen.getByText(/ngoài nội dung bài/)).toBeInTheDocument();
+    expect(screen.getByText('Học viên vướng ở vòng lặp.')).toBeInTheDocument();
+    expect(screen.getByText('Thêm ví dụ while')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /Làm mới/ }));
+    expect(mutate).toHaveBeenCalled();
+  });
+  it('tóm tắt lỗi: báo lỗi rõ + nút Thử lại; đang trong 10 phút giới hạn thì khoá nút và báo giờ thử lại', () => {
+    const lessons = [{ lessonId: 1, lessonTitle: 'B1', questionCount: 3, learnerCount: 2, unusual: false, poorCount: 0, topics: [] }];
+    insight = { ...base, totalQuestions: 3, learnerCount: 2, lessons,
+      summary: { status: 'FAILED', text: null, actions: [], generatedAt: null, retryAfter: new Date(Date.now() + 5 * 60_000).toISOString() } };
+    const { unmount } = renderWithIntl(<TutorInsightsView />);
+    expect(screen.getByRole('alert')).toHaveTextContent('Chưa tạo được tóm tắt');
+    expect(screen.getByRole('alert')).toHaveTextContent(/Có thể thử lại lúc/);
+    expect(screen.getByRole('button', { name: /Thử lại/ })).toBeDisabled();
+    unmount();
+
+    insight = { ...insight, summary: { ...insight.summary, retryAfter: null } };
+    renderWithIntl(<TutorInsightsView />);
+    const retry = screen.getByRole('button', { name: /Thử lại/ });
+    expect(retry).toBeEnabled();
+    fireEvent.click(retry);
+    expect(mutate).toHaveBeenCalled();
+  });
+});

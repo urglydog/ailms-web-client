@@ -1,4 +1,7 @@
 import { FeaturedShelf } from '@/components/home/FeaturedShelf';
+import { HomeAiFeatures } from '@/components/home/HomeAiFeatures';
+import { HomeCategoryBar } from '@/components/home/HomeCategoryBar';
+import { HomeContinue } from '@/components/home/HomeContinue';
 import { HomeHero } from '@/components/home/HomeHero';
 import { HomeShelves } from '@/components/home/HomeShelves';
 import { TrendingCourses } from '@/components/home/TrendingCourses';
@@ -7,6 +10,9 @@ import { categoriesApi } from '@/lib/api/categories';
 import { publicCoursesApi, EMPTY_FILTERS } from '@/lib/api/publicCourses';
 import { pickCategoryShelves } from '@/lib/home/categoryShelves';
 import { TRENDING_FETCH_SIZE } from '@/lib/home/trending';
+
+/** Kệ cuộn ngang hiện tối đa 12 thẻ; lấy dư để sau khi bỏ khóa đã sở hữu vẫn đủ. */
+const SHELF_FETCH_SIZE = 16;
 
 /**
  * Trang chủ gọi API thật (danh sách khóa nổi bật) — không có route segment động nên
@@ -41,14 +47,17 @@ async function safeFeatured() {
   }
 }
 
-/** Trang chủ (spec mục 4): hero chia đôi, rồi "Đang thịnh hành" và các hàng Mới ra mắt / Miễn phí / Người mới / Chủ đề. Banner xếp hạng cộng đồng (có sẵn)
- * đặt cuối để không tranh chú ý với hero. */
+/**
+ * Trang chủ (UDEMY_LAYOUT_ANALYSIS mục 2): hero → (đã đăng nhập) Tiếp tục học + streak →
+ * (bỏ khối thẻ chủ đề ở đầu trang theo phản hồi 26/11/2026 — trang chủ tập trung giới thiệu khoá học) →
+ * kệ Đề xuất / Thịnh hành / Mới / Miễn phí / Người mới / theo danh mục → khối tối giới thiệu AI → bảng xếp hạng thu gọn.
+ */
 export default async function HomePage() {
   const [courses, newest, free, beginner, featured] = await Promise.all([
     safeSearch(EMPTY_FILTERS, 'rating', TRENDING_FETCH_SIZE),
-    safeSearch(EMPTY_FILTERS, 'newest', TRENDING_FETCH_SIZE),
-    safeSearch({ ...EMPTY_FILTERS, priceType: 'free' }, 'reviews', TRENDING_FETCH_SIZE),
-    safeSearch({ ...EMPTY_FILTERS, level: 'BEGINNER', priceType: 'paid' }, 'rating', TRENDING_FETCH_SIZE),
+    safeSearch(EMPTY_FILTERS, 'newest', SHELF_FETCH_SIZE),
+    safeSearch({ ...EMPTY_FILTERS, priceType: 'free' }, 'reviews', SHELF_FETCH_SIZE),
+    safeSearch({ ...EMPTY_FILTERS, level: 'BEGINNER', priceType: 'paid' }, 'rating', SHELF_FETCH_SIZE),
     safeFeatured(),
   ]);
 
@@ -61,10 +70,15 @@ export default async function HomePage() {
 
   return (
     <>
+      <HomeCategoryBar categories={categories} />
       <HomeHero />
+      <HomeContinue
+        categoryCourses={categories.map((c, i) => ({ slug: c.slug, name: c.name, courses: perCategory[i] ?? [] }))}
+      />
       <FeaturedShelf courses={featured} />
       <TrendingCourses initialCourses={courses} />
       <HomeShelves newest={newest} free={free} beginner={beginner} categoryShelves={categoryShelves} />
+      <HomeAiFeatures />
       <RankingBanner />
     </>
   );

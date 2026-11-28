@@ -4,6 +4,7 @@ import { coursesApi } from '@/lib/api/courses';
 import { lessonsApi } from '@/lib/api/lessons';
 import { getAccessToken } from '@/lib/auth/token';
 import type {
+  CourseGoalsInput,
   CourseStatus,
   CourseVisibility,
   CreateChapterInput,
@@ -51,7 +52,9 @@ export function useUpdateCourse(id: number) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (input: UpdateCourseInput) => coursesApi.update(id, input),
-    onSuccess: () => {
+    // Ghi ngay bản trả về vào cache để checklist ✓ và % hoàn thiện đổi tức thì, rồi vẫn refetch cho chắc.
+    onSuccess: (saved) => {
+      if (saved) queryClient.setQueryData(['courses', 'mine', id], saved);
       queryClient.invalidateQueries({ queryKey: ['courses', 'mine', id] });
       queryClient.invalidateQueries({ queryKey: ['courses', 'mine'] });
     },
@@ -97,6 +100,18 @@ export function useUpdateCourseVisibility(id: number) {
     mutationFn: (input: { visibility: CourseVisibility; password?: string | null }) =>
       coursesApi.updateVisibility(id, input),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['courses', 'mine', id] }),
+  });
+}
+
+export function useUpdateCourseGoals(id: number) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: CourseGoalsInput) => coursesApi.updateGoals(id, input),
+    onSuccess: (saved) => {
+      if (saved) queryClient.setQueryData(['courses', 'mine', id], saved);
+      queryClient.invalidateQueries({ queryKey: ['courses', 'mine', id] });
+      queryClient.invalidateQueries({ queryKey: ['courses', 'mine'] });
+    },
   });
 }
 

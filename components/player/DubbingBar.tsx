@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Check, ChevronDown, Languages, Loader2, Plus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import {
@@ -9,7 +9,8 @@ import {
   languageToUseWhenOriginalOff,
   sortLanguagesForMenu,
 } from '@/lib/learn/dubbing';
-import type { DubLanguage } from '@/types/domain';
+import type { DubLanguage, VoiceOption } from '@/types/domain';
+import { prettyVoiceName } from './VoicePicker';
 
 interface DubbingBarProps {
   languages: DubLanguage[];
@@ -20,6 +21,12 @@ interface DubbingBarProps {
   processing: { code: string; percent: number } | null;
   onSelect: (code: string) => void;
   onUseOriginal: () => void;
+  /** Giọng đọc của ngôn ngữ đang chọn — rỗng thì không hiện ô chọn giọng. */
+  voices?: VoiceOption[];
+  selectedVoice?: string | null;
+  onSelectVoice?: (voiceName: string) => void;
+  /** Nút phụ ở cuối hàng (ví dụ chế độ rạp). */
+  trailing?: ReactNode;
 }
 
 /**
@@ -28,7 +35,18 @@ interface DubbingBarProps {
  * chọn ngôn ngữ chưa có sẽ mở panel kích hoạt (UC18) ở trang cha. Ngôn ngữ trùng ngôn ngữ gốc bị vô hiệu
  * (BR-DUB-09). Danh sách luôn đến từ `voice_mappings` đang active (BR-DUB-07), không ghi cứng ở frontend.
  */
-export function DubbingBar({ languages, activeCode, sourceLanguage, processing, onSelect, onUseOriginal }: DubbingBarProps) {
+export function DubbingBar({
+  languages,
+  activeCode,
+  sourceLanguage,
+  processing,
+  onSelect,
+  onUseOriginal,
+  voices = [],
+  selectedVoice = null,
+  onSelectVoice,
+  trailing,
+}: DubbingBarProps) {
   const t = useTranslations('learn.dubbing');
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
@@ -90,7 +108,7 @@ export function DubbingBar({ languages, activeCode, sourceLanguage, processing, 
       ref={containerRef}
       role="group"
       aria-label={t('groupAria')}
-      className="relative flex flex-wrap items-center gap-3 rounded-panel border border-line bg-surface-raised p-2.5"
+      className="relative flex flex-wrap items-center gap-2 rounded-b-card border-x border-b border-line bg-surface-raised px-2 py-1.5 sm:gap-3"
     >
       <button
         type="button"
@@ -98,7 +116,7 @@ export function DubbingBar({ languages, activeCode, sourceLanguage, processing, 
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="listbox"
         aria-expanded={open}
-        className="flex items-center gap-2.5 rounded-lg border-[1.5px] border-cyan bg-surface-raised px-3 py-2 text-left transition-colors duration-150 hover:border-accent"
+        className="flex min-h-10 items-center gap-2 rounded-control border-[1.5px] border-cyan bg-surface-raised px-2.5 py-1 text-left transition-colors duration-150 hover:border-accent"
       >
         <Languages size={18} aria-hidden className="shrink-0 text-accent" />
         <span className="flex flex-col leading-tight">
@@ -108,12 +126,29 @@ export function DubbingBar({ languages, activeCode, sourceLanguage, processing, 
         <ChevronDown size={14} aria-hidden className={`text-ink-muted transition-transform duration-150 ${open ? 'rotate-180' : ''}`} />
       </button>
 
+      {voices.length > 0 && onSelectVoice && (
+        <label className="flex items-center gap-1.5 text-[12px] text-ink-muted">
+          <span className="sr-only sm:not-sr-only">{t('voice')}</span>
+          <select
+            value={selectedVoice ?? ''}
+            onChange={(e) => onSelectVoice(e.target.value)}
+            className="min-h-10 rounded-control border border-line bg-surface-raised px-2 text-[13px] text-ink focus:border-accent"
+          >
+            {voices.map((v) => (
+              <option key={v.voiceName} value={v.voiceName}>
+                {prettyVoiceName(v.voiceName)}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
+
       <button
         type="button"
         role="switch"
         aria-checked={usingOriginal}
         onClick={toggleOriginal}
-        className="ml-auto flex items-center gap-2 rounded-md px-2 py-1.5 text-[13px] text-ink-muted hover:text-ink"
+        className="ml-auto flex min-h-10 items-center gap-2 rounded-md px-2 py-1.5 text-[13px] text-ink-muted hover:text-ink"
       >
         <span>{t('listenOriginal')}</span>
         <span
@@ -127,6 +162,8 @@ export function DubbingBar({ languages, activeCode, sourceLanguage, processing, 
           />
         </span>
       </button>
+
+      {trailing}
 
       {open && (
         <div className="absolute left-0 top-full z-20 mt-2 w-[280px] overflow-hidden rounded-panel border border-line bg-surface-raised shadow-card-hover">

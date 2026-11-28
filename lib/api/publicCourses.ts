@@ -75,6 +75,10 @@ interface RawDetail extends RawSummary {
   dubbedLanguages: string[];
   learnerCount: number;
   requiresPassword: boolean;
+  learningOutcomes?: string[] | null;
+  requirements?: string[] | null;
+  targetAudience?: string[] | null;
+  discountEndsAt?: string | null;
 }
 
 /**
@@ -138,6 +142,11 @@ function toDetail(raw: RawDetail): CourseDetail {
     dubbedLanguages: raw.dubbedLanguages,
     learnerCount: raw.learnerCount,
     requiresPassword: raw.requiresPassword,
+    // "Bạn sẽ học được gì" / "Yêu cầu" / "Dành cho ai" (V176) — thiếu 3 dòng này thì trang không hiện các khối đó.
+    learningOutcomes: raw.learningOutcomes ?? [],
+    requirements: raw.requirements ?? [],
+    targetAudience: raw.targetAudience ?? [],
+    discountEndsAt: raw.discountEndsAt ?? null,
   };
 }
 
@@ -247,6 +256,13 @@ export const publicCoursesApi = {
   getBySlug: async (slug: string): Promise<CourseDetail> => {
     const raw = await api.get<RawDetail>(`/api/v1/courses/${slug}`);
     return toDetail(raw);
+  },
+
+  /** Cờ theo NGƯỜI XEM đã đăng nhập (27/11/2026): trang chi tiết render ẩn danh ở server nên
+   * gọi lại phía client kèm token để biết người xem có phải giảng viên sở hữu khoá không. */
+  getViewerFlags: async (slug: string, token: string): Promise<{ viewerIsOwner: boolean }> => {
+    const raw = await api.get<{ viewerIsOwner?: boolean }>(`/api/v1/courses/${slug}`, { token });
+    return { viewerIsOwner: raw.viewerIsOwner === true };
   },
 
   /** UC11 — Học thử Preview: chỉ trả về được nếu bài học đánh dấu Preview (BR-ENROLL-02). */

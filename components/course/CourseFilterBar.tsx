@@ -1,9 +1,11 @@
 'use client';
 
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, SlidersHorizontal } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { Modal } from '@/components/ui/Modal';
 import { PopoverMotion } from '@/components/ui/PopoverMotion';
+import { EMPTY_FILTERS } from '@/lib/api/publicCourses';
 import type { Category, CourseFilterState } from '@/types/domain';
 
 /**
@@ -29,6 +31,7 @@ interface CourseFilterBarProps {
 export function CourseFilterBar({ filters, onChange, categories }: CourseFilterBarProps) {
   const t = useTranslations('courseList');
   const [open, setOpen] = useState<GroupKey | null>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -108,13 +111,29 @@ export function CourseFilterBar({ filters, onChange, categories }: CourseFilterB
     },
   ];
 
+  const activeCount = groups.filter((g) => g.value !== null).length;
+
   return (
     <div ref={rootRef} role="group" aria-label={t('filters.aria')} className="flex flex-wrap items-center gap-2">
+      {/* "Tất cả bộ lọc" luôn hiện; trên mobile đây là lối vào duy nhất (chip từng nhóm chỉ hiện từ md). */}
+      <button
+        type="button"
+        onClick={() => setDrawerOpen(true)}
+        aria-haspopup="dialog"
+        className={`inline-flex min-h-10 items-center gap-1.5 rounded-full border px-4 text-sm font-semibold transition-colors duration-150 ${
+          activeCount > 0 ? 'border-accent bg-accent/10 text-accent-dark' : 'border-line bg-surface-raised text-ink hover:border-accent'
+        }`}
+      >
+        <SlidersHorizontal size={15} aria-hidden />
+        {t('filters.all')}
+        {activeCount > 0 && <span className="font-medium">({activeCount})</span>}
+      </button>
+      <span aria-hidden className="hidden h-6 w-px bg-line md:block" />
       {groups.map((g) => {
         const isOpen = open === g.key;
         const active = g.value !== null;
         return (
-          <div key={g.key} className="relative">
+          <div key={g.key} className="relative hidden md:block">
             <button
               type="button"
               aria-expanded={isOpen}
@@ -148,6 +167,41 @@ export function CourseFilterBar({ filters, onChange, categories }: CourseFilterB
           </div>
         );
       })}
+
+      <Modal
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        title={t('filters.all')}
+        footer={
+          <div className="flex w-full items-center justify-between gap-3">
+            <button
+              type="button"
+              onClick={() => onChange({ ...EMPTY_FILTERS, keyword: filters.keyword })}
+              className="min-h-10 text-sm font-semibold text-accent-dark hover:underline"
+            >
+              {t('filters.clear')}
+            </button>
+            <button
+              type="button"
+              onClick={() => setDrawerOpen(false)}
+              className="min-h-10 rounded-control bg-accent px-5 text-sm font-semibold text-white hover:bg-accent-dark"
+            >
+              {t('filters.done')}
+            </button>
+          </div>
+        }
+      >
+        <div className="flex flex-col divide-y divide-line-soft">
+          {groups.map((g) => (
+            <section key={g.key} className="py-4 first:pt-0">
+              <h3 className="m-0 mb-2 font-display text-[15px] font-semibold text-ink">{g.label}</h3>
+              <ul role="listbox" aria-label={g.label} className={`m-0 list-none p-0 ${g.key === 'category' ? 'sm:columns-2' : ''}`}>
+                {g.options}
+              </ul>
+            </section>
+          ))}
+        </div>
+      </Modal>
     </div>
   );
 }

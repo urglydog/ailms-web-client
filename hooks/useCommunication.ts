@@ -3,13 +3,14 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { announcementApi, assignmentApi, messageApi, qaApi } from '@/lib/api/communication';
+import type { QaListParams } from '@/lib/api/communication';
 import { getAccessToken } from '@/lib/auth/token';
 
 // ==================== Q&A ====================
 
-export function useQaQuestions(params: { courseId?: number; onlyUnanswered?: boolean; search?: string; sort?: 'newest' | 'oldest'; page?: number }) {
+export function useQaQuestions(params: QaListParams) {
   return useQuery({
-    queryKey: ['qa', 'questions', params.courseId ?? 'all', params.onlyUnanswered ?? false, params.search ?? '', params.sort ?? 'newest', params.page ?? 0],
+    queryKey: ['qa', 'questions', params.courseId ?? 'all', params.onlyUnanswered ?? false, params.noInstructorAnswer ?? false, params.unread ?? false, params.noBestAnswer ?? false, params.search ?? '', params.sort ?? 'newest', params.page ?? 0],
     queryFn: () => qaApi.listQuestions(params),
     enabled: !!getAccessToken(),
     placeholderData: (prev) => prev,
@@ -17,10 +18,34 @@ export function useQaQuestions(params: { courseId?: number; onlyUnanswered?: boo
 }
 
 export function useQaThread(questionId: string | null) {
+  const queryClient = useQueryClient();
   return useQuery({
     queryKey: ['qa', 'thread', questionId],
-    queryFn: () => qaApi.getThread(questionId as string),
+    queryFn: async () => {
+      const thread = await qaApi.getThread(questionId as string);
+      // Mở câu hỏi = đã đọc (máy chủ ghi nhận) -> làm mới danh sách để bỏ chấm "Chưa đọc".
+      queryClient.invalidateQueries({ queryKey: ['qa', 'questions'] });
+      return thread;
+    },
     enabled: !!getAccessToken() && !!questionId,
+  });
+}
+
+/** Đặt / bỏ câu trả lời hay nhất từ hộp thư giảng viên (27/11/2026). */
+export function useSetBestAnswer() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ questionId, answerId }: { questionId: string; answerId: string | null }) => qaApi.setBestAnswer(questionId, answerId),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['qa'] }),
+  });
+}
+
+/** Đánh dấu chưa đọc / đã đọc thủ công (27/11/2026). */
+export function useSetQuestionRead() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ questionId, read }: { questionId: string; read: boolean }) => qaApi.setRead(questionId, read),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['qa', 'questions'] }),
   });
 }
 

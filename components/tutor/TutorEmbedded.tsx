@@ -8,6 +8,7 @@ import { useTutorChat } from '@/hooks/useTutorChat';
 import { ApiError } from '@/lib/api/client';
 import { MarkdownRenderer } from '@/components/ui/MarkdownRenderer';
 import type { TutorAttachment, TutorSession } from '@/types/domain';
+import { AiDisclaimer, TutorSuggestions } from '@/components/tutor/TutorSuggestions';
 
 /** UC30 mở rộng — giới hạn tệp đính kèm (khớp `lms.rules.max-tutor-attachments-per-turn`/
  * `max-tutor-attachment-size-mb` bên be/, kiểm ở đây chỉ để phản hồi sớm cho học viên). */
@@ -354,10 +355,17 @@ export function TutorEmbedded({ courseId, lessonId, onSeek, lessonTitleById }: T
               <p className="mt-4 text-center text-sm text-ink-faint">Đang tải lại cuộc trò chuyện…</p>
             )}
             {!isRestoring && messages.length === 0 && (
-              <p className="mt-4 text-center text-sm text-ink-muted">
-                Chào bạn! Hỏi mình bất cứ điều gì về bài học này (hoặc bài học khác trong khóa) nhé
-                — mình sẽ gợi ý để bạn tự tìm ra câu trả lời, chứ không đưa đáp án trực tiếp đâu
-              </p>
+              <>
+                <p className="mt-4 text-center text-sm text-ink-muted">
+                  Chào bạn! Hỏi mình bất cứ điều gì về bài học này (hoặc bài học khác trong khóa) nhé
+                  — mình sẽ gợi ý để bạn tự tìm ra câu trả lời, chứ không đưa đáp án trực tiếp đâu
+                </p>
+                <TutorSuggestions
+                  lessonId={lessonId}
+                  disabled={isSending}
+                  onPick={(q) => sendQuestion(q, [])}
+                />
+              </>
             )}
             <div className="flex flex-col gap-3">
               {messages.map((msg) => (
@@ -489,6 +497,7 @@ export function TutorEmbedded({ courseId, lessonId, onSeek, lessonTitleById }: T
               </button>
             </div>
           </form>
+          <AiDisclaimer />
         </>
       )}
     </div>

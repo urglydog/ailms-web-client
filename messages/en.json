@@ -74,9 +74,19 @@
       "categories": "CATEGORIES",
       "more": "MORE",
       "liveNow": "Live now",
-      "groups": { "it": "Information technology", "soft": "Soft skills", "other": "Other fields" }
+      "groups": {
+        "it": "Information technology",
+        "soft": "Soft skills",
+        "other": "Other fields"
+      }
     },
-    "theme": { "toDark": "Switch to dark mode", "toLight": "Switch to light mode", "label": "Appearance", "dark": "Dark", "light": "Light" },
+    "theme": {
+      "toDark": "Switch to dark mode",
+      "toLight": "Switch to light mode",
+      "label": "Appearance",
+      "dark": "Dark",
+      "light": "Light"
+    },
     "skipToContent": "Skip to content",
     "help": "Help & Support"
   },
@@ -112,7 +122,7 @@
   "home": {
     "hero": {
       "tag": "New · AI dubbing",
-      "titleBefore": "Every course in",
+      "titleBefore": "Learn any course in",
       "titleHighlight": "your language",
       "description": "AI dubs international courses into the language you choose, in sync with the original video. No subtitles needed.",
       "cta": "Explore courses",
@@ -186,7 +196,10 @@
       "empty": "No courses in this category yet."
     },
     "shelves": {
-      "featured": { "title": "Recommended", "subtitle": "Courses recommended for you by LinguaLearn." },
+      "featured": {
+        "title": "Recommended",
+        "subtitle": "Courses recommended for you by LinguaLearn."
+      },
       "newest": {
         "title": "Just launched",
         "subtitle": "Courses recently added to LinguaLearn"
@@ -201,18 +214,54 @@
       },
       "byCategory": {
         "subtitle": "Top courses in {name}"
-      }
+      },
+      "prev": "Previous",
+      "next": "Next"
     },
     "topics": {
       "title": "Explore by topic",
       "subtitle": "Pick the field you want to learn"
+    },
+    "continue": {
+      "title": "Continue learning",
+      "all": "My learning",
+      "streak": "{count}-day streak",
+      "studiedToday": "You studied today — keep it up!",
+      "notStudiedToday": "Study one lesson today to keep your streak",
+      "becauseViewed": "Because you viewed “{title}”",
+      "resumeFallback": "Resume your lesson",
+      "lessonMeta": "Lecture · {minutes} min",
+      "lessonLabel": "Lecture",
+      "progress": "{pct}% of course"
+    },
+    "ai": {
+      "title": "Learn with AI, your way",
+      "subtitle": "Three AI tools come with every LinguaLearn course.",
+      "dubbing": {
+        "title": "AI dubbing",
+        "body": "Hear lectures in the language you choose, synced with the original video."
+      },
+      "tutor": {
+        "title": "AI tutor",
+        "body": "Ask whenever you're stuck; the tutor guides you and jumps to the right moment."
+      },
+      "plan": {
+        "title": "AI study plan",
+        "body": "A personalised plan that fits your schedule and progress."
+      },
+      "cta": "Explore courses"
+    },
+    "categoryBar": {
+      "label": "Course categories"
     }
   },
   "myCourses": {
     "title": "My courses",
     "tabs": {
       "all": "All courses",
-      "wishlist": "Wishlist"
+      "wishlist": "Wishlist",
+      "certificates": "Certificates",
+      "ariaLabel": "Learning sections"
     },
     "count": "{count} courses",
     "loading": "Loading…",
@@ -278,11 +327,22 @@
     "suggestions": {
       "title": "Suggested next",
       "trending": "Trending now"
+    },
+    "hubTitle": "My learning",
+    "certificates": {
+      "subtitle": "Certificates are issued automatically when you complete 100% of a course.",
+      "loading": "Loading...",
+      "empty": "You have no certificates yet. Complete 100% of a course to earn your first one!",
+      "issuedOn": "Issued {date}"
     }
   },
   "learn": {
     "header": {
-      "back": "My courses"
+      "back": "My courses",
+      "browse": "Browse courses",
+      "help": "Help",
+      "menu": "Open lesson menu",
+      "progress": "Your progress"
     },
     "dubbing": {
       "groupAria": "Choose the AI dubbing voice",
@@ -297,7 +357,8 @@
       "processing": "Creating {percent}%",
       "create": "Create voice",
       "sourceTag": "original",
-      "sourceTitle": "This lesson is already in the language you picked"
+      "sourceTitle": "This lesson is already in the language you picked",
+      "voice": "Voice"
     },
     "tabs": {
       "overview": "Overview",
@@ -305,7 +366,12 @@
       "qna": "Q&A",
       "materials": "Materials",
       "gradebook": "Gradebook",
-      "reviews": "Reviews"
+      "reviews": "Reviews",
+      "transcript": "Transcript",
+      "lessons": "Lectures",
+      "tutor": "AI Tutor",
+      "ariaLabel": "Lesson content",
+      "notes": "Notes"
     },
     "materials": {
       "courseResources": "Course resources"
@@ -320,7 +386,51 @@
       "current": "Now studying",
       "notStarted": "Not started",
       "hasAttachments": "Has attachments",
-      "signInPrompt": "Sign in to see the full curriculum and track your progress in this course."
+      "signInPrompt": "Sign in to see the full curriculum and track your progress in this course.",
+      "lectures": "Lectures",
+      "chapterStats": "{done}/{total} · {duration}",
+      "locked": "Locked — enrol to unlock",
+      "expandChapter": "Toggle section"
+    },
+    "theatre": {
+      "on": "Theatre mode",
+      "off": "Exit theatre mode"
+    },
+    "qnaBanner": {
+      "text": "Ask the AI Tutor first for an instant answer",
+      "cta": "Ask the AI Tutor"
+    },
+    "notes": {
+      "createAt": "Create a note at {time}",
+      "newAt": "New note at {time}",
+      "save": "Save note",
+      "cancel": "Cancel",
+      "filter": "Show",
+      "scopeLesson": "Current lesson",
+      "scopeCourse": "All lessons in course",
+      "loading": "Loading notes…",
+      "errorLoad": "Couldn't load notes.",
+      "errorSave": "Couldn't save the note, please try again.",
+      "errorDelete": "Couldn't delete the note, please try again.",
+      "empty": "No notes yet. Use the box above to capture a key idea at the current moment.",
+      "seekTo": "Jump video to {time}",
+      "edit": "Edit note",
+      "editLabel": "Note content",
+      "delete": "Delete note",
+      "confirmDelete": "Delete this note?"
+    },
+    "tutorSuggest": {
+      "title": "Suggested questions",
+      "popular": "other learners asked this too",
+      "disclaimer": "AI can make mistakes — check it against the lesson.",
+      "templates": {
+        "summary": "Summarise the lesson {lesson}",
+        "quiz": "Quiz me with 3 questions on {lesson}",
+        "hardest": "Explain the hardest concept in {lesson}",
+        "relation": "How does this lesson relate to {previous}?",
+        "chapter": "What is the main idea of the chapter {chapter}?"
+      },
+      "aiGenerated": "AI-generated from the lesson content"
     }
   },
   "profile": {
@@ -404,7 +514,11 @@
       "title": "Course content",
       "summary": "{chapters} chapters · {lessons} lessons",
       "lessons": "{count} lessons",
-      "preview": "Preview"
+      "preview": "Preview",
+      "expandAll": "Expand all sections",
+      "collapseAll": "Collapse all sections",
+      "previewLink": "Preview",
+      "totalSummary": "{chapters} sections · {lessons} lectures · {duration} total"
     },
     "reviews": "Learner reviews",
     "price": {
@@ -435,11 +549,59 @@
       "wishlistRemove": "Remove from wishlist",
       "toastSuccess": "Signed up successfully!",
       "toastError": "Something went wrong"
+    },
+    "time": {
+      "hour": "h",
+      "minute": "min"
+    },
+    "includesTitle": "This course includes",
+    "description": {
+      "title": "Description",
+      "showMore": "Show more",
+      "showLess": "Show less"
+    },
+    "instructorBlock": {
+      "title": "Instructor",
+      "stats": "★ {rating} · {learners} learners"
+    },
+    "coupon": {
+      "note": "Have a coupon?",
+      "link": "Apply at checkout"
+    },
+    "goals": {
+      "outcomesTitle": "What you'll learn",
+      "requirementsTitle": "Requirements",
+      "audienceTitle": "Who this course is for"
+    },
+    "promo": {
+      "endsIn": "Offer ends in",
+      "days": "{d}d {h}h"
+    },
+    "shareGift": {
+      "share": "Share",
+      "gift": "Gift this course",
+      "soon": "Coming soon",
+      "copied": "Course link copied",
+      "copyFailed": "Couldn't copy the link"
+    },
+    "owner": {
+      "note": "This is your course.",
+      "edit": "Edit course",
+      "learn": "Open as a learner"
     }
   },
   "courseList": {
-    "loadMore": { "button": "Load more courses", "loading": "Loading more courses…", "end": "You've seen all matching courses." },
-    "pagination": { "nav": "Pagination", "prev": "Previous page", "next": "Next page", "page": "Page {page}" },
+    "loadMore": {
+      "button": "Load more courses",
+      "loading": "Loading more courses…",
+      "end": "You've seen all matching courses."
+    },
+    "pagination": {
+      "nav": "Pagination",
+      "prev": "Previous page",
+      "next": "Next page",
+      "page": "Page {page}"
+    },
     "title": "Course catalog",
     "subtitle": "Every course can be dubbed into the language of your choice.",
     "all": "All",
@@ -495,8 +657,12 @@
       "free": "Free",
       "paid": "Paid",
       "showMore": "Show more ({count})",
-      "showLess": "Show less"
-    }
+      "showLess": "Show less",
+      "all": "All filters",
+      "done": "Show results"
+    },
+    "resultsFor": "{count} results for “{q}”",
+    "resultsCount": "{count} courses"
   },
   "shop": {
     "steps": {
@@ -559,7 +725,11 @@
       "bundleSuggest": "Add <b>{title}</b> (+{price}) to get <b>{percent}%</b> off with the \"{bundle}\" bundle",
       "addToCart": "Add to cart",
       "emptyTitle": "Your cart is empty.",
-      "emptyCta": "Explore courses"
+      "emptyCta": "Explore courses",
+      "moveToWishlist": "Move to wishlist",
+      "movedToWishlist": "Moved to your wishlist",
+      "originalPrice": "Original price",
+      "percentOff": "{percent}% off"
     },
     "checkout": {
       "titleOne": "Pay for course",
@@ -813,8 +983,9 @@
       "back": "Back to courses",
       "tabsAria": "Course editing sections",
       "groups": {
-        "content": "Course content",
-        "publish": "Publish"
+        "content": "Create your content",
+        "publish": "Publish your course",
+        "plan": "Plan your course"
       },
       "tabs": {
         "curriculum": "Curriculum",
@@ -823,7 +994,8 @@
         "proctoring": "Exam proctoring",
         "basics": "Basic information",
         "pricing": "Pricing",
-        "promotions": "Promotions"
+        "promotions": "Promotions",
+        "goals": "Intended learners"
       },
       "completion": {
         "label": "{percent}% complete",
@@ -865,6 +1037,37 @@
         "archiveConfirm": "Remove",
         "cancel": "Cancel",
         "coInstructor": "Co-instructor management is in development and will arrive in a later update."
+      },
+      "stepDone": "Done",
+      "checklist": {
+        "submitting": "Submitting..."
+      },
+      "goals": {
+        "title": "Intended learners",
+        "intro": "These descriptions appear on your course landing page and help learners decide whether the course is right for them.",
+        "learningOutcomes": {
+          "label": "What will students learn?",
+          "hint": "Add at least {min} items, up to {max} characters each.",
+          "placeholder": "e.g. Handle everyday conversations with confidence"
+        },
+        "requirements": {
+          "label": "Requirements",
+          "hint": "Skills, tools or knowledge learners need. If none, say so to reassure beginners.",
+          "placeholder": "e.g. No prior knowledge needed"
+        },
+        "targetAudience": {
+          "label": "Who is this course for?",
+          "hint": "Describe the learners who will benefit most.",
+          "placeholder": "e.g. Beginners preparing for a trip"
+        },
+        "itemLabel": "{section} — item {n}",
+        "remove": "Remove item {n}",
+        "add": "Add item",
+        "recommendMin": "{count}/{min} items so far — add more to reach {min}.",
+        "save": "Save",
+        "saving": "Saving...",
+        "saved": "Course goals saved",
+        "saveFailed": "Could not save, please try again."
       }
     },
     "performance": {
@@ -894,12 +1097,22 @@
           "revenue": "Net revenue (30 days)",
           "enrollments": "New sign-ups",
           "rating": "Average rating",
-          "hardQuestions": "Hard questions"
+          "hardQuestions": "Hard questions",
+          "revenueRange": "Net earnings ({range})",
+          "sales": "Sales (selected course)"
         },
         "chart": {
           "title": "Daily net revenue (last 30 days)",
           "aria": "Bar chart of daily revenue, {total} in total over 30 days, best day {peak}",
-          "empty": "No revenue in the last 30 days."
+          "empty": "No revenue in the last 30 days.",
+          "titleRange": "Net earnings — {range}",
+          "ariaRange": "Revenue bar chart ({range}), {total} in total, highest bar {peak}",
+          "emptyRange": {
+            "7d": "No revenue in the last 7 days.",
+            "30d": "No revenue in the last 30 days.",
+            "12m": "No revenue in the last 12 months.",
+            "all": "No revenue yet."
+          }
         },
         "growth": {
           "start": "Revenue started this period",
@@ -909,7 +1122,15 @@
           "down": "Revenue is down {percent}% from the previous period"
         },
         "hard": "{count} questions are answered wrong by over 60% of learners, so review the related content.",
-        "lowRating": "A new {rating}★ review from {student} on \"{course}\", worth replying to soon."
+        "lowRating": "A new {rating}★ review from {student} on \"{course}\", worth replying to soon.",
+        "exportCsv": "Export CSV",
+        "csv": {
+          "date": "Date",
+          "course": "Course",
+          "amount": "Amount",
+          "earning": "Net earning",
+          "coupon": "Coupon"
+        }
       }
     },
     "refunds": {
@@ -987,7 +1208,8 @@
         "qa": "Q&A",
         "messages": "Messages",
         "assignments": "Assignments",
-        "announcements": "Announcements"
+        "announcements": "Announcements",
+        "insights": "AI Insights"
       }
     },
     "tools": {
@@ -1007,7 +1229,10 @@
           "title": "Course bundles",
           "description": "Group several courses into a bundle with an attractive discount so learners buy the whole set."
         },
-        "share": { "title": "Share & Promote", "description": "Get your own referral link for each course, share it on social media and see the orders that came through your links." }
+        "share": {
+          "title": "Share & Promote",
+          "description": "Get your own referral link for each course, share it on social media and see the orders that came through your links."
+        }
       }
     },
     "live": {
@@ -1207,7 +1432,22 @@
         "youAnswered": "You replied",
         "instructorTag": " (Instructor)",
         "placeholder": "Reply to the learner...",
-        "send": "Send"
+        "send": "Send",
+        "filtersAria": "Filter questions",
+        "filter": {
+          "all": "All",
+          "unanswered": "No answers",
+          "noInstructor": "No instructor answer",
+          "unread": "Unread",
+          "noBest": "No top answer"
+        },
+        "mostReplies": "Most replies",
+        "unreadDot": "Unread",
+        "best": "Top answer",
+        "hasBest": "Has top answer",
+        "markBest": "Mark as top answer",
+        "unmarkBest": "Unmark top answer",
+        "markUnread": "Mark as unread"
       },
       "assignments": {
         "title": "Assignments",
@@ -1254,6 +1494,43 @@
         "search": "Search courses...",
         "notFound": "No courses found."
       }
+    },
+    "insights": {
+      "title": "AI tutor insights",
+      "subtitle": "What learners ask the AI tutor — aggregated, with no names or individual questions.",
+      "noCourses": "No published courses yet. Insights appear once learners study and ask the AI tutor.",
+      "loadError": "Couldn't load insights. Please try again.",
+      "lessonFilter": "Filter by lesson",
+      "allLessons": "All lessons",
+      "noQuestions": "No learner has asked the AI tutor in the last {days} days.",
+      "lessonsTitle": "Common topics by lesson",
+      "noLessonQuestions": "No questions for this lesson yet.",
+      "unusual": "Unusually many questions",
+      "lessonCounts": "{questions} questions · {learners} learners",
+      "topicsAria": "Common topics in {lesson}",
+      "learners": "{count} learners",
+      "noTopics": "No topic has been asked by 2 or more learners yet.",
+      "poorCount": "{count} questions answered poorly",
+      "poorTitle": "Answered poorly by the tutor",
+      "poorHint": "Learners asked again, or the tutor said the content isn't in the lesson.",
+      "noPoor": "No topics detected yet.",
+      "reasonRepeat": "asked repeatedly",
+      "reasonNotCovered": "not covered in the lesson",
+      "statQuestions": "Questions ({days} days)",
+      "statLearners": "Learners who asked",
+      "statUnusual": "Lessons to review",
+      "summaryTitle": "AI summary & suggestions",
+      "generate": "Generate summary",
+      "refresh": "Refresh",
+      "summaryPending": "AI is writing the summary, please wait a moment…",
+      "summaryFailed": "Couldn't generate a summary. Please try again in a few minutes.",
+      "summaryNone": "No summary yet. It's generated daily, or click “Generate summary”.",
+      "summaryNoData": "A summary will appear once learners start asking the AI tutor.",
+      "actionsTitle": "Suggested actions",
+      "generatedAt": "Updated {time}",
+      "privacy": "Topics only appear when 2 or more learners asked; labels are shared keywords, never verbatim questions.",
+      "retry": "Retry",
+      "retryAfter": "You can retry at {time} (at most once every 10 minutes)."
     }
   },
   "coupons": {
@@ -3300,5 +3577,29 @@
     "requestThis": "Didn't solve it? Send a request",
     "otherInGroup": "Something else in this topic",
     "otherLabel": "Other issue"
+  },
+  "courseCard": {
+    "aiDub": "AI dubbing",
+    "instructor": "By {name}",
+    "free": "Free",
+    "owned": "Owned",
+    "viewCertificate": "View certificate",
+    "addToCart": "Add to cart",
+    "adding": "Adding...",
+    "goToCart": "Go to cart",
+    "wishlistAdd": "Add to wishlist",
+    "wishlistRemove": "Remove from wishlist",
+    "coverPlaceholder": "course cover",
+    "originalPrice": "Original price",
+    "level": {
+      "BEGINNER": "Beginner",
+      "INTERMEDIATE": "Intermediate",
+      "ADVANCED": "Advanced"
+    }
+  },
+  "common": {
+    "layout": {
+      "viewAll": "View all"
+    }
   }
 }
