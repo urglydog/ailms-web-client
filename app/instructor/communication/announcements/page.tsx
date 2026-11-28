@@ -29,7 +29,7 @@ export default function InstructorAnnouncementsPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="m-0 font-display text-[20px] font-bold text-ink">{t('announcements.title')}</h1>
         <div className="flex flex-wrap items-center gap-2">
-          <ListSearch label="Tìm thông báo" value={list.query} onChange={list.setQuery} placeholder="Tiêu đề, nội dung hoặc tên khóa học..." />
+          <ListSearch label={t('announcements.searchLabel')} value={list.query} onChange={list.setQuery} placeholder={t('announcements.searchPlaceholder')} />
           <CourseFilterDropdown align="right" courses={courses ?? []} value={filterCourseId} onChange={setFilterCourseId} />
         </div>
       </div>
@@ -65,7 +65,7 @@ export default function InstructorAnnouncementsPage() {
       </div>
       {!isLoading && list.total > 0 && <Pager page={list.page} totalPages={list.totalPages} total={list.total} onPage={list.setPage} />}
       {!isLoading && announcements && announcements.length > 0 && list.total === 0 && (
-        <div className="rounded-xl border border-line bg-surface-raised p-6 text-center text-sm text-ink-muted">Không có thông báo nào khớp.</div>
+        <div className="rounded-xl border border-line bg-surface-raised p-6 text-center text-sm text-ink-muted">{t('announcements.noMatch')}</div>
       )}
 
       {deleteId != null && (

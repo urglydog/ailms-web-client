@@ -17,6 +17,7 @@ interface VersionHistoryModalProps {
 
 export function VersionHistoryModal({ courseId, materialId, onClose, onInspect }: VersionHistoryModalProps) {
   const t = useTranslations('instructor.common');
+  const tv = useTranslations('instructor.versionHistory');
   const queryClient = useQueryClient();
 
   const { data: versions, isLoading } = useQuery({
@@ -27,13 +28,13 @@ export function VersionHistoryModal({ courseId, materialId, onClose, onInspect }
   const restoreMutation = useMutation({
     mutationFn: (versionId: number) => materialsApi.restoreVersion(versionId),
     onSuccess: (res) => {
-      toast.success('Đã khôi phục nội dung phiên bản cũ thành phiên bản mới nhất');
+      toast.success(tv('restored'));
       queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] });
       queryClient.invalidateQueries({ queryKey: ['material-versions', materialId] });
       onClose();
       if (res.id) onInspect(res.id);
     },
-    onError: (err: Error) => toast.error(err.message || 'Không thể khôi phục phiên bản'),
+    onError: (err: Error) => toast.error(err.message || tv('restoreError')),
   });
 
   return (
@@ -44,14 +45,14 @@ export function VersionHistoryModal({ courseId, materialId, onClose, onInspect }
       closeLabel={t('close')}
       title={
         <span className="flex items-center gap-2 text-base">
-          <History className="h-4 w-4 text-ink-muted" aria-hidden /> Lịch sử phiên bản
+          <History className="h-4 w-4 text-ink-muted" aria-hidden /> {tv('title')}
         </span>
       }
     >
         <div className="flex flex-col gap-2">
-          {isLoading && <div className="text-sm text-ink-muted text-center py-6">Đang tải...</div>}
+          {isLoading && <div className="text-sm text-ink-muted text-center py-6">{tv('loading')}</div>}
           {!isLoading && (versions?.length ?? 0) === 0 && (
-            <div className="text-sm text-ink-muted text-center py-6">Chưa có lịch sử phiên bản nào.</div>
+            <div className="text-sm text-ink-muted text-center py-6">{tv('empty')}</div>
           )}
           {versions?.map(v => (
             <div
@@ -63,9 +64,9 @@ export function VersionHistoryModal({ courseId, materialId, onClose, onInspect }
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-bold text-ink">V{v.displayVersionNo}</span>
-                  {v.isActive && <MaterialBadge tone="success">Đang dùng</MaterialBadge>}
+                  {v.isActive && <MaterialBadge tone="success">{tv('active')}</MaterialBadge>}
                 </div>
-                <p className="text-xs text-ink-muted truncate">{v.title || 'Học liệu không tên'}</p>
+                <p className="text-xs text-ink-muted truncate">{v.title || tv('untitled')}</p>
                 <p className="text-[10px] text-ink-faint">
                   {new Date(v.createdAt).toLocaleString('vi-VN')}{v.createdBy ? ` · ${v.createdBy}` : ''}
                 </p>
@@ -73,7 +74,7 @@ export function VersionHistoryModal({ courseId, materialId, onClose, onInspect }
               <div className="flex items-center gap-1 flex-shrink-0">
                 <button
                   onClick={() => { onClose(); onInspect(v.id, true); }}
-                  title="Xem phiên bản này (chỉ đọc)"
+                  title={tv('viewTitle')}
                   className="p-1.5 rounded-card hover:bg-accent/10 text-accent transition-colors"
                 >
                   <Eye className="w-3.5 h-3.5" />
@@ -82,7 +83,7 @@ export function VersionHistoryModal({ courseId, materialId, onClose, onInspect }
                   <button
                     onClick={() => restoreMutation.mutate(v.id)}
                     disabled={restoreMutation.isPending}
-                    title="Khôi phục nội dung này thành phiên bản mới nhất"
+                    title={tv('restoreTitle')}
                     className="p-1.5 rounded-card hover:bg-star/10 text-star transition-colors disabled:opacity-50"
                   >
                     <RotateCcw className="w-3.5 h-3.5" />

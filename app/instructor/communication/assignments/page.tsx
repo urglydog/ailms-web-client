@@ -30,7 +30,7 @@ export default function InstructorAssignmentsPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="m-0 font-display text-[20px] font-bold text-ink">{t('assignments.title')}</h1>
         <div className="flex flex-wrap items-center gap-2">
-          <ListSearch label="Tìm bài tập" value={list.query} onChange={list.setQuery} placeholder="Tên bài tập, khóa học hoặc bài học..." />
+          <ListSearch label={t('assignments.searchLabel')} value={list.query} onChange={list.setQuery} placeholder={t('assignments.searchPlaceholder')} />
           <CourseFilterDropdown align="right" courses={courses ?? []} value={courseId} onChange={setCourseId} />
         </div>
       </div>
@@ -68,7 +68,7 @@ export default function InstructorAssignmentsPage() {
 
       {!isLoading && list.total > 0 && <Pager page={list.page} totalPages={list.totalPages} total={list.total} onPage={list.setPage} />}
       {!isLoading && assignments && assignments.length > 0 && list.total === 0 && (
-        <div className="rounded-xl border border-line bg-surface-raised p-6 text-center text-sm text-ink-muted">Không có bài tập nào khớp.</div>
+        <div className="rounded-xl border border-line bg-surface-raised p-6 text-center text-sm text-ink-muted">{t('assignments.noMatch')}</div>
       )}
 
       {activeAssignment && (

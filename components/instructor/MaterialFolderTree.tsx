@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { Modal } from '@/components/ui/Modal';
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -45,6 +46,7 @@ export function MaterialFolderTree({
   moveToFolderMutation,
   duplicateMaterialMutation,
 }: MaterialFolderTreeProps) {
+  const t = useTranslations('instructor.folderTree');
   const queryClient = useQueryClient();
 
   const [contextMenu, setContextMenu] = useState<{
@@ -88,7 +90,7 @@ export function MaterialFolderTree({
     mutationFn: (vars: { name: string; parentId?: number }) =>
       materialsApi.createFolder(courseId, vars.name, vars.parentId),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['instructor-folders', courseId] }),
-    onError: () => toast.error('Không thể tạo thư mục'),
+    onError: () => toast.error(t('createError')),
   });
 
   const deleteFolderMutation = useMutation({
@@ -97,25 +99,25 @@ export function MaterialFolderTree({
       queryClient.invalidateQueries({ queryKey: ['instructor-folders', courseId] });
       queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] });
     },
-    onError: (err: Error) => toast.error(err.message || 'Không thể xóa thư mục'),
+    onError: (err: Error) => toast.error(err.message || t('deleteFolderError')),
   });
 
   const renameMaterialMutation = useMutation({
     mutationFn: (vars: { id: number; title: string }) => materialsApi.renameMaterial(vars.id, vars.title),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] });
-      toast.success('Đã đổi tên học liệu');
+      toast.success(t('renamed'));
     },
-    onError: (err: Error) => toast.error(err.message || 'Không thể đổi tên học liệu'),
+    onError: (err: Error) => toast.error(err.message || t('renameError')),
   });
 
   const deleteMaterialMutation = useMutation({
     mutationFn: (id: number) => materialsApi.deleteMaterial(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['instructor-materials', courseId] });
-      toast.success('Đã xóa học liệu');
+      toast.success(t('deleted'));
     },
-    onError: () => toast.error('Không thể xóa học liệu'),
+    onError: () => toast.error(t('deleteError')),
   });
 
 
@@ -152,19 +154,19 @@ export function MaterialFolderTree({
         e.preventDefault();
         if (mat) {
           setConfirmAction({
-            title: 'Xóa Học Liệu',
-            message: `Bạn có chắc chắn muốn xóa "${mat.title || 'học liệu này'}" không? Hành động này không thể hoàn tác.`,
+            title: t('deleteMatTitle'),
+            message: t('deleteMatMsg', { title: mat.title || t('thisMaterial') }),
             onConfirm: () => deleteMaterialMutation.mutateAsync(selectedMaterialId),
           });
         }
       } else if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
         e.preventDefault();
         setClipboard({ id: selectedMaterialId, mode: 'copy' });
-        toast.info(`Đã sao chép "${mat?.title || 'học liệu'}" — chọn thư mục đích và nhấn Ctrl+V để dán bản sao`);
+        toast.info(t('copied', { title: mat?.title || t('material') }));
       } else if ((e.ctrlKey || e.metaKey) && e.key === 'x') {
         e.preventDefault();
         setClipboard({ id: selectedMaterialId, mode: 'cut' });
-        toast.info(`Đã cắt "${mat?.title || 'học liệu'}" — chọn thư mục đích và nhấn Ctrl+V để dán`);
+        toast.info(t('cut', { title: mat?.title || t('material') }));
       } else if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
         e.preventDefault();
         if (clipboard !== null) {
@@ -175,7 +177,7 @@ export function MaterialFolderTree({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedMaterialId, clipboard, materials, setConfirmAction, deleteMaterialMutation, isInputFocused]);
+  }, [selectedMaterialId, clipboard, materials, setConfirmAction, deleteMaterialMutation, isInputFocused, t]);
 
   // ─── Folder Picker Helpers ────────────────────────────────────────────────
   const filteredFolders = folders.filter(f =>
@@ -202,10 +204,10 @@ export function MaterialFolderTree({
   const handleDeleteFolder = (id: number) => {
     const hasMaterials = materials.some(m => m.folderId === id);
     setConfirmAction({
-      title: hasMaterials ? 'Thư mục đang chứa học liệu' : 'Xóa Thư Mục',
+      title: hasMaterials ? t('folderHasMaterialsTitle') : t('deleteFolderTitle'),
       message: hasMaterials
-        ? 'Thư mục này đang chứa học liệu. Nếu tiếp tục xóa, các học liệu bên trong sẽ bị đẩy ra ngoài Workspace gốc. Bạn có chắc chắn không?'
-        : 'Bạn có chắc chắn muốn xóa thư mục này không?',
+        ? t('folderHasMaterialsMsg')
+        : t('deleteFolderMsg'),
       onConfirm: () => deleteFolderMutation.mutateAsync(id),
     });
     setContextMenu(null);
@@ -228,8 +230,8 @@ export function MaterialFolderTree({
   const handleDeleteMaterial = (matId: number) => {
     const mat = materials.find(m => m.id === matId);
     setConfirmAction({
-      title: 'Xóa Học Liệu',
-      message: `Bạn có chắc chắn muốn xóa "${mat?.title || 'học liệu này'}" không? Hành động này không thể hoàn tác.`,
+      title: t('deleteMatTitle'),
+      message: t('deleteMatMsg', { title: mat?.title || t('thisMaterial') }),
       onConfirm: () => deleteMaterialMutation.mutateAsync(matId),
     });
     setContextMenu(null);
@@ -327,7 +329,7 @@ export function MaterialFolderTree({
               </div>
             )}
             {childFolders.length === 0 && childMaterials.length === 0 && (
-              <div className="text-xs text-ink-faint py-2 pl-2 italic">Thư mục trống</div>
+              <div className="text-xs text-ink-faint py-2 pl-2 italic">{t('emptyFolder')}</div>
             )}
           </div>
         )}
@@ -382,11 +384,11 @@ export function MaterialFolderTree({
         }`}
       >
         <span className="text-xs font-semibold text-ink-muted uppercase tracking-wider">
-          Thư Mục Gốc (Click chuột phải để thêm · kéo học liệu thả vào đây để đưa về gốc)
+          {t('rootHint')}
         </span>
         {selectedMaterialId && (
           <span className="text-[10px] text-ink-faint italic">
-            ✓ Đã chọn — Del: xóa · Ctrl+C: chép · Ctrl+X: cắt · Ctrl+V: dán
+            {t('selectedHint')}
           </span>
         )}
       </div>
@@ -415,8 +417,8 @@ export function MaterialFolderTree({
       {rootFolders.length === 0 && rootMaterials.length === 0 && (
         <div className="flex flex-col items-center justify-center h-full text-ink-faint py-10">
           <Folder className="w-16 h-16 mb-2 opacity-30" />
-          <p className="text-sm font-medium">Workspace đang trống</p>
-          <p className="text-xs mt-1">Click chuột phải để tạo thư mục mới.</p>
+          <p className="text-sm font-medium">{t('workspaceEmpty')}</p>
+          <p className="text-xs mt-1">{t('workspaceEmptyHint')}</p>
         </div>
       )}
 
@@ -432,7 +434,7 @@ export function MaterialFolderTree({
               onClick={() => handleCreateFolder()}
               className="w-full text-left px-4 py-2 text-sm text-ink hover:bg-accent/5 flex items-center gap-2"
             >
-              <Plus className="w-4 h-4" /> Tạo Thư mục Mới
+              <Plus className="w-4 h-4" /> {t('ctx.newFolder')}
             </button>
           )}
 
@@ -442,14 +444,14 @@ export function MaterialFolderTree({
                 onClick={() => handleCreateFolder(contextMenu.targetId)}
                 className="w-full text-left px-4 py-2 text-sm text-ink hover:bg-accent/5 flex items-center gap-2"
               >
-                <Plus className="w-4 h-4" /> Tạo Thư mục con
+                <Plus className="w-4 h-4" /> {t('ctx.newSubfolder')}
               </button>
               <div className="h-px bg-surface-hover my-1" />
               <button
                 onClick={() => handleDeleteFolder(contextMenu.targetId!)}
                 className="w-full text-left px-4 py-2 text-sm text-danger hover:bg-danger/10 flex items-center gap-2"
               >
-                <Trash2 className="w-4 h-4" /> Xóa Thư mục
+                <Trash2 className="w-4 h-4" /> {t('ctx.deleteFolder')}
               </button>
             </>
           )}
@@ -461,33 +463,33 @@ export function MaterialFolderTree({
                   onClick={() => { if (contextMenu.targetId) onInspect(contextMenu.targetId); setContextMenu(null); }}
                   className="w-full text-left px-4 py-2 text-sm text-ink hover:bg-accent/5 flex items-center gap-2"
                 >
-                  <FolderOpen className="w-4 h-4" /> Xem / Chỉnh sửa
+                  <FolderOpen className="w-4 h-4" /> {t('ctx.viewEdit')}
                 </button>
                 <button
                   onClick={() => { if (contextMenu.targetId) handleRenameMaterial(contextMenu.targetId); }}
                   className="w-full text-left px-4 py-2 text-sm text-ink hover:bg-accent/5 flex items-center gap-2"
                 >
-                  <Pencil className="w-4 h-4" /> Đổi tên
+                  <Pencil className="w-4 h-4" /> {t('ctx.rename')}
                 </button>
                 <button
                   onClick={() => { if (contextMenu.targetId) { setVersionHistoryFor(contextMenu.targetId); setContextMenu(null); } }}
                   className="w-full text-left px-4 py-2 text-sm text-ink hover:bg-accent/5 flex items-center gap-2"
                 >
-                  <History className="w-4 h-4" /> Lịch sử phiên bản
+                  <History className="w-4 h-4" /> {t('ctx.history')}
                 </button>
                 <div className="h-px bg-surface-hover my-1" />
                 <button
                   onClick={() => { if (contextMenu.targetId) handleMoveMaterial(contextMenu.targetId); }}
                   className="w-full text-left px-4 py-2 text-sm text-ink hover:bg-accent/5 flex items-center gap-2"
                 >
-                  <MoveRight className="w-4 h-4" /> Chuyển vào Thư mục...
+                  <MoveRight className="w-4 h-4" /> {t('ctx.moveTo')}
                 </button>
                 <div className="h-px bg-surface-hover my-1" />
                 <button
                   onClick={() => { if (contextMenu.targetId) handleDeleteMaterial(contextMenu.targetId); }}
                   className="w-full text-left px-4 py-2 text-sm text-danger hover:bg-danger/10 flex items-center gap-2"
                 >
-                  <Trash2 className="w-4 h-4" /> Xóa Học Liệu
+                  <Trash2 className="w-4 h-4" /> {t('ctx.deleteMaterial')}
                 </button>
               </>
             );
@@ -497,14 +499,14 @@ export function MaterialFolderTree({
       )}
 
       {/* ─── Folder Picker Modal (thay thế raw-ID prompt) ─── */}
-      {folderPickerFor !== null && <Modal open onClose={() => setFolderPickerFor(null)} bare ariaLabel="Chọn thư mục" zClass="z-[100000]" className="bg-surface-raised rounded-card max-w-sm w-full p-5 shadow-2xl border border-line">
+      {folderPickerFor !== null && <Modal open onClose={() => setFolderPickerFor(null)} bare ariaLabel={t('picker.aria')} zClass="z-[100000]" className="bg-surface-raised rounded-card max-w-sm w-full p-5 shadow-2xl border border-line">
             <h3 className="text-base font-bold text-ink mb-3 flex items-center gap-2">
-              <Folder className="w-5 h-5 text-accent" /> {folderPickerFor.mode === 'copy' ? 'Chọn Thư mục Đích cho Bản sao' : 'Chọn Thư mục Đích'}
+              <Folder className="w-5 h-5 text-accent" /> {folderPickerFor.mode === 'copy' ? t('picker.titleCopy') : t('picker.title')}
             </h3>
             <input
               autoFocus
               className="w-full px-3 py-2 border border-line rounded-lg mb-3 outline-none focus:border-accent text-sm"
-              placeholder="Tìm kiếm thư mục..."
+              placeholder={t('picker.search')}
               value={folderPickerSearch}
               onChange={e => setFolderPickerSearch(e.target.value)}
             />
@@ -514,12 +516,12 @@ export function MaterialFolderTree({
                 className="w-full text-left px-3 py-2 text-sm text-ink-muted hover:bg-surface-hover rounded-lg flex items-center gap-2 italic"
                 onClick={() => commitFolderPickerTarget(null)}
               >
-                <FolderOpen className="w-4 h-4 text-ink-faint" /> Workspace gốc {folderPickerFor.mode === 'copy' ? '' : '(bỏ khỏi thư mục)'}
+                <FolderOpen className="w-4 h-4 text-ink-faint" /> {t('picker.root')} {folderPickerFor.mode === 'copy' ? '' : t('picker.removeFromFolder')}
               </button>
               <div className="h-px bg-surface-hover my-1" />
               {buildPickerTree(undefined)}
               {filteredFolders.length === 0 && (
-                <p className="text-xs text-ink-faint text-center py-4">Không tìm thấy thư mục nào</p>
+                <p className="text-xs text-ink-faint text-center py-4">{t('picker.none')}</p>
               )}
             </div>
             <div className="mt-3 flex justify-end">
@@ -527,20 +529,20 @@ export function MaterialFolderTree({
                 onClick={() => setFolderPickerFor(null)}
                 className="px-3 py-1.5 text-xs font-bold text-ink-muted bg-surface-hover rounded-lg hover:bg-line-soft"
               >
-                Hủy
+                {t('cancel')}
               </button>
             </div>
           </Modal>}
 
       {/* ─── Create Folder Modal (name-only, no raw IDs) ─── */}
-      {createFolderModal !== null && <Modal open onClose={() => setCreateFolderModal(null)} bare ariaLabel="Tạo thư mục" zClass="z-[100000]" className="bg-surface-raised rounded-card max-w-xs w-full p-5 shadow-2xl border border-line">
+      {createFolderModal !== null && <Modal open onClose={() => setCreateFolderModal(null)} bare ariaLabel={t('create.aria')} zClass="z-[100000]" className="bg-surface-raised rounded-card max-w-xs w-full p-5 shadow-2xl border border-line">
             <h3 className="text-base font-bold text-ink mb-3">
-              {createFolderModal.parentId ? 'Tạo Thư mục Con' : 'Tạo Thư mục Mới'}
+              {createFolderModal.parentId ? t('create.titleChild') : t('create.titleNew')}
             </h3>
             <input
               autoFocus
               className="w-full px-3 py-2 border border-line rounded-lg mb-4 outline-none focus:border-accent text-sm"
-              placeholder="Tên thư mục..."
+              placeholder={t('create.placeholder')}
               value={createFolderName}
               onChange={e => setCreateFolderName(e.target.value)}
               onKeyDown={e => {
@@ -555,7 +557,7 @@ export function MaterialFolderTree({
                 onClick={() => setCreateFolderModal(null)}
                 className="px-3 py-1.5 text-xs font-bold text-ink-muted bg-surface-hover rounded-lg hover:bg-line-soft"
               >
-                Hủy
+                {t('cancel')}
               </button>
               <button
                 disabled={!createFolderName.trim()}
@@ -567,18 +569,18 @@ export function MaterialFolderTree({
                 }}
                 className="px-3 py-1.5 text-xs font-bold text-white bg-accent rounded-lg hover:bg-accent-dark disabled:opacity-50"
               >
-                Tạo
+                {t('create.submit')}
               </button>
             </div>
           </Modal>}
 
       {/* ─── Rename Material Modal ─── */}
-      {renameModal !== null && <Modal open onClose={() => setRenameModal(null)} bare ariaLabel="Đổi tên học liệu" zClass="z-[100000]" className="bg-surface-raised rounded-card max-w-xs w-full p-5 shadow-2xl border border-line">
-            <h3 className="text-base font-bold text-ink mb-3">Đổi tên Học liệu</h3>
+      {renameModal !== null && <Modal open onClose={() => setRenameModal(null)} bare ariaLabel={t('rename.aria')} zClass="z-[100000]" className="bg-surface-raised rounded-card max-w-xs w-full p-5 shadow-2xl border border-line">
+            <h3 className="text-base font-bold text-ink mb-3">{t('rename.title')}</h3>
             <input
               autoFocus
               className="w-full px-3 py-2 border border-line rounded-lg mb-4 outline-none focus:border-accent text-sm"
-              placeholder="Tên học liệu..."
+              placeholder={t('rename.placeholder')}
               value={renameValue}
               onChange={e => setRenameValue(e.target.value)}
               onKeyDown={e => {
@@ -593,7 +595,7 @@ export function MaterialFolderTree({
                 onClick={() => setRenameModal(null)}
                 className="px-3 py-1.5 text-xs font-bold text-ink-muted bg-surface-hover rounded-lg hover:bg-line-soft"
               >
-                Hủy
+                {t('cancel')}
               </button>
               <button
                 disabled={!renameValue.trim()}
@@ -605,7 +607,7 @@ export function MaterialFolderTree({
                 }}
                 className="px-3 py-1.5 text-xs font-bold text-white bg-accent rounded-lg hover:bg-accent-dark disabled:opacity-50"
               >
-                Lưu
+                {t('rename.save')}
               </button>
             </div>
           </Modal>}

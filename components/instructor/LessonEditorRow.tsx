@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useState, type DragEvent } from 'react';
 import { ChevronDownIcon, DragHandleIcon, PencilIcon, TrashIcon } from '@/components/instructor/CurriculumIcons';
 import { LessonAssignmentPanel } from '@/components/instructor/LessonAssignmentPanel';
@@ -27,16 +28,10 @@ interface LessonEditorRowProps {
   isDropTarget: boolean;
 }
 
-const LESSON_STATUS_LABEL: Record<LessonEditItem['status'], string> = {
-  DRAFT: 'Chưa có video',
-  READY: 'Sẵn sàng',
-  UNAVAILABLE: 'Video lỗi',
-};
-
 /** Tên hiển thị của video — YouTube không có "tên tệp" thật, Upload thì lấy đoạn cuối URL
  * (khớp tên file gốc đã tải lên, giống Udemy hiện "2026-06-30 14-15-39.mp4"). */
-function deriveVideoDisplayName(lesson: LessonEditItem): string {
-  if (lesson.videoSource === 'YOUTUBE') return 'Video YouTube';
+function deriveVideoDisplayName(lesson: LessonEditItem, youtubeLabel: string): string {
+  if (lesson.videoSource === 'YOUTUBE') return youtubeLabel;
   if (!lesson.videoUrl) return '';
   const clean = lesson.videoUrl.split('?')[0]!;
   const parts = clean.split('/');
@@ -73,6 +68,7 @@ export function LessonEditorRow({
   onDragEnd,
   isDropTarget,
 }: LessonEditorRowProps) {
+  const t = useTranslations('instructor.lessonRow');
   const [editing, setEditing] = useState(false);
   const [title, setTitle] = useState(lesson.title);
   const [description, setDescription] = useState(lesson.description ?? '');
@@ -100,18 +96,18 @@ export function LessonEditorRow({
       draggable
       onDragStart={handleDragStart}
       onDragEnd={onDragEnd}
-      title="Kéo để đổi thứ tự bài học"
+      title={t('dragLesson')}
       className={`flex flex-col gap-2 rounded-lg border bg-surface/60 px-3 py-2 transition-colors cursor-move ${
         isDropTarget ? 'border-accent/40 bg-tint/60' : 'border-line-soft'
       }`}
     >
       {editing ? (
         <div className="flex flex-col gap-2" draggable={false} onDragStart={(e) => e.preventDefault()}>
-          <span className="text-[11.5px] font-bold text-ink-muted">Bài giảng {index + 1}:</span>
+          <span className="text-[11.5px] font-bold text-ink-muted">{t('lessonNo', { n: index + 1 })}</span>
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="Nhập tiêu đề"
+            placeholder={t('titlePlaceholder')}
             draggable={false}
             className="rounded-lg border border-line px-3 py-1.5 text-[13px] font-medium focus:border-accent focus:outline-none"
           />
@@ -119,7 +115,7 @@ export function LessonEditorRow({
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={2}
-            placeholder="Mô tả bài giảng — nêu rõ học viên sẽ làm được gì sau bài này."
+            placeholder={t('descPlaceholder')}
             draggable={false}
             className="rounded-lg border border-line px-3 py-1.5 text-[12.5px] focus:border-accent focus:outline-none"
           />
@@ -134,7 +130,7 @@ export function LessonEditorRow({
               }}
               className="rounded-lg px-3 py-1.5 text-[12px] font-semibold text-ink-muted hover:bg-tint"
             >
-              Hủy bỏ
+              {t('cancel')}
             </button>
             <button
               type="button"
@@ -142,7 +138,7 @@ export function LessonEditorRow({
               onClick={handleSaveEdit}
               className="rounded-lg bg-accent px-3 py-1.5 text-[12px] font-bold text-white hover:bg-accent-dark"
             >
-              Lưu bài giảng
+              {t('saveLesson')}
             </button>
           </div>
         </div>
@@ -165,13 +161,13 @@ export function LessonEditorRow({
               Phần cha) nên hover đúng hàng bài giảng mới hiện, không lộ nhầm icon của Phần. */}
           <div className="flex min-w-0 flex-1 items-center gap-1.5">
             <span className="truncate text-[13px] font-medium text-ink">
-              Bài giảng {index + 1}: {lesson.title}
+              {t('lessonTitled', { n: index + 1, title: lesson.title })}
             </span>
             <button
               type="button"
               draggable={false}
               onClick={() => setEditing(true)}
-              title="Đổi tên/mô tả bài giảng"
+              title={t('rename')}
               className="shrink-0 text-ink-faint opacity-0 hover:text-ink group-hover:opacity-100"
             >
               <PencilIcon />
@@ -180,14 +176,14 @@ export function LessonEditorRow({
               type="button"
               draggable={false}
               onClick={() => setConfirmDelete(true)}
-              title="Xóa bài giảng"
+              title={t('deleteLesson')}
               className="shrink-0 text-ink-faint opacity-0 hover:text-danger group-hover:opacity-100"
             >
               <TrashIcon />
             </button>
           </div>
 
-          <span className="shrink-0 text-[11px] text-ink-faint">{LESSON_STATUS_LABEL[lesson.status]}</span>
+          <span className="shrink-0 text-[11px] text-ink-faint">{t(`status.${lesson.status}`)}</span>
 
           <label className="flex shrink-0 cursor-pointer items-center gap-1.5 text-[11.5px] font-semibold text-ink-muted">
             <input
@@ -206,7 +202,7 @@ export function LessonEditorRow({
             onClick={onManageVideo}
             className="shrink-0 whitespace-nowrap rounded-full border border-line px-2.5 py-1 text-[11px] font-bold text-accent-dark hover:bg-tint transition-colors"
           >
-            + Nội dung
+            {t('addContent')}
           </button>
           {/* (19/09/2026) — bỏ viền/màu, chỉ còn icon mũi tên trơn; bấm để MỞ RỘNG ngay trong
               hàng (thay popover nổi trước đây), mũi tên tự xoay theo trạng thái. */}
@@ -214,7 +210,7 @@ export function LessonEditorRow({
             type="button"
             draggable={false}
             onClick={() => setExpanded((v) => !v)}
-            title={expanded ? 'Thu gọn' : 'Mở rộng'}
+            title={expanded ? t('collapse') : t('expand')}
             className="shrink-0 text-ink-muted hover:text-ink"
           >
             <ChevronDownIcon expanded={expanded} />
@@ -222,7 +218,7 @@ export function LessonEditorRow({
 
           <span
             aria-hidden
-            title="Kéo để đổi thứ tự"
+            title={t('dragReorder')}
             className="shrink-0 select-none text-ink-faint opacity-0 group-hover:opacity-100"
           >
             <DragHandleIcon />
@@ -255,9 +251,9 @@ export function LessonEditorRow({
                 )}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-[12.5px] font-medium text-ink">{deriveVideoDisplayName(lesson)}</p>
+                <p className="truncate text-[12.5px] font-medium text-ink">{deriveVideoDisplayName(lesson, t('youtubeVideo'))}</p>
                 <p className="text-[11px] text-ink-faint">
-                  {formatDuration(lesson.durationSec)} · {LESSON_STATUS_LABEL[lesson.status]}
+                  {formatDuration(lesson.durationSec)} · {t(`status.${lesson.status}`)}
                 </p>
                 <button
                   type="button"
@@ -265,7 +261,7 @@ export function LessonEditorRow({
                   onClick={onManageVideo}
                   className="mt-0.5 inline-flex items-center gap-1 text-[11.5px] font-semibold text-accent-dark hover:underline"
                 >
-                  <PencilIcon className="h-3 w-3" /> Chỉnh sửa nội dung
+                  <PencilIcon className="h-3 w-3" /> {t('editContent')}
                 </button>
               </div>
               {lesson.status === 'READY' && (
@@ -276,7 +272,7 @@ export function LessonEditorRow({
                     onClick={() => setShowPreviewMenu((v) => !v)}
                     className="flex items-center gap-1 rounded-lg bg-accent px-3 py-1.5 text-[12px] font-bold text-white hover:bg-accent-dark"
                   >
-                    Xem trước <ChevronDownIcon className="h-3.5 w-3.5" expanded={showPreviewMenu} />
+                    {t('preview')} <ChevronDownIcon className="h-3.5 w-3.5" expanded={showPreviewMenu} />
                   </button>
                   {showPreviewMenu && (
                     <div
@@ -292,7 +288,7 @@ export function LessonEditorRow({
                         }}
                         className="block w-full px-3 py-1.5 text-left text-[12px] text-ink hover:bg-surface"
                       >
-                        Với tư cách là Giảng viên
+                        {t('asInstructor')}
                       </button>
                       <button
                         type="button"
@@ -303,7 +299,7 @@ export function LessonEditorRow({
                         }}
                         className="block w-full px-3 py-1.5 text-left text-[12px] text-ink hover:bg-surface"
                       >
-                        Với tư cách là học viên
+                        {t('asLearner')}
                       </button>
                     </div>
                   )}
@@ -318,12 +314,12 @@ export function LessonEditorRow({
             onClick={() => setShowDescriptionPanel((v) => !v)}
             className="self-start rounded-full border border-line px-3 py-1.5 text-[12px] font-bold text-accent-dark hover:bg-tint transition-colors"
           >
-            + Sự miêu tả
+            {t('addDescription')}
           </button>
           {showDescriptionPanel && (
             <div className="flex flex-col gap-2 rounded-lg border border-line bg-surface/60 p-3">
               <p className="text-[11.5px] text-ink-faint">
-                Thêm phần mô tả. Nêu rõ những điều học viên sẽ làm được sau khi hoàn thành bài giảng.
+                {t('descHint')}
               </p>
               <textarea
                 value={description}
@@ -342,7 +338,7 @@ export function LessonEditorRow({
                   }}
                   className="rounded-lg px-3 py-1.5 text-[12px] font-semibold text-ink-muted hover:bg-tint"
                 >
-                  Hủy bỏ
+                  {t('cancel')}
                 </button>
                 <button
                   type="button"
@@ -353,7 +349,7 @@ export function LessonEditorRow({
                   }}
                   className="rounded-lg bg-accent px-3 py-1.5 text-[12px] font-bold text-white hover:bg-accent-dark"
                 >
-                  Lưu
+                  {t('save')}
                 </button>
               </div>
             </div>
@@ -365,7 +361,7 @@ export function LessonEditorRow({
             onClick={() => setShowResourcePanel((v) => !v)}
             className="self-start rounded-full border border-line px-3 py-1.5 text-[12px] font-bold text-accent-dark hover:bg-tint transition-colors"
           >
-            + Tài nguyên
+            {t('addResource')}
           </button>
           {showResourcePanel && <LessonResourcePanel lessonId={lesson.id} />}
 
@@ -375,7 +371,7 @@ export function LessonEditorRow({
             onClick={() => setShowAssignmentPanel((v) => !v)}
             className="self-start rounded-full border border-line px-3 py-1.5 text-[12px] font-bold text-accent-dark hover:bg-tint transition-colors"
           >
-            + Bài tập
+            {t('addAssignment')}
           </button>
           {showAssignmentPanel && <LessonAssignmentPanel lessonId={lesson.id} />}
         </div>
@@ -385,7 +381,7 @@ export function LessonEditorRow({
 
       {confirmDelete && (
         <ConfirmModal
-          message="Bạn sắp xóa 1 mục trong chương trình giảng dạy. Bạn có chắc chắn muốn tiếp tục không?"
+          message={t('deleteConfirm')}
           onCancel={() => setConfirmDelete(false)}
           onConfirm={() => {
             setConfirmDelete(false);

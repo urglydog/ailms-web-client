@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { BalanceCards } from '@/components/instructor/earnings/BalanceCards';
 import { DebtCard } from '@/components/instructor/earnings/DebtCard';
 import { StatementPanel } from '@/components/instructor/earnings/StatementPanel';
@@ -16,13 +17,14 @@ import { useFinanceSummary } from '@/hooks/useFinance';
  * lịch sử và sao kê. Mọi con số do BE tính từ sổ cái; trang này chỉ hiển thị. Quyền thật do BE kiểm (INSTRUCTOR).
  */
 export default function InstructorEarningsPage() {
+  const t = useTranslations('instructor.earningsPage');
   const { data: summary, isLoading, isError } = useFinanceSummary();
 
   return (
     <>
       <PageHeader
-        title="Thu nhập & Rút tiền"
-        subtitle="Thu nhập từ khóa học được giữ trong thời gian hoàn tiền rồi mới rút được. Bạn rút theo yêu cầu, có xác nhận qua email."
+        title={t('title')}
+        subtitle={t('subtitle')}
       />
       {isLoading ? (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -32,7 +34,7 @@ export default function InstructorEarningsPage() {
         </div>
       ) : isError || !summary ? (
         <div role="alert" className="rounded-xl border border-danger/40 bg-danger/5 p-6 text-center text-danger">
-          Không tải được thông tin thu nhập. Vui lòng thử lại.
+          {t('loadError')}
         </div>
       ) : (
         <>

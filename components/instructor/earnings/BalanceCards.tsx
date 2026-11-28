@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import type { FinanceSummary } from '@/types/finance';
 import { dateOnly, money } from '@/lib/finance';
 
@@ -15,25 +16,24 @@ function Card({ label, value, hint, strong }: { label: string; value: string; hi
 
 /** Số dư thu nhập: có thể rút / đang giữ / đóng băng / đã nhận (11/11/2026, Giai đoạn C). */
 export function BalanceCards({ summary }: { summary: FinanceSummary }) {
+  const t = useTranslations('instructor.balance');
   return (
     <div className="flex flex-col gap-3">
       {!summary.cryptoConfigured && (
         <div role="alert" className="rounded-xl border border-warning bg-surface-raised p-4 text-sm text-ink">
-          Máy chủ chưa bật tính năng tài khoản nhận tiền nên chưa thể liên kết tài khoản hay rút tiền. Thu nhập của bạn vẫn
-          được ghi nhận đầy đủ; quản trị viên sẽ bật tính năng này.
+          {t('noCrypto')}
         </div>
       )}
       {summary.available < 0 && (
         <div role="alert" className="rounded-xl border border-danger/40 bg-danger/5 p-4 text-sm text-ink">
-          Số dư của bạn đang âm {money(Math.abs(summary.available))} do các khoản hoàn tiền phát sinh sau khi đã chi trả. Khoản
-          này sẽ được bù trừ vào thu nhập các đơn hàng sau.
+          {t('negative', { amount: money(Math.abs(summary.available)) })}
         </div>
       )}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <Card label="Có thể rút" value={money(summary.withdrawable)} hint={`Đợt chi kế tiếp: ${dateOnly(summary.nextPayoutDate)}`} strong />
-        <Card label="Đang giữ" value={money(summary.pending)} hint="Thu nhập mới, giữ trong thời gian hoàn tiền" />
-        <Card label="Đóng băng" value={money(summary.frozen)} hint="Đơn đang có khiếu nại, chờ xử lý" />
-        <Card label="Đã nhận" value={money(summary.paidOut)} hint="Tổng số đã được chuyển khoản" />
+        <Card label={t('withdrawable')} value={money(summary.withdrawable)} hint={t('nextPayout', { date: dateOnly(summary.nextPayoutDate) })} strong />
+        <Card label={t('holding')} value={money(summary.pending)} hint={t('holdingHint')} />
+        <Card label={t('frozen')} value={money(summary.frozen)} hint={t('frozenHint')} />
+        <Card label={t('paidOut')} value={money(summary.paidOut)} hint={t('paidOutHint')} />
       </div>
     </div>
   );

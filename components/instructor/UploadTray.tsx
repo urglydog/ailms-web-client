@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { UploadProgressBar } from '@/components/ui/UploadProgressBar';
 import { useUploadTrayStore } from '@/lib/stores/uploadTrayStore';
 
@@ -10,6 +11,7 @@ import { useUploadTrayStore } from '@/lib/stores/uploadTrayStore';
  * `uploadTrayStore.ts`); tác vụ lỗi ở lại cho tới khi người dùng bấm đóng, tránh bị bỏ sót.
  */
 export function UploadTray() {
+  const t = useTranslations('instructor.uploadTray');
   const tasks = useUploadTrayStore((s) => s.tasks);
   const isOpen = useUploadTrayStore((s) => s.isOpen);
   const toggleOpen = useUploadTrayStore((s) => s.toggleOpen);
@@ -22,10 +24,10 @@ export function UploadTray() {
   const errorCount = tasks.filter((t) => t.status === 'error').length;
   const summary =
     uploadingCount > 0
-      ? `Đang tải lên (${uploadingCount})`
+      ? t('uploading', { count: uploadingCount })
       : errorCount > 0
-        ? `${errorCount} tác vụ lỗi`
-        : 'Đã tải xong';
+        ? t('errors', { count: errorCount })
+        : t('done');
 
   return (
     <div className="fixed bottom-4 right-4 z-40 w-80 overflow-hidden rounded-xl border border-line bg-surface-raised shadow-2xl">
@@ -55,7 +57,7 @@ export function UploadTray() {
                       onClick={() => cancelTask(task.id)}
                       className="shrink-0 pb-0.5 text-[11px] font-bold text-danger hover:text-danger"
                     >
-                      Hủy
+                      {t('cancel')}
                     </button>
                   )}
                 </div>
@@ -80,7 +82,7 @@ export function UploadTray() {
                       onClick={() => dismissTask(task.id)}
                       className="shrink-0 text-[11px] font-bold text-danger hover:text-danger"
                     >
-                      Đóng
+                      {t('close')}
                     </button>
                   </div>
                   <span className="text-[11.5px] text-danger">{task.errorMessage}</span>

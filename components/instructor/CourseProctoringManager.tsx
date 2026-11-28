@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { Eye, Video, ShieldAlert, Search, X } from 'lucide-react';
@@ -24,6 +25,7 @@ const RISK_BADGE: Record<string, string> = {
  * giám sát của khoá học này (không còn màn "chọn quiz" trung gian). Chỉ highlight thứ đáng chú ý
  * (rủi ro MEDIUM/HIGH) — LOW/chưa có đánh giá thì để trống, không phải chữ giải thích dài dòng. */
 export function CourseProctoringManager({ courseId }: { courseId: number }) {
+  const t = useTranslations('instructor.proctoringList');
   const { data: attempts, isLoading } = useProctoredAttempts(courseId);
   const [search, setSearch] = useState('');
   const [dateFrom, setDateFrom] = useState('');
@@ -61,7 +63,7 @@ export function CourseProctoringManager({ courseId }: { courseId: number }) {
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-ink-faint" />
           <input
             type="text"
-            placeholder="Tìm theo tên bài thi..."
+            placeholder={t('searchPlaceholder')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-8 pr-8 py-1.5 text-sm border border-line rounded-card focus:outline-none focus:border-accent transition-colors bg-surface"
@@ -73,7 +75,7 @@ export function CourseProctoringManager({ courseId }: { courseId: number }) {
           )}
         </div>
         <label className="flex items-center gap-1.5 text-xs text-ink-muted">
-          Từ
+          {t('from')}
           <input
             type="date"
             value={dateFrom}
@@ -82,7 +84,7 @@ export function CourseProctoringManager({ courseId }: { courseId: number }) {
           />
         </label>
         <label className="flex items-center gap-1.5 text-xs text-ink-muted">
-          Đến
+          {t('to')}
           <input
             type="date"
             value={dateTo}
@@ -95,7 +97,7 @@ export function CourseProctoringManager({ courseId }: { courseId: number }) {
           onChange={(e) => setRiskFilter(e.target.value as 'ALL' | 'HIGH' | 'MEDIUM')}
           className="px-2 py-1.5 text-sm border border-line rounded-card focus:outline-none focus:border-accent bg-surface text-ink"
         >
-          <option value="ALL">Mọi mức rủi ro</option>
+          <option value="ALL">{t('allRisk')}</option>
           <option value="HIGH">HIGH</option>
           <option value="MEDIUM">MEDIUM</option>
         </select>
@@ -106,12 +108,12 @@ export function CourseProctoringManager({ courseId }: { courseId: number }) {
       <table className="w-full min-w-[640px] text-left text-sm">
         <thead className="bg-surface-raised text-xs uppercase text-ink-muted border-b border-line">
           <tr>
-            <th className="px-4 py-3">Học viên</th>
-            <th className="px-4 py-3">Bài thi</th>
-            <th className="px-4 py-3">Nộp lúc</th>
-            <th className="px-4 py-3 text-center" title="Số vi phạm ghi nhận">VP</th>
-            <th className="px-4 py-3 text-center" title="Đánh giá rủi ro gian lận của AI">Rủi ro</th>
-            <th className="px-4 py-3 text-center" title="Video bằng chứng">
+            <th className="px-4 py-3">{t('colLearner')}</th>
+            <th className="px-4 py-3">{t('colExam')}</th>
+            <th className="px-4 py-3">{t('colSubmitted')}</th>
+            <th className="px-4 py-3 text-center" title={t('colViolationsTitle')}>{t('colViolationsAbbr')}</th>
+            <th className="px-4 py-3 text-center" title={t('colRiskTitle')}>{t('colRisk')}</th>
+            <th className="px-4 py-3 text-center" title={t('colVideoTitle')}>
               <Video className="w-3.5 h-3.5 inline" />
             </th>
             <th className="px-4 py-3 w-10"></th>
@@ -119,11 +121,11 @@ export function CourseProctoringManager({ courseId }: { courseId: number }) {
         </thead>
         <tbody className="divide-y divide-line">
           {isLoading ? (
-            <tr><td colSpan={7} className="px-4 py-8 text-center text-ink-muted">Đang tải...</td></tr>
+            <tr><td colSpan={7} className="px-4 py-8 text-center text-ink-muted">{t('loading')}</td></tr>
           ) : !attempts || attempts.length === 0 ? (
-            <tr><td colSpan={7} className="px-4 py-8 text-center text-ink-muted">Chưa có lượt thi nào ở các bài thi bật giám sát.</td></tr>
+            <tr><td colSpan={7} className="px-4 py-8 text-center text-ink-muted">{t('empty')}</td></tr>
           ) : !pagedAttempts || pagedAttempts.length === 0 ? (
-            <tr><td colSpan={7} className="px-4 py-8 text-center text-ink-muted">Không có lượt thi nào khớp bộ lọc.</td></tr>
+            <tr><td colSpan={7} className="px-4 py-8 text-center text-ink-muted">{t('noMatch')}</td></tr>
           ) : (
             pagedAttempts.map((a) => (
               <tr key={a.attemptId} className="hover:bg-surface-raised transition-colors">

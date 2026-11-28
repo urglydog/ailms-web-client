@@ -1,11 +1,13 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 
 /** (19/09/2026) — `/edit` tách thành nhiều trang con kiểu Udemy (xem `EditCourseLayout.tsx`);
  * giữ URL cũ này chuyển hướng sang trang mặc định để không hỏng đường link đã lưu/bookmark. */
 export default function EditCourseRedirectPage() {
+  const t = useTranslations('instructor.common');
   const router = useRouter();
   const params = useParams<{ id: string }>();
 
@@ -13,5 +15,5 @@ export default function EditCourseRedirectPage() {
     router.replace(`/instructor/courses/${params.id}/edit/curriculum`);
   }, [router, params.id]);
 
-  return <div className="p-10 text-center text-sm text-ink-muted">Đang chuyển hướng...</div>;
+  return <div className="p-10 text-center text-sm text-ink-muted">{t('redirecting')}</div>;
 }

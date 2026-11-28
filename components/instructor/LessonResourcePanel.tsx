@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useState, type ChangeEvent, type FormEvent } from 'react';
 import { UploadProgressBar } from '@/components/ui/UploadProgressBar';
 import { useAddLessonDocumentLink, useDeleteLessonDocument, useLessonDocuments } from '@/hooks/useCourses';
@@ -19,6 +20,7 @@ const MAX_DOCUMENTS = 5;
  * link" (mở rộng mới — xem `LessonDocumentService.addLink`, lưu URL với `fileType="LINK"`).
  */
 export function LessonResourcePanel({ lessonId }: { lessonId: number }) {
+  const t = useTranslations('instructor.lessonResource');
   const [mode, setMode] = useState<'file' | 'link'>('file');
   const [linkTitle, setLinkTitle] = useState('');
   const [linkUrl, setLinkUrl] = useState('');
@@ -37,7 +39,7 @@ export function LessonResourcePanel({ lessonId }: { lessonId: number }) {
     const file = e.target.files?.[0];
     e.target.value = '';
     if (!file) return;
-    startDocumentUpload(lessonId, file, `Tài liệu: ${file.name}`);
+    startDocumentUpload(lessonId, file, t('documentTask', { name: file.name }));
   };
 
   const handleLinkSubmit = (e: FormEvent) => {
@@ -56,15 +58,15 @@ export function LessonResourcePanel({ lessonId }: { lessonId: number }) {
       className="mt-2 flex flex-col gap-3 rounded-lg border border-line bg-surface/60 p-3"
     >
       <div className="flex items-center justify-between">
-        <h4 className="text-[12.5px] font-bold text-ink">Tài nguyên</h4>
+        <h4 className="text-[12.5px] font-bold text-ink">{t('title')}</h4>
         <span className="text-[11px] text-ink-faint">{docs.length}/{MAX_DOCUMENTS}</span>
       </div>
       {/* Text giải thích nhỏ — cùng tinh thần chú thích của Udemy dưới mỗi mục thêm nội dung. */}
       <p className="text-[11.5px] leading-relaxed text-ink-faint">
-        Tệp hoặc liên kết tham khảo hỗ trợ học viên trong bài giảng này. Đảm bảo tệp dễ đọc, tối đa 50MB.
+        {t('hint')}
       </p>
 
-      {isLoading && <p className="text-[12px] text-ink-faint">Đang tải...</p>}
+      {isLoading && <p className="text-[12px] text-ink-faint">{t('loading')}</p>}
 
       <div className="flex flex-col gap-1.5">
         {docs.map((doc) => (
@@ -93,12 +95,12 @@ export function LessonResourcePanel({ lessonId }: { lessonId: number }) {
               onClick={() => deleteDocument.mutate(doc.id)}
               className="shrink-0 text-[11.5px] font-bold text-danger hover:text-danger"
             >
-              Xóa
+              {t('delete')}
             </button>
           </div>
         ))}
         {docs.length === 0 && !isLoading && (
-          <p className="text-[12px] text-ink-faint">Chưa có tài nguyên nào.</p>
+          <p className="text-[12px] text-ink-faint">{t('empty')}</p>
         )}
       </div>
 
@@ -111,7 +113,7 @@ export function LessonResourcePanel({ lessonId }: { lessonId: number }) {
               onClick={() => setMode('file')}
               className={`flex-1 rounded-md py-1.5 ${mode === 'file' ? 'bg-surface-raised text-accent-dark shadow-sm' : 'text-ink-muted'}`}
             >
-              Thêm tệp từ máy
+              {t('addFile')}
             </button>
             <button
               type="button"
@@ -119,7 +121,7 @@ export function LessonResourcePanel({ lessonId }: { lessonId: number }) {
               onClick={() => setMode('link')}
               className={`flex-1 rounded-md py-1.5 ${mode === 'link' ? 'bg-surface-raised text-accent-dark shadow-sm' : 'text-ink-muted'}`}
             >
-              Dán link
+              {t('pasteLink')}
             </button>
           </div>
 
@@ -134,7 +136,7 @@ export function LessonResourcePanel({ lessonId }: { lessonId: number }) {
                 className="text-[12px] file:mr-3 file:rounded-md file:border-0 file:bg-tint file:px-3 file:py-1.5 file:text-[11.5px] file:font-semibold"
               />
               {docTask?.status === 'uploading' && (
-                <UploadProgressBar percent={docTask.percent} label="Đang tải tài liệu lên..." />
+                <UploadProgressBar percent={docTask.percent} label={t('uploadingDoc')} />
               )}
               {docTask?.status === 'error' && <p className="text-[11.5px] text-danger">{docTask.errorMessage}</p>}
             </div>
@@ -143,7 +145,7 @@ export function LessonResourcePanel({ lessonId }: { lessonId: number }) {
               <input
                 value={linkTitle}
                 onChange={(e) => setLinkTitle(e.target.value)}
-                placeholder="Tên hiển thị"
+                placeholder={t('displayName')}
                 draggable={false}
                 className="rounded-lg border border-line px-3 py-1.5 text-[12.5px] focus:border-accent focus:outline-none"
               />
@@ -160,13 +162,13 @@ export function LessonResourcePanel({ lessonId }: { lessonId: number }) {
                 disabled={addLink.isPending}
                 className="self-start rounded-lg bg-accent px-4 py-1.5 text-[12px] font-bold text-white hover:bg-accent-dark disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {addLink.isPending ? 'Đang thêm...' : 'Thêm liên kết'}
+                {addLink.isPending ? t('adding') : t('addLink')}
               </button>
             </form>
           )}
         </div>
       ) : (
-        <p className="text-[11.5px] text-warning">Đã đạt tối đa {MAX_DOCUMENTS} tài nguyên — xóa bớt để thêm mới.</p>
+        <p className="text-[11.5px] text-warning">{t('maxReached', { max: MAX_DOCUMENTS })}</p>
       )}
     </div>
   );

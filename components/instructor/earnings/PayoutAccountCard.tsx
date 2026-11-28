@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { useEditAccount, useLinkAccount, usePayoutAccounts, usePayoutBanks, useRemoveAccount, useSetPrimaryAccount } from '@/hooks/useFinance';
@@ -19,6 +20,7 @@ interface AccountFormProps {
 
 /** Form dùng chung cho thêm mới và sửa — hiển thị NGAY TRONG thẻ (không popup). */
 function AccountForm({ banks, account, pending, onSubmit, onCancel }: AccountFormProps) {
+  const t = useTranslations('instructor.payoutAccount');
   const [bankCode, setBankCode] = useState(account?.bankCode ?? '');
   const [accountNumber, setAccountNumber] = useState('');
   const [holderName, setHolderName] = useState(account?.holderName ?? '');
@@ -39,16 +41,16 @@ function AccountForm({ banks, account, pending, onSubmit, onCancel }: AccountFor
       className="flex flex-col gap-3"
     >
       <label className="flex flex-col gap-1.5">
-        <span className="text-sm font-semibold text-ink">Ngân hàng</span>
+        <span className="text-sm font-semibold text-ink">{t('bank')}</span>
         <select value={bankCode} onChange={(e) => setBankCode(e.target.value)} className={INPUT}>
-          <option value="">Chọn ngân hàng</option>
+          <option value="">{t('pickBank')}</option>
           {banks.map((b) => (
             <option key={b.code} value={b.code}>{b.name}</option>
           ))}
         </select>
       </label>
       <label className="flex flex-col gap-1.5">
-        <span className="text-sm font-semibold text-ink">Số tài khoản</span>
+        <span className="text-sm font-semibold text-ink">{t('accountNumber')}</span>
         <input
           type="text"
           inputMode="numeric"
@@ -56,12 +58,12 @@ function AccountForm({ banks, account, pending, onSubmit, onCancel }: AccountFor
           value={accountNumber}
           onChange={(e) => setAccountNumber(e.target.value)}
           maxLength={25}
-          placeholder={isEdit ? `Để trống nếu giữ nguyên số ${account.accountMask}` : undefined}
+          placeholder={isEdit ? t('keepNumberPlaceholder', { mask: account.accountMask }) : undefined}
           className={`${INPUT} font-mono`}
         />
       </label>
       <label className="flex flex-col gap-1.5">
-        <span className="text-sm font-semibold text-ink">Tên chủ tài khoản</span>
+        <span className="text-sm font-semibold text-ink">{t('holderName')}</span>
         <input
           type="text"
           autoComplete="off"
@@ -71,12 +73,12 @@ function AccountForm({ banks, account, pending, onSubmit, onCancel }: AccountFor
           placeholder="NGUYEN VAN A"
           className={INPUT}
         />
-        <span className="text-xs text-ink-muted">Nên trùng với tên tài khoản của bạn (viết hoa không dấu cũng được).</span>
+        <span className="text-xs text-ink-muted">{t('holderHint')}</span>
       </label>
       <p className="m-0 text-xs text-ink-muted">
         {needsEmail
-          ? 'Chúng tôi gửi email xác nhận tới địa chỉ của bạn; liên kết có hiệu lực 30 phút. Tài khoản cũ (nếu đang sửa) vẫn dùng được cho tới khi bạn xác nhận.'
-          : 'Chỉ đổi tên chủ tài khoản nên được áp dụng ngay, không cần xác nhận email.'}
+          ? t('needsEmailNote')
+          : t('noEmailNote')}
       </p>
       <div className="flex gap-2">
         <button
@@ -84,10 +86,10 @@ function AccountForm({ banks, account, pending, onSubmit, onCancel }: AccountFor
           disabled={!valid || pending}
           className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-dark disabled:opacity-50"
         >
-          {pending ? 'Đang gửi...' : needsEmail ? 'Gửi email xác nhận' : 'Lưu'}
+          {pending ? t('sending') : needsEmail ? t('sendConfirm') : t('save')}
         </button>
         <button type="button" onClick={onCancel} className="rounded-lg border border-line px-4 py-2 text-sm font-semibold text-ink-muted hover:text-ink">
-          Hủy
+          {t('cancel')}
         </button>
       </div>
     </form>
@@ -99,6 +101,7 @@ function AccountForm({ banks, account, pending, onSubmit, onCancel }: AccountFor
  * không popup. Thêm mới và đổi ngân hàng/số tài khoản cần xác nhận qua email; không khóa rút sau khi đổi.
  */
 export function PayoutAccountCard({ summary }: { summary: FinanceSummary }) {
+  const t = useTranslations('instructor.payoutAccount');
   const { data: accounts } = usePayoutAccounts();
   const { data: banks } = usePayoutBanks();
   const link = useLinkAccount();
@@ -118,19 +121,19 @@ export function PayoutAccountCard({ summary }: { summary: FinanceSummary }) {
     <section className="flex flex-col gap-4 rounded-xl border border-line bg-surface-raised p-5 shadow-sm">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="m-0 font-display text-base font-bold text-ink">
-          Tài khoản nhận tiền{' '}
+          {t('title')}{' '}
           <span className="text-sm font-medium text-ink-muted">({activeCount}/{MAX_PAYOUT_ACCOUNTS})</span>
         </h2>
         {canAdd && !adding && (
           <button type="button" onClick={() => setAdding(true)} className="text-sm font-semibold text-accent-dark hover:underline">
-            + Thêm tài khoản
+            {t('add')}
           </button>
         )}
       </div>
 
       {list.length === 0 && !adding && (
         <p className="m-0 text-sm text-ink-muted">
-          {summary.cryptoConfigured ? 'Bạn chưa liên kết tài khoản nào. Thêm một tài khoản ngân hàng để nhận tiền.' : 'Tính năng liên kết tài khoản chưa được bật trên máy chủ.'}
+          {summary.cryptoConfigured ? t('emptyConfigured') : t('emptyNotConfigured')}
         </p>
       )}
 
@@ -150,12 +153,12 @@ export function PayoutAccountCard({ summary }: { summary: FinanceSummary }) {
                       onSuccess: () => {
                         toast.success(
                           a.status === 'ACTIVE' && values.accountNumber === '' && values.bankCode === a.bankCode
-                            ? 'Đã cập nhật tên chủ tài khoản.'
-                            : 'Đã gửi email xác nhận. Hãy mở email và bấm liên kết trong vòng 30 phút.',
+                            ? t('toast.nameUpdated')
+                            : t('toast.confirmSent'),
                         );
                         setEditingId(null);
                       },
-                      onError: onError('Không sửa được tài khoản.'),
+                      onError: onError(t('toast.editFailed')),
                     },
                   )
                 }
@@ -167,45 +170,45 @@ export function PayoutAccountCard({ summary }: { summary: FinanceSummary }) {
                     {a.bankName} {a.accountMask}
                   </div>
                   <span className="flex items-center gap-2">
-                    {a.primary && <span className="rounded-full bg-tint px-2.5 py-1 text-xs font-bold text-accent-dark">Mặc định</span>}
+                    {a.primary && <span className="rounded-full bg-tint px-2.5 py-1 text-xs font-bold text-accent-dark">{t('badge.default')}</span>}
                     {a.status === 'PENDING_CONFIRM' && (
-                      <span className="rounded-full border border-warning px-2.5 py-1 text-xs font-medium text-ink">Chờ xác nhận email</span>
+                      <span className="rounded-full border border-warning px-2.5 py-1 text-xs font-medium text-ink">{t('badge.pending')}</span>
                     )}
                   </span>
                 </div>
-                <div className="text-sm text-ink-muted">Chủ tài khoản: {a.holderName}</div>
+                <div className="text-sm text-ink-muted">{t('holderLabel', { name: a.holderName })}</div>
                 {a.status === 'PENDING_CONFIRM' && (
                   <div className="text-xs text-ink">
-                    {a.replacesAccountId !== null ? 'Bản sửa này có hiệu lực sau khi bạn xác nhận qua email; tài khoản cũ vẫn dùng được cho tới lúc đó.' : 'Mở email và bấm liên kết xác nhận (có hiệu lực 30 phút).'}
+                    {a.replacesAccountId !== null ? t('pendingReplace') : t('pendingNew')}
                   </div>
                 )}
                 {a.nameMatchStatus === 'MISMATCH' && (
                   <div className="text-xs text-danger">
-                    Tên chủ tài khoản chưa khớp với tên tài khoản của bạn; quản trị viên sẽ kiểm tra kỹ trước khi chuyển tiền.
+                    {t('mismatch')}
                   </div>
                 )}
 
                 {confirmRemoveId === a.id ? (
                   <div className="flex flex-wrap items-center gap-2 rounded-lg bg-danger/5 px-3 py-2 text-sm text-ink">
-                    <span>Gỡ tài khoản này?</span>
+                    <span>{t('removeConfirm')}</span>
                     <button
                       type="button"
                       disabled={remove.isPending}
                       onClick={() =>
                         remove.mutate(a.id, {
                           onSuccess: () => {
-                            toast.success('Đã gỡ tài khoản.');
+                            toast.success(t('toast.removed'));
                             setConfirmRemoveId(null);
                           },
-                          onError: onError('Không gỡ được tài khoản.'),
+                          onError: onError(t('toast.removeFailed')),
                         })
                       }
                       className="rounded-lg bg-danger px-3 py-1 text-xs font-semibold text-white hover:opacity-90 disabled:opacity-50"
                     >
-                      Gỡ
+                      {t('remove')}
                     </button>
                     <button type="button" onClick={() => setConfirmRemoveId(null)} className="rounded-lg border border-line px-3 py-1 text-xs font-semibold text-ink-muted hover:text-ink">
-                      Hủy
+                      {t('cancel')}
                     </button>
                   </div>
                 ) : (
@@ -216,22 +219,22 @@ export function PayoutAccountCard({ summary }: { summary: FinanceSummary }) {
                         disabled={setPrimary.isPending}
                         onClick={() =>
                           setPrimary.mutate(a.id, {
-                            onSuccess: () => toast.success('Đã đặt làm tài khoản nhận tiền mặc định.'),
-                            onError: onError('Không đổi được tài khoản mặc định.'),
+                            onSuccess: () => toast.success(t('toast.defaultSet')),
+                            onError: onError(t('toast.defaultFailed')),
                           })
                         }
                         className="text-accent-dark hover:underline disabled:opacity-50"
                       >
-                        Đặt mặc định
+                        {t('setDefault')}
                       </button>
                     )}
                     {summary.cryptoConfigured && (
                       <button type="button" onClick={() => setEditingId(a.id)} className="text-accent-dark hover:underline">
-                        Sửa
+                        {t('edit')}
                       </button>
                     )}
                     <button type="button" onClick={() => setConfirmRemoveId(a.id)} className="text-danger hover:underline">
-                      Gỡ
+                      {t('remove')}
                     </button>
                   </div>
                 )}
@@ -242,7 +245,7 @@ export function PayoutAccountCard({ summary }: { summary: FinanceSummary }) {
 
         {adding && (
           <li className="rounded-xl border border-accent/40 bg-surface p-4 shadow-md">
-            <div className="mb-3 text-sm font-semibold text-ink">Thêm tài khoản mới</div>
+            <div className="mb-3 text-sm font-semibold text-ink">{t('addNew')}</div>
             <AccountForm
               banks={banks ?? []}
               pending={link.isPending}
@@ -250,10 +253,10 @@ export function PayoutAccountCard({ summary }: { summary: FinanceSummary }) {
               onSubmit={(values) =>
                 link.mutate(values, {
                   onSuccess: () => {
-                    toast.success('Đã gửi email xác nhận. Hãy mở email và bấm liên kết trong vòng 30 phút.');
+                    toast.success(t('toast.confirmSent'));
                     setAdding(false);
                   },
-                  onError: onError('Không liên kết được tài khoản.'),
+                  onError: onError(t('toast.linkFailed')),
                 })
               }
             />

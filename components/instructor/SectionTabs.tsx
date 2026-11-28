@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 
 export interface SectionTab {
@@ -18,6 +19,7 @@ interface SectionTabsProps {
  * `xl` (UDEMY_LAYOUT_ANALYSIS mục 12, 26/11/2026). Mục sáng khi đường dẫn trùng chính
  * xác, đánh dấu bằng aria-current, cuộn ngang được trên màn nhỏ. */
 export function SectionTabs({ tabs, pathname, ariaLabel }: SectionTabsProps) {
+  const t = useTranslations('instructor.sectionTabs');
   return (
     <nav
       aria-label={ariaLabel}
@@ -40,7 +42,7 @@ export function SectionTabs({ tabs, pathname, ariaLabel }: SectionTabsProps) {
               {tab.label}
               {(tab.badge ?? 0) > 0 && (
                 <span
-                  aria-label={`${tab.badge} chưa đọc`}
+                  aria-label={t('unread', { count: tab.badge ?? 0 })}
                   className="ml-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-danger px-1 text-[10px] font-bold leading-none text-white"
                 >
                   {(tab.badge ?? 0) > 99 ? '99+' : tab.badge}

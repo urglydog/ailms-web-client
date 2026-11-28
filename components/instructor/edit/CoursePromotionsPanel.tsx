@@ -1,14 +1,15 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { Modal } from '@/components/ui/Modal';
 
 import { useState } from 'react';
 import { useCreateCoupon, useDeleteCoupon, useMyCoupons, useUpdateCoupon } from '@/hooks/useCoupons';
 import type { Coupon, DiscountType } from '@/types/domain';
 
-const DISCOUNT_TYPE_LABEL: Record<DiscountType, string> = {
-  PERCENTAGE: 'Theo %',
-  FIXED_AMOUNT: 'Số tiền cố định',
+const DISCOUNT_TYPE_LABEL_KEY: Record<DiscountType, string> = {
+  PERCENTAGE: 'typePercentage',
+  FIXED_AMOUNT: 'typeFixed',
 };
 
 interface FormState {
@@ -49,6 +50,7 @@ function emptyForm(): FormState {
  * phạm vi lớn hơn 1 trang Khuyến mãi, chưa làm trong lượt này.
  */
 export function CoursePromotionsPanel({ courseId }: { courseId: number }) {
+  const t = useTranslations('instructor.promotions');
   const { data: coupons, isLoading } = useMyCoupons();
   const createCoupon = useCreateCoupon();
   const updateCoupon = useUpdateCoupon();
@@ -106,20 +108,18 @@ export function CoursePromotionsPanel({ courseId }: { courseId: number }) {
   return (
     <div className="flex flex-col gap-6">
       <div className="rounded-xl border border-line bg-surface-raised p-5 shadow-sm">
-        <h2 className="mb-1 font-display text-[16px] font-bold text-ink">Giới thiệu sinh viên</h2>
+        <h2 className="mb-1 font-display text-[16px] font-bold text-ink">{t('referralTitle')}</h2>
         <p className="text-[12.5px] text-ink-muted">
-          Tính năng chia sẻ link giới thiệu và ghi nhận doanh số riêng đang được lên kế hoạch, chưa có ở
-          phiên bản này.
+          {t('referralBody')}
         </p>
       </div>
 
       <div className="rounded-xl border border-line bg-surface-raised p-5 shadow-sm">
         <div className="mb-4 flex items-center justify-between">
           <div>
-            <h2 className="font-display text-[16px] font-bold text-ink">Mã giảm giá cho khóa học này</h2>
+            <h2 className="font-display text-[16px] font-bold text-ink">{t('couponsTitle')}</h2>
             <p className="mt-1 text-[12.5px] text-ink-muted">
-              Áp dụng riêng cho khóa này. Mã &quot;tự động&quot; hiện giá đã giảm ngay trên trang khóa học, không
-              cần học viên nhập mã.
+              {t('couponsHint')}
             </p>
           </div>
           <button
@@ -127,15 +127,15 @@ export function CoursePromotionsPanel({ courseId }: { courseId: number }) {
             onClick={openCreate}
             className="shrink-0 rounded-full bg-accent px-4 py-2 text-[12.5px] font-bold text-white hover:bg-accent-dark"
           >
-            + Tạo mã giảm giá
+            {t('create')}
           </button>
         </div>
 
         {isLoading ? (
-          <p className="text-[12.5px] text-ink-faint">Đang tải...</p>
+          <p className="text-[12.5px] text-ink-faint">{t('loading')}</p>
         ) : relevantCoupons.length === 0 ? (
           <p className="rounded-lg border border-dashed border-line p-6 text-center text-[12.5px] text-ink-faint">
-            Chưa có mã giảm giá nào cho khóa học này.
+            {t('empty')}
           </p>
         ) : (
           <div className="flex flex-col gap-2">
@@ -146,7 +146,7 @@ export function CoursePromotionsPanel({ courseId }: { courseId: number }) {
               >
                 <div className="flex items-center gap-3">
                   <span className="font-mono text-[13px] font-bold text-ink">
-                    {coupon.code ?? <span className="italic font-sans font-normal text-ink-muted">Tự động</span>}
+                    {coupon.code ?? <span className="italic font-sans font-normal text-ink-muted">{t('automatic')}</span>}
                   </span>
                   <span className="text-[12.5px] text-ink-muted">
                     {coupon.discountType === 'PERCENTAGE'
@@ -155,7 +155,7 @@ export function CoursePromotionsPanel({ courseId }: { courseId: number }) {
                   </span>
                   {coupon.scopeType === 'ALL_COURSES' && (
                     <span className="rounded-full bg-tint px-2 py-0.5 text-[10.5px] font-bold text-accent-dark">
-                      Toàn bộ khóa học của bạn
+                      {t('allCourses')}
                     </span>
                   )}
                   <span
@@ -163,7 +163,7 @@ export function CoursePromotionsPanel({ courseId }: { courseId: number }) {
                       coupon.isActive ? 'bg-success-tint text-success' : 'bg-tint text-ink-muted'
                     }`}
                   >
-                    {coupon.isActive ? 'Đang bật' : 'Đã tắt'}
+                    {coupon.isActive ? t('on') : t('off')}
                   </span>
                   <span className="text-[11.5px] text-ink-faint">
                     {new Date(coupon.startAt).toLocaleDateString('vi-VN')} – {new Date(coupon.endAt).toLocaleDateString('vi-VN')}
@@ -176,14 +176,14 @@ export function CoursePromotionsPanel({ courseId }: { courseId: number }) {
                       onClick={() => openEdit(coupon)}
                       className="text-[11.5px] font-bold text-accent-dark hover:underline"
                     >
-                      Sửa
+                      {t('edit')}
                     </button>
                     <button
                       type="button"
                       onClick={() => deleteCoupon.mutate(coupon.id)}
                       className="text-[11.5px] font-bold text-danger hover:underline"
                     >
-                      Xóa
+                      {t('delete')}
                     </button>
                   </div>
                 )}
@@ -194,9 +194,9 @@ export function CoursePromotionsPanel({ courseId }: { courseId: number }) {
       </div>
 
       {editing && (
-        <Modal open onClose={() => setEditing(null)} bare ariaLabel={String(editing === 'new' ? 'Tạo mã giảm giá' : 'Sửa mã giảm giá')} closeOnBackdrop={false} className="w-full max-w-md rounded-2xl bg-surface-raised p-6 shadow-2xl">
+        <Modal open onClose={() => setEditing(null)} bare ariaLabel={String(editing === 'new' ? t('createTitle') : t('editTitle'))} closeOnBackdrop={false} className="w-full max-w-md rounded-2xl bg-surface-raised p-6 shadow-2xl">
             <h2 className="mb-4 font-display text-lg font-bold text-ink">
-              {editing === 'new' ? 'Tạo mã giảm giá' : 'Sửa mã giảm giá'}
+              {editing === 'new' ? t('createTitle') : t('editTitle')}
             </h2>
             <form onSubmit={handleSubmit} className="flex flex-col gap-3">
               <label className="flex items-center gap-2 text-sm font-medium text-ink">
@@ -205,13 +205,13 @@ export function CoursePromotionsPanel({ courseId }: { courseId: number }) {
                   checked={form.autoApply}
                   onChange={(e) => setForm((f) => ({ ...f, autoApply: e.target.checked }))}
                 />
-                Tự động áp dụng (không cần nhập mã)
+                {t('autoApply')}
               </label>
               {!form.autoApply && (
                 <input
                   required
                   type="text"
-                  placeholder="Mã giảm giá, VD: SALE50"
+                  placeholder={t('codePlaceholder')}
                   value={form.code}
                   onChange={(e) => setForm((f) => ({ ...f, code: e.target.value }))}
                   className="rounded-lg border border-line px-3 py-2 text-sm uppercase focus:border-accent focus:outline-none"
@@ -223,8 +223,8 @@ export function CoursePromotionsPanel({ courseId }: { courseId: number }) {
                   onChange={(e) => setForm((f) => ({ ...f, discountType: e.target.value as DiscountType }))}
                   className="rounded-lg border border-line px-3 py-2 text-sm focus:border-accent focus:outline-none"
                 >
-                  {Object.entries(DISCOUNT_TYPE_LABEL).map(([value, label]) => (
-                    <option key={value} value={value}>{label}</option>
+                  {Object.entries(DISCOUNT_TYPE_LABEL_KEY).map(([value, labelKey]) => (
+                    <option key={value} value={value}>{t(labelKey)}</option>
                   ))}
                 </select>
                 <input
@@ -233,7 +233,7 @@ export function CoursePromotionsPanel({ courseId }: { courseId: number }) {
                   min={0}
                   max={form.discountType === 'PERCENTAGE' ? 100 : undefined}
                   step="0.01"
-                  placeholder="Giá trị"
+                  placeholder={t('valuePlaceholder')}
                   value={form.discountValue}
                   onChange={(e) => setForm((f) => ({ ...f, discountValue: e.target.value }))}
                   className="rounded-lg border border-line px-3 py-2 text-sm focus:border-accent focus:outline-none"
@@ -241,7 +241,7 @@ export function CoursePromotionsPanel({ courseId }: { courseId: number }) {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <label className="flex flex-col gap-1">
-                  <span className="text-[11.5px] font-semibold text-ink-muted">Bắt đầu</span>
+                  <span className="text-[11.5px] font-semibold text-ink-muted">{t('start')}</span>
                   <input
                     required
                     type="datetime-local"
@@ -251,7 +251,7 @@ export function CoursePromotionsPanel({ courseId }: { courseId: number }) {
                   />
                 </label>
                 <label className="flex flex-col gap-1">
-                  <span className="text-[11.5px] font-semibold text-ink-muted">Kết thúc</span>
+                  <span className="text-[11.5px] font-semibold text-ink-muted">{t('end')}</span>
                   <input
                     required
                     type="datetime-local"
@@ -265,7 +265,7 @@ export function CoursePromotionsPanel({ courseId }: { courseId: number }) {
                 <input
                   type="number"
                   min={1}
-                  placeholder="Giới hạn lượt dùng"
+                  placeholder={t('usageLimit')}
                   value={form.maxUsageCount}
                   onChange={(e) => setForm((f) => ({ ...f, maxUsageCount: e.target.value }))}
                   className="rounded-lg border border-line px-3 py-2 text-sm focus:border-accent focus:outline-none"
@@ -273,7 +273,7 @@ export function CoursePromotionsPanel({ courseId }: { courseId: number }) {
                 <input
                   type="number"
                   min={1}
-                  placeholder="Giới hạn / học viên"
+                  placeholder={t('perLearnerLimit')}
                   value={form.maxUsagePerUser}
                   onChange={(e) => setForm((f) => ({ ...f, maxUsagePerUser: e.target.value }))}
                   className="rounded-lg border border-line px-3 py-2 text-sm focus:border-accent focus:outline-none"
@@ -285,14 +285,14 @@ export function CoursePromotionsPanel({ courseId }: { courseId: number }) {
                   onClick={closeModal}
                   className="rounded-lg px-4 py-2 text-sm font-semibold text-ink-muted hover:bg-tint"
                 >
-                  Hủy
+                  {t('cancel')}
                 </button>
                 <button
                   type="submit"
                   disabled={isSaving}
                   className="rounded-lg bg-accent px-4 py-2 text-sm font-bold text-white hover:bg-accent-dark disabled:opacity-60"
                 >
-                  {isSaving ? 'Đang lưu...' : 'Lưu'}
+                  {isSaving ? t('saving') : t('save')}
                 </button>
               </div>
             </form>

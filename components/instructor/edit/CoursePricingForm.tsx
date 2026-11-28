@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from 'react';
 import { useMyCourseDetail, useUpdateCourse } from '@/hooks/useCourses';
 import { ApiError } from '@/lib/api/client';
@@ -9,6 +10,7 @@ import { ApiError } from '@/lib/api/client';
  * trang này vẫn phải gửi kèm nguyên các field khác của `course` KHÔNG đổi, chỉ `price` là field
  * người dùng thực sự chỉnh ở đây. */
 export function CoursePricingForm({ courseId }: { courseId: number }) {
+  const t = useTranslations('instructor.pricing');
   const { data: course } = useMyCourseDetail(courseId);
   const updateCourse = useUpdateCourse(courseId);
   const [price, setPrice] = useState('0');
@@ -44,9 +46,9 @@ export function CoursePricingForm({ courseId }: { courseId: number }) {
 
   return (
     <div className="max-w-xl rounded-xl border border-line bg-surface-raised p-5 shadow-sm">
-      <h2 className="mb-1 font-display text-[16px] font-bold text-ink">Đặt giá cho khóa học của bạn</h2>
+      <h2 className="mb-1 font-display text-[16px] font-bold text-ink">{t('title')}</h2>
       <p className="mb-4 text-[12.5px] text-ink-muted">
-        Để 0 nếu đây là khóa học miễn phí. Giá đã lưu sẽ được áp dụng ngay, kể cả khi khóa học đã xuất bản.
+        {t('hint')}
       </p>
       {updateCourse.error instanceof ApiError && (
         <div className="mb-4 rounded-xl border border-danger/30 bg-danger/5 p-3 text-[12.5px] text-danger">
@@ -55,7 +57,7 @@ export function CoursePricingForm({ courseId }: { courseId: number }) {
       )}
       <form onSubmit={handleSave} className="flex flex-col gap-4">
         <label className="flex flex-col gap-1.5">
-          <span className="text-[12.5px] font-semibold text-ink-muted">Giá (đ)</span>
+          <span className="text-[12.5px] font-semibold text-ink-muted">{t('price')}</span>
           <input
             type="text"
             inputMode="numeric"
@@ -69,7 +71,7 @@ export function CoursePricingForm({ courseId }: { courseId: number }) {
           disabled={updateCourse.isPending}
           className="self-start rounded-full bg-ink px-6 py-3 text-[13.5px] font-bold text-white hover:bg-ink/90 disabled:opacity-50"
         >
-          {updateCourse.isPending ? 'Đang lưu...' : 'Lưu thay đổi'}
+          {updateCourse.isPending ? t('saving') : t('save')}
         </button>
       </form>
     </div>

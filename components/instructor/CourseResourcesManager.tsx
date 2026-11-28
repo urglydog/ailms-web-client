@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useRef, useState, type DragEvent } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -15,11 +16,11 @@ function formatBytes(bytes: number) {
 }
 
 /** Cùng bộ icon-theo-loại-file với `CourseResourcesTab.tsx` (phía học viên) — giữ nhất quán. */
-function getFileVisual(fileType: string): { Icon: typeof FileText; bg: string; text: string; label: string } {
+function getFileVisual(fileType: string, zipLabel: string): { Icon: typeof FileText; bg: string; text: string; label: string } {
   if (fileType.includes('pdf')) return { Icon: FileText, bg: 'bg-danger/10', text: 'text-danger', label: 'PDF' };
   if (fileType.includes('word') || fileType.includes('document')) return { Icon: FileText, bg: 'bg-accent/10', text: 'text-accent', label: 'Word' };
   if (fileType.includes('powerpoint') || fileType.includes('presentation')) return { Icon: Presentation, bg: 'bg-warning/10', text: 'text-warning', label: 'PowerPoint' };
-  if (fileType.includes('zip') || fileType.includes('rar')) return { Icon: FileArchive, bg: 'bg-accent/10', text: 'text-accent-dark', label: 'Nén' };
+  if (fileType.includes('zip') || fileType.includes('rar')) return { Icon: FileArchive, bg: 'bg-accent/10', text: 'text-accent-dark', label: zipLabel };
   return { Icon: FileIcon, bg: 'bg-surface-hover', text: 'text-ink-muted', label: fileType.split('/')[1] || fileType };
 }
 
@@ -30,6 +31,7 @@ function getFileVisual(fileType: string): { Icon: typeof FileText; bg: string; t
  * thuần, cùng pattern đã dùng ở `TutorEmbedded.tsx` — không cần thêm thư viện).
  */
 export function CourseResourcesManager({ courseId }: { courseId: number }) {
+  const t = useTranslations('instructor.resources');
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -43,22 +45,22 @@ export function CourseResourcesManager({ courseId }: { courseId: number }) {
     mutationFn: (files: File[]) => courseResourcesApi.uploadResource(courseId, files),
     onSuccess: (data) => {
       if (data.failures && data.failures.length > 0) {
-        toast.warning(`Đã tải lên ${data.successes.length} file. ${data.failures.length} file bị lỗi (sai định dạng).`);
+        toast.warning(t('uploadPartial', { ok: data.successes.length, fail: data.failures.length }));
       } else {
-        toast.success(`Đã tải lên ${data.successes.length} tài nguyên thành công`);
+        toast.success(t('uploadOk', { count: data.successes.length }));
       }
       queryClient.invalidateQueries({ queryKey: ['course-resources', courseId] });
     },
-    onError: (err: Error) => toast.error(err.message || 'Lỗi khi tải lên file'),
+    onError: (err: Error) => toast.error(err.message || t('uploadError')),
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id: number) => courseResourcesApi.deleteResource(id),
     onSuccess: () => {
-      toast.success('Đã xoá tài nguyên tĩnh');
+      toast.success(t('deleted'));
       queryClient.invalidateQueries({ queryKey: ['course-resources', courseId] });
     },
-    onError: (err: Error) => toast.error(err.message || 'Lỗi khi xoá tài nguyên'),
+    onError: (err: Error) => toast.error(err.message || t('deleteError')),
   });
 
   const handleFiles = (files: FileList | File[]) => {
@@ -76,8 +78,8 @@ export function CourseResourcesManager({ courseId }: { courseId: number }) {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h2 className="text-lg font-bold text-ink">Tài nguyên tĩnh toàn khoá học</h2>
-        <p className="text-sm text-ink-muted mt-0.5">PDF, slide, tài liệu dùng chung cho cả khoá — tách biệt học liệu từng chương.</p>
+        <h2 className="text-lg font-bold text-ink">{t('title')}</h2>
+        <p className="text-sm text-ink-muted mt-0.5">{t('subtitle')}</p>
       </div>
 
       {/* Khu kéo-thả upload — HTML5 DnD thuần, cùng pattern đã dùng ở TutorEmbedded.tsx */}
@@ -92,9 +94,9 @@ export function CourseResourcesManager({ courseId }: { courseId: number }) {
       >
         <UploadCloud className={`w-8 h-8 ${isDragging ? 'text-accent' : 'text-ink-faint'}`} strokeWidth={1.5} />
         <p className="text-sm font-semibold text-ink">
-          {uploadMutation.isPending ? 'Đang tải lên...' : 'Kéo-thả file vào đây, hoặc bấm để chọn file'}
+          {uploadMutation.isPending ? t('uploading') : t('dropHint')}
         </p>
-        <p className="text-xs text-ink-faint">Hỗ trợ PDF, Word, PowerPoint, ZIP</p>
+        <p className="text-xs text-ink-faint">{t('supported')}</p>
         <input
           ref={fileInputRef}
           type="file"
@@ -110,12 +112,12 @@ export function CourseResourcesManager({ courseId }: { courseId: number }) {
 
       {/* Danh sách tài nguyên đã tải */}
       <div className="flex flex-col gap-2">
-        {isLoading && <div className="text-center text-sm text-ink-muted py-8">Đang tải...</div>}
+        {isLoading && <div className="text-center text-sm text-ink-muted py-8">{t('loading')}</div>}
         {!isLoading && (!resources || resources.length === 0) && (
-          <div className="text-center text-sm text-ink-muted py-8">Chưa có tài nguyên tĩnh nào cho khoá học này.</div>
+          <div className="text-center text-sm text-ink-muted py-8">{t('empty')}</div>
         )}
         {resources?.map((res: CourseResource) => {
-          const { Icon, bg, text, label } = getFileVisual(res.fileType);
+          const { Icon, bg, text, label } = getFileVisual(res.fileType, t('fileZip'));
           return (
             <div key={res.id} className="flex items-center gap-3 px-4 py-3 rounded-card border border-line bg-surface-raised">
               <div className={`shrink-0 flex items-center justify-center w-9 h-9 rounded-lg ${bg} ${text}`}>
@@ -129,7 +131,7 @@ export function CourseResourcesManager({ courseId }: { courseId: number }) {
                 onClick={() => deleteMutation.mutate(res.id)}
                 disabled={deleteMutation.isPending}
                 className="shrink-0 p-1.5 rounded-card text-danger hover:bg-danger/10 transition-colors disabled:opacity-50"
-                title="Xoá tài nguyên"
+                title={t('deleteTitle')}
               >
                 <Trash2 className="w-3.5 h-3.5" />
               </button>

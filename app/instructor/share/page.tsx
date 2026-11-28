@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
 import { Search, Share2 } from 'lucide-react';
 import { PageHeader } from '@/components/instructor/ui/PageHeader';
@@ -12,9 +13,9 @@ import { money } from '@/lib/finance';
 import type { CourseShare } from '@/types/finance';
 
 const RANGES = [
-  { id: 'all', label: 'Toàn thời gian', days: null },
-  { id: '30', label: '30 ngày', days: 30 },
-  { id: '90', label: '90 ngày', days: 90 },
+  { id: 'all', labelKey: 'range.all', days: null },
+  { id: '30', labelKey: 'range.30', days: 30 },
+  { id: '90', labelKey: 'range.90', days: 90 },
 ] as const;
 
 const isoDate = (d: Date) => d.toISOString().slice(0, 10);
@@ -22,10 +23,10 @@ const isoDate = (d: Date) => d.toISOString().slice(0, 10);
 /** Số khóa mỗi trang: cố định để vị trí các khối bên dưới (đăng ký quảng bá) không nhảy theo số khóa. */
 const PAGE_SIZE = 5;
 type StatusFilter = 'all' | 'published' | 'unpublished';
-const STATUS_FILTERS: { id: StatusFilter; label: string }[] = [
-  { id: 'all', label: 'Tất cả' },
-  { id: 'published', label: 'Đã xuất bản' },
-  { id: 'unpublished', label: 'Chưa xuất bản' },
+const STATUS_FILTERS: { id: StatusFilter; labelKey: string }[] = [
+  { id: 'all', labelKey: 'filter.all' },
+  { id: 'published', labelKey: 'filter.published' },
+  { id: 'unpublished', labelKey: 'filter.unpublished' },
 ];
 
 /** Tìm không phân biệt dấu/hoa thường (gõ "tieng anh" ra "Tiếng Anh"). */
@@ -33,11 +34,12 @@ const fold = (s: string) =>
   s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase();
 
 /**
- * "Chia sẻ & Quảng bá" của giảng viên (11/11/2026, Epic hoàn tiền – chi trả, Giai đoạn D): mỗi khóa có link giới thiệu riêng
+ * t('title') của giảng viên (11/11/2026, Epic hoàn tiền – chi trả, Giai đoạn D): mỗi khóa có link giới thiệu riêng
  * (học viên mua qua link được tính tỷ lệ giới thiệu cao hơn) và nút chia sẻ. Thống kê chỉ đo ĐƠN MUA đã thanh toán, chia theo
  * nguồn (link của bạn vs tự tìm thấy trên nền tảng); lượt xem/click chưa đo (hoãn có chủ đích, xem docs/PAYMENT_PAYOUT_EPIC.md).
  */
 export default function InstructorSharePage() {
+  const t = useTranslations('instructor.share');
   const [rangeId, setRangeId] = useState<(typeof RANGES)[number]['id']>('all');
   const [sharing, setSharing] = useState<CourseShare | null>(null);
   const [keyword, setKeyword] = useState('');
@@ -63,11 +65,11 @@ export default function InstructorSharePage() {
   return (
     <>
       <PageHeader
-        title="Chia sẻ & Quảng bá"
-        subtitle="Mỗi khóa có một link giới thiệu riêng: học viên mua qua link của bạn thì bạn hưởng tỷ lệ cao hơn so với khi họ tự tìm thấy khóa trên nền tảng."
+        title={t('title')}
+        subtitle={t('subtitle')}
       />
 
-      <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Khoảng thời gian thống kê">
+      <div className="flex flex-wrap items-center gap-2" role="group" aria-label={t('rangeAria')}>
         {RANGES.map((r) => (
           <button
             key={r.id}
@@ -76,7 +78,7 @@ export default function InstructorSharePage() {
             onClick={() => setRangeId(r.id)}
             className={`rounded-full border px-3.5 py-1.5 text-xs font-semibold ${rangeId === r.id ? 'border-accent bg-tint text-accent-dark' : 'border-line bg-surface-raised text-ink-muted hover:text-ink'}`}
           >
-            {r.label}
+            {t(r.labelKey)}
           </button>
         ))}
       </div>
@@ -91,12 +93,12 @@ export default function InstructorSharePage() {
               setKeyword(e.target.value);
               setPage(1);
             }}
-            placeholder="Tìm khóa học..."
-            aria-label="Tìm khóa học"
+            placeholder={t('searchPlaceholder')}
+            aria-label={t('searchAria')}
             className="w-full bg-transparent text-sm text-ink outline-none"
           />
         </label>
-        <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Lọc theo trạng thái">
+        <div className="flex flex-wrap items-center gap-2" role="group" aria-label={t('filterAria')}>
           {STATUS_FILTERS.map((f) => (
             <button
               key={f.id}
@@ -108,7 +110,7 @@ export default function InstructorSharePage() {
               }}
               className={`rounded-full border px-3.5 py-1.5 text-xs font-semibold ${statusFilter === f.id ? 'border-accent bg-tint text-accent-dark' : 'border-line bg-surface-raised text-ink-muted hover:text-ink'}`}
             >
-              {f.label}
+              {t(f.labelKey)}
             </button>
           ))}
         </div>
@@ -121,11 +123,11 @@ export default function InstructorSharePage() {
           ))}
         </div>
       ) : isError ? (
-        <div role="alert" className="rounded-xl border border-danger/40 bg-danger/5 p-6 text-center text-danger">Không tải được danh sách khóa học.</div>
+        <div role="alert" className="rounded-xl border border-danger/40 bg-danger/5 p-6 text-center text-danger">{t('loadError')}</div>
       ) : !data || data.length === 0 ? (
-        <div className="rounded-xl border border-line bg-surface-raised p-8 text-center text-ink-muted">Bạn chưa có khóa học nào.</div>
+        <div className="rounded-xl border border-line bg-surface-raised p-8 text-center text-ink-muted">{t('empty')}</div>
       ) : filtered.length === 0 ? (
-        <div className="rounded-xl border border-line bg-surface-raised p-8 text-center text-ink-muted">Không có khóa học nào khớp bộ lọc.</div>
+        <div className="rounded-xl border border-line bg-surface-raised p-8 text-center text-ink-muted">{t('noMatch')}</div>
       ) : (
         <>
         <ul className="m-0 flex min-h-[44rem] list-none flex-col gap-3 p-0">
@@ -135,34 +137,34 @@ export default function InstructorSharePage() {
                 <div className="min-w-0">
                   <div className="truncate font-semibold text-ink">{c.title}</div>
                   <div className="text-xs text-ink-muted">
-                    {c.shareable ? 'Đã xuất bản' : 'Chưa xuất bản — chưa có link dùng được'}
+                    {c.shareable ? t('published') : t('notShareable')}
                   </div>
                 </div>
                 <button
                   type="button"
                   disabled={!c.shareable}
                   onClick={() => setSharing(c)}
-                  title={c.shareable ? 'Lấy link giới thiệu và chia sẻ' : 'Xuất bản khóa học để chia sẻ'}
+                  title={c.shareable ? t('shareTitle') : t('publishToShare')}
                   className="flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-dark disabled:opacity-50"
                 >
-                  <Share2 className="h-4 w-4" aria-hidden /> Chia sẻ
+                  <Share2 className="h-4 w-4" aria-hidden /> {t('share')}
                 </button>
               </div>
               <dl className="m-0 grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
                 <div>
-                  <dt className="text-xs text-ink-muted">Đơn qua link của bạn</dt>
+                  <dt className="text-xs text-ink-muted">{t('ordersViaLink')}</dt>
                   <dd className="m-0 font-semibold text-ink">{c.referralOrders}</dd>
                 </div>
                 <div>
-                  <dt className="text-xs text-ink-muted">Thu nhập qua link</dt>
+                  <dt className="text-xs text-ink-muted">{t('earningsViaLink')}</dt>
                   <dd className="m-0 font-semibold text-success-ink">{money(c.referralEarning)}</dd>
                 </div>
                 <div>
-                  <dt className="text-xs text-ink-muted">Đơn tự tìm thấy</dt>
+                  <dt className="text-xs text-ink-muted">{t('ordersOrganic')}</dt>
                   <dd className="m-0 font-semibold text-ink">{c.organicOrders}</dd>
                 </div>
                 <div>
-                  <dt className="text-xs text-ink-muted">Thu nhập tự tìm thấy</dt>
+                  <dt className="text-xs text-ink-muted">{t('earningsOrganic')}</dt>
                   <dd className="m-0 font-semibold text-ink">{money(c.organicEarning)}</dd>
                 </div>
               </dl>
