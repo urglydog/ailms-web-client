@@ -1,23 +1,15 @@
 import Link from 'next/link';
+import { useLocale, useTranslations } from 'next-intl';
+import { languageDisplayName } from '@/lib/languageName';
 import type { LiveFeedItem } from '@/types/domain';
 
-function formatDateTime(iso: string): string {
-  return new Date(iso).toLocaleString('vi-VN', {
+function formatDateTime(iso: string, locale: string): string {
+  return new Date(iso).toLocaleString(locale, {
     day: '2-digit',
     month: '2-digit',
     hour: '2-digit',
     minute: '2-digit',
   });
-}
-
-/** Tên hiển thị từ mã BCP-47 — dùng API chuẩn của trình duyệt thay vì tự liệt kê bảng tên (BR-DUB-07
- * cấm hardcode danh sách ngôn ngữ) — cùng cách `LiveLanguagePicker.tsx` đang làm. */
-function languageDisplayName(code: string): string {
-  try {
-    return new Intl.DisplayNames(['vi'], { type: 'language' }).of(code) ?? code;
-  } catch {
-    return code;
-  }
 }
 
 /**
@@ -34,6 +26,8 @@ function languageDisplayName(code: string): string {
  * ngoài chính bản thân ảnh.
  */
 export function LiveFeedCard({ item }: { item: LiveFeedItem }) {
+  const t = useTranslations('live.feedCard');
+  const locale = useLocale();
   const isLive = item.status === 'LIVE';
 
   return (
@@ -59,7 +53,7 @@ export function LiveFeedCard({ item }: { item: LiveFeedItem }) {
             </span>
           ) : (
             <span className="rounded-full bg-black/60 px-2 py-0.5 text-[11px] font-semibold text-white shadow">
-              {item.scheduledAt ? formatDateTime(item.scheduledAt) : 'Sắp diễn ra'}
+              {item.scheduledAt ? formatDateTime(item.scheduledAt, locale) : t('upcoming')}
             </span>
           )}
         </div>
@@ -71,7 +65,7 @@ export function LiveFeedCard({ item }: { item: LiveFeedItem }) {
         </p>
         <p className="m-0 truncate text-[12px] text-ink-muted">{item.instructorName}</p>
         <p className="m-0 truncate text-[11.5px] text-ink-faint">
-          {item.courseTitle} · {languageDisplayName(item.sourceLanguage)}
+          {item.courseTitle} · {languageDisplayName(item.sourceLanguage, locale)}
         </p>
       </div>
     </Link>

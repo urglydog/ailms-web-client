@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import React, { useCallback, useEffect, useState, useRef, useMemo } from 'react';
 import {
   ReactFlow,
@@ -429,6 +430,7 @@ function parseFlowToMermaid(nodes: Node[], edges: Edge[], layout: string, theme:
 }
 
 export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOnly = false }: MindmapEditorProps) {
+    const t = useTranslations('learn.mindmapEditor');
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
   const [history, setHistory] = useState<{nodes: Node[], edges: Edge[]}[]>([]);
@@ -662,7 +664,7 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
           id: newId, 
           position: { x: selectedNode.position.x + 100, y: selectedNode.position.y + 50 }, 
           data: { 
-              label: 'Nhánh mới',
+              label: t('newBranch'),
               customBg: selectedNode.data.customBg,
               customColor: selectedNode.data.customColor,
               shape: selectedNode.data.shape,
@@ -700,7 +702,7 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
             });
         }
       }
-  }, [nodes, edges, applyLayout]);
+  }, [nodes, edges, applyLayout, t]);
 
   useEffect(() => {
     if (readOnly) return;
@@ -775,10 +777,10 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
             thu gọn hover-reveal nữa), chỉ tăng padding cho viền không sát icon như phản ánh. */}
         {!readOnly && (
           <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 bg-surface-raised shadow-card rounded-xl border border-line px-2.5 py-2 flex gap-1 items-center animate-in slide-in-from-top-4">
-                <button onClick={() => triggerAction('TAB')} disabled={!hasSelectedNode} className={`flex flex-col items-center justify-center p-2.5 rounded-lg min-w-[64px] transition-colors ${hasSelectedNode ? 'hover:bg-surface-hover text-ink-muted' : 'opacity-40 cursor-not-allowed text-ink-faint'}`} title="Thêm nhánh con (Tab)">
+                <button onClick={() => triggerAction('TAB')} disabled={!hasSelectedNode} className={`flex flex-col items-center justify-center p-2.5 rounded-lg min-w-[64px] transition-colors ${hasSelectedNode ? 'hover:bg-surface-hover text-ink-muted' : 'opacity-40 cursor-not-allowed text-ink-faint'}`} title={t('addChild')}>
                     <GitBranch className="w-[18px] h-[18px]" strokeWidth={1.75} /><span className="text-[10px] font-bold mt-1">Subtopic</span>
                 </button>
-                <button onClick={() => triggerAction('ENTER')} disabled={!hasSelectedNode || nodes.find(n => n.selected)?.id === 'root'} className={`flex flex-col items-center justify-center p-2.5 rounded-lg min-w-[64px] transition-colors ${hasSelectedNode && nodes.find(n => n.selected)?.id !== 'root' ? 'hover:bg-surface-hover text-ink-muted' : 'opacity-40 cursor-not-allowed text-ink-faint'}`} title="Thêm nhánh ngang hàng (Enter)">
+                <button onClick={() => triggerAction('ENTER')} disabled={!hasSelectedNode || nodes.find(n => n.selected)?.id === 'root'} className={`flex flex-col items-center justify-center p-2.5 rounded-lg min-w-[64px] transition-colors ${hasSelectedNode && nodes.find(n => n.selected)?.id !== 'root' ? 'hover:bg-surface-hover text-ink-muted' : 'opacity-40 cursor-not-allowed text-ink-faint'}`} title={t('addSibling')}>
                     <ArrowLeftRight className="w-[18px] h-[18px]" strokeWidth={1.75} /><span className="text-[10px] font-bold mt-1">Topic</span>
                 </button>
 
@@ -815,10 +817,10 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
 
                 <div className="w-[1px] h-8 bg-line mx-1"></div>
 
-                <button onClick={handleUndo} disabled={historyIndex <= 0} className={`flex flex-col items-center justify-center p-2.5 rounded-lg min-w-[48px] transition-colors ${historyIndex > 0 ? 'hover:bg-surface-hover text-ink-muted' : 'opacity-40 cursor-not-allowed text-ink-faint'}`} title="Hoàn tác (Ctrl+Z)">
+                <button onClick={handleUndo} disabled={historyIndex <= 0} className={`flex flex-col items-center justify-center p-2.5 rounded-lg min-w-[48px] transition-colors ${historyIndex > 0 ? 'hover:bg-surface-hover text-ink-muted' : 'opacity-40 cursor-not-allowed text-ink-faint'}`} title={t('undo')}>
                     <Undo2 className="w-[18px] h-[18px]" strokeWidth={1.75} /><span className="text-[10px] font-bold mt-1">Undo</span>
                 </button>
-                <button onClick={handleRedo} disabled={historyIndex >= history.length - 1} className={`flex flex-col items-center justify-center p-2.5 rounded-lg min-w-[48px] transition-colors ${historyIndex < history.length - 1 ? 'hover:bg-surface-hover text-ink-muted' : 'opacity-40 cursor-not-allowed text-ink-faint'}`} title="Làm lại (Ctrl+Y)">
+                <button onClick={handleRedo} disabled={historyIndex >= history.length - 1} className={`flex flex-col items-center justify-center p-2.5 rounded-lg min-w-[48px] transition-colors ${historyIndex < history.length - 1 ? 'hover:bg-surface-hover text-ink-muted' : 'opacity-40 cursor-not-allowed text-ink-faint'}`} title={t('redo')}>
                     <Redo2 className="w-[18px] h-[18px]" strokeWidth={1.75} /><span className="text-[10px] font-bold mt-1">Redo</span>
                 </button>
 
@@ -868,7 +870,7 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
         {editingNode && (
           <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm">
             <div className="bg-surface-raised p-6 rounded-2xl shadow-2xl border border-line-soft w-96 max-w-[90%] animate-in zoom-in-95">
-              <h3 className="text-sm font-bold text-ink mb-3 flex items-center gap-2"><Pencil className="w-4 h-4" strokeWidth={1.75} /> Nhập nội dung</h3>
+              <h3 className="text-sm font-bold text-ink mb-3 flex items-center gap-2"><Pencil className="w-4 h-4" strokeWidth={1.75} /> {t('enterContent')}</h3>
               <textarea
                 autoFocus
                 value={editingNode.label}
@@ -887,7 +889,7 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
                 className="w-full border border-line rounded-xl p-3 text-sm focus:ring-2 focus:ring-accent/20 focus:border-accent resize-none h-28 text-ink outline-none transition font-medium"
               />
               <div className="flex gap-2 justify-end mt-5">
-                <button onClick={() => setEditingNode(null)} className="px-4 py-2.5 bg-surface text-ink-muted rounded-xl text-xs font-bold hover:bg-tint">Hủy</button>
+                <button onClick={() => setEditingNode(null)} className="px-4 py-2.5 bg-surface text-ink-muted rounded-xl text-xs font-bold hover:bg-tint">{t('cancel')}</button>
                 <button onClick={() => {
                     setNodes((nds) => {
                         const newNodes = nds.map((n) => n.id === editingNode.id ? { ...n, data: { ...n.data, label: editingNode.label.trim() } } : n);
@@ -897,7 +899,7 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
                     setEditingNode(null);
                   }}
                   className="px-5 py-2.5 bg-accent text-white rounded-xl text-xs font-bold hover:bg-accent/90 shadow-sm"
-                >Cập nhật</button>
+                >{t('update')}</button>
               </div>
             </div>
           </div>
@@ -910,7 +912,7 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
             <button
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                 className="absolute top-1/2 right-0 -translate-y-1/2 z-30 flex items-center justify-center w-6 h-12 rounded-l-lg bg-accent text-white shadow-card-hover hover:bg-accent-dark transition-colors"
-                title={isSidebarOpen ? 'Ẩn bảng điều khiển' : 'Hiện bảng điều khiển'}
+                title={isSidebarOpen ? t('hidePanel') : t('showPanel')}
             >
                 {isSidebarOpen ? <ChevronRight className="w-4 h-4" strokeWidth={2} /> : <ChevronLeft className="w-4 h-4" strokeWidth={2} />}
             </button>
@@ -961,9 +963,9 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
                                     <label className="text-[11px] font-bold text-ink-faint uppercase tracking-wider mb-3 block">Shape</label>
                                     <div className="grid grid-cols-3 gap-2">
                                         {[
-                                            { id: 'rect', name: 'Hình vuông', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="6" width="18" height="12"></rect></svg> },
-                                            { id: 'rounded', name: 'Bo góc', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="6" width="18" height="12" rx="6"></rect></svg> },
-                                            { id: 'circle', name: 'Hình tròn', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"></circle></svg> }
+                                            { id: 'rect', name: t('shapeRect'), icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="6" width="18" height="12"></rect></svg> },
+                                            { id: 'rounded', name: t('shapeRounded'), icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="6" width="18" height="12" rx="6"></rect></svg> },
+                                            { id: 'circle', name: t('shapeCircle'), icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"></circle></svg> }
                                         ].map(s => (
                                             <button key={s.id} title={s.name} onClick={() => {
                                                 const selectedId = nodes.find(n => n.selected)!.id;
@@ -979,7 +981,7 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
                                     </div>
                                 </div>
                                 <div className="border p-4 rounded-card border-line">
-                                    <label className="text-[11px] font-bold text-ink-faint uppercase tracking-wider mb-2 block">Màu Nền (Fill)</label>
+                                    <label className="text-[11px] font-bold text-ink-faint uppercase tracking-wider mb-2 block">{t('fillColor')}</label>
                                     <div className="flex gap-2">
                                         <input type="color" className="w-10 h-10 rounded cursor-pointer border-0 p-0" onChange={(e) => {
                                             const selectedId = nodes.find(n => n.selected)!.id;
@@ -995,13 +997,13 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
                                             const selectedId = nodes.find(n => n.selected)!.id;
                                             setNodes(nds => nds.map(n => n.id === selectedId ? {...n, data: {...n.data, customBg: undefined}, style: {...n.style, background: undefined}} : n));
                                             setTimeout(() => applyTheme(colorTheme, nodes, edges), 0);
-                                        }} className="text-xs bg-surface-hover hover:bg-line-soft px-3 rounded-lg text-ink-muted font-bold">Về mặc định</button>
+                                        }} className="text-xs bg-surface-hover hover:bg-line-soft px-3 rounded-lg text-ink-muted font-bold">{t('resetDefault')}</button>
                                     </div>
                                 </div>
                                 <div className="border p-4 rounded-card border-line">
-                                    <label className="text-[11px] font-bold text-ink-faint uppercase tracking-wider mb-2 block">Văn Bản (Text)</label>
+                                    <label className="text-[11px] font-bold text-ink-faint uppercase tracking-wider mb-2 block">{t('textLabel')}</label>
                                     <div className="flex gap-2 mb-3">
-                                        <button title="In đậm" onClick={() => {
+                                        <button title={t('bold')} onClick={() => {
                                             const selectedId = nodes.find(n => n.selected)!.id;
                                             setNodes(nds => {
                                                 const sn = nds.find(n => n.id === selectedId)!;
@@ -1010,7 +1012,7 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
                                                 return nextNodes;
                                             });
                                         }} className={`flex-1 py-1.5 text-xs font-bold rounded-lg border ${nodes.find(n => n.selected)?.data.isBold ? 'bg-ink text-white border-ink' : 'bg-surface-hover text-ink-muted border-line'}`}>B</button>
-                                        <button title="In nghiêng" onClick={() => {
+                                        <button title={t('italic')} onClick={() => {
                                             const selectedId = nodes.find(n => n.selected)!.id;
                                             setNodes(nds => {
                                                 const sn = nds.find(n => n.id === selectedId)!;
@@ -1035,15 +1037,15 @@ export function FlowEditor({ initialMermaidCode, initialTemplate, onSave, readOn
                                             const selectedId = nodes.find(n => n.selected)!.id;
                                             setNodes(nds => nds.map(n => n.id === selectedId ? {...n, data: {...n.data, customColor: undefined}, style: {...n.style, color: undefined}} : n));
                                             setTimeout(() => applyTheme(colorTheme, nodes, edges), 0);
-                                        }} className="text-xs bg-surface-hover hover:bg-line-soft px-3 rounded-lg text-ink-muted font-bold">Về mặc định</button>
+                                        }} className="text-xs bg-surface-hover hover:bg-line-soft px-3 rounded-lg text-ink-muted font-bold">{t('resetDefault')}</button>
                                     </div>
                                 </div>
-                                <div className="text-xs text-ink-faint mt-2 text-center">Tùy chỉnh sẽ được đồng bộ khi bạn nhấn &quot;Save &amp; Apply&quot;</div>
+                                <div className="text-xs text-ink-faint mt-2 text-center">{t('syncNote')}</div>
                             </div>
                         ) : (
                             <div className="text-center text-ink-faint text-sm mt-10 p-4 border border-dashed rounded-card border-line">
                                 <strong className="text-ink-muted">Node Style</strong><br/><br/>
-                                Hãy click chọn một node cụ thể trên bản đồ để tuỳ chỉnh Shape, Font, Màu nền và Màu chữ.
+                                {t('pickNodeHint')}
                             </div>
                         )}
                       </div>

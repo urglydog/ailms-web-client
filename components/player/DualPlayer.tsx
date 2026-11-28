@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState, type RefObject } from 'react';
 import { useDualPlayerSync, useYouTubeDualPlayerSync } from '@/hooks/useDualPlayerSync';
 import { KeyboardShortcutsModal } from '@/components/player/KeyboardShortcutsModal';
@@ -112,7 +113,7 @@ export const DualPlayer = forwardRef<DualPlayerHandle, DualPlayerProps>(function
   videoUrl,
   youtubeId,
   track,
-  posterLabel = 'khung video bài giảng',
+  posterLabel,
   videoRef: externalVideoRef,
   audioRef: externalAudioRef,
   originalSubtitles = [],
@@ -130,6 +131,7 @@ export const DualPlayer = forwardRef<DualPlayerHandle, DualPlayerProps>(function
   onToggleAutoNext,
   autoPlay = false,
 }: DualPlayerProps, ref) {
+  const t = useTranslations('learn.player');
   const internalVideoRef = useRef<HTMLVideoElement>(null);
   const internalAudioRef = useRef<HTMLAudioElement>(null);
   const videoRef = externalVideoRef ?? internalVideoRef;
@@ -463,7 +465,7 @@ export const DualPlayer = forwardRef<DualPlayerHandle, DualPlayerProps>(function
         // Chưa nạp video — giữ đúng khung để không lệch layout
         <div className="flex h-full w-full items-center justify-center">
           <span className="rounded-full bg-white/10 px-3 py-1.5 font-mono text-[11px] tracking-wide text-white/60">
-            {posterLabel}
+            {posterLabel ?? t('posterLabel')}
           </span>
         </div>
       )}
@@ -474,7 +476,7 @@ export const DualPlayer = forwardRef<DualPlayerHandle, DualPlayerProps>(function
         <button
           type="button"
           onClick={handleTogglePlay}
-          aria-label="Phát video"
+          aria-label={t('playVideo')}
           className="absolute left-1/2 top-1/2 z-10 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2
                      items-center justify-center rounded-full bg-black/55 text-white transition-colors hover:bg-black/70"
         >
@@ -492,7 +494,7 @@ export const DualPlayer = forwardRef<DualPlayerHandle, DualPlayerProps>(function
         >
           <span className="h-1.5 w-1.5 animate-ai-pulse rounded-full bg-accent" aria-hidden />
           {/* Học viên tua tới đoạn chưa lồng tiếng xong -> đang tạm nghe tiếng gốc (xem resolveAudio). */}
-          {dubPending ? 'Đoạn này đang được lồng tiếng — tạm phát tiếng gốc' : 'Đang xử lý phần còn lại'}
+          {dubPending ? t('dubPending') : t('dubRemaining')}
         </span>
       )}
 
@@ -551,7 +553,7 @@ export const DualPlayer = forwardRef<DualPlayerHandle, DualPlayerProps>(function
         showOriginalSub={originalCaption === 'youtube' ? youtube.captionsOn : showOriginalSub}
         onToggleShowOriginalSub={originalCaption === 'youtube' ? youtube.toggleCaptions : onToggleShowOriginalSub}
         originalSubtitleAvailable={originalCaption !== 'none' && !(originalCaption === 'youtube' && youtube.captionsUnavailable)}
-        originalSubtitleHint={originalCaption === 'youtube' ? 'Phụ đề của YouTube (chưa có transcript của khóa học)' : undefined}
+        originalSubtitleHint={originalCaption === 'youtube' ? t('youtubeSubHint') : undefined}
         showTranslatedSub={showTranslatedSub}
         onToggleShowTranslatedSub={onToggleShowTranslatedSub}
         translatedSubtitleAvailable={translatedSubtitles.length > 0}
@@ -578,10 +580,10 @@ export const DualPlayer = forwardRef<DualPlayerHandle, DualPlayerProps>(function
           originalSettings={subtitleSettings.original}
           translatedSettings={subtitleSettings.translated}
           originalText={
-            findActiveSegment(originalSubtitles, currentSec)?.text ?? originalSubtitles[0]?.text ?? '(chưa có phụ đề gốc)'
+            findActiveSegment(originalSubtitles, currentSec)?.text ?? originalSubtitles[0]?.text ?? t('noOriginalSub')
           }
           translatedText={
-            findActiveSegment(translatedSubtitles, currentSec)?.text ?? translatedSubtitles[0]?.text ?? '(chưa có phụ đề dịch)'
+            findActiveSegment(translatedSubtitles, currentSec)?.text ?? translatedSubtitles[0]?.text ?? t('noTranslatedSub')
           }
           onChangeOriginalPosition={(pos: SubtitlePosition) =>
             setSubtitleSettings((prev) => ({ ...prev, original: { ...prev.original, position: pos } }))

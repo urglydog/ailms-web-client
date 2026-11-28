@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useState, type PointerEvent, type RefObject } from 'react';
 import { buildSubtitleAppearance, type SubtitlePosition, type SubtitleTypeSettings } from '@/components/player/subtitleStyle';
 
@@ -91,15 +92,16 @@ export function SubtitlePositionEditor({
   onResetPositions,
   onDone,
 }: SubtitlePositionEditorProps) {
+  const t = useTranslations('learn.player.positionEditor');
   return (
     <div className="absolute inset-0 z-30 bg-black/70">
       <div className="absolute inset-x-0 top-3 z-30 flex flex-wrap items-center justify-center gap-2 px-3">
-        <span className="rounded-full bg-black/70 px-3 py-1.5 text-[12px] text-white/85">Kéo thả phụ đề tới vị trí mong muốn</span>
+        <span className="rounded-full bg-black/70 px-3 py-1.5 text-[12px] text-white/85">{t('hint')}</span>
         <button type="button" onClick={onResetPositions} className="rounded-full border border-white/30 px-3 py-1.5 text-[12px] text-white hover:border-white">
-          Đặt lại mặc định
+          {t('reset')}
         </button>
         <button type="button" onClick={onDone} className="rounded-full bg-accent px-4 py-1.5 text-[12px] font-semibold text-white hover:bg-accent-dark">
-          Xong
+          {t('done')}
         </button>
       </div>
 

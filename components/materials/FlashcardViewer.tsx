@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useUpdateFlashcard, useAddFlashcard, useDeleteFlashcard } from '@/hooks/useFlashcards';
 import { toast } from 'sonner';
+import { useLocale, useTranslations } from 'next-intl';
 import { Pencil, Plus, Trash2, Volume2, ChevronLeft, ChevronRight, LayoutGrid } from 'lucide-react';
 import { MaterialBadge } from '@/components/materials/ui/MaterialBadge';
 
@@ -35,6 +36,8 @@ interface Flashcard {
 
 /** `language` khớp với trường `language` của MaterialGeneration (ví dụ: 'vi', 'en', 'ja'). */
 export function FlashcardViewer({ flashcards, language, deckId, readOnly = false }: { flashcards: Flashcard[]; language?: string; deckId?: number; readOnly?: boolean }) {
+  const t = useTranslations('learn.flashcard');
+  const locale = useLocale();
   const [currentIdx, setCurrentIdx] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const { mutate: updateCard } = useUpdateFlashcard();
@@ -98,10 +101,10 @@ export function FlashcardViewer({ flashcards, language, deckId, readOnly = false
     }
     return (
       <div className="text-center text-ink-muted flex flex-col items-center">
-        Chưa có flashcard nào.
+        {t('empty')}
         {deckId && (
           <button onClick={() => setAddMode({ front: '', back: '' })} className="mt-4 flex items-center gap-1.5 bg-accent text-white px-4 py-2 rounded-card font-semibold hover:bg-accent-dark transition-colors">
-            <Plus className="w-4 h-4" /> Thêm thẻ mới
+            <Plus className="w-4 h-4" /> {t('addNew')}
           </button>
         )}
       </div>
@@ -126,19 +129,19 @@ export function FlashcardViewer({ flashcards, language, deckId, readOnly = false
   const card = flashcards[safeIdx];
 
   if (!card) {
-    return <div className="text-center text-ink-muted">Đang tải thẻ...</div>;
+    return <div className="text-center text-ink-muted">{t('loading')}</div>;
   }
 
   const handleSpeak = (text: string, e: React.MouseEvent) => {
     e.stopPropagation();
     if (!('speechSynthesis' in window)) {
-      toast.error('Trình duyệt không hỗ trợ phát âm thanh.');
+      toast.error(t('noSpeech'));
       return;
     }
     const langCode = language?.toLowerCase().split('-')[0] ?? '';
     const bcp47 = LANGUAGE_MAP[langCode] ?? '';
     if (!bcp47) {
-      toast.info('Ngôn ngữ của bộ thẻ chưa được hỗ trợ phát âm.');
+      toast.info(t('langUnsupported'));
       return;
     }
     window.speechSynthesis.cancel();
@@ -157,15 +160,15 @@ export function FlashcardViewer({ flashcards, language, deckId, readOnly = false
       <div className="flex flex-col items-center max-w-2xl mx-auto">
         <div className="w-full flex items-center justify-between mb-6">
           <h3 className="font-display text-lg font-bold text-ink flex items-center gap-2">
-            Thêm Flashcard mới
+            {t('addTitle')}
           </h3>
           <button onClick={() => setAddMode(null)} className="text-ink-muted hover:text-ink text-sm font-semibold px-3 py-1 rounded-card hover:bg-surface-hover transition-colors">
-            Hủy
+            {t('cancel')}
           </button>
         </div>
         <div className="w-full space-y-4">
           <div>
-            <label className="block text-sm font-semibold text-ink-muted mb-1">Mặt trước (Front)</label>
+            <label className="block text-sm font-semibold text-ink-muted mb-1">{t('front')}</label>
             <textarea
               className="w-full p-3 rounded-card border border-line bg-surface focus:ring-2 focus:ring-accent outline-none text-ink text-lg font-medium resize-none h-24"
               value={addMode?.front || ''}
@@ -173,7 +176,7 @@ export function FlashcardViewer({ flashcards, language, deckId, readOnly = false
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-ink-muted mb-1">Mặt sau (Back)</label>
+            <label className="block text-sm font-semibold text-ink-muted mb-1">{t('back')}</label>
             <textarea
               className="w-full p-3 rounded-card border border-line bg-surface focus:ring-2 focus:ring-accent outline-none text-ink text-lg font-medium resize-none h-24"
               value={addMode?.back || ''}
@@ -185,7 +188,7 @@ export function FlashcardViewer({ flashcards, language, deckId, readOnly = false
               onClick={handleAddSave}
               className="bg-accent hover:bg-accent-dark text-white font-bold px-6 py-2 rounded-card shadow-card transition"
             >
-              Thêm Thẻ
+              {t('addSubmit')}
             </button>
           </div>
         </div>
@@ -198,15 +201,15 @@ export function FlashcardViewer({ flashcards, language, deckId, readOnly = false
       <div className="flex flex-col items-center max-w-2xl mx-auto">
         <div className="w-full flex items-center justify-between mb-6">
           <h3 className="font-display text-lg font-bold text-ink flex items-center gap-2">
-            Chỉnh sửa Flashcard
+            {t('editTitle')}
           </h3>
           <button onClick={() => setEditMode(null)} className="text-ink-muted hover:text-ink text-sm font-semibold px-3 py-1 rounded-card hover:bg-surface-hover transition-colors">
-            Hủy
+            {t('cancel')}
           </button>
         </div>
         <div className="w-full space-y-4">
           <div>
-            <label className="block text-sm font-semibold text-ink-muted mb-1">Mặt trước (Front)</label>
+            <label className="block text-sm font-semibold text-ink-muted mb-1">{t('front')}</label>
             <textarea
               className="w-full p-3 rounded-card border border-line bg-surface focus:ring-2 focus:ring-accent outline-none text-ink text-lg font-medium resize-none h-24"
               value={editMode?.front || ''}
@@ -214,7 +217,7 @@ export function FlashcardViewer({ flashcards, language, deckId, readOnly = false
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-ink-muted mb-1">Mặt sau (Back)</label>
+            <label className="block text-sm font-semibold text-ink-muted mb-1">{t('back')}</label>
             <textarea
               className="w-full p-3 rounded-card border border-line bg-surface focus:ring-2 focus:ring-accent outline-none text-ink text-lg font-medium resize-none h-24"
               value={editMode?.back || ''}
@@ -226,7 +229,7 @@ export function FlashcardViewer({ flashcards, language, deckId, readOnly = false
               onClick={handleEditSave}
               className="bg-accent hover:bg-accent-dark text-white font-bold px-6 py-2 rounded-card shadow-card transition"
             >
-              Lưu thay đổi
+              {t('saveChanges')}
             </button>
           </div>
         </div>
@@ -248,24 +251,24 @@ export function FlashcardViewer({ flashcards, language, deckId, readOnly = false
                 onClick={() => setEditMode({ id: card.id, front: card.frontText, back: card.backText })}
                 className="text-accent hover:underline flex items-center gap-1"
               >
-                <Pencil className="w-3.5 h-3.5" /> Sửa thẻ này
+                <Pencil className="w-3.5 h-3.5" /> {t('editThis')}
               </button>
               <button
                 onClick={() => setAddMode({ front: '', back: '' })}
                 className="text-success hover:underline flex items-center gap-1"
               >
-                <Plus className="w-3.5 h-3.5" /> Thêm thẻ mới
+                <Plus className="w-3.5 h-3.5" /> {t('addNew')}
               </button>
               <button
                 onClick={() => handleDelete(card.id)}
                 className="text-danger hover:underline flex items-center gap-1"
               >
-                <Trash2 className="w-3.5 h-3.5" /> Xóa thẻ này
+                <Trash2 className="w-3.5 h-3.5" /> {t('deleteThis')}
               </button>
             </>
           )}
         </div>
-        <span className="bg-surface-hover px-3 py-1 rounded-card border border-line">Click vào thẻ để lật</span>
+        <span className="bg-surface-hover px-3 py-1 rounded-card border border-line">{t('flipHint')}</span>
       </div>
 
       <div 
@@ -285,7 +288,7 @@ export function FlashcardViewer({ flashcards, language, deckId, readOnly = false
             <button
               onClick={(e) => handleSpeak(card.frontText, e)}
               className="absolute top-4 right-4 p-2 text-ink-muted hover:text-accent bg-surface hover:bg-surface-hover rounded-card transition-colors"
-              title={`Nghe phát âm (${LANGUAGE_MAP[langCode]})`}
+              title={t('listen', { lang: LANGUAGE_MAP[langCode] ?? '' })}
             >
               <Volume2 className="h-5 w-5" strokeWidth={1.75} />
             </button>
@@ -296,13 +299,13 @@ export function FlashcardViewer({ flashcards, language, deckId, readOnly = false
 
             {card.nextReviewAt && (
               <MaterialBadge tone={card.isDue ? 'danger' : 'success'} className="absolute top-4 left-4">
-                {card.isDue ? 'Tới hạn ôn tập' : `Ôn tập: ${new Date(card.nextReviewAt).toLocaleDateString()}`}
+                {card.isDue ? t('due') : t('reviewOn', { date: new Date(card.nextReviewAt).toLocaleDateString(locale) })}
               </MaterialBadge>
             )}
 
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-xs text-ink-muted flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
               <LayoutGrid className="h-3.5 w-3.5" strokeWidth={1.75} />
-              <span>Lật thẻ</span>
+              <span>{t('flip')}</span>
             </div>
           </div>
 
@@ -312,7 +315,7 @@ export function FlashcardViewer({ flashcards, language, deckId, readOnly = false
             <button
               onClick={(e) => handleSpeak(card.backText, e)}
               className="absolute top-4 right-4 p-2 text-white/70 hover:text-white bg-black/10 hover:bg-black/20 rounded-card transition-colors"
-              title={`Nghe phát âm (${LANGUAGE_MAP[langCode]})`}
+              title={t('listen', { lang: LANGUAGE_MAP[langCode] ?? '' })}
             >
               <Volume2 className="h-5 w-5" strokeWidth={1.75} />
             </button>

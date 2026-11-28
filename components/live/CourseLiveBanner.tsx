@@ -1,10 +1,11 @@
 'use client';
 
 import Link from 'next/link';
+import { useLocale, useTranslations } from 'next-intl';
 import { useLiveSessionsForCourse } from '@/hooks/useLiveView';
 
-function formatDateTime(iso: string): string {
-  return new Date(iso).toLocaleString('vi-VN', {
+function formatDateTime(iso: string, locale: string): string {
+  return new Date(iso).toLocaleString(locale, {
     day: '2-digit',
     month: '2-digit',
     hour: '2-digit',
@@ -18,6 +19,8 @@ function formatDateTime(iso: string): string {
  * làm rối trang chi tiết khóa học bình thường (đa số khóa không có live đang diễn ra).
  */
 export function CourseLiveBanner({ courseId }: { courseId: number }) {
+  const t = useTranslations('live.banner');
+  const locale = useLocale();
   const { data: sessions } = useLiveSessionsForCourse(courseId);
   const liveNow = sessions?.find((s) => s.status === 'LIVE');
   const upcoming = sessions?.find((s) => s.status === 'SCHEDULED');
@@ -42,15 +45,15 @@ export function CourseLiveBanner({ courseId }: { courseId: number }) {
         </span>
         <div>
           <p className="m-0 font-display text-sm font-bold text-ink">
-            {liveNow ? 'Đang live: ' : 'Sắp live: '}
+            {liveNow ? t('liveNow') : t('upcoming')}
             {session.title}
           </p>
           {!liveNow && session.scheduledAt && (
-            <p className="m-0 text-xs text-ink-muted">Dự kiến {formatDateTime(session.scheduledAt)}</p>
+            <p className="m-0 text-xs text-ink-muted">{t('scheduled', { time: formatDateTime(session.scheduledAt, locale) })}</p>
           )}
         </div>
       </div>
-      <span className="text-sm font-semibold text-accent">Xem ngay →</span>
+      <span className="text-sm font-semibold text-accent">{t('watch')}</span>
     </Link>
   );
 }

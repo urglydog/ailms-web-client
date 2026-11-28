@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api/client';
 import { Spinner } from '@/components/ui/Spinner';
 import Link from 'next/link';
+import { useLocale, useTranslations } from 'next-intl';
 import { Trophy, AlertTriangle } from 'lucide-react';
 import { MaterialBadge } from '@/components/materials/ui/MaterialBadge';
 import { Pagination } from '@/components/ui/Pagination';
@@ -43,6 +44,8 @@ interface AttemptDto {
 }
 
 export function CourseGradebookTab({ courseId }: { courseId: number }) {
+  const t = useTranslations('learn.gradebook');
+  const locale = useLocale();
   const [currentPage, setCurrentPage] = useState(1);
 
   const { data, isLoading, error } = useQuery<GradebookResponse>({
@@ -64,14 +67,14 @@ export function CourseGradebookTab({ courseId }: { courseId: number }) {
   const pagedQuizzes = quizzes.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   if (isLoading) return <div className="py-10 text-center"><Spinner className="mx-auto" /></div>;
-  if (error) return <div className="py-10 text-center text-danger">Lỗi khi tải bảng điểm.</div>;
+  if (error) return <div className="py-10 text-center text-danger">{t('error')}</div>;
 
   if (quizzes.length === 0) {
     return (
       <div className="py-12 text-center card bg-surface-hover border-dashed border-2 border-line rounded-card">
         <Trophy className="w-9 h-9 mx-auto mb-4 text-ink-faint" strokeWidth={1.5} />
-        <h4 className="text-lg font-bold mb-2 text-ink">Chưa có dữ liệu bảng điểm</h4>
-        <p className="text-ink-muted">Bạn chưa hoàn thành bài tập nào trong khóa học này. Hãy học và làm bài để xem kết quả tại đây nhé!</p>
+        <h4 className="text-lg font-bold mb-2 text-ink">{t('emptyTitle')}</h4>
+        <p className="text-ink-muted">{t('emptyBody')}</p>
       </div>
     );
   }
@@ -79,18 +82,18 @@ export function CourseGradebookTab({ courseId }: { courseId: number }) {
   return (
     <div className="space-y-6">
       <KnowledgeGapsWidget courseId={courseId} />
-      <h3 className="text-lg font-bold">Lịch sử làm bài thi & bài tập</h3>
+      <h3 className="text-lg font-bold">{t('title')}</h3>
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-surface border-b border-line text-sm text-ink-muted uppercase tracking-wider">
-              <th className="py-3 px-4 font-semibold">Tên bài kiểm tra</th>
-              <th className="py-3 px-4 font-semibold">Vị trí (Chương/Bài)</th>
-              <th className="py-3 px-4 font-semibold">Loại</th>
-              <th className="py-3 px-4 font-semibold">Điểm số cao nhất</th>
-              <th className="py-3 px-4 font-semibold text-center">Lượt làm</th>
-              <th className="py-3 px-4 font-semibold">Ngày nộp gần nhất</th>
-              <th className="py-3 px-4 font-semibold text-right">Hành động</th>
+              <th className="py-3 px-4 font-semibold">{t('colName')}</th>
+              <th className="py-3 px-4 font-semibold">{t('colLocation')}</th>
+              <th className="py-3 px-4 font-semibold">{t('colType')}</th>
+              <th className="py-3 px-4 font-semibold">{t('colBest')}</th>
+              <th className="py-3 px-4 font-semibold text-center">{t('colAttempts')}</th>
+              <th className="py-3 px-4 font-semibold">{t('colLatest')}</th>
+              <th className="py-3 px-4 font-semibold text-right">{t('colAction')}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-line">
@@ -99,11 +102,11 @@ export function CourseGradebookTab({ courseId }: { courseId: number }) {
                 <tr key={quiz.quizId} className="hover:bg-surface-hover transition-colors">
                   <td className="py-4 px-4">
                     <div className="font-medium text-ink flex flex-col gap-1">
-                      <div className="flex items-center gap-2">{quiz.quizTitle || 'Bài kiểm tra'}</div>
+                      <div className="flex items-center gap-2">{quiz.quizTitle || t('defaultTitle')}</div>
                       {quiz.isDeleted && (
                         <div className="p-2 mt-1 bg-star/10 border border-star/20 rounded-card text-star text-xs flex items-center gap-1.5 w-fit">
                           <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" />
-                          Bài tập/bài thi này đã được giảng viên lưu trữ.
+                          {t('archived')}
                         </div>
                       )}
                     </div>
@@ -113,9 +116,9 @@ export function CourseGradebookTab({ courseId }: { courseId: number }) {
                   </td>
                   <td className="py-4 px-4 text-sm">
                     {quiz.isOfficial ? (
-                      <MaterialBadge tone="accent">Thi chính thức</MaterialBadge>
+                      <MaterialBadge tone="accent">{t('official')}</MaterialBadge>
                     ) : (
-                      <MaterialBadge tone="neutral">Ôn tập (AI)</MaterialBadge>
+                      <MaterialBadge tone="neutral">{t('practice')}</MaterialBadge>
                     )}
                   </td>
                   <td className="py-4 px-4">
@@ -128,17 +131,17 @@ export function CourseGradebookTab({ courseId }: { courseId: number }) {
                     {quiz.attemptCount} / {quiz.maxAttempts && quiz.maxAttempts > 0 ? quiz.maxAttempts : '∞'}
                   </td>
                   <td className="py-4 px-4 text-sm text-ink-muted">
-                    {quiz.latestSubmittedAt ? new Date(quiz.latestSubmittedAt).toLocaleDateString('vi-VN', {
+                    {quiz.latestSubmittedAt ? new Date(quiz.latestSubmittedAt).toLocaleDateString(locale, {
                       day: '2-digit', month: '2-digit', year: 'numeric',
                       hour: '2-digit', minute: '2-digit'
-                    }) : 'Đang làm'}
+                    }) : t('inProgress')}
                   </td>
                   <td className="py-4 px-4 text-right">
                     <Link
                       href={`/exam/${quiz.quizId}/history?attemptId=${quiz.latestAttemptId}`}
                       className="text-accent font-semibold text-sm hover:underline"
                     >
-                      Xem lịch sử ({quiz.attemptCount} lần)
+                      {t('viewHistory', { count: quiz.attemptCount })}
                     </Link>
                   </td>
                 </tr>

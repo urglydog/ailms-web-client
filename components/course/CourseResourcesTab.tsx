@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api/client';
 import { Spinner } from '@/components/ui/Spinner';
@@ -18,6 +19,7 @@ interface Resource {
 }
 
 export function CourseResourcesTab({ courseId }: { courseId: number }) {
+  const t = useTranslations('learn.resources');
   const { data: resources, isLoading, error } = useQuery<Resource[]>({
     queryKey: ['student', 'course-resources', courseId],
     queryFn: async () => {
@@ -26,20 +28,20 @@ export function CourseResourcesTab({ courseId }: { courseId: number }) {
   });
 
   if (isLoading) return <div className="py-10 text-center"><Spinner className="mx-auto" /></div>;
-  if (error) return <div className="py-10 text-center text-danger">Lỗi khi tải tài nguyên khoá học.</div>;
+  if (error) return <div className="py-10 text-center text-danger">{t('error')}</div>;
   if (!resources || resources.length === 0) {
     return (
       <div className="py-12 text-center card bg-surface-hover border-dashed border-2">
         <FolderOpen className="w-10 h-10 mx-auto mb-4 text-ink-faint" strokeWidth={1.5} />
-        <h4 className="text-lg font-bold mb-2">Chưa có tài nguyên tĩnh</h4>
-        <p className="text-ink-muted">Giảng viên chưa đăng tải tài liệu đính kèm nào (PDF, ZIP,...) cho khóa học này.</p>
+        <h4 className="text-lg font-bold mb-2">{t('emptyTitle')}</h4>
+        <p className="text-ink-muted">{t('emptyBody')}</p>
       </div>
     );
   }
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-bold mb-4">Tài nguyên đính kèm</h3>
+      <h3 className="text-lg font-bold mb-4">{t('title')}</h3>
       {/* Danh sách dọc gọn (không phải lưới thẻ to) — không tràn trang dù có nhiều tài nguyên. */}
       <div className="flex flex-col rounded-card border border-line divide-y divide-line-soft overflow-hidden">
         {resources.map(res => {

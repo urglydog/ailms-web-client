@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { format } from 'date-fns';
 import type { CertificateVisual } from '@/types/domain';
 import { COLORS } from '@/lib/theme/colors';
@@ -43,6 +44,8 @@ export function CertificatePreview({
    * nhất quán giữa các trình duyệt). */
   interactive?: boolean;
 }) {
+  const t = useTranslations('certificate.preview');
+  const tc = useTranslations('certificate');
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0);
 
@@ -122,10 +125,10 @@ export function CertificatePreview({
           {/* Nội dung chính */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
             <div style={{ fontFamily: WORK_SANS, fontWeight: 600, fontSize: 12, letterSpacing: 3, color: GOLD_TEXT, textTransform: 'uppercase' }}>
-              Chứng Nhận Hoàn Thành Khóa Học
+              {t('title')}
             </div>
             <div style={{ fontFamily: PLAYFAIR, fontStyle: 'italic', fontWeight: 500, fontSize: 15, color: SLATE, marginTop: 6 }}>
-              Chứng chỉ này được trao cho
+              {t('awardedTo')}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, marginTop: 2 }}>
               <div style={{ fontFamily: PLAYFAIR, fontWeight: 700, fontStyle: 'italic', fontSize: 50, color: NAVY, lineHeight: 1.1 }}>
@@ -134,7 +137,7 @@ export function CertificatePreview({
               <div style={{ width: 220, height: 2, background: GOLD }} />
             </div>
             <div style={{ fontFamily: PLAYFAIR, fontStyle: 'italic', fontWeight: 500, fontSize: 15, color: SLATE, marginTop: 8 }}>
-              đã hoàn thành xuất sắc khóa học
+              {t('completed')}
             </div>
             <div style={{ fontFamily: PLAYFAIR, fontWeight: 700, fontSize: 25, color: NAVY, maxWidth: 760, lineHeight: 1.35, marginTop: 2 }}>
               &ldquo;{certificate.courseTitle}&rdquo;
@@ -142,11 +145,11 @@ export function CertificatePreview({
             <div style={{ display: 'flex', alignItems: 'center', gap: 32, marginTop: 14 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={GOLD} strokeWidth="2"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg>
-                <span style={{ fontFamily: WORK_SANS, fontSize: 13, color: SLATE }}>Thời lượng: {formatHours(certificate.courseHours)} giờ học</span>
+                <span style={{ fontFamily: WORK_SANS, fontSize: 13, color: SLATE }}>{t('duration', { hours: formatHours(certificate.courseHours) })}</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={GOLD} strokeWidth="2"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 10h18M8 3v4M16 3v4"></path></svg>
-                <span style={{ fontFamily: WORK_SANS, fontSize: 13, color: SLATE }}>Ngày hoàn thành: {completionDate}</span>
+                <span style={{ fontFamily: WORK_SANS, fontSize: 13, color: SLATE }}>{tc('completedOn')}: {completionDate}</span>
               </div>
             </div>
           </div>
@@ -160,7 +163,7 @@ export function CertificatePreview({
                 ))}
               </div>
               <div style={{ textAlign: 'left' }}>
-                <div style={{ fontFamily: WORK_SANS, fontWeight: 400, fontSize: 9, letterSpacing: 1.5, color: SLATE, textTransform: 'uppercase' }}>Mã chứng chỉ</div>
+                <div style={{ fontFamily: WORK_SANS, fontWeight: 400, fontSize: 9, letterSpacing: 1.5, color: SLATE, textTransform: 'uppercase' }}>{tc('code')}</div>
                 <div style={{ fontFamily: WORK_SANS, fontWeight: 600, fontSize: 12, color: NAVY }}>{certificate.certificateCode}</div>
                 {interactive ? (
                   <a
@@ -190,8 +193,8 @@ export function CertificatePreview({
             </div>
 
             <div style={{ display: 'flex', alignItems: 'flex-end', gap: 34 }}>
-              <SignatureBlock name={certificate.instructorName} label="Giảng viên phụ trách" />
-              <SignatureBlock name="LinguaLearn" label="Đại diện nền tảng" />
+              <SignatureBlock name={certificate.instructorName} label={t('instructorLabel')} />
+              <SignatureBlock name="LinguaLearn" label={t('platformLabel')} />
             </div>
           </div>
         </div>

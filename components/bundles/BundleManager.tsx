@@ -273,10 +273,10 @@ function BundleCard({ bundle, onEdit, onDelete }: { bundle: CourseBundle; onEdit
             <button
               type="button"
               onClick={onDelete}
-              aria-label={`Xóa gói: ${bundle.title}`}
+              aria-label={t('list.deleteAria', { title: bundle.title })}
               className="rounded-xl border border-line px-3 py-1.5 text-xs font-semibold text-danger hover:bg-surface hover:border-danger/40 transition-colors"
             >
-              Xóa
+              {t('list.delete')}
             </button>
           </div>
         </div>
@@ -373,9 +373,9 @@ export function BundleManager() {
       {!isLoading && bundles.length > 0 && (
         <>
           <div className="flex flex-wrap items-center gap-3">
-            <ListSearch label="Tìm gói khóa học" value={list.query} onChange={list.setQuery} placeholder="Tìm theo tên gói hoặc tên khóa học trong gói..." />
+            <ListSearch label={t('list.searchLabel')} value={list.query} onChange={list.setQuery} placeholder={t('list.searchPh')} />
             <select
-              aria-label="Lọc theo trạng thái"
+              aria-label={t('list.statusFilter')}
               value={statusFilter}
               onChange={(e) => {
                 setStatusFilter(e.target.value as 'ALL' | 'ACTIVE' | 'INACTIVE');
@@ -383,13 +383,13 @@ export function BundleManager() {
               }}
               className="rounded-lg border border-line bg-surface-raised px-3 py-2.5 text-sm text-ink outline-none focus:border-accent"
             >
-              <option value="ALL">Tất cả trạng thái</option>
-              <option value="ACTIVE">Đang bán</option>
-              <option value="INACTIVE">Đã tắt</option>
+              <option value="ALL">{t('list.statusAll')}</option>
+              <option value="ACTIVE">{t('list.statusActive')}</option>
+              <option value="INACTIVE">{t('list.statusInactive')}</option>
             </select>
           </div>
           {list.total === 0 ? (
-            <p className="m-0 rounded-xl border border-line bg-surface-raised p-6 text-center text-sm text-ink-muted">Không có gói khóa học nào khớp.</p>
+            <p className="m-0 rounded-xl border border-line bg-surface-raised p-6 text-center text-sm text-ink-muted">{t('list.noMatch')}</p>
           ) : (
             <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-5">
               {list.pageItems.map((bundle) => (
@@ -409,10 +409,10 @@ export function BundleManager() {
       <ConfirmDialog
         open={pendingDelete !== null}
         tone="danger"
-        title="Xóa gói khóa học?"
-        body={pendingDelete ? `Gói "${pendingDelete.title}" chưa có người mua sẽ được xóa hẳn; nếu đã có người mua, gói sẽ được lưu trữ (ngừng bán, ẩn khỏi danh sách) và lịch sử đơn vẫn được giữ nguyên.` : ''}
-        confirmLabel="Xóa"
-        cancelLabel="Hủy"
+        title={t('list.deleteTitle')}
+        body={pendingDelete ? t('list.deleteBody', { title: pendingDelete.title }) : ''}
+        confirmLabel={t('list.delete')}
+        cancelLabel={t('form.cancel')}
         onConfirm={() => {
           if (pendingDelete) deleteBundle.mutate(pendingDelete.id);
           setPendingDelete(null);

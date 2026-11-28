@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { Modal } from './Modal';
 
 /**
@@ -20,18 +21,19 @@ interface ConfirmModalProps {
 }
 
 export function ConfirmModal({
-  title = 'Xác nhận',
+  title,
   message,
-  confirmLabel = 'Đồng ý',
-  cancelLabel = 'Hủy',
+  confirmLabel,
+  cancelLabel,
   onConfirm,
   onCancel,
 }: ConfirmModalProps) {
+  const t = useTranslations('common.confirm');
   return (
     <Modal
       open
       onClose={onCancel}
-      title={title}
+      title={title ?? t('title')}
       size="sm"
       footer={
         <>
@@ -40,14 +42,14 @@ export function ConfirmModal({
             onClick={onCancel}
             className="rounded-lg px-4 py-2 text-sm font-semibold text-accent-dark transition-colors duration-150 hover:bg-tint"
           >
-            {cancelLabel}
+            {cancelLabel ?? t('cancel')}
           </button>
           <button
             type="button"
             onClick={onConfirm}
             className="btn-tactile rounded-lg bg-accent px-4 py-2 text-sm font-bold text-white hover:bg-accent-dark"
           >
-            {confirmLabel}
+            {confirmLabel ?? t('ok')}
           </button>
         </>
       }

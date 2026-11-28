@@ -117,19 +117,19 @@ export function Header() {
     toastedStreakDataRef.current = streakData;
 
     if (streakData && prevStreak !== null && streakData.currentStreak > prevStreak) {
-      toast.success(`🔥 Chúc mừng! Chuỗi ngày học của bạn đã lên ${streakData.currentStreak} ngày!`, {
+      toast.success(t('streak.congrats', { days: streakData.currentStreak }), {
         duration: 5000,
       });
     }
     if (streakData?.justFrozen) {
-      toast.info(`🧊 Bạn đã lỡ 1 ngày — hệ thống tự động "đóng băng" để giữ chuỗi ${streakData.currentStreak} ngày của bạn! Còn ${streakData.freezesRemaining} lần đóng băng trong tháng này.`, {
+      toast.info(t('streak.frozen', { days: streakData.currentStreak, remaining: streakData.freezesRemaining }), {
         duration: 7000,
       });
     }
     if (streakData) {
       setPrevStreak(streakData.currentStreak);
     }
-  }, [streakData, prevStreak]);
+  }, [streakData, prevStreak, t]);
 
   const accountMenuRef = useRef<HTMLDivElement>(null);
 
@@ -295,8 +295,8 @@ export function Header() {
                     <div className="flex items-center gap-3 mb-4">
                       <span className="text-3xl">🔥</span>
                       <div>
-                        <h4 className="font-bold text-ink text-[15px]">Chuỗi {streakData.currentStreak} ngày</h4>
-                        <p className="text-[12px] text-ink-muted">Kỷ lục: {streakData.longestStreak} ngày</p>
+                        <h4 className="font-bold text-ink text-[15px]">{t('streak.title', { days: streakData.currentStreak })}</h4>
+                        <p className="text-[12px] text-ink-muted">{t('streak.record', { days: streakData.longestStreak })}</p>
                       </div>
                     </div>
                     <div className="flex justify-between items-center mt-2">
@@ -326,10 +326,10 @@ export function Header() {
                       })}
                     </div>
                     <p className="text-[12px] text-center text-ink-muted mt-4">
-                      {streakData.hasStudiedToday ? 'Bạn đã hoàn thành mục tiêu hôm nay!' : 'Học 1 bài học hoặc làm 1 bài quiz để giữ chuỗi!'}
+                      {streakData.hasStudiedToday ? t('streak.doneToday') : t('streak.keepGoing')}
                     </p>
                     <p className="text-[11px] text-center text-ink-faint mt-1.5">
-                      🧊 Còn {streakData.freezesRemaining} lần đóng băng streak trong tháng này (tự động áp dụng nếu bạn lỡ 1 ngày)
+                      {t('streak.freezes', { remaining: streakData.freezesRemaining })}
                     </p>
                   </div>
                 )}

@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api/client';
 import { getAccessToken } from '@/lib/auth/token';
@@ -61,6 +62,7 @@ function getGapColorTheme(errorRate: number) {
 }
 
 export function KnowledgeGapsWidget({ courseId }: { courseId: number }) {
+  const t = useTranslations('learn.knowledgeGaps');
   const { data, isLoading, error } = useQuery<KnowledgeGapsRes>({
     queryKey: ['knowledge-gaps', courseId],
     queryFn: async () => {
@@ -98,8 +100,8 @@ export function KnowledgeGapsWidget({ courseId }: { courseId: number }) {
             <Trophy className="w-6 h-6" />
           </div>
           <div>
-            <h3 className="font-bold text-success-dark text-lg mb-1">Tuyệt vời!</h3>
-            <p className="text-ink-muted leading-relaxed">Bạn chưa có lỗ hổng kiến thức đáng chú ý nào. Hãy tiếp tục phát huy và duy trì phong độ xuất sắc này nhé!</p>
+            <h3 className="font-bold text-success-dark text-lg mb-1">{t('greatTitle')}</h3>
+            <p className="text-ink-muted leading-relaxed">{t('greatBody')}</p>
           </div>
         </div>
       </div>
@@ -110,10 +112,10 @@ export function KnowledgeGapsWidget({ courseId }: { courseId: number }) {
     <div className="card p-6 mb-6 border border-line shadow-sm bg-surface">
       <div className="flex items-center gap-2 mb-2">
         <AlertTriangle className="w-5 h-5 text-accent" />
-        <h3 className="font-bold text-lg text-ink">Phân tích lỗ hổng kiến thức</h3>
+        <h3 className="font-bold text-lg text-ink">{t('title')}</h3>
       </div>
       <p className="text-sm text-ink-muted mb-6">
-        Hệ thống phát hiện các chủ đề bạn thường xuyên trả lời sai trong 5 bài gần nhất. Hãy ưu tiên ôn tập để cải thiện điểm số:
+        {t('intro')}
       </p>
 
       <div className="space-y-4">
@@ -126,8 +128,8 @@ export function KnowledgeGapsWidget({ courseId }: { courseId: number }) {
               <div className="w-full sm:w-2/3 flex-1">
                 <h4 className="font-bold text-ink mb-2 text-base">{gap.topic}</h4>
                 <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm font-medium mb-3">
-                  <span className={theme.text}>Sai {gap.incorrectCount}/{gap.totalCount} lần</span>
-                  <span className="text-ink-muted">Tỷ lệ lỗi: {percent}%</span>
+                  <span className={theme.text}>{t('wrongCount', { wrong: gap.incorrectCount, total: gap.totalCount })}</span>
+                  <span className="text-ink-muted">{t('errorRate', { percent })}</span>
                 </div>
                 {/* Progress Bar */}
                 <div className="w-full bg-line rounded-full h-2 shadow-inner overflow-hidden">
@@ -143,16 +145,16 @@ export function KnowledgeGapsWidget({ courseId }: { courseId: number }) {
                   className="shrink-0 flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-surface border border-line shadow-sm text-ink font-semibold text-sm hover:border-accent hover:text-accent transition group"
                 >
                   <PlayCircle className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                  Ôn tập lý thuyết
+                  {t('review')}
                 </a>
               ) : (
                 <a
                   href="?tab=materials"
                   className="shrink-0 flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-surface border border-line shadow-sm text-ink font-semibold text-sm hover:bg-surface-hover transition"
-                  title="Chủ đề này thuộc bài đánh giá tổng hợp. Hãy xem lại toàn bộ học liệu."
+                  title={t('generalTitle')}
                 >
                   <Lightbulb className="w-4 h-4 text-ink-muted" />
-                  Kiến thức tổng hợp
+                  {t('general')}
                 </a>
               )}
             </div>

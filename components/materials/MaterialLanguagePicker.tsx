@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useEffect, useRef, useState } from 'react';
 import type { LanguageAvailability } from '@/lib/api/materials';
 
@@ -21,6 +22,7 @@ interface MaterialLanguagePickerProps {
 }
 
 export function MaterialLanguagePicker({ languages, value, onChange, disabled }: MaterialLanguagePickerProps) {
+  const t = useTranslations('learn.materialPicker');
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
@@ -64,7 +66,7 @@ export function MaterialLanguagePicker({ languages, value, onChange, disabled }:
   };
 
   return (
-    <div ref={containerRef} className="relative" role="group" aria-label="Chọn ngôn ngữ học liệu">
+    <div ref={containerRef} className="relative" role="group" aria-label={t('group')}>
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
@@ -80,11 +82,11 @@ export function MaterialLanguagePicker({ languages, value, onChange, disabled }:
             {active.available ? (
               <span className="text-success" aria-hidden>✓</span>
             ) : (
-              <span className="h-1.5 w-1.5 animate-ai-pulse rounded-full bg-star" aria-label="Chưa có bản dịch sẵn" />
+              <span className="h-1.5 w-1.5 animate-ai-pulse rounded-full bg-star" aria-label={t('notTranslated')} />
             )}
           </span>
         ) : (
-          <span className="text-ink-faint">{languages.length === 0 ? 'Chưa có transcript' : 'Chọn ngôn ngữ'}</span>
+          <span className="text-ink-faint">{languages.length === 0 ? t('noTranscript') : t('choose')}</span>
         )}
         <svg width="10" height="10" viewBox="0 0 12 12" aria-hidden className={`shrink-0 text-ink-faint transition-transform ${open ? 'rotate-180' : ''}`}>
           <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
@@ -99,15 +101,15 @@ export function MaterialLanguagePicker({ languages, value, onChange, disabled }:
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Tìm ngôn ngữ…"
-              aria-label="Tìm ngôn ngữ"
+              placeholder={t('search')}
+              aria-label={t('search')}
               className="w-full rounded-full border border-line bg-surface px-3 py-1.5 text-[13px]
                          text-ink outline-none placeholder:text-ink-faint focus:border-accent"
             />
           </div>
-          <ul role="listbox" aria-label="Danh sách ngôn ngữ" className="max-h-64 overflow-y-auto py-1">
+          <ul role="listbox" aria-label={t('list')} className="max-h-64 overflow-y-auto py-1">
             {filteredLanguages.length === 0 && (
-              <li className="px-4 py-3 text-center text-[13px] text-ink-faint">Không tìm thấy ngôn ngữ nào</li>
+              <li className="px-4 py-3 text-center text-[13px] text-ink-faint">{t('noLanguage')}</li>
             )}
             {filteredLanguages.map((lang) => {
               const isActive = lang.code === value;
@@ -124,9 +126,9 @@ export function MaterialLanguagePicker({ languages, value, onChange, disabled }:
                   >
                     <span>{lang.label}</span>
                     {lang.available ? (
-                      <span className="text-success" aria-label="Đã có bản dịch sẵn">✓</span>
+                      <span className="text-success" aria-label={t('translated')}>✓</span>
                     ) : (
-                      <span className="h-1.5 w-1.5 shrink-0 animate-ai-pulse rounded-full bg-star" aria-label="Chưa có bản dịch sẵn" />
+                      <span className="h-1.5 w-1.5 shrink-0 animate-ai-pulse rounded-full bg-star" aria-label={t('notTranslated')} />
                     )}
                   </button>
                 </li>

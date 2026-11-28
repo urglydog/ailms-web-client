@@ -2,6 +2,7 @@
 
 import { useChat, useDataChannel, useLocalParticipant } from '@livekit/components-react';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import { RequireLoginModal } from '@/components/live/RequireLoginModal';
 
 /** Topic RIÊNG cho lệnh ẩn tin nhắn — tách khỏi topic chat mặc định (`lk.chat`) của
@@ -12,8 +13,8 @@ interface HidePayload {
   messageId: string;
 }
 
-function formatTime(ts: number): string {
-  return new Date(ts).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+function formatTime(ts: number, locale: string): string {
+  return new Date(ts).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
 }
 
 /**
@@ -32,6 +33,8 @@ function formatTime(ts: number): string {
  * do `be/` cấp qua JWT ký bởi `LIVEKIT_API_SECRET`, học viên không thể giả mạo được.
  */
 export function LiveChatPanel({ isAuthenticated }: { isAuthenticated: boolean }) {
+  const t = useTranslations('live.chat');
+  const locale = useLocale();
   const { chatMessages, send, isSending } = useChat();
   const { send: sendHide } = useDataChannel(HIDE_TOPIC, (msg) => {
     if (!msg.from?.identity?.startsWith('instructor-')) return; // không phải giảng viên — bỏ qua
@@ -78,12 +81,12 @@ export function LiveChatPanel({ isAuthenticated }: { isAuthenticated: boolean })
   return (
     <div className="flex h-full min-h-[360px] flex-col rounded-xl border border-line bg-surface-raised">
       <div className="border-b border-line-soft px-4 py-3">
-        <span className="text-[13px] font-bold text-ink">Chat trực tiếp</span>
+        <span className="text-[13px] font-bold text-ink">{t('title')}</span>
       </div>
 
       <div ref={listRef} className="flex-1 overflow-y-auto px-4 py-3">
         {visibleMessages.length === 0 && (
-          <p className="text-center text-[12.5px] text-ink-faint">Chưa có tin nhắn nào.</p>
+          <p className="text-center text-[12.5px] text-ink-faint">{t('empty')}</p>
         )}
         <div className="flex flex-col gap-2.5">
           {visibleMessages.map((m) => {
@@ -92,9 +95,9 @@ export function LiveChatPanel({ isAuthenticated }: { isAuthenticated: boolean })
               <div key={m.id} className="group flex items-start justify-between gap-2 text-[13px]">
                 <p className="min-w-0 break-words text-ink">
                   <span className={`font-semibold ${senderIsInstructor ? 'text-danger' : 'text-ink'}`}>
-                    {senderIsInstructor ? 'Giảng viên' : (m.from?.name ?? 'Ẩn danh')}
+                    {senderIsInstructor ? t('instructor') : (m.from?.name ?? t('anonymous'))}
                   </span>{' '}
-                  <span className="text-[10.5px] text-ink-faint">{formatTime(m.timestamp)}</span>
+                  <span className="text-[10.5px] text-ink-faint">{formatTime(m.timestamp, locale)}</span>
                   <br />
                   {m.message}
                 </p>
@@ -102,10 +105,10 @@ export function LiveChatPanel({ isAuthenticated }: { isAuthenticated: boolean })
                   <button
                     type="button"
                     onClick={() => handleHide(m.id)}
-                    title="Ẩn tin nhắn này"
+                    title={t('hideTitle')}
                     className="shrink-0 text-[11px] text-ink-faint opacity-0 hover:text-danger group-hover:opacity-100"
                   >
-                    Ẩn
+                    {t('hide')}
                   </button>
                 )}
               </div>
@@ -122,7 +125,7 @@ export function LiveChatPanel({ isAuthenticated }: { isAuthenticated: boolean })
           onFocus={() => {
             if (!isAuthenticated) setShowLoginModal(true);
           }}
-          placeholder={isAuthenticated ? 'Nhập tin nhắn…' : 'Đăng nhập để chat'}
+          placeholder={isAuthenticated ? t('placeholder') : t('loginPlaceholder')}
           className="min-w-0 flex-1 rounded-full border border-line px-3.5 py-2 text-[13px]
                      text-ink outline-none placeholder:text-ink-faint focus:border-accent"
         />
@@ -132,14 +135,14 @@ export function LiveChatPanel({ isAuthenticated }: { isAuthenticated: boolean })
           className="shrink-0 rounded-full bg-accent px-4 py-2 text-[12.5px] font-bold text-white
                      hover:bg-accent-dark disabled:opacity-50"
         >
-          Gửi
+          {t('send')}
         </button>
       </form>
 
       <RequireLoginModal
         open={showLoginModal}
         onClose={() => setShowLoginModal(false)}
-        actionLabel="gửi tin nhắn trong buổi live"
+        actionLabel={t('loginAction')}
       />
     </div>
   );

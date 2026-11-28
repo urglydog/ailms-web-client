@@ -1,5 +1,6 @@
 'use client';
 
+import { useLocale, useTranslations } from 'next-intl';
 import { useState, type FormEvent } from 'react';
 import { useLessonAssignmentsForStudent, useSubmitAssignment } from '@/hooks/useCommunication';
 import type { StudentAssignmentItem } from '@/lib/api/communication';
@@ -8,13 +9,14 @@ import type { StudentAssignmentItem } from '@/lib/api/communication';
  * mới) — hiển thị trong tab "Học liệu" của trang học bài, phía trên `MaterialManager`. Không
  * hiện gì nếu bài giảng này chưa có bài tập nào (không làm rối giao diện). */
 export function LessonAssignmentsList({ lessonId }: { lessonId: number }) {
+  const t = useTranslations('learn.assignments');
   const { data: assignments, isLoading } = useLessonAssignmentsForStudent(lessonId, true);
 
   if (isLoading || !assignments || assignments.length === 0) return null;
 
   return (
     <div className="flex flex-col gap-3">
-      <h3 className="font-display text-base font-bold text-ink">Bài tập</h3>
+      <h3 className="font-display text-base font-bold text-ink">{t('title')}</h3>
       {assignments.map((item) => (
         <AssignmentCard key={item.assignment.id} lessonId={lessonId} item={item} />
       ))}
@@ -23,6 +25,8 @@ export function LessonAssignmentsList({ lessonId }: { lessonId: number }) {
 }
 
 function AssignmentCard({ lessonId, item }: { lessonId: number; item: StudentAssignmentItem }) {
+  const t = useTranslations('learn.assignments');
+  const locale = useLocale();
   const { assignment, mySubmission } = item;
   const [textContent, setTextContent] = useState('');
   const [file, setFile] = useState<File | null>(null);
@@ -45,12 +49,12 @@ function AssignmentCard({ lessonId, item }: { lessonId: number; item: StudentAss
         <div>
           <p className="text-[14px] font-bold text-ink">{assignment.title}</p>
           {assignment.dueDate && (
-            <p className="text-[12px] text-ink-muted">Hạn nộp: {new Date(assignment.dueDate).toLocaleDateString('vi-VN')}</p>
+            <p className="text-[12px] text-ink-muted">{t('due', { date: new Date(assignment.dueDate).toLocaleDateString(locale) })}</p>
           )}
         </div>
         {assignment.maxScore != null && (
           <span className="shrink-0 rounded-full bg-accent/10 px-2.5 py-1 text-[11.5px] font-bold text-accent">
-            Tối đa {assignment.maxScore} điểm
+            {t('maxScore', { score: assignment.maxScore })}
           </span>
         )}
       </div>
@@ -62,23 +66,23 @@ function AssignmentCard({ lessonId, item }: { lessonId: number; item: StudentAss
       {mySubmission ? (
         <div className="rounded-lg bg-surface-hover p-3">
           <p className="mb-1 text-[11.5px] font-semibold uppercase tracking-wide text-ink-faint">
-            Bài đã nộp · {new Date(mySubmission.submittedAt).toLocaleString('vi-VN')}
+            {t('submitted', { time: new Date(mySubmission.submittedAt).toLocaleString(locale) })}
           </p>
           {mySubmission.textContent && <p className="mb-1.5 whitespace-pre-line text-[13px] text-ink">{mySubmission.textContent}</p>}
           {mySubmission.fileUrl && (
             <a href={mySubmission.fileUrl} target="_blank" rel="noreferrer" className="text-[12.5px] font-semibold text-accent hover:underline">
-              📎 {mySubmission.fileName ?? 'Tệp đã nộp'}
+              📎 {mySubmission.fileName ?? t('submittedFile')}
             </a>
           )}
           {isGraded ? (
             <div className="mt-2 border-t border-line-soft pt-2">
               <p className="text-[13px] font-bold text-success">
-                Điểm: {mySubmission.score}{assignment.maxScore != null ? `/${assignment.maxScore}` : ''}
+                {t('score', { score: `${mySubmission.score}${assignment.maxScore != null ? `/${assignment.maxScore}` : ''}` })}
               </p>
               {mySubmission.feedback && <p className="mt-0.5 text-[12.5px] text-ink-muted">{mySubmission.feedback}</p>}
             </div>
           ) : (
-            <p className="mt-2 text-[12px] text-ink-muted">Đang chờ giảng viên chấm điểm.</p>
+            <p className="mt-2 text-[12px] text-ink-muted">{t('waiting')}</p>
           )}
         </div>
       ) : (
@@ -87,7 +91,7 @@ function AssignmentCard({ lessonId, item }: { lessonId: number; item: StudentAss
             value={textContent}
             onChange={(e) => setTextContent(e.target.value)}
             rows={3}
-            placeholder="Nhập nội dung bài làm..."
+            placeholder={t('placeholder')}
             className="resize-none rounded-lg border border-line px-3 py-2 text-[13px] focus:border-accent focus:outline-none"
           />
           <input
@@ -100,7 +104,7 @@ function AssignmentCard({ lessonId, item }: { lessonId: number; item: StudentAss
             disabled={(!textContent.trim() && !file) || submit.isPending}
             className="self-start rounded-lg bg-accent px-4 py-2 text-[13px] font-bold text-white hover:bg-accent-dark disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {submit.isPending ? 'Đang nộp...' : 'Nộp bài'}
+            {submit.isPending ? t('submitting') : t('submit')}
           </button>
         </form>
       )}

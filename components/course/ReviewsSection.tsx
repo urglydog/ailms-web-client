@@ -1,5 +1,6 @@
 'use client';
 
+import { useLocale, useTranslations } from 'next-intl';
 import { useState, useEffect, type FormEvent } from 'react';
 import { StarRatingInput } from '@/components/ui/StarRatingInput';
 import { useCourseReviews, useCreateReview } from '@/hooks/useReviews';
@@ -13,8 +14,8 @@ function avatarColor(name: string): string {
   return AVATAR_COLORS[sum % AVATAR_COLORS.length]!;
 }
 
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+function formatDate(iso: string, locale: string): string {
+  return new Date(iso).toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
 /**
@@ -26,6 +27,8 @@ function formatDate(iso: string): string {
  * hữu (BR-ENROLL-01) thì hiện thông báo lỗi ngay dưới form.
  */
 export function ReviewsSection({ courseId }: { courseId: number }) {
+  const t = useTranslations('courseDetail.reviewsList');
+  const locale = useLocale();
   const { data, isLoading } = useCourseReviews(courseId);
   const createReview = useCreateReview(courseId);
   const [rating, setRating] = useState(0);
@@ -59,13 +62,13 @@ export function ReviewsSection({ courseId }: { courseId: number }) {
     <div className="flex flex-col gap-5">
       {isStudent && !submitted && (
         <form onSubmit={handleSubmit} className="card flex flex-col gap-3 p-5">
-          <span className="font-display text-sm font-semibold text-ink">Viết đánh giá của bạn</span>
+          <span className="font-display text-sm font-semibold text-ink">{t('writeTitle')}</span>
           <StarRatingInput value={rating} onChange={setRating} />
           <textarea
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             rows={3}
-            placeholder="Chia sẻ cảm nhận của bạn về khóa học (không bắt buộc)..."
+            placeholder={t('placeholder')}
             className="rounded-lg border border-line bg-surface-raised px-3 py-2 text-sm text-ink
                        placeholder:text-ink-faint focus:border-accent focus:outline-none"
           />
@@ -78,19 +81,19 @@ export function ReviewsSection({ courseId }: { courseId: number }) {
             className="self-start rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-white
                        hover:bg-accent-dark disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {createReview.isPending ? 'Đang gửi...' : 'Gửi đánh giá'}
+            {createReview.isPending ? t('sending') : t('submit')}
           </button>
         </form>
       )}
 
       {submitted && (
-        <div className="card p-4 text-sm text-success">Cảm ơn bạn đã đánh giá khóa học!</div>
+        <div className="card p-4 text-sm text-success">{t('thanks')}</div>
       )}
 
-      {isLoading && <p className="text-sm text-ink-muted">Đang tải đánh giá...</p>}
+      {isLoading && <p className="text-sm text-ink-muted">{t('loading')}</p>}
 
       {!isLoading && reviews.length === 0 && (
-        <p className="text-sm text-ink-muted">Chưa có đánh giá nào cho khóa học này.</p>
+        <p className="text-sm text-ink-muted">{t('empty')}</p>
       )}
 
       <div className="flex flex-col gap-4">
@@ -107,11 +110,11 @@ export function ReviewsSection({ courseId }: { courseId: number }) {
             <div className="flex min-w-0 flex-1 flex-col gap-1.5">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <span className="font-display text-sm font-semibold text-ink">{review.userName}</span>
-                <span className="text-xs text-ink-faint">{formatDate(review.createdAt)}</span>
+                <span className="text-xs text-ink-faint">{formatDate(review.createdAt, locale)}</span>
               </div>
               {/* Danh sách đánh giá hiện đủ 5 icon sao (khác CourseCard — nơi đó chỉ cần
                   1 icon + số điểm trung bình, xem components/ui/StarRating.tsx). */}
-              <div className="flex items-center gap-0.5 text-star" aria-label={`${review.rating} trên 5 sao`}>
+              <div className="flex items-center gap-0.5 text-star" aria-label={t('starsAria', { rating: review.rating })}>
                 {[1, 2, 3, 4, 5].map((star) => (
                   <span key={star} aria-hidden>
                     {star <= review.rating ? '★' : '☆'}

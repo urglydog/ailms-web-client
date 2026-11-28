@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useCommunitySocket, ChatMessage } from '@/hooks/useCommunitySocket';
 import { Avatar } from '@/components/ui/Avatar';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 
 interface LiveChatPanelProps {
   lessonId: number;
@@ -24,6 +25,7 @@ const REPLIES_PAGE_SIZE = 3;
  *      khi đã hiện hết — không còn nút "Ẩn bớt" gộp chung nữa (đúng khuôn phân trang comment).
  */
 export function LiveChatPanel({ lessonId, userName, currentUserId }: LiveChatPanelProps) {
+  const t = useTranslations('community.chat');
   const { messages, sendMessage, setBestAnswer } = useCommunitySocket(lessonId);
   const [inputValue, setInputValue] = useState('');
   const [replyingTo, setReplyingTo] = useState<ChatMessage | null>(null);
@@ -49,7 +51,7 @@ export function LiveChatPanel({ lessonId, userName, currentUserId }: LiveChatPan
 
   const handleReplyClick = (msg: ChatMessage) => {
     if (currentUserId ? msg.senderId === currentUserId : msg.senderName === userName) {
-      toast.error('Bạn không thể trả lời tin nhắn của chính mình!');
+      toast.error(t('ownReply'));
       return;
     }
     // Giữ cấu trúc 1 cấp: Nếu reply 1 reply khác, ta gán parentId bằng parent gốc
@@ -66,7 +68,7 @@ export function LiveChatPanel({ lessonId, userName, currentUserId }: LiveChatPan
 
   const toggleBest = (root: ChatMessage, reply: ChatMessage) => {
     const next = root.bestAnswerId === reply.id ? null : reply.id;
-    setBestAnswer(root.id, next).catch(() => toast.error('Không cập nhật được câu trả lời hay nhất, thử lại sau.'));
+    setBestAnswer(root.id, next).catch(() => toast.error(t('bestError')));
   };
 
   const showMoreReplies = (rootId: string) => {
@@ -105,12 +107,12 @@ export function LiveChatPanel({ lessonId, userName, currentUserId }: LiveChatPan
           <span className="text-[14px] font-bold text-ink">{msg.senderName}</span>
           {msg.isInstructor && (
             <span className="rounded bg-ink px-1.5 py-0.5 text-[10px] font-bold text-surface">
-              Giảng viên
+              {t('instructor')}
             </span>
           )}
           {isBest && (
             <span className="rounded-full bg-success-tint px-2 py-0.5 text-[10.5px] font-bold text-success-ink">
-              ✓ Câu trả lời hay nhất
+              {t('bestAnswer')}
             </span>
           )}
           <span className="text-[12px] text-ink-muted">
@@ -125,7 +127,7 @@ export function LiveChatPanel({ lessonId, userName, currentUserId }: LiveChatPan
             onClick={() => handleReplyClick(msg)}
             className="text-[13px] text-accent font-medium w-fit hover:underline"
           >
-            Trả lời
+            {t('reply')}
           </button>
           {isReply && root && canMarkBest(root) && (
             <button
@@ -134,7 +136,7 @@ export function LiveChatPanel({ lessonId, userName, currentUserId }: LiveChatPan
               aria-pressed={isBest}
               className="text-[13px] font-medium text-ink-muted w-fit hover:text-success-ink hover:underline"
             >
-              {isBest ? 'Bỏ đánh dấu hay nhất' : 'Đánh dấu là câu trả lời hay nhất'}
+              {isBest ? t('unmarkBest') : t('markBest')}
             </button>
           )}
         </div>
@@ -146,11 +148,11 @@ export function LiveChatPanel({ lessonId, userName, currentUserId }: LiveChatPan
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-3">
-        <h3 className="font-semibold text-ink text-lg">Bình luận</h3>
+        <h3 className="font-semibold text-ink text-lg">{t('title')}</h3>
         <form onSubmit={handleSend} className="flex flex-col border border-line rounded-lg focus-within:border-accent overflow-hidden">
           {replyingTo && (
             <div className="px-3 py-2 bg-surface-raised text-xs text-ink-muted flex justify-between items-center border-b border-line">
-              <span>Đang trả lời <strong>{replyingTo.senderName}</strong></span>
+              <span>{t.rich('replyingTo', { name: replyingTo.senderName, b: (chunks) => <strong>{chunks}</strong> })}</span>
               <button
                 type="button"
                 onClick={() => {
@@ -159,7 +161,7 @@ export function LiveChatPanel({ lessonId, userName, currentUserId }: LiveChatPan
                 }}
                 className="text-danger hover:underline font-semibold"
               >
-                Hủy
+                {t('cancel')}
               </button>
             </div>
           )}
@@ -167,7 +169,7 @@ export function LiveChatPanel({ lessonId, userName, currentUserId }: LiveChatPan
             ref={inputRef}
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            placeholder={replyingTo ? "Nhập câu trả lời..." : "Chia sẻ cảm nghĩ của bạn ..."}
+            placeholder={replyingTo ? t('replyPlaceholder') : t('placeholder')}
             className="w-full text-sm bg-surface border-none focus:ring-0 p-3 min-h-[80px] resize-y outline-none"
             onKeyDown={(e) => {
               if (e.key === 'Enter' && !e.shiftKey) {
@@ -182,7 +184,7 @@ export function LiveChatPanel({ lessonId, userName, currentUserId }: LiveChatPan
               disabled={!inputValue.trim()}
               className="bg-accent text-white px-5 py-1.5 rounded-md text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-colors hover:bg-accent-strong"
             >
-              Gửi
+              {t('send')}
             </button>
           </div>
         </form>
@@ -192,7 +194,7 @@ export function LiveChatPanel({ lessonId, userName, currentUserId }: LiveChatPan
         {rootMessages.length === 0 ? (
           <div className="py-10 flex flex-col items-center justify-center text-sm text-ink-muted text-center bg-surface-raised rounded-xl">
             <span className="text-3xl mb-2" aria-hidden>💬</span>
-            Chưa có bình luận nào.<br/>Hãy là người đầu tiên chia sẻ cảm nghĩ!
+            {t('empty')}<br/>{t('emptyHint')}
           </div>
         ) : (
           rootMessages.map((msg) => {
@@ -213,7 +215,7 @@ export function LiveChatPanel({ lessonId, userName, currentUserId }: LiveChatPan
                         onClick={() => showMoreReplies(msg.id)}
                         className="w-fit text-[13px] font-semibold text-accent hover:underline mt-3"
                       >
-                        Xem thêm {orderedReplies.length - visibleCount} câu trả lời
+                        {t('showMore', { count: orderedReplies.length - visibleCount })}
                       </button>
                     )}
                   </div>

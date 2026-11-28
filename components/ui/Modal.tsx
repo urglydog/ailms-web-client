@@ -4,6 +4,7 @@ import { useEffect, useId, useRef, useState, type ReactNode, type RefObject } fr
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion, useIsPresent } from 'motion/react';
 import { X } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { duration, ease, scale } from '@/lib/motion/tokens';
 
 /**
@@ -64,7 +65,7 @@ export function Modal({
   size = 'md',
   closeOnBackdrop = true,
   hideClose = false,
-  closeLabel = 'Đóng',
+  closeLabel,
   className = '',
   role = 'dialog',
   initialFocusRef,
@@ -72,6 +73,7 @@ export function Modal({
   zClass = 'z-[300]',
   bare = false,
 }: ModalProps) {
+  const tUi = useTranslations('common.ui');
   // Render qua portal vào <body>: `fixed` bên trong phần tử có transform/overflow sẽ bị cắt hoặc lệch.
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
@@ -179,7 +181,7 @@ export function Modal({
                   <button
                     type="button"
                     onClick={onClose}
-                    aria-label={closeLabel}
+                    aria-label={closeLabel ?? tUi('close')}
                     className="-mr-2 -mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-ink-muted transition-colors duration-150 hover:bg-tint hover:text-ink"
                   >
                     <X size={18} aria-hidden />

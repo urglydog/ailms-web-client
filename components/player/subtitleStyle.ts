@@ -56,12 +56,12 @@ export const COLOR_SWATCHES = ['#ffffff', '#fde047', '#000000', '#22d3ee', '#4ad
 
 /** Mẫu áp nhanh 1 PHẦN cấu hình (patch) — KHÔNG loại trừ nhau, bấm nhiều mẫu liên tiếp sẽ chồng
  * lên nhau (vd "Nền đen" rồi "Chữ vàng" rồi "Viền chữ" -> nền đen + chữ vàng + có viền). */
-export const PRESET_TEMPLATES: { label: string; patch: Partial<SubtitleTypeSettings> }[] = [
-  { label: 'Mặc định', patch: { textColor: '#ffffff', backgroundColor: '#0b0b0f', backgroundOpacity: 80, outline: false } },
-  { label: 'Nền đen', patch: { backgroundColor: '#000000', backgroundOpacity: 90 } },
-  { label: 'Chữ vàng', patch: { textColor: '#fde047' } },
-  { label: 'Viền chữ', patch: { outline: true } },
-  { label: 'Tối giản (không nền)', patch: { backgroundOpacity: 0, outline: true } },
+export const PRESET_TEMPLATES: { id: string; patch: Partial<SubtitleTypeSettings> }[] = [
+  { id: 'presetDefault', patch: { textColor: '#ffffff', backgroundColor: '#0b0b0f', backgroundOpacity: 80, outline: false } },
+  { id: 'presetBlackBg', patch: { backgroundColor: '#000000', backgroundOpacity: 90 } },
+  { id: 'presetYellow', patch: { textColor: '#fde047' } },
+  { id: 'presetOutline', patch: { outline: true } },
+  { id: 'presetMinimal', patch: { backgroundOpacity: 0, outline: true } },
 ];
 
 export const DEFAULT_SUBTITLE_SETTINGS: SubtitleSettings = {

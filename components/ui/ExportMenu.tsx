@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { ChevronDown, Share2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 import { ApiError } from '@/lib/api/client';
 
 export interface ExportMenuItem {
@@ -27,7 +28,8 @@ interface Props {
  * Nút "Chia sẻ" duy nhất cho mọi thao tác xuất/gửi (PDF, CSV, XLSX, gửi email...): thay cho nhiều nút nhỏ rời rạc.
  * Đóng khi bấm ra ngoài hoặc nhấn Escape; mục đang chạy bị khóa và hiện "Đang xử lý...".
  */
-export function ExportMenu({ items, label = 'Chia sẻ', disabled = false, align = 'right' }: Props) {
+export function ExportMenu({ items, label, disabled = false, align = 'right' }: Props) {
+  const t = useTranslations('common.export');
   const [open, setOpen] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -54,7 +56,7 @@ export function ExportMenu({ items, label = 'Chia sẻ', disabled = false, align
       await item.onSelect();
       setOpen(false);
     } catch (err) {
-      toast.error(err instanceof ApiError ? err.message : 'Thao tác không thành công. Vui lòng thử lại.');
+      toast.error(err instanceof ApiError ? err.message : t('failed'));
     } finally {
       setBusyId(null);
     }
@@ -71,7 +73,7 @@ export function ExportMenu({ items, label = 'Chia sẻ', disabled = false, align
         className="inline-flex items-center gap-1.5 rounded-lg border border-line bg-surface-raised px-3 py-2 text-sm font-semibold text-accent-dark hover:bg-tint disabled:opacity-50"
       >
         <Share2 size={15} aria-hidden />
-        {label}
+        {label ?? t('share')}
         <ChevronDown size={14} aria-hidden />
       </button>
       {open && (
@@ -90,7 +92,7 @@ export function ExportMenu({ items, label = 'Chia sẻ', disabled = false, align
             >
               <span className="mt-0.5 text-ink-muted">{item.icon}</span>
               <span className="flex flex-col">
-                <span className="font-semibold">{busyId === item.id ? 'Đang xử lý...' : item.label}</span>
+                <span className="font-semibold">{busyId === item.id ? t('busy') : item.label}</span>
                 {item.hint && <span className="text-xs text-ink-muted">{item.hint}</span>}
               </span>
             </button>

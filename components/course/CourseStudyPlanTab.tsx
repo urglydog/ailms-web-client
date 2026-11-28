@@ -8,8 +8,9 @@ import { api, ApiError } from '@/lib/api/client';
 import { toast } from 'sonner';
 import { Sparkles, Calendar as CalendarIcon, Clock, Download, Plus, CheckCircle2, Trash2, AlertTriangle } from 'lucide-react';
 import { format, addDays, startOfDay, isBefore, differenceInCalendarDays } from 'date-fns';
-import { vi } from 'date-fns/locale';
 import Link from 'next/link';
+import { useLocale, useTranslations } from 'next-intl';
+import { getDateFnsLocale } from '@/lib/dateFnsLocale';
 
 interface CourseStudyPlanTabProps {
   courseId: number;
@@ -37,6 +38,8 @@ interface StudyPlanDto {
 }
 
 export function CourseStudyPlanTab({ courseId, completedLessonIds = [], allLessons = [] }: CourseStudyPlanTabProps) {
+  const t = useTranslations('learn.studyPlan');
+  const locale = useLocale();
   const queryClient = useQueryClient();
   const [showModal, setShowModal] = useState(false);
   const [targetDate, setTargetDate] = useState<string>(() => {
@@ -82,13 +85,13 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [], allLesso
     onSuccess: (data) => {
       queryClient.setQueryData(['study-plan', courseId], data);
       setShowModal(false);
-      toast.success('Đã tạo lộ trình học thành công!');
+      toast.success(t('createdToast'));
     },
     onError: (err) => {
       if (err instanceof ApiError) {
         toast.error(err.message);
       } else {
-        toast.error('Có lỗi xảy ra khi tạo lộ trình.');
+        toast.error(t('createError'));
       }
     },
   });
@@ -98,10 +101,10 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [], allLesso
     onSuccess: () => {
       queryClient.setQueryData(['study-plan', courseId], null);
       setShowDeleteModal(false);
-      toast.success('Đã xóa lộ trình thành công!');
+      toast.success(t('deletedToast'));
     },
     onError: () => {
-      toast.error('Có lỗi xảy ra khi xóa lộ trình.');
+      toast.error(t('deleteError'));
     },
   });
 
@@ -116,11 +119,11 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [], allLesso
       queryClient.setQueryData(['study-plan', courseId], data);
       setShowRescheduleModal(false);
       setRescheduleTargetDate('');
-      toast.success('Đã cập nhật tiến độ thành công!');
+      toast.success(t('updatedToast'));
     },
     onError: (err) => {
       if (err instanceof ApiError) toast.error(err.message);
-      else toast.error('Có lỗi xảy ra.');
+      else toast.error(t('genericError'));
     },
   });
 
@@ -158,8 +161,8 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [], allLesso
         const dtstart = day.date.replace(/-/g, '');
         const dtend = addDaysUtc(day.date, 1);
 
-        const description = `Mục tiêu: ${icsEscape(day.objective)}\\n\\nBài giảng:\\n` +
-          day.lessons.map(l => `- ${icsEscape(l.title)} (${l.duration_minutes} phút)`).join('\\n');
+        const description = `${t('icsObjective', { objective: icsEscape(day.objective) })}\\n\\n${t('icsLessons')}\\n` +
+          day.lessons.map(l => t('icsLessonLine', { title: icsEscape(l.title), minutes: l.duration_minutes })).join('\\n');
 
         icsContent += 'BEGIN:VEVENT\n';
         // UID ổn định theo courseId+ngày — bắt buộc theo RFC 5545, và giúp app lịch NHẬN RA
@@ -169,7 +172,7 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [], allLesso
         icsContent += `DTSTAMP:${dtstamp}\n`;
         icsContent += `DTSTART;VALUE=DATE:${dtstart}\n`;
         icsContent += `DTEND;VALUE=DATE:${dtend}\n`;
-        icsContent += `SUMMARY:Học LMS - ${icsEscape(day.lessons[0]?.title ?? 'Bài học')}...\n`;
+        icsContent += `SUMMARY:${t('icsSummary', { title: icsEscape(day.lessons[0]?.title ?? t('icsDefaultLesson')) })}\n`;
         icsContent += `DESCRIPTION:${description}\n`;
         icsContent += 'END:VEVENT\n';
       });
@@ -187,7 +190,7 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [], allLesso
       URL.revokeObjectURL(url);
 
     } catch {
-      toast.error('Lỗi khi xuất file Calendar');
+      toast.error(t('exportError'));
     }
   };
 
@@ -249,16 +252,16 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [], allLesso
   const isOverloaded = avgMinPerDay > 120;
 
   if (isLoading) {
-    return <div className="p-8 text-center text-ink-muted">Đang tải...</div>;
+    return <div className="p-8 text-center text-ink-muted">{t('loading')}</div>;
   }
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-bold text-ink">Lộ trình học AI (Cá nhân hóa)</h2>
+          <h2 className="text-lg font-bold text-ink">{t('title')}</h2>
           <p className="text-sm text-ink-muted mt-1">
-            Được phân bổ tự động bởi AI dựa trên tiến độ và mục tiêu của bạn.
+            {t('subtitle')}
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -267,7 +270,7 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [], allLesso
               onClick={handleExportIcs}
               className="flex items-center gap-2 rounded-lg border border-line px-4 py-2 text-sm font-medium hover:bg-surface-hover"
             >
-              <Download className="h-4 w-4" /> Xuất Calendar (.ics)
+              <Download className="h-4 w-4" /> {t('exportIcs')}
             </button>
           )}
           <button
@@ -281,14 +284,14 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [], allLesso
             ) : (
               <Sparkles className="h-4 w-4" />
             )}
-            {hasPlan ? (isBehindSchedule ? 'Cập nhật tiến độ' : 'Điều chỉnh lộ trình') : 'Tạo lộ trình ngay'}
+            {hasPlan ? (isBehindSchedule ? t('updateProgress') : t('adjust')) : t('createNow')}
           </button>
           
           {hasPlan && (
             <button
               onClick={() => setShowDeleteModal(true)}
               className="flex items-center justify-center rounded-lg p-2 text-danger hover:bg-danger/5 hover:text-danger transition-colors"
-              title="Xóa lộ trình"
+              title={t('deleteTitle')}
             >
               <Trash2 className="h-5 w-5" />
             </button>
@@ -302,9 +305,9 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [], allLesso
             <span className="text-xl">⚠️</span>
           </div>
           <div>
-            <h4 className="font-semibold text-streak-ink text-sm">Bạn đang trễ tiến độ!</h4>
+            <h4 className="font-semibold text-streak-ink text-sm">{t('behindTitle')}</h4>
             <p className="text-streak-ink text-sm mt-1">
-              Bạn có một số bài học trong quá khứ chưa hoàn thành. Hãy bấm <strong>Cập nhật tiến độ</strong> để hệ thống tự động dời các bài chưa học vào lịch còn lại.
+              {t.rich('behindBody', { b: (chunks) => <strong>{chunks}</strong> })}
             </p>
           </div>
         </div>
@@ -315,15 +318,15 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [], allLesso
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-accent/10">
             <Sparkles className="h-8 w-8 text-accent" />
           </div>
-          <h3 className="mt-4 font-semibold text-ink">Chưa có lộ trình học nào</h3>
+          <h3 className="mt-4 font-semibold text-ink">{t('emptyTitle')}</h3>
           <p className="mt-2 max-w-sm mx-auto text-sm text-ink-muted">
-            Hãy thiết lập mục tiêu ngày hoàn thành để AI tạo lịch học chi tiết cho từng ngày, giúp bạn dễ dàng theo dõi tiến độ.
+            {t('emptyBody')}
           </p>
           <button
             onClick={() => setShowModal(true)}
             className="mt-6 rounded-full bg-accent px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-accent-dark"
           >
-            Bắt đầu cấu hình
+            {t('startConfig')}
           </button>
         </div>
       )}
@@ -333,13 +336,13 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [], allLesso
           <div className="flex gap-6 rounded-lg bg-surface-hover p-4 text-sm">
             <div className="flex items-center gap-2">
               <CalendarIcon className="h-4 w-4 text-ink-muted" />
-              <span className="text-ink-muted">Mục tiêu hoàn thành:</span>
+              <span className="text-ink-muted">{t('targetLabel')}</span>
               <span className="font-semibold text-ink">{plan?.targetDate ? format(new Date(plan.targetDate), 'dd/MM/yyyy') : ''}</span>
             </div>
             <div className="flex items-center gap-2">
               <Clock className="h-4 w-4 text-ink-muted" />
-              <span className="text-ink-muted">Cam kết học:</span>
-              <span className="font-semibold text-ink">{plan?.hoursPerWeek ?? 0} giờ / tuần</span>
+              <span className="text-ink-muted">{t('commitLabel')}</span>
+              <span className="font-semibold text-ink">{t('hoursPerWeek', { hours: plan?.hoursPerWeek ?? 0 })}</span>
             </div>
           </div>
 
@@ -348,7 +351,7 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [], allLesso
               <div key={i} className="relative">
                 <div className="absolute -left-[31px] top-1 h-3 w-3 rounded-full border-2 border-accent bg-surface-raised" />
                 <h4 className="font-semibold text-ink">
-                  {format(new Date(day.date), 'EEEE, dd MMMM, yyyy', { locale: vi })}
+                  {format(new Date(day.date), 'EEEE, dd MMMM, yyyy', { locale: getDateFnsLocale(locale) })}
                 </h4>
                 <p className="text-sm font-medium text-accent mt-1">{day.objective}</p>
                 
@@ -376,11 +379,11 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [], allLesso
                           const hasVideo = realLesson && realLesson.durationSec && realLesson.durationSec > 0;
                           return hasVideo ? (
                             <span className="text-xs text-ink-muted rounded-full bg-surface-hover px-2 py-1">
-                              {lesson.duration_minutes} phút
+                              {t('minutes', { minutes: lesson.duration_minutes })}
                             </span>
                           ) : (
                             <span className="text-[11px] text-ink-faint rounded-full border border-line-soft px-2 py-0.5">
-                              Không có video
+                              {t('noVideo')}
                             </span>
                           );
                         })()}
@@ -395,18 +398,18 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [], allLesso
       )}
 
       {/* Modal Cấu hình Lộ trình */}
-      {showModal && typeof window !== 'undefined' && <Modal open onClose={() => setShowModal(false)} bare ariaLabel="Cấu hình lộ trình học AI" closeOnBackdrop={false} className="w-full max-w-md overflow-hidden rounded-2xl bg-surface-raised shadow-2xl">
+      {showModal && typeof window !== 'undefined' && <Modal open onClose={() => setShowModal(false)} bare ariaLabel={t('configTitle')} closeOnBackdrop={false} className="w-full max-w-md overflow-hidden rounded-2xl bg-surface-raised shadow-2xl">
             <div className="border-b border-line p-4">
               <h3 className="font-semibold text-ink flex items-center gap-2">
                 <Sparkles className="h-5 w-5 text-accent" />
-                Cấu hình lộ trình học AI
+                {t('configTitle')}
               </h3>
             </div>
             <form onSubmit={handleGenerate} className="p-6">
               <div className="space-y-5">
                 <div>
                   <label className="mb-1.5 block text-sm font-medium text-ink">
-                    Ngày hoàn thành dự kiến
+                    {t('expectedDate')}
                   </label>
                   <input
                     type="date"
@@ -416,11 +419,11 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [], allLesso
                     onChange={(e) => setTargetDate(e.target.value)}
                     className="w-full rounded-lg border border-line px-3 py-2 text-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                   />
-                  <p className="mt-1 text-xs text-ink-muted">Lịch học sẽ được chia đều từ hôm nay đến ngày này.</p>
+                  <p className="mt-1 text-xs text-ink-muted">{t('expectedDateHint')}</p>
                 </div>
                 <div>
                   <label className="mb-1.5 block text-sm font-medium text-ink">
-                    Thời gian học (Giờ / tuần)
+                    {t('weeklyHours')}
                   </label>
                   <input
                     type="number"
@@ -431,14 +434,14 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [], allLesso
                     onChange={(e) => setHoursPerWeek(Number(e.target.value))}
                     className="w-full rounded-lg border border-line px-3 py-2 text-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                   />
-                  <p className="mt-1 text-xs text-ink-muted">AI sẽ phân bổ sao cho không vượt quá giới hạn này.</p>
+                  <p className="mt-1 text-xs text-ink-muted">{t('weeklyHoursHint')}</p>
                 </div>
               </div>
 
               {isBehindSchedule && (
                 <div className="mt-4 rounded border border-warning/30 bg-streak-bg p-3 text-xs text-streak-ink">
-                  <p className="font-semibold mb-1">Gợi ý bắt kịp tiến độ:</p>
-                  <p>Vì khối lượng bài dồn lại nhiều hơn, bạn có thể cần <strong>tăng số giờ học mỗi tuần</strong> hoặc <strong>lùi ngày hoàn thành</strong> để lộ trình khả thi hơn.</p>
+                  <p className="font-semibold mb-1">{t('catchUpTitle')}</p>
+                  <p>{t.rich('catchUpBody', { b: (chunks) => <strong>{chunks}</strong> })}</p>
                 </div>
               )}
 
@@ -449,28 +452,28 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [], allLesso
                   className="rounded-lg px-4 py-2 text-sm font-semibold text-ink-muted hover:bg-surface-hover"
                   disabled={generatePlan.isPending}
                 >
-                  Hủy
+                  {t('cancel')}
                 </button>
                 <button
                   type="submit"
                   disabled={generatePlan.isPending}
                   className="flex items-center justify-center rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-dark disabled:opacity-50"
                 >
-                  {generatePlan.isPending ? 'Đang phân tích...' : 'Tạo lộ trình'}
+                  {generatePlan.isPending ? t('analyzing') : t('createPlan')}
                 </button>
               </div>
             </form>
           </Modal>}
 
       {/* Modal Xác nhận Xóa Lộ trình */}
-      {showDeleteModal && typeof window !== 'undefined' && <Modal open onClose={() => setShowDeleteModal(false)} bare ariaLabel="Xóa lộ trình hiện tại?" role="alertdialog" closeOnBackdrop={false} className="w-full max-w-sm overflow-hidden rounded-2xl bg-surface-raised shadow-2xl">
+      {showDeleteModal && typeof window !== 'undefined' && <Modal open onClose={() => setShowDeleteModal(false)} bare ariaLabel={t('deleteConfirmTitle')} role="alertdialog" closeOnBackdrop={false} className="w-full max-w-sm overflow-hidden rounded-2xl bg-surface-raised shadow-2xl">
             <div className="p-6 text-center">
               <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-danger/10">
                 <AlertTriangle className="h-6 w-6 text-danger" />
               </div>
-              <h3 className="mt-4 text-lg font-semibold text-ink">Xóa lộ trình hiện tại?</h3>
+              <h3 className="mt-4 text-lg font-semibold text-ink">{t('deleteConfirmTitle')}</h3>
               <p className="mt-2 text-sm text-ink-muted">
-                Bạn có chắc chắn muốn xóa lộ trình này không? Bạn sẽ phải cấu hình lại từ đầu.
+                {t('deleteConfirmBody')}
               </p>
             </div>
             <div className="flex border-t border-line">
@@ -480,7 +483,7 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [], allLesso
                 className="flex-1 py-3 text-sm font-semibold text-ink-muted hover:bg-surface-hover"
                 disabled={deletePlan.isPending}
               >
-                Hủy bỏ
+                {t('cancelShort')}
               </button>
               <div className="w-px bg-line" />
               <button
@@ -489,33 +492,33 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [], allLesso
                 className="flex-1 py-3 text-sm font-semibold text-danger hover:bg-danger/5 disabled:opacity-50"
                 disabled={deletePlan.isPending}
               >
-                {deletePlan.isPending ? 'Đang xóa...' : 'Xóa lộ trình'}
+                {deletePlan.isPending ? t('deleting') : t('deletePlan')}
               </button>
             </div>
           </Modal>}
 
       {/* Modal Reschedule Preview */}
-      {showRescheduleModal && typeof window !== 'undefined' && <Modal open onClose={() => setShowRescheduleModal(false)} bare ariaLabel="Cập nhật tiến độ" closeOnBackdrop={false} className="w-full max-w-md overflow-hidden rounded-2xl bg-surface-raised shadow-2xl">
+      {showRescheduleModal && typeof window !== 'undefined' && <Modal open onClose={() => setShowRescheduleModal(false)} bare ariaLabel={t('updateProgress')} closeOnBackdrop={false} className="w-full max-w-md overflow-hidden rounded-2xl bg-surface-raised shadow-2xl">
             <div className="border-b border-line p-4">
               <h3 className="font-semibold text-ink flex items-center gap-2">
                 <Clock className="h-5 w-5 text-warning" />
-                Cập nhật tiến độ
+                {t('updateProgress')}
               </h3>
             </div>
             <form onSubmit={(e) => { e.preventDefault(); reschedulePlan.mutate(); }} className="p-6">
               <div className="space-y-4 text-sm text-ink mb-6">
                 <div className="flex justify-between py-2 border-b border-line-soft">
-                  <span className="text-ink-muted">Còn lại:</span>
-                  <span className="font-medium">{uniqueUncompleted.length} bài ({totalMinutes} phút)</span>
+                  <span className="text-ink-muted">{t('remaining')}</span>
+                  <span className="font-medium">{t('remainingValue', { lessons: uniqueUncompleted.length, minutes: totalMinutes })}</span>
                 </div>
                 <div className="flex justify-between py-2 border-b border-line-soft">
-                  <span className="text-ink-muted">Đến hạn:</span>
-                  <span className="font-medium">{isValidTarget ? format(new Date(effectiveTarget), 'dd/MM/yyyy') : '--'} ({daysRemaining} ngày)</span>
+                  <span className="text-ink-muted">{t('dueLabel')}</span>
+                  <span className="font-medium">{t('dueValue', { date: isValidTarget ? format(new Date(effectiveTarget), 'dd/MM/yyyy') : '--', days: daysRemaining })}</span>
                 </div>
                 <div className="flex justify-between py-2 border-b border-line-soft">
-                  <span className="text-ink-muted">Tốc độ cần thiết:</span>
+                  <span className="text-ink-muted">{t('requiredPace')}</span>
                   <span className={`font-medium flex items-center gap-1 ${isOverloaded ? 'text-danger' : 'text-success'}`}>
-                    ~{avgMinPerDay === Infinity ? '--' : avgMinPerDay} phút / ngày
+                    {t('paceValue', { minutes: avgMinPerDay === Infinity ? '--' : avgMinPerDay })}
                     {isOverloaded ? <AlertTriangle className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4" />}
                   </span>
                 </div>
@@ -524,7 +527,7 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [], allLesso
               {(isOverloaded || isDeadlinePassed || !isValidTarget) && (
                 <div className="mb-6 space-y-2">
                   <label className="block text-sm font-medium text-ink">
-                    Chọn ngày hoàn thành mới { (isDeadlinePassed || !isValidTarget) && <span className="text-danger">*</span> }
+                    {t('pickNewDate')} { (isDeadlinePassed || !isValidTarget) && <span className="text-danger">*</span> }
                   </label>
                   <input
                     type="date"
@@ -535,10 +538,10 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [], allLesso
                     className="w-full rounded-lg border border-line px-3 py-2 text-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                   />
                   {isOverloaded && !isDeadlinePassed && isValidTarget && (
-                    <p className="text-xs text-warning">Khối lượng bài học quá nặng. Vui lòng dời deadline để giảm tải.</p>
+                    <p className="text-xs text-warning">{t('tooHeavy')}</p>
                   )}
                   {(isDeadlinePassed || !isValidTarget) && (
-                    <p className="text-xs text-danger">Deadline đã qua hoặc không hợp lệ. Bạn bắt buộc phải chọn ngày mới.</p>
+                    <p className="text-xs text-danger">{t('deadlinePassed')}</p>
                   )}
                 </div>
               )}
@@ -550,14 +553,14 @@ export function CourseStudyPlanTab({ courseId, completedLessonIds = [], allLesso
                   className="rounded-lg px-4 py-2 text-sm font-semibold text-ink-muted hover:bg-surface-hover"
                   disabled={reschedulePlan.isPending}
                 >
-                  Hủy
+                  {t('cancel')}
                 </button>
                 <button
                   type="submit"
                   disabled={reschedulePlan.isPending || !isValidTarget || isDeadlinePassed}
                   className="flex items-center justify-center rounded-lg bg-warning px-4 py-2 text-sm font-semibold text-white hover:bg-warning disabled:opacity-50"
                 >
-                  {reschedulePlan.isPending ? 'Đang cập nhật...' : 'Xác nhận cập nhật'}
+                  {reschedulePlan.isPending ? t('updating') : t('confirmUpdate')}
                 </button>
               </div>
             </form>
