@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { ConfirmDialog } from '@/components/admin/ui/ConfirmDialog';
 import { TableErrorRow } from '@/components/admin/ui/TableErrorRow';
@@ -14,31 +15,14 @@ import type { AiJobSummary, JobStatus } from '@/types/domain';
 
 /** Bộ lọc xem: "Cần xử lý" = job lỗi mà bài học + ngôn ngữ đó CHƯA có bản lồng tiếng thành công (job lỗi cũ đã được bản sau thay thế không hiện). */
 type View = 'ATTENTION' | 'ALL' | JobStatus;
-const VIEW_LABEL: Record<string, string> = {
-  ATTENTION: 'Cần xử lý (lỗi, chưa có bản thành công)',
-  PROCESSING: 'Đang xử lý',
-  PENDING: 'Đang chờ',
-  COMPLETED: 'Hoàn tất',
-  FAILED: 'Tất cả job lỗi',
-  SKIPPED: 'Đã bỏ qua',
-  ALL: 'Tất cả',
-};
 const VIEWS: View[] = ['ATTENTION', 'PROCESSING', 'PENDING', 'COMPLETED', 'FAILED', 'SKIPPED', 'ALL'];
-
-const STATUS_LABEL: Record<JobStatus, string> = {
-  PENDING: 'Đang chờ',
-  PROCESSING: 'Đang xử lý',
-  COMPLETED: 'Hoàn tất',
-  FAILED: 'Lỗi',
-  SKIPPED: 'Đã bỏ qua',
-  CANCELLED: 'Đã hủy',
-};
 
 /**
  * Giám sát job lồng tiếng (UC45, chỉnh 21/11/2026): mặc định chỉ hiện job CẦN XỬ LÝ; mỗi dòng nêu rõ khóa học, bài học, người yêu cầu và thời gian. Job lỗi cũ mà bài học + ngôn ngữ
  * đó đã có bản thành công được ghi "Đã có bản thành công" và KHÔNG có nút Thử lại (thử lại sẽ tốn chi phí AI vô ích). Nút Thử lại luôn hỏi xác nhận kèm cảnh báo chi phí.
  */
 export function AiJobQueueManager() {
+  const t = useTranslations('admin.jobs');
   const [view, setView] = useState<View>('ATTENTION');
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebounce(search, 400);
@@ -65,8 +49,8 @@ export function AiJobQueueManager() {
   const doRetry = () => {
     if (!confirming) return;
     retryJob.mutate(confirming.id, {
-      onSuccess: () => toast.success('Đã đưa job vào hàng đợi để lồng tiếng lại.'),
-      onError: (err) => toast.error(err instanceof ApiError ? err.message : 'Không thử lại được job. Vui lòng thử lại sau.'),
+      onSuccess: () => toast.success(t('queued')),
+      onError: (err) => toast.error(err instanceof ApiError ? err.message : t('retryFailed')),
     });
     setConfirming(null);
   };
@@ -75,20 +59,20 @@ export function AiJobQueueManager() {
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-end gap-3">
         <label className="flex flex-col gap-1">
-          <span className="text-xs font-semibold text-ink-muted">Xem</span>
-          <select aria-label="Chế độ xem" value={view} onChange={(e) => reset(() => setView(e.target.value as View))} className={`${input} w-72`}>
+          <span className="text-xs font-semibold text-ink-muted">{t('view.label')}</span>
+          <select value={view} onChange={(e) => reset(() => setView(e.target.value as View))} className={`${input} w-72`}>
             {VIEWS.map((v) => (
-              <option key={v} value={v}>{VIEW_LABEL[v]}</option>
+              <option key={v} value={v}>{t(`view.${v}`)}</option>
             ))}
           </select>
         </label>
-        <ListSearch label="Tìm job" value={search} onChange={(v) => reset(() => setSearch(v))} placeholder="Khóa học, bài học, ngôn ngữ, người yêu cầu hoặc mã job..." className="sm:w-80" />
+        <ListSearch label={t('find.label')} value={search} onChange={(v) => reset(() => setSearch(v))} placeholder={t('find.ph')} className="sm:w-80" />
         <label className="flex flex-col gap-1">
-          <span className="text-xs font-semibold text-ink-muted">Từ ngày</span>
+          <span className="text-xs font-semibold text-ink-muted">{t('from')}</span>
           <input type="date" value={from} max={to || undefined} onChange={(e) => reset(() => setFrom(e.target.value))} className={input} />
         </label>
         <label className="flex flex-col gap-1">
-          <span className="text-xs font-semibold text-ink-muted">Đến ngày</span>
+          <span className="text-xs font-semibold text-ink-muted">{t('to')}</span>
           <input type="date" value={to} min={from || undefined} onChange={(e) => reset(() => setTo(e.target.value))} className={input} />
         </label>
       </div>
@@ -97,25 +81,25 @@ export function AiJobQueueManager() {
         <table className="w-full min-w-[1100px] text-left text-sm">
           <thead className="bg-surface text-xs font-bold text-ink-muted uppercase">
             <tr>
-              <th className="whitespace-nowrap px-4 py-3">Khóa học / Bài học</th>
-              <th className="whitespace-nowrap px-4 py-3">Ngôn ngữ</th>
-              <th className="whitespace-nowrap px-4 py-3">Người yêu cầu</th>
-              <th className="whitespace-nowrap px-4 py-3">Trạng thái</th>
-              <th className="whitespace-nowrap px-4 py-3">Tiến độ</th>
-              <th className="whitespace-nowrap px-4 py-3">Thời gian</th>
-              <th className="whitespace-nowrap px-4 py-3">Lỗi</th>
-              <th className="whitespace-nowrap px-4 py-3 text-right">Thao tác</th>
+              <th className="whitespace-nowrap px-4 py-3">{t('head.course')}</th>
+              <th className="whitespace-nowrap px-4 py-3">{t('head.language')}</th>
+              <th className="whitespace-nowrap px-4 py-3">{t('head.requester')}</th>
+              <th className="whitespace-nowrap px-4 py-3">{t('head.status')}</th>
+              <th className="whitespace-nowrap px-4 py-3">{t('head.progress')}</th>
+              <th className="whitespace-nowrap px-4 py-3">{t('head.time')}</th>
+              <th className="whitespace-nowrap px-4 py-3">{t('head.error')}</th>
+              <th className="whitespace-nowrap px-4 py-3 text-right">{t('head.actions')}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-line-soft">
             {isLoading && !data && (
-              <tr><td colSpan={8} className="px-6 py-6 text-center text-ink-muted">Đang tải...</td></tr>
+              <tr><td colSpan={8} className="px-6 py-6 text-center text-ink-muted">{t('loading')}</td></tr>
             )}
             {isError && !data && <TableErrorRow colSpan={8} onRetry={() => void refetch()} />}
             {data && data.content.length === 0 && (
               <tr>
                 <td colSpan={8} className="px-6 py-8 text-center text-ink-muted">
-                  {view === 'ATTENTION' ? 'Không có job nào cần xử lý.' : 'Không có job nào khớp bộ lọc.'}
+                  {view === 'ATTENTION' ? t('emptyAttention') : t('emptyFilter')}
                 </td>
               </tr>
             )}
@@ -123,7 +107,7 @@ export function AiJobQueueManager() {
               <tr key={job.id} className="align-top hover:bg-surface">
                 <td className="px-4 py-3">
                   <div className="font-semibold text-ink">{job.courseTitle}</div>
-                  <div className="text-xs text-ink-muted">{job.lessonTitle} · job #{job.id}</div>
+                  <div className="text-xs text-ink-muted">{t('jobRef', { lesson: job.lessonTitle, id: job.id })}</div>
                 </td>
                 <td className="whitespace-nowrap px-4 py-3 text-ink-muted">{job.targetLanguage}</td>
                 <td className="px-4 py-3 text-ink-muted">
@@ -144,14 +128,14 @@ export function AiJobQueueManager() {
                             : 'bg-tint text-accent-dark'
                     }`}
                   >
-                    {STATUS_LABEL[job.status]}
+                    {t(`state.${job.status}`)}
                   </span>
-                  {job.superseded && <div className="mt-1 text-xs text-success-ink">Đã có bản lồng tiếng thành công</div>}
+                  {job.superseded && <div className="mt-1 text-xs text-success-ink">{t('superseded')}</div>}
                 </td>
-                <td className="whitespace-nowrap px-4 py-3 text-ink-muted">{job.doneChunks}/{job.totalChunks} ({job.progressPercent}%)<div className="text-xs">Thử lại {job.retryCount}/3</div></td>
+                <td className="whitespace-nowrap px-4 py-3 text-ink-muted">{job.doneChunks}/{job.totalChunks} ({job.progressPercent}%)<div className="text-xs">{t('retries', { count: job.retryCount })}</div></td>
                 <td className="whitespace-nowrap px-4 py-3 text-xs text-ink-muted">
-                  Tạo {dateTime(job.createdAt)}
-                  {job.finishedAt && <div>Xong {dateTime(job.finishedAt)}</div>}
+                  {t('created', { at: dateTime(job.createdAt) })}
+                  {job.finishedAt && <div>{t('finished', { at: dateTime(job.finishedAt) })}</div>}
                 </td>
                 <td className="max-w-xs px-4 py-3 text-xs text-ink-muted"><span className="line-clamp-2" title={job.errorMessage ?? ''}>{job.errorMessage ?? '—'}</span></td>
                 <td className="whitespace-nowrap px-4 py-3 text-right">
@@ -159,11 +143,11 @@ export function AiJobQueueManager() {
                     <button
                       type="button"
                       onClick={() => setConfirming(job)}
-                      aria-label={`Thử lại: ${job.lessonTitle}`}
+                      aria-label={t('retryAria', { lesson: job.lessonTitle })}
                       disabled={retryJob.isPending}
                       className="rounded-lg border border-line px-3 py-1.5 text-xs font-bold text-accent-dark hover:bg-tint disabled:opacity-50"
                     >
-                      Thử lại
+                      {t('retry')}
                     </button>
                   )}
                 </td>
@@ -178,14 +162,14 @@ export function AiJobQueueManager() {
       <ConfirmDialog
         open={confirming !== null}
         tone="primary"
-        title="Thử lại lồng tiếng?"
+        title={t('confirm.title')}
         body={
           confirming
-            ? `Bài "${confirming.lessonTitle}" (${confirming.targetLanguage}) sẽ được dịch và đọc lại từ đầu, việc này tốn chi phí AI. Chỉ thử lại khi bạn chắc chắn bài này chưa có bản lồng tiếng dùng được.`
+            ? t('confirm.body', { lesson: confirming.lessonTitle, language: confirming.targetLanguage })
             : ''
         }
-        confirmLabel="Thử lại"
-        cancelLabel="Hủy"
+        confirmLabel={t('retry')}
+        cancelLabel={t('confirm.cancel')}
         onConfirm={doRetry}
         onCancel={() => setConfirming(null)}
       />

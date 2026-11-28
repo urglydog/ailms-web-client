@@ -2147,6 +2147,55 @@
         "prev": "Previous",
         "next": "Next",
         "page": "Page {page} of {total}"
+      },
+      "view": {
+        "label": "View",
+        "ATTENTION": "Needs attention (failed, no successful version)",
+        "PROCESSING": "Processing",
+        "PENDING": "Pending",
+        "COMPLETED": "Completed",
+        "FAILED": "All failed jobs",
+        "SKIPPED": "Skipped",
+        "ALL": "All"
+      },
+      "state": {
+        "PENDING": "Pending",
+        "PROCESSING": "Processing",
+        "COMPLETED": "Completed",
+        "FAILED": "Failed",
+        "SKIPPED": "Skipped",
+        "CANCELLED": "Cancelled"
+      },
+      "find": {
+        "label": "Search jobs",
+        "ph": "Course, lesson, language, requester or job ID..."
+      },
+      "from": "From",
+      "to": "To",
+      "head": {
+        "course": "Course / Lesson",
+        "language": "Language",
+        "requester": "Requested by",
+        "status": "Status",
+        "progress": "Progress",
+        "time": "Time",
+        "error": "Error",
+        "actions": "Actions"
+      },
+      "emptyAttention": "No jobs need attention.",
+      "emptyFilter": "No jobs match the filters.",
+      "jobRef": "{lesson} · job #{id}",
+      "superseded": "A successful dub already exists",
+      "retries": "Retries {count}/3",
+      "created": "Created {at}",
+      "finished": "Finished {at}",
+      "retryAria": "Retry: {lesson}",
+      "queued": "The job was queued to be dubbed again.",
+      "retryFailed": "Could not retry the job. Please try again later.",
+      "confirm": {
+        "title": "Retry dubbing?",
+        "body": "\"{lesson}\" ({language}) will be translated and voiced again from scratch, which costs AI credits. Only retry if you are sure this lesson has no usable dub yet.",
+        "cancel": "Cancel"
       }
     },
     "payments": {

@@ -2081,6 +2081,55 @@
         "prev": "Previous",
         "next": "Next",
         "page": "Page {page} of {total}"
+      },
+      "view": {
+        "label": "查看",
+        "ATTENTION": "需处理（失败且无成功版本）",
+        "PROCESSING": "处理中",
+        "PENDING": "等待中",
+        "COMPLETED": "已完成",
+        "FAILED": "所有失败任务",
+        "SKIPPED": "已跳过",
+        "ALL": "全部"
+      },
+      "state": {
+        "PENDING": "等待中",
+        "PROCESSING": "处理中",
+        "COMPLETED": "已完成",
+        "FAILED": "失败",
+        "SKIPPED": "已跳过",
+        "CANCELLED": "已取消"
+      },
+      "find": {
+        "label": "搜索任务",
+        "ph": "课程、课时、语言、申请人或任务 ID..."
+      },
+      "from": "开始日期",
+      "to": "结束日期",
+      "head": {
+        "course": "课程 / 课时",
+        "language": "语言",
+        "requester": "申请人",
+        "status": "状态",
+        "progress": "进度",
+        "time": "时间",
+        "error": "错误",
+        "actions": "操作"
+      },
+      "emptyAttention": "没有需要处理的任务。",
+      "emptyFilter": "没有符合筛选条件的任务。",
+      "jobRef": "{lesson} · 任务 #{id}",
+      "superseded": "已有成功的配音版本",
+      "retries": "重试 {count}/3",
+      "created": "创建于 {at}",
+      "finished": "完成于 {at}",
+      "retryAria": "重试：{lesson}",
+      "queued": "任务已重新加入配音队列。",
+      "retryFailed": "无法重试该任务，请稍后再试。",
+      "confirm": {
+        "title": "重新配音？",
+        "body": "“{lesson}”（{language}）将从头重新翻译和朗读，这会产生 AI 费用。仅在确定该课时尚无可用配音时才重试。",
+        "cancel": "取消"
       }
     },
     "payments": {

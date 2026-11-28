@@ -2147,6 +2147,55 @@
         "prev": "Trước",
         "next": "Sau",
         "page": "Trang {page} / {total}"
+      },
+      "view": {
+        "label": "Xem",
+        "ATTENTION": "Cần xử lý (lỗi, chưa có bản thành công)",
+        "PROCESSING": "Đang xử lý",
+        "PENDING": "Đang chờ",
+        "COMPLETED": "Hoàn tất",
+        "FAILED": "Tất cả job lỗi",
+        "SKIPPED": "Đã bỏ qua",
+        "ALL": "Tất cả"
+      },
+      "state": {
+        "PENDING": "Đang chờ",
+        "PROCESSING": "Đang xử lý",
+        "COMPLETED": "Hoàn tất",
+        "FAILED": "Lỗi",
+        "SKIPPED": "Đã bỏ qua",
+        "CANCELLED": "Đã hủy"
+      },
+      "find": {
+        "label": "Tìm job",
+        "ph": "Khóa học, bài học, ngôn ngữ, người yêu cầu hoặc mã job..."
+      },
+      "from": "Từ ngày",
+      "to": "Đến ngày",
+      "head": {
+        "course": "Khóa học / Bài học",
+        "language": "Ngôn ngữ",
+        "requester": "Người yêu cầu",
+        "status": "Trạng thái",
+        "progress": "Tiến độ",
+        "time": "Thời gian",
+        "error": "Lỗi",
+        "actions": "Thao tác"
+      },
+      "emptyAttention": "Không có job nào cần xử lý.",
+      "emptyFilter": "Không có job nào khớp bộ lọc.",
+      "jobRef": "{lesson} · job #{id}",
+      "superseded": "Đã có bản lồng tiếng thành công",
+      "retries": "Thử lại {count}/3",
+      "created": "Tạo {at}",
+      "finished": "Xong {at}",
+      "retryAria": "Thử lại: {lesson}",
+      "queued": "Đã đưa job vào hàng đợi để lồng tiếng lại.",
+      "retryFailed": "Không thử lại được job. Vui lòng thử lại sau.",
+      "confirm": {
+        "title": "Thử lại lồng tiếng?",
+        "body": "Bài \"{lesson}\" ({language}) sẽ được dịch và đọc lại từ đầu, việc này tốn chi phí AI. Chỉ thử lại khi bạn chắc chắn bài này chưa có bản lồng tiếng dùng được.",
+        "cancel": "Hủy"
       }
     },
     "payments": {

@@ -2081,6 +2081,55 @@
         "prev": "Previous",
         "next": "Next",
         "page": "Page {page} of {total}"
+      },
+      "view": {
+        "label": "表示",
+        "ATTENTION": "要対応（失敗・成功版なし）",
+        "PROCESSING": "処理中",
+        "PENDING": "待機中",
+        "COMPLETED": "完了",
+        "FAILED": "すべての失敗ジョブ",
+        "SKIPPED": "スキップ済み",
+        "ALL": "すべて"
+      },
+      "state": {
+        "PENDING": "待機中",
+        "PROCESSING": "処理中",
+        "COMPLETED": "完了",
+        "FAILED": "失敗",
+        "SKIPPED": "スキップ済み",
+        "CANCELLED": "キャンセル済み"
+      },
+      "find": {
+        "label": "ジョブを検索",
+        "ph": "コース、レッスン、言語、依頼者またはジョブ ID..."
+      },
+      "from": "開始日",
+      "to": "終了日",
+      "head": {
+        "course": "コース / レッスン",
+        "language": "言語",
+        "requester": "依頼者",
+        "status": "ステータス",
+        "progress": "進捗",
+        "time": "日時",
+        "error": "エラー",
+        "actions": "操作"
+      },
+      "emptyAttention": "対応が必要なジョブはありません。",
+      "emptyFilter": "条件に一致するジョブはありません。",
+      "jobRef": "{lesson} · ジョブ #{id}",
+      "superseded": "成功した吹き替えが既にあります",
+      "retries": "再試行 {count}/3",
+      "created": "作成 {at}",
+      "finished": "完了 {at}",
+      "retryAria": "再試行：{lesson}",
+      "queued": "ジョブを吹き替えキューに再登録しました。",
+      "retryFailed": "ジョブを再試行できませんでした。しばらくしてからもう一度お試しください。",
+      "confirm": {
+        "title": "吹き替えを再試行しますか？",
+        "body": "「{lesson}」（{language}）を最初から翻訳・読み上げし直すため、AI コストが発生します。このレッスンに使える吹き替えがまだないと確信できる場合のみ再試行してください。",
+        "cancel": "キャンセル"
       }
     },
     "payments": {
