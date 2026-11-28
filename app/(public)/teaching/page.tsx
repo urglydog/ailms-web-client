@@ -78,7 +78,7 @@ export default function TeachingIntroPage() {
           <div className="absolute inset-0 flex items-center">
             <div className="shell w-full">
               <div className="max-w-sm">
-                <HeroText ctaHref={ctaHref} ctaLabel={ctaLabel} />
+                <HeroText ctaHref={ctaHref} ctaLabel={ctaLabel} onImage />
               </div>
             </div>
           </div>
@@ -147,13 +147,19 @@ export default function TeachingIntroPage() {
   );
 }
 
-function HeroText({ ctaHref, ctaLabel }: { ctaHref: string; ctaLabel: string }) {
+/**
+ * `onImage`: chữ đè lên ảnh nền 0.webp — ảnh là bitmap có vùng xám sáng bên trái ở CẢ 2 chế độ, nên
+ * không được dùng `text-ink` (đảo sang màu sáng ở dark mode → chữ sáng trên nền sáng). Dùng `night`
+ * (tối cố định ở mọi chế độ). Bản mobile nằm trên `bg-tint` đổi theo chế độ nên vẫn dùng `ink`.
+ */
+function HeroText({ ctaHref, ctaLabel, onImage = false }: { ctaHref: string; ctaLabel: string; onImage?: boolean }) {
+  const textColor = onImage ? 'text-night' : 'text-ink';
   return (
     <div className="flex flex-col gap-5">
-      <h1 className="font-display text-5xl font-extrabold leading-tight text-ink md:text-6xl">
+      <h1 className={`font-display text-5xl font-extrabold leading-tight ${textColor} md:text-6xl`}>
         Đến và giảng dạy cùng chúng tôi!
       </h1>
-      <p className="max-w-md text-lg leading-relaxed text-ink">
+      <p className={`max-w-md text-lg leading-relaxed ${textColor}`}>
         Trở thành giảng viên và thay đổi cuộc sống của người khác — kể cả chính bạn.
       </p>
       <Link

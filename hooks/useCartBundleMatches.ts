@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { bundlesApi } from '@/lib/api/bundles';
 import { enrollmentsApi } from '@/lib/api/enrollments';
-import { getAccessToken } from '@/lib/auth/token';
+import { canUseLearnerFeatures } from '@/lib/auth/token';
 import { matchCartBundles, type CartBundleMatch } from '@/lib/bundles/matchCartBundles';
 
 /** Enrollments của học viên hiện tại — dùng để nhận diện Pro-rated Pricing (đã sở hữu 1 khóa
@@ -14,7 +14,7 @@ export function useMyEnrollments() {
     queryFn: () => enrollmentsApi.listMine(),
     // Guest chưa đăng nhập gọi API này sẽ ra 401 — cùng pattern `enabled: !!getAccessToken()`
     // đã dùng ở useCart/useMyBundles, không tự chế check đăng nhập kiểu khác.
-    enabled: !!getAccessToken(),
+    enabled: canUseLearnerFeatures(),
   });
 }
 
