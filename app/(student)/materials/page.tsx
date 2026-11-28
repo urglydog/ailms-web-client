@@ -1,10 +1,11 @@
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { MaterialManager } from '@/components/materials/MaterialManager';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
+import { useMyEnrollments } from '@/hooks/useEnrollments';
 
 function MaterialsContent() {
   const t = useTranslations('pages.materials');
@@ -12,6 +13,15 @@ function MaterialsContent() {
   const searchParams = useSearchParams();
   const courseIdStr = searchParams.get('courseId');
   const courseId = courseIdStr ? parseInt(courseIdStr, 10) : null;
+
+  // Link từ thông báo (vd nhắc ôn flashcard: `/materials?courseId=N`): học viên đang học khoá đó thì mở thẳng tab "Học liệu" TRONG khoá
+  // (trang học bài) thay vì trang quản lý riêng. Giảng viên/người chưa ghi danh vẫn thấy trang quản lý này.
+  const { data: enrollments, isLoading: loadingEnrollments } = useMyEnrollments();
+  const enrollment = courseId ? enrollments?.find((e) => e.courseId === courseId) : undefined;
+  const learnLessonId = enrollment?.resumeLessonId ?? enrollment?.firstLessonId ?? null;
+  useEffect(() => {
+    if (learnLessonId) router.replace(`/learn/${learnLessonId}?tab=materials`);
+  }, [learnLessonId, router]);
 
   if (!courseId) {
     return (
@@ -24,6 +34,10 @@ function MaterialsContent() {
         </div>
       </div>
     );
+  }
+
+  if (loadingEnrollments || learnLessonId) {
+    return <MaterialsFallback />;
   }
 
   return (

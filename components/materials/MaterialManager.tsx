@@ -32,6 +32,8 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
 
   const { notifications } = useNotification();
   // Only track personal material notifications (global unread)
+  // Số học liệu cá nhân đã tạo xong — hiện cạnh tên tab như tab Official.
+  const personalCount = (materials ?? []).filter((m) => m.status === 'COMPLETED').length;
   const personalUnreadCount = notifications.filter(n => !n.isRead && n.type === 'NEW_PERSONAL_MATERIAL').length;
 
 
@@ -514,7 +516,7 @@ export function MaterialManager({ courseId, lessonId }: { courseId: number, less
           onChange={(key) => setActiveTab(key as 'OFFICIAL' | 'PERSONAL')}
           tabs={[
             { key: 'OFFICIAL', label: t('tabOfficial'), icon: <BookOpen className="w-3.5 h-3.5" />, count: filteredOfficialMaterials.length || undefined },
-            { key: 'PERSONAL', label: t('tabPersonal'), icon: <Target className="w-3.5 h-3.5" /> },
+            { key: 'PERSONAL', label: t('tabPersonal'), icon: <Target className="w-3.5 h-3.5" />, count: personalCount || undefined },
           ]}
         />
         {personalUnreadCount > 0 && (
