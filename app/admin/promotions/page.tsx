@@ -35,6 +35,9 @@ export default function AdminPromotionsPage() {
   const [statusFilter, setStatusFilter] = useState<PromotionStatus | 'ALL'>('REQUESTED');
   const [dialog, setDialog] = useState<Dialog | null>(null);
   const [endAt, setEndAt] = useState('');
+  // Mốc "bây giờ" cố định lúc mở trang, để nhận ra đợt đã duyệt nhưng quá hạn (backend vẫn ghi APPROVED sau khi hết `endAt`).
+  const [nowMs] = useState(() => Date.now());
+  const isExpired = (p: PromotionRes) => p.status === 'APPROVED' && !!p.endAt && new Date(p.endAt).getTime() <= nowMs;
   const [note, setNote] = useState('');
 
   const { data, isLoading, isError } = useQuery({
@@ -149,7 +152,7 @@ export default function AdminPromotionsPage() {
                 </div>
                 <span className="flex items-center gap-2">
                   {p.active && <span className="rounded-full bg-tint px-2.5 py-1 text-xs font-bold text-accent-dark">{t('running')}</span>}
-                  <span className="rounded-full border border-line px-2.5 py-1 text-xs font-medium text-ink">{t(`status.${p.status}`)}</span>
+                  <span className="rounded-full border border-line px-2.5 py-1 text-xs font-medium text-ink">{t(`status.${isExpired(p) ? 'ENDED' : p.status}`)}</span>
                 </span>
               </div>
               {p.requestNote && <div className="text-sm text-ink">{t('requestNote', { note: p.requestNote })}</div>}
@@ -175,7 +178,7 @@ export default function AdminPromotionsPage() {
                     </button>
                   </>
                 )}
-                {p.status === 'APPROVED' && (
+                {p.status === 'APPROVED' && !isExpired(p) && (
                   <button type="button" disabled={busy} onClick={() => setDialog({ kind: 'end', promotion: p })} className="rounded-lg border border-line px-3 py-1.5 text-xs font-semibold text-ink-muted hover:text-ink disabled:opacity-50">
                     {t('end')}
                   </button>
