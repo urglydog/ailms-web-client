@@ -74,7 +74,7 @@ export default function AdminSettingsPage() {
       <PageHeader title={t('title')} subtitle={t('subtitle')} />
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[250px_1fr]">
-        <nav aria-label="Nhóm cấu hình" className="flex gap-1.5 overflow-x-auto rounded-xl border border-line bg-surface-raised p-2 shadow-sm lg:flex-col lg:overflow-visible">
+        <nav aria-label={t('ui.groups')} className="flex gap-1.5 overflow-x-auto rounded-xl border border-line bg-surface-raised p-2 shadow-sm lg:flex-col lg:overflow-visible">
           {SETTING_GROUPS.map((g) => ({ id: g.id, title: g.title, dirty: dirtyInGroup(g) })).map((g) => (
             <button
               key={g.id}
@@ -86,7 +86,7 @@ export default function AdminSettingsPage() {
               }`}
             >
               {g.title}
-              {g.dirty && <span aria-label="Có thay đổi chưa lưu" className="h-2 w-2 shrink-0 rounded-full bg-warning" />}
+              {g.dirty && <span aria-label={t('ui.unsaved')} className="h-2 w-2 shrink-0 rounded-full bg-warning" />}
             </button>
           ))}
         </nav>
@@ -119,9 +119,9 @@ export default function AdminSettingsPage() {
       </div>
 
       {dirtyKeys.length > 0 && (
-        <div role="region" aria-label="Lưu thay đổi" className="sticky bottom-4 z-20 mx-auto flex w-full max-w-3xl flex-wrap items-center justify-between gap-3 rounded-xl border border-line bg-surface-raised px-5 py-3 shadow-card-hover">
+        <div role="region" aria-label={t('ui.saveRegion')} className="sticky bottom-4 z-20 mx-auto flex w-full max-w-3xl flex-wrap items-center justify-between gap-3 rounded-xl border border-line bg-surface-raised px-5 py-3 shadow-card-hover">
           <span className="text-sm font-semibold text-ink">
-            Có {dirtyKeys.length} thay đổi chưa lưu{hasErrors ? ' — vui lòng sửa các giá trị chưa hợp lệ' : ''}
+            {t('ui.pending', { count: dirtyKeys.length })}{hasErrors ? t('ui.fixInvalid') : ''}
           </span>
           <div className="flex gap-2">
             <button type="button" onClick={() => setDraft({})} className="rounded-lg border border-line bg-surface-raised px-4 py-2 text-sm font-semibold text-ink hover:bg-tint">

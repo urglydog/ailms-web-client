@@ -69,7 +69,7 @@ export function CategoryManager() {
         <div role="alert" className="rounded-xl border border-danger/40 bg-surface-raised p-4 text-[13px] text-danger">{errorMessage}</div>
       )}
 
-      <ListSearch label="Tìm danh mục" value={list.query} onChange={list.setQuery} placeholder="Tìm theo tên hoặc đường dẫn danh mục..." />
+      <ListSearch label={t('search')} value={list.query} onChange={list.setQuery} placeholder={t('searchPh')} />
 
       <div className="overflow-x-auto rounded-xl border border-line bg-surface-raised shadow-sm">
         <table className="w-full min-w-[520px] text-left text-sm">
@@ -98,7 +98,7 @@ export function CategoryManager() {
             )}
             {!isLoading && categories && categories.length > 0 && list.total === 0 && (
               <tr>
-                <td colSpan={3} className="px-6 py-6 text-center text-ink-muted">Không có danh mục nào khớp.</td>
+                <td colSpan={3} className="px-6 py-6 text-center text-ink-muted">{t('noMatch')}</td>
               </tr>
             )}
             {list.pageItems.map((category) => (

@@ -1772,7 +1772,11 @@
         "next": "Sau",
         "page": "Trang {page} / {total}"
       },
-      "authLocal": "Email"
+      "authLocal": "Email",
+      "prompt": {
+        "title": "Nhập thông tin để tìm người dùng",
+        "body": "Hệ thống có rất nhiều tài khoản nên không hiển thị sẵn. Hãy nhập tên, email hoặc ID người dùng ở ô tìm kiếm phía trên; hoặc chọn nhóm Bị khóa / Bị gắn cờ spam để xem các tài khoản cần theo dõi. Vai trò của từng tài khoản hiện ngay trong kết quả."
+      }
     },
     "userDetail": {
       "back": "Quay lại",
@@ -2266,6 +2270,17 @@
         "gateway": "Mã cổng thanh toán",
         "notYet": "Chưa có",
         "dispute": "Xem/xử lý khiếu nại"
+      },
+      "find": {
+        "needCriteria": "Hãy nhập mã đơn, email, tên người mua hoặc khóa học (hoặc chọn trạng thái) để tra cứu.",
+        "noReceipt": "Giao dịch này chưa có biên lai. Biên lai được tạo sau khi giao dịch hoàn tất, thường trong vài phút.",
+        "receiptError": "Không tải được biên lai. Vui lòng thử lại.",
+        "label": "Tìm giao dịch",
+        "ph": "Mã đơn, mã cổng thanh toán, email / tên / ID người mua, khóa học...",
+        "promptTitle": "Nhập thông tin để tra cứu giao dịch",
+        "prompt": "Hệ thống có rất nhiều giao dịch nên không hiển thị sẵn. Hãy nhập mã đơn, mã cổng thanh toán, email, tên hoặc ID người mua, hoặc tên khóa học; bấm vào một kết quả để xem chi tiết, tải biên lai và xử lý khiếu nại.",
+        "loading": "Đang tải...",
+        "receipt": "Tải biên lai"
       }
     },
     "disputes": {
@@ -2524,6 +2539,23 @@
       },
       "env": {
         "title": "Môi trường"
+      },
+      "ui": {
+        "groups": "Nhóm cấu hình",
+        "unsaved": "Có thay đổi chưa lưu",
+        "saveRegion": "Lưu thay đổi",
+        "pending": "Có {count} thay đổi chưa lưu",
+        "fixInvalid": " — vui lòng sửa các giá trị chưa hợp lệ",
+        "decrease": "Giảm",
+        "increase": "Tăng",
+        "slider": "{label} (thanh trượt)",
+        "daysPicked": "Đã chọn {count}/4 ngày",
+        "pickHoliday": "Chọn ngày lễ",
+        "addDate": "Thêm ngày",
+        "noHolidays": "Chưa có ngày lễ nào.",
+        "removeDate": "Xóa ngày {date}",
+        "addEmail": "Thêm email",
+        "remove": "Xóa {value}"
       }
     },
     "categories": {
@@ -2547,7 +2579,10 @@
         "title": "Xóa danh mục này?",
         "body": "Danh mục \"{name}\" sẽ bị xóa. Nếu còn khóa học thuộc danh mục này, hệ thống sẽ từ chối.",
         "cancel": "Hủy"
-      }
+      },
+      "search": "Tìm danh mục",
+      "searchPh": "Tìm theo tên hoặc đường dẫn danh mục...",
+      "noMatch": "Không có danh mục nào khớp."
     },
     "reviews": {
       "title": "Kiểm duyệt đánh giá",
@@ -3356,6 +3391,11 @@
             ]
           }
         }
+      },
+      "find": {
+        "label": "Tìm yêu cầu hỗ trợ",
+        "ph": "Mã yêu cầu, email hoặc tiêu đề...",
+        "more": "Xem thêm"
       }
     },
     "common": {

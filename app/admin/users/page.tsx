@@ -197,9 +197,8 @@ export default function AdminUsersPage() {
       </div>
 
       {needsQuery ? (
-        <SearchPrompt title="Nhập thông tin để tìm người dùng">
-          Hệ thống có rất nhiều tài khoản nên không hiển thị sẵn. Hãy nhập tên, email hoặc ID người dùng ở ô tìm kiếm phía trên;
-          hoặc chọn nhóm Bị khóa / Bị gắn cờ spam để xem các tài khoản cần theo dõi. Vai trò của từng tài khoản hiện ngay trong kết quả.
+        <SearchPrompt title={t('prompt.title')}>
+          {t('prompt.body')}
         </SearchPrompt>
       ) : loading ? (
         <div className="flex flex-col gap-2 rounded-xl border border-line bg-surface-raised p-4">

@@ -1772,7 +1772,11 @@
         "next": "Next",
         "page": "Page {page} of {total}"
       },
-      "authLocal": "Email"
+      "authLocal": "Email",
+      "prompt": {
+        "title": "Enter details to find users",
+        "body": "There are too many accounts to list by default. Enter a name, email or user ID in the search box above, or pick the Locked / Flagged as spam group to see accounts that need watching. Each account's role is shown in the results."
+      }
     },
     "userDetail": {
       "back": "Back",
@@ -2266,6 +2270,17 @@
         "gateway": "Gateway code",
         "notYet": "Not yet",
         "dispute": "View/handle dispute"
+      },
+      "find": {
+        "needCriteria": "Enter an order code, email, buyer name or course (or pick a status) to search.",
+        "noReceipt": "This transaction has no receipt yet. Receipts are created after the transaction completes, usually within a few minutes.",
+        "receiptError": "Could not load the receipt. Please try again.",
+        "label": "Search transactions",
+        "ph": "Order code, gateway reference, buyer email / name / ID, course...",
+        "promptTitle": "Enter details to look up transactions",
+        "prompt": "There are too many transactions to list by default. Enter an order code, gateway reference, buyer email, name or ID, or a course title; click a result to see details, download the receipt and handle disputes.",
+        "loading": "Loading...",
+        "receipt": "Download receipt"
       }
     },
     "disputes": {
@@ -2524,6 +2539,23 @@
       },
       "env": {
         "title": "Environment"
+      },
+      "ui": {
+        "groups": "Settings groups",
+        "unsaved": "Unsaved changes",
+        "saveRegion": "Save changes",
+        "pending": "{count} unsaved changes",
+        "fixInvalid": " — please fix the invalid values",
+        "decrease": "Decrease",
+        "increase": "Increase",
+        "slider": "{label} (slider)",
+        "daysPicked": "{count}/4 days selected",
+        "pickHoliday": "Pick a holiday",
+        "addDate": "Add date",
+        "noHolidays": "No holidays yet.",
+        "removeDate": "Remove {date}",
+        "addEmail": "Add email",
+        "remove": "Remove {value}"
       }
     },
     "categories": {
@@ -2547,7 +2579,10 @@
         "title": "Delete this category?",
         "body": "The category \"{name}\" will be deleted. The system will refuse if courses still belong to it.",
         "cancel": "Cancel"
-      }
+      },
+      "search": "Search categories",
+      "searchPh": "Search by category name or slug...",
+      "noMatch": "No categories match."
     },
     "reviews": {
       "title": "Review moderation",
@@ -3356,6 +3391,11 @@
             ]
           }
         }
+      },
+      "find": {
+        "label": "Search support requests",
+        "ph": "Request code, email or subject...",
+        "more": "Show more"
       }
     },
     "common": {

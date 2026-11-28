@@ -1772,7 +1772,11 @@
         "next": "下一页",
         "page": "第 {page} / {total} 页"
       },
-      "authLocal": "Email"
+      "authLocal": "Email",
+      "prompt": {
+        "title": "输入信息以查找用户",
+        "body": "账户数量很多，因此不会预先列出。请在上方搜索框输入姓名、邮箱或用户 ID；或选择“已锁定 / 被标记为垃圾信息”分组查看需要关注的账户。每个账户的角色会直接显示在结果中。"
+      }
     },
     "moderation": {
       "title": "课程审核",
@@ -2200,6 +2204,17 @@
         "gateway": "Gateway code",
         "notYet": "Not yet",
         "dispute": "View/handle dispute"
+      },
+      "find": {
+        "needCriteria": "请输入订单号、邮箱、买家姓名或课程（或选择状态）进行查询。",
+        "noReceipt": "该交易尚无收据。收据会在交易完成后生成，通常需要几分钟。",
+        "receiptError": "无法加载收据，请重试。",
+        "label": "搜索交易",
+        "ph": "订单号、支付网关编号、买家邮箱 / 姓名 / ID、课程...",
+        "promptTitle": "输入信息以查询交易",
+        "prompt": "交易数量很多，因此不会预先列出。请输入订单号、支付网关编号、买家的邮箱、姓名或 ID，或课程名称；点击结果可查看详情、下载收据并处理争议。",
+        "loading": "加载中...",
+        "receipt": "下载收据"
       }
     },
     "settings": {
@@ -2267,6 +2282,23 @@
       },
       "env": {
         "title": "环境"
+      },
+      "ui": {
+        "groups": "配置分组",
+        "unsaved": "有未保存的更改",
+        "saveRegion": "保存更改",
+        "pending": "有 {count} 项未保存的更改",
+        "fixInvalid": " — 请修正无效的值",
+        "decrease": "减少",
+        "increase": "增加",
+        "slider": "{label}（滑块）",
+        "daysPicked": "已选 {count}/4 天",
+        "pickHoliday": "选择节假日",
+        "addDate": "添加日期",
+        "noHolidays": "暂无节假日。",
+        "removeDate": "删除 {date}",
+        "addEmail": "添加邮箱",
+        "remove": "删除 {value}"
       }
     },
     "categories": {
@@ -2290,7 +2322,10 @@
         "title": "删除此分类？",
         "body": "分类“{name}”将被删除。如果仍有课程属于该分类，系统会拒绝。",
         "cancel": "取消"
-      }
+      },
+      "search": "搜索分类",
+      "searchPh": "按分类名称或路径搜索...",
+      "noMatch": "没有匹配的分类。"
     },
     "reviews": {
       "title": "评价审核",
@@ -3356,6 +3391,11 @@
             ]
           }
         }
+      },
+      "find": {
+        "label": "搜索支持请求",
+        "ph": "请求编号、邮箱或标题...",
+        "more": "查看更多"
       }
     },
     "common": {

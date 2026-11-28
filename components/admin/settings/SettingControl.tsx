@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Minus, Plus, X } from 'lucide-react';
 import { formatList, parseList, type SettingItem } from '@/lib/admin/settingsSchema';
 
@@ -32,6 +33,7 @@ function Switch({ checked, onChange, label }: { checked: boolean; onChange: (v: 
 
 /** Số nguyên không âm: chỉ nhận chữ số (gõ chữ, dấu âm, dấu chấm bị loại ngay), có nút − / + trong giới hạn min–max. */
 function IntegerInput({ item, value, onChange, invalid }: Props) {
+  const t = useTranslations('admin.settings.ui');
   const n = value === '' ? NaN : Number(value);
   const min = item.min ?? 0;
   const max = item.max ?? 999_999_999;
@@ -41,7 +43,7 @@ function IntegerInput({ item, value, onChange, invalid }: Props) {
   };
   return (
     <div className="flex items-center gap-1.5">
-      <button type="button" aria-label="Giảm" onClick={() => step(-1)} disabled={!Number.isNaN(n) && n <= min} className="rounded-lg border border-line p-2 text-ink hover:bg-tint disabled:opacity-40">
+      <button type="button" aria-label={t('decrease')} onClick={() => step(-1)} disabled={!Number.isNaN(n) && n <= min} className="rounded-lg border border-line p-2 text-ink hover:bg-tint disabled:opacity-40">
         <Minus size={14} aria-hidden />
       </button>
       <input
@@ -54,7 +56,7 @@ function IntegerInput({ item, value, onChange, invalid }: Props) {
         onChange={(e) => onChange(e.target.value.replace(/\D/g, '').slice(0, 9))}
         className={`${base} w-28 text-center ${invalid ? 'border-danger' : 'border-line'}`}
       />
-      <button type="button" aria-label="Tăng" onClick={() => step(1)} disabled={!Number.isNaN(n) && n >= max} className="rounded-lg border border-line p-2 text-ink hover:bg-tint disabled:opacity-40">
+      <button type="button" aria-label={t('increase')} onClick={() => step(1)} disabled={!Number.isNaN(n) && n >= max} className="rounded-lg border border-line p-2 text-ink hover:bg-tint disabled:opacity-40">
         <Plus size={14} aria-hidden />
       </button>
       {item.unit && <span className="text-xs text-ink-muted">{item.unit}</span>}
@@ -64,6 +66,7 @@ function IntegerInput({ item, value, onChange, invalid }: Props) {
 
 /** Phần trăm: thanh trượt + ô nhập (tối đa 2 chữ số sau dấu chấm). */
 function PercentInput({ item, value, onChange, invalid }: Props) {
+  const t = useTranslations('admin.settings.ui');
   const n = Number(value);
   const slider = Number.isFinite(n) ? Math.min(item.max ?? 100, Math.max(item.min ?? 0, n)) : 0;
   return (
@@ -74,7 +77,7 @@ function PercentInput({ item, value, onChange, invalid }: Props) {
         max={item.max ?? 100}
         step={1}
         value={slider}
-        aria-label={`${item.label} (thanh trượt)`}
+        aria-label={t('slider', { label: item.label })}
         onChange={(e) => onChange(e.target.value)}
         className="w-36 accent-accent"
       />
@@ -123,6 +126,7 @@ function PriceInput({ item, value, onChange, invalid }: Props) {
 
 /** Ngày trong tháng (1–28): lưới 28 ô, chọn tối đa 4. */
 function DaysGrid({ item, value, onChange }: Props) {
+  const t = useTranslations('admin.settings.ui');
   const selected = new Set(parseList(value).map(Number));
   const toggle = (d: number) => {
     const next = new Set(selected);
@@ -150,13 +154,14 @@ function DaysGrid({ item, value, onChange }: Props) {
           );
         })}
       </div>
-      <span className="text-xs text-ink-muted">Đã chọn {selected.size}/4 ngày{selected.size > 0 ? `: ${[...selected].sort((a, b) => a - b).join(', ')}` : ''}</span>
+      <span className="text-xs text-ink-muted">{t('daysPicked', { count: selected.size })}{selected.size > 0 ? `: ${[...selected].sort((a, b) => a - b).join(', ')}` : ''}</span>
     </div>
   );
 }
 
 /** Danh sách ngày cụ thể: chọn bằng lịch rồi thêm; xóa từng ngày bằng dấu ×. */
 function DatesPicker({ item, value, onChange }: Props) {
+  const t = useTranslations('admin.settings.ui');
   const [draft, setDraft] = useState('');
   const dates = parseList(value);
   const add = () => {
@@ -167,19 +172,19 @@ function DatesPicker({ item, value, onChange }: Props) {
   return (
     <div className="flex flex-col gap-2" role="group" aria-label={item.label}>
       <div className="flex items-center gap-2">
-        <input type="date" aria-label="Chọn ngày lễ" value={draft} onChange={(e) => setDraft(e.target.value)} className={`${base} border-line`} />
+        <input type="date" aria-label={t('pickHoliday')} value={draft} onChange={(e) => setDraft(e.target.value)} className={`${base} border-line`} />
         <button type="button" onClick={add} disabled={!draft || dates.includes(draft)} className="rounded-lg border border-line px-3 py-2 text-sm font-semibold text-accent-dark hover:bg-tint disabled:opacity-40">
-          Thêm ngày
+          {t('addDate')}
         </button>
       </div>
       {dates.length === 0 ? (
-        <span className="text-xs text-ink-muted">Chưa có ngày lễ nào.</span>
+        <span className="text-xs text-ink-muted">{t('noHolidays')}</span>
       ) : (
         <ul className="m-0 flex list-none flex-wrap gap-1.5 p-0">
           {dates.map((d) => (
             <li key={d} className="inline-flex items-center gap-1 rounded-full bg-tint px-2.5 py-1 text-xs font-semibold text-accent-dark">
               {new Date(`${d}T00:00:00`).toLocaleDateString('vi-VN')}
-              <button type="button" aria-label={`Xóa ngày ${d}`} onClick={() => onChange(formatList(dates.filter((x) => x !== d)))} className="rounded-full hover:text-danger">
+              <button type="button" aria-label={t('removeDate', { date: d })} onClick={() => onChange(formatList(dates.filter((x) => x !== d)))} className="rounded-full hover:text-danger">
                 <X size={12} aria-hidden />
               </button>
             </li>
@@ -192,6 +197,7 @@ function DatesPicker({ item, value, onChange }: Props) {
 
 /** Danh sách email dạng thẻ: nhập rồi nhấn Enter hoặc dấu phẩy để thêm. */
 function EmailTags({ item, value, onChange, invalid }: Props) {
+  const t = useTranslations('admin.settings.ui');
   const [draft, setDraft] = useState('');
   const emails = parseList(value);
   const commit = () => {
@@ -205,7 +211,7 @@ function EmailTags({ item, value, onChange, invalid }: Props) {
       <input
         type="email"
         autoComplete="off"
-        aria-label="Thêm email"
+        aria-label={t('addEmail')}
         aria-invalid={invalid}
         value={draft}
         placeholder={item.placeholder}
@@ -224,7 +230,7 @@ function EmailTags({ item, value, onChange, invalid }: Props) {
           {emails.map((m) => (
             <li key={m} className="inline-flex items-center gap-1 rounded-full bg-tint px-2.5 py-1 text-xs font-semibold text-accent-dark">
               {m}
-              <button type="button" aria-label={`Xóa ${m}`} onClick={() => onChange(formatList(emails.filter((x) => x !== m)))} className="rounded-full hover:text-danger">
+              <button type="button" aria-label={t('remove', { value: m })} onClick={() => onChange(formatList(emails.filter((x) => x !== m)))} className="rounded-full hover:text-danger">
                 <X size={12} aria-hidden />
               </button>
             </li>
