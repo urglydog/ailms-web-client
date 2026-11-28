@@ -4222,5 +4222,127 @@
     "layout": {
       "viewAll": "すべて表示"
     }
+  },
+  "finance": {
+    "invoiceType": {
+      "RECEIPT": "支払領収書",
+      "REFUND": "返金明細",
+      "PAYOUT": "出金支払票",
+      "DEBT_RECEIPT": "債務返済領収書",
+      "STATEMENT": "月次収益明細書"
+    },
+    "invoiceStatus": {
+      "ISSUED": "発行済み",
+      "VOIDED": "無効"
+    },
+    "invoiceField": {
+      "periodLabel": "明細期間",
+      "orders": "期間内の注文数",
+      "earnings": "コース収益",
+      "refundReversals": "返金による控除",
+      "adjustments": "調整",
+      "debtRepayments": "返済済み債務",
+      "payoutsPaid": "期間内の出金額",
+      "platformShare": "これらの注文のプラットフォーム取り分",
+      "billingName": "請求先氏名",
+      "billingPhone": "電話番号",
+      "paymentMethod": "支払方法",
+      "gatewayTxnNo": "決済ゲートウェイ取引番号",
+      "orderRef": "注文番号",
+      "originalReceipt": "元の領収書",
+      "payoutCode": "出金申請コード",
+      "bankName": "銀行",
+      "accountMasked": "受取口座",
+      "holderName": "口座名義人",
+      "orderCode": "支払コード",
+      "transferRef": "銀行取引番号",
+      "transferredAt": "送金日時"
+    },
+    "invoiceDetail": {
+      "recipient": "受取人",
+      "issuedAt": "発行日",
+      "related": "関連書類",
+      "byCourse": "コース別収益",
+      "byCourseChart": "期間内のコース別収益の棒グラフ",
+      "content": "内容",
+      "amount": "金額",
+      "discount": "割引",
+      "total": "合計",
+      "payoutFeeNote": "送金手数料は LinguaLearn が負担し、受取額からは差し引かれません。"
+    },
+    "refundReason": {
+      "BUYER_REMORSE": "受講者が期限内に購入を取り消した",
+      "OTHER": "その他の理由（過失なし）",
+      "TECHNICAL_ISSUE": "システム側の技術的な問題",
+      "DOUBLE_CHARGE": "二重請求",
+      "NOT_ENROLLED": "請求済みだが受講登録されていない",
+      "PLATFORM_FAULT": "プラットフォーム側の過失",
+      "COPYRIGHT_VIOLATION": "著作権侵害",
+      "CONTENT_MISMATCH": "内容が説明と大きく異なる",
+      "PROHIBITED_CONTENT": "禁止コンテンツ"
+    },
+    "refundResponsibility": {
+      "STANDARD": "標準 — 講師は受け取った分のみを返金",
+      "PLATFORM_COMPENSATES": "プラットフォームが全額負担",
+      "INSTRUCTOR_FAULT": "講師が全額負担"
+    },
+    "instructorPayoutStatus": {
+      "PENDING_EMAIL": "メール確認待ち",
+      "REQUESTED": "承認待ち",
+      "APPROVED": "承認済み · 送金中",
+      "PAID": "受取済み",
+      "REJECTED": "承認されませんでした",
+      "CANCELLED": "キャンセル済み",
+      "FAILED": "送金失敗 · 残高に戻しました"
+    },
+    "ledgerType": {
+      "EARNING": "注文による収益",
+      "REFUND_REVERSAL": "返金による控除",
+      "PAYOUT_RESERVE": "出金",
+      "PAYOUT_RELEASE": "残高返還（出金失敗）",
+      "ADJUSTMENT": "調整"
+    },
+    "ledger": {
+      "title": "収益明細",
+      "group": "項目の種類",
+      "groupALL": "すべて",
+      "groupEARNING": "注文による収益",
+      "groupREFUND": "返金による控除",
+      "groupPAYOUT": "出金",
+      "groupDEBT": "債務返済",
+      "groupADJUSTMENT": "調整",
+      "from": "開始日",
+      "to": "終了日",
+      "clear": "フィルターをクリア",
+      "loading": "読み込み中...",
+      "noMatch": "条件に一致する項目はありません。",
+      "empty": "まだ収益の記録はありません。",
+      "colTime": "日時",
+      "colType": "種類",
+      "colNote": "メモ",
+      "colEffective": "反映状況",
+      "colAmount": "金額",
+      "matured": "残高に反映済み",
+      "heldUntil": "{date} まで保留"
+    },
+    "refundDecision": {
+      "appealSent": "異議申し立てを送信しました。管理者が確認して連絡します。",
+      "appealFailed": "異議申し立てを送信できませんでした。",
+      "title": "返金の決定",
+      "mode": "方式：",
+      "charged": "収益からの控除額：",
+      "reason": "理由：{reason}。",
+      "adminNote": "管理者のメモ：{note}",
+      "evidence": "証拠：{note}",
+      "appealOpen": "異議申し立ては管理者の対応待ちです。",
+      "appealResult": "異議申し立ての結果：{result}",
+      "appealReduced": "認められ、標準方式に軽減されました",
+      "appealUpheld": "決定は維持されました",
+      "appealHint": "同意できませんか？{deadline} までに一度だけ異議申し立てができます。審査中は債務による制限（ある場合）が一時停止されます。",
+      "deadlineFallback": "期限",
+      "placeholder": "理由と証拠を具体的に記入してください（20文字以上）",
+      "sending": "送信中...",
+      "submit": "異議を申し立てる"
+    }
   }
 }

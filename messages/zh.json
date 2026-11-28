@@ -4222,5 +4222,127 @@
     "layout": {
       "viewAll": "查看全部"
     }
+  },
+  "finance": {
+    "invoiceType": {
+      "RECEIPT": "付款收据",
+      "REFUND": "退款单",
+      "PAYOUT": "提现付款单",
+      "DEBT_RECEIPT": "还款收据",
+      "STATEMENT": "月度收入明细"
+    },
+    "invoiceStatus": {
+      "ISSUED": "已开具",
+      "VOIDED": "已作废"
+    },
+    "invoiceField": {
+      "periodLabel": "明细周期",
+      "orders": "本期订单数",
+      "earnings": "课程收入",
+      "refundReversals": "退款扣除",
+      "adjustments": "调整",
+      "debtRepayments": "已还款",
+      "payoutsPaid": "本期已提现",
+      "platformShare": "平台在这些订单中的分成",
+      "billingName": "付款人姓名",
+      "billingPhone": "电话号码",
+      "paymentMethod": "支付方式",
+      "gatewayTxnNo": "支付网关交易号",
+      "orderRef": "订单号",
+      "originalReceipt": "原始收据",
+      "payoutCode": "提现申请编号",
+      "bankName": "银行",
+      "accountMasked": "收款账户",
+      "holderName": "账户持有人",
+      "orderCode": "支付编号",
+      "transferRef": "银行交易流水号",
+      "transferredAt": "转账时间"
+    },
+    "invoiceDetail": {
+      "recipient": "收件人",
+      "issuedAt": "开具日期",
+      "related": "相关单据",
+      "byCourse": "按课程统计的收入",
+      "byCourseChart": "本期按课程统计收入的柱状图",
+      "content": "内容",
+      "amount": "金额",
+      "discount": "优惠",
+      "total": "合计",
+      "payoutFeeNote": "转账手续费由 LinguaLearn 承担，不会从您收到的金额中扣除。"
+    },
+    "refundReason": {
+      "BUYER_REMORSE": "学员在退款期限内改变主意",
+      "OTHER": "其他原因（无责任方）",
+      "TECHNICAL_ISSUE": "系统端技术故障",
+      "DOUBLE_CHARGE": "重复付款",
+      "NOT_ENROLLED": "已扣款但未报名成功",
+      "PLATFORM_FAULT": "平台方过错",
+      "COPYRIGHT_VIOLATION": "侵犯版权",
+      "CONTENT_MISMATCH": "内容与描述严重不符",
+      "PROHIBITED_CONTENT": "违禁内容"
+    },
+    "refundResponsibility": {
+      "STANDARD": "标准 — 讲师退还其已获得的分成",
+      "PLATFORM_COMPENSATES": "平台承担全部",
+      "INSTRUCTOR_FAULT": "讲师承担全部"
+    },
+    "instructorPayoutStatus": {
+      "PENDING_EMAIL": "等待邮件确认",
+      "REQUESTED": "等待审核",
+      "APPROVED": "已批准 · 正在转账",
+      "PAID": "已到账",
+      "REJECTED": "未获批准",
+      "CANCELLED": "已取消",
+      "FAILED": "转账失败 · 余额已退回"
+    },
+    "ledgerType": {
+      "EARNING": "订单收入",
+      "REFUND_REVERSAL": "退款扣除",
+      "PAYOUT_RESERVE": "提现",
+      "PAYOUT_RELEASE": "余额退回（提现失败）",
+      "ADJUSTMENT": "调整"
+    },
+    "ledger": {
+      "title": "收入流水",
+      "group": "款项类型",
+      "groupALL": "全部",
+      "groupEARNING": "订单收入",
+      "groupREFUND": "退款扣除",
+      "groupPAYOUT": "提现",
+      "groupDEBT": "还款",
+      "groupADJUSTMENT": "调整",
+      "from": "开始日期",
+      "to": "结束日期",
+      "clear": "清除筛选",
+      "loading": "加载中...",
+      "noMatch": "没有符合筛选条件的款项。",
+      "empty": "暂无收入记录。",
+      "colTime": "时间",
+      "colType": "类型",
+      "colNote": "备注",
+      "colEffective": "生效",
+      "colAmount": "金额",
+      "matured": "已计入余额",
+      "heldUntil": "冻结至 {date}"
+    },
+    "refundDecision": {
+      "appealSent": "申诉已提交。管理员将进行审核并回复您。",
+      "appealFailed": "申诉提交失败。",
+      "title": "退款决定",
+      "mode": "模式：",
+      "charged": "从您的收入中扣除：",
+      "reason": "原因：{reason}。",
+      "adminNote": "管理员备注：{note}",
+      "evidence": "证据：{note}",
+      "appealOpen": "您的申诉正在等待管理员处理。",
+      "appealResult": "申诉结果：{result}",
+      "appealReduced": "已接受，已降为标准模式",
+      "appealUpheld": "维持原决定",
+      "appealHint": "不同意？您可以在 {deadline} 前申诉一次。等待期间，因欠款产生的限制（如有）将暂停。",
+      "deadlineFallback": "截止时间",
+      "placeholder": "请说明您的理由和证据（至少 20 个字符）",
+      "sending": "发送中...",
+      "submit": "提交申诉"
+    }
   }
 }

@@ -12,7 +12,7 @@ import { BLOCKED_REFRESH_MS, clockTime, isRetryBlocked } from '@/lib/payosRetry'
 import { REASON_CODES } from '@/lib/refundPolicy';
 import type { AppealDecision, DisputeAdminRes, RefundReasonCode, RefundResponsibility } from '@/types/domain';
 
-export { REASON_CODES, REASON_LABEL } from '@/lib/refundPolicy';
+export { REASON_CODES } from '@/lib/refundPolicy';
 
 const INPUT = 'w-full rounded-lg border border-line bg-surface-raised p-2.5 text-sm text-ink outline-none focus:border-accent';
 

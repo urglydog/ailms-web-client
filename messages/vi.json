@@ -4222,5 +4222,127 @@
     "layout": {
       "viewAll": "Xem tất cả"
     }
+  },
+  "finance": {
+    "invoiceType": {
+      "RECEIPT": "Biên lai thanh toán",
+      "REFUND": "Phiếu hoàn tiền",
+      "PAYOUT": "Phiếu chi rút tiền",
+      "DEBT_RECEIPT": "Biên lai trả nợ",
+      "STATEMENT": "Bảng kê thu nhập tháng"
+    },
+    "invoiceStatus": {
+      "ISSUED": "Đã phát hành",
+      "VOIDED": "Đã hủy"
+    },
+    "invoiceField": {
+      "periodLabel": "Kỳ bảng kê",
+      "orders": "Số đơn trong kỳ",
+      "earnings": "Thu nhập từ khóa học",
+      "refundReversals": "Trừ do hoàn tiền",
+      "adjustments": "Điều chỉnh",
+      "debtRepayments": "Đã trả nợ",
+      "payoutsPaid": "Đã rút trong kỳ",
+      "platformShare": "Phần nền tảng của các đơn này",
+      "billingName": "Họ tên thanh toán",
+      "billingPhone": "Số điện thoại",
+      "paymentMethod": "Phương thức thanh toán",
+      "gatewayTxnNo": "Mã cổng thanh toán",
+      "orderRef": "Mã đơn",
+      "originalReceipt": "Biên lai gốc",
+      "payoutCode": "Mã yêu cầu rút",
+      "bankName": "Ngân hàng",
+      "accountMasked": "Tài khoản nhận",
+      "holderName": "Chủ tài khoản",
+      "orderCode": "Mã thanh toán",
+      "transferRef": "Mã giao dịch ngân hàng",
+      "transferredAt": "Thời điểm chuyển tiền"
+    },
+    "invoiceDetail": {
+      "recipient": "Người nhận",
+      "issuedAt": "Ngày phát hành",
+      "related": "Chứng từ liên quan",
+      "byCourse": "Thu nhập theo khóa học",
+      "byCourseChart": "Biểu đồ cột thu nhập theo khóa học trong kỳ",
+      "content": "Nội dung",
+      "amount": "Số tiền",
+      "discount": "Khuyến mãi",
+      "total": "Tổng",
+      "payoutFeeNote": "Phí chuyển tiền do LinguaLearn chi trả, không trừ vào số tiền bạn nhận."
+    },
+    "refundReason": {
+      "BUYER_REMORSE": "Học viên đổi ý trong hạn",
+      "OTHER": "Lý do khác (không ai có lỗi)",
+      "TECHNICAL_ISSUE": "Lỗi kỹ thuật từ phía hệ thống",
+      "DOUBLE_CHARGE": "Thanh toán trùng",
+      "NOT_ENROLLED": "Đã trừ tiền nhưng không ghi danh",
+      "PLATFORM_FAULT": "Lỗi từ phía nền tảng",
+      "COPYRIGHT_VIOLATION": "Vi phạm bản quyền",
+      "CONTENT_MISMATCH": "Nội dung sai khác nghiêm trọng so với mô tả",
+      "PROHIBITED_CONTENT": "Nội dung bị cấm"
+    },
+    "refundResponsibility": {
+      "STANDARD": "Chuẩn — giảng viên trả lại đúng phần đã nhận",
+      "PLATFORM_COMPENSATES": "Nền tảng chịu toàn bộ",
+      "INSTRUCTOR_FAULT": "Giảng viên chịu toàn bộ"
+    },
+    "instructorPayoutStatus": {
+      "PENDING_EMAIL": "Chờ xác nhận email",
+      "REQUESTED": "Đang chờ duyệt",
+      "APPROVED": "Đã duyệt · đang chuyển tiền",
+      "PAID": "Đã nhận tiền",
+      "REJECTED": "Không được chấp nhận",
+      "CANCELLED": "Đã hủy",
+      "FAILED": "Chưa chuyển được · đã hoàn số dư"
+    },
+    "ledgerType": {
+      "EARNING": "Thu nhập từ đơn hàng",
+      "REFUND_REVERSAL": "Trừ do hoàn tiền",
+      "PAYOUT_RESERVE": "Rút tiền",
+      "PAYOUT_RELEASE": "Hoàn số dư (rút không thành công)",
+      "ADJUSTMENT": "Điều chỉnh"
+    },
+    "ledger": {
+      "title": "Sao kê thu nhập",
+      "group": "Loại khoản",
+      "groupALL": "Tất cả",
+      "groupEARNING": "Thu nhập từ đơn hàng",
+      "groupREFUND": "Trừ do hoàn tiền",
+      "groupPAYOUT": "Rút tiền",
+      "groupDEBT": "Trả nợ",
+      "groupADJUSTMENT": "Điều chỉnh",
+      "from": "Từ ngày",
+      "to": "Đến ngày",
+      "clear": "Xóa bộ lọc",
+      "loading": "Đang tải...",
+      "noMatch": "Không có khoản nào khớp bộ lọc.",
+      "empty": "Chưa có khoản thu nhập nào.",
+      "colTime": "Thời gian",
+      "colType": "Loại",
+      "colNote": "Ghi chú",
+      "colEffective": "Hiệu lực",
+      "colAmount": "Số tiền",
+      "matured": "Đã tính vào số dư",
+      "heldUntil": "Giữ đến {date}"
+    },
+    "refundDecision": {
+      "appealSent": "Đã gửi khiếu nại. Quản trị viên sẽ xem xét và báo lại.",
+      "appealFailed": "Không gửi được khiếu nại.",
+      "title": "Quyết định hoàn tiền",
+      "mode": "Chế độ:",
+      "charged": "Thu nhập của bạn bị trừ:",
+      "reason": "Lý do: {reason}.",
+      "adminNote": "Ghi chú của quản trị viên: {note}",
+      "evidence": "Minh chứng: {note}",
+      "appealOpen": "Khiếu nại của bạn đang chờ quản trị viên xử lý.",
+      "appealResult": "Kết quả khiếu nại: {result}",
+      "appealReduced": "được chấp nhận, đã giảm về chế độ Chuẩn",
+      "appealUpheld": "giữ nguyên quyết định",
+      "appealHint": "Bạn không đồng ý? Bạn được khiếu nại một lần trước {deadline}. Trong lúc chờ, các hạn chế do công nợ (nếu có) được tạm dừng.",
+      "deadlineFallback": "hạn",
+      "placeholder": "Nêu rõ lý do và bằng chứng của bạn (tối thiểu 20 ký tự)",
+      "sending": "Đang gửi...",
+      "submit": "Gửi khiếu nại"
+    }
   }
 }

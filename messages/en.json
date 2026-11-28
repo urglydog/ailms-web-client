@@ -4222,5 +4222,127 @@
     "layout": {
       "viewAll": "View all"
     }
+  },
+  "finance": {
+    "invoiceType": {
+      "RECEIPT": "Payment receipt",
+      "REFUND": "Refund note",
+      "PAYOUT": "Payout voucher",
+      "DEBT_RECEIPT": "Debt repayment receipt",
+      "STATEMENT": "Monthly earnings statement"
+    },
+    "invoiceStatus": {
+      "ISSUED": "Issued",
+      "VOIDED": "Voided"
+    },
+    "invoiceField": {
+      "periodLabel": "Statement period",
+      "orders": "Orders in period",
+      "earnings": "Course earnings",
+      "refundReversals": "Refund deductions",
+      "adjustments": "Adjustments",
+      "debtRepayments": "Debt repaid",
+      "payoutsPaid": "Paid out in period",
+      "platformShare": "Platform share of these orders",
+      "billingName": "Billing name",
+      "billingPhone": "Phone number",
+      "paymentMethod": "Payment method",
+      "gatewayTxnNo": "Gateway transaction ID",
+      "orderRef": "Order reference",
+      "originalReceipt": "Original receipt",
+      "payoutCode": "Payout request code",
+      "bankName": "Bank",
+      "accountMasked": "Receiving account",
+      "holderName": "Account holder",
+      "orderCode": "Payment code",
+      "transferRef": "Bank transaction reference",
+      "transferredAt": "Transferred at"
+    },
+    "invoiceDetail": {
+      "recipient": "Recipient",
+      "issuedAt": "Issue date",
+      "related": "Related document",
+      "byCourse": "Earnings by course",
+      "byCourseChart": "Bar chart of earnings by course in this period",
+      "content": "Description",
+      "amount": "Amount",
+      "discount": "Discount",
+      "total": "Total",
+      "payoutFeeNote": "Transfer fees are paid by LinguaLearn and are not deducted from the amount you receive."
+    },
+    "refundReason": {
+      "BUYER_REMORSE": "Student changed their mind within the refund window",
+      "OTHER": "Other reason (no one at fault)",
+      "TECHNICAL_ISSUE": "Technical issue on the system side",
+      "DOUBLE_CHARGE": "Duplicate payment",
+      "NOT_ENROLLED": "Charged but not enrolled",
+      "PLATFORM_FAULT": "Platform fault",
+      "COPYRIGHT_VIOLATION": "Copyright violation",
+      "CONTENT_MISMATCH": "Content differs seriously from the description",
+      "PROHIBITED_CONTENT": "Prohibited content"
+    },
+    "refundResponsibility": {
+      "STANDARD": "Standard — the instructor returns exactly the share they received",
+      "PLATFORM_COMPENSATES": "Platform covers the full amount",
+      "INSTRUCTOR_FAULT": "Instructor covers the full amount"
+    },
+    "instructorPayoutStatus": {
+      "PENDING_EMAIL": "Awaiting email confirmation",
+      "REQUESTED": "Awaiting approval",
+      "APPROVED": "Approved · transfer in progress",
+      "PAID": "Received",
+      "REJECTED": "Not accepted",
+      "CANCELLED": "Cancelled",
+      "FAILED": "Transfer failed · balance restored"
+    },
+    "ledgerType": {
+      "EARNING": "Order earnings",
+      "REFUND_REVERSAL": "Refund deduction",
+      "PAYOUT_RESERVE": "Payout",
+      "PAYOUT_RELEASE": "Balance restored (payout failed)",
+      "ADJUSTMENT": "Adjustment"
+    },
+    "ledger": {
+      "title": "Earnings statement",
+      "group": "Entry type",
+      "groupALL": "All",
+      "groupEARNING": "Order earnings",
+      "groupREFUND": "Refund deductions",
+      "groupPAYOUT": "Payouts",
+      "groupDEBT": "Debt repayments",
+      "groupADJUSTMENT": "Adjustments",
+      "from": "From",
+      "to": "To",
+      "clear": "Clear filters",
+      "loading": "Loading...",
+      "noMatch": "No entries match the filters.",
+      "empty": "No earnings entries yet.",
+      "colTime": "Time",
+      "colType": "Type",
+      "colNote": "Note",
+      "colEffective": "Availability",
+      "colAmount": "Amount",
+      "matured": "Added to balance",
+      "heldUntil": "Held until {date}"
+    },
+    "refundDecision": {
+      "appealSent": "Appeal sent. An administrator will review it and get back to you.",
+      "appealFailed": "Could not send the appeal.",
+      "title": "Refund decision",
+      "mode": "Mode:",
+      "charged": "Deducted from your earnings:",
+      "reason": "Reason: {reason}.",
+      "adminNote": "Administrator note: {note}",
+      "evidence": "Evidence: {note}",
+      "appealOpen": "Your appeal is waiting for an administrator.",
+      "appealResult": "Appeal result: {result}",
+      "appealReduced": "accepted, reduced to Standard mode",
+      "appealUpheld": "decision upheld",
+      "appealHint": "Disagree? You can appeal once before {deadline}. While it is pending, any debt-related restrictions are paused.",
+      "deadlineFallback": "the deadline",
+      "placeholder": "Explain your reasons and evidence (at least 20 characters)",
+      "sending": "Sending...",
+      "submit": "Submit appeal"
+    }
   }
 }

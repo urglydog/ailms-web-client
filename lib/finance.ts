@@ -1,4 +1,4 @@
-import type { LedgerEntryType, PayoutStatus } from '@/types/finance';
+import type { PayoutStatus } from '@/types/finance';
 
 export const money = (n: number | null | undefined) => `${(n ?? 0).toLocaleString('vi-VN')}đ`;
 
@@ -8,31 +8,7 @@ export const dateTime = (iso: string | null | undefined) =>
 export const dateOnly = (iso: string | null | undefined) =>
   iso ? new Date(iso).toLocaleDateString('vi-VN') : '—';
 
-/** Nhãn cho ADMIN (người thực hiện chi tiền): "Đã chi" — admin là bên chi. */
-export const PAYOUT_STATUS_LABEL: Record<PayoutStatus, string> = {
-  PENDING_EMAIL: 'Chờ xác nhận email',
-  REQUESTED: 'Chờ duyệt',
-  APPROVED: 'Đã duyệt, chờ chi',
-  PAID: 'Đã chi',
-  REJECTED: 'Bị từ chối',
-  CANCELLED: 'Đã hủy',
-  FAILED: 'Chi thất bại',
-};
-
-/**
- * Nhãn cho GIẢNG VIÊN (người NHẬN tiền) — viết từ góc nhìn người nhận: "Đã nhận tiền", không phải "Đã chuyển tiền" (nghe như giảng viên
- * chuyển cho ai đó). Hai bộ nhãn dùng chung bộ màu `PAYOUT_STATUS_CLASS`.
- */
-export const INSTRUCTOR_PAYOUT_STATUS_LABEL: Record<PayoutStatus, string> = {
-  PENDING_EMAIL: 'Chờ xác nhận email',
-  REQUESTED: 'Đang chờ duyệt',
-  APPROVED: 'Đã duyệt · đang chuyển tiền',
-  PAID: 'Đã nhận tiền',
-  REJECTED: 'Không được chấp nhận',
-  CANCELLED: 'Đã hủy',
-  FAILED: 'Chưa chuyển được · đã hoàn số dư',
-};
-
+/** Nhãn trạng thái phía giảng viên (người NHẬN tiền) nằm ở `finance.instructorPayoutStatus.<status>`, dùng chung bộ màu dưới đây. */
 export const PAYOUT_STATUS_CLASS: Record<PayoutStatus, string> = {
   PENDING_EMAIL: 'bg-surface-raised text-ink border-warning',
   REQUESTED: 'bg-tint text-accent-dark border-accent/30',
@@ -41,14 +17,6 @@ export const PAYOUT_STATUS_CLASS: Record<PayoutStatus, string> = {
   REJECTED: 'bg-danger/10 text-danger border-danger/30',
   CANCELLED: 'bg-line-soft text-ink-muted border-line',
   FAILED: 'bg-danger/10 text-danger border-danger/30',
-};
-
-export const LEDGER_TYPE_LABEL: Record<LedgerEntryType, string> = {
-  EARNING: 'Thu nhập từ đơn hàng',
-  REFUND_REVERSAL: 'Trừ do hoàn tiền',
-  PAYOUT_RESERVE: 'Rút tiền',
-  PAYOUT_RELEASE: 'Hoàn số dư (rút không thành công)',
-  ADJUSTMENT: 'Điều chỉnh',
 };
 
 /**

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { Pager } from '@/components/ui/SearchPanel';
 import { useListControls } from '@/hooks/useListControls';
@@ -9,10 +10,11 @@ import { useMyInvoices } from '@/hooks/useInvoices';
 import { invoicesApi } from '@/lib/api/invoices';
 import { saveBlob } from '@/lib/invoices';
 import { ApiError } from '@/lib/api/client';
-import { INSTRUCTOR_PAYOUT_STATUS_LABEL, PAYOUT_STATUS_CLASS, dateOnly, dateTime, money } from '@/lib/finance';
+import { PAYOUT_STATUS_CLASS, dateOnly, dateTime, money } from '@/lib/finance';
 
 /** Lịch sử yêu cầu rút tiền; còn hủy được khi chưa được admin duyệt. */
 export function PayoutHistory() {
+  const tFin = useTranslations('finance');
   const { data, isLoading } = useMyPayouts();
   // Lọc theo trạng thái + tìm theo mã yêu cầu, phân trang 5 yêu cầu mỗi trang (danh sách của chính giảng viên nên lọc ở trình duyệt).
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'PENDING' | 'PAID' | 'CLOSED'>('ALL');
@@ -100,7 +102,7 @@ export function PayoutHistory() {
               </div>
               <div className="flex items-center gap-2">
                 <span className={`rounded-full border px-2.5 py-1 text-xs font-medium ${PAYOUT_STATUS_CLASS[p.status]}`}>
-                  {INSTRUCTOR_PAYOUT_STATUS_LABEL[p.status]}
+                  {tFin(`instructorPayoutStatus.${p.status}`)}
                 </span>
                 {voucherByCode.has(p.code) && (
                   <button
