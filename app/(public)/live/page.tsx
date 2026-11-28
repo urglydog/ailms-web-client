@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { LiveFeedCard } from '@/components/live/LiveFeedCard';
 import { useEnrolledLiveFeed, usePublicLiveFeed } from '@/hooks/useLiveView';
 import { ApiError } from '@/lib/api/client';
@@ -10,9 +11,9 @@ import type { LiveFeedItem } from '@/types/domain';
 
 type FeedTab = 'public' | 'enrolled';
 
-const TABS: Array<{ value: FeedTab; label: string }> = [
-  { value: 'public', label: 'Công khai' },
-  { value: 'enrolled', label: 'Khóa học của tôi' },
+const TABS: Array<{ value: FeedTab; labelKey: 'tabPublic' | 'tabEnrolled' }> = [
+  { value: 'public', labelKey: 'tabPublic' },
+  { value: 'enrolled', labelKey: 'tabEnrolled' },
 ];
 
 /**
@@ -25,6 +26,7 @@ const TABS: Array<{ value: FeedTab; label: string }> = [
  * đây là "có gì đáng xem ngay", không phải "khóa X có buổi nào").
  */
 export default function LivePage() {
+  const t = useTranslations('pages.live');
   const [tab, setTab] = useState<FeedTab>('public');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -34,22 +36,22 @@ export default function LivePage() {
 
   return (
     <div className="shell py-10">
-      <h1 className="mb-2 font-display text-3xl font-bold text-ink">Buổi live</h1>
+      <h1 className="mb-2 font-display text-3xl font-bold text-ink">{t('title')}</h1>
       <p className="mb-8 text-sm text-ink-muted">
-        Xem trực tiếp cùng giảng viên — chọn ngôn ngữ lồng tiếng nếu cần.
+        {t('subtitle')}
       </p>
 
       <div className="mb-6 flex w-fit gap-1 rounded-full border border-line bg-surface-raised p-1">
-        {TABS.map((t) => (
+        {TABS.map((tabItem) => (
           <button
-            key={t.value}
+            key={tabItem.value}
             type="button"
-            onClick={() => setTab(t.value)}
+            onClick={() => setTab(tabItem.value)}
             className={`rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
-              tab === t.value ? 'bg-accent text-white' : 'text-ink-muted hover:bg-surface'
+              tab === tabItem.value ? 'bg-accent text-white' : 'text-ink-muted hover:bg-surface'
             }`}
           >
-            {t.label}
+            {t(tabItem.labelKey)}
           </button>
         ))}
       </div>
@@ -66,25 +68,27 @@ export default function LivePage() {
 }
 
 function PublicFeedSection() {
+  const t = useTranslations('pages.live');
   const { data, isLoading, error } = usePublicLiveFeed();
   return (
     <FeedList
       items={data}
       isLoading={isLoading}
       error={error}
-      emptyMessage="Hiện chưa có buổi live công khai nào đang hoặc sắp diễn ra."
+      emptyMessage={t('emptyPublic')}
     />
   );
 }
 
 function EnrolledFeedSection() {
+  const t = useTranslations('pages.live');
   const { data, isLoading, error } = useEnrolledLiveFeed();
   return (
     <FeedList
       items={data}
       isLoading={isLoading}
       error={error}
-      emptyMessage="Các khóa học bạn đã ghi danh hiện chưa có buổi live nào đang hoặc sắp diễn ra."
+      emptyMessage={t('emptyEnrolled')}
     />
   );
 }
@@ -100,14 +104,15 @@ function FeedList({
   error: unknown;
   emptyMessage: string;
 }) {
+  const t = useTranslations('pages.live');
   if (isLoading) {
-    return <p className="text-sm text-ink-muted">Đang tải…</p>;
+    return <p className="text-sm text-ink-muted">{t('loading')}</p>;
   }
 
   if (error) {
     return (
       <div className="card p-4 text-sm text-danger">
-        {error instanceof ApiError ? error.message : 'Không tải được danh sách buổi live.'}
+        {error instanceof ApiError ? error.message : t('loadError')}
       </div>
     );
   }
@@ -132,29 +137,30 @@ function FeedList({
  * hiện trong tab khi chưa đăng nhập, không phải modal — Guest bấm tab vẫn thấy tab tồn tại + biết
  * cần làm gì để dùng được, đúng quyết định lúc thiết kế (Câu 4, phương án A). */
 function RequireLoginInline() {
+  const t = useTranslations('pages.live');
   return (
     <div className="card flex flex-col items-center gap-3 px-6 py-14 text-center">
       <span className="text-3xl" aria-hidden>
         🔒
       </span>
       <p className="font-display text-lg font-semibold text-ink">
-        Đăng nhập để xem buổi live của khóa học bạn đã ghi danh
+        {t('loginTitle')}
       </p>
       <p className="max-w-sm text-sm text-ink-muted">
-        Buổi live riêng của từng khóa học chỉ hiện cho học viên đã ghi danh khóa đó.
+        {t('loginDesc')}
       </p>
       <div className="mt-1 flex gap-2">
         <Link
           href="/login"
           className="rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-white no-underline hover:bg-accent-dark"
         >
-          Đăng nhập
+          {t('login')}
         </Link>
         <Link
           href="/register"
           className="rounded-full border border-line px-5 py-2.5 text-sm font-semibold text-ink no-underline hover:bg-surface-hover"
         >
-          Đăng ký
+          {t('register')}
         </Link>
       </div>
     </div>

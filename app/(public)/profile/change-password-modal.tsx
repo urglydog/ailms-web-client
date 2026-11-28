@@ -3,6 +3,7 @@
 import { Modal } from '@/components/ui/Modal';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { ApiError } from '@/lib/api/client';
 import { usersApi } from '@/lib/api/users';
 
@@ -12,6 +13,7 @@ interface ChangePasswordModalProps {
 }
 
 export default function ChangePasswordModal({ onClose, onSuccess }: ChangePasswordModalProps) {
+  const t = useTranslations('pages.changePassword');
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -25,12 +27,12 @@ export default function ChangePasswordModal({ onClose, onSuccess }: ChangePasswo
     setSuccess('');
 
     if (newPassword !== confirmPassword) {
-      setError('Mật khẩu xác nhận không khớp');
+      setError(t('mismatch'));
       return;
     }
 
     if (newPassword.length < 8) {
-      setError('Mật khẩu phải >= 8 ký tự');
+      setError(t('tooShort'));
       return;
     }
 
@@ -38,20 +40,20 @@ export default function ChangePasswordModal({ onClose, onSuccess }: ChangePasswo
 
     try {
       await usersApi.changePassword({ currentPassword, newPassword });
-      setSuccess('Đổi mật khẩu thành công!');
+      setSuccess(t('success'));
       setTimeout(() => onSuccess(), 1500);
     } catch (err: unknown) {
-      setError(err instanceof ApiError ? err.message : 'Có lỗi xảy ra');
+      setError(err instanceof ApiError ? err.message : t('genericError'));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Modal open onClose={onClose} title="Đổi mật khẩu" closeOnBackdrop={false}>
+    <Modal open onClose={onClose} title={t('title')} closeOnBackdrop={false}>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-ink-muted mb-1">Mật khẩu hiện tại</label>
+            <label className="block text-sm font-medium text-ink-muted mb-1">{t('current')}</label>
             <input
               type="password"
               value={currentPassword}
@@ -61,7 +63,7 @@ export default function ChangePasswordModal({ onClose, onSuccess }: ChangePasswo
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-ink-muted mb-1">Mật khẩu mới</label>
+            <label className="block text-sm font-medium text-ink-muted mb-1">{t('new')}</label>
             <input
               type="password"
               value={newPassword}
@@ -72,7 +74,7 @@ export default function ChangePasswordModal({ onClose, onSuccess }: ChangePasswo
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-ink-muted mb-1">Xác nhận mật khẩu</label>
+            <label className="block text-sm font-medium text-ink-muted mb-1">{t('confirm')}</label>
             <input
               type="password"
               value={confirmPassword}
@@ -90,14 +92,14 @@ export default function ChangePasswordModal({ onClose, onSuccess }: ChangePasswo
               disabled={loading}
               className="flex-1 bg-accent text-white py-2 rounded-lg hover:bg-accent-dark disabled:opacity-50 font-semibold transition-colors"
             >
-              {loading ? 'Đang xử lý...' : 'Đổi mật khẩu'}
+              {loading ? t('processing') : t('title')}
             </button>
             <button
               type="button"
               onClick={onClose}
               className="flex-1 bg-tint text-ink py-2 rounded-lg hover:bg-line font-semibold transition-colors"
             >
-              Hủy
+              {t('cancel')}
             </button>
           </div>
         </form>

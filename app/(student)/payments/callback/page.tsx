@@ -5,8 +5,10 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { paymentsApi } from '@/lib/api/payments';
 import { flagPayosCancelledNotice, takePayosReturn } from '@/lib/payosReturn';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 function PayosReturnContent() {
+  const t = useTranslations('pages.payosReturn');
   const searchParams = useSearchParams();
   const router = useRouter();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
@@ -49,7 +51,7 @@ function PayosReturnContent() {
   return (
     <div className="shell flex min-h-[60vh] flex-col items-center justify-center py-20 text-center">
       {status === 'loading' && (
-        <div className="text-ink-muted">Đang xử lý kết quả thanh toán PayOS...</div>
+        <div className="text-ink-muted">{t('processing')}</div>
       )}
       
       {status === 'success' && (
@@ -57,22 +59,22 @@ function PayosReturnContent() {
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-success/10 text-success mb-4">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
           </div>
-          <h1 className="font-display text-2xl font-bold text-ink mb-2">Thanh toán thành công</h1>
+          <h1 className="font-display text-2xl font-bold text-ink mb-2">{t('successTitle')}</h1>
           <p className="text-sm text-ink-muted mb-6">
-            Lưu ý: Khoá học sẽ tự động được mở khóa ngay sau khi hệ thống ghi nhận thành công từ ngân hàng (thường mất 1-2 phút).
+            {t('successNote')}
           </p>
           <div className="flex w-full flex-col gap-3">
             <Link
               href="/payments"
               className="w-full rounded-full bg-accent px-6 py-3 font-semibold text-white no-underline hover:bg-accent-dark transition-colors"
             >
-              Xem lịch sử giao dịch
+              {t('viewHistory')}
             </Link>
             <Link
               href="/courses"
               className="text-sm font-semibold text-ink no-underline hover:underline mt-2"
             >
-              Quay lại kho khóa học
+              {t('backToCourses')}
             </Link>
           </div>
         </div>
@@ -83,16 +85,16 @@ function PayosReturnContent() {
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-danger/10 text-danger mb-4">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
           </div>
-          <h1 className="font-display text-2xl font-bold text-ink mb-2">Giao dịch không thành công</h1>
+          <h1 className="font-display text-2xl font-bold text-ink mb-2">{t('failTitle')}</h1>
           <p className="text-sm text-ink-muted mb-6">
-            Thanh toán đã bị hủy hoặc có lỗi xảy ra. Vui lòng thử lại.
+            {t('failNote')}
           </p>
           <div className="flex w-full flex-col gap-3">
             <Link 
               href="/courses" 
               className="w-full rounded-full bg-accent px-6 py-3 font-semibold text-white no-underline hover:bg-accent-dark"
             >
-              Quay lại kho khóa học
+              {t('backToCourses')}
             </Link>
           </div>
         </div>
@@ -101,9 +103,14 @@ function PayosReturnContent() {
   );
 }
 
+function PayosReturnFallback() {
+  const t = useTranslations('pages.payosReturn');
+  return <div className="flex min-h-[60vh] items-center justify-center">{t('processing')}</div>;
+}
+
 export default function PayosReturnPage() {
   return (
-    <Suspense fallback={<div className="flex min-h-[60vh] items-center justify-center">Đang xử lý kết quả thanh toán PayOS...</div>}>
+    <Suspense fallback={<PayosReturnFallback />}>
       <PayosReturnContent />
     </Suspense>
   );

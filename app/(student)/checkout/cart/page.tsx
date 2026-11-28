@@ -42,6 +42,7 @@ function Spinner() {
 
 function CartCheckoutContent() {
   const t = useTranslations('shop');
+  const tc = useTranslations('pages.checkout');
   const locale = useLocale();
   const router = useRouter();
   useRequireLogin();
@@ -55,7 +56,7 @@ function CartCheckoutContent() {
   // Bấm Back từ trang PayOS: trình duyệt khôi phục trang này từ bfcache với `payingMethod` còn
   // nguyên → nút PayOS quay mãi, không bấm được. Reset khi trang được hiện lại.
   useEffect(() => {
-    const notifyCancelled = () => { if (takePayosCancelledNotice()) toast.info('Đã hủy thanh toán.'); };
+    const notifyCancelled = () => { if (takePayosCancelledNotice()) toast.info(tc('cancelled')); };
     notifyCancelled();
     const onPageShow = (e: PageTransitionEvent) => {
       if (e.persisted) setPayingMethod(null);
@@ -63,7 +64,7 @@ function CartCheckoutContent() {
     };
     window.addEventListener('pageshow', onPageShow);
     return () => window.removeEventListener('pageshow', onPageShow);
-  }, []);
+  }, [tc]);
   const [billingName, setBillingName] = useState('');
   const [billingPhone, setBillingPhone] = useState('');
 

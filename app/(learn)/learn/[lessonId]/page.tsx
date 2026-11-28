@@ -63,57 +63,54 @@ const TAB_LABEL_KEYS: Record<LearnTab, string> = {
 /** Thông báo khoá thống nhất cho 3 mục cần sở hữu khoá học (Hỏi đáp/Học liệu/Gia sư AI) — thay
  * cho khối CTA rời trước đây, giờ mỗi mục tự hiện đúng ngay trong tab/khu vực của nó. */
 function LockedFeatureNotice({ feature, courseSlug }: { feature: string; courseSlug: string }) {
+  const tp = useTranslations('learnPage');
   return (
     <div className="flex flex-col items-center justify-center gap-2 py-8 text-center">
       <div className="text-2xl">🔒</div>
       <p className="text-sm text-ink-muted">
-        {feature} chỉ dành cho học viên đã sở hữu khóa học.
+        {tp('lockedNotice', { feature })}
       </p>
       <Link
         href={`/courses/${courseSlug}`}
         className="mt-1 rounded-full bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-dark no-underline"
       >
-        Mua khóa học ngay
+        {tp('buyNow')}
       </Link>
     </div>
   );
 }
 
 /** Nhãn hiển thị cho từng `stage` do AI Worker publish — xem `app/redis_client.py::publish_progress`. */
-const STAGE_LABELS: Record<string, string> = {
-  ASR: 'Đang bóc tách lời thoại (STT)',
-  TRANSLATE: 'Đang dịch nội dung',
-  TTS: 'Đang tổng hợp giọng đọc',
-  UPLOADING: 'Đang lưu file đoạn này',
+const STAGE_LABEL_KEYS: Record<string, string> = {
+  ASR: 'stageAsr',
+  TRANSLATE: 'stageTranslate',
+  TTS: 'stageTts',
+  UPLOADING: 'stageUploading',
 };
 
-const PREPARE_STEP: PipelineStep = {
-  key: 'prepare',
-  label: 'Đang tải & phân tích audio nguồn',
-  done: false,
-  active: true,
-};
+type StepTranslator = (key: string, values?: Record<string, string | number>) => string;
 
-const FINALIZE_STEP: PipelineStep = {
-  key: 'finalize',
-  label: 'Đang ghép & lưu file hoàn chỉnh',
-  done: false,
-  active: false,
-};
+function makePrepareStep(tp: StepTranslator): PipelineStep {
+  return { key: 'prepare', label: tp('stepPrepare'), done: false, active: true };
+}
+
+function makeFinalizeStep(tp: StepTranslator): PipelineStep {
+  return { key: 'finalize', label: tp('stepFinalize'), done: false, active: false };
+}
 
 /** Dựng lại danh sách bước đầy đủ (2 bước cấp-job bọc quanh N bước/chunk) khi lần đầu biết
  * `totalChunks` thật — trước đó chỉ có `PREPARE_STEP` làm placeholder (xem `PREPARING` bên dưới).
  */
-function buildChunkSteps(totalChunks: number): PipelineStep[] {
+function buildChunkSteps(totalChunks: number, tp: StepTranslator): PipelineStep[] {
   return [
-    { ...PREPARE_STEP, done: true, active: false },
+    { ...makePrepareStep(tp), done: true, active: false },
     ...Array.from({ length: totalChunks }, (_, i) => ({
       key: `chunk-${i}`,
-      label: `Đoạn ${i + 1}/${totalChunks} — đang chờ xử lý`,
+      label: tp('chunkWaiting', { n: i + 1, total: totalChunks }),
       done: false,
       active: false,
     })),
-    { ...FINALIZE_STEP },
+    { ...makeFinalizeStep(tp) },
   ];
 }
 
@@ -147,6 +144,7 @@ function LearnPageContent() {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const t = useTranslations('learn');
+  const tp = useTranslations('learnPage');
   const lessonId = Number(params.lessonId);
   const hasToken = !!getAccessToken();
   const { data: currentUser } = useCurrentUser();
@@ -255,7 +253,7 @@ function LearnPageContent() {
   const [selectedVoiceName, setSelectedVoiceName] = useState<string | null>(null);
   const { data: voiceOptions } = useVoiceOptions();
   const [mode, setMode] = useState<PlayerMode>('watching');
-  const [steps, setSteps] = useState<PipelineStep[]>([PREPARE_STEP]);
+  const [steps, setSteps] = useState<PipelineStep[]>(() => [makePrepareStep(tp)]);
   const [quotaExceeded, setQuotaExceeded] = useState(false);
   const [activateError, setActivateError] = useState<string | null>(null);
   const [jobError, setJobError] = useState<string | null>(null);
@@ -319,7 +317,7 @@ function LearnPageContent() {
     setMode('watching');
     setActiveLang(null);
     setSelectedVoiceName(null);
-    setSteps([PREPARE_STEP]);
+    setSteps([makePrepareStep(tp)]);
     setQuotaExceeded(false);
     setActivateError(null);
     setJobError(null);
@@ -329,6 +327,7 @@ function LearnPageContent() {
     setStreamConflict(false);
     setAutoPlayIntent(hasSeenLessonRef.current);
     hasSeenLessonRef.current = true;
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- chỉ chạy khi đổi bài, không chạy lại khi đổi ngôn ngữ giao diện
   }, [lessonId]);
 
   // Tự động chuyển sang bài tiếp theo khi phát hết bài hiện tại — nhớ lựa chọn của học viên giữa
@@ -409,7 +408,7 @@ function LearnPageContent() {
       const { stage, chunkIndex, totalChunks } = lastEvent;
 
       if (stage === 'PREPARING') {
-        setSteps([PREPARE_STEP]);
+        setSteps([makePrepareStep(tp)]);
         return;
       }
 
@@ -426,12 +425,12 @@ function LearnPageContent() {
       setSteps((prev) => {
         const size = totalChunks ?? 0;
         const chunkCount = prev.filter((s) => s.key.startsWith('chunk-')).length;
-        const base = chunkCount === size ? prev : buildChunkSteps(size);
+        const base = chunkCount === size ? prev : buildChunkSteps(size, tp);
         return base.map((step) => {
           if (step.key === `chunk-${chunkIndex}`) {
             return {
               ...step,
-              label: `Đoạn ${(chunkIndex ?? 0) + 1}/${size} — ${STAGE_LABELS[stage] ?? stage}`,
+              label: tp('chunkStage', { n: (chunkIndex ?? 0) + 1, total: size, stage: STAGE_LABEL_KEYS[stage] ? tp(STAGE_LABEL_KEYS[stage]) : stage }),
               active: true,
             };
           }
@@ -450,12 +449,12 @@ function LearnPageContent() {
       setSteps((prev) => {
         const size = lastEvent.totalChunks;
         const chunkCount = prev.filter((s) => s.key.startsWith('chunk-')).length;
-        const base = chunkCount === size ? prev : buildChunkSteps(size);
+        const base = chunkCount === size ? prev : buildChunkSteps(size, tp);
         return base.map((step) => {
           if (step.key === `chunk-${lastEvent.chunkIndex}`) {
             return {
               ...step,
-              label: `Đoạn ${lastEvent.chunkIndex + 1}/${size}`,
+              label: tp('chunkPlain', { n: lastEvent.chunkIndex + 1, total: size }),
               done: lastEvent.status === 'COMPLETED',
               failed: lastEvent.status === 'FAILED',
               active: false,
@@ -481,15 +480,16 @@ function LearnPageContent() {
     } else if (lastEvent.status === 'CANCELLED') {
       // UC20 — do CHÍNH học viên này (hoặc ai đó đang theo dõi cùng job) chủ động huỷ,
       // không phải lỗi — không hiện `jobError` (khối màu đỏ) cho trường hợp này.
-      toast.info('Đã huỷ lồng tiếng theo yêu cầu.');
+      toast.info(tp('dubCancelled'));
       setMode('watching');
     } else {
       setJobError(
         lastEvent.status === 'SKIPPED'
-          ? 'Bài học này không có lời thoại để lồng tiếng.'
-          : 'Lồng tiếng thất bại, vui lòng thử lại sau.',
+          ? tp('dubSkipped')
+          : tp('dubFailed'),
       );
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- `tp` chỉ dùng để dựng nhãn bước, không cần chạy lại khi đổi ngôn ngữ
   }, [lastEvent, refetchLesson]);
 
   const handleCancelDubbing = () => {
@@ -501,7 +501,7 @@ function LearnPageContent() {
         // NGAY từ be/ khi huỷ, xem DubbingRequestService.cancelDubbing) sẽ tự làm việc đó qua
         // nhánh xử lý lastEvent ở trên, tránh 2 nơi cùng quyết định 1 việc.
         onError: (err) => {
-          toast.error(err instanceof ApiError ? err.message : 'Không huỷ được lồng tiếng, vui lòng thử lại.');
+          toast.error(err instanceof ApiError ? err.message : tp('dubCancelError'));
         },
       },
     );
@@ -571,12 +571,12 @@ function LearnPageContent() {
       setStreamConflict(false);
       dualPlayerRef.current?.play();
     } catch {
-      toast.error('Không thể giành lại quyền phát.');
+      toast.error(tp('resumeError'));
     }
   };
 
   if (isLoading) {
-    return <div className="p-16 text-center text-sm text-ink-muted">Đang tải bài học...</div>;
+    return <div className="p-16 text-center text-sm text-ink-muted">{tp('loadingLesson')}</div>;
   }
 
   if (error || !lesson) {
@@ -585,17 +585,17 @@ function LearnPageContent() {
         <p className="text-sm text-ink-muted">
           {error instanceof ApiError
             ? error.message
-            : 'Không tìm thấy bài học, hoặc bài học này cần sở hữu khóa học mới xem được.'}
+            : tp('lessonNotFound')}
         </p>
         <Link href="/courses" className="text-sm font-semibold text-accent hover:underline">
-          ← Về kho khoá học
+          {tp('backToCourses')}
         </Link>
       </div>
     );
   }
 
   const activeLangLabel =
-    lesson.languages.find((l) => l.code === activeLang)?.label ?? 'ngôn ngữ đã chọn';
+    lesson.languages.find((l) => l.code === activeLang)?.label ?? tp('selectedLanguage');
   const voicesForActiveLang = voiceOptions?.filter((v) => v.language === activeLang) ?? [];
 
   // Giao diện tham khảo Udemy (06/09/2026) — tự động chuyển bài. Không có field `nextLessonId`
@@ -613,7 +613,7 @@ function LearnPageContent() {
 
   const handleVideoEnded = () => {
     if (autoNextEnabled && nextLessonId) {
-      toast.info('Đang chuyển sang bài học tiếp theo…');
+      toast.info(tp('nextLesson'));
       router.push(`/learn/${nextLessonId}`);
     }
   };
@@ -659,14 +659,14 @@ function LearnPageContent() {
           // đúng `/topic/dubbing/{lessonId}`; học viên thứ 2 chọn cùng ngôn ngữ trong lúc job
           // đang chạy sẽ nhận đúng luồng tiến độ của job đó, không tạo job mới.
           setMode('processing');
-          setSteps([PREPARE_STEP]);
+          setSteps([makePrepareStep(tp)]);
         },
         onError: (err) => {
           if (err instanceof ApiError && err.isQuotaExceeded) {
             setQuotaExceeded(true);
             return;
           }
-          setActivateError(err instanceof ApiError ? err.message : 'Không kích hoạt được lồng tiếng, vui lòng thử lại.');
+          setActivateError(err instanceof ApiError ? err.message : tp('activateError'));
         },
       },
     );
@@ -698,7 +698,7 @@ function LearnPageContent() {
       />
     ) : (
       <div className="flex-1">
-        <LockedFeatureNotice feature="Gia sư AI" courseSlug={lesson.courseSlug} />
+        <LockedFeatureNotice feature={tp('featureTutor')} courseSlug={lesson.courseSlug} />
       </div>
     );
 
@@ -762,7 +762,7 @@ function LearnPageContent() {
               {isSwitchingLesson && (
                 <div className="pointer-events-none absolute left-3 top-3 z-20 flex items-center gap-2 rounded-full bg-ink/70 px-3 py-1.5 text-[12px] font-medium text-white">
                   <span className="h-3 w-3 animate-spin rounded-full border-2 border-white/40 border-t-white" aria-hidden />
-                  Đang chuyển bài học...
+                  {tp('switching')}
                 </div>
               )}
             </div>
@@ -884,7 +884,7 @@ function LearnPageContent() {
                       allLessons={lesson.chapters.flatMap(c => c.lessons).map(l => ({ lessonId: l.lessonId, durationSec: l.durationSec }))}
                     />
                   ) : (
-                    <LockedFeatureNotice feature="Lộ trình học cá nhân hóa" courseSlug={lesson.courseSlug} />
+                    <LockedFeatureNotice feature={tp('featurePath')} courseSlug={lesson.courseSlug} />
                   )
                 )}
 
@@ -917,20 +917,20 @@ function LearnPageContent() {
                   lesson.enrolled ? (
                     <LiveChatPanel
                       lessonId={lesson.lessonId}
-                      userName={currentUser?.fullName ?? 'Học viên'}
+                      userName={currentUser?.fullName ?? tp('studentFallback')}
                       currentUserId={currentUser?.id != null ? String(currentUser.id) : undefined}
                     />
                   ) : (
-                    <LockedFeatureNotice feature="Hỏi đáp bài học" courseSlug={lesson.courseSlug} />
+                    <LockedFeatureNotice feature={tp('featureQna')} courseSlug={lesson.courseSlug} />
                   )
                 )}
 
                 {mainTab === 'reviews' && <ReviewsSection courseId={lesson.courseId} />}
                 {mainTab === 'gradebook' && (lesson.viewerIsOwner ? (
                   <div className="py-8 text-center text-sm text-ink-muted">
-                    Bảng điểm chỉ dành cho học viên.{' '}
+                    {tp('gradebookOwner')}{' '}
                     <Link href={`/instructor/courses/${lesson.courseId}/gradebook`} className="font-semibold text-accent-dark underline">
-                      Xem bảng điểm của lớp
+                      {tp('viewClassGradebook')}
                     </Link>
                   </div>
                 ) : <CourseGradebookTab courseId={lesson.courseId} />)}
@@ -947,7 +947,7 @@ function LearnPageContent() {
                       </section>
                     </div>
                   ) : (
-                    <LockedFeatureNotice feature="Học liệu" courseSlug={lesson.courseSlug} />
+                    <LockedFeatureNotice feature={tp('featureMaterials')} courseSlug={lesson.courseSlug} />
                   )
                 )}
               </div>
@@ -1003,17 +1003,17 @@ function LearnPageContent() {
       </div>
 
       {streamConflict && (
-        <Modal open onClose={() => {}} bare ariaLabel="Đã phát hiện thiết bị khác" role="alertdialog" closeOnBackdrop={false} className="mx-4 w-full max-w-sm rounded-card bg-surface-raised p-6 shadow-card text-center">
+        <Modal open onClose={() => {}} bare ariaLabel={tp('deviceTitle')} role="alertdialog" closeOnBackdrop={false} className="mx-4 w-full max-w-sm rounded-card bg-surface-raised p-6 shadow-card text-center">
             <div className="mb-4 text-4xl">⚠️</div>
-            <h2 className="mb-2 font-display text-lg font-bold text-ink">Đã phát hiện thiết bị khác</h2>
+            <h2 className="mb-2 font-display text-lg font-bold text-ink">{tp('deviceTitle')}</h2>
             <p className="mb-6 text-sm text-ink-muted">
-              Video đã tạm dừng vì tài khoản của bạn đang phát video trên một thiết bị khác.
+              {tp('deviceDesc')}
             </p>
             <button
               onClick={handleResumeStream}
               className="w-full rounded-lg bg-accent px-4 py-2.5 text-sm font-bold text-white hover:bg-accent-dark transition-colors"
             >
-              Tiếp tục phát tại đây
+              {tp('deviceResume')}
             </button>
           </Modal>
       )}
@@ -1025,9 +1025,14 @@ function LearnPageContent() {
   );
 }
 
+function LearnPageFallback() {
+  const tp = useTranslations('learnPage');
+  return <div className="p-16 text-center text-sm text-ink-muted">{tp('loadingUi')}</div>;
+}
+
 export default function LearnPage() {
   return (
-    <Suspense fallback={<div className="p-16 text-center text-sm text-ink-muted">Đang tải giao diện...</div>}>
+    <Suspense fallback={<LearnPageFallback />}>
       <LearnPageContent />
     </Suspense>
   );

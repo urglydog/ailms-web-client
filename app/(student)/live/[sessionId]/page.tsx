@@ -3,6 +3,7 @@
 import { LiveKitRoom, RoomAudioRenderer, useDataChannel, useTracks, VideoTrack } from '@livekit/components-react';
 import { RemoteTrackPublication, Track } from 'livekit-client';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { LiveChatPanel } from '@/components/live/LiveChatPanel';
@@ -47,6 +48,7 @@ function formatDateTime(iso: string): string {
  * (`/api/v1/live-sessions/{id}/view`) — trang này chỉ hiển thị đúng theo những gì API trả về,
  * không tự đoán quyền ở FE. */
 export default function LiveViewPage() {
+  const t = useTranslations('pages.liveView');
   const params = useParams<{ sessionId: string }>();
   const sessionId = Number(params.sessionId);
   const { data: session, isLoading, error } = useLiveSessionView(sessionId);
@@ -54,7 +56,7 @@ export default function LiveViewPage() {
   if (isLoading) {
     return (
       <div className="shell py-10">
-        <p className="text-sm text-ink-muted">Đang tải…</p>
+        <p className="text-sm text-ink-muted">{t('loading')}</p>
       </div>
     );
   }
@@ -67,22 +69,22 @@ export default function LiveViewPage() {
           <span className="text-3xl" aria-hidden>
             🔒
           </span>
-          <h1 className="font-display text-lg font-bold text-ink">Không xem được buổi live này</h1>
+          <h1 className="font-display text-lg font-bold text-ink">{t('cannotView')}</h1>
           <p className="text-sm text-ink-muted">
             {isForbidden
               ? getAccessToken()
-                ? 'Buổi live này chỉ dành cho học viên đã ghi danh khóa học.'
-                : 'Buổi live này chỉ dành cho học viên đã ghi danh khóa học — đăng nhập rồi thử lại nếu bạn đã ghi danh.'
+                ? t('enrolledOnly')
+                : t('enrolledOnlyLogin')
               : error instanceof ApiError
                 ? error.message
-                : 'Có lỗi xảy ra, thử lại sau.'}
+                : t('genericError')}
           </p>
           {!getAccessToken() && isForbidden && (
             <Link
               href="/login"
               className="mt-1 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-white no-underline hover:bg-accent-dark"
             >
-              Đăng nhập
+              {t('login')}
             </Link>
           )}
         </div>
@@ -105,11 +107,11 @@ export default function LiveViewPage() {
           <span className="text-3xl" aria-hidden>
             🗓️
           </span>
-          <p className="font-display text-lg font-semibold text-ink">Buổi live sắp bắt đầu</p>
+          <p className="font-display text-lg font-semibold text-ink">{t('upcoming')}</p>
           <p className="text-sm text-ink-muted">
             {session.scheduledAt
-              ? `Dự kiến lúc ${formatDateTime(session.scheduledAt)}`
-              : 'Giảng viên chưa bắt đầu — quay lại sau nhé.'}
+              ? t('scheduledAt', { time: formatDateTime(session.scheduledAt) })
+              : t('notStarted')}
           </p>
         </div>
       )}
@@ -119,7 +121,7 @@ export default function LiveViewPage() {
           <span className="text-3xl" aria-hidden>
             🏁
           </span>
-          <p className="font-display text-lg font-semibold text-ink">Buổi live đã kết thúc</p>
+          <p className="font-display text-lg font-semibold text-ink">{t('ended')}</p>
         </div>
       )}
 
@@ -163,6 +165,7 @@ function LiveRoomContent({
   const audioSelection = useLiveLanguageSelection(sessionId);
   const subtitleSelection = useLiveLanguageSelection(sessionId);
   const originalSubtitle = useLiveOriginalSubtitle(sessionId);
+  const t = useTranslations('pages.liveView');
   const [loginModalAction, setLoginModalAction] = useState<string | null>(null);
   // F11.7 — track đang XEM PHỤ ĐỀ DỊCH (nếu có) để useLiveSubtitles biết ưu tiên "gốc đồng bộ"
   // đúng track đó (chỉ có khi provider=Gemini) thay vì luôn nhận luồng gốc độc lập chung.
@@ -192,7 +195,7 @@ function LiveRoomContent({
 
   const handleToggleOriginalSubtitle = (checked: boolean) => {
     if (!isAuthenticated) {
-      setLoginModalAction('xem phụ đề gốc');
+      setLoginModalAction(t('actionOriginalSub'));
       return;
     }
     originalSubtitle.toggle(checked);
@@ -210,7 +213,7 @@ function LiveRoomContent({
 
         <div className="card flex flex-col gap-3 p-4">
           <div className="flex flex-wrap items-center gap-3">
-            <span className="w-24 shrink-0 text-[13px] font-medium text-ink">Nghe:</span>
+            <span className="w-24 shrink-0 text-[13px] font-medium text-ink">{t('listen')}</span>
             <LiveLanguagePicker
               isAuthenticated={isAuthenticated}
               sourceLanguage={sourceLanguage}
@@ -218,13 +221,13 @@ function LiveRoomContent({
               selectedLanguage={audioSelection.selectedLanguage}
               onSelect={audioSelection.selectLanguage}
               onClearSelection={audioSelection.clearSelection}
-              onRequireLogin={() => setLoginModalAction('nghe lồng tiếng')}
+              onRequireLogin={() => setLoginModalAction(t('actionDubbing'))}
               isPending={audioSelection.isPending}
             />
           </div>
 
           <div className="flex flex-wrap items-center gap-3 border-t border-line-soft pt-3">
-            <span className="w-24 shrink-0 text-[13px] font-medium text-ink">Phụ đề dịch:</span>
+            <span className="w-24 shrink-0 text-[13px] font-medium text-ink">{t('translatedSub')}</span>
             <LiveLanguagePicker
               isAuthenticated={isAuthenticated}
               sourceLanguage={sourceLanguage}
@@ -232,9 +235,9 @@ function LiveRoomContent({
               selectedLanguage={subtitleSelection.selectedLanguage}
               onSelect={subtitleSelection.selectLanguage}
               onClearSelection={subtitleSelection.clearSelection}
-              onRequireLogin={() => setLoginModalAction('xem phụ đề dịch')}
+              onRequireLogin={() => setLoginModalAction(t('actionTranslatedSub'))}
               isPending={subtitleSelection.isPending}
-              noneLabel="Không hiện phụ đề dịch"
+              noneLabel={t('noTranslatedSub')}
               showDelayHint={false}
             />
           </div>
@@ -246,7 +249,7 @@ function LiveRoomContent({
               disabled={originalSubtitle.isPending}
               onChange={(e) => handleToggleOriginalSubtitle(e.target.checked)}
             />
-            Phụ đề gốc
+            {t('originalSub')}
           </label>
         </div>
 
@@ -340,9 +343,10 @@ function LiveVideoStage({
   originalText: string;
   translatedText: string;
 }) {
+  const t = useTranslations('pages.liveView');
   const tracks = useTracks([Track.Source.Camera, Track.Source.ScreenShare]);
-  const screenTrack = tracks.find((t) => t.source === Track.Source.ScreenShare);
-  const cameraTrack = tracks.find((t) => t.source === Track.Source.Camera);
+  const screenTrack = tracks.find((tr) => tr.source === Track.Source.ScreenShare);
+  const cameraTrack = tracks.find((tr) => tr.source === Track.Source.Camera);
   const mainTrack = screenTrack ?? cameraTrack;
 
   const showTranslatedLine = showTranslatedSub && translatedText;
@@ -357,7 +361,7 @@ function LiveVideoStage({
         />
       ) : (
         <div className="flex h-full items-center justify-center text-sm text-white/40">
-          Giảng viên chưa bật camera hoặc chia sẻ màn hình
+          {t('noVideo')}
         </div>
       )}
       {screenTrack && cameraTrack && (
@@ -366,7 +370,7 @@ function LiveVideoStage({
         </div>
       )}
       <p className="absolute left-3 top-3 rounded-full bg-black/60 px-3 py-1 text-[11px] font-semibold text-white">
-        Âm thanh/hình ảnh có thể trễ vài giây so với thực tế
+        {t('delayNote')}
       </p>
 
       {(showTranslatedLine || showOriginalLine) && (

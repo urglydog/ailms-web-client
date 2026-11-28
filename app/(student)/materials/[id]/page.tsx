@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
+import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import Link from 'next/link';
 import { useMaterialDetail } from '@/hooks/useMaterials';
@@ -16,6 +17,7 @@ import { ApiError, apiBlob } from '@/lib/api/client';
 import { Download, Upload, FileText } from 'lucide-react';
 
 export default function MaterialDetailPage() {
+  const t = useTranslations('pages.materialDetail');
   const router = useRouter();
   const params = useParams();
 
@@ -45,7 +47,7 @@ export default function MaterialDetailPage() {
       a.click();
       URL.revokeObjectURL(url);
     } catch {
-      toast.error('Có lỗi khi xuất PDF, vui lòng thử lại.');
+      toast.error(t('exportPdfError'));
     } finally {
       setIsExportingQuizPdf(null);
     }
@@ -56,17 +58,17 @@ export default function MaterialDetailPage() {
     try {
       const result = await flashcardsApi.importFromTxt(id, file);
       if (result.importedCount > 0) {
-        toast.success(`Đã thêm ${result.importedCount} thẻ từ file.`);
+        toast.success(t('imported', { count: result.importedCount }));
         queryClient.invalidateQueries({ queryKey: ['materials', 'detail', id] });
       }
       if (result.errors.length > 0) {
-        toast.error(`${result.errors.length} dòng lỗi: ${result.errors.slice(0, 3).join('; ')}${result.errors.length > 3 ? '...' : ''}`);
+        toast.error(t('importErrors', { count: result.errors.length, samples: result.errors.slice(0, 3).join('; '), more: result.errors.length > 3 ? '...' : '' }));
       }
       if (result.importedCount === 0 && result.errors.length === 0) {
-        toast.error('File .txt không có dòng dữ liệu hợp lệ.');
+        toast.error(t('importEmpty'));
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Lỗi khi tải file .txt');
+      toast.error(err instanceof Error ? err.message : t('importFail'));
     } finally {
       setIsImportingTxt(false);
     }
@@ -75,7 +77,7 @@ export default function MaterialDetailPage() {
   if (!id || isLoading) {
     return (
       <div className="min-h-dvh bg-surface p-8 text-center text-ink-muted">
-        Đang tải chi tiết học liệu...
+        {t('loading')}
       </div>
     );
   }
@@ -83,8 +85,8 @@ export default function MaterialDetailPage() {
   if (error || !material) {
     const isNotFound = error instanceof ApiError && error.status === 404;
     const errorMessage = isNotFound 
-      ? 'Bài tập này đã được giảng viên gỡ bỏ hoặc cập nhật. Phiên làm việc kết thúc.' 
-      : (error instanceof ApiError ? error.message : 'Không tìm thấy học liệu này hoặc bạn không có quyền xem.');
+      ? t('removed') 
+      : (error instanceof ApiError ? error.message : t('notFound'));
 
     return (
       <div className="min-h-dvh bg-surface p-8 flex items-center justify-center">
@@ -93,7 +95,7 @@ export default function MaterialDetailPage() {
             {isNotFound ? '📦' : '⚠️'}
           </div>
           <h2 className="text-lg font-bold text-ink mb-2">
-            {isNotFound ? 'Học liệu không còn khả dụng' : 'Không thể tải dữ liệu'}
+            {isNotFound ? t('unavailableTitle') : t('loadErrorTitle')}
           </h2>
           <p className="text-sm text-ink-muted mb-8 leading-relaxed">
             {errorMessage}
@@ -104,13 +106,13 @@ export default function MaterialDetailPage() {
               onClick={() => router.back()}
               className="px-5 py-2 text-sm font-semibold text-ink bg-tint hover:bg-line-soft rounded-xl transition-colors"
             >
-              ← Quay lại
+              {t('back')}
             </button>
             <Link 
               href="/courses" 
               className="px-5 py-2 text-sm font-semibold text-white bg-accent hover:bg-accent-dark rounded-xl shadow-sm transition-colors"
             >
-              Về trang chủ
+              {t('toHome')}
             </Link>
           </div>
         </div>
@@ -130,21 +132,21 @@ export default function MaterialDetailPage() {
                 className="text-sm text-ink-muted hover:text-ink transition-colors flex items-center"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-                Quay lại
+                {t('backPlain')}
               </button>
               <span className="text-line">|</span>
               <Link href="/courses" className="text-sm text-ink-muted hover:text-accent transition-colors flex items-center">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
-                Trang chủ
+                {t('home')}
               </Link>
             </div>
             <h1 className="font-display text-2xl font-bold text-ink">
-              {material.materialType === 'MINDMAP' ? 'Sơ đồ tư duy' : material.materialType === 'FLASHCARD' ? 'Bộ thẻ Flashcard' : material.materialType} - Phiên bản {material.versionNo}
+              {t('heading', { type: material.materialType === 'MINDMAP' ? t('typeMindmap') : material.materialType === 'FLASHCARD' ? t('typeFlashcard') : material.materialType, version: material.versionNo })}
             </h1>
             <p className="text-sm text-ink-muted mt-1">
-              Trạng thái: <span className="font-semibold text-success">{material.status}</span>
+              {t('statusLabel')} <span className="font-semibold text-success">{material.status}</span>
               <span className="mx-2">•</span>
-              Ngày tạo: {new Date(material.createdAt).toLocaleString('vi-VN')}
+              {t('createdAt', { date: new Date(material.createdAt).toLocaleString('vi-VN') })}
             </p>
           </div>
           <div>
@@ -156,7 +158,7 @@ export default function MaterialDetailPage() {
 
         {material.materialType === 'MINDMAP' && material.mermaidCode ? (
           <div className="card p-6">
-            <h2 className="text-lg font-bold font-display mb-4">Sơ đồ</h2>
+            <h2 className="text-lg font-bold font-display mb-4">{t('diagram')}</h2>
             <MermaidViewer chart={material.mermaidCode} readOnly={isOfficial} />
           </div>
         ) : material.materialType === 'QUIZ' ? (
@@ -169,34 +171,34 @@ export default function MaterialDetailPage() {
                     className={`pb-2 text-sm font-bold border-b-2 transition-colors ${quizMode === 'study' ? 'border-accent text-accent' : 'border-transparent text-ink-muted hover:text-ink'
                       }`}
                   >
-                    📖 Làm Bài (Study Mode)
+                    {t('quizStudy')}
                   </button>
                   <button
                     onClick={() => setQuizMode('browse')}
                     className={`pb-2 text-sm font-bold border-b-2 transition-colors ${quizMode === 'browse' ? 'border-accent text-accent' : 'border-transparent text-ink-muted hover:text-ink'
                       }`}
                   >
-                    📋 Chỉnh Sửa Câu Hỏi (Edit Mode)
+                    {t('quizEdit')}
                   </button>
                 </div>
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => material.quizId && handleExportQuizPdf(material.quizId, 'blank')}
                     disabled={isExportingQuizPdf !== null}
-                    title="Xuất PDF đề trắng, đáp án ở trang cuối"
+                    title={t('exportBlankTitle')}
                     className="flex items-center gap-1.5 text-sm font-semibold text-accent hover:underline disabled:opacity-50"
                   >
                     <FileText className="w-4 h-4" strokeWidth={1.75} />
-                    {isExportingQuizPdf === 'blank' ? 'Đang xuất...' : 'Đề trắng'}
+                    {isExportingQuizPdf === 'blank' ? t('exporting') : t('blankPaper')}
                   </button>
                   <button
                     onClick={() => material.quizId && handleExportQuizPdf(material.quizId, 'cheatsheet')}
                     disabled={isExportingQuizPdf !== null}
-                    title="Xuất PDF cheatsheet, đáp án in kèm"
+                    title={t('exportCheatTitle')}
                     className="flex items-center gap-1.5 text-sm font-semibold text-accent hover:underline disabled:opacity-50"
                   >
                     <FileText className="w-4 h-4" strokeWidth={1.75} />
-                    {isExportingQuizPdf === 'cheatsheet' ? 'Đang xuất...' : 'Cheatsheet'}
+                    {isExportingQuizPdf === 'cheatsheet' ? t('exporting') : t('cheatsheet')}
                   </button>
                 </div>
               </div>
@@ -210,7 +212,7 @@ export default function MaterialDetailPage() {
               )
             ) : (
               <div className="card p-6 text-center text-ink-muted">
-                {material.status === 'COMPLETED' ? 'Bài trắc nghiệm này không có câu hỏi nào.' : 'Bài trắc nghiệm đang được AI xử lý, vui lòng quay lại sau...'}
+                {material.status === 'COMPLETED' ? t('quizEmptyDone') : t('quizProcessing')}
               </div>
             )}
           </div>
@@ -226,14 +228,14 @@ export default function MaterialDetailPage() {
                       className={`pb-2 text-sm font-bold border-b-2 transition-colors ${flashcardMode === 'study' ? 'border-accent text-accent' : 'border-transparent text-ink-muted hover:text-ink'
                         }`}
                     >
-                      📖 Ôn tập (Study Mode)
+                      {t('flashStudy')}
                     </button>
                     <button
                       onClick={() => setFlashcardMode('browse')}
                       className={`pb-2 text-sm font-bold border-b-2 transition-colors ${flashcardMode === 'browse' ? 'border-accent text-accent' : 'border-transparent text-ink-muted hover:text-ink'
                         }`}
                     >
-                      📋 Duyệt tất cả (Browse)
+                      {t('flashBrowse')}
                     </button>
                   </div>
                   <div className="flex items-center gap-4">
@@ -249,10 +251,10 @@ export default function MaterialDetailPage() {
                         a.click();
                         URL.revokeObjectURL(url);
                       }}
-                      title="Xuất file .txt tương thích Anki/Quizlet"
+                      title={t('exportTxtTitle')}
                       className="text-sm font-semibold text-accent hover:underline flex items-center gap-1.5"
                     >
-                      <Download className="w-4 h-4" strokeWidth={1.75} /> Xuất
+                      <Download className="w-4 h-4" strokeWidth={1.75} /> {t('export')}
                     </button>
                     <input
                       id="anki-txt-import"
@@ -267,17 +269,17 @@ export default function MaterialDetailPage() {
                     />
                     <label
                       htmlFor="anki-txt-import"
-                      title="Nhập file .txt từ Anki/Quizlet"
+                      title={t('importTxtTitle')}
                       className="text-sm font-semibold text-accent hover:underline flex items-center gap-1.5 cursor-pointer"
                     >
-                      <Upload className="w-4 h-4" strokeWidth={1.75} /> {isImportingTxt ? 'Đang nhập...' : 'Nhập'}
+                      <Upload className="w-4 h-4" strokeWidth={1.75} /> {isImportingTxt ? t('importing') : t('import')}
                     </label>
                   </div>
                 </div>
 
                 {flashcardMode === 'study' ? (
                   <FlashcardStudyMode
-                    deckName={material.title || 'Bộ thẻ Flashcard'}
+                    deckName={material.title || t('defaultDeckName')}
                     cards={material.flashcards.map(c => ({
                       id: c.id,
                       frontText: c.frontText,
@@ -297,13 +299,13 @@ export default function MaterialDetailPage() {
               </>
             ) : (
               <div className="card p-6 text-center text-ink-muted">
-                {material.status === 'COMPLETED' ? 'Bộ flashcard này không có thẻ nào.' : 'Bộ flashcard đang được AI xử lý, vui lòng quay lại sau...'}
+                {material.status === 'COMPLETED' ? t('flashEmptyDone') : t('flashProcessing')}
               </div>
             )}
           </div>
         ) : (
           <div className="card p-6 text-center text-ink-muted">
-            <p>Loại học liệu này chưa hỗ trợ hiển thị hoặc bị lỗi khi sinh.</p>
+            <p>{t('unsupported')}</p>
           </div>
         )}
       </div>

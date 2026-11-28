@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { Modal } from '@/components/ui/Modal';
 
 import { useEffect, useState, useRef, useCallback } from 'react';
@@ -45,13 +46,14 @@ function estimateHeadPose(landmarks: FaceLandmarks68): { yaw: number; pitch: num
 }
 
 export default function AntiCheatExamPage() {
+  const t = useTranslations('exam.page');
   const router = useRouter();
   const { data: user } = useCurrentUser();
   const userId = user?.id;
   const params = useParams();
   const searchParams = useSearchParams();
   const quizId = params.quizId;
-  const title = searchParams.get('title') || 'Bài kiểm tra';
+  const title = searchParams.get('title') || t('defaultTitle');
   const duration = searchParams.get('duration');
   const maxAttempts = searchParams.get('attempts');
   const questionCount = searchParams.get('count');
@@ -140,7 +142,7 @@ export default function AntiCheatExamPage() {
       // Trước đây không có onError — upload thất bại (mạng, 413, token hết hạn...) hoàn toàn
       // vô hình, không log không toast, không có cách nào debug được ngoài đoán mò.
       console.error('Upload video giám sát thất bại:', err);
-      toast.warning('Không lưu được video giám sát (không ảnh hưởng điểm bài thi)');
+      toast.warning(t('videoUploadWarn'));
     },
   });
 
@@ -205,8 +207,8 @@ export default function AntiCheatExamPage() {
         setExplanations(prev => ({ ...prev, [questionId]: { loading: false, text: data.explanation } }));
       },
       onError: () => {
-        setExplanations(prev => ({ ...prev, [questionId]: { loading: false, text: 'Có lỗi khi gọi AI. Vui lòng thử lại.' } }));
-        toast.error('Có lỗi khi lấy giải thích từ AI.');
+        setExplanations(prev => ({ ...prev, [questionId]: { loading: false, text: t('aiError') } }));
+        toast.error(t('aiExplainError'));
       }
     });
   };
@@ -496,7 +498,7 @@ export default function AntiCheatExamPage() {
         stopAllMedia();
         
         if (data && data.isArchived) {
-          setArchivedError({ show: true, message: 'Bài nộp đã được lưu vào Bảng điểm. Bài thi này hiện đã được giảng viên lưu trữ.' });
+          setArchivedError({ show: true, message: t('archivedSaved') });
         }
       },
       onError: (err: unknown) => {
@@ -507,7 +509,7 @@ export default function AntiCheatExamPage() {
         stopAllMedia();
         const apiErr = err instanceof ApiError ? err : null;
         if (apiErr?.status === 410 || apiErr?.code === 'QUIZ_ARCHIVED') {
-          setArchivedError({ show: true, message: apiErr.message || 'Bài tập này đã được giảng viên thu hồi.' });
+          setArchivedError({ show: true, message: apiErr.message || t('revoked') });
           if (userId && quizId) {
             try {
               localStorage.removeItem(`exam_draft_${userId}_${quizId}`);
@@ -516,20 +518,34 @@ export default function AntiCheatExamPage() {
           }
           router.replace(`/exam/${quizId}${returnUrl ? `?returnUrl=${returnUrl}` : ''}`);
         } else if (apiErr?.status === 404) {
-          setArchivedError({ show: true, message: 'Bài tập này đã được giảng viên gỡ bỏ hoặc cập nhật. Phiên làm bài kết thúc.' });
+          setArchivedError({ show: true, message: t('removedEnded') });
           router.replace(`/exam/${quizId}${returnUrl ? `?returnUrl=${returnUrl}` : ''}`);
         } else {
-          toast.error('Có lỗi khi nộp bài. Vui lòng thử lại.');
+          toast.error(t('submitError'));
         }
         setIsSubmitting(false);
       }
     });
-  }, [attemptData, answers, isSubmitting, submitQuiz, stopAllMedia, userId, quizId, router, returnUrl, stopCompositeRecording, uploadRecordingMutation]);
+  }, [attemptData, answers, isSubmitting, submitQuiz, stopAllMedia, userId, quizId, router, returnUrl, stopCompositeRecording, uploadRecordingMutation, t]);
 
   // UC-ANTICHEAT (25/09/2026) — Composite Behavioral Risk Engine.
   // Hàm xử lý vi phạm DUY NHẤT (đã gộp 2 bản trùng lặp cũ) — ghi nhận SERVER-SIDE qua
   // recordViolation thay vì chỉ đếm ở localStorage (client-trust cũ, học viên có thể sửa JS để
   // vô hiệu hoá hoàn toàn). Debounce 2 giây tránh trigger liên tục cho 1 hành vi.
+  // Nhãn hiển thị cho học viên (theo ngôn ngữ giao diện); `reason` gửi lên BE vẫn là tiếng Việt cố định để giảng viên đọc nhất quán.
+  const violationLabel = useCallback((type: ViolationType): string => {
+    switch (type) {
+      case 'TAB_SWITCH': return t('vTabSwitch');
+      case 'WINDOW_BLUR': return t('vWindowBlur');
+      case 'FULLSCREEN_EXIT': return t('vFullscreenExit');
+      case 'COPY_PASTE_BLOCKED': return t('vCopyPaste');
+      case 'DEVTOOLS_OPEN': return t('vDevtools');
+      case 'IDLE_TOO_LONG': return t('vIdle');
+      case 'AUDIO_VOICE_DETECTED': return t('vAudio');
+      default: return String(type);
+    }
+  }, [t]);
+
   const handleViolation = useCallback((type: ViolationType, reason: string) => {
     if (isSubmitting || result || hasAutoSubmittedRef.current || !attemptData) return;
     const now = Date.now();
@@ -541,16 +557,16 @@ export default function AntiCheatExamPage() {
         setViolationCount(res.violationCount);
         const max = res.maxViolations || 3;
         if (res.shouldAutoSubmit) {
-          toast.error(`Bạn đã vi phạm quá ${max} lần. Hệ thống tự động nộp bài!`);
+          toast.error(t('violationExceeded', { max }));
           submitExam(true);
         } else {
-          toast.warning(`Cảnh báo vi phạm (${res.violationCount}/${max}): ${reason}`);
+          toast.warning(t('violationWarn', { count: res.violationCount, max, reason: violationLabel(type) }));
         }
       },
       // Lỗi mạng lúc ghi nhận không được chặn học viên làm bài tiếp — chỉ bỏ qua lần này,
       // server vẫn ghi được các lần vi phạm sau.
     });
-  }, [isSubmitting, result, attemptData, recordViolationMutation, submitExam, getVideoOffsetSec]);
+  }, [isSubmitting, result, attemptData, recordViolationMutation, submitExam, getVideoOffsetSec, violationLabel, t]);
 
   // 1. Chống chuyển tab
   useEffect(() => {
@@ -726,10 +742,10 @@ export default function AntiCheatExamPage() {
               setViolationCount(res.violationCount);
               const max = res.maxViolations || 3;
               if (res.shouldAutoSubmit) {
-                toast.error(`Bạn đã vi phạm quá ${max} lần. Hệ thống tự động nộp bài!`);
+                toast.error(t('violationExceeded', { max }));
                 submitExam(true);
               } else {
-                toast.warning(`Cảnh báo AI Vision (${res.violationCount}/${max}): bất thường camera`);
+                toast.warning(t('violationAiWarn', { count: res.violationCount, max }));
               }
             }
           },
@@ -740,7 +756,7 @@ export default function AntiCheatExamPage() {
       // Lỗi chụp/gửi frame — bỏ qua lần quét này, không chặn thi.
       return false;
     }
-  }, [attemptData, analyzeProctorFrameMutation, submitExam, getVideoOffsetSec]);
+  }, [attemptData, analyzeProctorFrameMutation, submitExam, getVideoOffsetSec, t]);
 
   // `sendProctorFrame` đổi identity mỗi khi học viên chọn đáp án (phụ thuộc submitExam → answers). Đưa
   // vào deps của 2 effect bên dưới từng làm chúng chạy lại mỗi lần chọn đáp án: effect nhận diện khuôn
@@ -871,10 +887,10 @@ export default function AntiCheatExamPage() {
           const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
           screenStreamRef.current = screenStream;
         } catch {
-          toast.warning('Bạn đã bỏ qua chia sẻ màn hình — bài thi vẫn tiếp tục, nhưng sẽ không có video bằng chứng để xem lại sau này.');
+          toast.warning(t('screenShareSkipped'));
         }
       } catch {
-        toast.error('Bạn phải cấp quyền sử dụng Camera & Micro để làm bài thi này!');
+        toast.error(t('permissionDenied'));
         startExamLockRef.current = false;
         return;
       }
@@ -886,9 +902,9 @@ export default function AntiCheatExamPage() {
         setAttemptData(data);
         if (!isTakingMode) {
           if (isProctored) {
-            toast.success('Bắt đầu làm bài. Vui lòng không chuyển tab!');
+            toast.success(t('startedProctored'));
           } else {
-            toast.success('Bắt đầu làm bài!');
+            toast.success(t('started'));
           }
         }
         let url = `/exam/${quizId}?mode=taking`;
@@ -898,15 +914,15 @@ export default function AntiCheatExamPage() {
       },
       onError: (err: unknown) => {
         if (err instanceof ApiError && (err.status === 404 || err.status === 500)) {
-          toast.error('Bài tập này đã được giảng viên gỡ bỏ hoặc cập nhật.');
+          toast.error(t('removedToast'));
         } else {
-          toast.error(err instanceof ApiError && err.message ? err.message : 'Không thể tải bài thi.');
+          toast.error(err instanceof ApiError && err.message ? err.message : t('loadQuizError'));
         }
         stopAllMedia();
         startExamLockRef.current = false;
       }
     });
-  }, [isProctored, quizId, startQuiz, stopAllMedia, proctoredParam, returnUrl, router, isTakingMode]);
+  }, [isProctored, quizId, startQuiz, stopAllMedia, proctoredParam, returnUrl, router, isTakingMode, t]);
 
   // Cập nhật isStarted dựa trên mode=taking và attemptData
   useEffect(() => {
@@ -950,7 +966,7 @@ export default function AntiCheatExamPage() {
       if (remainingSeconds <= 0) {
         if (timerRef.current) clearInterval(timerRef.current);
         setTimeLeft(0);
-        toast.warning('⏱ Hết giờ! Bài thi đã được tự động nộp.');
+        toast.warning(t('timeUp'));
         setTimeout(() => submitExam(true), 300);
       } else {
         setTimeLeft(remainingSeconds);
@@ -1006,7 +1022,7 @@ export default function AntiCheatExamPage() {
     const formatElapsed = (s: number) => {
       const m = Math.floor(s / 60);
       const sec = s % 60;
-      return m > 0 ? `${m} phút ${sec} giây` : `${sec} giây`;
+      return m > 0 ? t('elapsedMinSec', { m, s: sec }) : t('elapsedSec', { s: sec });
     };
     return (
       <div className="min-h-dvh bg-surface p-8">
@@ -1015,32 +1031,32 @@ export default function AntiCheatExamPage() {
           <div className={`card p-6 text-center mb-8 border-t-4 ${isPassed ? 'border-success' : 'border-danger'}`}>
             <div className={`text-4xl mb-2 ${isPassed ? '' : ''}`}>{isPassed ? '🎉' : '📝'}</div>
             <h2 className={`text-xl font-bold mb-1 ${isPassed ? 'text-success' : 'text-danger'}`}>
-              {isPassed ? 'Xuất sắc! Bài thi hoàn thành' : 'Bài thi đã nộp'}
+              {isPassed ? t('resultPassed') : t('resultSubmitted')}
             </h2>
             <div className={`text-3xl font-extrabold my-2 ${isPassed ? 'text-success' : 'text-danger'}`}>
               {Number(result.score).toFixed(2).replace(/\.?0+$/, '')}/10
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4 text-xs">
               <div className="bg-surface-hover rounded-xl p-3">
-                <div className="text-ink-muted text-xs font-semibold uppercase mb-1">Câu đúng</div>
+                <div className="text-ink-muted text-xs font-semibold uppercase mb-1">{t('statCorrect')}</div>
                 <div className="text-2xl font-bold text-success">{result.correctCount}</div>
               </div>
               <div className="bg-surface-hover rounded-xl p-3">
-                <div className="text-ink-muted text-xs font-semibold uppercase mb-1">Câu sai</div>
+                <div className="text-ink-muted text-xs font-semibold uppercase mb-1">{t('statWrong')}</div>
                 <div className="text-2xl font-bold text-danger">{result.totalQuestions - result.correctCount}</div>
               </div>
               <div className="bg-surface-hover rounded-xl p-3">
-                <div className="text-ink-muted text-xs font-semibold uppercase mb-1">Tổng câu</div>
+                <div className="text-ink-muted text-xs font-semibold uppercase mb-1">{t('statTotal')}</div>
                 <div className="text-2xl font-bold text-ink">{result.totalQuestions}</div>
               </div>
               <div className="bg-surface-hover rounded-xl p-3">
-                <div className="text-ink-muted text-xs font-semibold uppercase mb-1">Thời gian</div>
+                <div className="text-ink-muted text-xs font-semibold uppercase mb-1">{t('statTime')}</div>
                 <div className="text-sm font-bold text-ink">{formatElapsed(elapsedSeconds)}</div>
               </div>
             </div>
             {submitTime && (
               <p className="text-xs text-ink-muted mt-4">
-                📅 Nộp lúc: {submitTime.toLocaleString('vi-VN')}
+                {t('submittedAt', { time: submitTime.toLocaleString('vi-VN') })}
               </p>
             )}
             <div className="flex justify-center gap-4 mt-8 flex-wrap">
@@ -1054,7 +1070,7 @@ export default function AntiCheatExamPage() {
                 }}
                 className="bg-accent text-white px-6 py-2 rounded-lg font-semibold text-sm shadow-lg hover:bg-accent-hover transition"
               >
-                Quay lại khóa học
+                {t('backToCourse')}
               </button>
               <button
                 onClick={() => {
@@ -1063,13 +1079,13 @@ export default function AntiCheatExamPage() {
                 }}
                 className="bg-surface-hover text-ink px-6 py-2 rounded-lg font-semibold text-sm shadow-sm border border-line hover:bg-line transition"
               >
-                Trở về lịch sử bài thi
+                {t('backToHistory')}
               </button>
             </div>
           </div>
 
           <div className="space-y-4">
-            <h3 className="text-lg font-bold mb-2">Chi tiết bài làm (Socratic Tutor)</h3>
+            <h3 className="text-lg font-bold mb-2">{t('detailsTitle')}</h3>
             {(() => {
               const resPerPage = 5;
               const totalResPages = Math.ceil((result.details?.length || 0) / resPerPage);
@@ -1080,19 +1096,19 @@ export default function AntiCheatExamPage() {
                 {result.details?.slice(rStart, rEnd).map((detail, idx) => (
               <div key={detail.questionId} className={`card p-4 border-l-4 ${detail.isCorrect === null ? 'border-line bg-surface' : (detail.isCorrect ? 'border-success' : 'border-danger')}`}>
                 <div className="flex justify-between items-start mb-2">
-                  <h4 className="font-bold text-sm">Câu {rStart + idx + 1}</h4>
+                  <h4 className="font-bold text-sm">{t('questionN', { n: rStart + idx + 1 })}</h4>
                   {detail.isCorrect === true ? (
-                    <span className="text-success font-bold bg-success-tint px-2 py-0.5 rounded text-xs">Đúng ✓</span>
+                    <span className="text-success font-bold bg-success-tint px-2 py-0.5 rounded text-xs">{t('correctMark')}</span>
                   ) : detail.isCorrect === false ? (
-                    <span className="text-danger font-bold bg-danger/5 px-2 py-0.5 rounded text-xs">Sai ✕</span>
+                    <span className="text-danger font-bold bg-danger/5 px-2 py-0.5 rounded text-xs">{t('wrongMark')}</span>
                   ) : (
-                    <span className="text-ink-muted font-bold bg-surface-hover px-2 py-0.5 rounded border border-line text-xs">{detail.selectedOptionIds?.length ? 'Đã ghi nhận' : 'Bỏ trống'}</span>
+                    <span className="text-ink-muted font-bold bg-surface-hover px-2 py-0.5 rounded border border-line text-xs">{detail.selectedOptionIds?.length ? t('recorded') : t('blank')}</span>
                   )}
                 </div>
                 
                 {detail.topicTag && (
                   <div className="mb-2 inline-block bg-accent/10 text-accent font-semibold text-xs px-2 py-1 rounded-md">
-                    Chủ đề: {detail.topicTag}
+                    {t('topic', { topic: detail.topicTag })}
                   </div>
                 )}
                 <p className="mb-3 text-sm">{detail.content}</p>
@@ -1108,7 +1124,7 @@ export default function AntiCheatExamPage() {
 
                     return (
                       <div key={opt.id} className={style}>
-                        {opt.content} {isSelected && !isCorrect && "(Bạn chọn)"} {isCorrect && "(Đáp án đúng)"}
+                        {opt.content} {isSelected && !isCorrect && t('youChose')} {isCorrect && t('correctAnswer')}
                       </div>
                     );
                   })}
@@ -1122,7 +1138,7 @@ export default function AntiCheatExamPage() {
                           onClick={() => handleExplain(detail.questionId, detail.selectedOptionIds?.[0] || null)}
                           className="text-accent text-sm font-semibold hover:underline flex items-center gap-1"
                         >
-                          Hỏi Gia sư AI tại sao sai?
+                          {t('askTutor')}
                         </button>
                       )}
                       {detail.referenceLessonId && (
@@ -1132,15 +1148,15 @@ export default function AntiCheatExamPage() {
                           rel="noopener noreferrer"
                           className="text-accent text-sm font-semibold hover:underline flex items-center gap-1"
                         >
-                          Ôn tập lại lý thuyết ↗
+                          {t('reviewTheory')}
                         </a>
                       )}
                     </div>
                     {explanations[detail.questionId] && (
                       <div className="bg-accent/5 p-4 rounded-lg border border-accent/15">
                         <div className="flex items-center gap-2 font-bold text-accent-dark mb-2">
-                          <span>Gia sư AI giải thích:</span>
-                          {explanations[detail.questionId]?.loading && <span className="animate-pulse text-accent">Đang suy nghĩ...</span>}
+                          <span>{t('tutorExplains')}</span>
+                          {explanations[detail.questionId]?.loading && <span className="animate-pulse text-accent">{t('thinking')}</span>}
                         </div>
                         {explanations[detail.questionId]?.text && (
                           <div className="text-sm text-ink leading-relaxed">
@@ -1155,9 +1171,9 @@ export default function AntiCheatExamPage() {
             ))}
                 {totalResPages > 1 && (
                   <div className="flex justify-between items-center mt-4">
-                    <button disabled={resultPage === 1} onClick={() => setResultPage(p => p - 1)} className="px-4 py-1.5 border border-line rounded-lg text-sm font-semibold disabled:opacity-50">Trang trước</button>
+                    <button disabled={resultPage === 1} onClick={() => setResultPage(p => p - 1)} className="px-4 py-1.5 border border-line rounded-lg text-sm font-semibold disabled:opacity-50">{t('prevPage')}</button>
                     <span className="text-sm font-medium text-ink-muted">Trang {resultPage}/{totalResPages}</span>
-                    <button disabled={resultPage === totalResPages} onClick={() => setResultPage(p => p + 1)} className="px-4 py-1.5 border border-line rounded-lg text-sm font-semibold disabled:opacity-50">Trang sau</button>
+                    <button disabled={resultPage === totalResPages} onClick={() => setResultPage(p => p + 1)} className="px-4 py-1.5 border border-line rounded-lg text-sm font-semibold disabled:opacity-50">{t('nextPage')}</button>
                   </div>
                 )}
                 </>
@@ -1200,7 +1216,7 @@ export default function AntiCheatExamPage() {
       <div className="min-h-dvh bg-surface p-4 sm:p-8">
         <div className="max-w-5xl mx-auto mt-4 sm:mt-8">
           <div className="flex items-center gap-2 mb-6 flex-wrap">
-            <button onClick={() => router.push('/my-courses')} className="text-accent hover:underline text-sm font-semibold whitespace-nowrap">Khóa học của tôi</button>
+            <button onClick={() => router.push('/my-courses')} className="text-accent hover:underline text-sm font-semibold whitespace-nowrap">{t('myCourses')}</button>
             {title.split(' / ').map((part, idx, arr) => (
               <div key={idx} className="flex items-center gap-2">
                 <span className="text-ink-muted">/</span>
@@ -1224,7 +1240,7 @@ export default function AntiCheatExamPage() {
                 📝
               </div>
               <div>
-                <div className="text-xs text-ink-muted uppercase font-bold tracking-wider mb-1">Trắc Nghiệm {isProctored && '- Có giám sát Camera'}</div>
+                <div className="text-xs text-ink-muted uppercase font-bold tracking-wider mb-1">{isProctored ? t('quizTypeProctored') : t('quizType')}</div>
                 <h3 className="font-display font-bold text-ink text-2xl">{title}</h3>
               </div>
             </div>
@@ -1233,27 +1249,27 @@ export default function AntiCheatExamPage() {
               <div className="flex flex-col md:flex-row gap-8">
                 <div className="flex-1 space-y-4">
                   <div className="flex items-center gap-3">
-                    <span className="w-24 font-semibold text-ink-muted">Mở bài:</span>
-                    <span className="font-medium text-ink">{startTime ? new Date(startTime).toLocaleString('vi-VN') : 'Không giới hạn'}</span>
+                    <span className="w-24 font-semibold text-ink-muted">{t('opensAt')}</span>
+                    <span className="font-medium text-ink">{startTime ? new Date(startTime).toLocaleString('vi-VN') : t('unlimited')}</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="w-24 font-semibold text-ink-muted">Đóng bài:</span>
-                    <span className="font-medium text-ink">{endTime ? new Date(endTime).toLocaleString('vi-VN') : 'Không giới hạn'}</span>
+                    <span className="w-24 font-semibold text-ink-muted">{t('closesAt')}</span>
+                    <span className="font-medium text-ink">{endTime ? new Date(endTime).toLocaleString('vi-VN') : t('unlimited')}</span>
                   </div>
                 </div>
 
                 <div className="flex-1 space-y-4 border-t md:border-t-0 md:border-l border-line pt-4 md:pt-0 md:pl-8">
                   <div className="flex items-center gap-3">
-                    <span className="w-32 font-semibold text-ink-muted">Số câu:</span>
-                    <span className="font-medium text-ink">{questionCount || '...'} câu</span>
+                    <span className="w-32 font-semibold text-ink-muted">{t('questionCountLabel')}</span>
+                    <span className="font-medium text-ink">{questionCount ? t('questionCountValue', { count: questionCount }) : '...'}</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="w-32 font-semibold text-ink-muted">Thời gian:</span>
-                    <span className="font-medium text-ink">{duration ? `${duration} phút` : 'Không giới hạn'}</span>
+                    <span className="w-32 font-semibold text-ink-muted">{t('durationLabel')}</span>
+                    <span className="font-medium text-ink">{duration ? t('durationValue', { n: duration }) : t('unlimited')}</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="w-32 font-semibold text-ink-muted">Số lượt làm:</span>
-                    <span className="font-medium text-ink">{maxAttempts ? `${maxAttempts} lần` : 'Không giới hạn'}</span>
+                    <span className="w-32 font-semibold text-ink-muted">{t('attemptsLabel')}</span>
+                    <span className="font-medium text-ink">{maxAttempts ? t('attemptsValue', { n: maxAttempts }) : t('unlimited')}</span>
                   </div>
                 </div>
               </div>
@@ -1261,7 +1277,7 @@ export default function AntiCheatExamPage() {
               {isProctored && (
                 <div className="bg-danger/5 border border-danger/30 rounded-lg p-4 mt-6">
                   <p className="text-danger font-semibold text-sm flex items-center gap-2">
-                    Để thực hiện bài trắc nghiệm này bạn cần bật Camera để AI giám sát. Không được chuyển tab hay rời khỏi màn hình.
+                    {t('proctoredNote')}
                   </p>
                 </div>
               )}
@@ -1272,17 +1288,17 @@ export default function AntiCheatExamPage() {
             {highestAttempt && (
               <div className="mb-8 p-6 bg-success-tint border border-success/30 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
                 <div>
-                  <h3 className="text-success-ink font-extrabold text-xl">Điểm chính thức của bạn</h3>
-                  <p className="text-success-ink text-sm mt-1 font-medium">Hệ thống ghi nhận điểm cao nhất trong số các lần thi của bạn.</p>
+                  <h3 className="text-success-ink font-extrabold text-xl">{t('officialScore')}</h3>
+                  <p className="text-success-ink text-sm mt-1 font-medium">{t('officialNote')}</p>
                 </div>
                 <div className="text-left sm:text-right bg-surface-raised px-6 py-3 rounded-xl shadow-sm border border-success/30 min-w-[140px]">
                   <div className="text-3xl font-black text-success">{highestAttempt.correctCount} <span className="text-success text-xl">/ {highestAttempt.totalQuestions}</span></div>
-                  <div className="text-success-ink font-bold mt-1 text-sm">{Number(highestAttempt.score).toFixed(2).replace(/\.?0+$/, '')} điểm (Hệ 10)</div>
+                  <div className="text-success-ink font-bold mt-1 text-sm">{t('scorePoints', { score: Number(highestAttempt.score).toFixed(2).replace(/\.?0+$/, '') })}</div>
                 </div>
               </div>
             )}
 
-            <h3 className="text-xl font-bold text-ink mb-4">Tổng quan các lần làm bài trước của bạn</h3>
+            <h3 className="text-xl font-bold text-ink mb-4">{t('previousTitle')}</h3>
             <div className="overflow-hidden border border-line rounded-xl shadow-sm bg-surface">
               {/* (26/09/2026, sửa lỗi) — `overflow-x-auto` ở đây (thay vì chỉ `overflow-hidden`
                   ở khung ngoài) để bảng cuộn ngang được trên điện thoại thay vì bị bóp cột. */}
@@ -1290,17 +1306,17 @@ export default function AntiCheatExamPage() {
               <table className="w-full text-sm text-left">
                 <thead className="bg-surface-hover text-ink font-semibold border-b border-line">
                   <tr>
-                    <th className="px-6 py-4">Lần thi</th>
-                    <th className="px-6 py-4">Trạng thái</th>
-                    <th className="px-6 py-4 text-center">Kết quả</th>
-                    <th className="px-6 py-4 text-center">Xem lại</th>
+                    <th className="px-6 py-4">{t('colAttempt')}</th>
+                    <th className="px-6 py-4">{t('colStatus')}</th>
+                    <th className="px-6 py-4 text-center">{t('colResult')}</th>
+                    <th className="px-6 py-4 text-center">{t('colReview')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-line">
                   {sortedHistory.length === 0 ? (
                     <tr>
                       <td colSpan={4} className="px-6 py-8 text-center text-ink-muted">
-                        Bạn chưa có lượt làm bài nào cho bài thi này.
+                        {t('noAttempts')}
                       </td>
                     </tr>
                   ) : (
@@ -1318,19 +1334,19 @@ export default function AntiCheatExamPage() {
                         <tr key={h.id} className="hover:bg-surface-hover transition-colors">
                           <td className="px-6 py-4 font-bold text-ink">{index + 1}</td>
                           <td className="px-6 py-4">
-                            <div className="font-medium text-success">Đã xong</div>
-                            <div className="text-ink-muted text-xs mt-1">Đã nộp {formatSubmittedAt(h.submittedAt)}</div>
+                            <div className="font-medium text-success">{t('done')}</div>
+                            <div className="text-ink-muted text-xs mt-1">{t('submittedOn', { time: formatSubmittedAt(h.submittedAt) })}</div>
                           </td>
                           <td className="px-6 py-4 text-center">
-                            <div className="font-bold text-lg text-ink">{h.correctCount} / {h.totalQuestions} <span className="text-sm font-normal text-ink-muted">câu</span></div>
-                            <div className="text-xs font-semibold text-accent mt-1">{Number(h.score).toFixed(2).replace(/\.?0+$/, '')} điểm</div>
+                            <div className="font-bold text-lg text-ink">{h.correctCount} / {h.totalQuestions} <span className="text-sm font-normal text-ink-muted">{t('questionsUnit')}</span></div>
+                            <div className="text-xs font-semibold text-accent mt-1">{t('scoreShort', { score: Number(h.score).toFixed(2).replace(/\.?0+$/, '') })}</div>
                           </td>
                           <td className="px-6 py-4 text-center">
                             {h.allowReview === false ? (
-                              <span className="text-ink-muted text-sm font-semibold opacity-60 cursor-not-allowed" title="Bài thi không cho phép xem lại đáp án">Chỉ xem điểm</span>
+                              <span className="text-ink-muted text-sm font-semibold opacity-60 cursor-not-allowed" title={t('noReviewTitle')}>{t('scoreOnly')}</span>
                             ) : (
                               <Link href={`/exam/${quizId}/history?attemptId=${h.id}`} className="text-accent font-semibold hover:underline">
-                                Xem chi tiết
+                                {t('viewDetails')}
                               </Link>
                             )}
                           </td>
@@ -1351,27 +1367,27 @@ export default function AntiCheatExamPage() {
                 disabled={isStarting}
                 className="bg-accent hover:bg-accent-hover text-white font-bold py-3 px-8 rounded-full shadow-lg transition"
               >
-                {isStarting ? 'Đang chuẩn bị...' : 'Tiếp tục làm bài'}
+                {isStarting ? t('preparing') : t('continueAttempt')}
               </button>
             ) : isNotOpenYet ? (
               <div className="text-warning font-bold p-4 bg-streak-bg rounded-lg">
-                Bài thi chưa mở. Vui lòng quay lại sau.
+                {t('notOpen')}
               </div>
             ) : isClosed ? (
               <div className="text-danger font-bold p-4 bg-danger/5 rounded-lg">
-                Bài thi đã đóng. Bạn không thể làm bài nữa.
+                {t('closed')}
               </div>
             ) : isArchivedQuiz ? (
               <div className="text-danger font-bold p-4 bg-danger/5 rounded-lg border border-danger/30 shadow-sm text-center">
-                Bài thi này đã bị giảng viên thu hồi hoặc xóa.<br/>
-                <span className="text-sm font-normal">Bạn chỉ có thể xem lại lịch sử làm bài.</span>
+                {t('archivedQuiz')}<br/>
+                <span className="text-sm font-normal">{t('archivedHistoryOnly')}</span>
               </div>
             ) : !canStartNewAttempt ? (
               <button
                 disabled
                 className="bg-line text-ink-muted font-bold py-3 px-8 rounded-full cursor-not-allowed shadow-none"
               >
-                Đã hết số lượt làm bài ({completedCount}/{maxAtt})
+                {t('noAttemptsLeft', { done: completedCount, max: maxAtt })}
               </button>
             ) : (
               <button
@@ -1379,7 +1395,7 @@ export default function AntiCheatExamPage() {
                 disabled={(!isProctored ? false : !isModelLoaded) || isStarting}
                 className="bg-accent hover:bg-accent-hover text-white font-bold py-3 px-8 rounded-full shadow-lg transition disabled:opacity-50"
               >
-                {isStarting ? 'Đang chuẩn bị...' : (!isProctored ? 'Bắt đầu làm bài mới' : isModelLoaded ? 'Bật Camera & Bắt đầu thi' : 'Đang tải AI Model...')}
+                {isStarting ? t('preparing') : (!isProctored ? t('startNew') : isModelLoaded ? t('startWithCamera') : t('loadingModel'))}
               </button>
             )}
           </div>
@@ -1393,7 +1409,7 @@ export default function AntiCheatExamPage() {
     if (!attemptData) return;
     const answeredCount = Object.keys(answers).filter(k => answers[Number(k)] && (answers[Number(k)]?.length || 0) > 0).length;
     if (answeredCount < attemptData.questions.length) {
-      toast.warning('Vui lòng hoàn thành toàn bộ câu hỏi trước khi nộp');
+      toast.warning(t('completeAll'));
     }
     setReviewPage(1);
     setShowReviewConfirm(true);
@@ -1405,21 +1421,21 @@ export default function AntiCheatExamPage() {
       {isSubmitting && (
         <div role="alertdialog" aria-live="assertive" className="fixed inset-0 z-[200] flex cursor-wait flex-col items-center justify-center gap-4 bg-ink/70 text-white">
           <div className="h-10 w-10 animate-spin rounded-full border-4 border-white/30 border-t-white" />
-          <p className="text-lg font-bold">Đang nộp bài, vui lòng đợi...</p>
+          <p className="text-lg font-bold">{t('submittingWait')}</p>
         </div>
       )}
       <div className="shell max-w-4xl mx-auto">
         <div className="flex justify-between items-center mb-8 border-b border-line pb-4">
           <div>
             <h1 className="font-display text-2xl font-bold text-ink flex items-center gap-2">
-              {isProctored ? <><span className="text-danger">🔴</span> Phòng Thi Trực Tuyến (Có giám sát)</> : <>📄 Bài Thi Trắc Nghiệm</>}
+              {isProctored ? <><span className="text-danger">🔴</span> {t('roomProctored')}</> : <>📄 {t('roomPlain')}</>}
             </h1>
-            <p className="text-sm text-ink-muted mt-1">Mã đề thi: {quizId}</p>
+            <p className="text-sm text-ink-muted mt-1">{t('quizCode', { id: String(quizId) })}</p>
           </div>
           <div className="flex items-center gap-6">
             {isProctored && (
               <div className="text-right">
-                <div className="text-sm font-semibold text-ink-muted">Cảnh báo vi phạm</div>
+                <div className="text-sm font-semibold text-ink-muted">{t('violationLabel')}</div>
                 <div className={`text-xl font-bold ${violationCount >= (attemptData?.maxViolations || 3) - 1 ? 'text-danger' : 'text-warning'}`}>
                   {violationCount} / {attemptData?.maxViolations || 3}
                 </div>
@@ -1437,32 +1453,32 @@ export default function AntiCheatExamPage() {
           const answeredTotal = attemptData?.questions.filter(q => answers[q.id] && (answers[q.id]?.length || 0) > 0).length || 0;
           return (
           <div className="card p-5 max-w-2xl mx-auto w-full">
-            <h2 className="text-base font-bold mb-1 text-center">Xác nhận nộp bài</h2>
-            <p className="text-xs text-ink-muted text-center mb-3">Đã trả lời: <strong className={answeredTotal < totalQ ? 'text-danger' : 'text-success'}>{answeredTotal}/{totalQ}</strong> câu</p>
+            <h2 className="text-base font-bold mb-1 text-center">{t('confirmTitle')}</h2>
+            <p className="text-xs text-ink-muted text-center mb-3">{t.rich('answered', { done: answeredTotal, total: totalQ, b: (chunks) => <strong className={answeredTotal < totalQ ? 'text-danger' : 'text-success'}>{chunks}</strong> })}</p>
             <div className="space-y-1.5 mb-4">
               {attemptData?.questions.slice(reviewStart, reviewEnd).map((q, idx) => {
                 const isAnswered = answers[q.id] && (answers[q.id]?.length || 0) > 0;
                 return (
                   <div key={q.id} className={`py-2 px-3 border rounded flex items-center justify-between text-xs ${isAnswered ? 'bg-success-tint border-success/30' : 'bg-danger/5 border-danger/30'}`}>
-                    <span className="font-bold">Câu {reviewStart + idx + 1}</span>
-                    <span className="font-semibold">{isAnswered ? '✅ Đã trả lời' : '❌ Chưa trả lời'}</span>
+                    <span className="font-bold">{t('questionN', { n: reviewStart + idx + 1 })}</span>
+                    <span className="font-semibold">{isAnswered ? t('answeredMark') : t('unansweredMark')}</span>
                   </div>
                 );
               })}
             </div>
             {totalReviewPages > 1 && (
               <div className="flex justify-between items-center mb-4">
-                <button disabled={reviewPage === 1} onClick={() => setReviewPage(p => p - 1)} className="px-3 py-1 border border-line rounded text-xs font-semibold disabled:opacity-50">Trước</button>
+                <button disabled={reviewPage === 1} onClick={() => setReviewPage(p => p - 1)} className="px-3 py-1 border border-line rounded text-xs font-semibold disabled:opacity-50">{t('prev')}</button>
                 <span className="text-xs text-ink-muted">Trang {reviewPage}/{totalReviewPages}</span>
-                <button disabled={reviewPage === totalReviewPages} onClick={() => setReviewPage(p => p + 1)} className="px-3 py-1 border border-line rounded text-xs font-semibold disabled:opacity-50">Sau</button>
+                <button disabled={reviewPage === totalReviewPages} onClick={() => setReviewPage(p => p + 1)} className="px-3 py-1 border border-line rounded text-xs font-semibold disabled:opacity-50">{t('next')}</button>
               </div>
             )}
             <div className="flex flex-col gap-2 pt-3 border-t border-line">
               <button onClick={() => submitExam(false)} disabled={isSubmitting} className="w-full bg-accent text-white font-bold py-2.5 rounded-full hover:bg-accent-hover transition-colors shadow-lg text-sm">
-                {isSubmitting ? 'Đang nộp...' : 'Xác nhận nộp bài'}
+                {isSubmitting ? t('submitting') : t('confirmSubmit')}
               </button>
               <button onClick={() => setShowReviewConfirm(false)} className="w-full text-ink-muted font-semibold hover:text-ink text-xs py-1">
-                Quay lại bài thi
+                {t('backToExam')}
               </button>
             </div>
           </div>
@@ -1476,18 +1492,18 @@ export default function AntiCheatExamPage() {
               .map((q, idx) => (
               <div key={q.id} id={`question-${q.id}`} className="card p-6">
                 <div className="flex justify-between items-start mb-4">
-                  <h3 className="font-bold text-lg">Câu hỏi {(currentPage - 1) * questionsPerPage + idx + 1}</h3>
+                  <h3 className="font-bold text-lg">{t('questionHeading', { n: (currentPage - 1) * questionsPerPage + idx + 1 })}</h3>
                   <button 
                     onClick={() => setFlagged(prev => ({ ...prev, [q.id]: !prev[q.id] }))}
                     className={`text-xl ${flagged[q.id] ? 'text-danger' : 'text-line-soft hover:text-red-200'}`}
-                    title="Đánh dấu xem lại"
+                    title={t('flagForReview')}
                   >
                     🚩
                   </button>
                 </div>
                 <p className="text-sm mb-6">{q.content}</p>
 
-                {q.isMultipleChoice && <div className="text-sm text-ink-muted italic mb-4">(Chọn nhiều đáp án)</div>}
+                {q.isMultipleChoice && <div className="text-sm text-ink-muted italic mb-4">{t('multipleHint')}</div>}
                 <div className="space-y-3">
                   {q.options.map((opt) => {
                     const isSelected = answers[q.id]?.includes(opt.id);
@@ -1525,7 +1541,7 @@ export default function AntiCheatExamPage() {
                   onClick={() => setCurrentPage(p => p - 1)}
                   className="px-4 py-2 border border-line rounded-lg text-sm font-semibold disabled:opacity-50"
                 >
-                  Trang trước
+                  {t('prevPage')}
                 </button>
                 <span className="text-sm font-medium text-ink-muted">
                   Trang {currentPage} / {Math.ceil(attemptData.questions.length / questionsPerPage)}
@@ -1548,11 +1564,11 @@ export default function AntiCheatExamPage() {
                 <div className={`text-white text-xs font-bold p-2 text-center transition-colors ${faceStatus === 'DETECTING' ? 'bg-warning' :
                   faceStatus === 'FACE_FOUND' ? 'bg-success' : 'bg-danger animate-pulse'
                   }`}>
-                  {faceStatus === 'DETECTING' && 'Đang quét khuôn mặt...'}
-                  {faceStatus === 'FACE_FOUND' && 'Camera Giám Sát AI (Bình thường)'}
-                  {faceStatus === 'NO_FACE' && 'CẢNH BÁO: KHÔNG THẤY KHUÔN MẶT'}
-                  {faceStatus === 'MULTIPLE_FACES' && 'CẢNH BÁO: PHÁT HIỆN NHIỀU KHUÔN MẶT'}
-                  {faceStatus === 'HEAD_TURNED' && 'CẢNH BÁO: QUAY ĐẦU/NHÌN RA NGOÀI MÀN HÌNH'}
+                  {faceStatus === 'DETECTING' && t('faceDetecting')}
+                  {faceStatus === 'FACE_FOUND' && t('faceOk')}
+                  {faceStatus === 'NO_FACE' && t('faceNone')}
+                  {faceStatus === 'MULTIPLE_FACES' && t('faceMultiple')}
+                  {faceStatus === 'HEAD_TURNED' && t('faceTurned')}
                 </div>
                 <video
                   ref={videoRef}
@@ -1580,7 +1596,7 @@ export default function AntiCheatExamPage() {
               disabled={isSubmitting}
               className="bg-ink text-white font-bold py-3 rounded-xl hover:opacity-90 disabled:opacity-50 shadow-lg w-full"
             >
-              {isSubmitting ? 'Đang nộp...' : 'Nộp bài thi'}
+              {isSubmitting ? t('submitting') : t('submitExam')}
             </button>
 
             <div className="card p-3">
@@ -1617,16 +1633,16 @@ export default function AntiCheatExamPage() {
       </div>
 
       {archivedError.show && (
-        <Modal open onClose={() => router.push(returnUrl ? returnUrl : '/my-courses')} bare ariaLabel="Bài thi không còn khả dụng" role="alertdialog" closeOnBackdrop={false} className="bg-surface-raised rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
+        <Modal open onClose={() => router.push(returnUrl ? returnUrl : '/my-courses')} bare ariaLabel={t('unavailableTitle')} role="alertdialog" closeOnBackdrop={false} className="bg-surface-raised rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
             <div className="p-6">
-              <h3 className="text-xl font-bold mb-2">Bài thi không còn khả dụng</h3>
+              <h3 className="text-xl font-bold mb-2">{t('unavailableTitle')}</h3>
               <p className="text-ink-muted">{archivedError.message}</p>
               <div className="mt-6 flex justify-end">
                 <button
                   onClick={() => router.push(returnUrl ? returnUrl : '/my-courses')}
                   className="bg-accent text-white px-5 py-2.5 rounded-lg font-semibold shadow-lg hover:bg-accent-hover transition-colors"
                 >
-                  Quay lại khóa học
+                  {t('backToCourse')}
                 </button>
               </div>
             </div>

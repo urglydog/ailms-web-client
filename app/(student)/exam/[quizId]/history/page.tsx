@@ -1,6 +1,7 @@
 'use client';
 
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useState, useEffect, Suspense } from 'react';
 import { useQuizHistory, useAttemptDetail } from '@/hooks/useQuizzes';
 import { ApiError } from '@/lib/api/client';
@@ -10,6 +11,7 @@ import { Hash, Calendar, Trophy, CheckCheck, CheckCircle2, XCircle, MinusCircle,
 const ATTEMPTS_PER_PAGE = 20;
 
 function AttemptHistoryContent() {
+  const t = useTranslations('exam.history');
   const router = useRouter();
   const params = useParams();
   const searchParams = useSearchParams();
@@ -34,7 +36,7 @@ function AttemptHistoryContent() {
     setHistoryPage(1);
   }, [selectedAttemptId]);
 
-  if (!quizId) return <div className="p-8 text-center">Mã bài thi không hợp lệ</div>;
+  if (!quizId) return <div className="p-8 text-center">{t('invalidId')}</div>;
 
   const formatDate = (d: string | number[]) => {
     if (Array.isArray(d)) {
@@ -53,19 +55,19 @@ function AttemptHistoryContent() {
         {/* Header */}
         <div className="flex items-center justify-between border-b border-line pb-3 mb-4">
           <div>
-            <h1 className="text-lg font-bold">Lịch sử làm bài thi</h1>
+            <h1 className="text-lg font-bold">{t('title')}</h1>
             {currentAttempt && (
               <div className="flex items-center gap-3 text-xs text-ink-muted mt-0.5">
-                <Tooltip label="Lần">
+                <Tooltip label={t('attemptNo')}>
                   <span className="flex items-center gap-1"><Hash className="w-3.5 h-3.5" /> {currentAttemptIndex}</span>
                 </Tooltip>
-                <Tooltip label="Ngày nộp">
+                <Tooltip label={t('submittedAt')}>
                   <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> {formatDate(currentAttempt.submittedAt)}</span>
                 </Tooltip>
-                <Tooltip label="Điểm">
+                <Tooltip label={t('score')}>
                   <span className="flex items-center gap-1 text-accent font-bold"><Trophy className="w-3.5 h-3.5" /> {Number(currentAttempt.score).toFixed(2).replace(/\.?0+$/, '')}/10</span>
                 </Tooltip>
-                <Tooltip label="Số câu đúng">
+                <Tooltip label={t('correctCount')}>
                   <span className="flex items-center gap-1"><CheckCheck className="w-3.5 h-3.5" /> {currentAttempt.correctCount}/{currentAttempt.totalQuestions}</span>
                 </Tooltip>
               </div>
@@ -87,7 +89,7 @@ function AttemptHistoryContent() {
                   >
                     {pagedHistory.map((h, idx) => (
                       <option key={h.id} value={h.id}>
-                        Lần {history.length - (start + idx)} — {Number(h.score).toFixed(1)}/10 ({h.correctCount}/{h.totalQuestions} câu)
+                        {t('optionLabel', { n: history.length - (start + idx), score: Number(h.score).toFixed(1), correct: h.correctCount, total: h.totalQuestions })}
                       </option>
                     ))}
                   </select>
@@ -116,20 +118,20 @@ function AttemptHistoryContent() {
               );
             })()}
             <button onClick={() => router.back()} className="text-xs font-semibold text-accent hover:underline whitespace-nowrap">
-              ← Quay lại
+              {t('back')}
             </button>
           </div>
         </div>
 
         {historyError ? (
           <div className="bg-danger/5 text-danger p-4 rounded-md text-sm">
-            {historyError instanceof ApiError ? historyError.message : 'Có lỗi xảy ra khi tải lịch sử'}
+            {historyError instanceof ApiError ? historyError.message : t('loadError')}
           </div>
         ) : isLoadingHistory ? (
-          <div className="text-center text-ink-muted py-8 text-sm">Đang tải lịch sử...</div>
+          <div className="text-center text-ink-muted py-8 text-sm">{t('loading')}</div>
         ) : !history || history.length === 0 ? (
           <div className="text-center text-ink-muted py-8 bg-surface-raised border border-line rounded-md shadow-sm text-sm">
-            Bạn chưa có lượt làm bài nào cho bài thi này.
+            {t('empty')}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -138,7 +140,7 @@ function AttemptHistoryContent() {
               {selectedAttemptId ? (
                 isLoadingDetail ? (
                   <div className="bg-surface-raised border border-line rounded-lg p-8 text-center shadow-sm text-sm">
-                    Đang tải chi tiết bài làm...
+                    {t('loadingDetail')}
                   </div>
                 ) : attemptDetail ? (() => {
                   const totalHistPages = Math.ceil(attemptDetail.details.length / historyPerPage);
@@ -160,12 +162,12 @@ function AttemptHistoryContent() {
                             </span>
                             <span className="text-ink">{q.content}</span>
                             {q.isCorrect === true
-                              ? <span className="ml-auto flex items-center gap-1 text-success text-[10px] font-bold whitespace-nowrap"><CheckCircle2 className="w-3 h-3" /> Đúng</span>
+                              ? <span className="ml-auto flex items-center gap-1 text-success text-[10px] font-bold whitespace-nowrap"><CheckCircle2 className="w-3 h-3" /> {t('correct')}</span>
                               : q.isCorrect === false && hasAnswer
-                                ? <span className="ml-auto flex items-center gap-1 text-danger text-[10px] font-bold whitespace-nowrap"><XCircle className="w-3 h-3" /> Sai</span>
+                                ? <span className="ml-auto flex items-center gap-1 text-danger text-[10px] font-bold whitespace-nowrap"><XCircle className="w-3 h-3" /> {t('wrong')}</span>
                                 : q.isCorrect === false && !hasAnswer
-                                  ? <span className="ml-auto flex items-center gap-1 text-danger text-[10px] font-bold whitespace-nowrap"><MinusCircle className="w-3 h-3" /> Bỏ trống</span>
-                                  : <span className="ml-auto text-ink-muted text-[10px] font-bold whitespace-nowrap">{hasAnswer ? 'Đã trả lời' : 'Bỏ trống'}</span>
+                                  ? <span className="ml-auto flex items-center gap-1 text-danger text-[10px] font-bold whitespace-nowrap"><MinusCircle className="w-3 h-3" /> {t('blank')}</span>
+                                  : <span className="ml-auto text-ink-muted text-[10px] font-bold whitespace-nowrap">{hasAnswer ? t('answered') : t('blank')}</span>
                             }
                           </h3>
 
@@ -211,21 +213,21 @@ function AttemptHistoryContent() {
                     })}
                     {totalHistPages > 1 && (
                       <div className="flex justify-between items-center mt-3 pt-3 border-t border-line">
-                        <button disabled={historyPage === 1} onClick={() => setHistoryPage(p => p - 1)} className="px-3 py-1 border border-line rounded text-xs font-semibold disabled:opacity-50">Trang trước</button>
-                        <span className="text-xs text-ink-muted">Trang {historyPage}/{totalHistPages}</span>
-                        <button disabled={historyPage === totalHistPages} onClick={() => setHistoryPage(p => p + 1)} className="px-3 py-1 border border-line rounded text-xs font-semibold disabled:opacity-50">Trang sau</button>
+                        <button disabled={historyPage === 1} onClick={() => setHistoryPage(p => p - 1)} className="px-3 py-1 border border-line rounded text-xs font-semibold disabled:opacity-50">{t('prevPage')}</button>
+                        <span className="text-xs text-ink-muted">{t('pageOf', { page: historyPage, total: totalHistPages })}</span>
+                        <button disabled={historyPage === totalHistPages} onClick={() => setHistoryPage(p => p + 1)} className="px-3 py-1 border border-line rounded text-xs font-semibold disabled:opacity-50">{t('nextPage')}</button>
                       </div>
                     )}
                   </div>
                   );
                 })() : (
                   <div className="bg-surface-raised border border-line rounded-lg p-8 text-center text-danger shadow-sm text-sm">
-                    Không tải được chi tiết
+                    {t('detailError')}
                   </div>
                 )
               ) : (
                 <div className="bg-surface border border-line border-dashed rounded-lg p-12 text-center text-ink-muted flex flex-col items-center justify-center h-full min-h-[300px] text-sm">
-                  <p>Chọn một lần làm bài để xem chi tiết</p>
+                  <p>{t('pickAttempt')}</p>
                 </div>
               )}
             </div>
@@ -235,7 +237,7 @@ function AttemptHistoryContent() {
               {attemptDetail && (
                 <div className="sticky top-24 w-full flex flex-col gap-3" style={{ maxHeight: "calc(100vh - 7rem)", overflowY: "auto" }}>
                   <div className="card p-3 shadow-lg border border-line">
-                    <h4 className="text-xs font-bold mb-2 text-center text-ink-muted">Ma trận kết quả</h4>
+                    <h4 className="text-xs font-bold mb-2 text-center text-ink-muted">{t('matrix')}</h4>
                     <div className="grid grid-cols-5 gap-2">
                       {attemptDetail.details.map((q, idx) => {
                         const isCorrect = q.isCorrect;
@@ -272,9 +274,14 @@ function AttemptHistoryContent() {
   );
 }
 
+function AttemptHistoryFallback() {
+  const t = useTranslations('exam.history');
+  return <div className="p-8 text-center">{t('loadingShort')}</div>;
+}
+
 export default function AttemptHistoryPage() {
   return (
-    <Suspense fallback={<div className="p-8 text-center">Đang tải...</div>}>
+    <Suspense fallback={<AttemptHistoryFallback />}>
       <AttemptHistoryContent />
     </Suspense>
   );
