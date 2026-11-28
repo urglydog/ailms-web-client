@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
+import { TableErrorRow } from '@/components/admin/ui/TableErrorRow';
 import { useTutorSecurityFlags } from '@/hooks/useTutorSecurity';
 
 const PAGE_SIZE = 20;
@@ -14,7 +15,7 @@ export function TutorSecurityFlagsManager() {
   const t = useTranslations('admin.tutorSec');
   const locale = useLocale();
   const [page, setPage] = useState(0);
-  const { data, isLoading } = useTutorSecurityFlags({ page, size: PAGE_SIZE });
+  const { data, isLoading, isError, refetch } = useTutorSecurityFlags({ page, size: PAGE_SIZE });
   const flags = data?.content ?? [];
 
   return (
@@ -36,7 +37,8 @@ export function TutorSecurityFlagsManager() {
                 <td colSpan={5} className="px-6 py-6 text-center text-ink-muted">{t('loading')}</td>
               </tr>
             )}
-            {!isLoading && flags.length === 0 && (
+            {isError && <TableErrorRow colSpan={5} onRetry={() => void refetch()} />}
+            {!isError && !isLoading && flags.length === 0 && (
               <tr>
                 <td colSpan={5} className="px-6 py-6 text-center text-ink-muted">
                   {t('empty')}

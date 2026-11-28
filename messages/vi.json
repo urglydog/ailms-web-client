@@ -3113,6 +3113,10 @@
           }
         }
       }
+    },
+    "common": {
+      "loadError": "Không tải được dữ liệu. Vui lòng thử lại.",
+      "retry": "Thử lại"
     }
   },
   "supportHelp": {

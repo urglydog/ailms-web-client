@@ -10,6 +10,7 @@ import {
   useVoiceMappings,
 } from '@/hooks/useVoiceMappings';
 import { ApiError } from '@/lib/api/client';
+import { TableErrorRow } from '@/components/admin/ui/TableErrorRow';
 import type { VoiceMapping } from '@/types/domain';
 
 /**
@@ -21,7 +22,7 @@ import type { VoiceMapping } from '@/types/domain';
 export function VoiceMappingManager() {
   const t = useTranslations('admin.voices');
   const [pendingDelete, setPendingDelete] = useState<VoiceMapping | null>(null);
-  const { data: voices, isLoading } = useVoiceMappings();
+  const { data: voices, isLoading, isError, refetch } = useVoiceMappings();
   const createVoice = useCreateVoiceMapping();
   const updateVoice = useUpdateVoiceMapping();
   const deleteVoice = useDeleteVoiceMapping();
@@ -146,7 +147,8 @@ export function VoiceMappingManager() {
                 </td>
               </tr>
             )}
-            {!isLoading && voices?.length === 0 && (
+            {isError && <TableErrorRow colSpan={6} onRetry={() => void refetch()} />}
+            {!isError && !isLoading && voices?.length === 0 && (
               <tr>
                 <td colSpan={6} className="px-6 py-6 text-center text-ink-muted">
                   {t('empty')}

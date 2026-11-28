@@ -3113,6 +3113,10 @@
           }
         }
       }
+    },
+    "common": {
+      "loadError": "无法加载数据，请重试。",
+      "retry": "重试"
     }
   },
   "supportHelp": {

@@ -9,6 +9,7 @@ import { ListSearch } from '@/components/ui/ListSearch';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useCreateSystemAnnouncement, useDeleteSystemAnnouncement, useRestoreSystemAnnouncement, useRevokeSystemAnnouncement, useSystemAnnouncements, useUpdateSystemAnnouncement } from '@/hooks/useSystemAnnouncements';
 import { ApiError } from '@/lib/api/client';
+import { TableErrorRow } from '@/components/admin/ui/TableErrorRow';
 import type { AnnouncementAudience, AnnouncementSeverity, CreateSystemAnnouncementReq, SystemAnnouncement } from '@/types/domain';
 
 const PAGE = 10;
@@ -32,7 +33,7 @@ export function SystemAnnouncementManager() {
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebounce(search, 350);
   const [limit, setLimit] = useState(PAGE);
-  const { data: announcements, isLoading } = useSystemAnnouncements(debouncedSearch, limit);
+  const { data: announcements, isLoading, isError, refetch } = useSystemAnnouncements(debouncedSearch, limit);
   const createAnnouncement = useCreateSystemAnnouncement();
   const updateAnnouncement = useUpdateSystemAnnouncement();
   const revokeAnnouncement = useRevokeSystemAnnouncement();
@@ -234,7 +235,8 @@ export function SystemAnnouncementManager() {
                 <td colSpan={7} className="px-6 py-6 text-center text-ink-muted">{t('loading')}</td>
               </tr>
             )}
-            {!isLoading && announcements?.length === 0 && (
+            {isError && <TableErrorRow colSpan={7} onRetry={() => void refetch()} />}
+            {!isError && !isLoading && announcements?.length === 0 && (
               <tr>
                 <td colSpan={7} className="px-6 py-6 text-center text-ink-muted">{t('empty')}</td>
               </tr>

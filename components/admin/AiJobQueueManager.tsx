@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { ConfirmDialog } from '@/components/admin/ui/ConfirmDialog';
+import { TableErrorRow } from '@/components/admin/ui/TableErrorRow';
 import { ListSearch } from '@/components/ui/ListSearch';
 import { Pager } from '@/components/ui/SearchPanel';
 import { useAiJobs, useRetryAiJob } from '@/hooks/useAiJobs';
@@ -46,7 +47,7 @@ export function AiJobQueueManager() {
   const [page, setPage] = useState(0);
   const [confirming, setConfirming] = useState<AiJobSummary | null>(null);
 
-  const { data, isLoading } = useAiJobs({
+  const { data, isLoading, isError, refetch } = useAiJobs({
     view: view === 'ATTENTION' ? 'ATTENTION' : undefined,
     status: view === 'ATTENTION' || view === 'ALL' ? undefined : view,
     search: debouncedSearch || undefined,
@@ -110,6 +111,7 @@ export function AiJobQueueManager() {
             {isLoading && !data && (
               <tr><td colSpan={8} className="px-6 py-6 text-center text-ink-muted">Đang tải...</td></tr>
             )}
+            {isError && !data && <TableErrorRow colSpan={8} onRetry={() => void refetch()} />}
             {data && data.content.length === 0 && (
               <tr>
                 <td colSpan={8} className="px-6 py-8 text-center text-ink-muted">

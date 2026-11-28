@@ -8,12 +8,13 @@ import { Pager } from '@/components/ui/SearchPanel';
 import { useListControls } from '@/hooks/useListControls';
 import { useCategories, useCreateCategory, useDeleteCategory, useUpdateCategory } from '@/hooks/useCategories';
 import { ApiError } from '@/lib/api/client';
+import { TableErrorRow } from '@/components/admin/ui/TableErrorRow';
 import type { Category } from '@/types/domain';
 
 export function CategoryManager() {
   const t = useTranslations('admin.categories');
   const [pendingDelete, setPendingDelete] = useState<Category | null>(null);
-  const { data: categories, isLoading } = useCategories();
+  const { data: categories, isLoading, isError, refetch } = useCategories();
   const list = useListControls(categories, { pageSize: 10, match: (c, q) => c.name.toLowerCase().includes(q) || c.slug.toLowerCase().includes(q) });
   const createCategory = useCreateCategory();
   const updateCategory = useUpdateCategory();
@@ -87,7 +88,8 @@ export function CategoryManager() {
                 </td>
               </tr>
             )}
-            {!isLoading && categories?.length === 0 && (
+            {isError && <TableErrorRow colSpan={3} onRetry={() => void refetch()} />}
+            {!isError && !isLoading && categories?.length === 0 && (
               <tr>
                 <td colSpan={3} className="px-6 py-6 text-center text-ink-muted">
                   {t('empty')}

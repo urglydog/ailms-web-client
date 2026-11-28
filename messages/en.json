@@ -3113,6 +3113,10 @@
           }
         }
       }
+    },
+    "common": {
+      "loadError": "Could not load data. Please try again.",
+      "retry": "Retry"
     }
   },
   "supportHelp": {
