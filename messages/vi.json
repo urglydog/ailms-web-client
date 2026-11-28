@@ -3616,6 +3616,51 @@
           "UNKNOWN": "chưa rõ nguyên nhân"
         }
       }
+    },
+    "promotions": {
+      "title": "Quảng bá khóa học",
+      "subtitle": "Duyệt đăng ký quảng bá của giảng viên. Khóa được duyệt xuất hiện ở kệ \"Được đề xuất\" trong khung thời gian bạn chọn.",
+      "status": {
+        "REQUESTED": "Chờ duyệt",
+        "APPROVED": "Đã duyệt",
+        "REJECTED": "Bị từ chối",
+        "CANCELLED": "Đã hủy",
+        "ENDED": "Đã kết thúc"
+      },
+      "placement": {
+        "HOME_FEATURED": "Kệ \"Được đề xuất\" trang chủ",
+        "CATEGORY_FEATURED": "Đầu trang danh mục"
+      },
+      "toast": {
+        "failed": "Thao tác không thành công.",
+        "approved": "Đã duyệt, khóa học sẽ lên kệ ngay.",
+        "rejected": "Đã từ chối đăng ký.",
+        "ended": "Đã gỡ quảng bá, giảng viên sẽ nhận được thông báo."
+      },
+      "search": "Tìm đăng ký quảng bá",
+      "searchPh": "Tên khóa học, tên hoặc email giảng viên...",
+      "statusLabel": "Trạng thái",
+      "all": "Tất cả",
+      "loadError": "Không tải được danh sách.",
+      "empty": "Không có đăng ký nào.",
+      "running": "Đang chạy",
+      "requestNote": "Ghi chú của giảng viên: {note}",
+      "adminNote": "Ghi chú quản trị: {note}",
+      "estimate": "Ước tính: {during} đơn ({revDuring}) khi chạy so với {before} đơn ({revBefore}) khoảng bằng nhau trước đó.",
+      "approve": "Duyệt",
+      "reject": "Từ chối",
+      "end": "Gỡ quảng bá",
+      "dlg": {
+        "approveTitle": "Duyệt quảng bá",
+        "endTitle": "Gỡ quảng bá",
+        "rejectTitle": "Từ chối đăng ký",
+        "cancel": "Hủy",
+        "confirm": "Xác nhận",
+        "endAt": "Kết thúc lúc *",
+        "endHint": "Bắt đầu ngay khi duyệt; tối đa 90 ngày.",
+        "note": "Ghi chú (không bắt buộc)",
+        "reason": "Lý do * (giảng viên sẽ nhận được nội dung này)"
+      }
     }
   },
   "supportHelp": {

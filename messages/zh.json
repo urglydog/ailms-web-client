@@ -3616,6 +3616,51 @@
           "UNKNOWN": "原因不明"
         }
       }
+    },
+    "promotions": {
+      "title": "课程推广",
+      "subtitle": "审核讲师的推广申请。获批课程会在您选择的时间段内出现在“推荐”栏位。",
+      "status": {
+        "REQUESTED": "待审核",
+        "APPROVED": "已批准",
+        "REJECTED": "已拒绝",
+        "CANCELLED": "已取消",
+        "ENDED": "已结束"
+      },
+      "placement": {
+        "HOME_FEATURED": "首页“推荐”栏位",
+        "CATEGORY_FEATURED": "分类页顶部"
+      },
+      "toast": {
+        "failed": "操作未成功。",
+        "approved": "已批准，课程将立即上架。",
+        "rejected": "已拒绝申请。",
+        "ended": "已撤下推广，讲师将收到通知。"
+      },
+      "search": "搜索推广申请",
+      "searchPh": "课程名称、讲师姓名或邮箱...",
+      "statusLabel": "状态",
+      "all": "全部",
+      "loadError": "无法加载列表。",
+      "empty": "没有申请。",
+      "running": "进行中",
+      "requestNote": "讲师备注：{note}",
+      "adminNote": "管理员备注：{note}",
+      "estimate": "估算：推广期间 {during} 笔订单（{revDuring}），之前同等时长 {before} 笔订单（{revBefore}）。",
+      "approve": "批准",
+      "reject": "拒绝",
+      "end": "撤下推广",
+      "dlg": {
+        "approveTitle": "批准推广",
+        "endTitle": "撤下推广",
+        "rejectTitle": "拒绝申请",
+        "cancel": "取消",
+        "confirm": "确认",
+        "endAt": "结束时间 *",
+        "endHint": "批准后立即开始；最长 90 天。",
+        "note": "备注（可选）",
+        "reason": "原因 *（讲师会收到此内容）"
+      }
     }
   },
   "supportHelp": {

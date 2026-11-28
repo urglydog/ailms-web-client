@@ -3616,6 +3616,51 @@
           "UNKNOWN": "unknown cause"
         }
       }
+    },
+    "promotions": {
+      "title": "Course promotions",
+      "subtitle": "Review instructors' promotion requests. Approved courses appear on the \"Featured\" shelf during the window you choose.",
+      "status": {
+        "REQUESTED": "Awaiting approval",
+        "APPROVED": "Approved",
+        "REJECTED": "Rejected",
+        "CANCELLED": "Cancelled",
+        "ENDED": "Ended"
+      },
+      "placement": {
+        "HOME_FEATURED": "Home page \"Featured\" shelf",
+        "CATEGORY_FEATURED": "Top of category page"
+      },
+      "toast": {
+        "failed": "The action did not succeed.",
+        "approved": "Approved; the course goes on the shelf right away.",
+        "rejected": "Request rejected.",
+        "ended": "Promotion removed; the instructor will be notified."
+      },
+      "search": "Search promotion requests",
+      "searchPh": "Course title, instructor name or email...",
+      "statusLabel": "Status",
+      "all": "All",
+      "loadError": "Could not load the list.",
+      "empty": "No requests.",
+      "running": "Running",
+      "requestNote": "Instructor note: {note}",
+      "adminNote": "Admin note: {note}",
+      "estimate": "Estimate: {during} orders ({revDuring}) while running vs {before} orders ({revBefore}) in the equal period before.",
+      "approve": "Approve",
+      "reject": "Reject",
+      "end": "Remove promotion",
+      "dlg": {
+        "approveTitle": "Approve promotion",
+        "endTitle": "Remove promotion",
+        "rejectTitle": "Reject request",
+        "cancel": "Cancel",
+        "confirm": "Confirm",
+        "endAt": "Ends at *",
+        "endHint": "Starts as soon as it is approved; up to 90 days.",
+        "note": "Note (optional)",
+        "reason": "Reason * (the instructor will receive this)"
+      }
     }
   },
   "supportHelp": {

@@ -3616,6 +3616,51 @@
           "UNKNOWN": "原因不明"
         }
       }
+    },
+    "promotions": {
+      "title": "コースの宣伝",
+      "subtitle": "講師の宣伝申請を審査します。承認されたコースは、選択した期間中「おすすめ」棚に表示されます。",
+      "status": {
+        "REQUESTED": "承認待ち",
+        "APPROVED": "承認済み",
+        "REJECTED": "却下",
+        "CANCELLED": "キャンセル",
+        "ENDED": "終了"
+      },
+      "placement": {
+        "HOME_FEATURED": "トップページの「おすすめ」棚",
+        "CATEGORY_FEATURED": "カテゴリページの上部"
+      },
+      "toast": {
+        "failed": "操作に失敗しました。",
+        "approved": "承認しました。コースはすぐに棚に並びます。",
+        "rejected": "申請を却下しました。",
+        "ended": "宣伝を取り下げました。講師に通知されます。"
+      },
+      "search": "宣伝申請を検索",
+      "searchPh": "コース名、講師名またはメール...",
+      "statusLabel": "ステータス",
+      "all": "すべて",
+      "loadError": "一覧を読み込めませんでした。",
+      "empty": "申請はありません。",
+      "running": "実施中",
+      "requestNote": "講師のメモ：{note}",
+      "adminNote": "管理者のメモ：{note}",
+      "estimate": "推定：実施中 {during} 件（{revDuring}）、直前の同期間 {before} 件（{revBefore}）。",
+      "approve": "承認",
+      "reject": "却下",
+      "end": "宣伝を取り下げ",
+      "dlg": {
+        "approveTitle": "宣伝を承認",
+        "endTitle": "宣伝を取り下げ",
+        "rejectTitle": "申請を却下",
+        "cancel": "キャンセル",
+        "confirm": "確定",
+        "endAt": "終了日時 *",
+        "endHint": "承認と同時に開始。最長 90 日。",
+        "note": "メモ（任意）",
+        "reason": "理由 *（講師に送信されます）"
+      }
     }
   },
   "supportHelp": {

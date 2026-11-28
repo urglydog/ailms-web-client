@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { PageHeader } from '@/components/instructor/ui/PageHeader';
@@ -12,12 +13,7 @@ import { ApiError } from '@/lib/api/client';
 import { adminPromotionsApi } from '@/lib/api/promotions';
 import { getAccessToken } from '@/lib/auth/token';
 import { dateTime, money } from '@/lib/finance';
-import {
-  PROMOTION_PLACEMENT_LABEL,
-  PROMOTION_STATUS_LABEL,
-  type PromotionRes,
-  type PromotionStatus,
-} from '@/types/promotion';
+import type { PromotionRes, PromotionStatus } from '@/types/promotion';
 
 const STATUSES: PromotionStatus[] = ['REQUESTED', 'APPROVED', 'ENDED', 'REJECTED', 'CANCELLED'];
 type Dialog = { kind: 'approve' | 'reject' | 'end'; promotion: PromotionRes };
@@ -34,6 +30,7 @@ function toLocalInput(date: Date): string {
  * bằng nhau ngay trước đó), không phải quy kết chính xác.
  */
 export default function AdminPromotionsPage() {
+  const t = useTranslations('admin.promotions');
   const queryClient = useQueryClient();
   const [statusFilter, setStatusFilter] = useState<PromotionStatus | 'ALL'>('REQUESTED');
   const [dialog, setDialog] = useState<Dialog | null>(null);
@@ -47,7 +44,7 @@ export default function AdminPromotionsPage() {
   });
 
   const refresh = () => queryClient.invalidateQueries({ queryKey: ['admin', 'promotions'] });
-  const onError = (err: unknown) => toast.error(err instanceof ApiError ? err.message : 'Thao tác không thành công.');
+  const onError = (err: unknown) => toast.error(err instanceof ApiError ? err.message : t('toast.failed'));
   const closeDialog = () => {
     setDialog(null);
     setNote('');
@@ -57,17 +54,17 @@ export default function AdminPromotionsPage() {
   const approve = useMutation({
     mutationFn: (v: { id: number; endAt: string; note: string }) =>
       adminPromotionsApi.approve(v.id, { endAt: v.endAt, note: v.note || undefined }),
-    onSuccess: () => { toast.success('Đã duyệt, khóa học sẽ lên kệ ngay.'); closeDialog(); refresh(); },
+    onSuccess: () => { toast.success(t('toast.approved')); closeDialog(); refresh(); },
     onError,
   });
   const reject = useMutation({
     mutationFn: (v: { id: number; reason: string }) => adminPromotionsApi.reject(v.id, v.reason),
-    onSuccess: () => { toast.success('Đã từ chối đăng ký.'); closeDialog(); refresh(); },
+    onSuccess: () => { toast.success(t('toast.rejected')); closeDialog(); refresh(); },
     onError,
   });
   const end = useMutation({
     mutationFn: (v: { id: number; reason: string }) => adminPromotionsApi.end(v.id, v.reason),
-    onSuccess: () => { toast.success('Đã gỡ quảng bá, giảng viên sẽ nhận được thông báo.'); closeDialog(); refresh(); },
+    onSuccess: () => { toast.success(t('toast.ended')); closeDialog(); refresh(); },
     onError,
   });
 
@@ -99,31 +96,31 @@ export default function AdminPromotionsPage() {
   return (
     <>
       <PageHeader
-        title="Quảng bá khóa học"
-        subtitle="Duyệt đăng ký quảng bá của giảng viên. Khóa được duyệt xuất hiện ở kệ &quot;Được đề xuất&quot; trong khung thời gian bạn chọn."
+        title={t('title')}
+        subtitle={t('subtitle')}
       />
 
       <div className="flex flex-wrap items-end gap-4 rounded-xl border border-line bg-surface-raised p-4">
         <label className="flex min-w-0 flex-1 flex-col gap-1.5 sm:min-w-64">
-          <span className="text-xs font-semibold text-ink-muted">Tìm đăng ký quảng bá</span>
+          <span className="text-xs font-semibold text-ink-muted">{t('search')}</span>
           <input
             type="search"
             value={list.query}
             onChange={(e) => list.setQuery(e.target.value)}
-            placeholder="Tên khóa học, tên hoặc email giảng viên..."
+            placeholder={t('searchPh')}
             className="w-full rounded-lg border border-line bg-surface-raised p-2.5 text-sm text-ink outline-none focus:border-accent"
           />
         </label>
         <label className="flex w-full flex-col gap-1.5 sm:w-64">
-          <span className="text-xs font-semibold text-ink-muted">Trạng thái</span>
+          <span className="text-xs font-semibold text-ink-muted">{t('statusLabel')}</span>
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as PromotionStatus | 'ALL')}
             className="w-full rounded-lg border border-line bg-surface-raised p-2.5 text-sm text-ink outline-none focus:border-accent"
           >
-            <option value="ALL">Tất cả</option>
+            <option value="ALL">{t('all')}</option>
             {STATUSES.map((s) => (
-              <option key={s} value={s}>{PROMOTION_STATUS_LABEL[s]}</option>
+              <option key={s} value={s}>{t(`status.${s}`)}</option>
             ))}
           </select>
         </label>
@@ -136,9 +133,9 @@ export default function AdminPromotionsPage() {
           ))}
         </div>
       ) : isError ? (
-        <div role="alert" className="rounded-xl border border-danger/40 bg-danger/5 p-6 text-center text-danger">Không tải được danh sách.</div>
+        <div role="alert" className="rounded-xl border border-danger/40 bg-danger/5 p-6 text-center text-danger">{t('loadError')}</div>
       ) : list.total === 0 ? (
-        <div className="rounded-xl border border-line bg-surface-raised p-8 text-center text-ink-muted">Không có đăng ký nào.</div>
+        <div className="rounded-xl border border-line bg-surface-raised p-8 text-center text-ink-muted">{t('empty')}</div>
       ) : (
         <ul className="m-0 flex list-none flex-col gap-3 p-0">
           {rows.map((p) => (
@@ -147,40 +144,40 @@ export default function AdminPromotionsPage() {
                 <div className="min-w-0">
                   <div className="truncate font-semibold text-ink">{p.courseTitle}</div>
                   <div className="text-xs text-ink-muted">
-                    {p.instructorName} · {p.instructorEmail} · {PROMOTION_PLACEMENT_LABEL[p.placement]}
+                    {p.instructorName} · {p.instructorEmail} · {t(`placement.${p.placement}`)}
                   </div>
                 </div>
                 <span className="flex items-center gap-2">
-                  {p.active && <span className="rounded-full bg-tint px-2.5 py-1 text-xs font-bold text-accent-dark">Đang chạy</span>}
-                  <span className="rounded-full border border-line px-2.5 py-1 text-xs font-medium text-ink">{PROMOTION_STATUS_LABEL[p.status]}</span>
+                  {p.active && <span className="rounded-full bg-tint px-2.5 py-1 text-xs font-bold text-accent-dark">{t('running')}</span>}
+                  <span className="rounded-full border border-line px-2.5 py-1 text-xs font-medium text-ink">{t(`status.${p.status}`)}</span>
                 </span>
               </div>
-              {p.requestNote && <div className="text-sm text-ink">Ghi chú của giảng viên: {p.requestNote}</div>}
+              {p.requestNote && <div className="text-sm text-ink">{t('requestNote', { note: p.requestNote })}</div>}
               {p.startAt && p.endAt && (
                 <div className="text-xs text-ink-muted">
-                  {dateTime(p.startAt)} → {dateTime(p.endAt)} 
+                  {dateTime(p.startAt)} → {dateTime(p.endAt)}
                 </div>
               )}
               {(p.status === 'APPROVED' || p.status === 'ENDED') && (
                 <div className="text-xs text-ink-muted">
-                  Ước tính: {p.ordersDuring} đơn ({money(p.revenueDuring)}) khi chạy so với {p.ordersBefore} đơn ({money(p.revenueBefore)}) khoảng bằng nhau trước đó.
+                  {t('estimate', { during: p.ordersDuring, revDuring: money(p.revenueDuring), before: p.ordersBefore, revBefore: money(p.revenueBefore) })}
                 </div>
               )}
-              {p.adminNote && <div className="text-xs text-ink">Ghi chú quản trị: {p.adminNote}</div>}
+              {p.adminNote && <div className="text-xs text-ink">{t('adminNote', { note: p.adminNote })}</div>}
               <div className="flex flex-wrap gap-2">
                 {p.status === 'REQUESTED' && (
                   <>
                     <button type="button" disabled={busy} onClick={() => openApprove(p)} className="rounded-lg bg-accent px-3 py-1.5 text-xs font-semibold text-white hover:bg-accent-dark disabled:opacity-50">
-                      Duyệt
+                      {t('approve')}
                     </button>
                     <button type="button" disabled={busy} onClick={() => setDialog({ kind: 'reject', promotion: p })} className="rounded-lg px-3 py-1.5 text-xs font-semibold text-danger ring-1 ring-inset ring-danger/40 hover:bg-danger/5 disabled:opacity-50">
-                      Từ chối
+                      {t('reject')}
                     </button>
                   </>
                 )}
                 {p.status === 'APPROVED' && (
                   <button type="button" disabled={busy} onClick={() => setDialog({ kind: 'end', promotion: p })} className="rounded-lg border border-line px-3 py-1.5 text-xs font-semibold text-ink-muted hover:text-ink disabled:opacity-50">
-                    Gỡ quảng bá
+                    {t('end')}
                   </button>
                 )}
               </div>
@@ -196,17 +193,17 @@ export default function AdminPromotionsPage() {
           onClose={closeDialog}
           size="sm"
           closeOnBackdrop={false}
-          title={dialog.kind === 'approve' ? 'Duyệt quảng bá' : dialog.kind === 'end' ? 'Gỡ quảng bá' : 'Từ chối đăng ký'}
+          title={dialog.kind === 'approve' ? t('dlg.approveTitle') : dialog.kind === 'end' ? t('dlg.endTitle') : t('dlg.rejectTitle')}
           footer={
             <div className="flex justify-end gap-2">
-              <button type="button" onClick={closeDialog} className="rounded-lg border border-line px-4 py-2 text-sm font-semibold text-ink-muted hover:text-ink">Hủy</button>
+              <button type="button" onClick={closeDialog} className="rounded-lg border border-line px-4 py-2 text-sm font-semibold text-ink-muted hover:text-ink">{t('dlg.cancel')}</button>
               <button
                 type="button"
                 disabled={busy || (dialog.kind === 'approve' ? !endAt : !note.trim())}
                 onClick={submit}
                 className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-dark disabled:opacity-50"
               >
-                Xác nhận
+                {t('dlg.confirm')}
               </button>
             </div>
           }
@@ -216,14 +213,14 @@ export default function AdminPromotionsPage() {
             {dialog.kind === 'approve' && (
               <>
                 <label className="flex flex-col gap-1.5">
-                  <span className="font-semibold text-ink">Kết thúc lúc *</span>
+                  <span className="font-semibold text-ink">{t('dlg.endAt')}</span>
                   <input type="datetime-local" value={endAt} onChange={(e) => setEndAt(e.target.value)} className="w-full rounded-lg border border-line bg-surface-raised p-2.5 text-ink outline-none focus:border-accent" />
-                  <span className="text-xs text-ink-muted">Bắt đầu ngay khi duyệt; tối đa 90 ngày.</span>
+                  <span className="text-xs text-ink-muted">{t('dlg.endHint')}</span>
                 </label>
               </>
             )}
             <label className="flex flex-col gap-1.5">
-              <span className="font-semibold text-ink">{dialog.kind === 'approve' ? 'Ghi chú (không bắt buộc)' : 'Lý do * (giảng viên sẽ nhận được nội dung này)'}</span>
+              <span className="font-semibold text-ink">{dialog.kind === 'approve' ? t('dlg.note') : t('dlg.reason')}</span>
               <textarea value={note} maxLength={500} rows={3} onChange={(e) => setNote(e.target.value)} className="w-full rounded-lg border border-line bg-surface-raised p-2.5 text-ink outline-none focus:border-accent" />
             </label>
           </div>
