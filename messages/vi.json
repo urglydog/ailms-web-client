@@ -1961,7 +1961,7 @@
     },
     "aiAnalytics": {
       "title": "AI Analytics",
-      "subtitle": "Giám sát lượng tiêu thụ API của học viên và khóa quyền dùng AI khi cần.",
+      "subtitle": "Theo dõi chi phí ước tính của các khóa API AI (Gemini, Groq) theo từng tính năng và người dùng.",
       "chartTitle": "Chi phí AI theo ngày (30 ngày gần nhất)",
       "cost": "Chi phí",
       "day": "Ngày {date}",
@@ -1979,7 +1979,86 @@
       "unlock": "Mở khóa",
       "empty": "Chưa có dữ liệu thống kê",
       "updated": "Đã cập nhật trạng thái AI của người dùng",
-      "error": "Có lỗi xảy ra"
+      "error": "Có lỗi xảy ra",
+      "feature": {
+        "FLASHCARD": "Flashcard",
+        "MINDMAP": "Sơ đồ tư duy",
+        "QUIZ": "Quiz",
+        "DUBBING_TRANSLATE": "Lồng tiếng: dịch lời thoại",
+        "DUBBING_TRANSCRIBE": "Lồng tiếng: nhận dạng giọng nói",
+        "TRANSCRIPT_EXTRACTION": "Bóc băng bài giảng",
+        "TUTOR_CHAT": "Gia sư AI (hỏi đáp)",
+        "TUTOR_QUIZ_EXPLAIN": "Gia sư AI: giải thích đáp án",
+        "TUTOR_TITLE": "Gia sư AI: đặt tiêu đề hội thoại",
+        "DISCOVERY_CHAT": "Tìm khóa học bằng AI",
+        "INSTRUCTOR_AI": "Trợ lý AI của giảng viên",
+        "PROCTORING_RISK": "Giám sát thi: đánh giá rủi ro",
+        "PROCTORING_FRAME": "Giám sát thi: phân tích hình ảnh",
+        "EMBEDDING_TUTOR": "Nhúng dữ liệu bài giảng",
+        "EMBEDDING_COURSE": "Nhúng dữ liệu khóa học",
+        "UNTAGGED": "Chưa phân loại"
+      },
+      "filter": {
+        "from": "Từ ngày",
+        "to": "Đến ngày",
+        "feature": "Tính năng AI",
+        "allFeatures": "Tất cả tính năng",
+        "badRange": "Ngày kết thúc phải sau hoặc bằng ngày bắt đầu."
+      },
+      "partial": "Hệ thống ghi chi phí đầy đủ của mọi tính năng từ ngày {date}. Trước ngày đó, phần Flashcard, Sơ đồ tư duy và Quiz là số ghi nhận thật, còn Lồng tiếng và Gia sư AI là số ước tính từ dữ liệu đã lưu (chỉ tính phần nhìn thấy được, chưa gồm token suy nghĩ và các lần gọi thử), nên tổng của khoảng này thấp hơn thực tế. Hãy xem mục “Đối soát với hóa đơn” bên dưới để biết phần chênh.",
+      "loadError": "Không tải được số liệu chi phí AI. Vui lòng thử lại.",
+      "stat": {
+        "cost": "Chi phí ước tính",
+        "rate": "{usd} · tỷ giá {rate}đ/USD",
+        "requests": "Số lệnh gọi AI",
+        "tokens": "Tổng token",
+        "audio": "Âm thanh đã nhận dạng (Groq)",
+        "hours": "{hours} giờ",
+        "audioHint": "Tính theo giờ âm thanh, không theo token"
+      },
+      "daily": {
+        "q": "Chi phí AI mỗi ngày là bao nhiêu và đến từ tính năng nào?",
+        "insight": "Tốn nhất: {name} ({amount}, {pct}% tổng chi phí).",
+        "aria": "Biểu đồ cột xếp chồng chi phí AI theo ngày và tính năng"
+      },
+      "share": {
+        "q": "Tính năng nào chiếm nhiều chi phí nhất?",
+        "insight": "Phần lớn chi phí tập trung ở vài tính năng đầu — kiểm soát các tính năng này trước.",
+        "empty": "Chưa có dữ liệu.",
+        "aria": "Biểu đồ tròn tỷ trọng chi phí AI theo tính năng"
+      },
+      "users": {
+        "title": "Ai dùng AI nhiều nhất?",
+        "search": "Tìm người dùng",
+        "searchPh": "Email, tên hoặc ID người dùng...",
+        "lockedOnly": "Chỉ người đang bị khóa AI",
+        "costCol": "Chi phí ước tính",
+        "note": "Bảng này chỉ gồm các lệnh gọi AI gắn với một người dùng cụ thể; các chi phí hệ thống (nhúng dữ liệu, tìm kiếm của khách...) nằm trong tổng chi phí ở trên."
+      },
+      "billing": {
+        "title": "Đối soát với hóa đơn",
+        "intro": "So chi phí ước tính từ token với số tiền Google AI Studio thực thu (nhập theo kỳ từ trang Usage của dự án). Chỉ gồm Gemini; Groq thanh toán riêng.",
+        "close": "Đóng",
+        "open": "Nhập hóa đơn",
+        "billed": "Hóa đơn thực tế",
+        "tracked": "Đã quy được theo tính năng",
+        "unexplained": "Chưa quy được",
+        "ofBill": "{pct}% hóa đơn",
+        "noRec": "Chưa có hóa đơn nào nằm trọn trong khoảng ngày đang xem. Chọn khoảng ngày bao trọn một kỳ hóa đơn đã nhập để xem đối soát.",
+        "unexplainedHint": "Phần chưa quy được thường đến từ token suy nghĩ ẩn, các lần chạy thử hoặc thất bại, hoặc tính năng chưa được ghi nhận (phiên học trực tiếp, tìm kiếm có Google Search). Từ ngày ghi nhận đầy đủ, phần này sẽ nhỏ dần.",
+        "from": "Từ ngày",
+        "to": "Đến ngày",
+        "amount": "Số tiền (đồng)",
+        "amountPh": "Ví dụ 220739",
+        "note": "Ghi chú (không bắt buộc)",
+        "save": "Lưu hóa đơn",
+        "rules": "Mỗi kỳ chỉ nhập một lần và không được trùng ngày với kỳ đã nhập. Hóa đơn đã lưu không sửa hoặc xóa được, để số liệu đối soát luôn đáng tin.",
+        "empty": "Chưa có hóa đơn nào.",
+        "saved": "Đã lưu hóa đơn.",
+        "saveError": "Không lưu được hóa đơn. Vui lòng thử lại sau."
+      },
+      "loading": "Đang tải...",
+      "retry": "Thử lại"
     },
     "voices": {
       "title": "Giọng đọc lồng tiếng",

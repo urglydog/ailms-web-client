@@ -10,9 +10,10 @@ import { PageHeader } from '@/components/instructor/ui/PageHeader';
 import { ListSearch } from '@/components/ui/ListSearch';
 import { Pager } from '@/components/ui/SearchPanel';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { TableErrorRow } from '@/components/admin/ui/TableErrorRow';
 import { useDebounce } from '@/hooks/useDebounce';
 import { api, ApiError } from '@/lib/api/client';
-import { aiFeatureLabel, usd, vnd, type AiBillingEntry, type AiUsageOverview } from '@/lib/aiUsage';
+import { usd, vnd, type AiBillingEntry, type AiUsageOverview } from '@/lib/aiUsage';
 import { getAccessToken } from '@/lib/auth/token';
 import { useThemeColors } from '@/lib/theme/useThemeColors';
 
@@ -44,6 +45,8 @@ export default function AiAnalyticsPage() {
   const t = useTranslations('admin.aiAnalytics');
   const locale = useLocale();
   const queryClient = useQueryClient();
+  const aiFeatureLabel = (f: string) => (t.has(`feature.${f}`) ? t(`feature.${f}`) : f);
+  const num = (n: number, opts?: Intl.NumberFormatOptions) => n.toLocaleString(locale, opts);
 
   const [from, setFrom] = useState(() => isoDay(new Date(Date.now() - 29 * 86_400_000)));
   const [to, setTo] = useState(() => isoDay(new Date()));
@@ -61,13 +64,13 @@ export default function AiAnalyticsPage() {
   if (feature) params.set('feature', feature);
   if (debouncedSearch.trim()) params.set('q', debouncedSearch.trim());
 
-  const { data: overview, isLoading } = useQuery({
+  const { data: overview, isLoading, isError: overviewError, refetch: refetchOverview } = useQuery({
     queryKey: ['admin-ai-overview', from, to, feature],
     queryFn: () => api.get<AiUsageOverview>(`/api/v1/admin/ai-usage/overview?${rangeParams.toString()}`, { token: getAccessToken() ?? undefined }),
     enabled,
     placeholderData: (prev) => prev,
   });
-  const { data: usagePage } = useQuery({
+  const { data: usagePage, isLoading: usageLoading, isError: usageError, refetch: refetchUsage } = useQuery({
     queryKey: ['admin-ai-usage', from, to, feature, lockedOnly, debouncedSearch, page],
     queryFn: () => api.get<AiUsagePage>(`/api/v1/admin/ai-usage?${params.toString()}`, { token: getAccessToken() ?? undefined }),
     enabled,
@@ -114,32 +117,32 @@ export default function AiAnalyticsPage() {
 
   return (
     <>
-      <PageHeader title={t('title')} subtitle="Theo dõi chi phí ước tính của các khóa API AI (Gemini, Groq) theo từng tính năng và người dùng." />
+      <PageHeader title={t('title')} subtitle={t('subtitle')} />
 
       <div className="flex flex-wrap items-end gap-3 rounded-xl border border-line bg-surface-raised p-4">
         <label className="flex flex-col gap-1">
-          <span className="text-xs font-semibold text-ink-muted">Từ ngày</span>
+          <span className="text-xs font-semibold text-ink-muted">{t('filter.from')}</span>
           <input type="date" value={from} max={to} onChange={(e) => { setFrom(e.target.value); setPage(0); }} className={inputCls} />
         </label>
         <label className="flex flex-col gap-1">
-          <span className="text-xs font-semibold text-ink-muted">Đến ngày</span>
+          <span className="text-xs font-semibold text-ink-muted">{t('filter.to')}</span>
           <input type="date" value={to} min={from} onChange={(e) => { setTo(e.target.value); setPage(0); }} className={inputCls} />
         </label>
         <label className="flex flex-col gap-1">
-          <span className="text-xs font-semibold text-ink-muted">Tính năng AI</span>
+          <span className="text-xs font-semibold text-ink-muted">{t('filter.feature')}</span>
           <select value={feature} onChange={(e) => { setFeature(e.target.value); setPage(0); }} className={inputCls}>
-            <option value="">Tất cả tính năng</option>
+            <option value="">{t('filter.allFeatures')}</option>
             {(features ?? []).map((f) => (
               <option key={f} value={f}>{aiFeatureLabel(f)}</option>
             ))}
           </select>
         </label>
       </div>
-      {!validRange && <p role="alert" className="m-0 text-sm font-semibold text-danger">Ngày kết thúc phải sau hoặc bằng ngày bắt đầu.</p>}
+      {!validRange && <p role="alert" className="m-0 text-sm font-semibold text-danger">{t('filter.badRange')}</p>}
 
       {overview?.partialCoverage && (
         <p role="status" className="m-0 rounded-xl border border-warning bg-surface-raised p-4 text-sm text-ink">
-          Hệ thống ghi chi phí đầy đủ của mọi tính năng từ ngày {new Date(overview.trackingSince).toLocaleDateString('vi-VN')}. Trước ngày đó, phần Flashcard, Sơ đồ tư duy và Quiz là số ghi nhận thật, còn Lồng tiếng và Gia sư AI là số ước tính từ dữ liệu đã lưu (chỉ tính phần nhìn thấy được, chưa gồm token suy nghĩ và các lần gọi thử), nên tổng của khoảng này thấp hơn thực tế. Hãy xem mục “Đối soát với hóa đơn” bên dưới để biết phần chênh.
+          {t('partial', { date: new Date(overview.trackingSince).toLocaleDateString(locale) })}
         </p>
       )}
 
@@ -149,49 +152,54 @@ export default function AiAnalyticsPage() {
             <Skeleton key={i} className="h-24" />
           ))}
         </div>
+      ) : overviewError && !overview ? (
+        <div role="alert" className="flex flex-col items-center gap-2 rounded-xl border border-danger/40 bg-danger/5 p-6 text-center text-danger">
+          {t('loadError')}
+          <button type="button" onClick={() => void refetchOverview()} className="rounded-lg border border-line px-3 py-1.5 text-xs font-bold text-ink hover:bg-tint">{t('retry')}</button>
+        </div>
       ) : overview ? (
         <>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <div className="flex flex-col gap-1 rounded-xl border border-line bg-surface-raised p-4 shadow-sm">
-              <span className="text-xs font-semibold text-ink-muted">Chi phí ước tính</span>
+              <span className="text-xs font-semibold text-ink-muted">{t('stat.cost')}</span>
               <span className="font-display text-xl font-bold text-ink">{vnd(totalCost, rate)}</span>
-              <span className="text-xs text-ink-muted">{usd(totalCost)} · tỷ giá {rate.toLocaleString('vi-VN')}đ/USD</span>
+              <span className="text-xs text-ink-muted">{t('stat.rate', { usd: usd(totalCost), rate: num(rate) })}</span>
               <Delta current={totalCost} previous={Number(overview.previous.costUsd)} upIsGood={false} />
             </div>
             <div className="flex flex-col gap-1 rounded-xl border border-line bg-surface-raised p-4 shadow-sm">
-              <span className="text-xs font-semibold text-ink-muted">Số lệnh gọi AI</span>
-              <span className="font-display text-xl font-bold text-ink">{overview.totals.requests.toLocaleString('vi-VN')}</span>
+              <span className="text-xs font-semibold text-ink-muted">{t('stat.requests')}</span>
+              <span className="font-display text-xl font-bold text-ink">{num(overview.totals.requests)}</span>
               <Delta current={overview.totals.requests} previous={overview.previous.requests} upIsGood={false} />
             </div>
             <div className="flex flex-col gap-1 rounded-xl border border-line bg-surface-raised p-4 shadow-sm">
-              <span className="text-xs font-semibold text-ink-muted">Tổng token</span>
-              <span className="font-display text-xl font-bold text-ink">{overview.totals.tokens.toLocaleString('vi-VN')}</span>
+              <span className="text-xs font-semibold text-ink-muted">{t('stat.tokens')}</span>
+              <span className="font-display text-xl font-bold text-ink">{num(overview.totals.tokens)}</span>
               <Delta current={overview.totals.tokens} previous={overview.previous.tokens} upIsGood={false} />
             </div>
             <div className="flex flex-col gap-1 rounded-xl border border-line bg-surface-raised p-4 shadow-sm">
-              <span className="text-xs font-semibold text-ink-muted">Âm thanh đã nhận dạng (Groq)</span>
-              <span className="font-display text-xl font-bold text-ink">{(overview.totals.audioSeconds / 3600).toLocaleString('vi-VN', { maximumFractionDigits: 2 })} giờ</span>
-              <span className="text-xs text-ink-muted">Tính theo giờ âm thanh, không theo token</span>
+              <span className="text-xs font-semibold text-ink-muted">{t('stat.audio')}</span>
+              <span className="font-display text-xl font-bold text-ink">{t('stat.hours', { hours: num(overview.totals.audioSeconds / 3600, { maximumFractionDigits: 2 }) })}</span>
+              <span className="text-xs text-ink-muted">{t('stat.audioHint')}</span>
             </div>
           </div>
 
           <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
             <ChartCard
               className="xl:col-span-2"
-              question="Chi phí AI mỗi ngày là bao nhiêu và đến từ tính năng nào?"
-              insight={topFeature ? `Tốn nhất: ${aiFeatureLabel(topFeature.feature)} (${vnd(Number(topFeature.costUsd), rate)}, ${totalCost > 0 ? Math.round((Number(topFeature.costUsd) / totalCost) * 100) : 0}% tổng chi phí).` : undefined}
+              question={t('daily.q')}
+              insight={topFeature ? t('daily.insight', { name: aiFeatureLabel(topFeature.feature), amount: vnd(Number(topFeature.costUsd), rate), pct: totalCost > 0 ? Math.round((Number(topFeature.costUsd) / totalCost) * 100) : 0 }) : undefined}
             >
               {dailyRows.length === 0 ? (
                 <p className="m-0 py-10 text-center text-sm text-ink-muted">{t('noDaily')}</p>
               ) : (
-                <div role="img" aria-label="Biểu đồ cột xếp chồng chi phí AI theo ngày và tính năng" className="h-72 w-full">
+                <div role="img" aria-label={t('daily.aria')} className="h-72 w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={dailyRows} margin={{ left: 4, right: 12 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke={palette.lineSoft} />
                       <XAxis dataKey="day" tick={{ fontSize: 11, fill: palette.inkMuted }} />
-                      <YAxis tick={{ fontSize: 11, fill: palette.inkMuted }} tickFormatter={(v: number) => `${Math.round(v * rate / 1000)}k`} width={48} />
+                      <YAxis tick={{ fontSize: 11, fill: palette.inkMuted }} tickFormatter={(v: number) => new Intl.NumberFormat(locale, { notation: 'compact', maximumFractionDigits: 1 }).format(v * rate)} width={48} />
                       <Tooltip formatter={(v, name) => [vnd(Number(v), rate), aiFeatureLabel(String(name))]} />
-                      <Legend formatter={(v) => aiFeatureLabel(String(v))} />
+                      <Legend formatter={(v) => <span className="text-ink">{aiFeatureLabel(String(v))}</span>} />
                       {featureKeys.map((k, i) => (
                         <Bar key={k} dataKey={k} stackId="cost" fill={pieColors[i % pieColors.length]} />
                       ))}
@@ -201,11 +209,11 @@ export default function AiAnalyticsPage() {
               )}
             </ChartCard>
 
-            <ChartCard question="Tính năng nào chiếm nhiều chi phí nhất?" insight={donut.length > 1 ? 'Phần lớn chi phí tập trung ở vài tính năng đầu — kiểm soát các tính năng này trước.' : undefined}>
+            <ChartCard question={t('share.q')} insight={donut.length > 1 ? t('share.insight') : undefined}>
               {donut.length === 0 ? (
-                <p className="m-0 py-10 text-center text-sm text-ink-muted">Chưa có dữ liệu.</p>
+                <p className="m-0 py-10 text-center text-sm text-ink-muted">{t('share.empty')}</p>
               ) : (
-                <div role="img" aria-label="Biểu đồ tròn tỷ trọng chi phí AI theo tính năng" className="h-72 w-full">
+                <div role="img" aria-label={t('share.aria')} className="h-72 w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie data={donut} dataKey="value" nameKey="name" innerRadius={52} outerRadius={86} paddingAngle={2}>
@@ -214,7 +222,7 @@ export default function AiAnalyticsPage() {
                         ))}
                       </Pie>
                       <Tooltip formatter={(v) => vnd(Number(v), rate)} />
-                      <Legend />
+                      <Legend formatter={(v) => <span className="text-ink">{String(v)}</span>} />
                     </PieChart>
                   </ResponsiveContainer>
                 </div>
@@ -228,12 +236,12 @@ export default function AiAnalyticsPage() {
 
       <section className="flex flex-col gap-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="m-0 font-display text-base font-bold text-ink">Ai dùng AI nhiều nhất?</h2>
+          <h2 className="m-0 font-display text-base font-bold text-ink">{t('users.title')}</h2>
           <div className="flex flex-wrap items-center gap-3">
-            <ListSearch label="Tìm người dùng" value={search} onChange={(v) => { setSearch(v); setPage(0); }} placeholder="Email, tên hoặc ID người dùng..." />
+            <ListSearch label={t('users.search')} value={search} onChange={(v) => { setSearch(v); setPage(0); }} placeholder={t('users.searchPh')} />
             <label className="flex items-center gap-2 text-sm text-ink">
               <input type="checkbox" checked={lockedOnly} onChange={(e) => { setLockedOnly(e.target.checked); setPage(0); }} className="h-4 w-4 accent-accent" />
-              Chỉ người đang bị khóa AI
+              {t('users.lockedOnly')}
             </label>
           </div>
         </div>
@@ -245,7 +253,7 @@ export default function AiAnalyticsPage() {
                   <th scope="col" className={th}>{t('cols.email')}</th>
                   <th scope="col" className={th}>{t('cols.status')}</th>
                   <th scope="col" className={th}>{t('cols.tokens')}</th>
-                  <th scope="col" className={th}>Chi phí ước tính</th>
+                  <th scope="col" className={th}>{t('users.costCol')}</th>
                   <th scope="col" className={`${th} text-right`}>{t('cols.actions')}</th>
                 </tr>
               </thead>
@@ -279,7 +287,13 @@ export default function AiAnalyticsPage() {
                     </td>
                   </tr>
                 ))}
-                {(!usageData || usageData.length === 0) && (
+                {usageLoading && !usagePage && (
+                  <tr>
+                    <td colSpan={5} className="px-6 py-8 text-center text-sm text-ink-muted">{t('loading')}</td>
+                  </tr>
+                )}
+                {usageError && !usagePage && <TableErrorRow colSpan={5} onRetry={() => void refetchUsage()} />}
+                {!usageLoading && !usageError && (!usageData || usageData.length === 0) && (
                   <tr>
                     <td colSpan={5} className="px-6 py-8 text-center text-sm text-ink-muted">
                       {t('empty')}
@@ -293,7 +307,7 @@ export default function AiAnalyticsPage() {
             <Pager page={page} totalPages={totalPages} total={usagePage?.total ?? 0} onPage={setPage} />
           </div>
         </div>
-        <p className="m-0 text-xs text-ink-muted">Bảng này chỉ gồm các lệnh gọi AI gắn với một người dùng cụ thể; các chi phí hệ thống (nhúng dữ liệu, tìm kiếm của khách...) nằm trong tổng chi phí ở trên.</p>
+        <p className="m-0 text-xs text-ink-muted">{t('users.note')}</p>
       </section>
     </>
   );
@@ -301,6 +315,9 @@ export default function AiAnalyticsPage() {
 
 /** Đối soát với hóa đơn thực tế của Google AI Studio: admin nhập số tiền theo kỳ (không sửa/xóa, không chồng lấn); hệ thống so với phần đã quy được từ token và nêu phần chưa quy được. */
 function BillingPanel({ overview }: { overview?: AiUsageOverview }) {
+  const t = useTranslations('admin.aiAnalytics.billing');
+  const locale = useLocale();
+  const vndText = (n: number) => `${n.toLocaleString(locale)}đ`;
   const queryClient = useQueryClient();
   const token = getAccessToken() ?? undefined;
   const { data: entries } = useQuery({
@@ -320,7 +337,7 @@ function BillingPanel({ overview }: { overview?: AiUsageOverview }) {
     mutationFn: () =>
       api.post('/api/v1/admin/ai-usage/billing', { periodStart: start, periodEnd: end, amountVnd: Number(amount), source: 'Google AI Studio', note: note.trim() || null }, { token }),
     onSuccess: () => {
-      toast.success('Đã lưu hóa đơn.');
+      toast.success(t('saved'));
       setStart('');
       setEnd('');
       setAmount('');
@@ -328,45 +345,45 @@ function BillingPanel({ overview }: { overview?: AiUsageOverview }) {
       queryClient.invalidateQueries({ queryKey: ['admin-ai-billing'] });
       queryClient.invalidateQueries({ queryKey: ['admin-ai-overview'] });
     },
-    onError: (err) => toast.error(err instanceof ApiError ? err.message : 'Không lưu được hóa đơn. Vui lòng thử lại sau.'),
+    onError: (err) => toast.error(err instanceof ApiError ? err.message : t('saveError')),
   });
 
   const rec = overview?.reconciliation;
   const inputCls = 'rounded-lg border border-line bg-surface-raised px-3 py-2 text-sm text-ink outline-none focus:border-accent';
   return (
-    <section className="flex flex-col gap-3 rounded-xl border border-line bg-surface-raised p-4 shadow-sm" aria-label="Đối soát với hóa đơn">
+    <section className="flex flex-col gap-3 rounded-xl border border-line bg-surface-raised p-4 shadow-sm" aria-label={t('title')}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="m-0 font-display text-base font-bold text-ink">Đối soát với hóa đơn</h2>
-          <p className="m-0 mt-1 text-xs text-ink-muted">So chi phí ước tính từ token với số tiền Google AI Studio thực thu (nhập theo kỳ từ trang Usage của dự án). Chỉ gồm Gemini; Groq thanh toán riêng.</p>
+          <h2 className="m-0 font-display text-base font-bold text-ink">{t('title')}</h2>
+          <p className="m-0 mt-1 text-xs text-ink-muted">{t('intro')}</p>
         </div>
         <button type="button" onClick={() => setOpen((v) => !v)} className="rounded-lg border border-line px-3 py-1.5 text-xs font-bold text-accent-dark hover:bg-tint">
-          {open ? 'Đóng' : 'Nhập hóa đơn'}
+          {open ? t('close') : t('open')}
         </button>
       </div>
 
       {rec ? (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           <div className="rounded-lg bg-surface p-3">
-            <div className="text-xs font-semibold text-ink-muted">Hóa đơn thực tế</div>
-            <div className="font-display text-lg font-bold text-ink">{rec.billedVnd.toLocaleString('vi-VN')}đ</div>
+            <div className="text-xs font-semibold text-ink-muted">{t('billed')}</div>
+            <div className="font-display text-lg font-bold text-ink">{vndText(rec.billedVnd)}</div>
           </div>
           <div className="rounded-lg bg-surface p-3">
-            <div className="text-xs font-semibold text-ink-muted">Đã quy được theo tính năng</div>
-            <div className="font-display text-lg font-bold text-ink">{rec.trackedVnd.toLocaleString('vi-VN')}đ</div>
+            <div className="text-xs font-semibold text-ink-muted">{t('tracked')}</div>
+            <div className="font-display text-lg font-bold text-ink">{vndText(rec.trackedVnd)}</div>
           </div>
           <div className="rounded-lg bg-surface p-3">
-            <div className="text-xs font-semibold text-ink-muted">Chưa quy được</div>
-            <div className="font-display text-lg font-bold text-warning">{rec.unexplainedVnd.toLocaleString('vi-VN')}đ</div>
-            <div className="text-xs text-ink-muted">{rec.billedVnd > 0 ? Math.round((rec.unexplainedVnd / rec.billedVnd) * 100) : 0}% hóa đơn</div>
+            <div className="text-xs font-semibold text-ink-muted">{t('unexplained')}</div>
+            <div className="font-display text-lg font-bold text-warning">{vndText(rec.unexplainedVnd)}</div>
+            <div className="text-xs text-ink-muted">{t('ofBill', { pct: rec.billedVnd > 0 ? Math.round((rec.unexplainedVnd / rec.billedVnd) * 100) : 0 })}</div>
           </div>
         </div>
       ) : (
-        <p className="m-0 text-sm text-ink-muted">Chưa có hóa đơn nào nằm trọn trong khoảng ngày đang xem. Chọn khoảng ngày bao trọn một kỳ hóa đơn đã nhập để xem đối soát.</p>
+        <p className="m-0 text-sm text-ink-muted">{t('noRec')}</p>
       )}
       {rec && rec.unexplainedVnd > 0 && (
         <p className="m-0 text-xs text-ink-muted">
-          Phần chưa quy được thường đến từ token suy nghĩ ẩn, các lần chạy thử hoặc thất bại, hoặc tính năng chưa được ghi nhận (phiên học trực tiếp, tìm kiếm có Google Search). Từ ngày ghi nhận đầy đủ, phần này sẽ nhỏ dần.
+          {t('unexplainedHint')}
         </p>
       )}
 
@@ -374,25 +391,25 @@ function BillingPanel({ overview }: { overview?: AiUsageOverview }) {
         <div className="flex flex-col gap-3 border-t border-line pt-3">
           <div className="flex flex-wrap items-end gap-3">
             <label className="flex flex-col gap-1">
-              <span className="text-xs font-semibold text-ink-muted">Từ ngày</span>
+              <span className="text-xs font-semibold text-ink-muted">{t('from')}</span>
               <input type="date" value={start} onChange={(e) => setStart(e.target.value)} className={inputCls} />
             </label>
             <label className="flex flex-col gap-1">
-              <span className="text-xs font-semibold text-ink-muted">Đến ngày</span>
+              <span className="text-xs font-semibold text-ink-muted">{t('to')}</span>
               <input type="date" value={end} min={start} onChange={(e) => setEnd(e.target.value)} className={inputCls} />
             </label>
             <label className="flex flex-col gap-1">
-              <span className="text-xs font-semibold text-ink-muted">Số tiền (đồng)</span>
+              <span className="text-xs font-semibold text-ink-muted">{t('amount')}</span>
               <input
                 inputMode="numeric"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value.replace(/\D/g, '').slice(0, 12))}
-                placeholder="Ví dụ 220739"
+                placeholder={t('amountPh')}
                 className={`${inputCls} w-40 text-right`}
               />
             </label>
             <label className="flex min-w-[12rem] flex-1 flex-col gap-1">
-              <span className="text-xs font-semibold text-ink-muted">Ghi chú (không bắt buộc)</span>
+              <span className="text-xs font-semibold text-ink-muted">{t('note')}</span>
               <input value={note} maxLength={300} onChange={(e) => setNote(e.target.value)} className={inputCls} />
             </label>
             <button
@@ -401,21 +418,21 @@ function BillingPanel({ overview }: { overview?: AiUsageOverview }) {
               onClick={() => add.mutate()}
               className="rounded-lg bg-accent px-4 py-2 text-sm font-bold text-white hover:bg-accent-dark disabled:cursor-not-allowed disabled:opacity-50"
             >
-              Lưu hóa đơn
+              {t('save')}
             </button>
           </div>
-          <p className="m-0 text-xs text-ink-muted">Mỗi kỳ chỉ nhập một lần và không được trùng ngày với kỳ đã nhập. Hóa đơn đã lưu không sửa hoặc xóa được, để số liệu đối soát luôn đáng tin.</p>
+          <p className="m-0 text-xs text-ink-muted">{t('rules')}</p>
           <ul className="m-0 flex list-none flex-col gap-1 p-0 text-sm">
             {(entries ?? []).map((e) => (
               <li key={e.id} className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-surface px-3 py-2">
                 <span className="text-ink">
-                  {new Date(e.periodStart).toLocaleDateString('vi-VN')} – {new Date(e.periodEnd).toLocaleDateString('vi-VN')} · {e.source}
+                  {new Date(e.periodStart).toLocaleDateString(locale)} – {new Date(e.periodEnd).toLocaleDateString(locale)} · {e.source}
                   {e.note ? <span className="text-ink-muted"> · {e.note}</span> : null}
                 </span>
-                <span className="font-semibold text-ink">{e.amountVnd.toLocaleString('vi-VN')}đ</span>
+                <span className="font-semibold text-ink">{vndText(e.amountVnd)}</span>
               </li>
             ))}
-            {(entries ?? []).length === 0 && <li className="text-ink-muted">Chưa có hóa đơn nào.</li>}
+            {(entries ?? []).length === 0 && <li className="text-ink-muted">{t('empty')}</li>}
           </ul>
         </div>
       )}

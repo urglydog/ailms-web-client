@@ -1961,7 +1961,7 @@
     },
     "aiAnalytics": {
       "title": "AI Analytics",
-      "subtitle": "Monitor learners’ API usage and lock AI access when needed.",
+      "subtitle": "Track the estimated cost of AI API keys (Gemini, Groq) by feature and by user.",
       "chartTitle": "AI cost per day (last 30 days)",
       "cost": "Cost",
       "day": "Day {date}",
@@ -1979,7 +1979,86 @@
       "unlock": "Unlock",
       "empty": "No usage data yet",
       "updated": "Updated the user’s AI status",
-      "error": "Something went wrong"
+      "error": "Something went wrong",
+      "feature": {
+        "FLASHCARD": "Flashcards",
+        "MINDMAP": "Mind maps",
+        "QUIZ": "Quiz",
+        "DUBBING_TRANSLATE": "Dubbing: dialogue translation",
+        "DUBBING_TRANSCRIBE": "Dubbing: speech recognition",
+        "TRANSCRIPT_EXTRACTION": "Lecture transcription",
+        "TUTOR_CHAT": "AI tutor (Q&A)",
+        "TUTOR_QUIZ_EXPLAIN": "AI tutor: answer explanations",
+        "TUTOR_TITLE": "AI tutor: conversation titles",
+        "DISCOVERY_CHAT": "AI course search",
+        "INSTRUCTOR_AI": "Instructor AI assistant",
+        "PROCTORING_RISK": "Proctoring: risk assessment",
+        "PROCTORING_FRAME": "Proctoring: image analysis",
+        "EMBEDDING_TUTOR": "Lecture embeddings",
+        "EMBEDDING_COURSE": "Course embeddings",
+        "UNTAGGED": "Uncategorised"
+      },
+      "filter": {
+        "from": "From",
+        "to": "To",
+        "feature": "AI feature",
+        "allFeatures": "All features",
+        "badRange": "The end date must be on or after the start date."
+      },
+      "partial": "Full cost tracking for every feature started on {date}. Before that, Flashcards, Mind maps and Quiz are recorded figures, while Dubbing and the AI tutor are estimates from stored data (visible output only, excluding thinking tokens and test calls), so totals for this range are lower than actual. See “Invoice reconciliation” below for the gap.",
+      "loadError": "Could not load AI cost figures. Please try again.",
+      "stat": {
+        "cost": "Estimated cost",
+        "rate": "{usd} · rate {rate} VND/USD",
+        "requests": "AI calls",
+        "tokens": "Total tokens",
+        "audio": "Audio transcribed (Groq)",
+        "hours": "{hours} h",
+        "audioHint": "Billed per audio hour, not per token"
+      },
+      "daily": {
+        "q": "How much does AI cost each day, and which features drive it?",
+        "insight": "Most expensive: {name} ({amount}, {pct}% of total cost).",
+        "aria": "Stacked bar chart of AI cost by day and feature"
+      },
+      "share": {
+        "q": "Which features account for the most cost?",
+        "insight": "Most of the cost sits in the top few features — control those first.",
+        "empty": "No data yet.",
+        "aria": "Pie chart of AI cost share by feature"
+      },
+      "users": {
+        "title": "Who uses AI the most?",
+        "search": "Search users",
+        "searchPh": "Email, name or user ID...",
+        "lockedOnly": "Only users with AI locked",
+        "costCol": "Estimated cost",
+        "note": "This table only includes AI calls tied to a specific user; system costs (embeddings, guest searches…) are part of the total above."
+      },
+      "billing": {
+        "title": "Invoice reconciliation",
+        "intro": "Compare the token-based estimate with what Google AI Studio actually charged (entered per period from the project's Usage page). Gemini only; Groq is billed separately.",
+        "close": "Close",
+        "open": "Enter invoice",
+        "billed": "Actual invoice",
+        "tracked": "Attributed to features",
+        "unexplained": "Unattributed",
+        "ofBill": "{pct}% of invoice",
+        "noRec": "No invoice falls entirely within the selected range. Choose a range that covers a whole entered billing period to see the reconciliation.",
+        "unexplainedHint": "The unattributed part usually comes from hidden thinking tokens, test or failed runs, or features not yet tracked (live sessions, Google Search grounding). It shrinks once full tracking is in place.",
+        "from": "From",
+        "to": "To",
+        "amount": "Amount (VND)",
+        "amountPh": "e.g. 220739",
+        "note": "Note (optional)",
+        "save": "Save invoice",
+        "rules": "Each period can be entered once and must not overlap an existing one. Saved invoices cannot be edited or deleted, so the reconciliation stays trustworthy.",
+        "empty": "No invoices yet.",
+        "saved": "Invoice saved.",
+        "saveError": "Could not save the invoice. Please try again later."
+      },
+      "loading": "Loading...",
+      "retry": "Retry"
     },
     "voices": {
       "title": "Dubbing voices",

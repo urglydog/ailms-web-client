@@ -210,7 +210,7 @@ export default function AdminFinanceReportsPage() {
                       <XAxis dataKey="period" tick={{ fontSize: 11, fill: palette.inkMuted }} />
                       <YAxis tick={{ fontSize: 11, fill: palette.inkMuted }} tickFormatter={compact} width={48} />
                       <Tooltip formatter={tooltipMoney} />
-                      <Legend />
+                      <Legend formatter={(v) => <span className="text-ink">{String(v)}</span>} />
                       <Area type="monotone" name={t('trend.gross')} dataKey="grossRevenue" stroke={palette.accent} fill={palette.accent} fillOpacity={0.15} />
                       <Area type="monotone" name={t('trend.refunds')} dataKey="refunds" stroke={palette.danger} fill={palette.danger} fillOpacity={0.15} />
                     </AreaChart>
@@ -239,7 +239,7 @@ export default function AdminFinanceReportsPage() {
                         ))}
                       </Pie>
                       <Tooltip formatter={tooltipMoney} />
-                      <Legend />
+                      <Legend formatter={(v) => <span className="text-ink">{String(v)}</span>} />
                     </PieChart>
                   </ResponsiveContainer>
                 </div>
@@ -339,7 +339,7 @@ export default function AdminFinanceReportsPage() {
                         ))}
                       </Pie>
                       <Tooltip formatter={tooltipMoney} />
-                      <Legend />
+                      <Legend formatter={(v) => <span className="text-ink">{String(v)}</span>} />
                     </PieChart>
                   </ResponsiveContainer>
                 </div>
@@ -366,7 +366,7 @@ export default function AdminFinanceReportsPage() {
                         ))}
                       </Pie>
                       <Tooltip formatter={tooltipMoney} />
-                      <Legend />
+                      <Legend formatter={(v) => <span className="text-ink">{String(v)}</span>} />
                     </PieChart>
                   </ResponsiveContainer>
                 </div>

@@ -1895,7 +1895,7 @@
     },
     "aiAnalytics": {
       "title": "AI 分析",
-      "subtitle": "监控学员的 API 用量，必要时锁定 AI 使用权限。",
+      "subtitle": "按功能和用户跟踪 AI API 密钥（Gemini、Groq）的预估费用。",
       "chartTitle": "每日 AI 费用（最近 30 天）",
       "cost": "费用",
       "day": "{date} 日",
@@ -1913,7 +1913,86 @@
       "unlock": "解锁",
       "empty": "暂无统计数据",
       "updated": "已更新该用户的 AI 状态",
-      "error": "出错了"
+      "error": "出错了",
+      "feature": {
+        "FLASHCARD": "抽认卡",
+        "MINDMAP": "思维导图",
+        "QUIZ": "测验",
+        "DUBBING_TRANSLATE": "配音：台词翻译",
+        "DUBBING_TRANSCRIBE": "配音：语音识别",
+        "TRANSCRIPT_EXTRACTION": "课程转录",
+        "TUTOR_CHAT": "AI 导师（问答）",
+        "TUTOR_QUIZ_EXPLAIN": "AI 导师：答案解析",
+        "TUTOR_TITLE": "AI 导师：会话标题",
+        "DISCOVERY_CHAT": "AI 找课",
+        "INSTRUCTOR_AI": "讲师 AI 助手",
+        "PROCTORING_RISK": "监考：风险评估",
+        "PROCTORING_FRAME": "监考：图像分析",
+        "EMBEDDING_TUTOR": "课程内容向量化",
+        "EMBEDDING_COURSE": "课程信息向量化",
+        "UNTAGGED": "未分类"
+      },
+      "filter": {
+        "from": "开始日期",
+        "to": "结束日期",
+        "feature": "AI 功能",
+        "allFeatures": "全部功能",
+        "badRange": "结束日期必须晚于或等于开始日期。"
+      },
+      "partial": "系统自 {date} 起完整记录所有功能的费用。在此之前，抽认卡、思维导图和测验为实际记录，而配音和 AI 导师是根据已存数据估算（仅含可见输出，不含思考 token 和测试调用），因此该区间的总额低于实际。差额请查看下方的“与账单对账”。",
+      "loadError": "无法加载 AI 费用数据，请重试。",
+      "stat": {
+        "cost": "预估费用",
+        "rate": "{usd} · 汇率 {rate} 越南盾/美元",
+        "requests": "AI 调用次数",
+        "tokens": "总 token 数",
+        "audio": "已识别音频（Groq）",
+        "hours": "{hours} 小时",
+        "audioHint": "按音频时长计费，而非 token"
+      },
+      "daily": {
+        "q": "每天的 AI 费用是多少，来自哪些功能？",
+        "insight": "花费最多：{name}（{amount}，占总费用 {pct}%）。",
+        "aria": "按日期和功能显示 AI 费用的堆叠柱状图"
+      },
+      "share": {
+        "q": "哪些功能的费用占比最高？",
+        "insight": "大部分费用集中在前几个功能 — 优先控制这些功能。",
+        "empty": "暂无数据。",
+        "aria": "按功能显示 AI 费用占比的饼图"
+      },
+      "users": {
+        "title": "谁使用 AI 最多？",
+        "search": "搜索用户",
+        "searchPh": "邮箱、姓名或用户 ID...",
+        "lockedOnly": "仅显示 AI 被锁定的用户",
+        "costCol": "预估费用",
+        "note": "此表仅包含与特定用户关联的 AI 调用；系统费用（向量化、访客搜索等）计入上方的总费用。"
+      },
+      "billing": {
+        "title": "与账单对账",
+        "intro": "将基于 token 的预估费用与 Google AI Studio 实际收费（按周期从项目的 Usage 页面录入）进行比较。仅含 Gemini；Groq 单独结算。",
+        "close": "关闭",
+        "open": "录入账单",
+        "billed": "实际账单",
+        "tracked": "已归属到功能",
+        "unexplained": "未归属",
+        "ofBill": "占账单 {pct}%",
+        "noRec": "当前日期范围内没有完整的账单周期。请选择完整覆盖某个已录入账单周期的日期范围以查看对账。",
+        "unexplainedHint": "未归属部分通常来自隐藏的思考 token、测试或失败的调用，或尚未记录的功能（直播课、Google 搜索增强）。完整记录开始后，这部分会逐渐减少。",
+        "from": "开始日期",
+        "to": "结束日期",
+        "amount": "金额（越南盾）",
+        "amountPh": "例如 220739",
+        "note": "备注（可选）",
+        "save": "保存账单",
+        "rules": "每个周期只能录入一次，且不得与已录入的周期重叠。已保存的账单无法修改或删除，以确保对账数据可信。",
+        "empty": "暂无账单。",
+        "saved": "账单已保存。",
+        "saveError": "无法保存账单，请稍后重试。"
+      },
+      "loading": "加载中...",
+      "retry": "重试"
     },
     "voices": {
       "title": "配音声音",
