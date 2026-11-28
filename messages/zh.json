@@ -3423,6 +3423,114 @@
         "sent": "已发送至 {email}",
         "notSent": "未发送邮件"
       }
+    },
+    "payouts": {
+      "title": "讲师结算",
+      "subtitle": "审核提现申请，手动转账后记录交易号。拒绝或失败的款项会退回讲师余额。",
+      "status": {
+        "PENDING_EMAIL": "等待邮件确认",
+        "REQUESTED": "待审核",
+        "APPROVED": "已批准，待付款",
+        "PAID": "已付款",
+        "REJECTED": "已拒绝",
+        "CANCELLED": "已取消",
+        "FAILED": "付款失败"
+      },
+      "toast": {
+        "failed": "操作未成功。",
+        "approved": "申请已批准。",
+        "paid": "已记录转账并通知讲师。",
+        "rejected": "已拒绝，金额已退回讲师。",
+        "markedFailed": "已标记为失败，金额已退回讲师。"
+      },
+      "search": "搜索提现申请",
+      "searchPh": "申请编号、邮箱或讲师姓名...",
+      "statusLabel": "状态",
+      "all": "全部",
+      "exportHint": "下载已批准申请的 CSV 以批量转账（含完整账号，会记录日志）",
+      "export": "导出已批准 CSV",
+      "loadError": "无法加载列表。",
+      "empty": "没有申请。",
+      "cols": {
+        "code": "编号",
+        "instructor": "讲师",
+        "account": "收款账户",
+        "amount": "金额",
+        "status": "状态",
+        "time": "时间",
+        "actions": "操作"
+      },
+      "nameMismatch": "账户持有人姓名与讲师不符 — 请仔细核对",
+      "transferRef": "转账号：{ref}",
+      "created": "创建：{at}",
+      "batch": "结算批次：{at}",
+      "paidAt": "付款：{at}",
+      "approve": "批准",
+      "reveal": "查看账号",
+      "manual": "手动",
+      "markPaid": "已转账",
+      "markFailed": "失败",
+      "reject": "拒绝",
+      "more": "查看更多",
+      "revealDlg": {
+        "title": "收款账号",
+        "bank": "银行",
+        "number": "账号",
+        "holder": "账户持有人",
+        "amount": "金额",
+        "memo": "建议转账备注",
+        "audit": "本次查看已记录到审计日志。请勿外传账号。"
+      },
+      "dlg": {
+        "paidTitle": "记录已转账",
+        "rejectTitle": "拒绝提现申请",
+        "failTitle": "转账失败",
+        "cancel": "取消",
+        "confirm": "确认",
+        "refLabel": "转账交易号 *",
+        "reasonLabel": "原因 *（讲师会收到此内容）",
+        "proofLabel": "凭证图片链接（可选）"
+      },
+      "debts": {
+        "title": "讲师欠款（{count}）",
+        "level1": "欠款中",
+        "level2": "限制发布/推广",
+        "level3": "停止新销售",
+        "meta": "{email} · 自 {since} 起欠款（{days} 天）· {level}",
+        "writeOff": "核销欠款",
+        "reasonPh": "核销原因（必填，讲师会收到）",
+        "reasonLabel": "核销原因",
+        "confirm": "确认核销",
+        "cancel": "取消",
+        "done": "欠款已核销，已通知讲师。",
+        "error": "无法核销欠款。"
+      },
+      "payos": {
+        "succeeded": "PayOS 已付款并已记录。",
+        "rejected": "PayOS 拒绝：{reason}",
+        "unknownReason": "原因不明",
+        "sent": "付款指令已发送至 PayOS，有结果后系统会自动更新。",
+        "sendError": "无法发送付款指令。",
+        "blocked": "重新付款已锁定",
+        "hint": "通过 PayOS 转账 {amount}。付款账户余额：{balance}",
+        "unknownBalance": "未知",
+        "sending": "发送中...",
+        "processing": "PayOS 处理中...",
+        "retryAt": "{time} 后可重新付款",
+        "locked": "PayOS 付款已锁定",
+        "retry": "通过 PayOS 重新付款",
+        "send": "通过 PayOS 付款",
+        "ok": "成功",
+        "fail": "失败",
+        "unknown": "结果未知",
+        "pending": "处理中 — 等待 PayOS/银行确认",
+        "nameMismatch": " ⚠ 银行户名与填写的姓名不同",
+        "cause": {
+          "TRANSIENT": "银行/PayOS 临时故障",
+          "ACCOUNT": "收款账户有问题",
+          "UNKNOWN": "原因不明"
+        }
+      }
     }
   },
   "supportHelp": {

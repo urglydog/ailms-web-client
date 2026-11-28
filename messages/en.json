@@ -3423,6 +3423,114 @@
         "sent": "sent to {email}",
         "notSent": "not emailed"
       }
+    },
+    "payouts": {
+      "title": "Instructor payouts",
+      "subtitle": "Approve withdrawal requests, transfer manually, then record the transaction ID. Rejected or failed payouts return the money to the instructor's balance.",
+      "status": {
+        "PENDING_EMAIL": "Awaiting email confirmation",
+        "REQUESTED": "Awaiting approval",
+        "APPROVED": "Approved, awaiting payment",
+        "PAID": "Paid",
+        "REJECTED": "Rejected",
+        "CANCELLED": "Cancelled",
+        "FAILED": "Payment failed"
+      },
+      "toast": {
+        "failed": "The action did not succeed.",
+        "approved": "Request approved.",
+        "paid": "Transfer recorded and the instructor notified.",
+        "rejected": "Rejected; the amount was returned to the instructor.",
+        "markedFailed": "Marked as failed; the amount was returned to the instructor."
+      },
+      "search": "Search withdrawal requests",
+      "searchPh": "Request code, email or instructor name...",
+      "statusLabel": "Status",
+      "all": "All",
+      "exportHint": "Download a CSV of approved requests for bulk transfer (full account numbers, logged)",
+      "export": "Export approved CSV",
+      "loadError": "Could not load the list.",
+      "empty": "No requests.",
+      "cols": {
+        "code": "Code",
+        "instructor": "Instructor",
+        "account": "Receiving account",
+        "amount": "Amount",
+        "status": "Status",
+        "time": "Time",
+        "actions": "Actions"
+      },
+      "nameMismatch": "Account holder name does not match the instructor — check carefully",
+      "transferRef": "Transfer ID: {ref}",
+      "created": "Created: {at}",
+      "batch": "Payout run: {at}",
+      "paidAt": "Paid: {at}",
+      "approve": "Approve",
+      "reveal": "Show account no.",
+      "manual": "Manual",
+      "markPaid": "Transferred",
+      "markFailed": "Failed",
+      "reject": "Reject",
+      "more": "Show more",
+      "revealDlg": {
+        "title": "Receiving account number",
+        "bank": "Bank",
+        "number": "Account number",
+        "holder": "Account holder",
+        "amount": "Amount",
+        "memo": "Suggested transfer note",
+        "audit": "This view has been written to the audit log. Do not share the account number."
+      },
+      "dlg": {
+        "paidTitle": "Record transfer",
+        "rejectTitle": "Reject withdrawal request",
+        "failTitle": "Transfer failed",
+        "cancel": "Cancel",
+        "confirm": "Confirm",
+        "refLabel": "Transfer transaction ID *",
+        "reasonLabel": "Reason * (the instructor will receive this)",
+        "proofLabel": "Receipt image link (optional)"
+      },
+      "debts": {
+        "title": "Instructor debts ({count})",
+        "level1": "In debt",
+        "level2": "Publishing/promotion restricted",
+        "level3": "New sales stopped",
+        "meta": "{email} · in debt since {since} ({days} days) · {level}",
+        "writeOff": "Write off",
+        "reasonPh": "Reason for write-off (required, sent to the instructor)",
+        "reasonLabel": "Reason for write-off",
+        "confirm": "Confirm write-off",
+        "cancel": "Cancel",
+        "done": "Debt written off; the instructor was notified.",
+        "error": "Could not write off the debt."
+      },
+      "payos": {
+        "succeeded": "PayOS paid out and it was recorded.",
+        "rejected": "PayOS declined: {reason}",
+        "unknownReason": "no reason given",
+        "sent": "Payout order sent to PayOS; it will update automatically when there is a result.",
+        "sendError": "Could not send the payout order.",
+        "blocked": "Retry is locked",
+        "hint": "Send a {amount} transfer via PayOS. Payout account balance: {balance}",
+        "unknownBalance": "unknown",
+        "sending": "Sending...",
+        "processing": "PayOS processing...",
+        "retryAt": "Retry after {time}",
+        "locked": "PayOS payout locked",
+        "retry": "Retry via PayOS",
+        "send": "Pay via PayOS",
+        "ok": "succeeded",
+        "fail": "failed",
+        "unknown": "result unknown",
+        "pending": "processing — waiting for PayOS/bank confirmation",
+        "nameMismatch": " ⚠ bank name differs from the entered name",
+        "cause": {
+          "TRANSIENT": "temporary bank/PayOS issue",
+          "ACCOUNT": "problem with the receiving account",
+          "UNKNOWN": "unknown cause"
+        }
+      }
     }
   },
   "supportHelp": {

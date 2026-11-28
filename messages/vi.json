@@ -3423,6 +3423,114 @@
         "sent": "đã gửi {email}",
         "notSent": "chưa gửi email"
       }
+    },
+    "payouts": {
+      "title": "Chi trả giảng viên",
+      "subtitle": "Duyệt yêu cầu rút tiền, chuyển khoản tay rồi ghi mã giao dịch. Từ chối hoặc thất bại sẽ trả tiền về số dư của giảng viên.",
+      "status": {
+        "PENDING_EMAIL": "Chờ xác nhận email",
+        "REQUESTED": "Chờ duyệt",
+        "APPROVED": "Đã duyệt, chờ chi",
+        "PAID": "Đã chi",
+        "REJECTED": "Bị từ chối",
+        "CANCELLED": "Đã hủy",
+        "FAILED": "Chi thất bại"
+      },
+      "toast": {
+        "failed": "Thao tác không thành công.",
+        "approved": "Đã duyệt yêu cầu.",
+        "paid": "Đã ghi nhận chuyển khoản và báo cho giảng viên.",
+        "rejected": "Đã từ chối, số tiền được trả lại cho giảng viên.",
+        "markedFailed": "Đã đánh dấu thất bại, số tiền được trả lại cho giảng viên."
+      },
+      "search": "Tìm yêu cầu rút",
+      "searchPh": "Mã yêu cầu, email hoặc tên giảng viên...",
+      "statusLabel": "Trạng thái",
+      "all": "Tất cả",
+      "exportHint": "Tải CSV các yêu cầu đã duyệt để chuyển khoản hàng loạt (có số tài khoản đầy đủ, được ghi nhật ký)",
+      "export": "Xuất CSV đã duyệt",
+      "loadError": "Không tải được danh sách.",
+      "empty": "Không có yêu cầu nào.",
+      "cols": {
+        "code": "Mã",
+        "instructor": "Giảng viên",
+        "account": "Tài khoản nhận",
+        "amount": "Số tiền",
+        "status": "Trạng thái",
+        "time": "Thời gian",
+        "actions": "Thao tác"
+      },
+      "nameMismatch": "Tên chủ TK không khớp tên giảng viên — kiểm tra kỹ",
+      "transferRef": "Mã CK: {ref}",
+      "created": "Tạo: {at}",
+      "batch": "Đợt chi: {at}",
+      "paidAt": "Chi: {at}",
+      "approve": "Duyệt",
+      "reveal": "Xem số TK",
+      "manual": "Thủ công",
+      "markPaid": "Đã chuyển",
+      "markFailed": "Thất bại",
+      "reject": "Từ chối",
+      "more": "Xem thêm",
+      "revealDlg": {
+        "title": "Số tài khoản nhận tiền",
+        "bank": "Ngân hàng",
+        "number": "Số tài khoản",
+        "holder": "Chủ tài khoản",
+        "amount": "Số tiền",
+        "memo": "Nội dung chuyển khoản gợi ý",
+        "audit": "Lượt xem này đã được ghi vào nhật ký kiểm toán. Không chia sẻ số tài khoản ra ngoài."
+      },
+      "dlg": {
+        "paidTitle": "Ghi nhận đã chuyển khoản",
+        "rejectTitle": "Từ chối yêu cầu rút",
+        "failTitle": "Chuyển khoản thất bại",
+        "cancel": "Hủy",
+        "confirm": "Xác nhận",
+        "refLabel": "Mã giao dịch chuyển khoản *",
+        "reasonLabel": "Lý do * (giảng viên sẽ nhận được nội dung này)",
+        "proofLabel": "Liên kết ảnh chứng từ (không bắt buộc)"
+      },
+      "debts": {
+        "title": "Công nợ giảng viên ({count})",
+        "level1": "Đang nợ",
+        "level2": "Hạn chế xuất bản/quảng bá",
+        "level3": "Ngừng bán mới",
+        "meta": "{email} · nợ từ {since} ({days} ngày) · {level}",
+        "writeOff": "Xóa nợ",
+        "reasonPh": "Lý do xóa nợ (bắt buộc, giảng viên sẽ nhận được)",
+        "reasonLabel": "Lý do xóa nợ",
+        "confirm": "Xác nhận xóa nợ",
+        "cancel": "Hủy",
+        "done": "Đã xóa nợ, giảng viên được thông báo.",
+        "error": "Không xóa được nợ."
+      },
+      "payos": {
+        "succeeded": "PayOS đã chi và đã ghi nhận.",
+        "rejected": "PayOS từ chối: {reason}",
+        "unknownReason": "không rõ lý do",
+        "sent": "Đã gửi lệnh chi sang PayOS, hệ thống sẽ tự cập nhật khi có kết quả.",
+        "sendError": "Không gửi được lệnh chi.",
+        "blocked": "Đang bị khóa chi lại",
+        "hint": "Gửi lệnh chuyển {amount} qua PayOS. Số dư tài khoản chi: {balance}",
+        "unknownBalance": "không rõ",
+        "sending": "Đang gửi...",
+        "processing": "PayOS đang xử lý...",
+        "retryAt": "Chi lại sau {time}",
+        "locked": "Đã khóa chi PayOS",
+        "retry": "Chi lại qua PayOS",
+        "send": "Chi qua PayOS",
+        "ok": "thành công",
+        "fail": "thất bại",
+        "unknown": "chưa rõ kết quả",
+        "pending": "đang xử lý — chờ PayOS/ngân hàng xác nhận",
+        "nameMismatch": " ⚠ tên ngân hàng khác tên đã nhập",
+        "cause": {
+          "TRANSIENT": "sự cố tạm thời phía ngân hàng/PayOS",
+          "ACCOUNT": "tài khoản nhận có vấn đề",
+          "UNKNOWN": "chưa rõ nguyên nhân"
+        }
+      }
     }
   },
   "supportHelp": {

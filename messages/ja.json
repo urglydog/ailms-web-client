@@ -3423,6 +3423,114 @@
         "sent": "{email} に送信済み",
         "notSent": "メール未送信"
       }
+    },
+    "payouts": {
+      "title": "講師への支払い",
+      "subtitle": "出金申請を承認し、手動で振り込んでから取引番号を記録します。却下・失敗した分は講師の残高に戻ります。",
+      "status": {
+        "PENDING_EMAIL": "メール確認待ち",
+        "REQUESTED": "承認待ち",
+        "APPROVED": "承認済み・支払い待ち",
+        "PAID": "支払い済み",
+        "REJECTED": "却下",
+        "CANCELLED": "キャンセル",
+        "FAILED": "支払い失敗"
+      },
+      "toast": {
+        "failed": "操作に失敗しました。",
+        "approved": "申請を承認しました。",
+        "paid": "振込を記録し、講師に通知しました。",
+        "rejected": "却下し、金額を講師に返しました。",
+        "markedFailed": "失敗として記録し、金額を講師に返しました。"
+      },
+      "search": "出金申請を検索",
+      "searchPh": "申請コード、メールまたは講師名...",
+      "statusLabel": "ステータス",
+      "all": "すべて",
+      "exportHint": "一括振込用に承認済み申請の CSV をダウンロード（口座番号を全桁含み、記録されます）",
+      "export": "承認済みを CSV 出力",
+      "loadError": "一覧を読み込めませんでした。",
+      "empty": "申請はありません。",
+      "cols": {
+        "code": "コード",
+        "instructor": "講師",
+        "account": "受取口座",
+        "amount": "金額",
+        "status": "ステータス",
+        "time": "日時",
+        "actions": "操作"
+      },
+      "nameMismatch": "口座名義が講師名と一致しません — よく確認してください",
+      "transferRef": "振込番号：{ref}",
+      "created": "作成：{at}",
+      "batch": "支払い回：{at}",
+      "paidAt": "支払い：{at}",
+      "approve": "承認",
+      "reveal": "口座番号を表示",
+      "manual": "手動",
+      "markPaid": "振込済み",
+      "markFailed": "失敗",
+      "reject": "却下",
+      "more": "もっと見る",
+      "revealDlg": {
+        "title": "受取口座番号",
+        "bank": "銀行",
+        "number": "口座番号",
+        "holder": "口座名義",
+        "amount": "金額",
+        "memo": "推奨振込メモ",
+        "audit": "この閲覧は監査ログに記録されました。口座番号を外部に共有しないでください。"
+      },
+      "dlg": {
+        "paidTitle": "振込を記録",
+        "rejectTitle": "出金申請を却下",
+        "failTitle": "振込失敗",
+        "cancel": "キャンセル",
+        "confirm": "確定",
+        "refLabel": "振込の取引番号 *",
+        "reasonLabel": "理由 *（講師に送信されます）",
+        "proofLabel": "証憑画像のリンク（任意）"
+      },
+      "debts": {
+        "title": "講師の未払い残高（{count}）",
+        "level1": "未払いあり",
+        "level2": "公開・宣伝を制限",
+        "level3": "新規販売を停止",
+        "meta": "{email} · {since} から未払い（{days} 日）· {level}",
+        "writeOff": "債務を免除",
+        "reasonPh": "免除の理由（必須、講師に送信されます）",
+        "reasonLabel": "免除の理由",
+        "confirm": "免除を確定",
+        "cancel": "キャンセル",
+        "done": "債務を免除し、講師に通知しました。",
+        "error": "債務を免除できませんでした。"
+      },
+      "payos": {
+        "succeeded": "PayOS で支払い、記録しました。",
+        "rejected": "PayOS が拒否しました：{reason}",
+        "unknownReason": "理由不明",
+        "sent": "支払い指示を PayOS に送信しました。結果が出ると自動で更新されます。",
+        "sendError": "支払い指示を送信できませんでした。",
+        "blocked": "再支払いはロック中です",
+        "hint": "PayOS で {amount} を送金します。支払い口座の残高：{balance}",
+        "unknownBalance": "不明",
+        "sending": "送信中...",
+        "processing": "PayOS 処理中...",
+        "retryAt": "{time} 以降に再支払い",
+        "locked": "PayOS 支払いはロック済み",
+        "retry": "PayOS で再支払い",
+        "send": "PayOS で支払う",
+        "ok": "成功",
+        "fail": "失敗",
+        "unknown": "結果不明",
+        "pending": "処理中 — PayOS/銀行の確認待ち",
+        "nameMismatch": " ⚠ 銀行の名義が入力した名前と異なります",
+        "cause": {
+          "TRANSIENT": "銀行/PayOS の一時的な障害",
+          "ACCOUNT": "受取口座の問題",
+          "UNKNOWN": "原因不明"
+        }
+      }
     }
   },
   "supportHelp": {
