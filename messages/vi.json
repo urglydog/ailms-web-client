@@ -3661,6 +3661,41 @@
         "note": "Ghi chú (không bắt buộc)",
         "reason": "Lý do * (giảng viên sẽ nhận được nội dung này)"
       }
+    },
+    "invoices": {
+      "title": "Hóa đơn & chứng từ",
+      "subtitle": "Tra cứu biên lai thanh toán, phiếu hoàn tiền, phiếu chi, biên lai trả nợ và bảng kê thu nhập tháng. Chứng từ không sửa hay xóa.",
+      "type": {
+        "RECEIPT": "Biên lai thanh toán",
+        "REFUND": "Phiếu hoàn tiền",
+        "PAYOUT": "Phiếu chi rút tiền",
+        "DEBT_RECEIPT": "Biên lai trả nợ",
+        "STATEMENT": "Bảng kê thu nhập tháng"
+      },
+      "needCriteria": "Hãy nhập số chứng từ, mã đơn, email hoặc tên người nhận, tên khóa học (hoặc chọn loại, khoảng ngày) để tra cứu.",
+      "resent": "Đã gửi lại chứng từ qua email cho người nhận.",
+      "resendFailed": "Không gửi được: người nhận chưa có email hợp lệ để nhận thư.",
+      "shareResults": "Chia sẻ kết quả",
+      "csv": "Tải danh sách (CSV)",
+      "csvHint": "Toàn bộ kết quả của lần tìm này",
+      "csvName": "chung-tu.csv",
+      "search": "Tìm chứng từ",
+      "searchPh": "Số chứng từ, mã đơn, email / tên / ID người nhận, tên khóa học...",
+      "typeLabel": "Loại chứng từ",
+      "allTypes": "Tất cả loại",
+      "from": "Từ ngày",
+      "to": "Đến ngày",
+      "promptTitle": "Nhập thông tin để tra cứu chứng từ",
+      "prompt": "Hệ thống phát hành rất nhiều chứng từ nên không hiển thị sẵn. Hãy nhập số chứng từ, mã đơn, email, tên hoặc ID người nhận, hoặc tên khóa học; bấm vào một kết quả để xem chi tiết, tải PDF hoặc gửi lại email cho người nhận.",
+      "loadError": "Không tải được kết quả. Vui lòng thử lại.",
+      "empty": "Không có chứng từ nào khớp điều kiện tìm kiếm.",
+      "detail": "Chi tiết chứng từ",
+      "pdf": "Tải PDF",
+      "pdfHint": "Bản chứng từ để lưu hoặc in",
+      "resend": "Gửi lại qua email",
+      "resendHint": "Gửi cho {email}",
+      "close": "Đóng",
+      "immutable": "Chứng từ được lưu cố định; nếu có sai sót sẽ được hủy bằng phiếu điều chỉnh, không chỉnh sửa trực tiếp."
     }
   },
   "supportHelp": {

@@ -3661,6 +3661,41 @@
         "note": "Note (optional)",
         "reason": "Reason * (the instructor will receive this)"
       }
+    },
+    "invoices": {
+      "title": "Invoices & documents",
+      "subtitle": "Look up payment receipts, refund notes, payout vouchers, debt receipts and monthly earnings statements. Documents cannot be edited or deleted.",
+      "type": {
+        "RECEIPT": "Payment receipt",
+        "REFUND": "Refund note",
+        "PAYOUT": "Payout voucher",
+        "DEBT_RECEIPT": "Debt repayment receipt",
+        "STATEMENT": "Monthly earnings statement"
+      },
+      "needCriteria": "Enter a document number, order code, recipient email or name, or course title (or pick a type or date range) to search.",
+      "resent": "The document was emailed to the recipient again.",
+      "resendFailed": "Could not send: the recipient has no valid email address.",
+      "shareResults": "Share results",
+      "csv": "Download list (CSV)",
+      "csvHint": "All results of this search",
+      "csvName": "documents.csv",
+      "search": "Search documents",
+      "searchPh": "Document number, order code, recipient email / name / ID, course title...",
+      "typeLabel": "Document type",
+      "allTypes": "All types",
+      "from": "From",
+      "to": "To",
+      "promptTitle": "Enter details to look up documents",
+      "prompt": "The system issues a large number of documents, so none are listed by default. Enter a document number, order code, recipient email, name or ID, or a course title; click a result to see details, download the PDF or email it to the recipient again.",
+      "loadError": "Could not load results. Please try again.",
+      "empty": "No documents match the search.",
+      "detail": "Document details",
+      "pdf": "Download PDF",
+      "pdfHint": "Copy of the document to keep or print",
+      "resend": "Resend by email",
+      "resendHint": "Send to {email}",
+      "close": "Close",
+      "immutable": "Documents are stored permanently; mistakes are cancelled with an adjustment note, never edited directly."
     }
   },
   "supportHelp": {
