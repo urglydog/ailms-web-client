@@ -695,7 +695,11 @@
       "subtotalOne": "小计",
       "discount": "已优惠",
       "total": "合计",
-      "terms": "付款即表示你同意 LinguaLearn 的<link>服务条款</link>。"
+      "terms": "付款即表示你同意 LinguaLearn 的<link>服务条款</link>。",
+      "promotionDiscount": "课程促销",
+      "couponDiscount": "优惠码 {code}",
+      "bundleDiscount": "课程包优惠",
+      "couponNotApplied": "优惠码 {code} 不能与促销叠加，且不会带来更低的价格，因此未生效。每门课程只享受一项最优惠。"
     },
     "billing": {
       "title": "补充信息",

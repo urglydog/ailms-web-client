@@ -695,7 +695,11 @@
       "subtotalOne": "Tạm tính",
       "discount": "Đã giảm",
       "total": "Tổng cộng",
-      "terms": "Bằng việc thanh toán, bạn đồng ý với <link>Điều khoản dịch vụ</link> của LinguaLearn."
+      "terms": "Bằng việc thanh toán, bạn đồng ý với <link>Điều khoản dịch vụ</link> của LinguaLearn.",
+      "promotionDiscount": "Khuyến mãi khóa học",
+      "couponDiscount": "Mã {code}",
+      "bundleDiscount": "Giảm giá gói khóa học",
+      "couponNotApplied": "Mã {code} không cộng dồn với khuyến mãi và không cho giá thấp hơn nên chưa được áp dụng. Mỗi khóa chỉ được hưởng 1 ưu đãi tốt nhất."
     },
     "billing": {
       "title": "Thông tin bổ sung",

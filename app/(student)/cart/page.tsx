@@ -18,6 +18,7 @@ import { useAddToWishlist } from '@/hooks/useWishlist';
 import { couponsApi } from '@/lib/api/coupons';
 import { ApiError } from '@/lib/api/client';
 import { formatMoney } from '@/lib/shop/money';
+import { buildOrderBreakdown, resolveLinePrice, type OrderLinePricing } from '@/lib/shop/orderPricing';
 import type { CouponPriceRes } from '@/types/domain';
 
 function formatHours(totalSec: number): string {
@@ -78,10 +79,21 @@ export default function CartPage() {
   // hiển thị mặc định của giỏ hàng (đã tính coupon autoApply, xem `CartService.toRes`).
   // Gói khóa học được ưu tiên TUYỆT ĐỐI hơn coupon — khóa nào đã khớp combo bỏ qua mọi coupon
   // (khớp rule BE: coupon cấp khóa KHÔNG áp dụng cho khóa đang nằm trong bundle).
-  const finalPriceFor = (item: (typeof items)[number]) =>
-    bundleMatch.priceByCartCourseId.get(item.courseId) ?? priceMap.get(item.courseId)?.finalPrice ?? item.finalPrice;
-  const total = selectedItems.reduce((sum, item) => sum + finalPriceFor(item), 0);
-  const totalOriginal = selectedItems.reduce((sum, item) => sum + item.price, 0);
+  // Coupon KHÔNG cộng dồn với khuyến mãi (BR-COUPON-01): BE chỉ lấy giá thấp nhất. `item.finalPrice`
+  // đã là giá sau khuyến mãi tự động; mã nhập tay (preview chỉ xét riêng mã) chỉ thắng khi rẻ hơn.
+  const linePricing = (item: (typeof items)[number]): OrderLinePricing => {
+    const code = priceMap.get(item.courseId);
+    return {
+      original: item.price,
+      promoPrice: item.finalPrice,
+      codePrice: code?.enteredCodeValid ? code.finalPrice : null,
+      bundlePrice: bundleMatch.priceByCartCourseId.get(item.courseId),
+    };
+  };
+  const finalPriceFor = (item: (typeof items)[number]) => resolveLinePrice(linePricing(item)).finalPrice;
+  const breakdown = buildOrderBreakdown(selectedItems.map(linePricing), appliedCode !== null);
+  const total = breakdown.total;
+  const totalOriginal = breakdown.original;
 
   const handleCheckout = () => {
     if (selectedItems.length === 0) return;
@@ -152,7 +164,13 @@ export default function CartPage() {
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between border-b border-line-soft pb-3">
               <label className="flex items-center gap-2 text-sm text-ink-muted">
-                <input type="checkbox" checked={allChecked} onChange={toggleAll} className="h-4 w-4 rounded accent-accent" />
+                <input
+                  type="checkbox"
+                  checked={allChecked}
+                  onChange={toggleAll}
+                  className="h-4 w-4 rounded accent-accent"
+                  aria-label={t('cart.selectAll', { count: items.length })}
+                />
                 {t('cart.selectAll', { count: items.length })}
               </label>
               {selectedItems.length > 0 && (
@@ -168,10 +186,8 @@ export default function CartPage() {
             </div>
 
             {items.map((item) => {
-              const bundlePrice = bundleMatch.priceByCartCourseId.get(item.courseId);
-              const applied = priceMap.get(item.courseId);
-              const finalPrice = bundlePrice ?? applied?.finalPrice ?? item.finalPrice;
-              const hasDiscount = bundlePrice !== undefined || !!(applied?.discountPercent ?? item.discountPercent);
+              const finalPrice = finalPriceFor(item);
+              const hasDiscount = finalPrice < item.price;
               const bundle = bundleMatch.bundleByCartCourseId.get(item.courseId);
               return (
                 <div key={item.courseId} className="card flex flex-col gap-4 p-4 sm:flex-row sm:items-center">
@@ -292,6 +308,8 @@ export default function CartPage() {
               selectedOf={{ selected: selectedItems.length, total: items.length }}
               original={totalOriginal}
               total={total}
+              breakdown={breakdown}
+              couponCode={appliedCode}
             />
             {totalOriginal > total && totalOriginal > 0 && (
               <p className="m-0 mt-2 flex items-baseline justify-end gap-2 text-sm">

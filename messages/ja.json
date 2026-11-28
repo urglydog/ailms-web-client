@@ -695,7 +695,11 @@
       "subtotalOne": "小計",
       "discount": "割引",
       "total": "合計",
-      "terms": "お支払いにより、LinguaLearn の<link>利用規約</link>に同意したものとみなされます。"
+      "terms": "お支払いにより、LinguaLearn の<link>利用規約</link>に同意したものとみなされます。",
+      "promotionDiscount": "講座プロモーション",
+      "couponDiscount": "コード {code}",
+      "bundleDiscount": "バンドル割引",
+      "couponNotApplied": "コード {code} はプロモーションと併用できず、より安くならないため適用されませんでした。各講座には最もお得な特典が1つだけ適用されます。"
     },
     "billing": {
       "title": "追加情報",

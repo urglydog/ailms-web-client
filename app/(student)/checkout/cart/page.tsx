@@ -22,6 +22,7 @@ import { getReferralCodesFor } from '@/lib/referral';
 import { couponsApi } from '@/lib/api/coupons';
 import { ApiError } from '@/lib/api/client';
 import { formatMoney } from '@/lib/shop/money';
+import { buildOrderBreakdown, resolveLinePrice, type OrderLinePricing } from '@/lib/shop/orderPricing';
 import type { AvailableCoupon, CouponPriceRes } from '@/types/domain';
 
 /**
@@ -84,6 +85,8 @@ function CartCheckoutContent() {
   const [couponCode, setCouponCode] = useState(searchParams.get('coupon') ?? '');
   const [appliedCode, setAppliedCode] = useState<string | null>(null);
   const [priceMap, setPriceMap] = useState<Map<number, CouponPriceRes>>(new Map());
+  // Giá chỉ tính khuyến mãi đã chọn (không mã) — để tách "khuyến mãi" khỏi "mã" trong tóm tắt.
+  const [promoMap, setPromoMap] = useState<Map<number, CouponPriceRes>>(new Map());
   const [applying, setApplying] = useState(false);
   // Khuyến mãi học viên TỰ CHỌN (không áp ngầm): undefined = chưa quyết định (sẽ chọn sẵn mức giảm
   // nhiều nhất khi tải xong), null = chủ động không dùng.
@@ -107,9 +110,19 @@ function CartCheckoutContent() {
   // Tính lại giá từng khóa mỗi khi đổi khuyến mãi đã chọn hoặc mã nhập tay.
   useEffect(() => {
     if (!itemIdsKey || selectedCouponId === undefined) return;
-    couponsApi.previewMany(itemIdsKey.split(',').map(Number), appliedCode ?? '', selectedCouponId ?? undefined)
-      .then(setPriceMap)
-      .catch(() => setPriceMap(new Map()));
+    const ids = itemIdsKey.split(',').map(Number);
+    const couponId = selectedCouponId ?? undefined;
+    const promoReq = couponsApi.previewMany(ids, '', couponId);
+    const fullReq = appliedCode ? couponsApi.previewMany(ids, appliedCode, couponId) : promoReq;
+    Promise.all([promoReq, fullReq])
+      .then(([promo, full]) => {
+        setPromoMap(promo);
+        setPriceMap(full);
+      })
+      .catch(() => {
+        setPromoMap(new Map());
+        setPriceMap(new Map());
+      });
   }, [itemIdsKey, selectedCouponId, appliedCode]);
 
   useEffect(() => {
@@ -141,10 +154,21 @@ function CartCheckoutContent() {
     }
   };
 
-  const finalPriceFor = (item: (typeof items)[number]) =>
-    bundleMatch.priceByCartCourseId.get(item.courseId) ?? priceMap.get(item.courseId)?.finalPrice ?? item.price;
-  const total = items.reduce((sum, item) => sum + finalPriceFor(item), 0);
-  const totalOriginal = items.reduce((sum, item) => sum + item.price, 0);
+  // BE chỉ lấy 1 ưu đãi tốt nhất cho mỗi khóa, không cộng dồn khuyến mãi với mã (BR-COUPON-01).
+  // `priceMap` là giá BE sẽ chốt (khuyến mãi đã chọn + mã); `promoMap` là giá nếu chỉ có khuyến mãi.
+  const linePricing = (item: (typeof items)[number]): OrderLinePricing => {
+    const full = priceMap.get(item.courseId);
+    return {
+      original: item.price,
+      promoPrice: promoMap.get(item.courseId)?.finalPrice ?? item.price,
+      codePrice: appliedCode && full?.enteredCodeValid ? full.finalPrice : null,
+      bundlePrice: bundleMatch.priceByCartCourseId.get(item.courseId),
+    };
+  };
+  const finalPriceFor = (item: (typeof items)[number]) => resolveLinePrice(linePricing(item)).finalPrice;
+  const breakdown = buildOrderBreakdown(items.map(linePricing), appliedCode !== null);
+  const total = breakdown.total;
+  const totalOriginal = breakdown.original;
 
   const handlePay = async (method: string) => {
     if (items.length === 0) return;
@@ -246,7 +270,7 @@ function CartCheckoutContent() {
           <div>
             <div className="card sticky top-24 p-6">
               <h2 className="mb-4 font-display text-lg font-bold text-ink">{t('summary.title')}</h2>
-              <OrderTotals count={items.length} original={totalOriginal} total={total} />
+              <OrderTotals count={items.length} original={totalOriginal} total={total} breakdown={breakdown} couponCode={appliedCode} />
 
               <div className="my-4 flex flex-col gap-4 border-t border-line-soft pt-4">
                 <CouponPicker

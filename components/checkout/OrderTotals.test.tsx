@@ -23,3 +23,32 @@ describe('OrderTotals', () => {
     expect(screen.getByText('1 / 3 khóa học')).toBeInTheDocument();
   });
 });
+
+describe('OrderTotals với breakdown', () => {
+  const base = { original: 249000, promotionDiscount: 74700, couponDiscount: 0, bundleDiscount: 0, total: 174300, couponNotApplied: false };
+
+  it('tách dòng khuyến mãi, không hiện dòng Đã giảm chung', () => {
+    renderWithIntl(<OrderTotals count={1} original={249000} total={174300} breakdown={base} />);
+    expect(screen.getByText('Khuyến mãi khóa học')).toBeInTheDocument();
+    expect(screen.getByText('-74.700đ')).toBeInTheDocument();
+    expect(screen.queryByText('Đã giảm')).toBeNull();
+  });
+
+  it('mã không cộng dồn: hiện ghi chú, không có dòng mã', () => {
+    renderWithIntl(
+      <OrderTotals count={1} original={249000} total={174300} couponCode="pydemo30" breakdown={{ ...base, couponNotApplied: true }} />,
+    );
+    expect(screen.getByText(/PYDEMO30 không cộng dồn/)).toBeInTheDocument();
+    expect(screen.queryByText('Mã PYDEMO30')).toBeNull();
+  });
+
+  it('mã thay thế khuyến mãi: chỉ có dòng mã', () => {
+    renderWithIntl(
+      <OrderTotals count={1} original={249000} total={149400} couponCode="PYDEMO30"
+        breakdown={{ ...base, promotionDiscount: 0, couponDiscount: 99600, total: 149400 }} />,
+    );
+    expect(screen.getByText('Mã PYDEMO30')).toBeInTheDocument();
+    expect(screen.getByText('-99.600đ')).toBeInTheDocument();
+    expect(screen.queryByText('Khuyến mãi khóa học')).toBeNull();
+  });
+});

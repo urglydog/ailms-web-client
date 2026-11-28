@@ -695,7 +695,11 @@
       "subtotalOne": "Subtotal",
       "discount": "Discount",
       "total": "Total",
-      "terms": "By paying, you agree to LinguaLearn's <link>Terms of Service</link>."
+      "terms": "By paying, you agree to LinguaLearn's <link>Terms of Service</link>.",
+      "promotionDiscount": "Course promotion",
+      "couponDiscount": "Code {code}",
+      "bundleDiscount": "Bundle discount",
+      "couponNotApplied": "Code {code} does not stack with the promotion and does not give a lower price, so it was not applied. Each course gets only its single best offer."
     },
     "billing": {
       "title": "Additional information",

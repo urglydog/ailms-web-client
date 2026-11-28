@@ -14,6 +14,7 @@ import { CouponBox } from '@/components/checkout/CouponBox';
 import { CouponPicker } from '@/components/checkout/CouponPicker';
 import { OrderTotals } from '@/components/checkout/OrderTotals';
 import { PayosButton } from '@/components/checkout/PayosButton';
+import { buildOrderBreakdown } from '@/lib/shop/orderPricing';
 import { publicCoursesApi } from '@/lib/api/publicCourses';
 import { couponsApi } from '@/lib/api/coupons';
 import { ApiError } from '@/lib/api/client';
@@ -67,6 +68,9 @@ function CheckoutPageContent() {
   const [couponCode, setCouponCode] = useState(searchParams.get('coupon') ?? '');
   const [appliedCode, setAppliedCode] = useState<string | null>(null);
   const [preview, setPreview] = useState<{ finalPrice: number; discountPercent: number | null } | null>(null);
+  // Giá chỉ tính khuyến mãi đã chọn (không mã) — để tách "khuyến mãi" khỏi "mã" trong tóm tắt.
+  const [promoPrice, setPromoPrice] = useState<number | null>(null);
+  const [codeValid, setCodeValid] = useState(false);
   const [applying, setApplying] = useState(false);
   // Khuyến mãi học viên TỰ CHỌN (không áp ngầm): undefined = chưa quyết định (sẽ chọn sẵn mức giảm
   // nhiều nhất khi tải xong), null = chủ động không dùng.
@@ -103,13 +107,15 @@ function CheckoutPageContent() {
   // Tính lại giá mỗi khi đổi khuyến mãi đã chọn hoặc mã nhập tay.
   useEffect(() => {
     if (!course || selectedCouponId === undefined) return;
-    couponsApi.preview({
-      courseId: course.id,
-      code: appliedCode ?? undefined,
-      couponId: selectedCouponId ?? undefined,
-      manualCoupon: true,
-    })
-      .then((r) => setPreview({ finalPrice: r.finalPrice, discountPercent: r.discountPercent }))
+    const base = { courseId: course.id, couponId: selectedCouponId ?? undefined, manualCoupon: true };
+    const promoReq = couponsApi.preview(base);
+    const fullReq = appliedCode ? couponsApi.preview({ ...base, code: appliedCode }) : promoReq;
+    Promise.all([promoReq, fullReq])
+      .then(([promo, full]) => {
+        setPromoPrice(promo.finalPrice);
+        setCodeValid(!!appliedCode && full.enteredCodeValid);
+        setPreview({ finalPrice: full.finalPrice, discountPercent: full.discountPercent });
+      })
       .catch(() => setPreview(null));
   }, [course, selectedCouponId, appliedCode]);
 
@@ -147,6 +153,13 @@ function CheckoutPageContent() {
   };
 
   const finalPrice = preview?.finalPrice ?? course?.price ?? 0;
+  // BE chỉ lấy 1 ưu đãi tốt nhất, không cộng dồn khuyến mãi với mã (BR-COUPON-01).
+  const breakdown = course
+    ? buildOrderBreakdown(
+        [{ original: course.price, promoPrice: promoPrice ?? course.price, codePrice: codeValid ? finalPrice : null }],
+        appliedCode !== null,
+      )
+    : null;
 
   const handlePay = async (method: string) => {
     if (!course) return;
@@ -233,7 +246,13 @@ function CheckoutPageContent() {
           <div>
             <div className="card sticky top-24 p-6">
               <h2 className="mb-4 font-display text-lg font-bold text-ink">{t('summary.title')}</h2>
-              <OrderTotals count={1} original={course.price} total={finalPrice} />
+              <OrderTotals
+                count={1}
+                original={course.price}
+                total={breakdown?.total ?? finalPrice}
+                breakdown={breakdown ?? undefined}
+                couponCode={appliedCode}
+              />
 
               <div className="my-4 flex flex-col gap-4 border-t border-line-soft pt-4">
                 <CouponPicker
