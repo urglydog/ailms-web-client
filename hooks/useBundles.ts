@@ -4,6 +4,7 @@ import { ApiError } from '@/lib/api/client';
 import { bundlesApi } from '@/lib/api/bundles';
 import { getAccessToken } from '@/lib/auth/token';
 import type { CreateBundleReq, UpdateBundleReq } from '@/types/domain';
+import { tr } from '@/lib/i18n/translate';
 
 const MY_BUNDLES_KEY = ['bundles', 'mine'] as const;
 
@@ -20,11 +21,11 @@ export function useCreateBundle() {
   return useMutation({
     mutationFn: (req: CreateBundleReq) => bundlesApi.create(req),
     onSuccess: () => {
-      toast.success('Đã tạo gói khóa học thành công');
+      toast.success(tr('errors.toast.bundles.created'));
       void queryClient.invalidateQueries({ queryKey: MY_BUNDLES_KEY });
     },
     onError: (err) => {
-      toast.error(err instanceof ApiError ? err.message : 'Không tạo được gói khóa học');
+      toast.error(err instanceof ApiError ? err.message : tr('errors.toast.bundles.createFailed'));
     },
   });
 }
@@ -34,11 +35,11 @@ export function useUpdateBundle() {
   return useMutation({
     mutationFn: ({ id, req }: { id: number; req: UpdateBundleReq }) => bundlesApi.update(id, req),
     onSuccess: () => {
-      toast.success('Đã cập nhật gói khóa học');
+      toast.success(tr('errors.toast.bundles.updated'));
       void queryClient.invalidateQueries({ queryKey: MY_BUNDLES_KEY });
     },
     onError: (err) => {
-      toast.error(err instanceof ApiError ? err.message : 'Không cập nhật được gói khóa học');
+      toast.error(err instanceof ApiError ? err.message : tr('errors.toast.bundles.updateFailed'));
     },
   });
 }
@@ -57,11 +58,11 @@ export function useDeleteBundle() {
   return useMutation({
     mutationFn: (id: number) => bundlesApi.remove(id),
     onSuccess: (res) => {
-      toast.success(res.deleted ? 'Đã xóa gói khóa học.' : 'Gói này đã có người mua nên được lưu trữ: ngừng bán và ẩn khỏi danh sách, lịch sử đơn vẫn được giữ nguyên.');
+      toast.success(res.deleted ? tr('errors.toast.bundles.deleted') : tr('errors.toast.bundles.archived'));
       void queryClient.invalidateQueries({ queryKey: MY_BUNDLES_KEY });
     },
     onError: (err) => {
-      toast.error(err instanceof ApiError ? err.message : 'Không xóa được gói khóa học. Vui lòng thử lại.');
+      toast.error(err instanceof ApiError ? err.message : tr('errors.toast.bundles.deleteFailed'));
     },
   });
 }

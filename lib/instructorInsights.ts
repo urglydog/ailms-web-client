@@ -1,3 +1,5 @@
+import { tr } from '@/lib/i18n/translate';
+
 /** Helper dùng chung cho khu "Hiệu suất" Giảng viên (29/09/2026) — tổng hợp dữ liệu ở tầng
  * Frontend cho biểu đồ/insight, không cần thêm endpoint Backend nào. */
 
@@ -52,12 +54,12 @@ export function formatShortDate(isoDay: string): string {
  * với giảng viên mới mở bán, không phải lỗi). */
 export function describeGrowth(current: number, previous: number): string {
   if (previous === 0) {
-    return current > 0 ? 'Bắt đầu có doanh thu trong kỳ này' : 'Chưa có phát sinh doanh thu';
+    return current > 0 ? tr('errors.lib.growth.start') : tr('errors.lib.growth.none');
   }
   const percent = ((current - previous) / previous) * 100;
   const rounded = Math.abs(percent).toFixed(0);
-  if (percent === 0) return 'Doanh thu không đổi so với kỳ trước';
-  return percent > 0 ? `Doanh thu tăng ${rounded}% so với kỳ trước` : `Doanh thu giảm ${rounded}% so với kỳ trước`;
+  if (percent === 0) return tr('errors.lib.growth.flat');
+  return percent > 0 ? tr('errors.lib.growth.up', { percent: rounded }) : tr('errors.lib.growth.down', { percent: rounded });
 }
 
 export type GrowthTrend =

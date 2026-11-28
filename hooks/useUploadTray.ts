@@ -5,6 +5,7 @@ import { lessonsApi } from '@/lib/api/lessons';
 import { liveApi } from '@/lib/api/live';
 import { useUploadTrayStore } from '@/lib/stores/uploadTrayStore';
 import type { CourseEditDetail, LiveSession } from '@/types/domain';
+import { tr } from '@/lib/i18n/translate';
 
 /**
  * Bắt đầu upload (video/tài liệu/ảnh bìa) và đẩy tiến độ vào {@link useUploadTrayStore} —
@@ -21,7 +22,7 @@ function newTaskId(): string {
 }
 
 function toErrorMessage(err: unknown): string {
-  return err instanceof ApiError ? err.message : 'Tải lên thất bại, thử lại sau.';
+  return err instanceof ApiError ? err.message : tr('errors.toast.upload.failed');
 }
 
 export function useStartLessonVideoUpload(courseId: number) {

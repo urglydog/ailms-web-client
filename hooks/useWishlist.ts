@@ -3,6 +3,7 @@ import { toast } from 'sonner';
 import { wishlistApi } from '@/lib/api/wishlist';
 import { ApiError } from '@/lib/api/client';
 import { canUseLearnerFeatures } from '@/lib/auth/token';
+import { tr } from '@/lib/i18n/translate';
 
 /** Danh sách yêu thích (14/09/2026) — TÍNH NĂNG MỞ RỘNG, không nằm trong 49 use case đặc tả gốc. */
 const WISHLIST_QUERY_KEY = ['wishlist'] as const;
@@ -23,7 +24,7 @@ export function useAddToWishlist() {
       void queryClient.invalidateQueries({ queryKey: WISHLIST_QUERY_KEY });
     },
     onError: (err) => {
-      toast.error(err instanceof ApiError ? err.message : 'Không thêm được vào danh sách yêu thích, thử lại sau.');
+      toast.error(err instanceof ApiError ? err.message : tr('errors.toast.wishlist.addFailed'));
     },
   });
 }
@@ -36,7 +37,7 @@ export function useRemoveFromWishlist() {
       void queryClient.invalidateQueries({ queryKey: WISHLIST_QUERY_KEY });
     },
     onError: (err) => {
-      toast.error(err instanceof ApiError ? err.message : 'Không xoá được khỏi danh sách yêu thích, thử lại sau.');
+      toast.error(err instanceof ApiError ? err.message : tr('errors.toast.wishlist.removeFailed'));
     },
   });
 }

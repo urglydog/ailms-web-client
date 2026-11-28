@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { toTutorMessage, tutorApi } from '@/lib/api/tutor';
 import { ApiError } from '@/lib/api/client';
 import type { TutorAttachment, TutorMessage } from '@/types/domain';
+import { tr } from '@/lib/i18n/translate';
 
 interface ActiveChat {
   sessionId: number | null;
@@ -21,7 +22,7 @@ function fileToBase64(file: File): Promise<string> {
       const result = reader.result as string;
       resolve(result.split(',')[1] ?? '');
     };
-    reader.onerror = () => reject(reader.error ?? new Error('Không đọc được tệp'));
+    reader.onerror = () => reject(reader.error ?? new Error(tr('errors.toast.tutor.readFileFailed')));
     reader.readAsDataURL(file);
   });
 }
@@ -132,10 +133,10 @@ export function useTutorChat(courseId: number, currentLessonId: number) {
     onError: (err) => {
       const message =
         err instanceof ApiError && err.isQuotaExceeded
-          ? 'Bạn đã hỏi đủ số lượt trong hôm nay, quay lại vào ngày mai nhé.'
+          ? tr('errors.toast.tutor.quotaExceeded')
           : err instanceof ApiError
             ? err.message
-            : 'Gia sư AI hiện không phản hồi được, thử lại sau ít phút.';
+            : tr('errors.toast.tutor.noResponse');
       toast.error(message);
     },
   });
@@ -162,7 +163,7 @@ export function useTutorChat(courseId: number, currentLessonId: number) {
       await tutorApi.pinSession(courseId, targetSessionId, pinned);
       void queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
     } catch (err) {
-      toast.error(err instanceof ApiError ? err.message : 'Không ghim được cuộc trò chuyện này.');
+      toast.error(err instanceof ApiError ? err.message : tr('errors.toast.tutor.pinFailed'));
     }
   };
 

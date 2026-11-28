@@ -3,6 +3,7 @@ import { toast } from 'sonner';
 import { cartApi } from '@/lib/api/cart';
 import { ApiError } from '@/lib/api/client';
 import { canUseLearnerFeatures } from '@/lib/auth/token';
+import { tr } from '@/lib/i18n/translate';
 
 /** Giỏ hàng (06/09/2026) — TÍNH NĂNG MỞ RỘNG, không nằm trong 49 use case đặc tả gốc. */
 const CART_QUERY_KEY = ['cart'] as const;
@@ -23,7 +24,7 @@ export function useAddToCart() {
       void queryClient.invalidateQueries({ queryKey: CART_QUERY_KEY });
     },
     onError: (err) => {
-      toast.error(err instanceof ApiError ? err.message : 'Không thêm được vào giỏ hàng, thử lại sau.');
+      toast.error(err instanceof ApiError ? err.message : tr('errors.toast.cart.addFailed'));
     },
   });
 }
@@ -36,7 +37,7 @@ export function useRemoveFromCart() {
       void queryClient.invalidateQueries({ queryKey: CART_QUERY_KEY });
     },
     onError: (err) => {
-      toast.error(err instanceof ApiError ? err.message : 'Không xoá được khỏi giỏ hàng, thử lại sau.');
+      toast.error(err instanceof ApiError ? err.message : tr('errors.toast.cart.removeFailed'));
     },
   });
 }

@@ -3,6 +3,7 @@ import { toast } from 'sonner';
 import { usersApi } from '@/lib/api/users';
 import { ApiError } from '@/lib/api/client';
 import { getAccessToken } from '@/lib/auth/token';
+import { tr } from '@/lib/i18n/translate';
 
 /** Nguồn sự thật duy nhất cho hồ sơ người dùng hiện tại (14/09/2026) — xem `lib/api/users.ts`. */
 const CURRENT_USER_QUERY_KEY = ['users', 'me'] as const;
@@ -21,11 +22,11 @@ export function useUpdateProfile() {
   return useMutation({
     mutationFn: usersApi.updateMe,
     onSuccess: () => {
-      toast.success('Đã cập nhật hồ sơ');
+      toast.success(tr('errors.toast.user.profileUpdated'));
       void queryClient.invalidateQueries({ queryKey: CURRENT_USER_QUERY_KEY });
     },
     onError: (err) => {
-      toast.error(err instanceof ApiError ? err.message : 'Không cập nhật được hồ sơ, thử lại sau.');
+      toast.error(err instanceof ApiError ? err.message : tr('errors.toast.user.profileUpdateFailed'));
     },
   });
 }
@@ -36,11 +37,11 @@ export function useUploadAvatar() {
     mutationFn: ({ file, onProgress }: { file: File; onProgress?: (percent: number) => void }) =>
       usersApi.uploadAvatar(file, onProgress),
     onSuccess: () => {
-      toast.success('Đã cập nhật ảnh đại diện');
+      toast.success(tr('errors.toast.user.avatarUpdated'));
       void queryClient.invalidateQueries({ queryKey: CURRENT_USER_QUERY_KEY });
     },
     onError: (err) => {
-      toast.error(err instanceof ApiError ? err.message : 'Không tải được ảnh lên, thử lại sau.');
+      toast.error(err instanceof ApiError ? err.message : tr('errors.toast.user.avatarUploadFailed'));
     },
   });
 }
@@ -53,7 +54,7 @@ export function useUpdatePrivacy() {
       void queryClient.invalidateQueries({ queryKey: CURRENT_USER_QUERY_KEY });
     },
     onError: (err) => {
-      toast.error(err instanceof ApiError ? err.message : 'Không cập nhật được, thử lại sau.');
+      toast.error(err instanceof ApiError ? err.message : tr('errors.toast.user.updateFailed'));
     },
   });
 }
