@@ -136,10 +136,10 @@ export function CourseGradebookTab({ courseId }: { courseId: number }) {
                       hour: '2-digit', minute: '2-digit'
                     }) : t('inProgress')}
                   </td>
-                  <td className="py-4 px-4 text-right">
+                  <td className="py-4 px-4 text-right whitespace-nowrap">
                     <Link
                       href={`/exam/${quiz.quizId}/history?attemptId=${quiz.latestAttemptId}`}
-                      className="text-accent font-semibold text-sm hover:underline"
+                      className="whitespace-nowrap text-accent font-semibold text-sm hover:underline"
                     >
                       {t('viewHistory', { count: quiz.attemptCount })}
                     </Link>
