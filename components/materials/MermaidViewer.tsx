@@ -14,10 +14,11 @@ const DIRECTIONS = [
 
 interface MermaidViewerProps {
   chart: string;
+  /** Chỉ để tương thích với nơi gọi: nút xoay hướng là thao tác XEM nên luôn hiện, không phụ thuộc chế độ chỉ-xem. */
   readOnly?: boolean;
 }
 
-export function MermaidViewer({ chart, readOnly = false }: MermaidViewerProps) {
+export function MermaidViewer({ chart }: MermaidViewerProps) {
   const t = useTranslations('learn.mermaid');
   const containerRef = useRef<HTMLDivElement>(null);
   const [svgContent, setSvgContent] = useState<string>('');
@@ -154,22 +155,21 @@ export function MermaidViewer({ chart, readOnly = false }: MermaidViewerProps) {
     <div className="flex flex-col gap-4">
       {/* Thanh công cụ điều khiển sơ đồ */}
       <div className="flex flex-wrap items-center justify-between gap-4 bg-surface p-2 rounded-xl border border-line">
-        {!readOnly ? (
-          <div className="flex items-center gap-1 bg-surface-raised p-1 rounded-lg border border-line">
-            {DIRECTIONS.map(dir => (
-              <button
-                key={dir.id}
-                onClick={() => setLayoutDirection(dir.id)}
-                className={`p-2 rounded-md transition-colors ${
-                  layoutDirection === dir.id ? 'bg-accent text-white shadow-sm' : 'text-ink-muted hover:bg-surface-hover hover:text-ink'
-                }`}
-                title={t('rotate', { direction: dir.name })}
-              >
-                <dir.Icon className="w-4 h-4" strokeWidth={1.75} />
-              </button>
-            ))}
-          </div>
-        ) : <div />}
+        {/* 4 nút xoay hướng chỉ đổi CÁCH XEM sơ đồ (không sửa dữ liệu) nên hiện cho cả học liệu Official (chỉ xem) lẫn cá nhân. */}
+        <div className="flex items-center gap-1 bg-surface-raised p-1 rounded-lg border border-line">
+          {DIRECTIONS.map(dir => (
+            <button
+              key={dir.id}
+              onClick={() => setLayoutDirection(dir.id)}
+              className={`p-2 rounded-md transition-colors ${
+                layoutDirection === dir.id ? 'bg-accent text-white shadow-sm' : 'text-ink-muted hover:bg-surface-hover hover:text-ink'
+              }`}
+              title={t('rotate', { direction: dir.name })}
+            >
+              <dir.Icon className="w-4 h-4" strokeWidth={1.75} />
+            </button>
+          ))}
+        </div>
 
         {svgContent && (
           <div className="flex items-center gap-2">
