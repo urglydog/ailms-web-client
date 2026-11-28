@@ -46,6 +46,10 @@ export function useCommunitySocket(lessonId: number | null) {
     };
     fetchHistory();
 
+    // BE chỉ cho người học được bài này nghe/gửi qua WebSocket (28/11/2026). Khách chưa đăng nhập
+    // vẫn xem lịch sử qua REST; không mở socket để tránh vòng ERROR -> reconnect mỗi 3 giây.
+    if (!getAccessToken()) return;
+
     const client = new Client({
       webSocketFactory: () => new SockJS(`${process.env.NEXT_PUBLIC_WS_URL ?? 'http://localhost:8080'}/ws`),
       connectHeaders: {
