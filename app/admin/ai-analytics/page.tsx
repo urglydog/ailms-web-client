@@ -246,9 +246,9 @@ export default function AiAnalyticsPage() {
           </div>
         </div>
         <div className="overflow-hidden rounded-xl border border-line bg-surface-raised shadow-sm">
-          <div className="overflow-x-auto">
+          <div className="max-h-[70vh] overflow-auto">
             <table className="min-w-full divide-y divide-line-soft">
-              <thead className="bg-surface">
+              <thead className="sticky top-0 z-10 bg-surface">
                 <tr>
                   <th scope="col" className={th}>{t('cols.email')}</th>
                   <th scope="col" className={th}>{t('cols.status')}</th>

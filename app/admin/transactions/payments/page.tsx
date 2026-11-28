@@ -171,9 +171,9 @@ export default function AdminPaymentsPage() {
         <div className="rounded-xl border border-line bg-surface-raised p-8 text-center text-ink-muted">{t('noMatch')}</div>
       ) : (
         <div className="flex flex-col gap-4">
-          <div className="overflow-x-auto rounded-xl border border-line bg-surface-raised shadow-sm">
+          <div className="max-h-[70vh] overflow-auto rounded-xl border border-line bg-surface-raised shadow-sm">
             <table className="w-full min-w-[900px] text-left text-sm">
-              <thead className="border-b border-line bg-surface text-xs text-ink-muted">
+              <thead className="sticky top-0 z-10 border-b border-line bg-surface text-xs text-ink-muted">
                 <tr>
                   <th scope="col" className="px-4 py-3 font-semibold">{t('cols.ref')}</th>
                   <th scope="col" className="px-4 py-3 font-semibold">{t('cols.user')}</th>

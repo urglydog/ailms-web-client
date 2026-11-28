@@ -190,9 +190,9 @@ function AdminDisputesContent() {
       ) : filtered.length === 0 ? (
         <div className="rounded-xl border border-line bg-surface-raised p-8 text-center text-ink-muted">{t('empty')}</div>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-line bg-surface-raised shadow-sm">
+        <div className="max-h-[70vh] overflow-auto rounded-xl border border-line bg-surface-raised shadow-sm">
           <table className="w-full min-w-[820px] text-left text-sm">
-            <thead className="border-b border-line bg-surface text-xs text-ink-muted">
+            <thead className="sticky top-0 z-10 border-b border-line bg-surface text-xs text-ink-muted">
               <tr>
                 <th className="px-4 py-3 font-semibold">{t('cols.ref')}</th>
                 <th className="px-4 py-3 font-semibold">{t('cols.user')}</th>

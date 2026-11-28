@@ -96,9 +96,9 @@ export function ReviewManager() {
         </select>
       </div>
 
-      <div className="overflow-x-auto rounded-xl border border-line bg-surface-raised shadow-sm">
+      <div className="max-h-[70vh] overflow-auto rounded-xl border border-line bg-surface-raised shadow-sm">
         <table className="w-full min-w-[900px] text-left text-sm">
-          <thead className="bg-surface text-xs font-bold text-ink-muted uppercase">
+          <thead className="sticky top-0 z-10 bg-surface text-xs font-bold text-ink-muted uppercase">
             <tr>
               <th className="px-6 py-4">{t('cols.course')}</th>
               <th className="px-6 py-4">{t('cols.student')}</th>
